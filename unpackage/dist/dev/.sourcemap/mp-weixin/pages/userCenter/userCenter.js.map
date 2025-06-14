@@ -1,0 +1,1 @@
+{"version":3,"file":"userCenter.js","sources":["pages/userCenter/userCenter.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/carConnectInternet/pages/userCenter/userCenter.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;AACA,GAAG,WAAW,eAAe;"}

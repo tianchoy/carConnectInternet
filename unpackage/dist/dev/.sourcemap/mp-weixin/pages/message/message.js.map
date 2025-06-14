@@ -1,0 +1,1 @@
+{"version":3,"file":"message.js","sources":["pages/message/message.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/carConnectInternet/pages/message/message.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;AACA,GAAG,WAAW,eAAe;"}

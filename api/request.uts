@@ -1,0 +1,8 @@
+import http from "./http";
+
+const getUserInfoUrl = '/api/getuserInfo'
+
+
+export const getUserInfo = () =>{
+	return http(getUserInfoUrl)
+}

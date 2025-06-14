@@ -1,0 +1,120 @@
+
+<template>
+  <!-- 通用地图容器 -->
+  <view>
+    <!-- H5/APP端使用div容器 -->
+    <!-- #ifdef H5 || APP -->
+    <div id="mapContainer" class="map-box"></div>
+    <!-- #endif -->
+    
+    <!-- 小程序端使用原生map组件 -->
+    <!-- #ifdef MP-WEIXIN -->
+    <map 
+      id="myMap"
+      :latitude="latitude"
+      :longitude="longitude"
+      :markers="markers"
+      :polyline="polyline"
+      class="map-box"
+	  :scale="5"
+      @tap="handleMapTap">
+    </map>
+    <!-- #endif -->
+    
+    <!-- 位置信息展示 -->
+    <view class="info-box">
+      <text>当前位置：{{address}}</text>
+      <uv-button @click="getLocation" type="primary" text="获取定位"></uv-button>
+    </view>
+  </view>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+// 小程序端SDK引入
+// #ifdef MP-WEIXIN
+let amapFile = require('../../static/libs/amap-wx.130.js')
+let myAmapFun = null
+// #endif
+
+// 响应式数据
+const latitude = ref(39.904989)
+const longitude = ref(116.405285)
+const address = ref('北京市')
+const markers = ref([])
+const polyline = ref([])
+
+// 初始化地图
+onMounted(() => {
+  // #ifdef H5 || APP
+  initWebMap()
+  // #endif
+  
+  // #ifdef MP-WEIXIN
+  myAmapFun = new amapFile.AMapWX({
+    key: 'e3e773ad74f7ba25f38775c9c8db6474'
+  })
+  // #endif
+})
+
+// H5/APP端初始化
+const initWebMap = async () => {
+  // #ifdef H5 || APP
+  const AMapLoader = await import('@amap/amap-jsapi-loader')
+  AMapLoader.load({
+    key: 'e3e773ad74f7ba25f38775c9c8db6474',
+    version: '2.0',
+    plugins: ['AMap.Geocoder']
+  }).then((AMap) => {
+    new AMap.Map('mapContainer', {
+      viewMode: '2D',
+      zoom: 15,
+      center: [longitude.value, latitude.value]
+    })
+  })
+  // #endif
+}
+
+// 获取定位
+const getLocation = () => {
+  // #ifdef H5 || APP
+  uni.getLocation({
+    type: 'gcj02',
+    success: (res) => {
+      updatePosition(res.latitude, res.longitude)
+    }
+  })
+  // #endif
+  
+  // #ifdef MP-WEIXIN
+  myAmapFun.getRegeo({
+    success: (data) => {
+      updatePosition(data[0].latitude, data[0].longitude)
+      address.value = data[0].name
+    }
+  })
+  // #endif
+}
+
+// 更新位置信息
+const updatePosition = (lat, lng) => {
+  latitude.value = lat
+  longitude.value = lng
+  markers.value = [{
+    id: 1,
+    latitude: lat,
+    longitude: lng,
+    iconPath: '/static/location.png'
+  }]
+}
+</script>
+
+<style>
+.map-box {
+  width: 100%;
+  height: 500rpx;
+}
+.info-box {
+  padding: 15px;
+}
+</style>

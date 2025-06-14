@@ -1,0 +1,109 @@
+// 基础配置
+const BASE_URL = 'https://your-api-domain.com' // https base地址
+const TIMEOUT = 5000 // 请求超时时间（ms）
+
+
+const http = (url, method = 'GET', data = {}, config = {}) => {
+	return new Promise((resolve, reject) => {
+		// 请求拦截
+		const finalConfig = requestInterceptor({
+			url: `${BASE_URL}${url}`,
+			method,
+			data,
+			timeout: TIMEOUT,
+			header: {
+				'Content-Type': 'application/json',
+				...config.header
+			},
+			...config
+		})
+
+		// 发起请求
+		uni.request({
+			...finalConfig,
+			success: (res) => {
+				console.log(res)
+				// 响应拦截
+				try {
+					const processedData = responseInterceptor(res)
+					resolve(processedData)
+				} catch (err) {
+					reject(err)
+				}
+			},
+			fail: (err) => {
+				reject(err.errMsg || '网络错误')
+			}
+		})
+	})
+}
+
+
+// 请求拦截器
+const requestInterceptor = (config) => {
+	// 添加Token
+	const token = uni.getStorageSync('token') || ''
+	if (token) {
+		config.header = config.header || {}
+		config.header['Authorization'] = `Bearer ${token}`
+	}
+	return config
+}
+
+// 响应拦截器
+const responseInterceptor = (response, config) => {
+	const { statusCode, data } = response;
+	const { url, method } = config;
+
+	// HTTP状态码异常
+	if (statusCode < 200 || statusCode >= 300) {
+		uni.showToast({
+			title: `请求失败 (HTTP ${statusCode})`,
+			icon: 'none'
+		})
+		return Promise.reject({
+			type: 'http',
+			code: statusCode,
+			message: `[${method}] ${url} 请求失败 (HTTP ${statusCode})`,
+			original: response
+		});
+	}
+
+	// 业务自定义错误码
+	if (data?.code !== undefined && data.code !== 200) {
+		const error = {
+			type: 'business',
+			code: data.code,
+			message: data.message || '业务逻辑错误',
+			original: data
+		};
+
+		// 特殊错误码处理（如Token过期）
+		if (data.code === 401) {
+			uni.reLaunch({ url: '/pages/login' });
+		}
+
+		return Promise.reject(error);
+	}
+
+	// 数据安全校验
+	if (config.needSignature && !validateDataSignature(data)) {
+		return Promise.reject({
+			type: 'security',
+			code: -300,
+			message: '数据签名验证失败'
+		});
+	}
+
+	// 成功数据处理
+	return {
+		...data,
+		_metadata: {
+			timestamp: Date.now(),
+			api: url
+		}
+	};
+};
+
+
+export default http
