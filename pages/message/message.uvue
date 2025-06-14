@@ -1,17 +1,46 @@
 <template>
-	<!-- #ifdef APP -->
-	<scroll-view style="flex:1">
-	<!-- #endif -->
-		
-	<!-- #ifdef APP -->
-	</scroll-view>
-	<!-- #endif -->
+	<view class="container">
+		<view class="list-box">
+			<uv-list>
+				<uv-list-item :title="title" :show-badge="true" :note="desc" @click="handleItemClick(1)"
+					:clickable="true" :badge="{value: badge}"></uv-list-item>
+			</uv-list>
+			<uv-list>
+				<uv-list-item :title="title" :show-badge="true" :note="desc" @click="handleItemClick(2)"
+					:clickable="true" :badge="{value: badge}"></uv-list-item>
+			</uv-list>
+		</view>
+	</view>
 </template>
 
-<script setup>
-		
+<script setup lang="uts">
+	const handleItemClick = (e) => {
+		uni.showToast({
+			title: '点击事件已触发',
+			icon: 'none'
+		});
+		console.log('点击', e);
+	}
+	const badge = ref(98)
+	const title = ref('这里是消息的主题')
+	const desc = ref('这里是描述文字')
 </script>
 
-<style>
-		
+<style lang="scss">
+	.container {
+		width: 100%;
+		height: 100%;
+		background-color: #f5f5f5;
+		padding: 20rpx;
+
+		.list-box {
+			width: 100%;
+			height: 100%;
+
+			.uv-list {
+				margin-bottom: 20rpx;
+				border-radius: 20rpx;
+			}
+		}
+	}
 </style>

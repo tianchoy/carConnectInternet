@@ -1,499 +1,504 @@
 <template>
-  <view class="container">
-    <!-- 地图容器 -->
-    <view class="mapBox">
-    	<map id="fenceMap" :latitude="center.latitude" :longitude="center.longitude" :polygons="polygons"
-    	  :markers="markers" :polyline="polyline" :scale="mapScale" @tap="handleMapTap" style="width:100%;height:100%"
-    	  show-location></map>
-    </view>
+	<view class="container">
+		<!-- 地图容器 -->
+		<view class="mapBox">
+			<map id="fenceMap" :latitude="center.latitude" :longitude="center.longitude" :polygons="polygons"
+				:markers="markers" :polyline="polyline" :scale="mapScale" @tap="handleMapTap"
+				style="width:100%;height:100%" show-location></map>
+		</view>
 
-    <!-- 操作按钮组 -->
-    <view class="control-panel">
-      <button @click="toggleMode" :type="currentMode === 'draw' ? 'primary' : 'default'">
-        {{ currentMode === 'draw' ? '绘制模式' : '轨迹模式' }}
-      </button>
-		<button @click="getlocation">获取当前位置</button>
-      <template v-if="currentMode === 'draw'">
-        <button @click="startDrawing" :disabled="isDrawing" type="primary">开始绘制</button>
-        <button @click="addPoint" :disabled="!isDrawing" type="primary">添加当前点</button>
-        <button @click="finishDrawing" :disabled="!isDrawing || points.length < 3" type="warn">完成绘制</button>
-        <button @click="clearAll" type="default">重置</button>
-      </template>
+		<!-- 操作按钮组 -->
+		<view class="control-panel">
+			<button @click="toggleMode" :type="currentMode === 'draw' ? 'primary' : 'default'">
+				{{ currentMode === 'draw' ? '绘制模式' : '轨迹模式' }}
+			</button>
+			<button @click="getlocation">获取当前位置</button>
+			<template v-if="currentMode === 'draw'">
+				<button @click="startDrawing" :disabled="isDrawing" type="primary">开始绘制</button>
+				<button @click="addPoint" :disabled="!isDrawing" type="primary">添加当前点</button>
+				<button @click="finishDrawing" :disabled="!isDrawing || points.length < 3" type="warn">完成绘制</button>
+				<button @click="clearAll" type="default">重置</button>
+			</template>
 
-      <template v-else>
-        <button @click="startPlayback" :disabled="isPlaying" type="primary">开始回放</button>
-        <button @click="pausePlayback" :disabled="!isPlaying" type="warn">暂停</button>
-        <button @click="clearTrack" type="default">清除轨迹</button>
-        <slider :value="playbackSpeed" min="1" max="5" @change="setPlaybackSpeed" show-value />
-      </template>
-    </view>
+			<template v-else>
+				<button @click="startPlayback" :disabled="isPlaying" type="primary">开始回放</button>
+				<button @click="pausePlayback" :disabled="!isPlaying" type="warn">暂停</button>
+				<button @click="clearTrack" type="default">清除轨迹</button>
+				<slider :value="playbackSpeed" min="1" max="5" @change="setPlaybackSpeed" show-value />
+			</template>
+		</view>
 
-    <!-- 坐标点列表/轨迹信息 -->
-    <view class="info-panel">
-      <view v-if="currentMode === 'draw' && points.length > 0" class="point-list">
-        <view class="section-title">围栏顶点 ({{points.length}}个)</view>
-        <scroll-view scroll-y style="max-height: 150px;">
-          <view class="point-item" v-for="(point, index) in points" :key="index">
-            <text>顶点{{index + 1}}: {{point.latitude.toFixed(6)}}, {{point.longitude.toFixed(6)}}</text>
-            <button @click="removePoint(index)" size="mini">删除</button>
-          </view>
-        </scroll-view>
-      </view>
+		<!-- 坐标点列表/轨迹信息 -->
+		<view class="info-panel">
+			<view v-if="currentMode === 'draw' && points.length > 0" class="point-list">
+				<view class="section-title">围栏顶点 ({{points.length}}个)</view>
+				<scroll-view scroll-y style="max-height: 150px;">
+					<view class="point-item" v-for="(point, index) in points" :key="index">
+						<text>顶点{{index + 1}}: {{point.latitude.toFixed(6)}}, {{point.longitude.toFixed(6)}}</text>
+						<button @click="removePoint(index)" size="mini">删除</button>
+					</view>
+				</scroll-view>
+			</view>
 
-      <view v-else class="track-info">
-        <view class="section-title">轨迹信息</view>
-        <text>总点数: {{trackPoints.length}}</text>
-        <text>行驶距离: {{(totalDistance/1000).toFixed(2)}} km</text>
-        <text>回放速度: {{playbackSpeed}}x</text>
-      </view>
-    </view>
-  </view>
+			<view v-else class="track-info">
+				<view class="section-title">轨迹信息</view>
+				<text>总点数: {{trackPoints.length}}</text>
+				<text>行驶距离: {{(totalDistance/1000).toFixed(2)}} km</text>
+				<text>回放速度: {{playbackSpeed}}x</text>
+			</view>
+		</view>
+	</view>
 </template>
 
 <script setup lang="uts">
-  // 地图状态
-  const center = reactive({
-    latitude: 39.90469,
-    longitude: 116.40717
-  })
-  const mapScale = ref(13)
-  const currentMode = ref<'draw' | 'track'>('draw')
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(13)
+	const currentMode = ref<'draw' | 'track'>('draw')
 
-  // 电子围栏相关
-  const isDrawing = ref(false)
-  const points = ref<Array<{ latitude: number, longitude: number }>>([])
-  const polygons = ref<Array<any>>([])
+	// 电子围栏相关
+	const isDrawing = ref(false)
+	const points = ref<Array<{ latitude : number, longitude : number }>>([])
+	const polygons = ref<Array<any>>([])
 
-  // 轨迹回放相关
-  const trackPoints = ref<Array<{ latitude: number, longitude: number, timestamp: number }>>([])
-  const polyline = ref<Array<any>>([])
-  const isPlaying = ref(false)
-  const playbackSpeed = ref(50)
-  const totalDistance = ref(0)
-  const playbackInterval = ref<number | null>(null)
-  const currentIndex = ref(0)
-  const carMarker = ref<any>(null)
+	// 轨迹回放相关
+	const trackPoints = ref<Array<{ latitude : number, longitude : number, timestamp : number }>>([])
+	const polyline = ref<Array<any>>([])
+	const isPlaying = ref(false)
+	const playbackSpeed = ref(50)
+	const totalDistance = ref(0)
+	const playbackInterval = ref<number | null>(null)
+	const currentIndex = ref(0)
+	const carMarker = ref<any>(null)
 
-  // 标记点集合
-  const markers = ref<Array<any>>([])
+	// 标记点集合
+	const markers = ref<Array<any>>([])
 
-  // 高德地图实例
-  const amapFile = require('../../static/libs/amap-wx.130.js')
-  const amap = amapFile.AMapWX({ key: 'e3e773ad74f7ba25f38775c9c8db6474' })
+	// 高德地图实例
+	const amapFile = require('../../static/libs/amap-wx.130.js')
+	const amap = amapFile.AMapWX({ key: 'e3e773ad74f7ba25f38775c9c8db6474' })
 
-  // 初始化加载测试轨迹
-  onMounted(() => {
-    loadSampleTrack()
-    polygons.value = [{
-      points: [
-        {latitude: 39.911224745973904, longitude: 116.4004448639945},
-        {latitude: 39.90158231816865, longitude: 116.39965115224538},
-        {latitude: 39.90225756812269, longitude: 116.4126210618266},
-        {latitude: 39.910544072055366, longitude: 116.41189424747824}
-      ],
-      strokeWidth: 2,
-      strokeColor: '#FF0000',
-      fillColor: 'rgba(255,0,0,0.2)',
-      zIndex: 1
-    }]
-  })
-  
-  onLoad(() => {
-	  getlocation()
-  })
-  
-  //获取当前位置
-  const getlocation = () =>{
-	  uni.getLocation({
-	  	success: (res) => {
-	  		console.log(res)
-			center.latitude = res.latitude
-			center.longitude = res.longitude
-	  	}
-	  })
-  }
+	// 初始化加载测试轨迹
+	onMounted(() => {
+		getlocation()
+		loadSampleTrack()
+		polygons.value = [{
+			points: [
+				{ latitude: 39.911224745973904, longitude: 116.4004448639945 },
+				{ latitude: 39.90158231816865, longitude: 116.39965115224538 },
+				{ latitude: 39.90225756812269, longitude: 116.4126210618266 },
+				{ latitude: 39.910544072055366, longitude: 116.41189424747824 }
+			],
+			strokeWidth: 2,
+			strokeColor: '#FF0000',
+			fillColor: 'rgba(255,0,0,0.2)',
+			zIndex: 1
+		}]
+	})
 
-  // 切换模式
-  const toggleMode = () => {
-    currentMode.value = currentMode.value === 'draw' ? 'track' : 'draw'
-    if (currentMode.value === 'track') {
-      initCarMarker()
-      resetPlayback()
-      adjustMapToFitTrack()
-    }
-  }
+	onLoad(() => {
 
-  // 初始化小车标记
-  const initCarMarker = () => {
-    if (trackPoints.value.length > 0 && !carMarker.value) {
-      carMarker.value = {
-        id: 999,
-        latitude: trackPoints.value[0].latitude,
-        longitude: trackPoints.value[0].longitude,
-        iconPath: '/static/car.png',
-        width: 32,
-        height: 32,
-        anchor: { x: 0.5, y: 0.5 }
-      }
-      markers.value = [carMarker.value]
-    }
-  }
+	})
 
-  // 调整地图视野以适应轨迹
-  const adjustMapToFitTrack = () => {
-    if (trackPoints.value.length === 0) return
-    
-    const bounds = calculateTrackBounds()
-    center.latitude = (bounds.minLat + bounds.maxLat) / 2
-    center.longitude = (bounds.minLng + bounds.maxLng) / 2
-    
-    // 根据轨迹范围自动计算合适的缩放级别
-    const latDiff = bounds.maxLat - bounds.minLat
-    const lngDiff = bounds.maxLng - bounds.minLng
-    const maxDiff = Math.max(latDiff, lngDiff)
-    
-    if (maxDiff > 0.1) mapScale.value = 11
-    else if (maxDiff > 0.05) mapScale.value = 12
-    else if (maxDiff > 0.02) mapScale.value = 13
-    else mapScale.value = 14
-  }
+	//获取当前位置
+	const getlocation = () => {
+		uni.getLocation({
+			success: (res) => {
+				console.log(res)
+				center.latitude = res.latitude
+				center.longitude = res.longitude
+			}
+		})
+	}
 
-  // 计算轨迹边界
-  const calculateTrackBounds = () => {
-    let minLat = trackPoints.value[0].latitude
-    let maxLat = trackPoints.value[0].latitude
-    let minLng = trackPoints.value[0].longitude
-    let maxLng = trackPoints.value[0].longitude
-    
-    trackPoints.value.forEach(point => {
-      minLat = Math.min(minLat, point.latitude)
-      maxLat = Math.max(maxLat, point.latitude)
-      minLng = Math.min(minLng, point.longitude)
-      maxLng = Math.max(maxLng, point.longitude)
-    })
-    
-    return { minLat, maxLat, minLng, maxLng }
-  }
+	// 切换模式
+	const toggleMode = () => {
+		currentMode.value = currentMode.value === 'draw' ? 'track' : 'draw'
+		if (currentMode.value === 'track') {
+			initCarMarker()
+			resetPlayback()
+			adjustMapToFitTrack()
+		}
+	}
 
-  /* 电子围栏功能部分 */
-  const startDrawing = () => {
-    isDrawing.value = true
-    points.value = []
-    updateMapDisplay()
-  }
+	// 初始化小车标记
+	const initCarMarker = () => {
+		if (trackPoints.value.length > 0 && !carMarker.value) {
+			carMarker.value = {
+				id: 999,
+				latitude: trackPoints.value[0].latitude,
+				longitude: trackPoints.value[0].longitude,
+				iconPath: '/static/car.png',
+				width: 32,
+				height: 32,
+				anchor: { x: 0.5, y: 0.5 }
+			}
+			markers.value = [carMarker.value]
+		}
+	}
 
-  const handleMapTap = (e: any) => {
-    if (!isDrawing.value || currentMode.value !== 'draw') return
-    addNewPoint(e.detail.latitude, e.detail.longitude)
-  }
+	// 调整地图视野以适应轨迹
+	const adjustMapToFitTrack = () => {
+		if (trackPoints.value.length === 0) return
 
-  const addPoint = () => {
-    uni.createSelectorQuery()
-      .select('#fenceMap')
-      .context((res: any) => {
-        const mapContext = res.context
-        mapContext.getCenterLocation({
-          success: (centerRes: any) => {
-            addNewPoint(centerRes.latitude, centerRes.longitude)
-          }
-        })
-      })
-      .exec()
-  }
+		const bounds = calculateTrackBounds()
+		center.latitude = (bounds.minLat + bounds.maxLat) / 2
+		center.longitude = (bounds.minLng + bounds.maxLng) / 2
 
-  const addNewPoint = (lat: number, lng: number) => {
-    points.value.push({ latitude: lat, longitude: lng })
-    updateMapDisplay()
-  }
+		// 根据轨迹范围自动计算合适的缩放级别
+		const latDiff = bounds.maxLat - bounds.minLat
+		const lngDiff = bounds.maxLng - bounds.minLng
+		const maxDiff = Math.max(latDiff, lngDiff)
 
-  const removePoint = (index: number) => {
-    points.value.splice(index, 1)
-    updateMapDisplay()
-  }
+		if (maxDiff > 0.1) mapScale.value = 11
+		else if (maxDiff > 0.05) mapScale.value = 12
+		else if (maxDiff > 0.02) mapScale.value = 13
+		else mapScale.value = 14
+	}
 
-  const finishDrawing = () => {
-    if (points.value.length < 3) {
-      uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
-      return
-    }
-    isDrawing.value = false
-    uni.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` })
-    console.log('电子围栏坐标:', JSON.stringify(points.value))
-  }
+	// 计算轨迹边界
+	const calculateTrackBounds = () => {
+		let minLat = trackPoints.value[0].latitude
+		let maxLat = trackPoints.value[0].latitude
+		let minLng = trackPoints.value[0].longitude
+		let maxLng = trackPoints.value[0].longitude
 
-  const clearAll = () => {
-    isDrawing.value = false
-    points.value = []
-    polygons.value = []
-    updateMapDisplay()
-  }
+		trackPoints.value.forEach(point => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
 
-  /* 轨迹回放功能部分 */
-  const loadSampleTrack = () => {
-    // 模拟生成测试轨迹数据
-    const mockTrack = []
-    const baseLat = 39.90469
-    const baseLng = 116.40717
+		return { minLat, maxLat, minLng, maxLng }
+	}
 
-    for (let i = 0; i < 50; i++) {
-      mockTrack.push({
-        latitude: baseLat + Math.sin(i / 10) * 0.01,
-        longitude: baseLng + Math.cos(i / 10) * 0.01,
-        timestamp: Date.now() - (50 - i) * 60000
-      })
-    }
+	/* 电子围栏功能部分 */
+	const startDrawing = () => {
+		isDrawing.value = true
+		points.value = []
+		updateMapDisplay()
+	}
 
-    trackPoints.value = mockTrack
-    calculateTrackDistance()
-    updatePolyline()
-  }
+	const handleMapTap = (e : any) => {
+		if (!isDrawing.value || currentMode.value !== 'draw') return
+		addNewPoint(e.detail.latitude, e.detail.longitude)
+	}
 
-  const calculateTrackDistance = () => {
-    totalDistance.value = 0
-    for (let i = 1; i < trackPoints.value.length; i++) {
-      totalDistance.value += getDistance(
-        trackPoints.value[i - 1].latitude,
-        trackPoints.value[i - 1].longitude,
-        trackPoints.value[i].latitude,
-        trackPoints.value[i].longitude
-      )
-    }
-  }
+	const addPoint = () => {
+		uni.createSelectorQuery()
+			.select('#fenceMap')
+			.context((res : any) => {
+				const mapContext = res.context
+				mapContext.getCenterLocation({
+					success: (centerRes : any) => {
+						addNewPoint(centerRes.latitude, centerRes.longitude)
+					}
+				})
+			})
+			.exec()
+	}
 
-  // 计算两点间距离（米）
-  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const rad = (d: number) => d * Math.PI / 180.0
-    const radLat1 = rad(lat1)
-    const radLat2 = rad(lat2)
-    const a = radLat1 - radLat2
-    const b = rad(lng1) - rad(lng2)
-    const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
-      Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
-    return s * 6378.137 * 1000
-  }
+	const addNewPoint = (lat : number, lng : number) => {
+		points.value.push({ latitude: lat, longitude: lng })
+		updateMapDisplay()
+	}
 
-  const startPlayback = () => {
-    if (trackPoints.value.length === 0) {
-      uni.showToast({ title: '没有轨迹数据', icon: 'none' })
-      return
-    }
+	const removePoint = (index : number) => {
+		points.value.splice(index, 1)
+		updateMapDisplay()
+	}
 
-    isPlaying.value = true
-    currentIndex.value = 0
+	const finishDrawing = () => {
+		if (points.value.length < 3) {
+			uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
+			return
+		}
+		isDrawing.value = false
+		uni.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` })
+		console.log('电子围栏坐标:', JSON.stringify(points.value))
+	}
 
-    // 确保小车标记已初始化
-    initCarMarker()
+	const clearAll = () => {
+		isDrawing.value = false
+		points.value = []
+		polygons.value = []
+		updateMapDisplay()
+	}
 
-    // 开始播放
-    playbackInterval.value = setInterval(playNextPoint, 1000 / playbackSpeed.value)
-  }
+	/* 轨迹回放功能部分 */
+	const loadSampleTrack = () => {
+		// 模拟生成测试轨迹数据
+		const mockTrack = []
+		const baseLat = 39.90469
+		const baseLng = 116.40717
 
-  const playNextPoint = () => {
-    if (currentIndex.value >= trackPoints.value.length - 1) {
-      pausePlayback()
-      return
-    }
+		for (let i = 0; i < 50; i++) {
+			mockTrack.push({
+				latitude: baseLat + Math.sin(i / 10) * 0.01,
+				longitude: baseLng + Math.cos(i / 10) * 0.01,
+				timestamp: Date.now() - (50 - i) * 60000
+			})
+		}
 
-    currentIndex.value++
-    const point = trackPoints.value[currentIndex.value]
+		trackPoints.value = mockTrack
+		calculateTrackDistance()
+		updatePolyline()
+	}
 
-    // 只更新小车位置，不更新地图中心
-    if (carMarker.value) {
-      carMarker.value.latitude = point.latitude
-      carMarker.value.longitude = point.longitude
-      markers.value = [carMarker.value]
-    }
-  }
+	const calculateTrackDistance = () => {
+		totalDistance.value = 0
+		for (let i = 1; i < trackPoints.value.length; i++) {
+			totalDistance.value += getDistance(
+				trackPoints.value[i - 1].latitude,
+				trackPoints.value[i - 1].longitude,
+				trackPoints.value[i].latitude,
+				trackPoints.value[i].longitude
+			)
+		}
+	}
 
-  const pausePlayback = () => {
-    isPlaying.value = false
-    if (playbackInterval.value) {
-      clearInterval(playbackInterval.value)
-      playbackInterval.value = null
-    }
-  }
+	// 计算两点间距离（米）
+	const getDistance = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) => {
+		const rad = (d : number) => d * Math.PI / 180.0
+		const radLat1 = rad(lat1)
+		const radLat2 = rad(lat2)
+		const a = radLat1 - radLat2
+		const b = rad(lng1) - rad(lng2)
+		const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+			Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
+		return s * 6378.137 * 1000
+	}
 
-  // 重置回放
-  const resetPlayback = () => {
-    pausePlayback()
-    currentIndex.value = 0
-    updatePolyline()
-    
-    // 安全地重置小车位置
-    if (trackPoints.value.length > 0) {
-      initCarMarker()
-      if (carMarker.value) {
-        carMarker.value.latitude = trackPoints.value[0].latitude
-        carMarker.value.longitude = trackPoints.value[0].longitude
-        markers.value = [carMarker.value]
-      }
-    }
-  }
+	const startPlayback = () => {
+		if (trackPoints.value.length === 0) {
+			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
+			return
+		}
 
-  const clearTrack = () => {
-    pausePlayback()
-    trackPoints.value = []
-    polyline.value = []
-    totalDistance.value = 0
-    carMarker.value = null
-    markers.value = []
-  }
+		isPlaying.value = true
+		currentIndex.value = 0
 
-  const setPlaybackSpeed = (e: any) => {
-    playbackSpeed.value = e.detail.value
-    if (isPlaying.value) {
-      pausePlayback()
-      startPlayback()
-    }
-  }
+		// 确保小车标记已初始化
+		initCarMarker()
 
-  const updatePolyline = () => {
-    if (!trackPoints.value || trackPoints.value.length === 0) {
-      polyline.value = []
-      return
-    }
+		// 开始播放
+		playbackInterval.value = setInterval(playNextPoint, 1000 / playbackSpeed.value)
+	}
 
-    polyline.value = [{
-      points: trackPoints.value.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
-      color: '#1890FF',
-      width: 4,
-      arrowLine: true,
-      borderColor: '#FFF',
-      borderWidth: 2
-    }]
-  }
+	const playNextPoint = () => {
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			pausePlayback()
+			return
+		}
 
-  /* 通用地图更新方法 */
-  const updateMapDisplay = () => {
-    // 更新标记点
-    const newMarkers = []
+		currentIndex.value++
+		const point = trackPoints.value[currentIndex.value]
 
-    // 添加围栏顶点标记
-    if (currentMode.value === 'draw') {
-      newMarkers.push(...points.value.map((point, index) => ({
-        id: index + 1,
-        latitude: point.latitude,
-        longitude: point.longitude,
-        iconPath: '/static/marker.png',
-        width: 20,
-        height: 20,
-        callout: { content: `顶点${index + 1}`, display: 'ALWAYS' }
-      })))
-    }
+		// 只更新小车位置，不更新地图中心
+		if (carMarker.value) {
+			carMarker.value.latitude = point.latitude
+			carMarker.value.longitude = point.longitude
+			markers.value = [carMarker.value]
+		}
+	}
 
-    // 添加车辆标记
-    if (carMarker.value) {
-      newMarkers.push(carMarker.value)
-    }
+	const pausePlayback = () => {
+		isPlaying.value = false
+		if (playbackInterval.value) {
+			clearInterval(playbackInterval.value)
+			playbackInterval.value = null
+		}
+	}
 
-    markers.value = newMarkers
+	// 重置回放
+	const resetPlayback = () => {
+		pausePlayback()
+		currentIndex.value = 0
+		updatePolyline()
 
-    // 更新围栏多边形
-    if (currentMode.value === 'draw' && points.value.length >= 3) {
-      polygons.value = [{
-        points: points.value,
-        strokeWidth: 2,
-        strokeColor: '#FF0000',
-        fillColor: 'rgba(255,0,0,0.2)',
-        zIndex: 1
-      }]
-    } else {
-      polygons.value = []
-    }
+		// 安全地重置小车位置
+		if (trackPoints.value.length > 0) {
+			initCarMarker()
+			if (carMarker.value) {
+				carMarker.value.latitude = trackPoints.value[0].latitude
+				carMarker.value.longitude = trackPoints.value[0].longitude
+				markers.value = [carMarker.value]
+			}
+		}
+	}
 
-    // 更新轨迹线
-    if (currentMode.value === 'track') {
-      updatePolyline()
-    }
-  }
+	const clearTrack = () => {
+		pausePlayback()
+		trackPoints.value = []
+		polyline.value = []
+		totalDistance.value = 0
+		carMarker.value = null
+		markers.value = []
+	}
+
+	const setPlaybackSpeed = (e : any) => {
+		playbackSpeed.value = e.detail.value
+		if (isPlaying.value) {
+			pausePlayback()
+			startPlayback()
+		}
+	}
+
+	const updatePolyline = () => {
+		if (!trackPoints.value || trackPoints.value.length === 0) {
+			polyline.value = []
+			return
+		}
+
+		polyline.value = [{
+			points: trackPoints.value.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
+			color: '#1890FF',
+			width: 4,
+			arrowLine: true,
+			borderColor: '#FFF',
+			borderWidth: 2
+		}]
+	}
+
+	/* 通用地图更新方法 */
+	const updateMapDisplay = () => {
+		// 更新标记点
+		const newMarkers = []
+
+		// 添加围栏顶点标记
+		if (currentMode.value === 'draw') {
+			newMarkers.push(...points.value.map((point, index) => ({
+				id: index + 1,
+				latitude: point.latitude,
+				longitude: point.longitude,
+				iconPath: '/static/marker.png',
+				width: 20,
+				height: 20,
+				callout: { content: `顶点${index + 1}`, display: 'ALWAYS' }
+			})))
+		}
+
+		// 添加车辆标记
+		if (carMarker.value) {
+			newMarkers.push(carMarker.value)
+		}
+
+		markers.value = newMarkers
+
+		// 更新围栏多边形
+		if (currentMode.value === 'draw' && points.value.length >= 3) {
+			polygons.value = [{
+				points: points.value,
+				strokeWidth: 2,
+				strokeColor: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)',
+				zIndex: 1
+			}]
+		} else {
+			polygons.value = []
+		}
+
+		// 更新轨迹线
+		if (currentMode.value === 'track') {
+			updatePolyline()
+		}
+	}
 </script>
 
 <style lang="scss">
-  .container {
-    position: relative;
-	width: 100%;
-    height: 100%;
-	.mapBox{
-		position: absolute;
+	.container {
+		position: relative;
 		width: 100%;
 		height: 100%;
-		z-index: 1;
+
+		.mapBox {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+		}
 	}
-  }
 
-  #fenceMap {
-    flex: 1;
-  }
+	#fenceMap {
+		flex: 1;
+	}
 
-  .control-panel {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 10rpx;
-    gap: 10rpx;
-	position: absolute;
-	z-index: 2;
-    button {
-      flex: 1;
-      min-width: 150rpx;
-      font-size: 28rpx;
-    }
-
-    slider {
-      width: 100%;
-      margin: 10rpx 0;
-    }
-  }
-
-  .info-panel {
-    padding: 20rpx;
-    background-color: #f5f5f5;
-	position: absolute;
-	z-index: 2;
-    .section-title {
-      font-weight: bold;
-      margin-bottom: 10rpx;
-      color: #333;
-    }
-
-    .point-list {
+	.control-panel {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 10rpx;
+		gap: 10rpx;
 		position: absolute;
 		z-index: 2;
-      scroll-view {
-        background-color: #fff;
-        border-radius: 8rpx;
-        padding: 10rpx;
-      }
 
-      .point-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15rpx 0;
-        border-bottom: 1rpx solid #eee;
+		button {
+			flex: 1;
+			min-width: 150rpx;
+			font-size: 28rpx;
+		}
 
-        text {
-          font-size: 26rpx;
-          color: #333;
-        }
+		slider {
+			width: 100%;
+			margin: 10rpx 0;
+		}
+	}
 
-        button {
-          margin: 0;
-          padding: 0 20rpx;
-          height: 50rpx;
-          line-height: 50rpx;
-        }
-      }
-    }
+	.info-panel {
+		padding: 20rpx;
+		background-color: #f5f5f5;
+		position: absolute;
+		z-index: 2;
 
-    .track-info {
-      display: flex;
-      flex-direction: column;
-      gap: 10rpx;
+		.section-title {
+			font-weight: bold;
+			margin-bottom: 10rpx;
+			color: #333;
+		}
 
-      text {
-        font-size: 26rpx;
-        color: #333;
-      }
-    }
-  }
+		.point-list {
+			position: absolute;
+			z-index: 2;
+
+			scroll-view {
+				background-color: #fff;
+				border-radius: 8rpx;
+				padding: 10rpx;
+			}
+
+			.point-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 15rpx 0;
+				border-bottom: 1rpx solid #eee;
+
+				text {
+					font-size: 26rpx;
+					color: #333;
+				}
+
+				button {
+					margin: 0;
+					padding: 0 20rpx;
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+			}
+		}
+
+		.track-info {
+			display: flex;
+			flex-direction: column;
+			gap: 10rpx;
+
+			text {
+				font-size: 26rpx;
+				color: #333;
+			}
+		}
+	}
 </style>
