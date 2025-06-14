@@ -13,12 +13,6 @@
 			}
 		},
 		{
-			"path": "pages/search/search",
-			"style": {
-				"navigationBarTitleText": "搜索"
-			}
-		},
-		{
 			"path": "pages/message/message",
 			"style": {
 				"navigationBarTitleText": "消息"
@@ -32,8 +26,8 @@
 		}
 	],
 	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#3cc51f",
+		"color": "#2c2c2c",
+		"selectedColor": "#d81e06",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
