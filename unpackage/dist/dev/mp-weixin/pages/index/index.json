@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "uni-app x",
   "usingComponents": {
-    "map-component": "../../components/MapComponent/MapComponent"
+    "map-component": "../../components/MapComponent/MapComponent",
+    "index-list-mode": "../../components/indexListMode/indexListMode",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
   }
 }

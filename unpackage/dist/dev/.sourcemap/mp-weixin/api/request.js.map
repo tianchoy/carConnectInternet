@@ -1,1 +1,1 @@
-{"version":3,"file":"request.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;"}
+{"version":3,"file":"request.js","sources":["api/request.uts"],"sourcesContent":["import http from \"./http\";\n\r\nconst getUserInfoUrl = '/api/getuserInfo'\n\n\r\nexport const getUserInfo = () =>{\n\treturn http(getUserInfoUrl)\n}"],"names":["http"],"mappings":";;AAEA,MAAM,iBAAiB;AAGV,MAAA,cAAc,MAAA;AAC1B,SAAOA,SAAAA,KAAK,cAAc;AAC3B;;"}

@@ -45,7 +45,8 @@
     "getLocation",
     "onLocationChange",
     "startLocationUpdate",
-    "startLocationUpdateBackground"
+    "startLocationUpdateBackground",
+    "chooseLocation"
   ],
   "usingComponents": {}
 }

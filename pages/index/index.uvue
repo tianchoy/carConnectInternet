@@ -1,57 +1,110 @@
 <template>
 	<view class="container">
 		<!-- 地图组件 -->
-		<MapComponent :center="center" :mapScale="mapScale" :polygons="polygons" :markers="markers" :polyline="polyline"
-			:isDrawing="isDrawing" :currentMode="currentMode" @map-tap="handleMapTap" />
-
-		<!-- 操作按钮组 -->
-		<view class="control-panel">
-			<button @click="toggleMode" :type="currentMode === 'draw' ? 'primary' : 'default'">
-				{{ currentMode === 'draw' ? '绘制模式' : '轨迹模式' }}
-			</button>
-			<button @click="getlocation">获取当前位置</button>
-
+		<view class="map-container" v-if="showMap">
+			<MapComponent :center="center" :mapScale="mapScale" :polygons="polygons" :markers="markers"
+				:polyline="polyline" :isDrawing="isDrawing" :currentMode="currentMode" @map-tap="handleMapTap" />
+		</view>
+		<view class="indexListMode" v-else>
+			<indexListMode />
+		</view>
+		
+		<view class="tools-panel">
+			<uv-button @click="getlocation()">
+				<image src="/static/icon/location.png" class="icon" />
+			</uv-button>
+			<uv-button @click="toggleMapMode">
+				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="icon" />
+			</uv-button>
+			<uv-button
+				:class="['mode-btn', currentMode === 'draw' ? 'active' : '']" 
+				@click="toggleMode('draw')"
+			>
+				绘制模式
+			</uv-button>
+			<uv-button 
+				:class="['mode-btn', currentMode === 'track' ? 'active' : '']" 
+				@click="toggleMode('track')"
+			>
+				轨迹模式
+			</uv-button>
 			<template v-if="currentMode === 'draw'">
-				<button @click="startDrawing" :disabled="isDrawing" type="primary">开始绘制</button>
-				<button @click="addPoint" :disabled="!isDrawing" type="primary">添加当前点</button>
-				<button @click="finishDrawing" :disabled="!isDrawing || points.length < 3" type="warn">完成绘制</button>
-				<button @click="clearAll" type="default">重置</button>
+				<uv-button @click="startDrawing" :disabled="isDrawing">
+					开始绘制
+				</uv-button>
+				<uv-button @click="addPoint" :disabled="!isDrawing">
+					添加当前点
+				</uv-button>
+				<uv-button @click="finishDrawing" :disabled="!isDrawing || points.length < 3">
+					完成绘制
+				</uv-button>
+				<uv-button @click="clearAll">
+					重置
+				</uv-button>
 			</template>
-
+			
 			<template v-else>
-				<button @click="startPlayback" :disabled="isPlaying" type="primary">开始回放</button>
-				<button @click="pausePlayback" :disabled="!isPlaying" type="warn">暂停</button>
-				<button @click="clearTrack" type="default">清除轨迹</button>
-				<slider :value="playbackSpeed" min="1" max="5" @change="setPlaybackSpeed" show-value />
+				<uv-button @click="startPlayback" :disabled="isPlaying">
+					开始回放
+				</uv-button>
+				<uv-button @click="pausePlayback" :disabled="!isPlaying">
+					暂停
+				</uv-button>
+				<uv-button @click="clearTrack">
+					清除轨迹
+				</uv-button>
+				<view class="speed-control">
+					<text class="speed-label">回放速度: {{playbackSpeed}}x</text>
+					<slider :value="playbackSpeed" min="1" max="5" @change="setPlaybackSpeed" show-value />
+				</view>
 			</template>
 		</view>
-
 		<!-- 坐标点列表/轨迹信息 -->
 		<view class="info-panel">
-			<view v-if="currentMode === 'draw' && points.length > 0" class="point-list">
-				<view class="section-title">围栏顶点 ({{points.length}}个)</view>
-				<scroll-view scroll-y style="max-height: 150px;">
+			<view v-if="currentMode === 'draw' && points.length > 0">
+				<view class="section-title">
+					围栏顶点 ({{points.length}}个)
+				</view>
+				<scroll-view scroll-y class="scroll-container">
 					<view class="point-item" v-for="(point, index) in points" :key="index">
-						<text>顶点{{index + 1}}: {{point.latitude.toFixed(6)}}, {{point.longitude.toFixed(6)}}</text>
-						<button @click="removePoint(index)" size="mini">删除</button>
+						<text class="point-info">顶点{{index + 1}}: {{point.latitude.toFixed(6)}}, {{point.longitude.toFixed(6)}}</text>
+						<uv-button @click="removePoint(index)" class="remove-btn" text="删除"></uv-button>
 					</view>
 				</scroll-view>
 			</view>
 
 			<view v-else class="track-info">
-				<view class="section-title">轨迹信息</view>
-				<text>总点数: {{trackPoints.length}}</text>
-				<text>行驶距离: {{(totalDistance/1000).toFixed(2)}} km</text>
-				<text>回放速度: {{playbackSpeed}}x</text>
+				<view class="section-title">
+					轨迹信息
+				</view>
+				<view class="info-item">
+					<text>总点数: {{trackPoints.length}}</text>
+				</view>
+				<view class="info-item">
+					<text>行驶距离: {{(totalDistance/1000).toFixed(2)}} km</text>
+				</view>
+				<view class="info-item">
+					<text>回放速度: {{playbackSpeed}}x</text>
+				</view>
+			</view>
+			
+			<!-- 车辆状态检测 -->
+			<view class="status-section">
+				<view class="section-title">
+					<image src="/static/car.png" class="section-icon" />
+					车辆状态
+				</view>
+				<view class="status-display" :class="carInFence ? 'in-fence' : 'out-fence'">
+					<text>{{ carInFence ? '车辆在围栏内' : '车辆在围栏外' }}</text>
+					<view class="status-indicator" :class="carInFence ? 'in' : 'out'"></view>
+				</view>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted } from 'vue'
 	import { getUserInfo } from '../../api/request.uts'
-	import MapComponent from '../../components/MapComponent/MapComponent.uvue'
 
 	// 地图状态
 	const center = reactive({
@@ -60,6 +113,8 @@
 	})
 	const mapScale = ref(13)
 	const currentMode = ref<'draw' | 'track'>('draw')
+	const showMap = ref(true)
+	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关
 	const isDrawing = ref(false)
@@ -75,41 +130,100 @@
 	const playbackInterval = ref<number | null>(null)
 	const currentIndex = ref(0)
 	const carMarker = ref<any>(null)
+	const address = ref('')
+	const gdKey = '7609efb7050c60178c2670401e2ff0b0'
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
 
-	// 初始化加载测试轨迹
+	// 检测车辆是否在电子围栏内（射线法）
+	const checkCarInFence = (point: { latitude: number, longitude: number }) => {
+		if (polygons.value.length === 0 || polygons.value[0].points.length < 3) {
+			carInFence.value = false
+			return
+		}
+		
+		const polygon = polygons.value[0].points
+		const x = point.longitude
+		const y = point.latitude
+		
+		let inside = false
+		for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+			const xi = polygon[i].longitude
+			const yi = polygon[i].latitude
+			const xj = polygon[j].longitude
+			const yj = polygon[j].latitude
+			
+			const intersect = ((yi > y) !== (yj > y)) &&
+				(x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+			
+			if (intersect) inside = !inside
+		}
+		
+		carInFence.value = inside
+		console.log(`车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? '在围栏内' : '在围栏外'}`)
+	}
+
+	// 初始化加载测试的电子围栏
 	onMounted(() => {
 		getlocation()
 		loadSampleTrack()
 		polygons.value = [{
-			points: [{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }, 
+			points: [{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 },
 			{ "latitude": 35.23764782824115, "longitude": 115.39397562325496 },
-			{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }, 
+			{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 },
 			{ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }],
 			strokeWidth: 2,
 			strokeColor: '#FF0000',
 			fillColor: 'rgba(255,0,0,0.2)',
 			zIndex: 1
 		}]
+		
+		// 初始检测
+		checkCarInFence(center)
 	})
 
 	//获取当前位置
 	const getlocation = () => {
 		uni.getLocation({
 			success: (res) => {
-				console.log('当前坐标点：',res);
+				console.log('当前坐标点：', res);
 				center.latitude = res.latitude
 				center.longitude = res.longitude
+				getAddress(res.latitude, res.longitude)
+				
+				// 检测车辆位置
+				checkCarInFence({latitude: res.latitude, longitude: res.longitude})
 			}
 		})
 	}
 
+	const getAddress = (lat: number, lng: number) => {
+		console.log(lat, lng)
+		uni.request({
+			url: `https://restapi.amap.com/v3/geocode/regeo?parameters&location=${lng},${lat}&key=${gdKey}&radius=10&extensions=all`,
+			success: (res) => {
+				console.log('获取地址信息:', res.data.regeocode)
+				if (res.data.status === '1') {
+					address.value = res.data.regeocode.formatted_address
+					console.log('地址信息:', address.value)
+					uni.showToast({ title: address.value, icon: 'none', duration: 2000 })
+				} else {
+					uni.showToast({ title: '获取地址失败', icon: 'none' })
+				}
+			},
+		})
+	}
+
+	// 切换地图/列表视图
+	const toggleMapMode = () => {
+		showMap.value = !showMap.value
+	}
+
 	// 切换模式
-	const toggleMode = () => {
-		currentMode.value = currentMode.value === 'draw' ? 'track' : 'draw'
-		if (currentMode.value === 'track') {
+	const toggleMode = (mode: 'draw' | 'track') => {
+		currentMode.value = mode
+		if (mode === 'track') {
 			initCarMarker()
 			resetPlayback()
 			adjustMapToFitTrack()
@@ -150,23 +264,36 @@
 		isDrawing.value = false
 		uni.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` })
 		console.log('电子围栏坐标:', JSON.stringify(points.value))
+		
+		// 更新多边形
+		polygons.value = [{
+			points: points.value,
+			strokeWidth: 2,
+			strokeColor: '#FF0000',
+			fillColor: 'rgba(255,0,0,0.2)',
+			zIndex: 1
+		}]
+		
+		// 检测车辆位置
+		checkCarInFence(center)
 	}
 
 	const clearAll = () => {
 		isDrawing.value = false
 		points.value = []
 		polygons.value = []
+		carInFence.value = false
 		updateMapDisplay()
 	}
 
 	/* 轨迹回放功能部分 */
 	const loadSampleTrack = () => {
-		// 模拟测试轨迹数据
-		const mockTrack = [{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }, 
-			{ "latitude": 35.23764782824115, "longitude": 115.39397562325496 },
-			{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }, 
-			{ "latitude": 35.270452534471225, "longitude": 115.44611973480175 },
-			{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }]
+		// 模拟测试轨迹数据，正式版用接口的数据把它替换下来
+		const mockTrack = [{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 },
+		{ "latitude": 35.23764782824115, "longitude": 115.39397562325496 },
+		{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 },
+		{ "latitude": 35.270452534471225, "longitude": 115.44611973480175 },
+		{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }]
 
 
 		trackPoints.value = mockTrack
@@ -279,6 +406,9 @@
 			carMarker.value.longitude = point.longitude
 			markers.value = [carMarker.value]
 		}
+		
+		// 检测车辆位置
+		checkCarInFence(point)
 	}
 
 	const pausePlayback = () => {
@@ -303,6 +433,9 @@
 				carMarker.value.longitude = trackPoints.value[0].longitude
 				markers.value = [carMarker.value]
 			}
+			
+			// 检测车辆位置
+			checkCarInFence(trackPoints.value[0])
 		}
 	}
 
@@ -313,6 +446,7 @@
 		totalDistance.value = 0
 		carMarker.value = null
 		markers.value = []
+		carInFence.value = false
 	}
 
 	const setPlaybackSpeed = (e : any) => {
@@ -391,79 +525,204 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
+		background-color: #f5f7fa;
 
 		.map-container {
 			flex: 1;
+			width: 100%;
+		}
+
+		.tools-panel {
+			position: absolute;
+			top: 20rpx;
+			right: 20rpx;
+			z-index: 10;
+			display: flex;
+			flex-direction: column;
+			gap: 15rpx;
+			
+			button {
+				padding: 12rpx 24rpx;
+				border-radius: 50rpx;
+				background-color: rgba(255, 255, 255, 0.9);
+				box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+				font-size: 26rpx;
+				color: #333;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+			}
+			
+			.icon {
+				width: 36rpx;
+				height: 36rpx;
+				margin-right: 8rpx;
+			}
 		}
 	}
 
 	.control-panel {
-		display: flex;
-		flex-wrap: wrap;
-		padding: 10rpx;
-		gap: 10rpx;
-		z-index: 2;
-
-		button {
-			flex: 1;
-			min-width: 150rpx;
-			font-size: 28rpx;
+		padding: 20rpx;
+		background-color: #fff;
+		border-radius: 20rpx;
+		margin: 20rpx;
+		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+		
+		.mode-toggle {
+			display: flex;
+			background-color: #f5f7fa;
+			border-radius: 50rpx;
+			margin-bottom: 20rpx;
+			overflow: hidden;
+			
+			.mode-btn {
+				flex: 1;
+				padding: 16rpx;
+				text-align: center;
+				background-color: transparent;
+				border: none;
+				font-size: 28rpx;
+				color: #666;
+				
+				&.active {
+					background-color: #3498db;
+					color: #fff;
+					font-weight: 500;
+				}
+			}
 		}
-
-		slider {
-			width: 100%;
-			margin: 10rpx 0;
+		
+		.speed-control {
+			padding: 10rpx 0;
+			
+			.speed-label {
+				font-size: 28rpx;
+				color: #333;
+				margin-bottom: 10rpx;
+				display: block;
+			}
 		}
 	}
 
 	.info-panel {
 		padding: 20rpx;
-		background-color: #f5f5f5;
-		z-index: 2;
-
+		background-color: #fff;
+		border-radius: 20rpx;
+		margin: 0 20rpx 20rpx;
+		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+		
 		.section-title {
+			font-size: 32rpx;
 			font-weight: bold;
-			margin-bottom: 10rpx;
-			color: #333;
-		}
-
-		.point-list {
-			scroll-view {
-				background-color: #fff;
-				border-radius: 8rpx;
-				padding: 10rpx;
-			}
-
-			.point-item {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				padding: 15rpx 0;
-				border-bottom: 1rpx solid #eee;
-
-				text {
-					font-size: 26rpx;
-					color: #333;
-				}
-
-				button {
-					margin: 0;
-					padding: 0 20rpx;
-					height: 50rpx;
-					line-height: 50rpx;
-				}
-			}
-		}
-
-		.track-info {
+			color: #2c3e50;
+			margin-bottom: 20rpx;
 			display: flex;
-			flex-direction: column;
-			gap: 10rpx;
-
-			text {
+			align-items: center;
+			
+			.section-icon {
+				width: 40rpx;
+				height: 40rpx;
+				margin-right: 12rpx;
+			}
+		}
+		
+		.scroll-container {
+			max-height: 200rpx;
+			padding: 10rpx;
+			background-color: #f9f9f9;
+			border-radius: 12rpx;
+		}
+		
+		.point-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20rpx 0;
+			border-bottom: 1rpx solid #eee;
+			
+			.point-info {
 				font-size: 26rpx;
 				color: #333;
+				flex: 1;
 			}
+			
+			.remove-btn {
+				background: transparent;
+				border: none;
+				padding: 0;
+				margin: 0;
+				
+				.delete-icon {
+					width: 36rpx;
+					height: 36rpx;
+				}
+			}
+		}
+		
+		.track-info {
+			.info-item {
+				padding: 12rpx 0;
+				font-size: 28rpx;
+				color: #333;
+				border-bottom: 1rpx solid #f0f0f0;
+			}
+		}
+		
+		.status-section {
+			margin-top: 30rpx;
+			padding-top: 20rpx;
+			border-top: 1rpx dashed #eee;
+		}
+		
+		.status-display {
+			padding: 24rpx;
+			border-radius: 16rpx;
+			display: flex;
+			align-items: center;
+			font-size: 32rpx;
+			font-weight: 500;
+			margin: 20rpx 0;
+			
+			&.in-fence {
+				background-color: rgba(46, 204, 113, 0.1);
+				color: #27ae60;
+			}
+			
+			&.out-fence {
+				background-color: rgba(231, 76, 60, 0.1);
+				color: #e74c3c;
+			}
+			
+			.status-icon {
+				width: 48rpx;
+				height: 48rpx;
+				margin-right: 15rpx;
+			}
+			
+			.status-indicator {
+				width: 20rpx;
+				height: 20rpx;
+				border-radius: 50%;
+				margin-left: 15rpx;
+				
+				&.in {
+					background-color: #2ecc71;
+					box-shadow: 0 0 10rpx #2ecc71;
+				}
+				
+				&.out {
+					background-color: #e74c3c;
+					box-shadow: 0 0 10rpx #e74c3c;
+				}
+			}
+		}
+		
+		.algorithm-info {
+			font-size: 26rpx;
+			color: #7f8c8d;
+			text-align: center;
+			margin-top: 10rpx;
 		}
 	}
 </style>

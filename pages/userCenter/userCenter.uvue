@@ -20,6 +20,11 @@
 </template>
 
 <script setup lang="uts">
+	import { getUserInfo } from '../../api/request.uts'
+	onLoad(async () => {
+		const res = await getUserInfo();
+		console.log(res);
+	});
 	const userInfo = {
 		avatar: '/static/avatar.png',
 		nickname: '123456789',
