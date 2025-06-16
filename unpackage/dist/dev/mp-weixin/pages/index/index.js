@@ -1,6 +1,9 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const api_request = require("../../api/request.js");
+if (!Math) {
+  common_vendor.unref(MapComponent)();
+}
+const MapComponent = () => "../../components/MapComponent/MapComponent.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObject({
   __name: "index",
   setup(__props) {
@@ -16,40 +19,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
     const trackPoints = common_vendor.ref([]);
     const polyline = common_vendor.ref([]);
     const isPlaying = common_vendor.ref(false);
-    const playbackSpeed = common_vendor.ref(50);
+    const playbackSpeed = common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
     const playbackInterval = common_vendor.ref(null);
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
     const markers = common_vendor.ref([]);
-    const amapFile = require("../../static/libs/amap-wx.130.js");
-    amapFile.AMapWX(new UTSJSONObject({ key: "e3e773ad74f7ba25f38775c9c8db6474" }));
     common_vendor.onMounted(() => {
       getlocation();
       loadSampleTrack();
       polygons.value = [new UTSJSONObject({
-        points: [
-          new UTSJSONObject({ latitude: 39.911224745973904, longitude: 116.4004448639945 }),
-          new UTSJSONObject({ latitude: 39.90158231816865, longitude: 116.39965115224538 }),
-          new UTSJSONObject({ latitude: 39.90225756812269, longitude: 116.4126210618266 }),
-          new UTSJSONObject({ latitude: 39.910544072055366, longitude: 116.41189424747824 })
-        ],
+        points: [new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }), new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }), new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }), new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 })],
         strokeWidth: 2,
         strokeColor: "#FF0000",
         fillColor: "rgba(255,0,0,0.2)",
         zIndex: 1
       })];
     });
-    common_vendor.onLoad(() => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.getUserInfo();
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:105", res);
-      });
-    });
     const getlocation = () => {
       common_vendor.index.getLocation(new UTSJSONObject({
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:112", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:102", "当前坐标点：", res);
           center.latitude = res.latitude;
           center.longitude = res.longitude;
         }
@@ -62,6 +52,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
         resetPlayback();
         adjustMapToFitTrack();
       }
+    };
+    const startDrawing = () => {
+      isDrawing.value = true;
+      points.value = [];
+      updateMapDisplay();
+    };
+    const handleMapTap = (point) => {
+      if (!isDrawing.value || currentMode.value !== "draw")
+        return null;
+      addNewPoint(point.latitude, point.longitude);
+    };
+    const addPoint = () => {
+      addNewPoint(center.latitude, center.longitude);
+    };
+    const addNewPoint = (lat, lng) => {
+      points.value.push({ latitude: lat, longitude: lng });
+      updateMapDisplay();
+    };
+    const removePoint = (index) => {
+      points.value.splice(index, 1);
+      updateMapDisplay();
+    };
+    const finishDrawing = () => {
+      if (points.value.length < 3) {
+        common_vendor.index.showToast({ title: "至少需要3个顶点", icon: "none" });
+        return null;
+      }
+      isDrawing.value = false;
+      common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:152", "电子围栏坐标:", UTS.JSON.stringify(points.value));
+    };
+    const clearAll = () => {
+      isDrawing.value = false;
+      points.value = [];
+      polygons.value = [];
+      updateMapDisplay();
+    };
+    const loadSampleTrack = () => {
+      const mockTrack = [new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }), new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }), new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }), new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }), new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 })];
+      trackPoints.value = mockTrack;
+      calculateTrackDistance();
+      updatePolyline();
     };
     const initCarMarker = () => {
       if (trackPoints.value.length > 0 && !carMarker.value) {
@@ -107,64 +139,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
         maxLng = Math.max(maxLng, point.longitude);
       });
       return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
-    };
-    const startDrawing = () => {
-      isDrawing.value = true;
-      points.value = [];
-      updateMapDisplay();
-    };
-    const handleMapTap = (e = null) => {
-      if (!isDrawing.value || currentMode.value !== "draw")
-        return null;
-      addNewPoint(e.detail.latitude, e.detail.longitude);
-    };
-    const addPoint = () => {
-      common_vendor.index.createSelectorQuery().select("#fenceMap").context((res = null) => {
-        const mapContext = res.context;
-        mapContext.getCenterLocation(new UTSJSONObject({
-          success: (centerRes = null) => {
-            addNewPoint(centerRes.latitude, centerRes.longitude);
-          }
-        }));
-      }).exec();
-    };
-    const addNewPoint = (lat, lng) => {
-      points.value.push({ latitude: lat, longitude: lng });
-      updateMapDisplay();
-    };
-    const removePoint = (index) => {
-      points.value.splice(index, 1);
-      updateMapDisplay();
-    };
-    const finishDrawing = () => {
-      if (points.value.length < 3) {
-        common_vendor.index.showToast({ title: "至少需要3个顶点", icon: "none" });
-        return null;
-      }
-      isDrawing.value = false;
-      common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:224", "电子围栏坐标:", UTS.JSON.stringify(points.value));
-    };
-    const clearAll = () => {
-      isDrawing.value = false;
-      points.value = [];
-      polygons.value = [];
-      updateMapDisplay();
-    };
-    const loadSampleTrack = () => {
-      const mockTrack = [];
-      const baseLat = 39.90469;
-      const baseLng = 116.40717;
-      for (let i = 0; i < 50; i++) {
-        mockTrack.push({
-          latitude: baseLat + Math.sin(i / 10) * 0.01,
-          longitude: baseLng + Math.cos(i / 10) * 0.01,
-          timestamp: Date.now() - (50 - i) * 6e4
-        });
-      }
-      trackPoints.value = mockTrack;
-      calculateTrackDistance();
-      updatePolyline();
     };
     const calculateTrackDistance = () => {
       totalDistance.value = 0;
@@ -293,40 +267,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
     };
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.sei("fenceMap", "map"),
-        b: common_vendor.unref(center).latitude,
-        c: common_vendor.unref(center).longitude,
-        d: common_vendor.unref(polygons),
-        e: common_vendor.unref(markers),
-        f: common_vendor.unref(polyline),
-        g: common_vendor.unref(mapScale),
-        h: common_vendor.o(handleMapTap),
-        i: common_vendor.t(common_vendor.unref(currentMode) === "draw" ? "绘制模式" : "轨迹模式"),
-        j: common_vendor.o(toggleMode),
-        k: common_vendor.unref(currentMode) === "draw" ? "primary" : "default",
-        l: common_vendor.o(getlocation),
-        m: common_vendor.unref(currentMode) === "draw"
-      }), common_vendor.unref(currentMode) === "draw" ? new UTSJSONObject({
-        n: common_vendor.o(startDrawing),
-        o: common_vendor.unref(isDrawing),
-        p: common_vendor.o(addPoint),
-        q: !common_vendor.unref(isDrawing),
-        r: common_vendor.o(finishDrawing),
-        s: !common_vendor.unref(isDrawing) || common_vendor.unref(points).length < 3,
-        t: common_vendor.o(clearAll)
+        a: common_vendor.o(handleMapTap),
+        b: common_vendor.p(new UTSJSONObject({
+          center,
+          mapScale: mapScale.value,
+          polygons: polygons.value,
+          markers: markers.value,
+          polyline: polyline.value,
+          isDrawing: isDrawing.value,
+          currentMode: currentMode.value
+        })),
+        c: common_vendor.t(currentMode.value === "draw" ? "绘制模式" : "轨迹模式"),
+        d: common_vendor.o(toggleMode),
+        e: currentMode.value === "draw" ? "primary" : "default",
+        f: common_vendor.o(getlocation),
+        g: currentMode.value === "draw"
+      }), currentMode.value === "draw" ? new UTSJSONObject({
+        h: common_vendor.o(startDrawing),
+        i: isDrawing.value,
+        j: common_vendor.o(addPoint),
+        k: !isDrawing.value,
+        l: common_vendor.o(finishDrawing),
+        m: !isDrawing.value || points.value.length < 3,
+        n: common_vendor.o(clearAll)
       }) : new UTSJSONObject({
-        v: common_vendor.o(startPlayback),
-        w: common_vendor.unref(isPlaying),
-        x: common_vendor.o(pausePlayback),
-        y: !common_vendor.unref(isPlaying),
-        z: common_vendor.o(clearTrack),
-        A: common_vendor.unref(playbackSpeed),
-        B: common_vendor.o(setPlaybackSpeed)
+        o: common_vendor.o(startPlayback),
+        p: isPlaying.value,
+        q: common_vendor.o(pausePlayback),
+        r: !isPlaying.value,
+        s: common_vendor.o(clearTrack),
+        t: playbackSpeed.value,
+        v: common_vendor.o(setPlaybackSpeed)
       }), new UTSJSONObject({
-        C: common_vendor.unref(currentMode) === "draw" && common_vendor.unref(points).length > 0
-      }), common_vendor.unref(currentMode) === "draw" && common_vendor.unref(points).length > 0 ? new UTSJSONObject({
-        D: common_vendor.t(common_vendor.unref(points).length),
-        E: common_vendor.f(common_vendor.unref(points), (point = null, index = null, i0 = null) => {
+        w: currentMode.value === "draw" && points.value.length > 0
+      }), currentMode.value === "draw" && points.value.length > 0 ? new UTSJSONObject({
+        x: common_vendor.t(points.value.length),
+        y: common_vendor.f(points.value, (point = null, index = null, i0 = null) => {
           return new UTSJSONObject({
             a: common_vendor.t(index + 1),
             b: common_vendor.t(point.latitude.toFixed(6)),
@@ -338,11 +314,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
           });
         })
       }) : new UTSJSONObject({
-        F: common_vendor.t(common_vendor.unref(trackPoints).length),
-        G: common_vendor.t((common_vendor.unref(totalDistance) / 1e3).toFixed(2)),
-        H: common_vendor.t(common_vendor.unref(playbackSpeed))
+        z: common_vendor.t(trackPoints.value.length),
+        A: common_vendor.t((totalDistance.value / 1e3).toFixed(2)),
+        B: common_vendor.t(playbackSpeed.value)
       }), new UTSJSONObject({
-        I: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

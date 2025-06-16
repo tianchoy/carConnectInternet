@@ -28,15 +28,11 @@
 .container {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.container .mapBox {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-#fenceMap {
+.container .map-container {
   flex: 1;
 }
 .control-panel {
@@ -44,7 +40,6 @@
   flex-wrap: wrap;
   padding: 10rpx;
   gap: 10rpx;
-  position: absolute;
   z-index: 2;
 }
 .control-panel button {
@@ -59,18 +54,12 @@
 .info-panel {
   padding: 20rpx;
   background-color: #f5f5f5;
-  position: absolute;
-  right: 0;
   z-index: 2;
 }
 .info-panel .section-title {
   font-weight: bold;
   margin-bottom: 10rpx;
   color: #333;
-}
-.info-panel .point-list {
-  position: absolute;
-  z-index: 2;
 }
 .info-panel .point-list scroll-view {
   background-color: #fff;

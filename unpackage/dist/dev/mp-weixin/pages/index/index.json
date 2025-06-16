@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "uni-app x",
-  "usingComponents": {}
+  "usingComponents": {
+    "map-component": "../../components/MapComponent/MapComponent"
+  }
 }

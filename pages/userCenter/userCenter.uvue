@@ -2,16 +2,16 @@
 	<view class="container">
 		<view class="user-info-box">
 			<view>
-				<uv-avatar src="/static/avatar.png" shape="circle"></uv-avatar>
+				<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
 			</view>
 			<view class="user-info">
-				<text>123456789</text>
+				<text>{{userInfo.nickname}}</text>
 			</view>
 		</view>
 		<view>
 			<view class="list">
 				<text>我的车辆</text>
-				<text class="badge"><uv-badge type="error" :value="3"></uv-badge></text>
+				<text class="badge"><uv-badge type="error" :value="carsnumber"></uv-badge></text>
 			</view>
 			<view class="list">流量充值</view>
 			<view class="list">平台续费</view>
@@ -20,8 +20,11 @@
 </template>
 
 <script setup lang="uts">
-
-
+	const userInfo = {
+		avatar: '/static/avatar.png',
+		nickname: '123456789',
+	};
+	const carsnumber = ref(3)
 </script>
 
 <style lang="scss">
