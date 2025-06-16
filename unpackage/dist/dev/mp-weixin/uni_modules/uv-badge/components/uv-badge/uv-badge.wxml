@@ -1,0 +1,1 @@
+<text wx:if="{{a}}" class="{{[d, e, f, g, 'uv-badge', 'data-v-91e4945b', virtualHostClass]}}" style="{{h + ';' + i + ';' + virtualHostStyle}}" id="{{c}}" change:eS="{{uV.sS}}" eS="{{$eS[c]}}" change:eA="{{uV.sA}}" eA="{{$eA[c]}}" hidden="{{virtualHostHidden || false}}">{{b}}</text><wxs src="/common/uniView.wxs" module="uV"/>

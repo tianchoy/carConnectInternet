@@ -68,8 +68,8 @@ const capitalize = cacheStringFunction((str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 });
 const toHandlerKey = cacheStringFunction((str) => {
-  const s = str ? `on${capitalize(str)}` : ``;
-  return s;
+  const s2 = str ? `on${capitalize(str)}` : ``;
+  return s2;
 });
 const hasChanged = (value, oldValue) => !Object.is(value, oldValue);
 const invokeArrayFns$1 = (fns, arg) => {
@@ -85,8 +85,8 @@ const def = (obj, key, value) => {
   });
 };
 const looseToNumber = (val) => {
-  const n = parseFloat(val);
-  return isNaN(n) ? val : n;
+  const n2 = parseFloat(val);
+  return isNaN(n2) ? val : n2;
 };
 function normalizeStyle$1(value) {
   if (isArray(value)) {
@@ -117,6 +117,26 @@ function parseStringStyle(cssText) {
     }
   });
   return ret;
+}
+function normalizeClass$1(value) {
+  let res = "";
+  if (isString(value)) {
+    res = value;
+  } else if (isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const normalized = normalizeClass$1(value[i]);
+      if (normalized) {
+        res += normalized + " ";
+      }
+    }
+  } else if (isObject(value)) {
+    for (const name in value) {
+      if (value[name]) {
+        res += name + " ";
+      }
+    }
+  }
+  return res.trim();
 }
 const toDisplayString = (val) => {
   return isString(val) ? val : val == null ? "" : isArray(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
@@ -337,6 +357,33 @@ function normalizeStyle(value) {
   } else {
     return normalizeStyle$1(value);
   }
+}
+function normalizeClass(value) {
+  let res = "";
+  const g2 = getGlobal$1();
+  if (g2 && g2.UTSJSONObject && value instanceof g2.UTSJSONObject) {
+    g2.UTSJSONObject.keys(value).forEach((key) => {
+      if (value[key]) {
+        res += key + " ";
+      }
+    });
+  } else if (value instanceof Map) {
+    value.forEach((value2, key) => {
+      if (value2) {
+        res += key + " ";
+      }
+    });
+  } else if (isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const normalized = normalizeClass(value[i]);
+      if (normalized) {
+        res += normalized + " ";
+      }
+    }
+  } else {
+    res = normalizeClass$1(value);
+  }
+  return res.trim();
 }
 const encode = encodeURIComponent;
 function stringifyQuery(obj, encodeStr = encode) {
@@ -5847,7 +5894,9 @@ function genUniElementId(_ctx, idBinding, genId) {
 }
 const o = (value, key) => vOn(value, key);
 const f = (source, renderItem) => vFor(source, renderItem);
+const s = (value) => stringifyStyle(value);
 const e = (target, ...sources) => extend(target, ...sources);
+const n = (value) => normalizeClass(value);
 const t = (val) => toDisplayString(val);
 const p = (props) => renderProps(props);
 const sei = setUniElementId;
@@ -6522,8 +6571,8 @@ const $once = defineSyncApi(API_ONCE, (name, callback) => {
 const $off = defineSyncApi(API_OFF, (name, callback) => {
   if (!isArray(name))
     name = name ? [name] : [];
-  name.forEach((n) => {
-    eventBus.off(n, callback);
+  name.forEach((n2) => {
+    eventBus.off(n2, callback);
   });
 }, OffProtocol);
 const $emit = defineSyncApi(API_EMIT, (name, ...args) => {
@@ -7837,7 +7886,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.22";
   const port = "8090";
-  const id = "mp-weixin_XGKQuL";
+  const id = "mp-weixin_LOZryW";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9448,10 +9497,64 @@ const createSubpackageApp = initCreateSubpackageApp();
   wx.createPluginApp = global.createPluginApp = createPluginApp;
   wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
 }
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function(resolve2) {
+      resolve2(value);
+    });
+  }
+  return new (P || (P = Promise))(function(resolve2, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e2) {
+        reject(e2);
+      }
+    }
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e2) {
+        reject(e2);
+      }
+    }
+    function step(result) {
+      result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+function __read(o2, n2) {
+  var m = typeof Symbol === "function" && o2[Symbol.iterator];
+  if (!m)
+    return o2;
+  var i = m.call(o2), r, ar = [], e2;
+  try {
+    while ((n2 === void 0 || n2-- > 0) && !(r = i.next()).done)
+      ar.push(r.value);
+  } catch (error) {
+    e2 = { error };
+  } finally {
+    try {
+      if (r && !r.done && (m = i["return"]))
+        m.call(i);
+    } finally {
+      if (e2)
+        throw e2.error;
+    }
+  }
+  return ar;
+}
+typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
+  var e2 = new Error(message);
+  return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
+};
 const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
   !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
 };
 const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
+exports.__awaiter = __awaiter;
+exports.__read = __read;
 exports._export_sfc = _export_sfc;
 exports.createSSRApp = createSSRApp;
 exports.defineComponent = defineComponent;
@@ -9459,6 +9562,7 @@ exports.e = e;
 exports.f = f;
 exports.gei = gei;
 exports.index = index;
+exports.n = n;
 exports.o = o;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
@@ -9466,6 +9570,7 @@ exports.p = p;
 exports.reactive = reactive;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
+exports.s = s;
 exports.sei = sei;
 exports.t = t;
 exports.unref = unref;

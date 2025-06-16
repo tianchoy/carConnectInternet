@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "消息",
-  "usingComponents": {}
+  "usingComponents": {
+    "uv-list-item": "../../uni_modules/uv-list/components/uv-list-item/uv-list-item",
+    "uv-list": "../../uni_modules/uv-list/components/uv-list/uv-list"
+  }
 }

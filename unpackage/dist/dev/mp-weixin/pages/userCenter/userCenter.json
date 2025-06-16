@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "我的",
-  "usingComponents": {}
+  "usingComponents": {
+    "uv-avatar": "../../uni_modules/uv-avatar/components/uv-avatar/uv-avatar",
+    "uv-badge": "../../uni_modules/uv-badge/components/uv-badge/uv-badge"
+  }
 }

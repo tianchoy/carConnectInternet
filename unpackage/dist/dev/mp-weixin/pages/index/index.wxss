@@ -60,6 +60,7 @@
   padding: 20rpx;
   background-color: #f5f5f5;
   position: absolute;
+  right: 0;
   z-index: 2;
 }
 .info-panel .section-title {

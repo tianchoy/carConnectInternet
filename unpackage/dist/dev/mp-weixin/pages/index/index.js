@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_request = require("../../api/request.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObject({
   __name: "index",
   setup(__props) {
@@ -24,6 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
     const amapFile = require("../../static/libs/amap-wx.130.js");
     amapFile.AMapWX(new UTSJSONObject({ key: "e3e773ad74f7ba25f38775c9c8db6474" }));
     common_vendor.onMounted(() => {
+      getlocation();
       loadSampleTrack();
       polygons.value = [new UTSJSONObject({
         points: [
@@ -39,12 +41,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       })];
     });
     common_vendor.onLoad(() => {
-      getlocation();
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_request.getUserInfo();
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:105", res);
+      });
     });
     const getlocation = () => {
       common_vendor.index.getLocation(new UTSJSONObject({
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:109", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:112", res);
           center.latitude = res.latitude;
           center.longitude = res.longitude;
         }
@@ -138,7 +143,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       }
       isDrawing.value = false;
       common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:221", "电子围栏坐标:", UTS.JSON.stringify(points.value));
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:224", "电子围栏坐标:", UTS.JSON.stringify(points.value));
     };
     const clearAll = () => {
       isDrawing.value = false;

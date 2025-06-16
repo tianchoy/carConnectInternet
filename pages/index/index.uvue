@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="uts">
+	import { getUserInfo} from '../../api/request.uts'
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -99,8 +100,9 @@
 		}]
 	})
 
-	onLoad(() => {
-
+	onLoad(async () => {
+		const res = await getUserInfo()
+		console.log(res);
 	})
 
 	//获取当前位置
@@ -451,6 +453,7 @@
 		padding: 20rpx;
 		background-color: #f5f5f5;
 		position: absolute;
+		right: 0;
 		z-index: 2;
 
 		.section-title {
