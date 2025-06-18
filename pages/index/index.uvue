@@ -8,24 +8,15 @@
 		<view class="indexListMode" v-else>
 			<indexListMode />
 		</view>
-		
+
 		<view class="tools-panel">
-			<uv-button @click="getlocation()">
-				<image src="/static/icon/location.png" class="icon" />
-			</uv-button>
-			<uv-button @click="toggleMapMode">
+			<uv-button type="primary" @click="toggleMapMode">
 				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="icon" />
 			</uv-button>
-			<uv-button
-				:class="['mode-btn', currentMode === 'draw' ? 'active' : '']" 
-				@click="toggleMode('draw')"
-			>
+			<uv-button :class="['mode-btn', currentMode === 'draw' ? 'active' : '']" @click="toggleMode('draw')">
 				绘制模式
 			</uv-button>
-			<uv-button 
-				:class="['mode-btn', currentMode === 'track' ? 'active' : '']" 
-				@click="toggleMode('track')"
-			>
+			<uv-button :class="['mode-btn', currentMode === 'track' ? 'active' : '']" @click="toggleMode('track')">
 				轨迹模式
 			</uv-button>
 			<template v-if="currentMode === 'draw'">
@@ -42,7 +33,7 @@
 					重置
 				</uv-button>
 			</template>
-			
+
 			<template v-else>
 				<uv-button @click="startPlayback" :disabled="isPlaying">
 					开始回放
@@ -67,7 +58,8 @@
 				</view>
 				<scroll-view scroll-y class="scroll-container">
 					<view class="point-item" v-for="(point, index) in points" :key="index">
-						<text class="point-info">顶点{{index + 1}}: {{point.latitude.toFixed(6)}}, {{point.longitude.toFixed(6)}}</text>
+						<text class="point-info">顶点{{index + 1}}: {{point.latitude.toFixed(6)}},
+							{{point.longitude.toFixed(6)}}</text>
 						<uv-button @click="removePoint(index)" class="remove-btn" text="删除"></uv-button>
 					</view>
 				</scroll-view>
@@ -87,7 +79,7 @@
 					<text>回放速度: {{playbackSpeed}}x</text>
 				</view>
 			</view>
-			
+
 			<!-- 车辆状态检测 -->
 			<view class="status-section">
 				<view class="section-title">
@@ -104,14 +96,14 @@
 </template>
 
 <script setup lang="uts">
-	import { getUserInfo } from '../../api/request.uts'
+	import amapFile from '../../utils/amap-wx.130'
 
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(13)
+	const mapScale = ref(12)
 	const currentMode = ref<'draw' | 'track'>('draw')
 	const showMap = ref(true)
 	const carInFence = ref(false) // 车辆是否在围栏内
@@ -130,55 +122,49 @@
 	const playbackInterval = ref<number | null>(null)
 	const currentIndex = ref(0)
 	const carMarker = ref<any>(null)
+
+	//高德地图相关
 	const address = ref('')
-	const gdKey = '7609efb7050c60178c2670401e2ff0b0'
+	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
+	const myAmapFun = ref()
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
 
 	// 检测车辆是否在电子围栏内（射线法）
-	const checkCarInFence = (point: { latitude: number, longitude: number }) => {
+	const checkCarInFence = (point : { latitude : number, longitude : number }) => {
 		if (polygons.value.length === 0 || polygons.value[0].points.length < 3) {
 			carInFence.value = false
 			return
 		}
-		
+
 		const polygon = polygons.value[0].points
 		const x = point.longitude
 		const y = point.latitude
-		
+
 		let inside = false
 		for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
 			const xi = polygon[i].longitude
 			const yi = polygon[i].latitude
 			const xj = polygon[j].longitude
 			const yj = polygon[j].latitude
-			
+
 			const intersect = ((yi > y) !== (yj > y)) &&
 				(x < (xj - xi) * (y - yi) / (yj - yi) + xi)
-			
+
 			if (intersect) inside = !inside
 		}
-		
+
 		carInFence.value = inside
 		console.log(`车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? '在围栏内' : '在围栏外'}`)
 	}
 
 	// 初始化加载测试的电子围栏
 	onMounted(() => {
+		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
 		getlocation()
+		loadPolygons()
 		loadSampleTrack()
-		polygons.value = [{
-			points: [{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 },
-			{ "latitude": 35.23764782824115, "longitude": 115.39397562325496 },
-			{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 },
-			{ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }],
-			strokeWidth: 2,
-			strokeColor: '#FF0000',
-			fillColor: 'rgba(255,0,0,0.2)',
-			zIndex: 1
-		}]
-		
 		// 初始检测
 		checkCarInFence(center)
 	})
@@ -190,28 +176,29 @@
 				console.log('当前坐标点：', res);
 				center.latitude = res.latitude
 				center.longitude = res.longitude
-				getAddress(res.latitude, res.longitude)
-				
+				getRegeo(res.latitude, res.longitude)
 				// 检测车辆位置
-				checkCarInFence({latitude: res.latitude, longitude: res.longitude})
+				checkCarInFence({ latitude: res.latitude, longitude: res.longitude })
 			}
 		})
 	}
 
-	const getAddress = (lat: number, lng: number) => {
-		console.log(lat, lng)
-		uni.request({
-			url: `https://restapi.amap.com/v3/geocode/regeo?parameters&location=${lng},${lat}&key=${gdKey}&radius=10&extensions=all`,
-			success: (res) => {
-				console.log('获取地址信息:', res.data.regeocode)
-				if (res.data.status === '1') {
-					address.value = res.data.regeocode.formatted_address
+	const getRegeo = (latitude,longitude) => {
+		myAmapFun.value.getRegeo({
+			location: `${longitude},${latitude}`,
+			success: (data) => {
+				console.log('获取地址信息:', data)
+				if (data.length > 0) {
+					address.value = data[0].regeocodeData.formatted_address
 					console.log('地址信息:', address.value)
 					uni.showToast({ title: address.value, icon: 'none', duration: 2000 })
 				} else {
 					uni.showToast({ title: '获取地址失败', icon: 'none' })
 				}
 			},
+			fail: (err) => {
+				console.log('获取地址失败:', err)
+			}
 		})
 	}
 
@@ -221,7 +208,7 @@
 	}
 
 	// 切换模式
-	const toggleMode = (mode: 'draw' | 'track') => {
+	const toggleMode = (mode : 'draw' | 'track') => {
 		currentMode.value = mode
 		if (mode === 'track') {
 			initCarMarker()
@@ -264,7 +251,7 @@
 		isDrawing.value = false
 		uni.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` })
 		console.log('电子围栏坐标:', JSON.stringify(points.value))
-		
+
 		// 更新多边形
 		polygons.value = [{
 			points: points.value,
@@ -273,7 +260,7 @@
 			fillColor: 'rgba(255,0,0,0.2)',
 			zIndex: 1
 		}]
-		
+
 		// 检测车辆位置
 		checkCarInFence(center)
 	}
@@ -284,6 +271,19 @@
 		polygons.value = []
 		carInFence.value = false
 		updateMapDisplay()
+	}
+	
+	const loadPolygons = () =>{
+		polygons.value = [{
+			points: [{ "latitude": 35.277849527708206, "longitude": 115.39025552959356 },
+			{ "latitude": 35.22397928678945, "longitude": 115.37543744586583 },
+			{ "latitude": 35.23341600978699, "longitude": 115.44904849298473 },
+			{ "latitude": 35.279357522215726, "longitude": 115.45106784538075 }],
+			strokeWidth: 2,
+			strokeColor: '#FF0000',
+			fillColor: 'rgba(255,0,0,0.2)',
+			zIndex: 1
+		}]
 	}
 
 	/* 轨迹回放功能部分 */
@@ -406,7 +406,7 @@
 			carMarker.value.longitude = point.longitude
 			markers.value = [carMarker.value]
 		}
-		
+
 		// 检测车辆位置
 		checkCarInFence(point)
 	}
@@ -433,7 +433,7 @@
 				carMarker.value.longitude = trackPoints.value[0].longitude
 				markers.value = [carMarker.value]
 			}
-			
+
 			// 检测车辆位置
 			checkCarInFence(trackPoints.value[0])
 		}
@@ -540,7 +540,7 @@
 			display: flex;
 			flex-direction: column;
 			gap: 15rpx;
-			
+
 			button {
 				padding: 12rpx 24rpx;
 				border-radius: 50rpx;
@@ -553,7 +553,7 @@
 				justify-content: center;
 				border: none;
 			}
-			
+
 			.icon {
 				width: 36rpx;
 				height: 36rpx;
@@ -568,14 +568,14 @@
 		border-radius: 20rpx;
 		margin: 20rpx;
 		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-		
+
 		.mode-toggle {
 			display: flex;
 			background-color: #f5f7fa;
 			border-radius: 50rpx;
 			margin-bottom: 20rpx;
 			overflow: hidden;
-			
+
 			.mode-btn {
 				flex: 1;
 				padding: 16rpx;
@@ -584,7 +584,7 @@
 				border: none;
 				font-size: 28rpx;
 				color: #666;
-				
+
 				&.active {
 					background-color: #3498db;
 					color: #fff;
@@ -592,10 +592,10 @@
 				}
 			}
 		}
-		
+
 		.speed-control {
 			padding: 10rpx 0;
-			
+
 			.speed-label {
 				font-size: 28rpx;
 				color: #333;
@@ -611,7 +611,7 @@
 		border-radius: 20rpx;
 		margin: 0 20rpx 20rpx;
 		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-		
+
 		.section-title {
 			font-size: 32rpx;
 			font-weight: bold;
@@ -619,47 +619,47 @@
 			margin-bottom: 20rpx;
 			display: flex;
 			align-items: center;
-			
+
 			.section-icon {
 				width: 40rpx;
 				height: 40rpx;
 				margin-right: 12rpx;
 			}
 		}
-		
+
 		.scroll-container {
 			max-height: 200rpx;
 			padding: 10rpx;
 			background-color: #f9f9f9;
 			border-radius: 12rpx;
 		}
-		
+
 		.point-item {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			padding: 20rpx 0;
 			border-bottom: 1rpx solid #eee;
-			
+
 			.point-info {
 				font-size: 26rpx;
 				color: #333;
 				flex: 1;
 			}
-			
+
 			.remove-btn {
 				background: transparent;
 				border: none;
 				padding: 0;
 				margin: 0;
-				
+
 				.delete-icon {
 					width: 36rpx;
 					height: 36rpx;
 				}
 			}
 		}
-		
+
 		.track-info {
 			.info-item {
 				padding: 12rpx 0;
@@ -668,13 +668,13 @@
 				border-bottom: 1rpx solid #f0f0f0;
 			}
 		}
-		
+
 		.status-section {
 			margin-top: 30rpx;
 			padding-top: 20rpx;
 			border-top: 1rpx dashed #eee;
 		}
-		
+
 		.status-display {
 			padding: 24rpx;
 			border-radius: 16rpx;
@@ -683,41 +683,41 @@
 			font-size: 32rpx;
 			font-weight: 500;
 			margin: 20rpx 0;
-			
+
 			&.in-fence {
 				background-color: rgba(46, 204, 113, 0.1);
 				color: #27ae60;
 			}
-			
+
 			&.out-fence {
 				background-color: rgba(231, 76, 60, 0.1);
 				color: #e74c3c;
 			}
-			
+
 			.status-icon {
 				width: 48rpx;
 				height: 48rpx;
 				margin-right: 15rpx;
 			}
-			
+
 			.status-indicator {
 				width: 20rpx;
 				height: 20rpx;
 				border-radius: 50%;
 				margin-left: 15rpx;
-				
+
 				&.in {
 					background-color: #2ecc71;
 					box-shadow: 0 0 10rpx #2ecc71;
 				}
-				
+
 				&.out {
 					background-color: #e74c3c;
 					box-shadow: 0 0 10rpx #e74c3c;
 				}
 			}
 		}
-		
+
 		.algorithm-info {
 			font-size: 26rpx;
 			color: #7f8c8d;
