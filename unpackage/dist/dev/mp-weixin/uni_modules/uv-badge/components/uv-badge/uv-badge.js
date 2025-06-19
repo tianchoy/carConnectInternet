@@ -5,7 +5,7 @@ const uni_modules_uvUiTools_libs_mixin_mixin = require("../../../uv-ui-tools/lib
 const uni_modules_uvBadge_components_uvBadge_props = require("./props.js");
 const _sfc_main = common_vendor.defineComponent({
   name: "uv-badge",
-  mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvBadge_components_uvBadge_props.props],
+  mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvBadge_components_uvBadge_props.uvBadgeProps],
   computed: {
     // 是否将badge中心与父组件右上角重合
     boxStyle() {

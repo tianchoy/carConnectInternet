@@ -1,43 +1,101 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const utils_amapWx_130 = require("../../utils/amap-wx.130.js");
 if (!Array) {
-  const _easycom_MapComponent_1 = common_vendor.resolveComponent("MapComponent");
+  const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
+  const _easycom_deviceInfoComponent_1 = common_vendor.resolveComponent("deviceInfoComponent");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
+  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
+  const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
+  const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
   const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  (_easycom_MapComponent_1 + _easycom_indexListMode_1 + _easycom_uv_button_1)();
+  (_easycom_custom_navBar_1 + _easycom_deviceInfoComponent_1 + _easycom_indexListMode_1 + _easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1 + _easycom_uv_button_1)();
 }
-const _easycom_MapComponent = () => "../../components/MapComponent/MapComponent.js";
+const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
+const _easycom_deviceInfoComponent = () => "../../components/deviceInfoComponent/deviceInfoComponent.js";
 const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
+const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
+const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
 const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 if (!Math) {
-  (_easycom_MapComponent + _easycom_indexListMode + _easycom_uv_button)();
+  (_easycom_custom_navBar + _easycom_deviceInfoComponent + _easycom_indexListMode + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_button)();
 }
-const gdKey = "7609efb7050c60178c2670401e2ff0b0";
+const gdKey = "e3e773ad74f7ba25f38775c9c8db6474";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObject({
   __name: "index",
   setup(__props) {
+    common_vendor.ref(88);
+    const handleCapsule = (type = null) => {
+      if (type === "close") {
+        common_vendor.index.navigateBack();
+      } else {
+        common_vendor.index.showToast({ title: "菜单点击", icon: "none" });
+      }
+    };
     const center = common_vendor.reactive(new UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(13);
+    const mapScale = common_vendor.ref(12);
     const currentMode = common_vendor.ref("draw");
     const showMap = common_vendor.ref(true);
+    const showMoreTools = common_vendor.ref(true);
     const carInFence = common_vendor.ref(false);
     const isDrawing = common_vendor.ref(false);
     const points = common_vendor.ref([]);
     const polygons = common_vendor.ref([]);
+    const draggingIndex = common_vendor.ref(-1);
+    const isDragging = common_vendor.ref(false);
+    common_vendor.ref([]);
     const trackPoints = common_vendor.ref([]);
     const polyline = common_vendor.ref([]);
-    const isPlaying = common_vendor.ref(false);
-    const playbackSpeed = common_vendor.ref(1);
+    common_vendor.ref(false);
+    common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
-    const playbackInterval = common_vendor.ref(null);
-    const currentIndex = common_vendor.ref(0);
+    common_vendor.ref(null);
+    common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
     const address = common_vendor.ref("");
+    const myAmapFun = common_vendor.ref();
     const markers = common_vendor.ref([]);
+    const showDevicePopup = common_vendor.ref(false);
+    const currentDeviceInfo = common_vendor.ref(new UTSJSONObject({
+      deviceName: "",
+      carNumber: "",
+      deviceSerial: "",
+      locationType: "",
+      lngLat: "",
+      updateTime: "",
+      locationTime: "",
+      speed: "",
+      totalMileage: "",
+      address: ""
+    }));
+    common_vendor.ref(0);
+    const baseList = common_vendor.ref([new UTSJSONObject({
+      name: "/static/gjhf.png",
+      title: "轨迹回放"
+    }), new UTSJSONObject({
+      name: "/static/clgz.png",
+      title: "车辆跟踪"
+    }), new UTSJSONObject({
+      name: "/static/lcjl.png",
+      title: "里程记录"
+    }), new UTSJSONObject({
+      name: "/static/tcjl.png",
+      title: "停车记录"
+    }), new UTSJSONObject({
+      name: "/static/dzwl.png",
+      title: "电子围栏"
+    })]);
+    const click = (name = null) => {
+      common_vendor.index.showToast({
+        icon: "none",
+        title: `点击了第${name}个`
+      });
+    };
     const checkCarInFence = (point) => {
       if (polygons.value.length === 0 || polygons.value[0].points.length < 3) {
         carInFence.value = false;
@@ -57,57 +115,102 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
           inside = !inside;
       }
       carInFence.value = inside;
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:164", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:206", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
     };
     common_vendor.onMounted(() => {
-      getlocation();
-      loadSampleTrack();
-      polygons.value = [new UTSJSONObject({
-        points: [new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }), new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }), new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }), new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 })],
-        strokeWidth: 2,
-        strokeColor: "#FF0000",
-        fillColor: "rgba(255,0,0,0.2)",
-        zIndex: 1
-      })];
-      checkCarInFence(center);
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        myAmapFun.value = new utils_amapWx_130.amapFile.AMapWX(new UTSJSONObject({ key: gdKey }));
+        yield getlocation();
+        yield loadPolygons();
+        yield loadSampleTrack();
+        yield checkCarInFence(center);
+      });
     });
     const getlocation = () => {
       common_vendor.index.getLocation(new UTSJSONObject({
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:190", "当前坐标点：", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:223", "当前坐标点：", res);
           center.latitude = res.latitude;
           center.longitude = res.longitude;
-          getAddress(res.latitude, res.longitude);
+          getRegeo(res.latitude, res.longitude);
           checkCarInFence({ latitude: res.latitude, longitude: res.longitude });
         }
       }));
     };
-    const getAddress = (lat, lng) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:202", lat, lng);
-      common_vendor.index.request({
-        url: `https://restapi.amap.com/v3/geocode/regeo?parameters&location=${lng},${lat}&key=${gdKey}&radius=10&extensions=all`,
-        success: (res) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:206", "获取地址信息:", res.data.regeocode);
-          if (res.data.status === "1") {
-            address.value = res.data.regeocode.formatted_address;
-            common_vendor.index.__f__("log", "at pages/index/index.uvue:209", "地址信息:", address.value);
-            common_vendor.index.showToast({ title: address.value, icon: "none", duration: 2e3 });
+    const getRegeo = (latitude = null, longitude = null) => {
+      myAmapFun.value.getRegeo(new UTSJSONObject({
+        location: `${longitude},${latitude}`,
+        success: (data = null) => {
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:237", "获取地址信息:", data);
+          if (data.length > 0) {
+            address.value = data[0].regeocodeData.formatted_address;
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:240", "地址信息:", address.value);
+            markers.value = [
+              new UTSJSONObject({
+                id: 1,
+                latitude,
+                longitude,
+                iconPath: "/static/marker.png",
+                width: 40,
+                height: 40,
+                callout: new UTSJSONObject({
+                  content: address.value,
+                  borderRadius: 5,
+                  padding: 5,
+                  display: "ALWAYS"
+                })
+              })
+            ];
           } else {
             common_vendor.index.showToast({ title: "获取地址失败", icon: "none" });
           }
+        },
+        fail: (err = null) => {
+          common_vendor.index.showToast({
+            title: err.errMsg,
+            icon: "none"
+          });
         }
+      }));
+    };
+    const handMarkerTap = (e = null) => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:287", "markertap event:", e);
+      if (e.detail && e.detail.markerId !== void 0) {
+        const markerId = e.detail.markerId;
+        const marker = UTS.arrayFind(markers.value, (m = null) => {
+          return m.id === markerId;
+        });
+        if (marker && marker.extData) {
+          currentDeviceInfo.value = {
+            deviceName: marker.extData.deviceName || "",
+            carNumber: marker.extData.carNumber || "",
+            deviceSerial: marker.extData.deviceSerial || "",
+            locationType: marker.extData.locationType || "",
+            lngLat: `${marker.extData.latitude},${marker.extData.longitude}` || "",
+            updateTime: marker.extData.updateTime || "",
+            locationTime: marker.extData.locationTime || "",
+            speed: marker.extData.speed || "",
+            totalMileage: marker.extData.totalMileage || "",
+            address: marker.extData.address || ""
+          };
+          showDevicePopup.value = true;
+          return null;
+        }
+      }
+      common_vendor.index.__f__("warn", "at pages/index/index.uvue:312", "无法获取标记点信息", e);
+      common_vendor.index.showToast({
+        title: "无法获取设备信息",
+        icon: "none"
       });
+    };
+    const closeDevicePopup = () => {
+      showDevicePopup.value = false;
     };
     const toggleMapMode = () => {
       showMap.value = !showMap.value;
     };
-    const toggleMode = (mode) => {
-      currentMode.value = mode;
-      if (mode === "track") {
-        initCarMarker();
-        resetPlayback();
-        adjustMapToFitTrack();
-      }
+    const toggleMoreTools = () => {
+      showMoreTools.value = !showMoreTools.value;
     };
     const startDrawing = () => {
       isDrawing.value = true;
@@ -117,17 +220,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
     const handleMapTap = (point) => {
       if (!isDrawing.value || currentMode.value !== "draw")
         return null;
-      addNewPoint(point.latitude, point.longitude);
+      addNewPoint(point.detail.latitude, point.detail.longitude);
     };
     const addPoint = () => {
       addNewPoint(center.latitude, center.longitude);
     };
     const addNewPoint = (lat, lng) => {
       points.value.push({ latitude: lat, longitude: lng });
-      updateMapDisplay();
-    };
-    const removePoint = (index) => {
-      points.value.splice(index, 1);
       updateMapDisplay();
     };
     const finishDrawing = () => {
@@ -137,14 +236,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       }
       isDrawing.value = false;
       common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:266", "电子围栏坐标:", UTS.JSON.stringify(points.value));
-      polygons.value = [new UTSJSONObject({
-        points: points.value,
-        strokeWidth: 2,
-        strokeColor: "#FF0000",
-        fillColor: "rgba(255,0,0,0.2)",
-        zIndex: 1
-      })];
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:379", "电子围栏坐标:", UTS.JSON.stringify(points.value));
+      updateFencePolygon();
       checkCarInFence(center);
     };
     const clearAll = () => {
@@ -152,58 +245,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       points.value = [];
       polygons.value = [];
       carInFence.value = false;
+      isDragging.value = false;
+      draggingIndex.value = -1;
       updateMapDisplay();
     };
+    const loadPolygons = () => {
+      polygons.value = [new UTSJSONObject({
+        points: [new UTSJSONObject({ "latitude": 35.277849527708206, "longitude": 115.39025552959356 }), new UTSJSONObject({ "latitude": 35.22397928678945, "longitude": 115.37543744586583 }), new UTSJSONObject({ "latitude": 35.23341600978699, "longitude": 115.44904849298473 }), new UTSJSONObject({ "latitude": 35.279357522215726, "longitude": 115.45106784538075 })],
+        strokeWidth: 2,
+        strokeColor: "#FF0000",
+        fillColor: "rgba(255,0,0,0.2)",
+        zIndex: 1
+      })];
+    };
+    function updateFencePolygon() {
+      polygons.value = [new UTSJSONObject({
+        points: points.value,
+        strokeWidth: 2,
+        strokeColor: isDragging.value ? "#00AA00" : "#FF0000",
+        fillColor: isDragging.value ? "rgba(0,170,0,0.2)" : "rgba(255,0,0,0.2)",
+        zIndex: 1
+      })];
+    }
     const loadSampleTrack = () => {
       const mockTrack = [new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }), new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }), new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }), new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }), new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 })];
       trackPoints.value = mockTrack;
       calculateTrackDistance();
       updatePolyline();
-    };
-    const initCarMarker = () => {
-      if (trackPoints.value.length > 0 && !carMarker.value) {
-        carMarker.value = new UTSJSONObject({
-          id: 999,
-          latitude: trackPoints.value[0].latitude,
-          longitude: trackPoints.value[0].longitude,
-          iconPath: "/static/car.png",
-          width: 32,
-          height: 32,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-        });
-        markers.value = [carMarker.value];
-      }
-    };
-    const adjustMapToFitTrack = () => {
-      if (trackPoints.value.length === 0)
-        return null;
-      const bounds = calculateTrackBounds();
-      center.latitude = (bounds.minLat + bounds.maxLat) / 2;
-      center.longitude = (bounds.minLng + bounds.maxLng) / 2;
-      const latDiff = bounds.maxLat - bounds.minLat;
-      const lngDiff = bounds.maxLng - bounds.minLng;
-      const maxDiff = Math.max(latDiff, lngDiff);
-      if (maxDiff > 0.1)
-        mapScale.value = 11;
-      else if (maxDiff > 0.05)
-        mapScale.value = 12;
-      else if (maxDiff > 0.02)
-        mapScale.value = 13;
-      else
-        mapScale.value = 14;
-    };
-    const calculateTrackBounds = () => {
-      let minLat = trackPoints.value[0].latitude;
-      let maxLat = trackPoints.value[0].latitude;
-      let minLng = trackPoints.value[0].longitude;
-      let maxLng = trackPoints.value[0].longitude;
-      trackPoints.value.forEach((point) => {
-        minLat = Math.min(minLat, point.latitude);
-        maxLat = Math.max(maxLat, point.latitude);
-        minLng = Math.min(minLng, point.longitude);
-        maxLng = Math.max(maxLng, point.longitude);
-      });
-      return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
     };
     const calculateTrackDistance = () => {
       totalDistance.value = 0;
@@ -221,67 +289,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       const b = rad(lng1) - rad(lng2);
       const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
       return s * 6378.137 * 1e3;
-    };
-    const startPlayback = () => {
-      if (trackPoints.value.length === 0) {
-        common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
-        return null;
-      }
-      isPlaying.value = true;
-      currentIndex.value = 0;
-      initCarMarker();
-      playbackInterval.value = setInterval(playNextPoint, 1e3 / playbackSpeed.value);
-    };
-    const playNextPoint = () => {
-      if (currentIndex.value >= trackPoints.value.length - 1) {
-        pausePlayback();
-        return null;
-      }
-      currentIndex.value++;
-      const point = trackPoints.value[currentIndex.value];
-      if (carMarker.value) {
-        carMarker.value.latitude = point.latitude;
-        carMarker.value.longitude = point.longitude;
-        markers.value = [carMarker.value];
-      }
-      checkCarInFence(point);
-    };
-    const pausePlayback = () => {
-      isPlaying.value = false;
-      if (playbackInterval.value) {
-        clearInterval(playbackInterval.value);
-        playbackInterval.value = null;
-      }
-    };
-    const resetPlayback = () => {
-      pausePlayback();
-      currentIndex.value = 0;
-      updatePolyline();
-      if (trackPoints.value.length > 0) {
-        initCarMarker();
-        if (carMarker.value) {
-          carMarker.value.latitude = trackPoints.value[0].latitude;
-          carMarker.value.longitude = trackPoints.value[0].longitude;
-          markers.value = [carMarker.value];
-        }
-        checkCarInFence(trackPoints.value[0]);
-      }
-    };
-    const clearTrack = () => {
-      pausePlayback();
-      trackPoints.value = [];
-      polyline.value = [];
-      totalDistance.value = 0;
-      carMarker.value = null;
-      markers.value = [];
-      carInFence.value = false;
-    };
-    const setPlaybackSpeed = (e = null) => {
-      playbackSpeed.value = e.detail.value;
-      if (isPlaying.value) {
-        pausePlayback();
-        startPlayback();
-      }
     };
     const updatePolyline = () => {
       if (!trackPoints.value || trackPoints.value.length === 0) {
@@ -304,13 +311,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       if (currentMode.value === "draw") {
         newMarkers.push(...points.value.map((point, index) => {
           return new UTSJSONObject({
-            id: index + 1,
+            id: 1e3 + index,
             latitude: point.latitude,
             longitude: point.longitude,
-            iconPath: "/static/marker.png",
-            width: 20,
-            height: 20,
-            callout: new UTSJSONObject({ content: `顶点${index + 1}`, display: "ALWAYS" })
+            iconPath: isDragging.value && index === draggingIndex.value ? "/static/marker_active.png" : "/static/marker.png",
+            width: 32,
+            height: 32,
+            callout: new UTSJSONObject({ content: `顶点${index + 1}`, display: "ALWAYS" }),
+            draggable: !isDrawing.value,
+            anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
+            // 设置锚点为中心
           });
         }));
       }
@@ -319,13 +329,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
       }
       markers.value = newMarkers;
       if (currentMode.value === "draw" && points.value.length >= 3) {
-        polygons.value = [new UTSJSONObject({
-          points: points.value,
-          strokeWidth: 2,
-          strokeColor: "#FF0000",
-          fillColor: "rgba(255,0,0,0.2)",
-          zIndex: 1
-        })];
+        updateFencePolygon();
       } else {
         polygons.value = [];
       }
@@ -335,90 +339,74 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(new UTSJSONObjec
     };
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.unref(showMap)
+        a: common_vendor.o(handleCapsule),
+        b: common_vendor.p(new UTSJSONObject({
+          title: "首页",
+          ["show-back"]: true,
+          backgroundColor: "#fff",
+          textColor: "#333",
+          showCapsule: true
+        })),
+        c: common_vendor.unref(showMap)
       }), common_vendor.unref(showMap) ? new UTSJSONObject({
-        b: common_vendor.o(handleMapTap),
-        c: common_vendor.p(new UTSJSONObject({
-          center: common_vendor.unref(center),
-          mapScale: common_vendor.unref(mapScale),
-          polygons: common_vendor.unref(polygons),
-          markers: common_vendor.unref(markers),
-          polyline: common_vendor.unref(polyline),
-          isDrawing: common_vendor.unref(isDrawing),
-          currentMode: common_vendor.unref(currentMode)
+        d: common_vendor.sei("myMap", "map"),
+        e: common_vendor.unref(center).latitude,
+        f: common_vendor.unref(center).longitude,
+        g: common_vendor.unref(polygons),
+        h: common_vendor.unref(markers),
+        i: common_vendor.unref(polyline),
+        j: common_vendor.unref(mapScale),
+        k: common_vendor.o(handleMapTap),
+        l: common_vendor.o(handMarkerTap),
+        m: common_vendor.o(closeDevicePopup),
+        n: common_vendor.p(new UTSJSONObject({
+          ["show-popup"]: common_vendor.unref(showDevicePopup),
+          ["device-info"]: common_vendor.unref(currentDeviceInfo)
         }))
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        d: common_assets._imports_0,
-        e: common_vendor.o(($event = null) => {
-          return getlocation();
-        }),
-        f: common_vendor.unref(showMap) ? "/static/list.png" : "/static/map.png",
-        g: common_vendor.o(toggleMapMode),
-        h: common_vendor.n(common_vendor.unref(currentMode) === "draw" ? "active" : ""),
-        i: common_vendor.o(($event = null) => {
-          return toggleMode("draw");
-        }),
-        j: common_vendor.n(common_vendor.unref(currentMode) === "track" ? "active" : ""),
-        k: common_vendor.o(($event = null) => {
-          return toggleMode("track");
-        }),
-        l: common_vendor.unref(currentMode) === "draw"
-      }), common_vendor.unref(currentMode) === "draw" ? new UTSJSONObject({
-        m: common_vendor.o(startDrawing),
-        n: common_vendor.p(new UTSJSONObject({
-          disabled: common_vendor.unref(isDrawing)
-        })),
-        o: common_vendor.o(addPoint),
-        p: common_vendor.p(new UTSJSONObject({
-          disabled: !common_vendor.unref(isDrawing)
-        })),
-        q: common_vendor.o(finishDrawing),
-        r: common_vendor.p(new UTSJSONObject({
-          disabled: !common_vendor.unref(isDrawing) || common_vendor.unref(points).length < 3
-        })),
-        s: common_vendor.o(clearAll)
-      }) : new UTSJSONObject({
-        t: common_vendor.o(startPlayback),
-        v: common_vendor.p(new UTSJSONObject({
-          disabled: common_vendor.unref(isPlaying)
-        })),
-        w: common_vendor.o(pausePlayback),
-        x: common_vendor.p(new UTSJSONObject({
-          disabled: !common_vendor.unref(isPlaying)
-        })),
-        y: common_vendor.o(clearTrack),
-        z: common_vendor.t(common_vendor.unref(playbackSpeed)),
-        A: common_vendor.unref(playbackSpeed),
-        B: common_vendor.o(setPlaybackSpeed)
-      }), new UTSJSONObject({
-        C: common_vendor.unref(currentMode) === "draw" && common_vendor.unref(points).length > 0
-      }), common_vendor.unref(currentMode) === "draw" && common_vendor.unref(points).length > 0 ? new UTSJSONObject({
-        D: common_vendor.t(common_vendor.unref(points).length),
-        E: common_vendor.f(common_vendor.unref(points), (point = null, index = null, i0 = null) => {
+        o: common_vendor.unref(showMap) ? "/static/list.png" : "/static/map.png",
+        p: common_vendor.o(toggleMapMode),
+        q: common_vendor.unref(showMap)
+      }), common_vendor.unref(showMap) ? new UTSJSONObject({
+        r: common_assets._imports_0,
+        s: common_vendor.o(toggleMoreTools)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        t: common_vendor.unref(showMoreTools) && common_vendor.unref(showMap)
+      }), common_vendor.unref(showMoreTools) && common_vendor.unref(showMap) ? new UTSJSONObject({
+        v: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return new UTSJSONObject({
-            a: common_vendor.t(index + 1),
-            b: common_vendor.t(point.latitude.toFixed(6)),
-            c: common_vendor.t(point.longitude.toFixed(6)),
-            d: common_vendor.o(($event = null) => {
-              return removePoint(index);
-            }, index),
-            e: "a4fca7fa-13-" + i0,
-            f: index
+            a: "a4fca7fa-5-" + i0 + "," + ("a4fca7fa-4-" + i0),
+            b: common_vendor.p(new UTSJSONObject({
+              customStyle: new UTSJSONObject({
+                paddingTop: "20rpx"
+              }),
+              name: item.name,
+              size: 54
+            })),
+            c: common_vendor.t(item.title),
+            d: index,
+            e: "a4fca7fa-4-" + i0 + ",a4fca7fa-3"
           });
         }),
-        F: common_vendor.p(new UTSJSONObject({
-          text: "删除"
-        }))
-      }) : new UTSJSONObject({
-        G: common_vendor.t(common_vendor.unref(trackPoints).length),
-        H: common_vendor.t((common_vendor.unref(totalDistance) / 1e3).toFixed(2)),
-        I: common_vendor.t(common_vendor.unref(playbackSpeed))
-      }), new UTSJSONObject({
-        J: common_assets._imports_1,
-        K: common_vendor.t(common_vendor.unref(carInFence) ? "车辆在围栏内" : "车辆在围栏外"),
-        L: common_vendor.n(common_vendor.unref(carInFence) ? "in" : "out"),
-        M: common_vendor.n(common_vendor.unref(carInFence) ? "in-fence" : "out-fence"),
-        N: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        w: common_vendor.o(click),
+        x: common_vendor.p(new UTSJSONObject({
+          col: 5
+        })),
+        y: common_vendor.o(startDrawing),
+        z: common_vendor.p(new UTSJSONObject({
+          disabled: common_vendor.unref(isDrawing)
+        })),
+        A: common_vendor.o(addPoint),
+        B: common_vendor.p(new UTSJSONObject({
+          disabled: !common_vendor.unref(isDrawing)
+        })),
+        C: common_vendor.o(finishDrawing),
+        D: common_vendor.p(new UTSJSONObject({
+          disabled: !common_vendor.unref(isDrawing) || common_vendor.unref(points).length < 3
+        })),
+        E: common_vendor.o(clearAll)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

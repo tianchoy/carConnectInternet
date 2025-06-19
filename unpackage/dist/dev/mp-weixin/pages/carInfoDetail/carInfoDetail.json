@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "车辆详情",
+  "usingComponents": {
+    "device-info-component": "../../components/deviceInfoComponent/deviceInfoComponent",
+    "index-list-mode": "../../components/indexListMode/indexListMode",
+    "uv-tags": "../../uni_modules/uv-tags/components/uv-tags/uv-tags"
+  }
+}

@@ -36,168 +36,63 @@
 .container .map-container {
   flex: 1;
   width: 100%;
+  position: relative;
 }
-.container .tools-panel {
+.container .map-container .drag-hint {
   position: absolute;
   top: 20rpx;
-  right: 20rpx;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 15rpx;
-}
-.container .tools-panel button {
-  padding: 12rpx 24rpx;
-  border-radius: 50rpx;
+  left: 0;
+  right: 0;
+  z-index: 100;
   background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-  font-size: 26rpx;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-}
-.container .tools-panel .icon {
-  width: 36rpx;
-  height: 36rpx;
-  margin-right: 8rpx;
-}
-.control-panel {
-  padding: 20rpx;
-  background-color: #fff;
-  border-radius: 20rpx;
-  margin: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-}
-.control-panel .mode-toggle {
-  display: flex;
-  background-color: #f5f7fa;
-  border-radius: 50rpx;
-  margin-bottom: 20rpx;
-  overflow: hidden;
-}
-.control-panel .mode-toggle .mode-btn {
-  flex: 1;
   padding: 16rpx;
   text-align: center;
-  background-color: transparent;
-  border: none;
   font-size: 28rpx;
-  color: #666;
-}
-.control-panel .mode-toggle .mode-btn.active {
-  background-color: #3498db;
-  color: #fff;
-  font-weight: 500;
-}
-.control-panel .speed-control {
-  padding: 10rpx 0;
-}
-.control-panel .speed-control .speed-label {
-  font-size: 28rpx;
-  color: #333;
-  margin-bottom: 10rpx;
-  display: block;
-}
-.info-panel {
-  padding: 20rpx;
-  background-color: #fff;
-  border-radius: 20rpx;
-  margin: 0 20rpx 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-}
-.info-panel .section-title {
-  font-size: 32rpx;
+  color: #00aa00;
   font-weight: bold;
-  color: #2c3e50;
-  margin-bottom: 20rpx;
-  display: flex;
-  align-items: center;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
+  animation: pulse 1.5s infinite;
 }
-.info-panel .section-title .section-icon {
-  width: 40rpx;
-  height: 40rpx;
-  margin-right: 12rpx;
+@keyframes pulse {
+0% {
+    opacity: 0.7;
 }
-.info-panel .scroll-container {
-  max-height: 200rpx;
-  padding: 10rpx;
-  background-color: #f9f9f9;
-  border-radius: 12rpx;
+50% {
+    opacity: 1;
 }
-.info-panel .point-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #eee;
+100% {
+    opacity: 0.7;
 }
-.info-panel .point-item .point-info {
-  font-size: 26rpx;
-  color: #333;
-  flex: 1;
 }
-.info-panel .point-item .remove-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
+.container .tool-nav {
+  position: absolute;
+  top: 200rpx;
+  right: 20rpx;
+  z-index: 100;
 }
-.info-panel .point-item .remove-btn .delete-icon {
-  width: 36rpx;
-  height: 36rpx;
+.container .tool-nav .btn-map-list {
+  width: 60rpx;
+  height: 60rpx;
 }
-.info-panel .track-info .info-item {
-  padding: 12rpx 0;
-  font-size: 28rpx;
-  color: #333;
-  border-bottom: 1rpx solid #f0f0f0;
+.container .tool-nav .btn-map-list-icon {
+  width: 100%;
+  height: 100%;
+  padding: 8rpx;
+  border-radius: 10rpx;
+  background-color: #69c2f1;
 }
-.info-panel .status-section {
-  margin-top: 30rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx dashed #eee;
+.container .tool-more {
+  position: absolute;
+  top: 30%;
+  right: 20rpx;
+  z-index: 100;
+  width: 60rpx;
+  height: 60rpx;
 }
-.info-panel .status-display {
-  padding: 24rpx;
-  border-radius: 16rpx;
-  display: flex;
-  align-items: center;
-  font-size: 32rpx;
-  font-weight: 500;
-  margin: 20rpx 0;
+.container .tool-more .btn-tool-more-icon {
+  width: 100%;
+  height: 100%;
 }
-.info-panel .status-display.in-fence {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: #27ae60;
-}
-.info-panel .status-display.out-fence {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-}
-.info-panel .status-display .status-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-right: 15rpx;
-}
-.info-panel .status-display .status-indicator {
-  width: 20rpx;
-  height: 20rpx;
-  border-radius: 50%;
-  margin-left: 15rpx;
-}
-.info-panel .status-display .status-indicator.in {
-  background-color: #2ecc71;
-  box-shadow: 0 0 10rpx #2ecc71;
-}
-.info-panel .status-display .status-indicator.out {
-  background-color: #e74c3c;
-  box-shadow: 0 0 10rpx #e74c3c;
-}
-.info-panel .algorithm-info {
-  font-size: 26rpx;
-  color: #7f8c8d;
-  text-align: center;
-  margin-top: 10rpx;
+.container .tools-panel {
+  width: 100%;
 }

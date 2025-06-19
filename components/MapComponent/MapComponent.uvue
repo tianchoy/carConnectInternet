@@ -1,72 +1,75 @@
 <template>
-  <view class="map-container">
-    <map 
-      id="fenceMap" 
-      :latitude="center.latitude" 
-      :longitude="center.longitude" 
-      :polygons="polygons"
-      :markers="markers"
-      :polyline="polyline"
-      :scale="mapScale"
-      @tap="handleMapTap"
-      style="width:100%;height:100%"
-      show-location
-    ></map>
-  </view>
+    <view class="map-container">
+        <map 
+            id="fenceMap"
+            :latitude="center.latitude" 
+            :longitude="center.longitude" 
+            :polygons="polygons"
+            :markers="markers" 
+            :polyline="polyline" 
+            :scale="mapScale" 
+            @tap="handleMapTap"
+            style="width:100%;height:100%" 
+            :show-location="true"
+			@markertap="handleMarkerTap"
+        >
+        </map>
+    </view>
 </template>
 
 <script setup lang="uts">
-  import { ref, reactive, watch } from 'vue'
-  
-  // 定义Props
-  const props = defineProps({
-    center: {
-      type: Object,
-      default: () => ({ latitude: 39.90469, longitude: 116.40717 })
-    },
-    mapScale: {
-      type: Number,
-      default: 13
-    },
-    polygons: {
-      type: Array,
-      default: () => []
-    },
-    markers: {
-      type: Array,
-      default: () => []
-    },
-    polyline: {
-      type: Array,
-      default: () => []
-    },
-    isDrawing: {
-      type: Boolean,
-      default: false
-    },
-    currentMode: {
-      type: String,
-      default: 'draw'
+    import { ref, reactive } from 'vue'
+
+    const props = defineProps({
+        center: {
+            type: Object,
+            default: () => ({ latitude: 39.90469, longitude: 116.40717 })
+        },
+        mapScale: {
+            type: Number,
+            default: 13
+        },
+        polygons: {
+            type: Array,
+            default: () => []
+        },
+        markers: {
+            type: Array,
+            default: () => []
+        },
+        polyline: {
+            type: Array,
+            default: () => []
+        },
+        isDrawing: {
+            type: Boolean,
+            default: false
+        },
+        currentMode: {
+            type: String,
+            default: 'draw'
+        }
+    })
+
+    const emit = defineEmits(['map-tap','marker-tap'])
+
+    // 处理地图点击事件
+    const handleMapTap = (e : any) => {
+        if (props.isDrawing && props.currentMode === 'draw') {
+            emit('map-tap', {
+                latitude: e.detail.latitude,
+                longitude: e.detail.longitude
+            });
+        }
     }
-  })
-  
-  // 定义Emits
-  const emit = defineEmits(['map-tap'])
-  
-  // 处理地图点击事件
-  const handleMapTap = (e : any) => {
-    if (props.isDrawing && props.currentMode === 'draw') {
-      emit('map-tap', {
-        latitude: e.detail.latitude,
-        longitude: e.detail.longitude
-      })
-    }
-  }
+	const handleMarkerTap = (e : any) => {
+		emit('marker-tap', e.markerId)
+	}
 </script>
 
 <style lang="scss">
-  .map-container {
-    width: 100%;
-    height: 100%;
-  }
+    .map-container {
+        width: 100%;
+        height: 100%;
+    }
 </style>

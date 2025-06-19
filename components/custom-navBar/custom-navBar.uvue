@@ -1,0 +1,120 @@
+<template>
+	<view :style="{ height: statusBarHeight + 'px' }"></view>
+	<view class="navbar" :style="{
+    height: navBarHeight + 'px',
+    background: backgroundColor
+  }">
+		<view class="back-btn">
+			<image  v-if="showBack" src="/static/back.png" mode="aspectFit" class="icon"  @click="handleBack" />
+		</view>
+		<view class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
+			<slot name="title">{{ title }}</slot>
+		</view>
+		<view v-if="showCapsule" class="capsule" :style="{
+      right: 170+'rpx',
+    }">
+			<view class="capsule-item" @click="emit('capsuleClick', 'menu')">
+				<image src="/static/menu.png" mode="aspectFit" class="menu-icon" />
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	const props = defineProps({
+		title: String,
+		showBack: { type: Boolean, default: true },
+		backText: { type: String, default: '' },
+		showCapsule: { type: Boolean, default: true },
+		backgroundColor: { type: String, default: '#ffffff' },
+		textColor: { type: String, default: '#000000' }
+	});
+
+	const emit = defineEmits(['back', 'capsuleClick']);
+
+	// 动态尺寸数据
+	const statusBarHeight = ref(20);
+	const navBarHeight = ref(44);
+	const menuButtonInfo = ref({
+		top: 4,
+		right: 10,
+		width: 87,
+		height: 32
+	});
+
+	// 初始化尺寸数据
+	const initDimensions = () => {
+		const systemInfo = uni.getSystemInfoSync();
+		statusBarHeight.value = systemInfo.statusBarHeight || 20;
+
+		try {
+			const menuRect = uni.getMenuButtonBoundingClientRect();
+			if (menuRect) {
+				console.log(menuRect);
+				menuButtonInfo.value = menuRect;
+				// 关键计算公式 :cite[2]:cite[7]
+				const gap = menuRect.top - statusBarHeight.value;
+				navBarHeight.value = gap * 2 + menuRect.height + 4;
+			}
+		} catch (e) {
+			console.warn('胶囊按钮信息获取失败', e);
+		}
+	};
+
+	// 返回按钮处理
+	const handleBack = () => {
+		const pages = getCurrentPages();
+		console.log('back',pages.length);
+		if (pages.length > 1) {
+			uni.navigateBack();
+		} else {
+			uni.switchTab({ url: '/pages/index/index' });
+		}
+		emit('back');
+	};
+
+	onMounted(initDimensions);
+</script>
+
+<style scoped>
+	.navbar {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.back-btn {
+		display: flex;
+		align-items: center;
+		width: 70rpx;
+		height: 40rpx;
+		z-index: 10;
+	}
+
+	.title {
+		text-align: center;
+	}
+
+	.capsule {
+		text-align: center;
+	}
+
+	.capsule-item {
+		width: 40px;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.icon {
+		width: 40rpx;
+		height: 40rpx;
+	}
+	.menu-icon{
+		width: 60rpx;
+		height: 60rpx;
+	}
+</style>

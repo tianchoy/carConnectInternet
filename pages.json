@@ -5,11 +5,13 @@
 			"^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
 		}
 	},
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app x"
+				"navigationBarTitleText": "车联网",
+				"navigationStyle": "custom" ,
+				"app-plus": { "titleView": false }
 			}
 		},
 		{
@@ -22,6 +24,13 @@
 			"path": "pages/userCenter/userCenter",
 			"style": {
 				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path" : "pages/carInfoDetail/carInfoDetail",
+			"style" : 
+			{
+				"navigationBarTitleText" : "车辆详情"
 			}
 		}
 	],

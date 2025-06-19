@@ -1,0 +1,37 @@
+:host{display:flex;flex-direction:column}
+
+.navbar.data-v-11b89787 {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+}
+.back-btn.data-v-11b89787 {
+		display: flex;
+		align-items: center;
+		width: 70rpx;
+		height: 40rpx;
+		z-index: 10;
+}
+.title.data-v-11b89787 {
+		text-align: center;
+}
+.capsule.data-v-11b89787 {
+		text-align: center;
+}
+.capsule-item.data-v-11b89787 {
+		width: 40px;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+}
+.icon.data-v-11b89787 {
+		width: 40rpx;
+		height: 40rpx;
+}
+.menu-icon.data-v-11b89787{
+		width: 60rpx;
+		height: 60rpx;
+}
