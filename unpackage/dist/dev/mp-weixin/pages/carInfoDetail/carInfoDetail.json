@@ -1,8 +1,12 @@
 {
   "navigationBarTitleText": "车辆详情",
   "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "device-info-component": "../../components/deviceInfoComponent/deviceInfoComponent",
-    "index-list-mode": "../../components/indexListMode/indexListMode",
-    "uv-tags": "../../uni_modules/uv-tags/components/uv-tags/uv-tags"
+    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
+    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
+    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "uv-slider": "../../uni_modules/uv-slider/components/uv-slider/uv-slider"
   }
 }

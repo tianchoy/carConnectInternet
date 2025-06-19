@@ -66,7 +66,7 @@
 }
 .container .tool-nav {
   position: absolute;
-  top: 20rpx;
+  top: 200rpx;
   right: 20rpx;
   z-index: 100;
 }
@@ -83,7 +83,7 @@
 }
 .container .tool-more {
   position: absolute;
-  top: 160rpx;
+  top: 30%;
   right: 20rpx;
   z-index: 100;
   width: 60rpx;
@@ -95,7 +95,29 @@
 }
 .container .tools-panel {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  background-color: #fff;
+}
+.container .tools-panel .h-line {
+  width: 90%;
+  height: 2rpx;
+  background-color: #f1f1f1;
+  margin: 50rpx auto 0;
+}
+.container .tools-panel .tool-tag-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50rpx 20rpx;
+}
+.container .tools-panel .speed-control {
   padding: 20rpx;
+}
+.container .tools-panel .speed-control .slider {
+  width: 90%;
+  margin: 0 auto;
+}
+.container .tools-panel .grid-text {
+  padding: 20rpx 0 0;
+  box-sizing: border-box;
 }

@@ -1,5 +1,5 @@
 <template>
-	<view :style="{ height: statusBarHeight + 'px' }"></view>
+	<view :style="{ height: statusBarHeight + 'px','background-color':'#fff' }"></view>
 	<view class="navbar" :style="{
     height: navBarHeight + 'px',
     background: backgroundColor

@@ -3,6 +3,7 @@
 		<uv-tabs :list="list" :current="currentList" itemStyle="height:35" lineWidth="55" @click="selectList"></uv-tabs>
 		<view class="msg-content">
 			{{list[currentList].name}}
+			<uv-button type="primary" text="详情" @click="todetail"></uv-button>
 		</view>
 	</view>
 </template>
@@ -29,6 +30,12 @@
 	const selectList = (e) => {
 		console.log(e.index);
 		currentList.value = e.index
+	}
+	
+	const todetail = () => {
+		uni.navigateTo({
+			url: '/pages/carInfoDetail/carInfoDetail'
+		})
 	}
 	
 </script>

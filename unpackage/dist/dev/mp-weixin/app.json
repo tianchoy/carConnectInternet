@@ -6,6 +6,7 @@
     "pages/carInfoDetail/carInfoDetail"
   ],
   "window": {
+    "navigationStyle": "custom",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app x",
     "navigationBarBackgroundColor": "#F8F8F8",

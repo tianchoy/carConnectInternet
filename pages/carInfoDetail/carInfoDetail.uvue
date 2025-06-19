@@ -1,7 +1,9 @@
 <template>
 	<view class="container">
-		<!-- 地图组件 -->
-		<view class="map-container" v-if="showMap">
+		<custom-navBar title="详情" :show-back="true" backgroundColor="#fff" textColor="#333"
+			@capsuleClick="handleCapsule" :showCapsule="true">
+		</custom-navBar>
+		<view class="map-container">
 			<!-- <MapComponent :center="center" :mapScale="mapScale" :polygons="polygons" :markers="markers"
 				:polyline="polyline" :isDrawing="isDrawing" :currentMode="currentMode" @map-tap="handleMapTap"
 				@marker-tap="handMarkerTap" /> -->
@@ -12,61 +14,54 @@
 			<deviceInfoComponent :show-popup="showDevicePopup" :device-info="currentDeviceInfo"
 				@close="closeDevicePopup" />
 		</view>
-		<view v-else>
-			<indexListMode />
-		</view>
-		<view class="tool-nav">
-			<view class="btn-map-list" @click="toggleMapMode">
-				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="btn-map-list-icon" />
-			</view>
-		</view>
-		<view class="tool-more" @click="toggleMoreTools" v-if="showMap">
+
+		<view class="tool-more" @click="toggleMoreTools">
 			<image src="/static/icon-tool.png" mode="aspectFit" class="btn-tool-more-icon"></image>
 		</view>
 
-		<view class="tools-panel" v-if="showMoreTools && showMap">
-			<view class="uv-page__tag-item" v-for="(item, index) in radios" :key="index">
-				<uv-tags :text="`选项${index + 1}`" :plain="!item.checked" :name="index"
-					@click="radioClick">
-				</uv-tags>
+		<view class="tools-panel" v-if="showMoreTools">
+			<uv-grid :col="4" @click="click">
+				<uv-grid-item v-for="(item,index) in baseList" :key="index">
+					<uv-icon :customStyle="{paddingTop:40+'rpx'}" :name="item.name" :size="56"></uv-icon>
+					<text class="grid-text">{{item.title}}</text>
+				</uv-grid-item>
+			</uv-grid>
+			<view class="h-line"></view>
+			<view v-if="currentToolItem == 4">
+				<view class="tool-tag-item">
+					<uv-button @click="startDrawing" :disabled="isDrawing">
+						开始绘制
+					</uv-button>
+					<uv-button @click="addPoint" :disabled="!isDrawing">
+						添加当前点
+					</uv-button>
+					<uv-button @click="finishDrawing" :disabled="!isDrawing || points.length < 3">
+						完成绘制
+					</uv-button>
+					<uv-button @click="clearAll">
+						重置
+					</uv-button>
+				</view>
 			</view>
-
-			<!-- <uv-button :class="['mode-btn', currentMode === 'draw' ? 'active' : '']" @click="toggleMode('draw')">
-				绘制模式
-			</uv-button>
-			<uv-button :class="['mode-btn', currentMode === 'track' ? 'active' : '']" @click="toggleMode('track')">
-				轨迹模式
-			</uv-button>
-			<template v-if="currentMode === 'draw'">
-				<uv-button @click="startDrawing" :disabled="isDrawing">
-					开始绘制
-				</uv-button>
-				<uv-button @click="addPoint" :disabled="!isDrawing">
-					添加当前点
-				</uv-button>
-				<uv-button @click="finishDrawing" :disabled="!isDrawing || points.length < 3">
-					完成绘制
-				</uv-button>
-				<uv-button @click="clearAll">
-					重置
-				</uv-button>
-			</template>
-
-			<template v-else>
-				<uv-button @click="startPlayback" :disabled="isPlaying">
-					开始回放
-				</uv-button>
-				<uv-button @click="pausePlayback" :disabled="!isPlaying">
-					暂停
-				</uv-button>
-				<uv-button @click="clearTrack">
-					清除轨迹
-				</uv-button>
+			<view v-if="currentToolItem == 0">
+				<view class="tool-tag-item">
+					<uv-button @click="startPlayback" :disabled="isPlaying">
+						开始回放
+					</uv-button>
+					<uv-button @click="pausePlayback" :disabled="!isPlaying">
+						暂停
+					</uv-button>
+					<uv-button @click="clearTrack">
+						清除轨迹
+					</uv-button>
+				</view>
 				<view class="speed-control">
 					<text class="speed-label">回放速度: {{playbackSpeed}}x</text>
-					<slider :value="playbackSpeed" min="1" max="5" @change="setPlaybackSpeed" show-value />
+					<uv-slider class="slider" v-model="playbackSpeed" block-size="15" block-color="red" backgroundColor="pink"
+						activeColor="blue" min="1" max="5" @change="setPlaybackSpeed">
+					</uv-slider>
 				</view>
-			</template> -->
+			</view>
 		</view>
 	</view>
 </template>
@@ -74,14 +69,22 @@
 <script setup lang="uts">
 	import amapFile from '../../utils/amap-wx.130'
 
+	const navBarHeight = ref(88); // 由组件实际高度决定
+
+	const handleCapsule = (type) => {
+		if (type === 'close') {
+			uni.navigateBack();
+		} else {
+			uni.showToast({ title: '菜单点击', icon: 'none' });
+		}
+	};
+
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
-	const currentMode = ref<'draw' | 'track'>('draw')
-	const showMap = ref(true)
 	const showMoreTools = ref(true)
 	const carInFence = ref(false) // 车辆是否在围栏内
 
@@ -126,20 +129,28 @@
 		address: ''
 	})
 
-	const radios = ref([{
-		checked: true
+	const currentToolItem = ref(0)
+	const baseList = ref([{
+		name: '/static/gjhf.png',
+		title: '轨迹回放'
 	}, {
-		checked: false
+		name: '/static/clgz.png',
+		title: '车辆跟踪'
 	}, {
-		checked: false
-	}])
-
-	const radioClick = (name) => {
-		radios.value.map((item, index) => {
-			item.checked = index === name ? true : false
-		})
+		name: '/static/lcjl.png',
+		title: '里程记录'
+	}, {
+		name: '/static/tcjl.png',
+		title: '停车记录'
+	}, {
+		name: '/static/dzwl.png',
+		title: '电子围栏'
 	}
+	])
 
+	const click = (name) => {
+		currentToolItem.value = name
+	}
 	// 检测车辆是否在电子围栏内
 	const checkCarInFence = (point : { latitude : number, longitude : number }) => {
 		if (polygons.value.length === 0 || polygons.value[0].points.length < 3) {
@@ -283,28 +294,9 @@
 		showDevicePopup.value = false
 	}
 
-	// 切换地图/列表视图
-	const toggleMapMode = () => {
-		showMap.value = !showMap.value
-	}
-
 	const toggleMoreTools = () => {
 		showMoreTools.value = !showMoreTools.value
 	}
-
-	// 切换模式
-	const toggleMode = (mode : 'draw' | 'track') => {
-		currentMode.value = mode
-		if (mode === 'track') {
-			initCarMarker()
-			resetPlayback()
-			adjustMapToFitTrack()
-		} else {
-			// 切换到绘制模式时更新标记点
-			updateMapDisplay()
-		}
-	}
-
 	/* 电子围栏功能部分 */
 	const startDrawing = () => {
 		isDrawing.value = true
@@ -313,7 +305,6 @@
 	}
 
 	const handleMapTap = (point : { latitude : number, longitude : number }) => {
-		if (!isDrawing.value || currentMode.value !== 'draw') return
 		addNewPoint(point.detail.latitude, point.detail.longitude)
 	}
 
@@ -541,7 +532,7 @@
 	}
 
 	const setPlaybackSpeed = (e : any) => {
-		playbackSpeed.value = e.detail.value
+		playbackSpeed.value = e
 		if (isPlaying.value) {
 			pausePlayback()
 			startPlayback()
@@ -570,21 +561,21 @@
 		const newMarkers = []
 
 		// 添加围栏顶点标记
-		if (currentMode.value === 'draw') {
-			newMarkers.push(...points.value.map((point, index) => ({
-				id: 1000 + index,  // 使用数字ID（1000+）
-				latitude: point.latitude,
-				longitude: point.longitude,
-				iconPath: isDragging.value && index === draggingIndex.value
-					? '/static/marker_active.png'
-					: '/static/marker.png',
-				width: 32,
-				height: 32,
-				callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
-				draggable: !isDrawing.value,  // 只有在绘制完成后才能拖动
-				anchor: { x: 0.5, y: 0.5 }    // 设置锚点为中心
-			})))
-		}
+
+		newMarkers.push(...points.value.map((point, index) => ({
+			id: 1000 + index,  // 使用数字ID（1000+）
+			latitude: point.latitude,
+			longitude: point.longitude,
+			iconPath: isDragging.value && index === draggingIndex.value
+				? '/static/marker_active.png'
+				: '/static/marker.png',
+			width: 32,
+			height: 32,
+			callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+			draggable: !isDrawing.value,  // 只有在绘制完成后才能拖动
+			anchor: { x: 0.5, y: 0.5 }    // 设置锚点为中心
+		})))
+
 
 		// 添加车辆标记
 		if (carMarker.value) {
@@ -594,16 +585,14 @@
 		markers.value = newMarkers
 
 		// 更新围栏多边形
-		if (currentMode.value === 'draw' && points.value.length >= 3) {
+		if (points.value.length >= 3) {
 			updateFencePolygon()
 		} else {
 			polygons.value = []
 		}
 
 		// 更新轨迹线
-		if (currentMode.value === 'track') {
-			updatePolyline()
-		}
+		updatePolyline()
 	}
 </script>
 
@@ -654,7 +643,7 @@
 
 		.tool-nav {
 			position: absolute;
-			top: 20rpx;
+			top: 200rpx;
 			right: 20rpx;
 			z-index: 100;
 
@@ -675,7 +664,7 @@
 
 		.tool-more {
 			position: absolute;
-			top: 160rpx;
+			top: 30%;
 			right: 20rpx;
 			z-index: 100;
 			width: 60rpx;
@@ -689,11 +678,37 @@
 
 		.tools-panel {
 			width: 100%;
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			padding: 20rpx;
+			background-color: #fff;
+			
+			.h-line{
+				width: 90%;
+				height: 2rpx;
+				background-color: #f1f1f1;
+				margin: 50rpx auto 0;
+			}
 
-			.uv-page__tag-item {}
+			.tool-tag-item {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 50rpx 20rpx;
+			}
+
+			.speed-control {
+				padding: 20rpx;
+				.slider{
+					width: 90%;
+					margin: 0 auto;
+				}
+			}
+
+			.grid-text {
+				padding: 20rpx 0 0;
+				/* #ifndef APP-PLUS */
+				box-sizing: border-box;
+				/* #endif */
+			}
 		}
 	}
 </style>
