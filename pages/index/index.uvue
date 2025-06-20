@@ -1,14 +1,13 @@
 <template>
 	<view class="container">
 		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333"
-			@capsuleClick="handleCapsule" :showCapsule="true">
+			@capsuleClick="handleCapsule" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true"
+				@regionchange="handleRegionChange">
 			</map>
-			<deviceInfoComponent :show-popup="showDevicePopup" :device-info="currentDeviceInfo"
-				@close="closeDevicePopup" />
 		</view>
 		<view v-else>
 			<indexListMode />
@@ -23,9 +22,13 @@
 
 <script setup lang="uts">
 	import amapFile from '../../utils/amap-wx.130'
+	//高德地图相关
+	const address = ref('')
+	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
+	const myAmapFun = ref()
 
+	//自定义头部导航
 	const navBarHeight = ref(88); // 由组件实际高度决定
-
 	const handleCapsule = (type) => {
 		if (type === 'close') {
 			uni.navigateBack();
@@ -41,36 +44,15 @@
 	})
 	const mapScale = ref(12)
 	const showMap = ref(true)
-
-	//高德地图相关
-	const address = ref('')
-	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
-	const myAmapFun = ref()
-
 	// 标记点集合
 	const markers = ref<Array<any>>([])
 
-	// 控制弹窗显示
-	const showDevicePopup = ref(false)
-	const currentDeviceInfo = ref({
-		deviceName: '',
-		carNumber: '',
-		deviceSerial: '',
-		locationType: '',
-		lngLat: '',
-		updateTime: '',
-		locationTime: '',
-		speed: '',
-		totalMileage: '',
-		address: ''
-	})
 
 
 	// 初始化加载测试的电子围栏
 	onMounted(async () => {
 		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
 		await getlocation() //获取当前位置	
-
 	})
 
 	//获取当前位置
@@ -96,18 +78,133 @@
 					markers.value = [
 						{
 							id: 1,
-							latitude: latitude,
-							longitude: longitude,
+							latitude: '35.297468099059046',
+							longitude: '115.40080913614395',
 							iconPath: '/static/marker.png',
+							joinCluster: true,
 							width: 40,
 							height: 40,
 							callout: {
-								content: address.value,
+
 								borderRadius: 5,
 								padding: 5,
 								display: 'ALWAYS'
 							}
-						}
+						},
+						{
+							id: 2,
+							latitude: '35.29013716066542',
+							longitude: '115.3879504152693',
+							iconPath: '/static/current-location.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+							callout: {
+
+								borderRadius: 5,
+								padding: 5,
+								display: 'ALWAYS'
+							}
+						},
+						{
+							id: 3,
+							latitude: '35.276764674702385',
+							longitude: '115.37423373457307',
+							iconPath: '/static/user_location.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+							callout: {
+
+								borderRadius: 5,
+								padding: 5,
+								display: 'ALWAYS'
+							}
+						},
+						{
+							id: 4,
+							latitude: '35.26338122455396',
+							longitude: '115.3737993948281',
+							iconPath: '/static/marker.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+							callout: {
+
+								borderRadius: 5,
+								padding: 5,
+								display: 'ALWAYS'
+							}
+						},
+						{
+							id: 5,
+							latitude: '35.24911026114625',
+							longitude: '115.37670948421612',
+							iconPath: '/static/marker-active.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+							callout: {
+
+								borderRadius: 5,
+								padding: 5,
+								display: 'ALWAYS'
+							}
+						},
+						{
+							id: 6,
+							latitude: '35.25490871693403',
+							longitude: '115.4736823649265',
+							iconPath: '/static/vertex.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
+						{
+							id: 7,
+							latitude: '35.265920623714884',
+							longitude: '115.47432047397626',
+							iconPath: '/static/marker.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
+						{
+							id: 8,
+							latitude: '35.280857632699494',
+							longitude: '115.48226198671648',
+							iconPath: '/static/marker-active.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
+						{
+							id: 9,
+							latitude: '35.2892924000666',
+							longitude: '115.47252411687543',
+							iconPath: '/static/marker.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
+						{
+							id: 10,
+							latitude: '35.277303128902886',
+							longitude: '115.44594871137554',
+							iconPath: '/static/user_location.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
+						{
+							id: 11,
+							latitude: '35.27709737493474',
+							longitude: '115.42029729381204',
+							iconPath: '/static/marker.png',
+							joinCluster: true,
+							width: 40,
+							height: 40,
+						},
 					]
 				} else {
 					uni.showToast({ title: '获取地址失败', icon: 'none' })
@@ -122,63 +219,85 @@
 		})
 	}
 
-	//打开地图app跳转
-	const handMarkerTap = (e) => {
-		// const mapContext = uni.createMapContext("myMap", this); 
-		// mapContext.openMapApp({
-		// 	latitude: center.latitude,  
-		// 	longitude: center.longitude, 
-		// 	destination: address.value, 
-		// 	success(res) {
-		// 		console.log('success!!', res);
-		// 	},
-		// 	fail(err) {
-		// 		uni.showToast({
-		// 			title: err.errMsg,
-		// 			icon: 'none'
-		// 		})
-		// 	}
-		// });
-		console.log('markertap event:', e)
-
-		// 微信小程序返回的是markerId
-		if (e.detail && e.detail.markerId !== undefined) {
-			const markerId = e.detail.markerId
-			const marker = markers.value.find(m => m.id === markerId)
-
-			if (marker && marker.extData) {
-				currentDeviceInfo.value = {
-					deviceName: marker.extData.deviceName || '',
-					carNumber: marker.extData.carNumber || '',
-					deviceSerial: marker.extData.deviceSerial || '',
-					locationType: marker.extData.locationType || '',
-					lngLat: `${marker.extData.latitude},${marker.extData.longitude}` || '',
-					updateTime: marker.extData.updateTime || '',
-					locationTime: marker.extData.locationTime || '',
-					speed: marker.extData.speed || '',
-					totalMileage: marker.extData.totalMileage || '',
-					address: marker.extData.address || ''
-				}
-				showDevicePopup.value = true
-				return
+	const handleTap = (e) => {
+		console.log(e.detail);
+		uni.openLocation({
+			latitude: e.detail.latitude,
+			longitude: e.detail.longitude,
+			name: 'test',
+			scale: 18,
+			success: () => {
+				uni.showToast({
+					title: '成功调起地图',
+					icon: 'none'
+				});
+			},
+			fail: (err) => {
+				uni.showToast({
+					title: '调起地图失败',
+					icon: 'none'
+				});
+				console.error('调起地图失败:', err);
 			}
-		}
-
-		console.warn('无法获取标记点信息', e)
-		uni.showToast({
-			title: '无法获取设备信息',
-			icon: 'none'
-		})
+		});
 	}
-
-	// 关闭弹窗
-	const closeDevicePopup = () => {
-		showDevicePopup.value = false
-	}
-
 	// 切换地图/列表视图
 	const toggleMapMode = () => {
 		showMap.value = !showMap.value
+	}
+
+	//聚合点
+	const handleRegionChange = (e) => {
+		console.log('e', e);
+		if (e.type == 'end') {
+			const mapCtx = wx.createMapContext('myMap', this)
+			mapCtx.initMarkerCluster({
+				enableDefaultStyle: false,
+				zoomOnClick: true,
+				gridSize: 10,
+				maxZoom: 17,
+				minClusterSize: 2,
+				success: (res) => {
+					console.log('初始化标记点聚合成功：', res);
+				},
+				fail: (err) => {
+					console.error('初始化标记点聚合失败：', err);
+				}
+			})
+			console.log(mapCtx);
+
+			mapCtx.getScale({
+				success: res => {
+					console.log(res.scale);
+				}
+			})
+
+			//运动轨迹
+			// mapCtx.moveAlong({
+			// 	markerId:1,
+			// 	autoRotate:false,
+			// 	path:[
+			// 		{
+			// 			latitude: '35.297468099059046',
+			// 			longitude: '115.40080913614395',
+			// 		},
+			// 		{
+			// 			latitude: '35.2892924000666',
+			// 			longitude: '115.47252411687543',
+			// 		},
+			// 		{
+			// 			latitude: '35.276764674702385',
+			// 			longitude: '115.37423373457307',
+			// 		}
+			// 	],
+			// 	duration:1000,
+			// 	precision:{},
+			// 	success:res =>{
+			// 		console.log(res);
+			// 	}
+			// })
+		}
+
 	}
 </script>
 
