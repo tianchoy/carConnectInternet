@@ -102,19 +102,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (formRef.value) {
         formRef.value.setRules(rules);
       }
-      const getToken = common_vendor.index.getStorageSync("token");
-      if (getToken) {
-        common_vendor.index.reLaunch({
-          url: "/pages/index/index"
-        });
-      }
     });
     const submit = () => {
       var _a;
       (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then((res) => {
         const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
         api_request.login("POST", newFormData).then((res2 = null) => {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:98", "1111:", res2.data.token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:91", "1111:", res2.data.token);
           common_vendor.index.setStorageSync("token", res2.data.token);
           common_vendor.index.reLaunch({
             url: "/pages/index/index"
@@ -151,8 +145,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return form.value.password = $event;
         }),
         f: common_vendor.p({
-          type: "text",
+          type: "password",
           placeholder: "请输入密码",
+          password: true,
           modelValue: form.value.password
         }),
         g: common_vendor.p({

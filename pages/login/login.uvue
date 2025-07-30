@@ -8,7 +8,7 @@
 					<uv-input v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
 				<uv-form-item label="密码" prop="password">
-					<uv-input v-model="form.password" type="text" placeholder="请输入密码" />
+					<uv-input v-model="form.password" type="password" placeholder="请输入密码" :password="true" />
 				</uv-form-item>
 			</uv-form>
 			<view class="regisiter_box">
@@ -77,13 +77,6 @@
 		if (formRef.value) {
 			formRef.value.setRules(rules)
 		}
-		const getToken = uni.getStorageSync('token')
-		if(getToken){
-			uni.reLaunch({
-				url:'/pages/index/index'
-			})
-		}
-		
 	})
 
 	const submit = () => {

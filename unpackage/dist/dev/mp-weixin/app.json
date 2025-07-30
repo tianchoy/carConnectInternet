@@ -1,10 +1,10 @@
 {
   "pages": [
-    "pages/login/login",
-    "pages/signUp/signUp",
     "pages/index/index",
     "pages/message/message",
     "pages/userCenter/userCenter",
+    "pages/login/login",
+    "pages/signUp/signUp",
     "pages/carInfoDetail/carInfoDetail"
   ],
   "window": {

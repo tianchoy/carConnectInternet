@@ -270,6 +270,14 @@
 			}
 		})
 	}
+	onLoad(()=>{
+		const token = uni.getStorageSync('token')
+		if(!token){
+			uni.navigateTo({
+				url:'/pages/login/login'
+			})
+		}
+	})
 </script>
 
 <style lang="scss">
