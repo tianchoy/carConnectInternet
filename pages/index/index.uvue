@@ -1,0 +1,311 @@
+<template>
+	<view class="container">
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333"
+			@capsuleClick="handleCapsule" :showCapsule="true">
+		</custom-navBar>
+		<view class="map-container" v-if="showMap">
+			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true"
+				@regionchange="handleRegionChange" @markertap="handleTap">
+			</map>
+		</view>
+		<view v-else>
+			<indexListMode />
+		</view>
+		<view class="tool-nav">
+			<view class="btn-map-list" @click="toggleMapMode">
+				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="btn-map-list-icon" />
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import amapFile from '../../utils/amap-wx.130'
+	//高德地图相关
+	const address = ref('')
+	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
+	const myAmapFun = ref({})
+	
+	const handleCapsule = (type:string) => {
+		if (type == 'close') {
+			uni.navigateBack();
+		} else {
+			uni.showToast({ title: '菜单点击', icon: 'none' });
+		}
+	};
+
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(12)
+	const showMap = ref(true)
+	// 标记点集合
+	const markers = ref<Array<any>>([])
+	let mapCtx = undefined
+
+
+	// 初始化加载测试的电子围栏
+	onMounted(async () => {
+		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
+		mapCtx = uni.createMapContext('myMap', this)
+		getlocation() //获取当前位置	
+		
+		mapCtx.initMarkerCluster({
+			enableDefaultStyle: true,
+			zoomOnClick: true,
+			gridSize: 10,
+			maxZoom: 17,
+			minClusterSize: 2,
+			complete(res) {
+				console.log('initMarkerCluster', res)
+			}
+		})
+
+		mapCtx.on("markerClusterCreate", (e) => {
+			console.log("markerClusterCreate", e);
+		});
+
+		addMarkers()
+	})
+
+	//获取当前位置
+	const getlocation = () => {
+		uni.getLocation({
+			success: async (res) => {
+				center.latitude = res.latitude
+				center.longitude = res.longitude
+				address.value = await getRegeo(res.latitude, res.longitude)
+			}
+		})
+	}
+
+	const getRegeo = (latitude, longitude) => {
+	  return new Promise((resolve, reject) => {
+	    myAmapFun.value.getRegeo({
+	      location: `${longitude},${latitude}`,
+	      success: (data:any) => {
+	        if (data.length > 0) {
+	          const address = data[0].regeocodeData.formatted_address;
+			  console.log(address)
+	          resolve(address); // 返回正确地址
+	        } else {
+	          uni.showToast({ title: '获取地址失败', icon: 'none' });
+	          reject(new Error('逆地理编码数据为空'));
+	        }
+	      },
+	      fail: (err:any) => {
+	        uni.showToast({ title: err.errMsg, icon: 'none' });
+	        reject(err); // 传递错误对象
+	      }
+	    });
+	  });
+	};
+
+	const handleTap = (e) => {
+		console.log('e', e);
+		uni.navigateTo({
+			url: '/pages/carInfoDetail/carInfoDetail',
+			success: res => {},
+			fail: () => {},
+			complete: () => {}
+		});
+		//导航去此位置
+		// uni.openLocation({
+		// 	latitude: e.detail.latitude,
+		// 	longitude: e.detail.longitude,
+		// 	name: 'test',
+		// 	scale: 18,
+		// 	success: () => {
+		// 		uni.showToast({
+		// 			title: '成功调起地图',
+		// 			icon: 'none'
+		// 		});
+		// 	},
+		// 	fail: (err) => {
+		// 		uni.showToast({
+		// 			title: '调起地图失败',
+		// 			icon: 'none'
+		// 		});
+		// 		console.error('调起地图失败:', err);
+		// 	}
+		// });
+	}
+	// 切换地图/列表视图
+	const toggleMapMode = () => {
+		showMap.value = !showMap.value
+	}
+
+	//聚合点
+	const handleRegionChange = (e) => {
+		if (e.type == 'end') {
+			// mapCtx.getScale({
+			// 	success: res => {
+			// 		console.log(res.scale);
+			// 	}
+			// })
+
+			// //运动轨迹
+			// mapCtx.moveAlong({
+			// 	markerId:1,
+			// 	autoRotate:false,
+			// 	path:[
+			// 		{
+			// 			latitude: '35.297468099059046',
+			// 			longitude: '115.40080913614395',
+			// 		},
+			// 		{
+			// 			latitude: '35.2892924000666',
+			// 			longitude: '115.47252411687543',
+			// 		},
+			// 		{
+			// 			latitude: '35.276764674702385',
+			// 			longitude: '115.37423373457307',
+			// 		}
+			// 	],
+			// 	duration:1000,
+			// 	precision:{},
+			// 	success:res =>{
+			// 		console.log(res);
+			// 	}
+			// })
+
+		}
+
+	}
+
+	const addMarkers = () => {
+		const positions = [
+			{
+				id: 1,
+				latitude: 35.297468099059046,
+				longitude: 115.40080913614395,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 4,
+				latitude: 35.26338122455396,
+				longitude: 115.3737993948281,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 5,
+				latitude: 35.24911026114625,
+				longitude: 115.37670948421612,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 7,
+				latitude: 35.265920623714884,
+				longitude: 115.47432047397626,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 8,
+				latitude: 35.280857632699494,
+				longitude: 115.48226198671648,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 9,
+				latitude: 35.2892924000666,
+				longitude: 115.47252411687543,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+			{
+				id: 11,
+				latitude: 35.27709737493474,
+				longitude: 115.42029729381204,
+				iconPath: '/static/marker.png',
+				joinCluster: true,
+				width: 40,
+				height: 40,
+			},
+		]
+
+		positions.forEach(async (p, i) => {
+			markers.value.push(
+				Object.assign({}, {
+					id: i + 1,
+					iconPath: '/static/marker.png',
+					width: 50,
+					height: 50,
+					joinCluster: true, // 指定了该参数才会参与聚合
+					callout: {
+						padding: 5,
+						borderWidth: 1,
+						borderRadius: 10,
+						bgColor: '#ffffff',
+						content: await getRegeo(p.latitude,p.longitude),
+						display: 'ALWAYS'
+					}
+				}, p)
+			)
+		})
+		mapCtx.addMarkers({
+			markers: markers.value,
+			clear: false,
+			complete(res) {
+				console.log('addMarkers', res)
+			}
+		})
+	}
+</script>
+
+<style lang="scss">
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f7fa;
+
+		.map-container {
+			flex: 1;
+			width: 100%;
+			position: relative;
+		}
+
+		.tool-nav {
+			position: absolute;
+			top: 200rpx;
+			right: 20rpx;
+			z-index: 100;
+
+			.btn-map-list {
+				width: 60rpx;
+				height: 60rpx;
+
+			}
+
+			.btn-map-list-icon {
+				width: 100%;
+				height: 100%;
+				padding: 8rpx;
+				border-radius: 10rpx;
+				background-color: #69c2f1;
+			}
+		}
+	}
+</style>

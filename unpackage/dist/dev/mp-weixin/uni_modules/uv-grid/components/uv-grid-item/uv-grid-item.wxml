@@ -1,0 +1,1 @@
+<view hover-class="uv-grid-item--hover-class" hover-stay-time="{{200}}" bindtap="{{b}}" class="{{['uv-grid-item', 'data-v-0657340f', c, virtualHostClass]}}" style="{{d + ';' + virtualHostStyle}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" hidden="{{virtualHostHidden || false}}"><slot/></view><wxs src="/common/uniView.wxs" module="uV"/>

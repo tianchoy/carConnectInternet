@@ -1,0 +1,13 @@
+import http from "./http";
+
+const loginUrl = '/sys/login'
+const customList = '/sys/dept/deps'
+
+
+export const login = (method:string,data:UTSJSONObject) =>{
+	return http.post(loginUrl,data)
+}
+
+export const getCustomList = ()=>{
+	return http.get(customList)
+}

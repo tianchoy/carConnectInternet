@@ -1,0 +1,222 @@
+// 定义类型
+interface RequestOptions {
+    url: string
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'HEAD'
+    data?: any
+    header?: Record<string, string>
+    showLoading?: boolean
+    [key: string]: any
+}
+
+interface HttpResponse<T = any> {
+    code: number
+    message: string
+    data: T
+}
+
+interface HttpError {
+    statusCode: number
+    message: string
+    data?: any
+}
+
+const BASE_URL =  'http://car.zdiot.cn:8081/api' // https base地址
+
+// 请求拦截器
+function requestInterceptor(config: RequestOptions): RequestOptions {
+    // 可以在这里添加token等全局header
+    const token = uni.getStorageSync('token')
+	console.log('token',token)
+    if (token) {
+        config.header = config.header || {}
+        config.header['token'] = `${token}`
+    }
+    
+    // 显示加载中
+    if (config.showLoading !== false) {
+        uni.showLoading({
+            title: '加载中...',
+            mask: true
+        })
+    }
+    
+    return config
+}
+
+// 响应拦截器
+function responseInterceptor(response: any, config: RequestOptions): any {
+    // 隐藏加载中
+    if (config.showLoading !== false) {
+        uni.hideLoading()
+    }
+    
+    // 根据业务需求处理响应数据
+    if (response.statusCode === 200) {
+        return response.data
+    } else {
+        throw response
+    }
+}
+
+// 错误处理
+function errorHandler(error: HttpError, config: RequestOptions): void {
+    // 隐藏加载中
+    if (config.showLoading !== false) {
+        uni.hideLoading()
+    }
+    
+    // 处理错误状态码
+    if (error.statusCode) {
+        switch (error.statusCode) {
+            case 401:
+                // token过期处理
+                uni.showToast({
+                    title: '登录已过期，请重新登录',
+                    icon: 'none'
+                })
+                // 跳转到登录页
+                uni.navigateTo({
+                    url: '/pages/login/login'
+                })
+                break
+            case 403:
+                uni.showToast({
+                    title: '没有权限访问',
+                    icon: 'none'
+                })
+                break
+            case 404:
+                uni.showToast({
+                    title: '请求资源不存在',
+                    icon: 'none'
+                })
+                break
+            case 500:
+                uni.showToast({
+                    title: '服务器错误',
+                    icon: 'none'
+                })
+                break
+            default:
+                uni.showToast({
+                    title: `请求错误: ${error.statusCode}`,
+                    icon: 'none'
+                })
+        }
+    } else {
+        // 网络错误等
+        uni.showToast({
+            title: '网络错误，请检查网络连接',
+            icon: 'none'
+        })
+    }
+}
+
+// 封装uni.request
+function request<T = any>(options: RequestOptions): Promise<T> {
+    // 合并配置
+    const config: RequestOptions = {
+        url: options.url,
+        method: options.method || 'GET',
+        data: options.data || {},
+        header: options.header || {},
+        showLoading: options.showLoading !== false, // 默认显示loading
+        ...options
+    }
+    
+    // 处理完整URL
+    if (!config.url.startsWith('http')) {
+        config.url = BASE_URL + config.url
+    }
+    console.log('config',config)
+    // 请求拦截
+    requestInterceptor(config)
+    
+    return new Promise<T>((resolve, reject) => {
+        uni.request({
+            ...config,
+            success: (res: any) => {
+                try {
+                    const data = responseInterceptor(res, config)
+                    resolve(data as T)
+                } catch (error) {
+                    reject(error)
+                }
+            },
+            fail: (error: any) => {
+                errorHandler(error, config)
+                reject(error)
+            }
+        })
+    })
+}
+
+// 封装常用方法
+const http = {
+    get<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
+        return request<T>({
+            url,
+            data,
+            method: 'GET',
+            ...options
+        })
+    },
+    
+    post<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
+        return request<T>({
+            url,
+            data,
+            method: 'POST',
+            ...options
+        })
+    },
+    
+    put<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
+        return request<T>({
+            url,
+            data,
+            method: 'PUT',
+            ...options
+        })
+    },
+    
+    delete<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
+        return request<T>({
+            url,
+            data,
+            method: 'DELETE',
+            ...options
+        })
+    },
+    
+    upload<T = any>(url: string, filePath: string, name: string = 'file', formData: any = {}, options: RequestOptions = {}): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            uni.uploadFile({
+                url: BASE_URL + url,
+                filePath,
+                name,
+                formData,
+                header: options.header || {},
+                success: (res: any) => {
+                    if (res.statusCode === 200) {
+                        try {
+                            // 尝试解析返回的数据
+                            const data = JSON.parse(res.data)
+                            resolve(data as T)
+                        } catch (e) {
+                            resolve(res.data as T)
+                        }
+                    } else {
+                        reject(res)
+                    }
+                },
+                fail: (error: any) => {
+                    errorHandler(error, options)
+                    reject(error)
+                }
+            })
+        })
+    }
+}
+
+export default http

@@ -1,0 +1,82 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
+		}
+	},
+	"pages": [
+		{
+			"path" : "pages/login/login",
+			"style" : 
+			{
+				"navigationBarTitleText" : "登陆"
+			}
+		},
+		{
+			"path" : "pages/signUp/signUp",
+			"style" : 
+			{
+				"navigationBarTitleText" : "注册"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "车联网"
+			}
+		},
+		{
+			"path": "pages/message/message",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/userCenter/userCenter",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path" : "pages/carInfoDetail/carInfoDetail",
+			"style" : 
+			{
+				"navigationBarTitleText" : "车辆详情"
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#2c2c2c",
+		"selectedColor": "#d81e06",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"iconPath": "/static/tabBar/home.png",
+				"selectedIconPath": "/static/tabBar/home1.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/message/message",
+				"iconPath": "/static/tabBar/message.png",
+				"selectedIconPath": "/static/tabBar/message1.png",
+				"text": "消息"
+			},
+			{
+				"pagePath": "pages/userCenter/userCenter",
+				"iconPath": "/static/tabBar/userCenter.png",
+				"selectedIconPath": "/static/tabBar/userCenter1.png",
+				"text": "我的"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationStyle": "custom" ,
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app x",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {}
+}

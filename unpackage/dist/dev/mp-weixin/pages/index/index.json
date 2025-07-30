@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "车联网",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "index-list-mode": "../../components/indexListMode/indexListMode"
+  }
+}

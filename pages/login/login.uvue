@@ -1,0 +1,129 @@
+<template>
+	<view class="container">
+		<custom-navBar title="登陆" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="content">
+			<uv-form :model="form" :rules="rules" ref="formRef">
+				<uv-form-item label="账号" prop="username">
+					<uv-input v-model="form.username" placeholder="请输入账号" />
+				</uv-form-item>
+				<uv-form-item label="密码" prop="password">
+					<uv-input v-model="form.password" type="text" placeholder="请输入密码" />
+				</uv-form-item>
+			</uv-form>
+			<view class="regisiter_box">
+				<text @click="toSignUp">立即注册</text>
+			</view>
+			<uv-button @click="submit">提交</uv-button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, onMounted } from 'vue'
+	import { login } from '../../api/request.uts'
+	// 定义表单类型
+	type FormData = {
+		username : string
+		password : string
+	}
+
+	type UvFormInstance = {
+		setRules : (rules : Record<string, any>) => void
+		validate : () => Promise<boolean>
+	}
+
+	const form = ref<FormData>({
+		username: '',
+		password: ''
+	})
+
+	const formRef = ref<UvFormInstance | null>(null)
+	const deviceModel= ref('')
+
+	const rules = {
+		username: [
+			{
+				required: true,
+				message: '请输入账号',
+				trigger: ['blur', 'change']
+			}
+		],
+		password: [
+			{
+				required: true,
+				message: '请输入密码',
+				trigger: ['blur', 'change']
+			}
+		]
+	}
+
+	//获取系统信息
+	const getSystemInfo = () => {
+		const res = uni.getSystemInfoSync()
+		console.log(res)
+		deviceModel.value = res.deviceModel
+	}
+
+	//注册按钮
+	const toSignUp = () => {
+		uni.reLaunch({
+			url:'/pages/signUp/signUp'
+		})
+	}
+
+	onMounted(() => {
+		getSystemInfo()
+		if (formRef.value) {
+			formRef.value.setRules(rules)
+		}
+		const getToken = uni.getStorageSync('token')
+		if(getToken){
+			uni.reLaunch({
+				url:'/pages/index/index'
+			})
+		}
+		
+	})
+
+	const submit = () => {
+		formRef.value?.validate().then(res => {
+			const newFormData = {
+				...form.value,
+				from:deviceModel.value,
+				type:"USER"
+			}
+			// 请求登陆接口
+			login('POST',newFormData).then(res=>{
+				console.log('1111:',res.data.token)
+				uni.setStorageSync('token',res.data.token)
+				uni.reLaunch({
+					url:'/pages/index/index'
+				})
+			})
+			
+		}).catch(errors => {
+			uni.showToast({
+				icon: 'error',
+				title: '校验失败'
+			})
+		})
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		height: 100vh;
+		background-color: #f5f5f5;
+
+		.content {
+			background-color: #fff;
+			padding: 20rpx;
+
+			.regisiter_box {
+				font-size: 25rpx;
+				margin: 10rpx 0 30rpx;
+			}
+		}
+	}
+</style>

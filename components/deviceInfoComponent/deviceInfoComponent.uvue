@@ -1,0 +1,134 @@
+// DeviceInfoPopup.uts
+<template>
+  <view class="popup-mask" v-if="showPopup" @click="onMaskClick">
+    <view class="popup-content">
+      <view class="popup-header">设备信息</view>
+      <view class="popup-item">
+        <text class="label">设备名称:</text>
+        <text>{{ deviceInfo.deviceName }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">车牌号:</text>
+        <text>{{ deviceInfo.carNumber }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">设备序号:</text>
+        <text>{{ deviceInfo.deviceSerial }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">定位类型:</text>
+        <text>{{ deviceInfo.locationType }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">经纬度:</text>
+        <text>{{ deviceInfo.lngLat }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">更新时间:</text>
+        <text>{{ deviceInfo.updateTime }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">定位时间:</text>
+        <text>{{ deviceInfo.locationTime }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">速度:</text>
+        <text>{{ deviceInfo.speed }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">总里程:</text>
+        <text>{{ deviceInfo.totalMileage }}</text>
+      </view>
+      <view class="popup-item">
+        <text class="label">详细地址:</text>
+        <text>{{ deviceInfo.address }}</text>
+      </view>
+      <view class="btn-group">
+        <button class="popup-btn" @click="onClose">关闭</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const props = defineProps({
+  showPopup: Boolean,
+  deviceInfo: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['close'])
+
+const onClose = () => {
+  emit('close')
+}
+
+const onMaskClick = (e: any) => {
+  // 阻止冒泡，点击内容区域不关闭
+  if (e.target?.className !== 'popup-mask') return
+  onClose()
+}
+</script>
+
+<style lang="scss">
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; 
+  padding: 50rpx 30rpx;
+  box-sizing: border-box;
+
+  .popup-content {
+    width: 100%;
+    max-width: 600rpx;
+    background-color: #fff;
+    border-radius: 20rpx 20rpx 0 0;
+    padding: 30rpx;
+    box-sizing: border-box;
+
+    .popup-header {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20rpx;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10rpx;
+    }
+
+    .popup-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 28rpx;
+      color: #666;
+      margin-bottom: 15rpx;
+
+      .label {
+        color: #999;
+        width: 120rpx;
+      }
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20rpx;
+
+      .popup-btn {
+        padding: 15rpx 30rpx;
+        font-size: 28rpx;
+        border-radius: 10rpx;
+      }
+    }
+  }
+}
+</style>
