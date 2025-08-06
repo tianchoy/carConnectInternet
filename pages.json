@@ -45,6 +45,13 @@
 			{
 				"navigationBarTitleText" : "车辆详情"
 			}
+		},
+		{
+			"path" : "pages/addCar/addCar",
+			"style" : 
+			{
+				"navigationBarTitleText" : "添加车辆"
+			}
 		}
 	],
 	"tabBar": {

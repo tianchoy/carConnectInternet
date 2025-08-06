@@ -2,26 +2,38 @@
 	<view class="container">
 		<custom-navBar title="登陆" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
+		<view class="banner">
+			<image src="/static/car_location.png" mode="aspectFill"></image>
+			<text class="title">车联网</text>
+		</view>
+
 		<view class="content">
 			<uv-form :model="form" :rules="rules" ref="formRef">
-				<uv-form-item label="账号" prop="username">
-					<uv-input v-model="form.username" placeholder="请输入账号" />
+				<uv-form-item label="" prop="username" labelWidth="0">
+					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
-				<uv-form-item label="密码" prop="password">
-					<uv-input v-model="form.password" type="password" placeholder="请输入密码" :password="true" />
+				<uv-form-item label="" prop="password" labelWidth="0">
+					<uv-input prefixIcon="lock-fill" v-model="form.password" placeholder="请输入密码" :password="showpw"  customStyle="border:1rpx solid red;height:80rpx">
+						<template v-slot:suffix>
+							<uv-icon :name="showpw?'eye-off-outline':'eye'" @click="showpwfun" />
+						</template>
+					</uv-input>
 				</uv-form-item>
 			</uv-form>
 			<view class="regisiter_box">
-				<text @click="toSignUp">立即注册</text>
+				<!-- <text @click="toSignUp">立即注册</text> -->
 			</view>
-			<uv-button @click="submit">提交</uv-button>
+			<uv-button type="primary" @click="submit">提交</uv-button>
 		</view>
+		<view class=""></view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, onMounted } from 'vue'
 	import { login } from '../../api/request.uts'
+	const showpw = ref(true)
+
 	// 定义表单类型
 	type FormData = {
 		username : string
@@ -57,6 +69,11 @@
 			}
 		]
 	}
+
+	const showpwfun = () => {
+		showpw.value = !showpw.value
+	}
+
 
 	//获取系统信息
 	const getSystemInfo = () => {
@@ -107,11 +124,32 @@
 <style lang="scss" scoped>
 	.container {
 		height: 100vh;
-		background-color: #f5f5f5;
+		background-color: #fff;
+
+		.banner {
+			background-color: #fff;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			height: 20%;
+			image {
+				height: 120rpx;
+				width: 120rpx;
+				margin-right: 20rpx;
+			}
+			.title{
+				font-size: 40rpx;
+				font-weight: bold;
+				color: #333;
+
+			}
+		}
+
 
 		.content {
 			background-color: #fff;
-			padding: 20rpx;
+			padding: 20rpx 100rpx;
 
 			.regisiter_box {
 				font-size: 25rpx;

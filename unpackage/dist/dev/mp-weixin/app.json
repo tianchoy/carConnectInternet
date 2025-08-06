@@ -5,7 +5,8 @@
     "pages/userCenter/userCenter",
     "pages/login/login",
     "pages/signUp/signUp",
-    "pages/carInfoDetail/carInfoDetail"
+    "pages/carInfoDetail/carInfoDetail",
+    "pages/addCar/addCar"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -408,7 +408,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-popup"]: common_vendor.unref(showDevicePopup),
           ["device-info"]: common_vendor.unref(currentDeviceInfo)
         })),
-        n: common_assets._imports_0,
+        n: common_assets._imports_0$2,
         o: common_vendor.o(toggleMoreTools),
         p: common_vendor.unref(showMoreTools)
       }), common_vendor.unref(showMoreTools) ? common_vendor.e(new UTSJSONObject({

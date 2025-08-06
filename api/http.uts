@@ -20,7 +20,7 @@ interface HttpError {
     data?: any
 }
 
-const BASE_URL =  'http://car.zdiot.cn:8081/api' // https base地址
+const BASE_URL =  'https://car.zdiot.cn:18443/api' // https base地址
 
 // 请求拦截器
 function requestInterceptor(config: RequestOptions): RequestOptions {

@@ -8,10 +8,11 @@ if (!Math) {
   "./pages/login/login.js";
   "./pages/signUp/signUp.js";
   "./pages/carInfoDetail/carInfoDetail.js";
+  "./pages/addCar/addCar.js";
 }
 const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.uvue:5", "App Launch");
+    common_vendor.index.__f__("log", "at App.uvue:5", "App onLaunch");
   },
   onShow: function() {
     common_vendor.index.__f__("log", "at App.uvue:8", "App Show");

@@ -1,15 +1,21 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_assets = require("../../common/assets.js");
 const utils_amapWx_130 = require("../../utils/amap-wx.130.js");
+require("../../api/http.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
-  (_easycom_custom_navBar_1 + _easycom_indexListMode_1)();
+  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
+  const _easycom_uv_picker_1 = common_vendor.resolveComponent("uv-picker");
+  (_easycom_custom_navBar_1 + _easycom_indexListMode_1 + _easycom_uv_icon_1 + _easycom_uv_picker_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
+const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_uv_picker = () => "../../uni_modules/uv-picker/components/uv-picker/uv-picker.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_indexListMode)();
+  (_easycom_custom_navBar + _easycom_indexListMode + _easycom_uv_icon + _easycom_uv_picker)();
 }
 const gdKey = "e3e773ad74f7ba25f38775c9c8db6474";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -32,6 +38,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showMap = common_vendor.ref(true);
     const markers = common_vendor.ref([]);
     let mapCtx = void 0;
+    const picker = common_vendor.ref(null);
+    const columns = common_vendor.ref([
+      [
+        new UTSJSONObject({
+          label: "全部",
+          value: "1"
+        }),
+        new UTSJSONObject({
+          label: "在线",
+          value: "2"
+        }),
+        new UTSJSONObject({
+          label: "离线",
+          value: "3"
+        })
+      ]
+    ]);
+    const pickerTitle = common_vendor.ref("全部");
+    const handPicker = () => {
+      var _a;
+      (_a = picker.value) === null || _a === void 0 ? null : _a.open();
+    };
+    const confirm = (e = null) => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:91", e.value[0].value);
+      pickerTitle.value = e.value[0].label;
+    };
+    const addCar = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/addCar/addCar",
+        success: (res) => {
+        },
+        fail: () => {
+        },
+        complete: () => {
+        }
+      });
+    };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         myAmapFun.value = new utils_amapWx_130.amapFile.AMapWX(new UTSJSONObject({ key: gdKey }));
@@ -44,11 +87,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           maxZoom: 17,
           minClusterSize: 2,
           complete(res = null) {
-            common_vendor.index.__f__("log", "at pages/index/index.uvue:63", "initMarkerCluster", res);
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:118", "initMarkerCluster", res);
           }
         }));
         mapCtx.on("markerClusterCreate", (e = null) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:68", "markerClusterCreate", e);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:123", "markerClusterCreate", e);
         });
         addMarkers();
       });
@@ -71,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           success: (data = null) => {
             if (data.length > 0) {
               const address_1 = data[0].regeocodeData.formatted_address;
-              common_vendor.index.__f__("log", "at pages/index/index.uvue:92", address_1);
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:147", address_1);
               resolve(address_1);
             } else {
               common_vendor.index.showToast({ title: "获取地址失败", icon: "none" });
@@ -86,7 +129,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleTap = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:108", "e", e);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:163", "e", e);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail",
         success: (res) => {
@@ -193,16 +236,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         markers: markers.value,
         clear: false,
         complete(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:269", "addMarkers", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:324", "addMarkers", res);
         }
       }));
     };
     common_vendor.onLoad(() => {
       const token = common_vendor.index.getStorageSync("token");
       if (!token) {
-        common_vendor.index.navigateTo({
+        common_vendor.index.redirectTo({
           url: "/pages/login/login"
         });
+        return null;
       }
     });
     return (_ctx = null, _cache = null) => {
@@ -215,19 +259,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: true
         })),
-        c: common_vendor.unref(showMap)
-      }), common_vendor.unref(showMap) ? new UTSJSONObject({
+        c: showMap.value
+      }), showMap.value ? new UTSJSONObject({
         d: common_vendor.sei("myMap", "map"),
         e: common_vendor.unref(center).latitude,
         f: common_vendor.unref(center).longitude,
-        g: common_vendor.unref(markers),
-        h: common_vendor.unref(mapScale),
+        g: markers.value,
+        h: mapScale.value,
         i: common_vendor.o(handleRegionChange),
         j: common_vendor.o(handleTap)
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        k: common_vendor.unref(showMap) ? "/static/list.png" : "/static/map.png",
-        l: common_vendor.o(toggleMapMode),
-        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        k: common_assets._imports_0,
+        l: common_vendor.o(addCar),
+        m: showMap.value ? "/static/list.png" : "/static/map.png",
+        n: common_vendor.o(toggleMapMode),
+        o: common_vendor.t(pickerTitle.value),
+        p: common_vendor.p(new UTSJSONObject({
+          name: "arrow-down",
+          color: "#fff"
+        })),
+        q: common_vendor.o(handPicker),
+        r: common_vendor.sr(picker, "a4fca7fa-3", new UTSJSONObject({
+          "k": "picker"
+        })),
+        s: common_vendor.o(confirm),
+        t: common_vendor.p(new UTSJSONObject({
+          columns: columns.value,
+          keyName: "label"
+        })),
+        v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };
