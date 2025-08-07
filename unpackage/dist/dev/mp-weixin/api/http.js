@@ -93,7 +93,7 @@ function request(options) {
     } }));
   });
 }
-const http = new UTSJSONObject({
+new UTSJSONObject({
   get(url, data = new UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
@@ -150,5 +150,4 @@ const http = new UTSJSONObject({
     });
   }
 });
-exports.http = http;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

@@ -1,54 +1,27 @@
 <template>
 	<view class="list-container">
-		<uv-tabs :list="list" :current="currentList" itemStyle="height:35" lineWidth="55" @click="selectList"></uv-tabs>
-		<view class="msg-content">
-			{{list[currentList].name}}
-			<uv-button type="primary" text="详情" @click="todetail"></uv-button>
-		</view>
-		<view>
-			<uv-button text="test" @click="getCustomLists"></uv-button>
+		<view class="content">
+			<view class="list-item">
+				<view class="title">
+					<text class="car-number">京A12345</text>
+					<uv-tags text="在线" type="success"></uv-tags>
+				</view>
+				<view class="imei">
+					<text>IMEI 12345678</text>
+				</view>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { getCustomList } from '../../api/request.uts'
-	
-	const currentList = ref(0)
-	const list = [{
-		name: '全部',
-		badge: {
-			value: 15,
-		}
-	}, {
-		name: '在线',
-		badge: {
-			value: 10
-		}
-	}, {
-		name: '离线',
-		badge: {
-			value: 5,
-		}
-	}]
-	
-	const selectList = (e) => {
-		console.log(e.index);
-		currentList.value = e.index
-	}
-	
+
 	const todetail = () => {
 		uni.navigateTo({
 			url: '/pages/carInfoDetail/carInfoDetail'
 		})
 	}
-	
-	const getCustomLists = async () => {
-		const res = await getCustomList()
-		
-		console.log('res',res)
-	}
-	
 </script>
 
 <style lang="scss">
@@ -57,5 +30,31 @@
 		height: 100vh;
 		background-color: #f5f5f5;
 		padding: 0 20rpx;
+
+		.content {
+			margin-top: 120rpx;
+
+			.list-item {
+				padding: 20rpx;
+				background-color: #fff;
+				border-radius: 10rpx;
+
+				.title {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					margin-bottom: 20rpx;
+					.car-number{
+						font-size: 35rpx;
+						font-weight: bolder;
+						margin-right: 20rpx;
+					}
+				}
+
+				.imei text {
+					color: #ccc;
+				}
+			}
+		}
 	}
 </style>

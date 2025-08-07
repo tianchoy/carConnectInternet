@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-const api_request = require("../../api/request.js");
+require("../../api/http.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
@@ -106,12 +106,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then((res) => {
         const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
-        api_request.login("POST", newFormData).then((res2 = null) => {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:108", "1111:", res2.data.token);
-          common_vendor.index.setStorageSync("token", res2.data.token);
-          common_vendor.index.reLaunch({
-            url: "/pages/index/index"
-          });
+        common_vendor.index.request({
+          url: "https://car.zdiot.cn:18443/api/sys/login",
+          method: "POST",
+          data: newFormData,
+          success: (res2) => {
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:119", res2);
+          },
+          fail: (err) => {
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:122", err);
+          }
         });
       }).catch((errors = null) => {
         common_vendor.index.showToast({

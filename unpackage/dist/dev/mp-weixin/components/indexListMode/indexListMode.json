@@ -1,7 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "uv-tabs": "../../uni_modules/uv-tabs/components/uv-tabs/uv-tabs",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
+    "uv-tags": "../../uni_modules/uv-tags/components/uv-tags/uv-tags"
   }
 }

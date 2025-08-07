@@ -20,7 +20,7 @@
 				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="btn-map-list-icon" />
 			</view>
 		</view>
-		<view class="right-bar">
+		<view class="right-bar" v-if="showMap">
 			<view class="allCar">全部 40</view>
 			<view class="onlineCar">在线 20</view>
 			<view class="offlineCar">离线 20</view>
@@ -37,14 +37,14 @@
 	import { ref } from 'vue'
 
 	import amapFile from '../../utils/amap-wx.130'
-	import {getCustomList} from '../../api/request.uts'
-
+	import { getCustomList } from '../../api/request.uts'
+	const Login = ref<boolean>(false)
 	//高德地图相关
 	const address = ref('')
 	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
 	const myAmapFun = ref({})
-	
-	const handleCapsule = (type:string) => {
+
+	const handleCapsule = (type : string) => {
 		if (type == 'close') {
 			uni.navigateBack();
 		} else {
@@ -84,7 +84,7 @@
 	const pickerTitle = ref('全部')
 
 
-	const handPicker = () =>{
+	const handPicker = () => {
 		picker.value?.open();
 	}
 	const confirm = (e) => {
@@ -96,34 +96,37 @@
 	const addCar = () => {
 		uni.navigateTo({
 			url: '/pages/addCar/addCar',
-			success: res => {},
-			fail: () => {},
-			complete: () => {}
+			success: res => { },
+			fail: () => { },
+			complete: () => { }
 		});
 	}
 
 	// 初始化加载测试的电子围栏
 	onMounted(async () => {
+		console.log('onmounted')
 		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
 		mapCtx = uni.createMapContext('myMap', this)
-		getlocation() //获取当前位置	
+		if(Login.value){
+			getlocation() //获取当前位置	
+			mapCtx.initMarkerCluster({
+				enableDefaultStyle: true,
+				zoomOnClick: true,
+				gridSize: 10,
+				maxZoom: 17,
+				minClusterSize: 2,
+				complete(res) {
+					console.log('initMarkerCluster', res)
+				}
+			})
+			
+			mapCtx.on("markerClusterCreate", (e) => {
+				console.log("markerClusterCreate", e);
+			});
+			
+			addMarkers()
+		}
 		
-		mapCtx.initMarkerCluster({
-			enableDefaultStyle: true,
-			zoomOnClick: true,
-			gridSize: 10,
-			maxZoom: 17,
-			minClusterSize: 2,
-			complete(res) {
-				console.log('initMarkerCluster', res)
-			}
-		})
-
-		mapCtx.on("markerClusterCreate", (e) => {
-			console.log("markerClusterCreate", e);
-		});
-
-		addMarkers()
 	})
 
 	//获取当前位置
@@ -138,34 +141,34 @@
 	}
 
 	const getRegeo = (latitude, longitude) => {
-	  return new Promise((resolve, reject) => {
-	    myAmapFun.value.getRegeo({
-	      location: `${longitude},${latitude}`,
-	      success: (data:any) => {
-	        if (data.length > 0) {
-	          const address = data[0].regeocodeData.formatted_address;
-			  console.log(address)
-	          resolve(address); // 返回正确地址
-	        } else {
-	          uni.showToast({ title: '获取地址失败', icon: 'none' });
-	          reject(new Error('逆地理编码数据为空'));
-	        }
-	      },
-	      fail: (err:any) => {
-	        uni.showToast({ title: err.errMsg, icon: 'none' });
-	        reject(err); // 传递错误对象
-	      }
-	    });
-	  });
+		return new Promise((resolve, reject) => {
+			myAmapFun.value.getRegeo({
+				location: `${longitude},${latitude}`,
+				success: (data : any) => {
+					if (data.length > 0) {
+						const address = data[0].regeocodeData.formatted_address;
+						console.log(address)
+						resolve(address); // 返回正确地址
+					} else {
+						uni.showToast({ title: '获取地址失败', icon: 'none' });
+						reject(new Error('逆地理编码数据为空'));
+					}
+				},
+				fail: (err : any) => {
+					uni.showToast({ title: err.errMsg, icon: 'none' });
+					reject(err); // 传递错误对象
+				}
+			});
+		});
 	};
 
 	const handleTap = (e) => {
 		console.log('e', e);
 		uni.navigateTo({
 			url: '/pages/carInfoDetail/carInfoDetail',
-			success: res => {},
-			fail: () => {},
-			complete: () => {}
+			success: res => { },
+			fail: () => { },
+			complete: () => { }
 		});
 		//导航去此位置
 		// uni.openLocation({
@@ -311,7 +314,7 @@
 						borderWidth: 1,
 						borderRadius: 10,
 						bgColor: '#ffffff',
-						content: await getRegeo(p.latitude,p.longitude),
+						content: await getRegeo(p.latitude, p.longitude),
 						display: 'ALWAYS'
 					}
 				}, p)
@@ -325,14 +328,18 @@
 			}
 		})
 	}
-	onLoad(()=>{
+	onLoad(() => {
+		
 		const token = uni.getStorageSync('token')
-		if (!token) {
-        uni.redirectTo({
-            url: '/pages/login/login'
-        })
-        return
-    }
+		if (token == '') {
+			uni.redirectTo({
+				url: '/pages/login/login'
+			})
+			Login.value = false
+		}else{
+			Login.value = true
+		}
+		
 		// getCustomList().then(res=>{
 		// 	console.log(res)
 		// })
@@ -378,18 +385,21 @@
 				border-radius: 10rpx;
 				background-color: #0898e6ff;
 			}
-			.addCar{
+
+			.addCar {
 				width: 60rpx;
 				height: 60rpx;
 				margin-right: 20rpx;
-				image{
+
+				image {
 					width: 100%;
 					height: 100%;
 				}
 
 			}
 		}
-		.right-bar{
+
+		.right-bar {
 			position: absolute;
 			top: 300rpx;
 			right: 20rpx;
@@ -398,24 +408,29 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			view{
+
+			view {
 				padding: 5rpx 15rpx;
-    			font-size: 25rpx;
+				font-size: 25rpx;
 				margin-bottom: 20rpx;
 				border-radius: 10rpx;
 				color: #fff;
 			}
-			.allCar{
+
+			.allCar {
 				background: rgba(67, 181, 241, 0.8);
 			}
-			.onlineCar{
+
+			.onlineCar {
 				background: rgba(113, 239, 168, 0.8);
 			}
-			.offlineCar{
+
+			.offlineCar {
 				background: rgba(132, 131, 131, 1);
 			}
 		}
-		.left-bar{
+
+		.left-bar {
 			position: absolute;
 			top: 200rpx;
 			left: 20rpx;

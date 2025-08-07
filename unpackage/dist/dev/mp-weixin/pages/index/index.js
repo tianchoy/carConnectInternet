@@ -21,6 +21,7 @@ const gdKey = "e3e773ad74f7ba25f38775c9c8db6474";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const Login = common_vendor.ref(false);
     const address = common_vendor.ref("");
     const myAmapFun = common_vendor.ref(new UTSJSONObject({}));
     const handleCapsule = (type) => {
@@ -77,23 +78,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:107", "onmounted");
         myAmapFun.value = new utils_amapWx_130.amapFile.AMapWX(new UTSJSONObject({ key: gdKey }));
         mapCtx = common_vendor.index.createMapContext("myMap", this);
-        getlocation();
-        mapCtx.initMarkerCluster(new UTSJSONObject({
-          enableDefaultStyle: true,
-          zoomOnClick: true,
-          gridSize: 10,
-          maxZoom: 17,
-          minClusterSize: 2,
-          complete(res = null) {
-            common_vendor.index.__f__("log", "at pages/index/index.uvue:118", "initMarkerCluster", res);
-          }
-        }));
-        mapCtx.on("markerClusterCreate", (e = null) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:123", "markerClusterCreate", e);
-        });
-        addMarkers();
+        if (Login.value) {
+          getlocation();
+          mapCtx.initMarkerCluster(new UTSJSONObject({
+            enableDefaultStyle: true,
+            zoomOnClick: true,
+            gridSize: 10,
+            maxZoom: 17,
+            minClusterSize: 2,
+            complete(res = null) {
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:119", "initMarkerCluster", res);
+            }
+          }));
+          mapCtx.on("markerClusterCreate", (e = null) => {
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:124", "markerClusterCreate", e);
+          });
+          addMarkers();
+        }
       });
     });
     const getlocation = () => {
@@ -114,7 +118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           success: (data = null) => {
             if (data.length > 0) {
               const address_1 = data[0].regeocodeData.formatted_address;
-              common_vendor.index.__f__("log", "at pages/index/index.uvue:147", address_1);
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:150", address_1);
               resolve(address_1);
             } else {
               common_vendor.index.showToast({ title: "获取地址失败", icon: "none" });
@@ -129,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleTap = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:163", "e", e);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:166", "e", e);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail",
         success: (res) => {
@@ -236,17 +240,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         markers: markers.value,
         clear: false,
         complete(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:324", "addMarkers", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:327", "addMarkers", res);
         }
       }));
     };
     common_vendor.onLoad(() => {
       const token = common_vendor.index.getStorageSync("token");
-      if (!token) {
+      if (token == "") {
         common_vendor.index.redirectTo({
           url: "/pages/login/login"
         });
-        return null;
+        Login.value = false;
+      } else {
+        Login.value = true;
       }
     });
     return (_ctx = null, _cache = null) => {
@@ -273,21 +279,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.o(addCar),
         m: showMap.value ? "/static/list.png" : "/static/map.png",
         n: common_vendor.o(toggleMapMode),
-        o: common_vendor.t(pickerTitle.value),
-        p: common_vendor.p(new UTSJSONObject({
+        o: showMap.value
+      }), showMap.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+        p: common_vendor.t(pickerTitle.value),
+        q: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
           color: "#fff"
         })),
-        q: common_vendor.o(handPicker),
-        r: common_vendor.sr(picker, "a4fca7fa-3", new UTSJSONObject({
+        r: common_vendor.o(handPicker),
+        s: common_vendor.sr(picker, "a4fca7fa-3", new UTSJSONObject({
           "k": "picker"
         })),
-        s: common_vendor.o(confirm),
-        t: common_vendor.p(new UTSJSONObject({
+        t: common_vendor.o(confirm),
+        v: common_vendor.p(new UTSJSONObject({
           columns: columns.value,
           keyName: "label"
         })),
-        v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

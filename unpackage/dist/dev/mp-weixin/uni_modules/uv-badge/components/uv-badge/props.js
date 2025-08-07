@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b;
 const common_vendor = require("../../../../common/vendor.js");
-const uvBadgeProps = {
+const props = {
   props: {
     // 是否显示圆点
     isDot: {
@@ -74,5 +74,5 @@ const uvBadgeProps = {
     ...(_b = (_a = common_vendor.index.$uv) == null ? void 0 : _a.props) == null ? void 0 : _b.badge
   }
 };
-exports.uvBadgeProps = uvBadgeProps;
+exports.props = props;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-badge/components/uv-badge/props.js.map
