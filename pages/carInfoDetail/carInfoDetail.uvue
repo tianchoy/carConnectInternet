@@ -15,11 +15,14 @@
 				@close="closeDevicePopup" />
 		</view>
 
-		<view class="tool-more" @click="toggleMoreTools">
-			<image src="/static/icon-tool.png" mode="aspectFit" class="btn-tool-more-icon"></image>
-		</view>
-
-		<view class="tools-panel" v-if="showMoreTools">
+		<view class="tools-panel">
+			<view class="Imei-box">
+				<view class="imei-info">
+					<text>IMEI 12345678</text>
+					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
+				</view>
+				<text>定位时间</text>
+			</view>
 			<uv-grid :col="4" @click="click">
 				<uv-grid-item v-for="(item,index) in baseList" :key="index">
 					<uv-icon :customStyle="{paddingTop:40+'rpx'}" :name="item.name" :size="56"></uv-icon>
@@ -85,7 +88,6 @@
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
-	const showMoreTools = ref(true)
 	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关
@@ -294,9 +296,6 @@
 		showDevicePopup.value = false
 	}
 
-	const toggleMoreTools = () => {
-		showMoreTools.value = !showMoreTools.value
-	}
 	/* 电子围栏功能部分 */
 	const startDrawing = () => {
 		isDrawing.value = true
@@ -679,6 +678,16 @@
 		.tools-panel {
 			width: 100%;
 			background-color: #fff;
+			.Imei-box{
+				padding: 20rpx 30rpx 0;
+				.imei-info{
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding: 20rpx 0;
+				}
+			}
 			
 			.h-line{
 				width: 90%;

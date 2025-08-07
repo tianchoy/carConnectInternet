@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
 const utils_amapWx_130 = require("../../utils/amap-wx.130.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -39,7 +38,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(12);
-    const showMoreTools = common_vendor.ref(true);
     const carInFence = common_vendor.ref(false);
     const isDrawing = common_vendor.ref(false);
     const points = common_vendor.ref([]);
@@ -110,7 +108,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           inside = !inside;
       }
       carInFence.value = inside;
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:179", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:181", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -124,7 +122,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getlocation = () => {
       common_vendor.index.getLocation(new UTSJSONObject({
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:196", "当前坐标点：", res);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:198", "当前坐标点：", res);
           center.latitude = res.latitude;
           center.longitude = res.longitude;
           getRegeo(res.latitude, res.longitude);
@@ -136,10 +134,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       myAmapFun.value.getRegeo(new UTSJSONObject({
         location: `${longitude},${latitude}`,
         success: (data = null) => {
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:210", "获取地址信息:", data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:212", "获取地址信息:", data);
           if (data.length > 0) {
             address.value = data[0].regeocodeData.formatted_address;
-            common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:213", "地址信息:", address.value);
+            common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:215", "地址信息:", address.value);
             markers.value = [
               new UTSJSONObject({
                 id: 1,
@@ -169,7 +167,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const handMarkerTap = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:260", "markertap event:", e);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:262", "markertap event:", e);
       if (e.detail && e.detail.markerId !== void 0) {
         const markerId = e.detail.markerId;
         const marker = UTS.arrayFind(markers.value, (m = null) => {
@@ -192,7 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return null;
         }
       }
-      common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:285", "无法获取标记点信息", e);
+      common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:287", "无法获取标记点信息", e);
       common_vendor.index.showToast({
         title: "无法获取设备信息",
         icon: "none"
@@ -200,9 +198,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const closeDevicePopup = () => {
       showDevicePopup.value = false;
-    };
-    const toggleMoreTools = () => {
-      showMoreTools.value = !showMoreTools.value;
     };
     const startDrawing = () => {
       isDrawing.value = true;
@@ -226,7 +221,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       isDrawing.value = false;
       common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:332", "电子围栏坐标:", UTS.JSON.stringify(points.value));
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:331", "电子围栏坐标:", UTS.JSON.stringify(points.value));
       updateFencePolygon();
       checkCarInFence(center);
     };
@@ -408,13 +403,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-popup"]: common_vendor.unref(showDevicePopup),
           ["device-info"]: common_vendor.unref(currentDeviceInfo)
         })),
-        n: common_assets._imports_0$2,
-        o: common_vendor.o(toggleMoreTools),
-        p: common_vendor.unref(showMoreTools)
-      }), common_vendor.unref(showMoreTools) ? common_vendor.e(new UTSJSONObject({
-        q: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
+        n: common_vendor.p(new UTSJSONObject({
+          name: "arrow-right",
+          bold: true,
+          size: 25
+        })),
+        o: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return new UTSJSONObject({
-            a: "6cb34a81-4-" + i0 + "," + ("6cb34a81-3-" + i0),
+            a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p(new UTSJSONObject({
               customStyle: new UTSJSONObject({
                 paddingTop: "40rpx"
@@ -424,46 +420,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             })),
             c: common_vendor.t(item.title),
             d: index,
-            e: "6cb34a81-3-" + i0 + ",6cb34a81-2"
+            e: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           });
         }),
-        r: common_vendor.o(click),
-        s: common_vendor.p(new UTSJSONObject({
+        p: common_vendor.o(click),
+        q: common_vendor.p(new UTSJSONObject({
           col: 4
         })),
-        t: common_vendor.unref(currentToolItem) == 4
+        r: common_vendor.unref(currentToolItem) == 4
       }), common_vendor.unref(currentToolItem) == 4 ? new UTSJSONObject({
-        v: common_vendor.o(startDrawing),
-        w: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.o(startDrawing),
+        t: common_vendor.p(new UTSJSONObject({
           disabled: common_vendor.unref(isDrawing)
         })),
-        x: common_vendor.o(addPoint),
-        y: common_vendor.p(new UTSJSONObject({
+        v: common_vendor.o(addPoint),
+        w: common_vendor.p(new UTSJSONObject({
           disabled: !common_vendor.unref(isDrawing)
         })),
-        z: common_vendor.o(finishDrawing),
-        A: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.o(finishDrawing),
+        y: common_vendor.p(new UTSJSONObject({
           disabled: !common_vendor.unref(isDrawing) || common_vendor.unref(points).length < 3
         })),
-        B: common_vendor.o(clearAll)
+        z: common_vendor.o(clearAll)
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        C: common_vendor.unref(currentToolItem) == 0
+        A: common_vendor.unref(currentToolItem) == 0
       }), common_vendor.unref(currentToolItem) == 0 ? new UTSJSONObject({
-        D: common_vendor.o(startPlayback),
-        E: common_vendor.p(new UTSJSONObject({
+        B: common_vendor.o(startPlayback),
+        C: common_vendor.p(new UTSJSONObject({
           disabled: common_vendor.unref(isPlaying)
         })),
-        F: common_vendor.o(pausePlayback),
-        G: common_vendor.p(new UTSJSONObject({
+        D: common_vendor.o(pausePlayback),
+        E: common_vendor.p(new UTSJSONObject({
           disabled: !common_vendor.unref(isPlaying)
         })),
-        H: common_vendor.o(clearTrack),
-        I: common_vendor.t(common_vendor.unref(playbackSpeed)),
-        J: common_vendor.o(setPlaybackSpeed),
-        K: common_vendor.o(($event = null) => {
+        F: common_vendor.o(clearTrack),
+        G: common_vendor.t(common_vendor.unref(playbackSpeed)),
+        H: common_vendor.o(setPlaybackSpeed),
+        I: common_vendor.o(($event = null) => {
           return common_vendor.isRef(playbackSpeed) ? playbackSpeed.value = $event : null;
         }),
-        L: common_vendor.p(new UTSJSONObject({
+        J: common_vendor.p(new UTSJSONObject({
           ["block-size"]: "15",
           ["block-color"]: "red",
           backgroundColor: "pink",
@@ -472,8 +468,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           max: "5",
           modelValue: common_vendor.unref(playbackSpeed)
         }))
-      }) : new UTSJSONObject({})) : new UTSJSONObject({}), new UTSJSONObject({
-        M: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

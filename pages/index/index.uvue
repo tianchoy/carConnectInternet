@@ -25,8 +25,12 @@
 			<view class="onlineCar">在线 20</view>
 			<view class="offlineCar">离线 20</view>
 		</view>
-		<view class="left-bar" @click="handPicker">
-			<text style="margin-right: 20rpx;">{{pickerTitle}}</text>
+		<view class="left-bar" @click="handStatePicker">
+			<text style="margin-right: 20rpx;">{{pickerStateTitle}}</text>
+			<uv-icon name="arrow-down" color="#fff"></uv-icon>
+		</view>
+		<view class="left-bar-state" @click="handGroupPicker"  v-if="!showMap">
+			<text style="margin-right: 20rpx;">{{pickerGroupTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
 		<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
@@ -62,35 +66,68 @@
 	// 标记点集合
 	const markers = ref<Array<any>>([])
 	let mapCtx = undefined
-
+	const currentPickerType = ref('')
 	const picker = ref(null);
-	const columns = ref([
+	const carState = ref([
+		[{
+			label: '全部状态',
+			value: '1'
+		},
+		{
+			label: '在线',
+			value: '2'
+		},
+		{
+			label: '离线',
+			value: '3'
+		}]
+
+	])
+	const carGroup = ref([
 		[
 			{
-				label: '全部',
+				label: '全部分组',
 				value: '1'
 			},
 			{
-				label: '在线',
+				label: '分组1',
 				value: '2'
 			},
 			{
-				label: '离线',
+				label: '分组2',
 				value: '3'
 			}
-
 		]
+
 	])
-	const pickerTitle = ref('全部')
+	const columns = ref<Array<{ label : string, value : string }>>([[]])
+	const pickerStateTitle = ref('全部状态')
+	const pickerGroupTitle = ref('全部分组')
 
-
-	const handPicker = () => {
-		picker.value?.open();
+	const handStatePicker = () => {
+	    columns.value = carState.value
+	    currentPickerType.value = 'state'
+	    picker.value?.open()
 	}
-	const confirm = (e) => {
-		console.log(e.value[0].value)
-		pickerTitle.value = e.value[0].label
+	
+	const handGroupPicker = () => {
+	    columns.value = carGroup.value
+	    currentPickerType.value = 'group'
+	    picker.value?.open()
+	}
 
+	const confirm = (e: { value: Array<{ label: string, value: string }> }) => {
+	    const selected = e.value[0]
+	    
+	    if (currentPickerType.value === 'state') {
+	        pickerStateTitle.value = selected.label
+	        console.log('选择了状态:', selected.value)
+	    } else if (currentPickerType.value === 'group') {
+	        pickerGroupTitle.value = selected.label
+	        console.log('选择了分组:', selected.value)
+	    }
+	    
+	    currentPickerType.value = ''
 	}
 
 	const addCar = () => {
@@ -104,10 +141,9 @@
 
 	// 初始化加载测试的电子围栏
 	onMounted(async () => {
-		console.log('onmounted')
 		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
 		mapCtx = uni.createMapContext('myMap', this)
-		if(Login.value){
+		if (Login.value) {
 			getlocation() //获取当前位置	
 			mapCtx.initMarkerCluster({
 				enableDefaultStyle: true,
@@ -119,14 +155,14 @@
 					console.log('initMarkerCluster', res)
 				}
 			})
-			
+
 			mapCtx.on("markerClusterCreate", (e) => {
 				console.log("markerClusterCreate", e);
 			});
-			
+
 			addMarkers()
 		}
-		
+
 	})
 
 	//获取当前位置
@@ -140,27 +176,17 @@
 		})
 	}
 
-	const getRegeo = (latitude, longitude) => {
-		return new Promise((resolve, reject) => {
-			myAmapFun.value.getRegeo({
-				location: `${longitude},${latitude}`,
-				success: (data : any) => {
-					if (data.length > 0) {
-						const address = data[0].regeocodeData.formatted_address;
-						console.log(address)
-						resolve(address); // 返回正确地址
-					} else {
-						uni.showToast({ title: '获取地址失败', icon: 'none' });
-						reject(new Error('逆地理编码数据为空'));
-					}
-				},
-				fail: (err : any) => {
-					uni.showToast({ title: err.errMsg, icon: 'none' });
-					reject(err); // 传递错误对象
-				}
-			});
-		});
-	};
+	const getRegeo = async (latitude : number, longitude : number) : Promise<string> => {
+		try {
+			const res = await myAmapFun.value.getRegeo({
+				location: `${longitude},${latitude}`
+			})
+			return res[0]?.regeocodeData?.formatted_address || '未知位置'
+		} catch (err) {
+			console.error('逆地理编码失败:', err)
+			return '获取位置失败'
+		}
+	}
 
 	const handleTap = (e) => {
 		console.log('e', e);
@@ -329,17 +355,17 @@
 		})
 	}
 	onLoad(() => {
-		
-		const token = uni.getStorageSync('token')
-		if (token == '') {
-			uni.redirectTo({
-				url: '/pages/login/login'
-			})
-			Login.value = false
-		}else{
-			Login.value = true
-		}
-		
+
+		// const token = uni.getStorageSync('token')
+		// if (token == '') {
+		// 	uni.redirectTo({
+		// 		url: '/pages/login/login'
+		// 	})
+		// 	Login.value = false
+		// }else{
+		// 	Login.value = true
+		// }
+
 		// getCustomList().then(res=>{
 		// 	console.log(res)
 		// })
@@ -383,7 +409,7 @@
 				height: 100%;
 				padding: 8rpx;
 				border-radius: 10rpx;
-				background-color: #0898e6ff;
+				background-color: rgba(3, 109, 246, 0.71);
 			}
 
 			.addCar {
@@ -430,19 +456,30 @@
 			}
 		}
 
-		.left-bar {
+		.left-bar,
+		.left-bar-state {
 			position: absolute;
 			top: 200rpx;
-			left: 20rpx;
 			z-index: 100;
 			display: flex;
-			flex-direction: row;
-			justify-content: center;
 			align-items: center;
 			padding: 10rpx 20rpx;
 			border-radius: 10rpx;
 			background-color: rgba(3, 109, 246, 0.71);
 			color: #fff;
+			font-size: 25rpx;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.left-bar {
+			left: 20rpx;
+		}
+
+		.left-bar-state {
+			left: 220rpx;
 		}
 	}
 </style>

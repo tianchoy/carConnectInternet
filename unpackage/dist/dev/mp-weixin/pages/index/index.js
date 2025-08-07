@@ -39,31 +39,61 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showMap = common_vendor.ref(true);
     const markers = common_vendor.ref([]);
     let mapCtx = void 0;
+    const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
-    const columns = common_vendor.ref([
+    const carState = common_vendor.ref([
+      [new UTSJSONObject({
+        label: "全部状态",
+        value: "1"
+      }), new UTSJSONObject({
+        label: "在线",
+        value: "2"
+      }), new UTSJSONObject({
+        label: "离线",
+        value: "3"
+      })]
+    ]);
+    const carGroup = common_vendor.ref([
       [
         new UTSJSONObject({
-          label: "全部",
+          label: "全部分组",
           value: "1"
         }),
         new UTSJSONObject({
-          label: "在线",
+          label: "分组1",
           value: "2"
         }),
         new UTSJSONObject({
-          label: "离线",
+          label: "分组2",
           value: "3"
         })
       ]
     ]);
-    const pickerTitle = common_vendor.ref("全部");
-    const handPicker = () => {
+    const columns = common_vendor.ref([[]]);
+    const pickerStateTitle = common_vendor.ref("全部状态");
+    const pickerGroupTitle = common_vendor.ref("全部分组");
+    const handStatePicker = () => {
       var _a;
+      columns.value = carState.value;
+      currentPickerType.value = "state";
       (_a = picker.value) === null || _a === void 0 ? null : _a.open();
     };
-    const confirm = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:91", e.value[0].value);
-      pickerTitle.value = e.value[0].label;
+    const handGroupPicker = () => {
+      var _a;
+      columns.value = carGroup.value;
+      currentPickerType.value = "group";
+      (_a = picker.value) === null || _a === void 0 ? null : _a.open();
+    };
+    const confirm = (e) => {
+      const selected = e.value[0];
+      if (currentPickerType.value === "state") {
+        pickerStateTitle.value = selected.label;
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:124", "选择了状态:", selected.value);
+      } else if (currentPickerType.value === "group") {
+        pickerGroupTitle.value = selected.label;
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:127", "选择了分组:", selected.value);
+      }
+      currentPickerType.value = "";
     };
     const addCar = () => {
       common_vendor.index.navigateTo({
@@ -78,7 +108,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:107", "onmounted");
         myAmapFun.value = new utils_amapWx_130.amapFile.AMapWX(new UTSJSONObject({ key: gdKey }));
         mapCtx = common_vendor.index.createMapContext("myMap", this);
         if (Login.value) {
@@ -90,11 +119,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             maxZoom: 17,
             minClusterSize: 2,
             complete(res = null) {
-              common_vendor.index.__f__("log", "at pages/index/index.uvue:119", "initMarkerCluster", res);
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:155", "initMarkerCluster", res);
             }
           }));
           mapCtx.on("markerClusterCreate", (e = null) => {
-            common_vendor.index.__f__("log", "at pages/index/index.uvue:124", "markerClusterCreate", e);
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:160", "markerClusterCreate", e);
           });
           addMarkers();
         }
@@ -111,29 +140,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }));
     };
-    const getRegeo = (latitude = null, longitude = null) => {
-      return new Promise((resolve, reject) => {
-        myAmapFun.value.getRegeo(new UTSJSONObject({
-          location: `${longitude},${latitude}`,
-          success: (data = null) => {
-            if (data.length > 0) {
-              const address_1 = data[0].regeocodeData.formatted_address;
-              common_vendor.index.__f__("log", "at pages/index/index.uvue:150", address_1);
-              resolve(address_1);
-            } else {
-              common_vendor.index.showToast({ title: "获取地址失败", icon: "none" });
-              reject(new Error("逆地理编码数据为空"));
-            }
-          },
-          fail: (err = null) => {
-            common_vendor.index.showToast({ title: err.errMsg, icon: "none" });
-            reject(err);
-          }
-        }));
+    const getRegeo = (latitude, longitude) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        try {
+          const res = yield myAmapFun.value.getRegeo(new UTSJSONObject({
+            location: `${longitude},${latitude}`
+          }));
+          return ((_b = (_a = res[0]) === null || _a === void 0 ? null : _a.regeocodeData) === null || _b === void 0 ? null : _b.formatted_address) || "未知位置";
+        } catch (err) {
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:186", "逆地理编码失败:", err);
+          return "获取位置失败";
+        }
       });
     };
     const handleTap = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:166", "e", e);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:192", "e", e);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail",
         success: (res) => {
@@ -240,20 +262,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         markers: markers.value,
         clear: false,
         complete(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:327", "addMarkers", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:353", "addMarkers", res);
         }
       }));
     };
     common_vendor.onLoad(() => {
-      const token = common_vendor.index.getStorageSync("token");
-      if (token == "") {
-        common_vendor.index.redirectTo({
-          url: "/pages/login/login"
-        });
-        Login.value = false;
-      } else {
-        Login.value = true;
-      }
     });
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
@@ -281,21 +294,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         n: common_vendor.o(toggleMapMode),
         o: showMap.value
       }), showMap.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        p: common_vendor.t(pickerTitle.value),
+        p: common_vendor.t(pickerStateTitle.value),
         q: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
           color: "#fff"
         })),
-        r: common_vendor.o(handPicker),
-        s: common_vendor.sr(picker, "a4fca7fa-3", new UTSJSONObject({
+        r: common_vendor.o(handStatePicker),
+        s: !showMap.value
+      }), !showMap.value ? new UTSJSONObject({
+        t: common_vendor.t(pickerGroupTitle.value),
+        v: common_vendor.p(new UTSJSONObject({
+          name: "arrow-down",
+          color: "#fff"
+        })),
+        w: common_vendor.o(handGroupPicker)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        x: common_vendor.sr(picker, "a4fca7fa-4", new UTSJSONObject({
           "k": "picker"
         })),
-        t: common_vendor.o(confirm),
-        v: common_vendor.p(new UTSJSONObject({
+        y: common_vendor.o(confirm),
+        z: common_vendor.p(new UTSJSONObject({
           columns: columns.value,
           keyName: "label"
         })),
-        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        A: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

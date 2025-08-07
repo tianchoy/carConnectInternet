@@ -1,7 +1,7 @@
 <template>
 	<view class="list-container">
 		<view class="content">
-			<view class="list-item">
+			<view class="list-item" @click="todetail">
 				<view class="title">
 					<text class="car-number">京A12345</text>
 					<uv-tags text="在线" type="success"></uv-tags>
@@ -16,6 +16,7 @@
 
 <script setup lang="uts">
 	import { getCustomList } from '../../api/request.uts'
+
 
 	const todetail = () => {
 		uni.navigateTo({

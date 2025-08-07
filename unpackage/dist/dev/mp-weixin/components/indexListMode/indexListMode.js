@@ -12,13 +12,19 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "indexListMode",
   setup(__props) {
+    const todetail = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/carInfoDetail/carInfoDetail"
+      });
+    };
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
         a: common_vendor.p({
           text: "在线",
           type: "success"
         }),
-        b: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        b: common_vendor.o(todetail),
+        c: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };
