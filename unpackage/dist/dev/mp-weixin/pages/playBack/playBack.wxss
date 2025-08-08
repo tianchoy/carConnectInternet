@@ -49,7 +49,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20rpx;
+  padding: 0 10rpx;
   margin-bottom: 30rpx;
 }
 .container .tools-panel .Datetime-box .date-box {

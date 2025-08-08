@@ -2,20 +2,22 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _component_marker = common_vendor.resolveComponent("marker");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
+  const _easycom_uv_tags_1 = common_vendor.resolveComponent("uv-tags");
+  const _component_marker = common_vendor.resolveComponent("marker");
   const _easycom_uv_slider_1 = common_vendor.resolveComponent("uv-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _component_marker + _easycom_uv_icon_1 + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_tags_1 + _component_marker + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-tags.js";
 const _easycom_uv_slider = () => "../../uni_modules/uv-slider/components/uv-slider/uv-slider.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_uv_tags + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
@@ -25,6 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(18);
+    const carStatus = common_vendor.ref("在线");
     const showDateTimePicker = common_vendor.ref(false);
     const currentPickerType = common_vendor.ref("start");
     const pickerTitle = common_vendor.ref("选择开始时间");
@@ -49,9 +52,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const formatTime = (date) => {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
       };
-      startTime.value = formatTime(now);
-      const endDate = new Date(now.getTime() + 36e5);
-      endTime.value = formatTime(endDate);
+      endTime.value = formatTime(now);
+      const startDate = new Date(now.getTime() - 36e5);
+      startTime.value = formatTime(startDate);
     };
     const showPicker = (type) => {
       currentPickerType.value = type;
@@ -235,7 +238,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         resetPlayback();
       }
       isPlaying.value = true;
-      const intervalDuration = 2e3 / playbackSpeed.value;
+      const intervalDuration = 1e3 / playbackSpeed.value;
       playbackInterval.value = setInterval(playNextPoint, intervalDuration);
     };
     const playNextPoint = () => {
@@ -327,8 +330,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         b: carMarker.value
       }), carMarker.value ? new UTSJSONObject({
-        c: carMarker.value.id,
+        c: common_vendor.p(new UTSJSONObject({
+          name: "arrow-down",
+          size: "15",
+          color: "#fff"
+        })),
         d: common_vendor.p(new UTSJSONObject({
+          text: carStatus.value,
+          type: carStatus.value === "在线" ? "success" : "error"
+        })),
+        e: carMarker.value.id,
+        f: common_vendor.p(new UTSJSONObject({
           id: carMarker.value.id,
           latitude: carMarker.value.latitude,
           longitude: carMarker.value.longitude,
@@ -341,34 +353,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           animation: carMarker.value.animation
         }))
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        e: common_vendor.sei("myMap", "map"),
-        f: center.latitude,
-        g: center.longitude,
-        h: markers.value,
-        i: polyline.value,
-        j: mapScale.value,
-        k: common_vendor.p(new UTSJSONObject({
+        g: common_vendor.sei("myMap", "map"),
+        h: center.latitude,
+        i: center.longitude,
+        j: markers.value,
+        k: polyline.value,
+        l: mapScale.value,
+        m: common_vendor.p(new UTSJSONObject({
           name: "calendar",
           size: "25"
         })),
-        l: common_vendor.t(startTime.value),
-        m: common_vendor.o(($event = null) => {
+        n: common_vendor.t(startTime.value),
+        o: common_vendor.o(($event = null) => {
           return showPicker("start");
         }),
-        n: common_vendor.t(endTime.value),
-        o: common_vendor.o(($event = null) => {
+        p: common_vendor.t(endTime.value),
+        q: common_vendor.o(($event = null) => {
           return showPicker("end");
         }),
-        p: common_vendor.o(togglePlayback),
-        q: common_vendor.p(new UTSJSONObject({
+        r: common_vendor.o(togglePlayback),
+        s: common_vendor.p(new UTSJSONObject({
           name: isPlaying.value ? "pause-circle" : "play-circle",
           size: "30"
         })),
-        r: common_vendor.o(setPlaybackSpeed),
-        s: common_vendor.o(($event = null) => {
+        t: common_vendor.o(setPlaybackSpeed),
+        v: common_vendor.o(($event = null) => {
           return playbackSpeed.value = $event;
         }),
-        t: common_vendor.p(new UTSJSONObject({
+        w: common_vendor.p(new UTSJSONObject({
           backgroundColor: "#f5f5f5",
           activeColor: "#1890FF",
           min: "1",
@@ -380,27 +392,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }),
           modelValue: playbackSpeed.value
         })),
-        v: common_vendor.t(playbackSpeed.value),
-        w: common_vendor.t(startTime.value),
-        x: common_vendor.t(currentSpeed.value),
-        y: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        z: common_vendor.o(onConfirm),
-        A: common_vendor.o(onCancel),
-        B: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.t(playbackSpeed.value),
+        y: common_vendor.t(startTime.value),
+        z: common_vendor.t(currentSpeed.value),
+        A: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
+        B: common_vendor.o(onConfirm),
+        C: common_vendor.o(onCancel),
+        D: common_vendor.p(new UTSJSONObject({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
         })),
-        C: common_vendor.o(($event = null) => {
+        E: common_vendor.o(($event = null) => {
           return showDateTimePicker.value = $event;
         }),
-        D: common_vendor.p(new UTSJSONObject({
+        F: common_vendor.p(new UTSJSONObject({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
         })),
-        E: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        G: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

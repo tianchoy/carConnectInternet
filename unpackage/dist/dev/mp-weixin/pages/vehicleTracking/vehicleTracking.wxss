@@ -86,7 +86,8 @@
 .container .tools-panel .pos-info-box {
   padding: 10rpx 0;
 }
-.container .tools-panel .pos-info-box .speed, .container .tools-panel .pos-info-box .address {
+.container .tools-panel .pos-info-box .speed,
+.container .tools-panel .pos-info-box .address {
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -94,11 +95,13 @@
   padding: 8rpx 0;
   font-size: 28rpx;
 }
-.container .tools-panel .pos-info-box .speed text:first-child, .container .tools-panel .pos-info-box .address text:first-child {
+.container .tools-panel .pos-info-box .speed text:first-child,
+.container .tools-panel .pos-info-box .address text:first-child {
   color: #666;
   width: 100rpx;
 }
-.container .tools-panel .pos-info-box .speed text:last-child, .container .tools-panel .pos-info-box .address text:last-child {
+.container .tools-panel .pos-info-box .speed text:last-child,
+.container .tools-panel .pos-info-box .address text:last-child {
   color: #333;
   font-weight: 500;
 }

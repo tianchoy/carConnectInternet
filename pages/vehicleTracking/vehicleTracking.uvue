@@ -1,586 +1,587 @@
 <template>
-  <view class="container">
-    <custom-navBar title="车辆跟踪" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
-    </custom-navBar>
-    <view class="map-container">
-      <map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-        :polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
-        @regionchange="handleRegionChange">
-        <cover-view class="tools-box">
-          <cover-view class="second" @click="handleTime">
-            <cover-view class="times">{{currentTime}}</cover-view>
-            <uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
-          </cover-view>
-          <cover-view class="car-box">
-            <cover-view class="selectCar" @click="handleCar">
-              <cover-view>{{currentCar}}</cover-view>
-              <uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
-            </cover-view>
-            <uv-tags :text="carStatus" :type="carStatus === '在线' ? 'success' : 'error'"></uv-tags>
-          </cover-view>
-        </cover-view>
-      </map>
-    </view>
+	<view class="container">
+		<custom-navBar title="车辆跟踪" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="map-container">
+			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
+				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
+				@regionchange="handleRegionChange">
+				<cover-view class="tools-box">
+					<cover-view class="second" @click="handleTime">
+						<cover-view class="times">{{currentTime}}</cover-view>
+						<uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
+					</cover-view>
+					<cover-view class="car-box">
+						<cover-view class="selectCar" @click="handleCar">
+							<cover-view>{{currentCar}}</cover-view>
+							<uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
+						</cover-view>
+						<uv-tags :text="carStatus" :type="carStatus === '在线' ? 'success' : 'error'"></uv-tags>
+					</cover-view>
+				</cover-view>
+			</map>
+		</view>
 
-    <view class="tools-panel">
-      <view class="btn">
-        <button @click="toggleTracking" :style="{backgroundColor: isTracking ? '#e64340' : '#1296db'}">
-          {{isTracking ? '停止跟踪' : '开始跟踪'}}
-        </button>
-      </view>
-      <view class="pos-info-box">
-        <view class="speed">
-          <text>时速：</text>
-          <text>{{currentSpeed}}Km/h</text>
-        </view>
-        <view class="address">
-          <text>地址：</text>
-          <text>{{currentAddress}}</text>
-        </view>
-      </view>
-      <view class="info-panel" v-if="routeInfo.distance">
-        <text>路线距离: {{formatDistance(routeInfo.distance)}}</text>
-        <text>预计时间: {{formatDuration(routeInfo.duration)}}</text>
-      </view>
-    </view>
-    <uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
-  </view>
+		<view class="tools-panel">
+			<view class="btn">
+				<button @click="toggleTracking" :style="{backgroundColor: isTracking ? '#e64340' : '#1296db'}">
+					{{isTracking ? '停止跟踪' : '开始跟踪'}}
+				</button>
+			</view>
+			<view class="pos-info-box">
+				<view class="speed">
+					<text>时速：</text>
+					<text>{{currentSpeed}}Km/h</text>
+				</view>
+				<view class="address">
+					<text>地址：</text>
+					<text>{{currentAddress}}</text>
+				</view>
+			</view>
+			<view class="info-panel" v-if="routeInfo.distance">
+				<text>路线距离: {{formatDistance(routeInfo.distance)}}</text>
+				<text>预计时间: {{formatDuration(routeInfo.duration)}}</text>
+			</view>
+		</view>
+		<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
+	</view>
 </template>
 
 <script setup lang="uts">
-import { ref, reactive, onMounted } from 'vue'
-import amap from '../../utils/amap-wx.130'
+	import { ref, reactive, onMounted } from 'vue'
+	import amap from '../../utils/amap-wx.130'
 
-// 地图状态
-const center = reactive({
-  latitude: 39.90469,
-  longitude: 116.40717
-})
-const mapScale = ref(15)
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(15)
 
-// 标记点集合
-const markers = ref<Array<any>>([])
+	// 标记点集合
+	const markers = ref<Array<any>>([])
 
-// 路线集合
-const polylines = ref<Array<any>>([])
+	// 路线集合
+	const polylines = ref<Array<any>>([])
 
-// 路线信息
-const routeInfo = reactive({
-  distance: 0,
-  duration: 0
-})
+	// 路线信息
+	const routeInfo = reactive({
+		distance: 0,
+		duration: 0
+	})
 
-// 高德地图实例
-const amapInstance = ref(null)
+	// 高德地图实例
+	const amapInstance = ref(null)
 
-// 跟踪状态
-const isTracking = ref(false)
-const trackingInterval = ref(null)
-const trackPoints = ref<Array<any>>([])
+	// 跟踪状态
+	const isTracking = ref(false)
+	const trackingInterval = ref(null)
+	const trackPoints = ref<Array<any>>([])
 
-// 当前车辆信息
-const currentSpeed = ref(0)
-const currentAddress = ref('获取中...')
-const carStatus = ref('在线')
+	// 当前车辆信息
+	const currentSpeed = ref(0)
+	const currentAddress = ref('获取中...')
+	const carStatus = ref('在线')
 
-// 选择器相关
-const columns = ref<Array<{ label: string, value: string }>>([[]])
-const picker = ref(null)
-const currentPickerType = ref('')
-const currentTime = ref('10s')
-const currentCar = ref('京A12345')
-const times = ref([
-  [
-    { label: '5s', value: '5' },
-    { label: '10s', value: '10' },
-    { label: '20s', value: '20' },
-    { label: '30s', value: '30' }
-  ]
-])
+	// 选择器相关
+	const columns = ref<Array<{ label : string, value : string }>>([[]])
+	const picker = ref(null)
+	const currentPickerType = ref('')
+	const currentTime = ref('10s')
+	const currentCar = ref('京A12345')
+	const times = ref([
+		[
+			{ label: '5s', value: '5' },
+			{ label: '10s', value: '10' },
+			{ label: '20s', value: '20' },
+			{ label: '30s', value: '30' }
+		]
+	])
 
-const cars = ref([
-  [
-    { label: '京A12345', value: '12345' },
-    { label: '京A12346', value: '12346' },
-    { label: '京A12347', value: '12347' }
-  ]
-])
+	const cars = ref([
+		[
+			{ label: '京A12345', value: '12345' },
+			{ label: '京A12346', value: '12346' },
+			{ label: '京A12347', value: '12347' }
+		]
+	])
 
-// 初始化地图
-onMounted(() => {
-  initAMap()
-})
+	// 初始化地图
+	onMounted(() => {
+		initAMap()
+	})
 
-// 初始化高德地图
-const initAMap = () => {
-  amapInstance.value = new amap.AMapWX({
-    key: 'e3e773ad74f7ba25f38775c9c8db6474' // 替换为你的key
-  })
-}
+	// 初始化高德地图
+	const initAMap = () => {
+		amapInstance.value = new amap.AMapWX({
+			key: 'e3e773ad74f7ba25f38775c9c8db6474' // 替换为你的key
+		})
+	}
 
-// 设置标记点
-const setMarkers = () => {
-  if (trackPoints.value.length === 0) return
-  
-  markers.value = [
-    // 起点
-    {
-      id: 0,
-      latitude: trackPoints.value[0].latitude,
-      longitude: trackPoints.value[0].longitude,
-      iconPath: '/static/start.png',
-      width: 60,
-      height: 60,
-      callout: {
-        content: '起点',
-        color: '#ffffff',
-        bgColor: '#1aad19',
-        padding: 5,
-        borderRadius: 4,
-        display: 'ALWAYS'
-      }
-    },
-    // 终点
-    {
-      id: 1,
-      latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-      longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-      iconPath: '/static/end.png',
-      width: 60,
-      height: 60,
-      callout: {
-        content: '终点',
-        color: '#ffffff',
-        bgColor: '#e64340',
-        padding: 5,
-        borderRadius: 4,
-        display: 'ALWAYS'
-      }
-    },
-    // 当前位置
-    {
-      id: 2,
-      latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-      longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-      iconPath: '/static/car.png',
-      width: 40,
-      height: 40,
-      rotate: getCarDirection(),
-      callout: {
-        content: '当前位置',
-        color: '#ffffff',
-        bgColor: '#1296db',
-        padding: 5,
-        borderRadius: 4,
-        display: 'ALWAYS'
-      }
-    }
-  ]
-}
+	// 设置标记点
+	const setMarkers = () => {
+		if (trackPoints.value.length === 0) return
 
-// 计算车辆方向
-const getCarDirection = () => {
-  if (trackPoints.value.length < 2) return 0
-  
-  const last = trackPoints.value[trackPoints.value.length - 1]
-  const prev = trackPoints.value[trackPoints.value.length - 2]
-  
-  const dx = last.longitude - prev.longitude
-  const dy = last.latitude - prev.latitude
-  const angle = Math.atan2(dy, dx) * 180 / Math.PI
-  
-  return angle
-}
+		markers.value = [
+			// 起点
+			{
+				id: 0,
+				latitude: trackPoints.value[0].latitude,
+				longitude: trackPoints.value[0].longitude,
+				iconPath: '/static/start.png',
+				width: 60,
+				height: 60,
+				callout: {
+					content: '起点',
+					color: '#ffffff',
+					bgColor: '#1aad19',
+					padding: 5,
+					borderRadius: 4,
+					display: 'ALWAYS'
+				}
+			},
+			// 终点
+			{
+				id: 1,
+				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
+				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+				iconPath: '/static/end.png',
+				width: 60,
+				height: 60,
+				callout: {
+					content: '终点',
+					color: '#ffffff',
+					bgColor: '#e64340',
+					padding: 5,
+					borderRadius: 4,
+					display: 'ALWAYS'
+				}
+			},
+			// 当前位置
+			{
+				id: 2,
+				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
+				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+				iconPath: '/static/car.png',
+				width: 40,
+				height: 40,
+				rotate: getCarDirection(),
+				callout: {
+					content: '当前位置',
+					color: '#ffffff',
+					bgColor: '#1296db',
+					padding: 5,
+					borderRadius: 4,
+					display: 'ALWAYS'
+				}
+			}
+		]
+	}
 
-// 开始/停止跟踪
-const toggleTracking = () => {
-  if (isTracking.value) {
-    stopTracking()
-  } else {
-    startTracking()
-  }
-}
+	// 计算车辆方向
+	const getCarDirection = () => {
+		if (trackPoints.value.length < 2) return 0
 
-// 开始跟踪
-const startTracking = () => {
-  isTracking.value = true
-  trackPoints.value = []
-  
-  const interval = parseInt(currentTime.value.replace('s', '')) * 1000
-  
-  getCurrentPosition()
-  
-  trackingInterval.value = setInterval(() => {
-    getCurrentPosition()
-  }, interval)
-}
+		const last = trackPoints.value[trackPoints.value.length - 1]
+		const prev = trackPoints.value[trackPoints.value.length - 2]
 
-// 停止跟踪
-const stopTracking = () => {
-  isTracking.value = false
-  if (trackingInterval.value) {
-    clearInterval(trackingInterval.value)
-    trackingInterval.value = null
-  }
-  
-  if (trackPoints.value.length >= 2) {
-    getRealRoute()
-  }
-}
+		const dx = last.longitude - prev.longitude
+		const dy = last.latitude - prev.latitude
+		const angle = Math.atan2(dy, dx) * 180 / Math.PI
 
-// 获取当前位置（模拟）
-const getCurrentPosition = () => {
-  uni.showLoading({
-    title: '获取位置中...'
-  })
-  
-  setTimeout(() => {
-    if (trackPoints.value.length === 0) {
-      // 第一个点使用当前位置
-      trackPoints.value.push({
-        latitude: center.latitude,
-        longitude: center.longitude
-      })
-      currentAddress.value = getAddressName(center.latitude, center.longitude)
-    } else {
-      // 模拟车辆移动
-      const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-      const randomLat = Math.random() * 0.01 - 0.005
-      const randomLng = Math.random() * 0.01 - 0.005
-      
-      const newPoint = {
-        latitude: lastPoint.latitude + randomLat,
-        longitude: lastPoint.longitude + randomLng
-      }
-      trackPoints.value.push(newPoint)
-      currentAddress.value = getAddressName(newPoint.latitude, newPoint.longitude)
-    }
-    
-    currentSpeed.value = Math.floor(Math.random() * 80 + 20)
-    
-    const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-    center.latitude = lastPoint.latitude
-    center.longitude = lastPoint.longitude
-    
-    setMarkers()
-    
-    if (isTracking.value && trackPoints.value.length >= 2) {
-      drawTempRoute()
-    }
-    
-    uni.hideLoading()
-  }, 500)
-}
+		return angle
+	}
 
-// 模拟获取地址名称
-const getAddressName = (lat, lng) => {
-  // 这里应该是调用逆地理编码API获取实际地址
-  // 模拟返回
-  const streets = ['朝阳路', '建国路', '东三环', '西直门大街', '中关村大街']
-  const numbers = Math.floor(Math.random() * 100) + '号'
-  return '北京市' + streets[Math.floor(Math.random() * streets.length)] + numbers
-}
+	// 开始/停止跟踪
+	const toggleTracking = () => {
+		if (isTracking.value) {
+			stopTracking()
+		} else {
+			startTracking()
+		}
+	}
 
-// 绘制临时路线
-const drawTempRoute = () => {
-  polylines.value = [
-    {
-      points: trackPoints.value,
-      color: '#1296db',
-      width: 6,
-      arrowLine: true,
-      borderColor: '#ffffff',
-      borderWidth: 2
-    }
-  ]
-}
+	// 开始跟踪
+	const startTracking = () => {
+		isTracking.value = true
+		trackPoints.value = []
 
-// 获取真实道路路线
-const getRealRoute = () => {
-  if (trackPoints.value.length < 2) {
-    uni.showToast({
-      title: '至少需要2个坐标点',
-      icon: 'none'
-    })
-    return
-  }
+		const interval = parseInt(currentTime.value.replace('s', '')) * 1000
 
-  uni.showLoading({
-    title: '路线规划中...'
-  })
+		getCurrentPosition()
 
-  const waypoints = trackPoints.value
-    .slice(1, -1)
-    .map(point => `${point.longitude},${point.latitude}`)
-    .join(';')
+		trackingInterval.value = setInterval(() => {
+			getCurrentPosition()
+		}, interval)
+	}
 
-  amapInstance.value.getDrivingRoute({
-    origin: `${trackPoints.value[0].longitude},${trackPoints.value[0].latitude}`,
-    destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
-    waypoints: waypoints || undefined,
-    strategy: 5,
-    success: (res: any) => {
-      uni.hideLoading()
-      if (res.paths && res.paths[0]) {
-        drawRoadRoute(res.paths[0])
-      } else {
-        uni.showToast({
-          title: '未找到合适路线',
-          icon: 'none'
-        })
-      }
-    },
-    fail: (err: any) => {
-      uni.hideLoading()
-      uni.showToast({
-        title: '路线获取失败',
-        icon: 'none'
-      })
-      console.error('路线规划失败:', err)
-    }
-  })
-}
+	// 停止跟踪
+	const stopTracking = () => {
+		isTracking.value = false
+		if (trackingInterval.value) {
+			clearInterval(trackingInterval.value)
+			trackingInterval.value = null
+		}
 
-// 绘制道路路线
-const drawRoadRoute = (path: any) => {
-  const roadPoints = []
+		if (trackPoints.value.length >= 2) {
+			getRealRoute()
+		}
+	}
 
-  path.steps.forEach((step: any) => {
-    const polyline = step.polyline.split(';')
-    polyline.forEach((item: string) => {
-      const coords = item.split(',')
-      roadPoints.push({
-        longitude: parseFloat(coords[0]),
-        latitude: parseFloat(coords[1])
-      })
-    })
-  })
+	// 获取当前位置（模拟）
+	const getCurrentPosition = () => {
+		uni.showLoading({
+			title: '获取位置中...'
+		})
 
-  polylines.value = [
-    // 道路底色
-    {
-      points: roadPoints,
-      color: '#4a90e2',
-      width: 12,
-      level: 'low'
-    },
-    // 主路线
-    {
-      points: roadPoints,
-      color: '#1a73e8',
-      width: 8,
-      arrowLine: true,
-      arrowIconPath: '/static/road-arrow.png',
-      level: 'high'
-    },
-    // 路线高亮
-    {
-      points: roadPoints,
-      color: '#ffffff',
-      width: 2,
-      level: 'highest'
-    }
-  ]
+		setTimeout(() => {
+			if (trackPoints.value.length === 0) {
+				// 第一个点使用当前位置
+				trackPoints.value.push({
+					latitude: center.latitude,
+					longitude: center.longitude
+				})
+				currentAddress.value = getAddressName(center.latitude, center.longitude)
+			} else {
+				// 模拟车辆移动
+				const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+				const randomLat = Math.random() * 0.01 - 0.005
+				const randomLng = Math.random() * 0.01 - 0.005
 
-  routeInfo.distance = path.distance
-  routeInfo.duration = path.duration
+				const newPoint = {
+					latitude: lastPoint.latitude + randomLat,
+					longitude: lastPoint.longitude + randomLng
+				}
+				trackPoints.value.push(newPoint)
+				currentAddress.value = getAddressName(newPoint.latitude, newPoint.longitude)
+			}
 
-  adjustMapView(roadPoints)
-}
+			currentSpeed.value = Math.floor(Math.random() * 80 + 20)
 
-// 调整地图视野
-const adjustMapView = (points: Array<any>) => {
-  if (points.length === 0) return
+			const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+			center.latitude = lastPoint.latitude
+			center.longitude = lastPoint.longitude
 
-  let minLat = points[0].latitude
-  let maxLat = points[0].latitude
-  let minLng = points[0].longitude
-  let maxLng = points[0].longitude
+			setMarkers()
 
-  points.forEach((point: any) => {
-    minLat = Math.min(minLat, point.latitude)
-    maxLat = Math.max(maxLat, point.latitude)
-    minLng = Math.min(minLng, point.longitude)
-    maxLng = Math.max(maxLng, point.longitude)
-  })
+			if (isTracking.value && trackPoints.value.length >= 2) {
+				drawTempRoute()
+			}
 
-  center.latitude = (minLat + maxLat) / 2
-  center.longitude = (minLng + maxLng) / 2
+			uni.hideLoading()
+		}, 500)
+	}
 
-  const latDiff = maxLat - minLat
-  const lngDiff = maxLng - minLng
-  const diff = Math.max(latDiff, lngDiff)
+	// 模拟获取地址名称
+	const getAddressName = (lat, lng) => {
+		// 这里应该是调用逆地理编码API获取实际地址
+		// 模拟返回
+		const streets = ['朝阳路', '建国路', '东三环', '西直门大街', '中关村大街']
+		const numbers = Math.floor(Math.random() * 100) + '号'
+		return '北京市' + streets[Math.floor(Math.random() * streets.length)] + numbers
+	}
 
-  if (diff < 0.01) {
-    mapScale.value = 16
-  } else if (diff < 0.02) {
-    mapScale.value = 15
-  } else if (diff < 0.05) {
-    mapScale.value = 14
-  } else {
-    mapScale.value = 13
-  }
-}
+	// 绘制临时路线
+	const drawTempRoute = () => {
+		polylines.value = [
+			{
+				points: trackPoints.value,
+				color: '#1296db',
+				width: 6,
+				arrowLine: true,
+				borderColor: '#ffffff',
+				borderWidth: 2
+			}
+		]
+	}
 
-// 格式化距离
-const formatDistance = (distance: number): string => {
-  if (distance < 1000) {
-    return `${distance}米`
-  } else {
-    return `${(distance / 1000).toFixed(1)}公里`
-  }
-}
+	// 获取真实道路路线
+	const getRealRoute = () => {
+		if (trackPoints.value.length < 2) {
+			uni.showToast({
+				title: '至少需要2个坐标点',
+				icon: 'none'
+			})
+			return
+		}
 
-// 格式化时间
-const formatDuration = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60)
-  if (mins < 60) {
-    return `${mins}分钟`
-  } else {
-    const hours = Math.floor(mins / 60)
-    const remainingMins = mins % 60
-    return `${hours}小时${remainingMins}分钟`
-  }
-}
+		uni.showLoading({
+			title: '路线规划中...'
+		})
 
-// 选择器方法
-const handleTime = () => {
-  columns.value = times.value
-  currentPickerType.value = 'time'
-  picker.value?.open()
-}
+		const waypoints = trackPoints.value
+			.slice(1, -1)
+			.map(point => `${point.longitude},${point.latitude}`)
+			.join(';')
 
-const handleCar = () => {
-  columns.value = cars.value
-  currentPickerType.value = 'car'
-  picker.value?.open()
-}
+		amapInstance.value.getDrivingRoute({
+			origin: `${trackPoints.value[0].longitude},${trackPoints.value[0].latitude}`,
+			destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
+			waypoints: waypoints || undefined,
+			strategy: 5,
+			success: (res : any) => {
+				uni.hideLoading()
+				if (res.paths && res.paths[0]) {
+					drawRoadRoute(res.paths[0])
+				} else {
+					uni.showToast({
+						title: '未找到合适路线',
+						icon: 'none'
+					})
+				}
+			},
+			fail: (err : any) => {
+				uni.hideLoading()
+				uni.showToast({
+					title: '路线获取失败',
+					icon: 'none'
+				})
+				console.error('路线规划失败:', err)
+			}
+		})
+	}
 
-const confirm = (e: { value: Array<{ label: string, value: string }> }) => {
-  const selected = e.value[0]
-  
-  if (currentPickerType.value == 'time') {
-    currentTime.value = selected.label
-  } else if (currentPickerType.value == 'car') {
-    currentCar.value = selected.label
-  }
-  
-  currentPickerType.value = ''
-}
+	// 绘制道路路线
+	const drawRoadRoute = (path : any) => {
+		const roadPoints = []
 
-// 地图区域变化事件
-const handleRegionChange = (e: any) => {
-  console.log('地图区域变化:', e)
-}
+		path.steps.forEach((step : any) => {
+			const polyline = step.polyline.split(';')
+			polyline.forEach((item : string) => {
+				const coords = item.split(',')
+				roadPoints.push({
+					longitude: parseFloat(coords[0]),
+					latitude: parseFloat(coords[1])
+				})
+			})
+		})
+
+		polylines.value = [
+			// 道路底色
+			{
+				points: roadPoints,
+				color: '#4a90e2',
+				width: 12,
+				level: 'low'
+			},
+			// 主路线
+			{
+				points: roadPoints,
+				color: '#1a73e8',
+				width: 8,
+				arrowLine: true,
+				arrowIconPath: '/static/road-arrow.png',
+				level: 'high'
+			},
+			// 路线高亮
+			{
+				points: roadPoints,
+				color: '#ffffff',
+				width: 2,
+				level: 'highest'
+			}
+		]
+
+		routeInfo.distance = path.distance
+		routeInfo.duration = path.duration
+
+		adjustMapView(roadPoints)
+	}
+
+	// 调整地图视野
+	const adjustMapView = (points : Array<any>) => {
+		if (points.length === 0) return
+
+		let minLat = points[0].latitude
+		let maxLat = points[0].latitude
+		let minLng = points[0].longitude
+		let maxLng = points[0].longitude
+
+		points.forEach((point : any) => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+
+		center.latitude = (minLat + maxLat) / 2
+		center.longitude = (minLng + maxLng) / 2
+
+		const latDiff = maxLat - minLat
+		const lngDiff = maxLng - minLng
+		const diff = Math.max(latDiff, lngDiff)
+
+		if (diff < 0.01) {
+			mapScale.value = 16
+		} else if (diff < 0.02) {
+			mapScale.value = 15
+		} else if (diff < 0.05) {
+			mapScale.value = 14
+		} else {
+			mapScale.value = 13
+		}
+	}
+
+	// 格式化距离
+	const formatDistance = (distance : number) : string => {
+		if (distance < 1000) {
+			return `${distance}米`
+		} else {
+			return `${(distance / 1000).toFixed(1)}公里`
+		}
+	}
+
+	// 格式化时间
+	const formatDuration = (seconds : number) : string => {
+		const mins = Math.floor(seconds / 60)
+		if (mins < 60) {
+			return `${mins}分钟`
+		} else {
+			const hours = Math.floor(mins / 60)
+			const remainingMins = mins % 60
+			return `${hours}小时${remainingMins}分钟`
+		}
+	}
+
+	// 选择器方法
+	const handleTime = () => {
+		columns.value = times.value
+		currentPickerType.value = 'time'
+		picker.value?.open()
+	}
+
+	const handleCar = () => {
+		columns.value = cars.value
+		currentPickerType.value = 'car'
+		picker.value?.open()
+	}
+
+	const confirm = (e : { value : Array<{ label : string, value : string }> }) => {
+		const selected = e.value[0]
+
+		if (currentPickerType.value == 'time') {
+			currentTime.value = selected.label
+		} else if (currentPickerType.value == 'car') {
+			currentCar.value = selected.label
+		}
+
+		currentPickerType.value = ''
+	}
+
+	// 地图区域变化事件
+	const handleRegionChange = (e : any) => {
+		console.log('地图区域变化:', e)
+	}
 </script>
 
 <style lang="scss">
-.container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f5f7fa;
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f7fa;
 
-  .map-container {
-    flex: 1;
-    width: 100%;
-    position: relative;
+		.map-container {
+			flex: 1;
+			width: 100%;
+			position: relative;
 
-    .tools-box {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20rpx 30rpx;
+			.tools-box {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 20rpx 30rpx;
 
-      .car-box {
-        @extend .tools-box;
-        padding: 0;
+				.car-box {
+					@extend .tools-box;
+					padding: 0;
 
-        .selectCar {
-          @extend .tools-box;
-          margin-right: 20rpx;
-          color: #fff;
-          background-color: rgba(3, 109, 246, 0.71);
-          padding: 10rpx;
-          border-radius: 10rpx;
-        }
-      }
+					.selectCar {
+						@extend .tools-box;
+						margin-right: 20rpx;
+						color: #fff;
+						background-color: rgba(3, 109, 246, 0.71);
+						padding: 10rpx;
+						border-radius: 10rpx;
+					}
+				}
 
-      .second {
-        @extend .tools-box;
-        padding: 10rpx;
-        background-color: rgba(3, 109, 246, 0.71);
-        border-radius: 10rpx;
-        color: #fff;
+				.second {
+					@extend .tools-box;
+					padding: 10rpx;
+					background-color: rgba(3, 109, 246, 0.71);
+					border-radius: 10rpx;
+					color: #fff;
 
-        .times {
-          margin-right: 10rpx;
-          font-size: 30rpx;
-        }
-      }
-    }
-  }
+					.times {
+						margin-right: 10rpx;
+						font-size: 30rpx;
+					}
+				}
+			}
+		}
 
-  .tools-panel {
-    width: 100%;
-    background-color: #fff;
-    padding: 20rpx 40rpx;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+		.tools-panel {
+			width: 100%;
+			background-color: #fff;
+			padding: 20rpx 40rpx;
+			display: flex;
+			flex-direction: column;
+			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 
-    .btn {
-      margin-bottom: 20rpx;
-      
-      button {
-        width: 100%;
-        margin: 0;
-        background-color: #1296db;
-        color: white;
-        font-size: 28rpx;
-      }
-    }
-    
-    .pos-info-box {
-      padding: 10rpx 0;
-      
-      .speed, .address {
-        display: flex;
-        flex-direction: row;
-        justify-content: start;
-        align-items: center;
-        padding: 8rpx 0;
-        font-size: 28rpx;
-        
-        text:first-child {
-          color: #666;
-          width: 100rpx;
-        }
-        
-        text:last-child {
-          color: #333;
-          font-weight: 500;
-        }
-      }
-    }
-  }
+			.btn {
+				margin-bottom: 20rpx;
 
-  .info-panel {
-    width: 100%;
-    background-color: #fff;
-    padding: 20rpx;
-    display: flex;
-    flex-direction: column;
-    font-size: 26rpx;
-    color: #666;
-    border-top: 1rpx solid #eee;
-    
-    text {
-      padding: 5rpx 0;
-    }
-  }
-}
+				button {
+					width: 100%;
+					margin: 0;
+					background-color: #1296db;
+					color: white;
+					font-size: 28rpx;
+				}
+			}
+
+			.pos-info-box {
+				padding: 10rpx 0;
+
+				.speed,
+				.address {
+					display: flex;
+					flex-direction: row;
+					justify-content: start;
+					align-items: center;
+					padding: 8rpx 0;
+					font-size: 28rpx;
+
+					text:first-child {
+						color: #666;
+						width: 100rpx;
+					}
+
+					text:last-child {
+						color: #333;
+						font-weight: 500;
+					}
+				}
+			}
+		}
+
+		.info-panel {
+			width: 100%;
+			background-color: #fff;
+			padding: 20rpx;
+			display: flex;
+			flex-direction: column;
+			font-size: 26rpx;
+			color: #666;
+			border-top: 1rpx solid #eee;
+
+			text {
+				padding: 5rpx 0;
+			}
+		}
+	}
 </style>
