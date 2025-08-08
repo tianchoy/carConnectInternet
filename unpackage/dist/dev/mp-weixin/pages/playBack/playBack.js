@@ -1,13 +1,13 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../utils/amap-wx.130.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
+  const _component_marker = common_vendor.resolveComponent("marker");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_slider_1 = common_vendor.resolveComponent("uv-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  (_easycom_custom_navBar_1 + _component_marker + _easycom_uv_icon_1 + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
@@ -33,6 +33,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isPlaying = common_vendor.ref(false);
     const playbackSpeed = common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
+    const currentSpeed = common_vendor.ref(0);
     const playbackInterval = common_vendor.ref(null);
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
@@ -69,18 +70,60 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showDateTimePicker.value = false;
     };
     const loadSampleTrack = () => {
-      const mockTrack = [
+      const rawTrack = [
         new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }),
         new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }),
         new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }),
         new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }),
         new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 })
       ];
-      trackPoints.value = mockTrack;
+      const interpolatedTrack = [];
+      for (let i = 0; i < rawTrack.length - 1; i++) {
+        const start = rawTrack[i];
+        const end = rawTrack[i + 1];
+        interpolatedTrack.push(Object.assign({}, start));
+        const steps = 5;
+        for (let j = 1; j < steps; j++) {
+          const ratio = j / steps;
+          interpolatedTrack.push({
+            latitude: start.latitude + (end.latitude - start.latitude) * ratio,
+            longitude: start.longitude + (end.longitude - start.longitude) * ratio,
+            rotation: calculateBearing(start.latitude, start.longitude, end.latitude, end.longitude)
+          });
+        }
+      }
+      interpolatedTrack.push(Object.assign({}, rawTrack[rawTrack.length - 1]));
+      for (let i = 0; i < interpolatedTrack.length - 1; i++) {
+        const current = interpolatedTrack[i];
+        const next = interpolatedTrack[i + 1];
+        current.rotation = calculateBearing(current.latitude, current.longitude, next.latitude, next.longitude);
+        const distance = getDistance(current.latitude, current.longitude, next.latitude, next.longitude);
+        current.speed = Math.min(100, Math.round(distance * 3.6));
+      }
+      if (interpolatedTrack.length > 1) {
+        interpolatedTrack[interpolatedTrack.length - 1].rotation = interpolatedTrack[interpolatedTrack.length - 2].rotation;
+        interpolatedTrack[interpolatedTrack.length - 1].speed = interpolatedTrack[interpolatedTrack.length - 2].speed;
+      }
+      trackPoints.value = interpolatedTrack;
       calculateTrackDistance();
       initCarMarker();
       updatePolyline();
       adjustMapToFitTrack();
+    };
+    const calculateBearing = (lat1, lng1, lat2, lng2) => {
+      const degToRad = (d) => {
+        return d * Math.PI / 180;
+      };
+      const radToDeg = (r) => {
+        return r * 180 / Math.PI;
+      };
+      const φ1 = degToRad(lat1);
+      const φ2 = degToRad(lat2);
+      const Δλ = degToRad(lng2 - lng1);
+      const y = Math.sin(Δλ) * Math.cos(φ2);
+      const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+      const θ = Math.atan2(y, x);
+      return (radToDeg(θ) + 360) % 360;
     };
     const initCarMarker = () => {
       if (trackPoints.value.length > 0) {
@@ -91,7 +134,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           iconPath: "/static/car.png",
           width: 32,
           height: 32,
+          rotate: trackPoints.value[0].rotation || 0,
           anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          animation: new UTSJSONObject({
+            duration: 1e3,
+            type: "move"
+          }),
           callout: new UTSJSONObject({
             content: "起点",
             borderRadius: 5,
@@ -183,8 +231,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
         return null;
       }
+      if (currentIndex.value >= trackPoints.value.length - 1) {
+        resetPlayback();
+      }
       isPlaying.value = true;
-      playbackInterval.value = setInterval(playNextPoint, 1e3 / playbackSpeed.value);
+      const intervalDuration = 2e3 / playbackSpeed.value;
+      playbackInterval.value = setInterval(playNextPoint, intervalDuration);
     };
     const playNextPoint = () => {
       if (currentIndex.value >= trackPoints.value.length - 1) {
@@ -203,13 +255,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentIndex.value++;
       updateCarPosition();
       updatePolyline();
+      if (trackPoints.value[currentIndex.value].speed) {
+        currentSpeed.value = trackPoints.value[currentIndex.value].speed;
+      }
     };
     const updateCarPosition = () => {
       if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
         const point = trackPoints.value[currentIndex.value];
-        carMarker.value.latitude = point.latitude;
-        carMarker.value.longitude = point.longitude;
+        Object.assign(carMarker.value, new UTSJSONObject({
+          latitude: point.latitude,
+          longitude: point.longitude,
+          rotate: point.rotation || 0,
+          animation: new UTSJSONObject({
+            duration: 1e3 / playbackSpeed.value,
+            type: "move"
+          })
+        }));
         markers.value = [carMarker.value];
+        center.latitude = point.latitude;
+        center.longitude = point.longitude;
       }
     };
     const pausePlayback = () => {
@@ -222,6 +286,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const resetPlayback = () => {
       pausePlayback();
       currentIndex.value = 0;
+      currentSpeed.value = 0;
       updateCarPosition();
       updatePolyline();
     };
@@ -229,7 +294,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       playbackSpeed.value = e;
       if (isPlaying.value) {
         pausePlayback();
-        startPlayback();
+        const intervalDuration = 2e3 / playbackSpeed.value;
+        playbackInterval.value = setInterval(playNextPoint, intervalDuration);
+        isPlaying.value = true;
       }
     };
     const calculateTrackDistance = () => {
@@ -250,73 +317,91 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return s * 6378.137 * 1e3;
     };
     return (_ctx = null, _cache = null) => {
-      const __returned__ = {
-        a: common_vendor.p({
+      const __returned__ = common_vendor.e(new UTSJSONObject({
+        a: common_vendor.p(new UTSJSONObject({
           title: "轨迹回放",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        }),
-        b: common_vendor.sei("myMap", "map"),
-        c: common_vendor.unref(center).latitude,
-        d: common_vendor.unref(center).longitude,
-        e: common_vendor.unref(markers),
-        f: common_vendor.unref(polyline),
-        g: common_vendor.unref(mapScale),
-        h: common_vendor.p({
+        })),
+        b: carMarker.value
+      }), carMarker.value ? new UTSJSONObject({
+        c: carMarker.value.id,
+        d: common_vendor.p(new UTSJSONObject({
+          id: carMarker.value.id,
+          latitude: carMarker.value.latitude,
+          longitude: carMarker.value.longitude,
+          iconPath: carMarker.value.iconPath,
+          width: carMarker.value.width,
+          height: carMarker.value.height,
+          rotate: carMarker.value.rotate,
+          anchor: carMarker.value.anchor,
+          callout: carMarker.value.callout,
+          animation: carMarker.value.animation
+        }))
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        e: common_vendor.sei("myMap", "map"),
+        f: center.latitude,
+        g: center.longitude,
+        h: markers.value,
+        i: polyline.value,
+        j: mapScale.value,
+        k: common_vendor.p(new UTSJSONObject({
           name: "calendar",
           size: "25"
-        }),
-        i: common_vendor.t(common_vendor.unref(startTime)),
-        j: common_vendor.o(($event = null) => {
+        })),
+        l: common_vendor.t(startTime.value),
+        m: common_vendor.o(($event = null) => {
           return showPicker("start");
         }),
-        k: common_vendor.t(common_vendor.unref(endTime)),
-        l: common_vendor.o(($event = null) => {
+        n: common_vendor.t(endTime.value),
+        o: common_vendor.o(($event = null) => {
           return showPicker("end");
         }),
-        m: common_vendor.o(togglePlayback),
-        n: common_vendor.p({
-          name: common_vendor.unref(isPlaying) ? "pause-circle" : "play-circle",
+        p: common_vendor.o(togglePlayback),
+        q: common_vendor.p(new UTSJSONObject({
+          name: isPlaying.value ? "pause-circle" : "play-circle",
           size: "30"
+        })),
+        r: common_vendor.o(setPlaybackSpeed),
+        s: common_vendor.o(($event = null) => {
+          return playbackSpeed.value = $event;
         }),
-        o: common_vendor.o(setPlaybackSpeed),
-        p: common_vendor.o(($event = null) => {
-          return common_vendor.isRef(playbackSpeed) ? playbackSpeed.value = $event : null;
-        }),
-        q: common_vendor.p({
-          backgroundColor: "pink",
-          activeColor: "blue",
+        t: common_vendor.p(new UTSJSONObject({
+          backgroundColor: "#f5f5f5",
+          activeColor: "#1890FF",
           min: "1",
           max: "5",
-          blockStyle: {
+          blockStyle: new UTSJSONObject({
             width: "32rpx",
             height: "32rpx",
             background: "url(/static/slider.png) no-repeat center/cover"
-          },
-          modelValue: common_vendor.unref(playbackSpeed)
-        }),
-        r: common_vendor.t(common_vendor.unref(playbackSpeed)),
-        s: common_vendor.t(common_vendor.unref(startTime)),
-        t: common_vendor.o(onConfirm),
-        v: common_vendor.o(onCancel),
-        w: common_vendor.p({
+          }),
+          modelValue: playbackSpeed.value
+        })),
+        v: common_vendor.t(playbackSpeed.value),
+        w: common_vendor.t(startTime.value),
+        x: common_vendor.t(currentSpeed.value),
+        y: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
+        z: common_vendor.o(onConfirm),
+        A: common_vendor.o(onCancel),
+        B: common_vendor.p(new UTSJSONObject({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
-          title: common_vendor.unref(pickerTitle),
+          title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
+        })),
+        C: common_vendor.o(($event = null) => {
+          return showDateTimePicker.value = $event;
         }),
-        x: common_vendor.o(($event = null) => {
-          return common_vendor.isRef(showDateTimePicker) ? showDateTimePicker.value = $event : null;
-        }),
-        y: common_vendor.p({
+        D: common_vendor.p(new UTSJSONObject({
           position: "bottom",
           closeable: false,
-          modelValue: common_vendor.unref(showDateTimePicker)
-        }),
-        z: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      };
+          modelValue: showDateTimePicker.value
+        })),
+        E: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+      }));
       return __returned__;
     };
   }

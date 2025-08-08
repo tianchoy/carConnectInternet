@@ -42,6 +42,7 @@
   width: 100%;
   background-color: #fff;
   padding: 50rpx 20rpx;
+  box-shadow: 0 -10rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 .container .tools-panel .Datetime-box {
   display: flex;
@@ -49,6 +50,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 20rpx;
+  margin-bottom: 30rpx;
 }
 .container .tools-panel .Datetime-box .date-box {
   margin: 0 10rpx;
@@ -59,13 +61,14 @@
 }
 .container .tools-panel .Datetime-box .date-box .Date {
   font-size: 25rpx;
+  padding: 10rpx 15rpx;
   margin: 0 10rpx;
   border-radius: 5rpx;
   background-color: #f5f5f5;
 }
 .container .tools-panel .Datetime-box .playbackdetail {
   font-size: 25rpx;
-  color: #69c2f1;
+  color: #1890FF;
 }
 .container .tools-panel .tool-tag-item {
   padding: 40rpx 20rpx;
@@ -75,12 +78,13 @@
   align-items: center;
 }
 .container .tools-panel .tool-tag-item .speed-label {
-  border: 5rpx solid #999;
+  border: 2rpx solid #1890FF;
   font-size: 25rpx;
-  color: #666;
+  color: #1890FF;
   display: block;
-  padding: 5rpx 10rpx;
-  border-radius: 8rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 30rpx;
+  margin-left: 20rpx;
 }
 .container .tools-panel .tool-tag-item .slider {
   flex: 1;
@@ -92,6 +96,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 20rpx;
+  margin-top: 20rpx;
+  background-color: #f9f9f9;
+  border-radius: 15rpx;
 }
 .container .tools-panel .play-back-info .item-info {
   display: flex;
@@ -99,7 +106,13 @@
   justify-content: center;
   align-items: center;
 }
+.container .tools-panel .play-back-info .item-info text:first-child {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
 .container .tools-panel .play-back-info .info-label {
   font-size: 25rpx;
-  padding: 20rpx;
+  padding: 10rpx 0;
+  color: #999;
 }
