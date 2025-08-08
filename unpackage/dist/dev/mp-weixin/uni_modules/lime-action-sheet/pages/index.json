@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "l-icon": "../../lime-icon/components/l-icon/l-icon",
+    "l-popup": "../../lime-popup/components/l-popup/l-popup"
+  }
+}

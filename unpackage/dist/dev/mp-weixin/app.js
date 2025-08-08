@@ -9,6 +9,9 @@ if (!Math) {
   "./pages/signUp/signUp.js";
   "./pages/carInfoDetail/carInfoDetail.js";
   "./pages/addCar/addCar.js";
+  "./pages/playBack/playBack.js";
+  "./uni_modules/lime-action-sheet/pages/index.js";
+  "./pages/vehicleTracking/vehicleTracking.js";
 }
 const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onLaunch: function() {

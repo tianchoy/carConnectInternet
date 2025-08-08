@@ -1,0 +1,80 @@
+<template>
+	<view v-if="inited"
+		class="l-overlay" 
+		ref="overlayRef"
+		:class="[lClass, classes]"
+		:style="[styles, lStyle]"
+		@click.stop="onClick" 
+		@touchmove.stop="noop" 
+		@transitionend="finished" 
+		:aria-role="ariaRole" 
+		:aria-label="ariaLabel">
+		<slot></slot>
+	</view>
+</template>
+
+<script lang="uts" setup>
+	import { useTransition, UseTransitionOptions, TransitionEmitStatus } from '@/uni_modules/lime-transition';
+	import { OverlayProps } from './type';
+	defineOptions({
+		name:'l-overlay'	
+	})
+	
+	const props = withDefaults(defineProps<OverlayProps>(), {
+		ariaLabel: '关闭',
+		ariaRole: 'button',
+		preventScrollThrough: true,
+		zIndex: 998,
+		visible: false,
+		duration: 300,
+	})
+	
+	const emit = defineEmits(['click', 'before-enter', 'enter', 'after-enter', 'before-leave', 'leave', 'after-leave'])
+	
+	const {inited, display, classes, finished} = useTransition({
+		defaultName: 'fade',
+		appear: props.visible,
+		emits: (name:TransitionEmitStatus) => { emit(name) },
+		visible: (): boolean => props.visible,
+		duration: props.duration,
+	} as UseTransitionOptions)
+	
+	const styles = computed<Map<string,any>>(():Map<string,any> => {
+		const style = new Map<string,any>();
+		if (props.bgColor != null) {
+			style.set("background", props.bgColor!)
+		}
+		if (props.zIndex > 0) {
+			style.set("z-index", props.zIndex)
+		}
+		// #ifndef APP || WEB
+		style.set('transition-duration', props.duration + 'ms')
+		if (!display.value) {
+			style.set("display", "none")
+		}
+		// #endif
+		return style
+	})
+	
+	const noop = () => {}
+	const onClick = (event: UniPointerEvent) =>{
+		// event.stopPropagation()
+		emit('click', !props.visible)
+	}
+	// #ifdef APP || WEB
+	const overlayRef = ref<UniElement|null>(null)
+	
+	watchEffect(()=>{
+		overlayRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if(!display.value){
+			overlayRef.value?.style.setProperty('display', "none")
+		} else {
+			overlayRef.value?.style.setProperty('display', "flex")
+		}
+	})
+	// #endif
+	
+</script>
+<style lang="scss">
+	@import './index';
+</style>

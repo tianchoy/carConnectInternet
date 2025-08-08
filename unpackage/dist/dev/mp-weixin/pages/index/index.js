@@ -108,7 +108,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        myAmapFun.value = new utils_amapWx_130.amapFile.AMapWX(new UTSJSONObject({ key: gdKey }));
+        myAmapFun.value = new utils_amapWx_130.amap.AMapWX(new UTSJSONObject({ key: gdKey }));
         mapCtx = common_vendor.index.createMapContext("myMap", this);
         if (Login.value) {
           getlocation();

@@ -1,0 +1,1 @@
+<view class="{{['l-svg', e && 'is-inherit', virtualHostClass]}}" style="{{f + ';' + virtualHostStyle}}" id="{{d}}" change:eS="{{uV.sS}}" eS="{{$eS[d]}}" change:eA="{{uV.sA}}" eA="{{$eA[d]}}" hidden="{{virtualHostHidden || false}}"><image class="l-svg-img" src="{{a}}" binderror="{{b}}" bindload="{{c}}"></image></view><wxs src="/common/uniView.wxs" module="uV"/>

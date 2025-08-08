@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "l-svg": "../../../lime-svg/components/l-svg/l-svg"
+  }
+}

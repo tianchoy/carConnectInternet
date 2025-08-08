@@ -1,0 +1,207 @@
+@import '~@/uni_modules/lime-style/index.scss';
+@import '~@/uni_modules/lime-style/mixins/hairline.scss';
+// $prefix: l !default;
+$pre: '--';
+$action-sheet: #{$prefix}-action-sheet;
+
+$action-sheet-item-height: create-var(action-sheet-item-height, 112rpx);
+$action-sheet-item-disabled-color: create-var(action-sheet-item-disabled-color, $text-color-4);
+$action-sheet-hover-color: create-var(action-sheet-hover-color, $fill-3);
+$action-sheet-border-color: create-var(action-sheet-border-color, $border-color-1);
+$action-sheet-gap-height: create-var(action-sheet-gap-height, 16rpx);
+$action-sheet-gap-color: create-var(action-sheet-gap-color, $bg-color-page);
+$action-sheet-color: create-var(action-sheet-color, $text-color-1);
+$action-sheet-border-radius: create-var(action-sheet-border-radius, $border-radius-lg);
+$action-sheet-description-color: create-var(action-sheet-description-color, $text-color-3);
+$action-sheet-description-font-size: create-var(action-sheet-description-font-size, $font-size);
+$action-sheet-text-align: create-var(action-sheet-text-align, center);
+$action-sheet-font-size: create-var(action-sheet-font-size, $font-size-md);
+$action-sheet-cancel-height: create-var(action-sheet-cancel-height, 96rpx);
+$action-sheet-cancel-color: create-var(action-sheet-cancel-color, $text-color-1);
+
+$action-sheet-image-size: create-var(action-sheet-image-size, 96rpx);
+$action-sheet-image-bg-color: create-var(action-sheet-image-bg-color, $fill-3);
+$action-sheet-col-font-size: create-var(action-sheet-font-size, 24rpx);
+$action-sheet-col-icon-size: create-var(action-sheet-icon-size, 48rpx);
+$action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx);
+
+.#{$action-sheet} {
+	// position: fixed;
+	// bottom: 0;
+	// left: 0;
+	// right: 0;
+	
+	/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
+	color: $action-sheet-color;
+	/* #endif */
+	border-top-left-radius: $action-sheet-border-radius;
+	border-top-right-radius: $action-sheet-border-radius;
+	background-color: $bg-color-container;
+	
+	&--grid {
+	    // padding-top: 16rpx;
+	}
+		
+	&__item {
+		/* #ifndef UNI-APP-X */
+		display: flex;
+		/* #endif */
+		height: $action-sheet-item-height;
+		justify-content: center;
+		align-items: center;
+		flex-direction: row;
+		padding: 0 32rpx;
+		&-text {
+			color: $action-sheet-color;
+			font-size: $action-sheet-font-size;
+		}
+		&-icon {
+			/* #ifndef UNI-APP-X */
+			display: inline-flex;
+			/* #endif */
+			color: $action-sheet-color;
+			margin-right: 16rpx;
+			// font-size: $action-sheet-font-size !important;
+			font-size: $action-sheet-font-size;
+		}
+		&--hover {
+			background-color: $action-sheet-hover-color;
+		}
+		&--left {
+			justify-content: flex-start;
+		}
+		&--disabled {
+			opacity: 0.5;
+		    // color: $action-sheet-item-disabled-color;
+		}
+		&--bordered {
+			/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
+			border-bottom: 0.8px solid $action-sheet-gap-color;
+			/* #endif */
+			/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
+			&:before {
+				@include hairline-bottom($action-sheet-gap-color);
+				transform: scaleY(0.8);
+				// position: absolute;
+				// content: '';
+				// left: 0;
+				// right: 0;
+				// height: 1px;
+				// background: $action-sheet-gap-color
+			}
+			/* #endif */
+		}
+	}
+	&__gap {
+		height: $action-sheet-gap-height;
+		background-color: $action-sheet-gap-color;
+	}
+	&__cancel {
+		display: flex;
+	    background-color: $bg-color-container;
+		
+		height: $action-sheet-cancel-height;
+		justify-content: center;
+		align-items: center;
+		box-sizing: content-box;
+		
+		&--hover {
+			background-color: $action-sheet-hover-color;
+		}
+		&-text {
+			color: $action-sheet-cancel-color;
+			font-size: $action-sheet-font-size;
+		}
+	}
+			
+	&__description {
+		/* #ifndef UNI-APP-X */
+		display: flex;
+		justify-content: center;
+		/* #endif */
+		color: $action-sheet-description-color;
+		line-height: 44rpx;
+		font-size: $action-sheet-description-font-size;
+		text-align: $action-sheet-text-align;
+		padding: 24rpx 32rpx;
+		border-bottom: 0.8px solid $action-sheet-gap-color;
+		
+		&--left {
+			text-align: left;
+		}
+	}
+	&__wrap {
+		display: flex;
+		padding-top: 32rpx;
+		padding-bottom: 32rpx;
+		white-space: nowrap;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY  */
+		width: fit-content;
+		min-width: 100%;
+		/* #endif */
+	}
+	&__row {
+		/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
+		padding-top: 32rpx;
+		padding-bottom: 32rpx;
+		flex-direction: row;
+		/* #endif */
+		&--border {
+			/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
+			border-top: 1rpx solid $action-sheet-gap-color;
+			/* #endif */
+			/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY  */
+			position: relative;
+			&:before {
+				position: absolute;
+				content: '';
+				left: 0;
+				right: 0;
+				height: 1px;
+				background: $action-sheet-gap-color
+			}
+			/* #endif */
+		}
+	}
+	
+	&__col {
+		/* #ifndef UNI-APP-X */
+		display: flex;
+		flex-direction: column;
+		/* #endif */
+		justify-content: center;
+		align-items: center;
+		// flex: 1;
+		&--evenly{
+			flex: 1;
+		}
+		&-text {
+			/* #ifndef UNI-APP-X */
+			// display: flex;
+			/* #endif */
+			color: $action-sheet-color;
+			padding-top: $action-sheet-col-text-padding;
+			font-size: $action-sheet-col-font-size;
+		}
+		&-icon {
+			font-size: $action-sheet-col-icon-size;
+		}
+	}
+	
+	&__image {
+		width: $action-sheet-image-size;
+		height: $action-sheet-image-size;
+		margin: 0 16px;
+		background-color: $action-sheet-image-bg-color;
+		border-radius: 99px;
+		/* #ifndef UNI-APP-X */
+		display: flex;
+		/* #endif */
+		&--center {
+			justify-content: center;
+			align-items: center;
+		}
+	}
+}

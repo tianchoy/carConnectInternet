@@ -643,6 +643,6 @@ AMapWX.prototype.getRidingRoute = function(a) {
     }
   });
 };
-const amapFile = { AMapWX };
-exports.amapFile = amapFile;
+const amap = { AMapWX };
+exports.amap = amap;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/amap-wx.130.js.map

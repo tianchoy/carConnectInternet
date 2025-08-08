@@ -1,0 +1,433 @@
+<template>
+	<view class="container">
+		<custom-navBar title="轨迹回放" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="map-container">
+			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
+				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true">
+			</map>
+		</view>
+
+		<view class="tools-panel">
+			<view class="Datetime-box">
+				<uv-icon name="calendar" size="25"></uv-icon>
+				<view class="date-box">
+					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
+					<text>至</text>
+					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
+				</view>
+				<text class="playbackdetail">轨迹明细</text>
+			</view>
+			<view class="tool-tag-item">
+				<view class="">
+					<uv-icon :name="isPlaying ? 'pause-circle':'play-circle' " size="30"
+						@click="togglePlayback"></uv-icon>
+				</view>
+				<view class="slider">
+					<uv-slider v-model="playbackSpeed" backgroundColor="pink" activeColor="blue" min="1" max="5"
+						@change="setPlaybackSpeed" :blockStyle="{
+    width: '32rpx',
+    height: '32rpx',
+    background: 'url(/static/slider.png) no-repeat center/cover',
+  }">
+					</uv-slider>
+				</view>
+				<text class="speed-label">{{playbackSpeed}}x</text>
+			</view>
+			<view class="play-back-info">
+				<view class="item-info">
+					<text>{{startTime}}</text>
+					<text class="info-label">时间</text>
+				</view>
+				<view class="item-info">
+					<text>50Km/h</text>
+					<text class="info-label">速度</text>
+				</view>
+				<view class="item-info">
+					<text>225Km</text>
+					<text class="info-label">里程</text>
+				</view>
+			</view>
+			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="1|2|4|8|16|32"
+					@confirm="onConfirm" @cancel="onCancel">
+				</l-date-time-picker>
+			</l-popup>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import amapFile from '../../utils/amap-wx.130'
+
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(18)
+
+	// 日期时间选择器相关
+	const showDateTimePicker = ref(false)
+	const currentPickerType = ref('start') // 'start' or 'end'
+	const pickerTitle = ref('选择开始时间')
+
+	// 轨迹回放相关
+	const trackPoints = ref<Array<{ latitude : number, longitude : number, timestamp : number }>>([])
+	const polyline = ref<Array<any>>([])
+	const isPlaying = ref(false)
+	const playbackSpeed = ref(1)
+	const totalDistance = ref(0)
+	const playbackInterval = ref<number | null>(null)
+	const currentIndex = ref(0)
+	const carMarker = ref<any>(null)
+
+	const startTime = ref('')
+	const endTime = ref('')
+
+	// 标记点集合
+	const markers = ref<Array<any>>([])
+
+	// 初始化加载
+	onMounted(() => {
+		loadSampleTrack()
+		initDateTime()
+	})
+
+	// 初始化时间
+	const initDateTime = () => {
+		const now = new Date()
+		const formatTime = (date : Date) : string => {
+			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+		}
+
+		startTime.value = formatTime(now)
+		// 结束时间默认为开始时间后1小时
+		const endDate = new Date(now.getTime() + 3600000)
+		endTime.value = formatTime(endDate)
+	}
+
+	// 显示日期时间选择器
+	const showPicker = (type : string) => {
+		currentPickerType.value = type
+		pickerTitle.value = type === 'start' ? '选择开始时间' : '选择结束时间'
+		showDateTimePicker.value = true
+	}
+
+	// 确认选择时间
+	const onConfirm = (value : string) => {
+		if (currentPickerType.value === 'start') {
+			startTime.value = value
+		} else {
+			endTime.value = value
+		}
+		showDateTimePicker.value = false
+	}
+
+	const onCancel = () => {
+		showDateTimePicker.value = false
+	}
+
+	/* 轨迹回放功能部分 */
+	const loadSampleTrack = () => {
+		// 模拟测试轨迹数据
+		const mockTrack = [
+			{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 },
+			{ "latitude": 35.23764782824115, "longitude": 115.39397562325496 },
+			{ "latitude": 35.23905101311781, "longitude": 115.44459367195407 },
+			{ "latitude": 35.270452534471225, "longitude": 115.44611973480175 },
+			{ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }
+		]
+
+		trackPoints.value = mockTrack
+		calculateTrackDistance()
+		initCarMarker()
+		updatePolyline()
+		adjustMapToFitTrack()
+	}
+
+	// 初始化小车标记
+	const initCarMarker = () => {
+		if (trackPoints.value.length > 0) {
+			carMarker.value = {
+				id: 999,
+				latitude: trackPoints.value[0].latitude,
+				longitude: trackPoints.value[0].longitude,
+				iconPath: '/static/car.png',
+				width: 32,
+				height: 32,
+				anchor: { x: 0.5, y: 0.5 },
+				callout: {
+					content: '起点',
+					borderRadius: 5,
+					padding: 5,
+					display: 'ALWAYS'
+				}
+			}
+			markers.value = [carMarker.value]
+		}
+	}
+
+	const updatePolyline = () => {
+		if (!trackPoints.value || trackPoints.value.length < 2) {
+			polyline.value = []
+			return
+		}
+
+		const newPolyline = []
+
+		// 已播放的轨迹部分（实线）
+		if (currentIndex.value > 0) {
+			const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
+			if (playedPoints.length >= 2) {
+				newPolyline.push({
+					points: playedPoints.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
+					color: '#1890FF',
+					width: 6,
+					arrowLine: true,
+					borderColor: '#FFF',
+					borderWidth: 1
+				})
+			}
+		}
+
+		// 未播放的轨迹部分（虚线）
+		if (currentIndex.value < trackPoints.value.length - 1) {
+			const unplayedPoints = trackPoints.value.slice(currentIndex.value)
+			if (unplayedPoints.length >= 2) {
+				newPolyline.push({
+					points: unplayedPoints.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
+					color: '#ccc',
+					width: 6,
+					borderColor: '#FFF',
+					borderWidth: 1,
+					dottedLine: true
+				})
+			}
+		}
+
+		polyline.value = newPolyline
+	}
+
+	const adjustMapToFitTrack = () => {
+		if (trackPoints.value.length === 0) return
+
+		const bounds = calculateTrackBounds()
+		center.latitude = (bounds.minLat + bounds.maxLat) / 2
+		center.longitude = (bounds.minLng + bounds.maxLng) / 2
+
+		const latDiff = bounds.maxLat - bounds.minLat
+		const lngDiff = bounds.maxLng - bounds.minLng
+		const maxDiff = Math.max(latDiff, lngDiff)
+
+		if (maxDiff > 0.1) mapScale.value = 11
+		else if (maxDiff > 0.05) mapScale.value = 12
+		else if (maxDiff > 0.02) mapScale.value = 13
+		else mapScale.value = 14
+	}
+
+	const calculateTrackBounds = () => {
+		let minLat = trackPoints.value[0].latitude
+		let maxLat = trackPoints.value[0].latitude
+		let minLng = trackPoints.value[0].longitude
+		let maxLng = trackPoints.value[0].longitude
+
+		trackPoints.value.forEach(point => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+
+		return { minLat, maxLat, minLng, maxLng }
+	}
+
+	// 播放控制
+	const togglePlayback = () => {
+		if (isPlaying.value) {
+			pausePlayback()
+		} else {
+			startPlayback()
+		}
+	}
+
+	const startPlayback = () => {
+		if (trackPoints.value.length === 0) {
+			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
+			return
+		}
+
+		isPlaying.value = true
+		playbackInterval.value = setInterval(playNextPoint, 1000 / playbackSpeed.value)
+	}
+
+	const playNextPoint = () => {
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			pausePlayback()
+			updatePolyline()
+			uni.showToast({
+				title: '轨迹回放完成',
+				icon: 'none',
+				duration: 1500
+			})
+			setTimeout(() => {
+				resetPlayback()
+			}, 2000)
+			return
+		}
+
+		currentIndex.value++
+		updateCarPosition()
+		updatePolyline()
+	}
+
+	const updateCarPosition = () => {
+		if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+			const point = trackPoints.value[currentIndex.value]
+			carMarker.value.latitude = point.latitude
+			carMarker.value.longitude = point.longitude
+			markers.value = [carMarker.value]
+		}
+	}
+
+	const pausePlayback = () => {
+		isPlaying.value = false
+		if (playbackInterval.value) {
+			clearInterval(playbackInterval.value)
+			playbackInterval.value = null
+		}
+	}
+
+	const resetPlayback = () => {
+		pausePlayback()
+		currentIndex.value = 0
+		updateCarPosition()
+		updatePolyline()
+	}
+
+	const setPlaybackSpeed = (e : any) => {
+		playbackSpeed.value = e
+		if (isPlaying.value) {
+			pausePlayback()
+			startPlayback()
+		}
+	}
+
+	// 计算轨迹总距离
+	const calculateTrackDistance = () => {
+		totalDistance.value = 0
+		for (let i = 1; i < trackPoints.value.length; i++) {
+			totalDistance.value += getDistance(
+				trackPoints.value[i - 1].latitude,
+				trackPoints.value[i - 1].longitude,
+				trackPoints.value[i].latitude,
+				trackPoints.value[i].longitude
+			)
+		}
+	}
+
+	// 计算两点间距离（米）
+	const getDistance = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) => {
+		const rad = (d : number) => d * Math.PI / 180.0
+		const radLat1 = rad(lat1)
+		const radLat2 = rad(lat2)
+		const a = radLat1 - radLat2
+		const b = rad(lng1) - rad(lng2)
+		const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+			Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
+		return s * 6378.137 * 1000
+	}
+</script>
+
+<style lang="scss">
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f7fa;
+
+		.map-container {
+			flex: 1;
+			width: 100%;
+			position: relative;
+		}
+
+		.tools-panel {
+			width: 100%;
+			background-color: #fff;
+			padding: 50rpx 20rpx;
+
+			.Datetime-box {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0 20rpx;
+
+				.date-box {
+					margin: 0 10rpx;
+					display: flex;
+					flex-direction: row;
+					justify-content: center;
+					align-items: center;
+
+					.Date {
+						font-size: 25rpx;
+						margin: 0 10rpx;
+						border-radius: 5rpx;
+						background-color: #f5f5f5;
+					}
+				}
+
+				.playbackdetail {
+					font-size: 25rpx;
+					color: #69c2f1;
+				}
+			}
+
+			.tool-tag-item {
+				padding: 40rpx 20rpx;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+
+				.speed-label {
+					border: 5rpx solid #999;
+					font-size: 25rpx;
+					color: #666;
+					display: block;
+					padding: 5rpx 10rpx;
+					border-radius: 8rpx;
+				}
+
+				.slider {
+					flex: 1;
+					padding: 0 50rpx;
+				}
+			}
+
+			.play-back-info {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 20rpx;
+
+				.item-info {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+				}
+
+				.info-label {
+					font-size: 25rpx;
+					padding: 20rpx;
+				}
+			}
+		}
+	}
+</style>

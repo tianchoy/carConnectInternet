@@ -52,8 +52,25 @@
 			{
 				"navigationBarTitleText" : "添加车辆"
 			}
+		},
+		{
+			"path" : "pages/playBack/playBack",
+			"style" : 
+			{
+				"navigationBarTitleText" : "轨迹回放"
+			}
 		}
-	],
+	,{
+    "path": "uni_modules/lime-action-sheet/pages/index"
+},
+{
+	"path" : "pages/vehicleTracking/vehicleTracking",
+	"style" : 
+	{
+		"navigationBarTitleText" : "车辆跟踪"
+	}
+}
+],
 	"tabBar": {
 		"color": "#2c2c2c",
 		"selectedColor": "#d81e06",

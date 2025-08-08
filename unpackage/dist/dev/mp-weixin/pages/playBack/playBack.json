@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "轨迹回放",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
+    "uv-slider": "../../uni_modules/uv-slider/components/uv-slider/uv-slider",
+    "l-date-time-picker": "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker",
+    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup"
+  }
+}

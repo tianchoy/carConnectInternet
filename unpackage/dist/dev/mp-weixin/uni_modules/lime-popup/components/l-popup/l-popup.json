@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "l-overlay": "../../../lime-overlay/components/l-overlay/l-overlay",
+    "l-icon": "../../../lime-icon/components/l-icon/l-icon"
+  }
+}

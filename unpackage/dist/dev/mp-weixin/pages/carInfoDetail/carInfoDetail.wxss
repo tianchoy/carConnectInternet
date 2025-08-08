@@ -99,6 +99,7 @@
 }
 .container .tools-panel .Imei-box {
   padding: 20rpx 30rpx 0;
+  font-size: 32rpx;
 }
 .container .tools-panel .Imei-box .imei-info {
   display: flex;
@@ -130,4 +131,5 @@
 .container .tools-panel .grid-text {
   padding: 20rpx 0 0;
   box-sizing: border-box;
+  font-size: 30rpx;
 }

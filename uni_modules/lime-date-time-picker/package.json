@@ -1,0 +1,91 @@
+{
+  "id": "lime-date-time-picker",
+  "displayName": "lime-date-time-picker 时间选择器",
+  "version": "0.0.7",
+  "description": "lime-date-time-picker 用于选择时间，支持日期、时分等时间维度的时间选择，兼容uniapp/uniappx",
+  "keywords": [
+    "date-time-picker",
+    "datetime-picker",
+    "时间选择",
+    "时间"
+],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^4.42"
+  },
+  "dcloudext": {
+    "type": "component-vue",
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": ""
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "无",
+      "permissions": "无"
+    },
+    "npmurl": ""
+  },
+  "uni_modules": {
+    "dependencies": [
+		"lime-picker",
+		"lime-dayuts",
+		"lime-shared"
+	],
+    "encrypt": [],
+    "platforms": {
+      "cloud": {
+        "tcb": "y",
+        "aliyun": "y",
+        "alipay": "y"
+      },
+      "client": {
+        "Vue": {
+          "vue2": "u",
+          "vue3": "y"
+        },
+        "App": {
+            "app-vue": "y",
+            "app-nvue": "u",
+            "app-uvue": "y",
+            "app-harmony": "u"
+        },
+        "H5-mobile": {
+          "Safari": "y",
+          "Android Browser": "u",
+          "微信浏览器(Android)": "u",
+          "QQ浏览器(Android)": "u"
+        },
+        "H5-pc": {
+          "Chrome": "y",
+          "IE": "u",
+          "Edge": "u",
+          "Firefox": "u",
+          "Safari": "u"
+        },
+        "小程序": {
+          "微信": "y",
+          "阿里": "u",
+          "百度": "u",
+          "字节跳动": "u",
+          "QQ": "u",
+          "钉钉": "u",
+          "快手": "u",
+          "飞书": "u",
+          "京东": "u"
+        },
+        "快应用": {
+          "华为": "u",
+          "联盟": "u"
+        }
+      }
+    }
+  }
+}

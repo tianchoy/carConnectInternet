@@ -4,9 +4,6 @@
 			@capsuleClick="handleCapsule" :showCapsule="true">
 		</custom-navBar>
 		<view class="map-container">
-			<!-- <MapComponent :center="center" :mapScale="mapScale" :polygons="polygons" :markers="markers"
-				:polyline="polyline" :isDrawing="isDrawing" :currentMode="currentMode" @map-tap="handleMapTap"
-				@marker-tap="handMarkerTap" /> -->
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :polygons="polygons"
 				:markers="markers" :polyline="polyline" :scale="mapScale" @click="handleMapTap"
 				style="width:100%;height:100%" :show-location="true" @markertap="handMarkerTap">
@@ -46,25 +43,7 @@
 					</uv-button>
 				</view>
 			</view>
-			<view v-if="currentToolItem == 0">
-				<view class="tool-tag-item">
-					<uv-button @click="startPlayback" :disabled="isPlaying">
-						开始回放
-					</uv-button>
-					<uv-button @click="pausePlayback" :disabled="!isPlaying">
-						暂停
-					</uv-button>
-					<uv-button @click="clearTrack">
-						清除轨迹
-					</uv-button>
-				</view>
-				<view class="speed-control">
-					<text class="speed-label">回放速度: {{playbackSpeed}}x</text>
-					<uv-slider class="slider" v-model="playbackSpeed" block-size="15" block-color="red" backgroundColor="pink"
-						activeColor="blue" min="1" max="5" @change="setPlaybackSpeed">
-					</uv-slider>
-				</view>
-			</view>
+			
 		</view>
 	</view>
 </template>
@@ -152,6 +131,16 @@
 
 	const click = (name) => {
 		currentToolItem.value = name
+		if(name == 0){
+			uni.navigateTo({
+				url:'/pages/playBack/playBack'
+			})
+		}
+		if(name == 1){
+			uni.navigateTo({
+				url:'/pages/vehicleTracking/vehicleTracking'
+			})
+		}
 	}
 	// 检测车辆是否在电子围栏内
 	const checkCarInFence = (point : { latitude : number, longitude : number }) => {
@@ -680,6 +669,7 @@
 			background-color: #fff;
 			.Imei-box{
 				padding: 20rpx 30rpx 0;
+				font-size: 32rpx;
 				.imei-info{
 					display: flex;
 					flex-direction: row;
@@ -717,6 +707,7 @@
 				/* #ifndef APP-PLUS */
 				box-sizing: border-box;
 				/* #endif */
+				font-size: 30rpx;
 			}
 		}
 	}
