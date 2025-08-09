@@ -2,22 +2,22 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_tags_1 = common_vendor.resolveComponent("uv-tags");
+  const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
   const _component_marker = common_vendor.resolveComponent("marker");
+  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_slider_1 = common_vendor.resolveComponent("uv-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_tags_1 + _component_marker + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _component_marker + _easycom_uv_icon_1 + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
+const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-tags.js";
 const _easycom_uv_slider = () => "../../uni_modules/uv-slider/components/uv-slider/uv-slider.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_uv_tags + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
@@ -27,7 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(18);
-    const carStatus = common_vendor.ref("在线");
+    common_vendor.ref("在线");
     const showDateTimePicker = common_vendor.ref(false);
     const currentPickerType = common_vendor.ref("start");
     const pickerTitle = common_vendor.ref("选择开始时间");
@@ -43,6 +43,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
     const markers = common_vendor.ref([]);
+    const currentCar = common_vendor.ref("京A12345");
+    const cars = common_vendor.ref([
+      [
+        new UTSJSONObject({ label: "京A12345", value: "12345" }),
+        new UTSJSONObject({ label: "京A12346", value: "12346" }),
+        new UTSJSONObject({ label: "京A12347", value: "12347" })
+      ]
+    ]);
+    common_vendor.watch(currentCar, (newVal) => {
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:120", "车辆变化:", newVal);
+    });
     common_vendor.onMounted(() => {
       loadSampleTrack();
       initDateTime();
@@ -330,14 +341,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         b: carMarker.value
       }), carMarker.value ? new UTSJSONObject({
-        c: common_vendor.p(new UTSJSONObject({
-          name: "arrow-down",
-          size: "15",
-          color: "#fff"
-        })),
+        c: common_vendor.o((val = null) => {
+          return currentCar.value = val;
+        }),
         d: common_vendor.p(new UTSJSONObject({
-          text: carStatus.value,
-          type: carStatus.value === "在线" ? "success" : "error"
+          showTime: false,
+          currentCar: currentCar.value,
+          cars: cars.value
         })),
         e: carMarker.value.id,
         f: common_vendor.p(new UTSJSONObject({

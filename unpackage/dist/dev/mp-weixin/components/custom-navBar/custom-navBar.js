@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.unref(statusBarHeight) + "px",
         b: __props.showBack
       }), __props.showBack ? new UTSJSONObject({
-        c: common_assets._imports_0$2,
+        c: common_assets._imports_0$3,
         d: common_vendor.o(handleBack)
       }) : new UTSJSONObject({}), new UTSJSONObject({
         e: common_vendor.t(__props.title),

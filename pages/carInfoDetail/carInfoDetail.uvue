@@ -7,9 +7,14 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :polygons="polygons"
 				:markers="markers" :polyline="polyline" :scale="mapScale" @click="handleMapTap"
 				style="width:100%;height:100%" :show-location="true" @markertap="handMarkerTap">
+				<sub-navBar :showTime="false" :currentCar="currentCar" :cars="cars"
+					@update:current-car="(val) => (currentCar = val)"></sub-navBar>
 			</map>
 			<deviceInfoComponent :show-popup="showDevicePopup" :device-info="currentDeviceInfo"
 				@close="closeDevicePopup" />
+			<view class="navTo" @click="navTo">
+				<image src="/static/navto.png" mode="aspectFit"></image>
+			</view>
 		</view>
 
 		<view class="tools-panel">
@@ -43,7 +48,7 @@
 					</uv-button>
 				</view>
 			</view>
-			
+
 		</view>
 	</view>
 </template>
@@ -66,7 +71,7 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(12)
+	const mapScale = ref(17)
 	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关
@@ -111,6 +116,17 @@
 	})
 
 	const currentToolItem = ref(0)
+	const currentCar = ref('京A12345')
+	
+	const cars = ref([
+		[
+			{ label: '京A12345', value: '12345' },
+			{ label: '京A12346', value: '12346' },
+			{ label: '京A12347', value: '12347' }
+		]
+	])
+	
+
 	const baseList = ref([{
 		name: '/static/gjhf.png',
 		title: '轨迹回放'
@@ -128,17 +144,22 @@
 		title: '电子围栏'
 	}
 	])
+	
+	// 监听 currentCar 变化
+	watch(currentCar, (newVal) => {
+	  console.log("车辆变化:", newVal);
+	});
 
 	const click = (name) => {
 		currentToolItem.value = name
-		if(name == 0){
+		if (name == 0) {
 			uni.navigateTo({
-				url:'/pages/playBack/playBack'
+				url: '/pages/playBack/playBack'
 			})
 		}
-		if(name == 1){
+		if (name == 1) {
 			uni.navigateTo({
-				url:'/pages/vehicleTracking/vehicleTracking'
+				url: '/pages/vehicleTracking/vehicleTracking'
 			})
 		}
 	}
@@ -207,7 +228,7 @@
 							id: 1,
 							latitude: latitude,
 							longitude: longitude,
-							iconPath: '/static/marker.png',
+							iconPath: '/static/car.png',
 							width: 40,
 							height: 40,
 							callout: {
@@ -231,25 +252,27 @@
 		})
 	}
 
+	const navTo = () => {
+		const mapContext = uni.createMapContext("myMap", this);
+		mapContext.openMapApp({
+			latitude: center.latitude,
+			longitude: center.longitude,
+			destination: address.value,
+			success(res) {
+				console.log('success!!', res);
+			},
+			fail(err) {
+				uni.showToast({
+					title: err.errMsg,
+					icon: 'none'
+				})
+			}
+		});
+	}
+
 	//打开地图app跳转
 	const handMarkerTap = (e) => {
-		// const mapContext = uni.createMapContext("myMap", this); 
-		// mapContext.openMapApp({
-		// 	latitude: center.latitude,  
-		// 	longitude: center.longitude, 
-		// 	destination: address.value, 
-		// 	success(res) {
-		// 		console.log('success!!', res);
-		// 	},
-		// 	fail(err) {
-		// 		uni.showToast({
-		// 			title: err.errMsg,
-		// 			icon: 'none'
-		// 		})
-		// 	}
-		// });
-		console.log('markertap event:', e)
-
+		
 		// 微信小程序返回的是markerId
 		if (e.detail && e.detail.markerId !== undefined) {
 			const markerId = e.detail.markerId
@@ -627,6 +650,23 @@
 					opacity: 0.7;
 				}
 			}
+
+			.navTo {
+				width: 60rpx;
+				height: 60rpx;
+				background-color: #fff;
+				border-radius: 10rpx;
+				position: absolute;
+				z-index: 100;
+				bottom: 10%;
+				right: 30rpx;
+				padding: 5rpx;
+
+				image {
+					width: 100%;
+					height: 100%;
+				}
+			}
 		}
 
 		.tool-nav {
@@ -667,10 +707,12 @@
 		.tools-panel {
 			width: 100%;
 			background-color: #fff;
-			.Imei-box{
+
+			.Imei-box {
 				padding: 20rpx 30rpx 0;
 				font-size: 32rpx;
-				.imei-info{
+
+				.imei-info {
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
@@ -678,8 +720,8 @@
 					padding: 20rpx 0;
 				}
 			}
-			
-			.h-line{
+
+			.h-line {
 				width: 90%;
 				height: 2rpx;
 				background-color: #f1f1f1;
@@ -696,7 +738,8 @@
 
 			.speed-control {
 				padding: 20rpx;
-				.slider{
+
+				.slider {
 					width: 90%;
 					margin: 0 auto;
 				}

@@ -6,19 +6,9 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
 				@regionchange="handleRegionChange">
-				<cover-view class="tools-box">
-					<cover-view class="second" @click="handleTime">
-						<cover-view class="times">{{currentTime}}</cover-view>
-						<uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
-					</cover-view>
-					<cover-view class="car-box">
-						<cover-view class="selectCar" @click="handleCar">
-							<cover-view>{{currentCar}}</cover-view>
-							<uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
-						</cover-view>
-						<uv-tags :text="carStatus" :type="carStatus === '在线' ? 'success' : 'error'"></uv-tags>
-					</cover-view>
-				</cover-view>
+				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" :cars="cars"
+					@update:current-time="(val) => (currentTime = val)"
+					@update:current-car="(val) => (currentCar = val)"></sub-navBar>
 			</map>
 		</view>
 
@@ -43,7 +33,7 @@
 				<text>预计时间: {{formatDuration(routeInfo.duration)}}</text>
 			</view>
 		</view>
-		<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
+
 	</view>
 </template>
 
@@ -82,13 +72,10 @@
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
 	const carStatus = ref('在线')
-
-	// 选择器相关
-	const columns = ref<Array<{ label : string, value : string }>>([[]])
-	const picker = ref(null)
-	const currentPickerType = ref('')
 	const currentTime = ref('10s')
 	const currentCar = ref('京A12345')
+
+
 	const times = ref([
 		[
 			{ label: '5s', value: '5' },
@@ -105,6 +92,17 @@
 			{ label: '京A12347', value: '12347' }
 		]
 	])
+	
+	// 监听 currentTime 变化
+	watch(currentTime, (newVal) => {
+	  console.log("时间变化:", newVal);
+	});
+	
+	// 监听 currentCar 变化
+	watch(currentCar, (newVal) => {
+	  console.log("车辆变化:", newVal);
+	});
+	
 
 	// 初始化地图
 	onMounted(() => {
@@ -443,30 +441,7 @@
 		}
 	}
 
-	// 选择器方法
-	const handleTime = () => {
-		columns.value = times.value
-		currentPickerType.value = 'time'
-		picker.value?.open()
-	}
 
-	const handleCar = () => {
-		columns.value = cars.value
-		currentPickerType.value = 'car'
-		picker.value?.open()
-	}
-
-	const confirm = (e : { value : Array<{ label : string, value : string }> }) => {
-		const selected = e.value[0]
-
-		if (currentPickerType.value == 'time') {
-			currentTime.value = selected.label
-		} else if (currentPickerType.value == 'car') {
-			currentCar.value = selected.label
-		}
-
-		currentPickerType.value = ''
-	}
 
 	// 地图区域变化事件
 	const handleRegionChange = (e : any) => {
@@ -487,41 +462,6 @@
 			flex: 1;
 			width: 100%;
 			position: relative;
-
-			.tools-box {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-				padding: 20rpx 30rpx;
-
-				.car-box {
-					@extend .tools-box;
-					padding: 0;
-
-					.selectCar {
-						@extend .tools-box;
-						margin-right: 20rpx;
-						color: #fff;
-						background-color: rgba(3, 109, 246, 0.71);
-						padding: 10rpx;
-						border-radius: 10rpx;
-					}
-				}
-
-				.second {
-					@extend .tools-box;
-					padding: 10rpx;
-					background-color: rgba(3, 109, 246, 0.71);
-					border-radius: 10rpx;
-					color: #fff;
-
-					.times {
-						margin-right: 10rpx;
-						font-size: 30rpx;
-					}
-				}
-			}
 		}
 
 		.tools-panel {

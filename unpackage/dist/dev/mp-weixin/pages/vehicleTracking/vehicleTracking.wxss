@@ -38,33 +38,6 @@
   width: 100%;
   position: relative;
 }
-.container .map-container .tools-box, .container .map-container .tools-box .second, .container .map-container .tools-box .car-box .selectCar, .container .map-container .tools-box .car-box .selectCar .car-box, .container .map-container .tools-box .car-box {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 30rpx;
-}
-.container .map-container .tools-box .car-box, .container .map-container .tools-box .car-box .selectCar .car-box {
-  padding: 0;
-}
-.container .map-container .tools-box .car-box .selectCar {
-  margin-right: 20rpx;
-  color: #fff;
-  background-color: rgba(3, 109, 246, 0.71);
-  padding: 10rpx;
-  border-radius: 10rpx;
-}
-.container .map-container .tools-box .second {
-  padding: 10rpx;
-  background-color: rgba(3, 109, 246, 0.71);
-  border-radius: 10rpx;
-  color: #fff;
-}
-.container .map-container .tools-box .second .times {
-  margin-right: 10rpx;
-  font-size: 30rpx;
-}
 .container .tools-panel {
   width: 100%;
   background-color: #fff;

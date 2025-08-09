@@ -9,13 +9,8 @@
 					:longitude="carMarker.longitude" :iconPath="carMarker.iconPath" :width="carMarker.width"
 					:height="carMarker.height" :rotate="carMarker.rotate" :anchor="carMarker.anchor"
 					:callout="carMarker.callout" :animation="carMarker.animation">
-					<cover-view class="car-box">
-						<cover-view class="selectCar" >
-							<cover-view>京A12345</cover-view>
-							<uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
-						</cover-view>
-						<uv-tags :text="carStatus" :type="carStatus === '在线' ? 'success' : 'error'"></uv-tags>
-					</cover-view>
+					<sub-navBar :showTime="false" :currentCar="currentCar" :cars="cars"
+						@update:current-car="(val) => (currentCar = val)"></sub-navBar>
 				</marker>
 			</map>
 		</view>
@@ -108,6 +103,22 @@
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
+	
+	const currentCar = ref('京A12345')
+	
+	
+	const cars = ref([
+		[
+			{ label: '京A12345', value: '12345' },
+			{ label: '京A12346', value: '12346' },
+			{ label: '京A12347', value: '12347' }
+		]
+	])
+	
+	// 监听 currentCar 变化
+	watch(currentCar, (newVal) => {
+	  console.log("车辆变化:", newVal);
+	});
 
 	// 初始化加载
 	onMounted(() => {

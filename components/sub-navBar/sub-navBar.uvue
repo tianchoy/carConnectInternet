@@ -1,20 +1,145 @@
 <template>
-	<view>
-		
-	</view>
+	<cover-view class="tools-box">
+		<cover-view class="second" @click="handleTime" v-if="showTime">
+			<cover-view class="times">{{ currentTime }}</cover-view>
+			<cover-image class="down_icon" src="/static/down_icon.png"></cover-image>
+		</cover-view>
+		<cover-view class="slot" v-else></cover-view>
+		<cover-view class="car-box">
+			<cover-view class="selectCar" @click="handleCar">
+				<cover-view>{{ currentCar }}</cover-view>
+				<cover-image class="down_icon" src="/static/down_icon.png"></cover-image>
+			</cover-view>
+			<cover-view class="car-state" :class="carStatus === '在线' ? 'success' : 'error'">
+				<cover-view>{{carStatus}}</cover-view>
+			</cover-view>
+		</cover-view>
+	</cover-view>
+
+	<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
 </template>
 
-<script>
-	export default {
-		name:"sub-navBar",
-		data() {
-			return {
-				
-			};
+<script lang="uts" setup>
+	const props = defineProps({
+		showTime: {
+			type: Boolean,
+			default: true,
+		},
+		currentTime: {
+			type: String,
+			default: "",
+		},
+		currentCar: {
+			type: String,
+			default: "",
+		},
+		carStatus: {
+			type: String,
+			default: "在线",
+		},
+		times: {
+			type: Array as PropType<Array<Array<{ label : string; value : string }>>>,
+			default: () => [[]], // 默认值调整为二维数组
+		},
+		cars: {
+			type: Array as PropType<Array<Array<{ label : string; value : string }>>>,
+			default: () => [[]], // 默认值调整为二维数组
+		},
+	});
+
+	// 选择器相关
+	const columns = ref<Array<Array<{ label : string; value : string }>>>([]);
+	const picker = ref(null);
+	const currentPickerType = ref("");
+
+	// 选择器方法
+	const handleTime = () => {
+		columns.value = props.times; // 直接使用 props.times（已经是二维数组）
+		currentPickerType.value = "time";
+		picker.value?.open();
+	};
+
+	const handleCar = () => {
+		columns.value = props.cars; // 直接使用 props.cars（已经是二维数组）
+		currentPickerType.value = "car";
+		picker.value?.open();
+	};
+
+	const confirm = (e : { value : Array<{ label : string; value : string }> }) => {
+		const selected = e.value[0];
+
+		if (currentPickerType.value === "time") {
+			emit("update:currentTime", selected.label); // 通知父组件更新 currentTime
+		} else if (currentPickerType.value === "car") {
+			emit("update:currentCar", selected.label); // 通知父组件更新 currentCar
 		}
-	}
+
+		currentPickerType.value = "";
+	};
+
+	// 定义 emit 事件
+	const emit = defineEmits(["update:currentTime", "update:currentCar"]);
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	.tools-box {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20rpx 30rpx;
 
+		.slot {
+			width: 50rpx;
+			height: 20rpx
+		}
+
+		.car-box {
+			@extend .tools-box;
+			padding: 0;
+
+			.selectCar {
+				@extend .tools-box;
+				margin-right: 20rpx;
+				color: #fff;
+				background-color: rgba(3, 109, 246, 0.71);
+				padding: 10rpx;
+				border-radius: 10rpx;
+			}
+
+			.car-state {
+			  @extend .tools-box;
+			  border-radius: 10rpx;
+			  color: #fff;
+			  padding: 10rpx 15rpx;
+			  font-size: 25rpx;
+			}
+
+			.success {
+				background-color: #5ac725;
+			}
+
+			.error {
+				background-color: #f56c6c;
+			}
+		}
+
+		.second {
+			@extend .tools-box;
+			padding: 10rpx;
+			background-color: rgba(3, 109, 246, 0.71);
+			border-radius: 10rpx;
+			color: #fff;
+
+			.times {
+				margin-right: 10rpx;
+				font-size: 30rpx;
+			}
+		}
+
+		.down_icon {
+			width: 32rpx;
+			height: 32rpx;
+		}
+	}
 </style>
