@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:81", res);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:82", res);
       deviceModel.value = res.deviceModel;
     };
     common_vendor.onMounted(() => {
@@ -111,10 +111,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           method: "POST",
           data: newFormData,
           success: (res2) => {
-            common_vendor.index.__f__("log", "at pages/login/login.uvue:119", res2);
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:120", res2);
           },
           fail: (err) => {
-            common_vendor.index.__f__("log", "at pages/login/login.uvue:122", err);
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:123", err);
           }
         });
       }).catch((errors = null) => {

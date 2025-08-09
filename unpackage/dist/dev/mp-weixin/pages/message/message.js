@@ -20,25 +20,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         title: "点击事件已触发",
         icon: "none"
       });
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:25", "点击", e);
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:24", "点击", e);
     };
     const badge = common_vendor.ref(98);
     const title = common_vendor.ref("这里是消息的主题");
     const desc = common_vendor.ref("这里是描述文字");
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
-        a: common_vendor.o(_ctx.handleCapsule),
-        b: common_vendor.p({
+        a: common_vendor.p({
           title: "消息中心",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
         }),
-        c: common_vendor.o(($event = null) => {
+        b: common_vendor.o(($event = null) => {
           return handleItemClick(1);
         }),
-        d: common_vendor.p({
+        c: common_vendor.p({
           title: common_vendor.unref(title),
           ["show-badge"]: true,
           note: common_vendor.unref(desc),
@@ -47,10 +46,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             value: common_vendor.unref(badge)
           }
         }),
-        e: common_vendor.o(($event = null) => {
+        d: common_vendor.o(($event = null) => {
           return handleItemClick(2);
         }),
-        f: common_vendor.p({
+        e: common_vendor.p({
           title: common_vendor.unref(title),
           ["show-badge"]: true,
           note: common_vendor.unref(desc),
@@ -59,7 +58,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             value: common_vendor.unref(badge)
           }
         }),
-        g: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

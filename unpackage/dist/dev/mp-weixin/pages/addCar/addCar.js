@@ -69,13 +69,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "success",
           title: "校验通过"
         });
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:93", "表单数据:", carInfo.value);
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:96", "表单数据:", carInfo.value);
       }).catch((errors = null) => {
         common_vendor.index.showToast({
           icon: "error",
           title: "校验失败"
         });
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:99", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:102", "验证错误:", errors);
       });
     };
     return (_ctx = null, _cache = null) => {

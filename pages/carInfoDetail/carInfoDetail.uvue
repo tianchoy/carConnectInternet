@@ -1,7 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="详情" :show-back="true" backgroundColor="#fff" textColor="#333"
-			@capsuleClick="handleCapsule" :showCapsule="true">
+		<custom-navBar title="详情" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :polygons="polygons"
@@ -55,16 +54,6 @@
 
 <script setup lang="uts">
 	import amapFile from '../../utils/amap-wx.130'
-
-	const navBarHeight = ref(88); // 由组件实际高度决定
-
-	const handleCapsule = (type) => {
-		if (type === 'close') {
-			uni.navigateBack();
-		} else {
-			uni.showToast({ title: '菜单点击', icon: 'none' });
-		}
-	};
 
 	// 地图状态
 	const center = reactive({

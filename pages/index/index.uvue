@@ -29,7 +29,7 @@
 			<text style="margin-right: 20rpx;">{{pickerStateTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
-		<view class="left-bar-state" @click="handGroupPicker"  v-if="!showMap">
+		<view class="left-bar-state" @click="handGroupPicker" v-if="!showMap">
 			<text style="margin-right: 20rpx;">{{pickerGroupTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
@@ -105,29 +105,29 @@
 	const pickerGroupTitle = ref('全部分组')
 
 	const handStatePicker = () => {
-	    columns.value = carState.value
-	    currentPickerType.value = 'state'
-	    picker.value?.open()
-	}
-	
-	const handGroupPicker = () => {
-	    columns.value = carGroup.value
-	    currentPickerType.value = 'group'
-	    picker.value?.open()
+		columns.value = carState.value
+		currentPickerType.value = 'state'
+		picker.value?.open()
 	}
 
-	const confirm = (e: { value: Array<{ label: string, value: string }> }) => {
-	    const selected = e.value[0]
-	    
-	    if (currentPickerType.value === 'state') {
-	        pickerStateTitle.value = selected.label
-	        console.log('选择了状态:', selected.value)
-	    } else if (currentPickerType.value === 'group') {
-	        pickerGroupTitle.value = selected.label
-	        console.log('选择了分组:', selected.value)
-	    }
-	    
-	    currentPickerType.value = ''
+	const handGroupPicker = () => {
+		columns.value = carGroup.value
+		currentPickerType.value = 'group'
+		picker.value?.open()
+	}
+
+	const confirm = (e : { value : Array<{ label : string, value : string }> }) => {
+		const selected = e.value[0]
+
+		if (currentPickerType.value === 'state') {
+			pickerStateTitle.value = selected.label
+			console.log('选择了状态:', selected.value)
+		} else if (currentPickerType.value === 'group') {
+			pickerGroupTitle.value = selected.label
+			console.log('选择了分组:', selected.value)
+		}
+
+		currentPickerType.value = ''
 	}
 
 	const addCar = () => {

@@ -13,7 +13,8 @@
 					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
 				<uv-form-item label="" prop="password" labelWidth="0">
-					<uv-input prefixIcon="lock-fill" v-model="form.password" placeholder="请输入密码" :password="showpw"  customStyle="border:1rpx solid red;height:80rpx">
+					<uv-input prefixIcon="lock-fill" v-model="form.password" placeholder="请输入密码" :password="showpw"
+						customStyle="border:1rpx solid red;height:80rpx">
 						<template v-slot:suffix>
 							<uv-icon :name="showpw?'eye-off-outline':'eye'" @click="showpwfun" />
 						</template>
@@ -51,7 +52,7 @@
 	})
 
 	const formRef = ref<UvFormInstance | null>(null)
-	const deviceModel= ref('')
+	const deviceModel = ref('')
 
 	const rules = {
 		username: [
@@ -85,7 +86,7 @@
 	//注册按钮
 	const toSignUp = () => {
 		uni.reLaunch({
-			url:'/pages/signUp/signUp'
+			url: '/pages/signUp/signUp'
 		})
 	}
 
@@ -100,8 +101,8 @@
 		formRef.value?.validate().then(res => {
 			const newFormData = {
 				...form.value,
-				from:deviceModel.value,
-				type:"USER"
+				from: deviceModel.value,
+				type: "USER"
 			}
 			// 请求登陆接口
 			// login('POST',newFormData).then(res=>{
@@ -112,17 +113,17 @@
 			// 	})
 			// })
 			uni.request({
-				url:'https://car.zdiot.cn:18443/api/sys/login',
-				method:'POST',
-				data:newFormData,
-				success:res=>{
+				url: 'https://car.zdiot.cn:18443/api/sys/login',
+				method: 'POST',
+				data: newFormData,
+				success: res => {
 					console.log(res)
 				},
-				fail:err=>{
+				fail: err => {
 					console.log(err)
 				}
 			})
-			
+
 		}).catch(errors => {
 			uni.showToast({
 				icon: 'error',
@@ -144,12 +145,14 @@
 			justify-content: center;
 			align-items: center;
 			height: 20%;
+
 			image {
 				height: 120rpx;
 				width: 120rpx;
 				margin-right: 20rpx;
 			}
-			.title{
+
+			.title {
 				font-size: 40rpx;
 				font-weight: bold;
 				color: #333;

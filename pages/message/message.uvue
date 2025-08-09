@@ -1,7 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="消息中心" :show-back="false" backgroundColor="#fff" textColor="#333"
-			@capsuleClick="handleCapsule" :showCapsule="false">
+		<custom-navBar title="消息中心" :show-back="false" backgroundColor="#fff" textColor="#333"  :showCapsule="false">
 		</custom-navBar>
 		<view class="list-box">
 			<uv-list>
@@ -39,6 +38,7 @@
 			width: 100%;
 			height: 100%;
 			padding: 20rpx;
+
 			.uv-list {
 				margin-bottom: 20rpx;
 				border-radius: 20rpx;
