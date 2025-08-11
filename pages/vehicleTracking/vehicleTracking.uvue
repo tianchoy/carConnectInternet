@@ -112,7 +112,7 @@
 	// 初始化高德地图
 	const initAMap = () => {
 		amapInstance.value = new amap.AMapWX({
-			key: 'e3e773ad74f7ba25f38775c9c8db6474' // 替换为你的key
+			key: '' // 替换为你的key
 		})
 	}
 

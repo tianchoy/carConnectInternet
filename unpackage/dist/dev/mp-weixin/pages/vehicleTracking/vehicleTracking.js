@@ -60,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const initAMap = () => {
       amapInstance.value = new utils_amapWx_130.amap.AMapWX(new UTSJSONObject({
-        key: "e3e773ad74f7ba25f38775c9c8db6474"
+        key: ""
         // 替换为你的key
       }));
     };

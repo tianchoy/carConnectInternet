@@ -23,7 +23,7 @@ const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-butt
 if (!Math) {
   (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_deviceInfoComponent + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_button)();
 }
-const gdKey = "e3e773ad74f7ba25f38775c9c8db6474";
+const gdKey = "";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carInfoDetail",
   setup(__props) {
@@ -105,6 +105,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: "/pages/vehicleTracking/vehicleTracking"
         });
       }
+      if (name == 2) {
+        common_vendor.index.navigateTo({
+          url: "/pages/mileageRecord/mileageRecord"
+        });
+      }
     };
     const checkCarInFence = (point) => {
       if (polygons.value.length === 0 || polygons.value[0].points.length < 3) {
@@ -125,7 +130,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           inside = !inside;
       }
       carInFence.value = inside;
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:183", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:188", `车辆位置: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} - ${inside ? "在围栏内" : "在围栏外"}`);
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -139,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getlocation = () => {
       common_vendor.index.getLocation(new UTSJSONObject({
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:200", "当前坐标点：", res);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:205", "当前坐标点：", res);
           center.latitude = res.latitude;
           center.longitude = res.longitude;
           getRegeo(res.latitude, res.longitude);
@@ -151,10 +156,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       myAmapFun.value.getRegeo(new UTSJSONObject({
         location: `${longitude},${latitude}`,
         success: (data = null) => {
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:214", "获取地址信息:", data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:219", "获取地址信息:", data);
           if (data.length > 0) {
             address.value = data[0].regeocodeData.formatted_address;
-            common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:217", "地址信息:", address.value);
+            common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:222", "地址信息:", address.value);
             markers.value = [
               new UTSJSONObject({
                 id: 1,
@@ -184,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:248", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:253", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -201,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:266", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:271", "调起地图失败:", err);
         }
       });
     };
@@ -228,7 +233,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return null;
         }
       }
-      common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:297", "无法获取标记点信息", e);
+      common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:302", "无法获取标记点信息", e);
       common_vendor.index.showToast({
         title: "无法获取设备信息",
         icon: "none"
@@ -259,7 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       isDrawing.value = false;
       common_vendor.index.showToast({ title: `围栏创建成功，共${points.value.length}个顶点` });
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:341", "电子围栏坐标:", UTS.JSON.stringify(points.value));
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:346", "电子围栏坐标:", UTS.JSON.stringify(points.value));
       updateFencePolygon();
       checkCarInFence(center);
     };
@@ -359,11 +364,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadData = (deptId2 = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getDevicePos(deptId2);
-        common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:610", res);
+        common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:615", res);
       });
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:614", "option", option);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:619", "option", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
       loadData(option.deptId);

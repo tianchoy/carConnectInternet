@@ -1,0 +1,26 @@
+export const  getAddress = (latitude:number,longitude:number,  tk = 'fcaf46a375259f6bf44c387383a212a1') => {
+  return new Promise((resolve, reject) => {
+    // 构造请求参数
+    const postStr = JSON.stringify({
+      lon: longitude,
+      lat: latitude,
+      ver: 1
+    });
+    
+    uni.request({
+      url: `https://api.tianditu.gov.cn/geocoder?postStr=${encodeURIComponent(postStr)}&type=geocode&tk=${tk}`,
+      method: 'GET',
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          resolve(res.data);
+        } else {
+          reject(new Error('获取地址信息失败'));
+        }
+      },
+      fail: (err) => {
+        reject(err);
+      }
+    });
+  });
+}
+

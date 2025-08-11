@@ -1,8 +1,8 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-require("../../utils/amap-wx.130.js");
 const api_request = require("../../api/request.js");
+const utils_getAdress = require("../../utils/getAdress.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
@@ -21,8 +21,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     const Login = common_vendor.ref(false);
-    common_vendor.ref("");
-    common_vendor.ref(new UTSJSONObject({}));
+    const address = common_vendor.ref("");
     const center = common_vendor.reactive(new UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
@@ -30,6 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const mapScale = common_vendor.ref(12);
     const showMap = common_vendor.ref(true);
     const markers = common_vendor.ref([]);
+    let mapCtx = void 0;
     const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
     const carState = common_vendor.ref([
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const selected = e.value[0];
       if (currentPickerType.value === "state") {
         pickerStateTitle.value = selected.label;
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:100", "选择了状态:", selected.value);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:97", "选择了状态:", selected.value);
       } else if (currentPickerType.value === "group") {
         pickerGroupTitle.value = selected.label;
         carList.value = selected.devices;
@@ -79,8 +79,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onMounted(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        mapCtx = common_vendor.index.createMapContext("myMap", this);
+        if (Login.value) {
+          getlocation();
+          mapCtx.initMarkerCluster(new UTSJSONObject({
+            enableDefaultStyle: true,
+            zoomOnClick: true,
+            gridSize: 10,
+            maxZoom: 17,
+            minClusterSize: 2,
+            complete(res = null) {
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:124", "initMarkerCluster", res);
+            }
+          }));
+          mapCtx.on("markerClusterCreate", (e = null) => {
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:129", "markerClusterCreate", e);
+          });
+          addMarkers();
+        }
       });
     });
+    const getlocation = () => {
+      common_vendor.index.getLocation(new UTSJSONObject({
+        success: (res) => {
+          return common_vendor.__awaiter(this, void 0, void 0, function* () {
+            center.latitude = res.latitude;
+            center.longitude = res.longitude;
+            address.value = yield utils_getAdress.getAddress(res.latitude, res.longitude);
+          });
+        }
+      }));
+    };
     const handleTap = (e = null) => {
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail"
@@ -92,6 +121,71 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleRegionChange = (e = null) => {
       if (e.type == "end")
         ;
+    };
+    const addMarkers = () => {
+      const positions = [
+        new UTSJSONObject({
+          id: 1,
+          latitude: 35.297468099059046,
+          longitude: 115.40080913614395
+        }),
+        new UTSJSONObject({
+          id: 4,
+          latitude: 35.26338122455396,
+          longitude: 115.3737993948281
+        }),
+        new UTSJSONObject({
+          id: 5,
+          latitude: 35.24911026114625,
+          longitude: 115.37670948421612
+        }),
+        new UTSJSONObject({
+          id: 7,
+          latitude: 35.265920623714884,
+          longitude: 115.47432047397626
+        }),
+        new UTSJSONObject({
+          id: 8,
+          latitude: 35.280857632699494,
+          longitude: 115.48226198671648
+        }),
+        new UTSJSONObject({
+          id: 9,
+          latitude: 35.2892924000666,
+          longitude: 115.47252411687543
+        }),
+        new UTSJSONObject({
+          id: 11,
+          latitude: 35.27709737493474,
+          longitude: 115.42029729381204
+        })
+      ];
+      positions.forEach((p, i) => {
+        return common_vendor.__awaiter(this, void 0, void 0, function* () {
+          markers.value.push(Object.assign(new UTSJSONObject({}), new UTSJSONObject({
+            id: i + 1,
+            iconPath: "/static/marker.png",
+            width: 50,
+            height: 50,
+            joinCluster: true,
+            callout: new UTSJSONObject({
+              padding: 5,
+              borderWidth: 1,
+              borderRadius: 10,
+              bgColor: "#ffffff",
+              content: yield utils_getAdress.getAddress(p.latitude, p.longitude),
+              display: "ALWAYS"
+            })
+          }), p));
+        });
+      });
+      mapCtx.addMarkers(new UTSJSONObject({
+        markers: markers.value,
+        clear: false,
+        complete(res = null) {
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:260", "addMarkers", res);
+        }
+      }));
     };
     const loadGroupData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -117,7 +211,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pickerGroupTitle.value = "全部分组";
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:330", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:287", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"

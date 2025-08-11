@@ -86,7 +86,7 @@
 
 	//高德地图相关
 	const address = ref('')
-	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
+	const gdKey = ''
 	const myAmapFun = ref('')
 
 	// 标记点集合
@@ -152,6 +152,11 @@
 		if (name == 1) {
 			uni.navigateTo({
 				url: '/pages/vehicleTracking/vehicleTracking'
+			})
+		}
+		if(name == 2){
+			uni.navigateTo({
+				url:'/pages/mileageRecord/mileageRecord'
 			})
 		}
 	}

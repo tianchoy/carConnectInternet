@@ -69,6 +69,13 @@
 	{
 		"navigationBarTitleText" : "车辆跟踪"
 	}
+},
+{
+	"path" : "pages/mileageRecord/mileageRecord",
+	"style" : 
+	{
+		"navigationBarTitleText" : ""
+	}
 }
 ],
 	"tabBar": {

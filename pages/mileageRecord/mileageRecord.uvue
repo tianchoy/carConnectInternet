@@ -1,0 +1,133 @@
+<template>
+	<view class="container">
+		<custom-navBar title="里程记录" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="tools-panel">
+			<view class="Datetime-box">
+				<view class="date-box">
+					<uv-icon name="calendar" size="25"></uv-icon>
+					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
+					<uv-icon name="arrow-down" @click="showPicker('start')" size="16"></uv-icon>
+					<text>至</text>
+					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
+					<uv-icon name="arrow-down" @click="showPicker('end')" size="16"></uv-icon>
+				</view>
+			</view>
+			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消" :title="pickerTitle" :mode="1|2|4|8|16|32"
+					@confirm="onConfirm" @cancel="onCancel">
+				</l-date-time-picker>
+			</l-popup>
+		</view>
+		<view class="mileage_title">
+			<text>设备名称</text>
+			<text>里程0Km</text>
+		</view>
+		<view class="content">
+			
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, reactive, onMounted } from 'vue'
+
+
+	const carStatus = ref('在线')
+
+	// 日期时间选择器相关
+	const showDateTimePicker = ref(false)
+	const currentPickerType = ref('start') // 'start' or 'end'
+	const pickerTitle = ref('选择开始时间')
+
+	const startTime = ref('')
+	const endTime = ref('')
+
+
+	// 初始化加载
+	onMounted(() => {
+		initDateTime()
+	})
+
+	// 初始化时间
+	const initDateTime = () => {
+		const now = new Date()
+		const formatTime = (date : Date) : string => {
+			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
+		}
+
+		endTime.value = formatTime(now)
+		// 开始时间默认为当前时间前1小时
+		const startDate = new Date(now.getTime() - 3600000)
+		startTime.value = formatTime(startDate)
+	}
+
+	// 显示日期时间选择器
+	const showPicker = (type : string) => {
+		currentPickerType.value = type
+		pickerTitle.value = type === 'start' ? '选择开始时间' : '选择结束时间'
+		showDateTimePicker.value = true
+	}
+
+	// 确认选择时间
+	const onConfirm = (value : string) => {
+		if (currentPickerType.value === 'start') {
+			startTime.value = value
+		} else {
+			endTime.value = value
+		}
+		showDateTimePicker.value = false
+	}
+
+	const onCancel = () => {
+		showDateTimePicker.value = false
+	}
+</script>
+
+<style lang="scss">
+	.container {
+		height: 100vh;
+		background-color: #f5f7fa;
+
+		.tools-panel {
+			background-color: #fff;
+			border: 1rpx solid #69c2f1;
+			padding: 20rpx;
+			margin: 20rpx;
+			border-radius: 20rpx;
+
+			.Datetime-box {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+
+				.date-box {
+					display: flex;
+					flex-direction: row;
+					justify-content: center;
+					align-items: center;
+
+					.Date {
+						font-size: 25rpx;
+						border-radius: 5rpx;
+						padding: 0 10rpx;
+					}
+				}
+			}
+		}
+		.mileage_title{
+			margin: 20rpx 40rpx;
+			padding: 20rpx;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.content{
+			@extend .mileage_title;
+			background-color: #fff;
+			border-radius: 15rpx;
+		}
+	}
+</style>
