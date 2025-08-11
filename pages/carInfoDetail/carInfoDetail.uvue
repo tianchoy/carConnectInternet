@@ -54,7 +54,10 @@
 
 <script setup lang="uts">
 	import amapFile from '../../utils/amap-wx.130'
-
+	import {getDevicePos} from '../../api/request.uts'
+	
+	const deptId= ref<string|null>('')
+	const imei = ref<string |null>('')
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -106,7 +109,7 @@
 
 	const currentToolItem = ref(0)
 	const currentCar = ref('京A12345')
-	
+
 	const cars = ref([
 		[
 			{ label: '京A12345', value: '12345' },
@@ -114,7 +117,7 @@
 			{ label: '京A12347', value: '12347' }
 		]
 	])
-	
+
 
 	const baseList = ref([{
 		name: '/static/gjhf.png',
@@ -133,10 +136,10 @@
 		title: '电子围栏'
 	}
 	])
-	
+
 	// 监听 currentCar 变化
 	watch(currentCar, (newVal) => {
-	  console.log("车辆变化:", newVal);
+		console.log("车辆变化:", newVal);
 	});
 
 	const click = (name) => {
@@ -242,26 +245,32 @@
 	}
 
 	const navTo = () => {
-		const mapContext = uni.createMapContext("myMap", this);
-		mapContext.openMapApp({
+		console.log(address.value)
+		//导航去此位置
+		uni.openLocation({
 			latitude: center.latitude,
 			longitude: center.longitude,
-			destination: address.value,
-			success(res) {
-				console.log('success!!', res);
-			},
-			fail(err) {
+			name: address.value,
+			scale: 18,
+			success: () => {
 				uni.showToast({
-					title: err.errMsg,
+					title: '成功调起地图',
 					icon: 'none'
-				})
+				});
+			},
+			fail: (err) => {
+				uni.showToast({
+					title: '调起地图失败',
+					icon: 'none'
+				});
+				console.error('调起地图失败:', err);
 			}
 		});
 	}
 
 	//打开地图app跳转
 	const handMarkerTap = (e) => {
-		
+
 		// 微信小程序返回的是markerId
 		if (e.detail && e.detail.markerId !== undefined) {
 			const markerId = e.detail.markerId
@@ -594,6 +603,19 @@
 		// 更新轨迹线
 		updatePolyline()
 	}
+	
+	const loadData = async (deptId) => {
+		const res = await getDevicePos(deptId)
+		
+		console.log(res)
+	}
+	
+	onLoad((option)=>{
+		console.log('option',option)
+		deptId.value = option.deptId
+		imei.value = option.imei
+		loadData(option.deptId)
+	})
 </script>
 
 <style lang="scss">

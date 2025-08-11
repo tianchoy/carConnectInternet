@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
@@ -25,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const deviceTypeSelect = common_vendor.ref(null);
     const carInfo = common_vendor.ref({
       deviceName: "",
-      deviceImei: "",
+      imei: "",
       deviceType: "",
       carNumber: ""
     });
@@ -40,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       })
     ]);
     const rules = new UTSJSONObject({
-      deviceImei: [
+      imei: [
         new UTSJSONObject({
           required: true,
           message: "请输入设备IMEI",
@@ -65,17 +66,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const submit = () => {
       var _a;
       (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then(() => {
-        common_vendor.index.showToast({
-          icon: "success",
-          title: "校验通过"
+        return common_vendor.__awaiter(this, void 0, void 0, function* () {
+          common_vendor.index.showToast({
+            icon: "success",
+            title: "校验通过"
+          });
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:97", "表单数据:", carInfo.value);
+          yield api_request.addDevice(carInfo.value);
         });
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:96", "表单数据:", carInfo.value);
       }).catch((errors = null) => {
         common_vendor.index.showToast({
           icon: "error",
           title: "校验失败"
         });
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:102", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:105", "验证错误:", errors);
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -102,17 +106,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           borderBottom: true
         }),
         e: common_vendor.o(($event = null) => {
-          return carInfo.value.deviceImei = $event;
+          return carInfo.value.imei = $event;
         }),
         f: common_vendor.p({
           border: "none",
           placeholder: "请输入设备IMEI(必填)",
-          modelValue: carInfo.value.deviceImei
+          modelValue: carInfo.value.imei
         }),
         g: common_vendor.p({
           label: "*设备IMEI",
           labelWidth: "150rpx",
-          prop: "deviceImei",
+          prop: "imei",
           borderBottom: true
         }),
         h: common_vendor.o(($event = null) => {

@@ -299,8 +299,8 @@
 			if (unplayedPoints.length >= 2) {
 				newPolyline.push({
 					points: unplayedPoints.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
-					color: '#ccc',
-					width: 6,
+					color: '#999',
+					width: 3,
 					borderColor: '#FFF',
 					borderWidth: 1,
 					dottedLine: true

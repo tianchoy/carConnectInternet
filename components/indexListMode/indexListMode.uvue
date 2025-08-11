@@ -1,26 +1,38 @@
 <template>
 	<view class="list-container">
-		<view class="content">
-			<view class="list-item" @click="todetail">
+		<view class="content" v-if="props.lists.length != 0">
+			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei)">
 				<view class="title">
-					<text class="car-number">京A12345</text>
-					<uv-tags text="在线" type="success"></uv-tags>
+					<text class="car-number">deviceId:{{item.deviceId}}</text>
+					<uv-tags :text="item.status == 0 ? '在线' : '离线'" :type="item.status== 0 ? 'success' : 'error'"></uv-tags>
 				</view>
 				<view class="imei">
-					<text>IMEI 12345678</text>
+					<text>IMEI {{item.imei}}</text>
 				</view>
 			</view>
+		</view>
+		<view class="empty" v-else>
+			暂无数据
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { getCustomList } from '../../api/request.uts'
+	interface DeviceItem {
+		deviceId : string
+		imei : string,
+		status: number,
+		companyId:string
+	}
+	const props = defineProps<{
+		lists : DeviceItem[]
+	}>()
 
-
-	const todetail = () => {
+	const todetail = (companyId:string,imei:string) => {
+		console.log(companyId)
 		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail'
+			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei
 		})
 	}
 </script>
@@ -39,13 +51,15 @@
 				padding: 20rpx;
 				background-color: #fff;
 				border-radius: 10rpx;
+				margin-bottom: 20rpx;
 
 				.title {
 					display: flex;
 					flex-direction: row;
 					align-items: center;
 					margin-bottom: 20rpx;
-					.car-number{
+
+					.car-number {
 						font-size: 35rpx;
 						font-weight: bolder;
 						margin-right: 20rpx;
@@ -56,6 +70,14 @@
 					color: #ccc;
 				}
 			}
+		}
+		.empty{
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			color: #ccc;
+			height: 100vh;
 		}
 	}
 </style>

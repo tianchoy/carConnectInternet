@@ -1,9 +1,8 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const BASE_URL = "https://car.zdiot.cn:18443/api";
+const BASE_URL = "http://182.40.96.184:8081/api";
 function requestInterceptor(config) {
   const token = common_vendor.index.getStorageSync("token");
-  common_vendor.index.__f__("log", "at api/http.uts:29", "token", token);
   if (token) {
     config.header = config.header || {};
     config.header["token"] = `${token}`;
@@ -77,7 +76,6 @@ function request(options) {
   if (!config.url.startsWith("http")) {
     config.url = BASE_URL + config.url;
   }
-  common_vendor.index.__f__("log", "at api/http.uts:131", "config", config);
   requestInterceptor(config);
   return new Promise((resolve, reject) => {
     common_vendor.index.request(Object.assign(Object.assign({}, config), { success: (res = null) => {
@@ -93,7 +91,7 @@ function request(options) {
     } }));
   });
 }
-new UTSJSONObject({
+const http = new UTSJSONObject({
   get(url, data = new UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
@@ -150,4 +148,5 @@ new UTSJSONObject({
     });
   }
 });
+exports.http = http;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

@@ -1,7 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333"
-			@capsuleClick="handleCapsule" :showCapsule="true">
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
@@ -10,7 +9,7 @@
 			</map>
 		</view>
 		<view v-else>
-			<indexListMode />
+			<indexListMode :lists="carList" />
 		</view>
 		<view class="tool-nav">
 			<view class="addCar" @click="addCar">
@@ -41,20 +40,12 @@
 	import { ref } from 'vue'
 
 	import amapFile from '../../utils/amap-wx.130'
-	import { getCustomList } from '../../api/request.uts'
+	import { getCustomList, getCustomDeviceList, getUserInfo } from '../../api/request.uts'
 	const Login = ref<boolean>(false)
 	//高德地图相关
 	const address = ref('')
 	const gdKey = 'e3e773ad74f7ba25f38775c9c8db6474'
 	const myAmapFun = ref({})
-
-	const handleCapsule = (type : string) => {
-		if (type == 'close') {
-			uni.navigateBack();
-		} else {
-			uni.showToast({ title: '菜单点击', icon: 'none' });
-		}
-	};
 
 	// 地图状态
 	const center = reactive({
@@ -71,38 +62,23 @@
 	const carState = ref([
 		[{
 			label: '全部状态',
-			value: '1'
+			value: '0'
 		},
 		{
 			label: '在线',
-			value: '2'
+			value: '1'
 		},
 		{
 			label: '离线',
-			value: '3'
+			value: '2'
 		}]
 
 	])
-	const carGroup = ref([
-		[
-			{
-				label: '全部分组',
-				value: '1'
-			},
-			{
-				label: '分组1',
-				value: '2'
-			},
-			{
-				label: '分组2',
-				value: '3'
-			}
-		]
-
-	])
+	const carGroup = ref<any>([])
 	const columns = ref<Array<{ label : string, value : string }>>([[]])
 	const pickerStateTitle = ref('全部状态')
 	const pickerGroupTitle = ref('全部分组')
+	const carList = ref([])
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -116,7 +92,7 @@
 		picker.value?.open()
 	}
 
-	const confirm = (e : { value : Array<{ label : string, value : string }> }) => {
+	const confirm = (e : { value : Array<{ label : string, value : string, devices : array }> }) => {
 		const selected = e.value[0]
 
 		if (currentPickerType.value === 'state') {
@@ -124,7 +100,7 @@
 			console.log('选择了状态:', selected.value)
 		} else if (currentPickerType.value === 'group') {
 			pickerGroupTitle.value = selected.label
-			console.log('选择了分组:', selected.value)
+			carList.value = selected.devices
 		}
 
 		currentPickerType.value = ''
@@ -133,35 +109,32 @@
 	const addCar = () => {
 		uni.navigateTo({
 			url: '/pages/addCar/addCar',
-			success: res => { },
-			fail: () => { },
-			complete: () => { }
 		});
 	}
 
 	// 初始化加载测试的电子围栏
 	onMounted(async () => {
-		myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
-		mapCtx = uni.createMapContext('myMap', this)
-		if (Login.value) {
-			getlocation() //获取当前位置	
-			mapCtx.initMarkerCluster({
-				enableDefaultStyle: true,
-				zoomOnClick: true,
-				gridSize: 10,
-				maxZoom: 17,
-				minClusterSize: 2,
-				complete(res) {
-					console.log('initMarkerCluster', res)
-				}
-			})
+		// myAmapFun.value = new amapFile.AMapWX({ key: gdKey });
+		// mapCtx = uni.createMapContext('myMap', this)
+		// if (Login.value) {
+		// 	getlocation() //获取当前位置	
+		// 	mapCtx.initMarkerCluster({
+		// 		enableDefaultStyle: true,
+		// 		zoomOnClick: true,
+		// 		gridSize: 10,
+		// 		maxZoom: 17,
+		// 		minClusterSize: 2,
+		// 		complete(res) {
+		// 			console.log('initMarkerCluster', res)
+		// 		}
+		// 	})
 
-			mapCtx.on("markerClusterCreate", (e) => {
-				console.log("markerClusterCreate", e);
-			});
+		// 	mapCtx.on("markerClusterCreate", (e) => {
+		// 		console.log("markerClusterCreate", e);
+		// 	});
 
-			addMarkers()
-		}
+		// 	addMarkers()
+		// }
 
 	})
 
@@ -189,33 +162,10 @@
 	}
 
 	const handleTap = (e) => {
-		console.log('e', e);
 		uni.navigateTo({
 			url: '/pages/carInfoDetail/carInfoDetail',
-			success: res => { },
-			fail: () => { },
-			complete: () => { }
 		});
-		//导航去此位置
-		// uni.openLocation({
-		// 	latitude: e.detail.latitude,
-		// 	longitude: e.detail.longitude,
-		// 	name: 'test',
-		// 	scale: 18,
-		// 	success: () => {
-		// 		uni.showToast({
-		// 			title: '成功调起地图',
-		// 			icon: 'none'
-		// 		});
-		// 	},
-		// 	fail: (err) => {
-		// 		uni.showToast({
-		// 			title: '调起地图失败',
-		// 			icon: 'none'
-		// 		});
-		// 		console.error('调起地图失败:', err);
-		// 	}
-		// });
+
 	}
 	// 切换地图/列表视图
 	const toggleMapMode = () => {
@@ -354,23 +304,46 @@
 			}
 		})
 	}
-	onLoad(() => {
 
-		// const token = uni.getStorageSync('token')
-		// if (token == '') {
-		// 	uni.redirectTo({
-		// 		url: '/pages/login/login'
-		// 	})
-		// 	Login.value = false
-		// }else{
-		// 	Login.value = true
-		// }
+	const loadGroupData = async () => {
+		try {
+			const userRes = await getUserInfo();
+			const deviceRes = await getCustomDeviceList(userRes.data.deptId);
+			const formattedData = deviceRes.data.map(item => ({
+				label: item.name,
+				value: item.id.toString(),
+				devices: item.devices
+			}));
 
-		// getCustomList().then(res=>{
-		// 	console.log(res)
-		// })
-
-	})
+			carGroup.value = [formattedData];
+			if (formattedData.length > 0) {
+				let allDevices = [];
+				formattedData.forEach(group => {
+					if (group.devices && group.devices.length > 0) {
+						allDevices = allDevices.concat(group.devices);
+					}
+				});
+				carList.value = allDevices;
+				pickerGroupTitle.value = '全部分组';
+			}
+		} catch (err) {
+			console.error('加载分组数据失败:', err);
+			uni.showToast({
+				title: '加载分组失败',
+				icon: 'none'
+			});
+		}
+	}
+	onLoad(async () => {
+		const token = uni.getStorageSync('token');
+		if (token == '') {
+			uni.redirectTo({ url: '/pages/login/login' });
+			Login.value = false;
+		} else {
+			Login.value = true;
+			loadGroupData()
+		}
+	});
 </script>
 
 <style lang="scss">

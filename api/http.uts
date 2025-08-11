@@ -20,13 +20,13 @@ interface HttpError {
     data?: any
 }
 
-const BASE_URL =  'https://car.zdiot.cn:18443/api' // https base地址
+// const BASE_URL =  'https://car.zdiot.cn:18443/api' // https base地址
+const BASE_URL =  'http://182.40.96.184:8081/api' 
 
 // 请求拦截器
 function requestInterceptor(config: RequestOptions): RequestOptions {
     // 可以在这里添加token等全局header
     const token = uni.getStorageSync('token')
-	console.log('token',token)
     if (token) {
         config.header = config.header || {}
         config.header['token'] = `${token}`
@@ -128,7 +128,6 @@ function request<T = any>(options: RequestOptions): Promise<T> {
     if (!config.url.startsWith('http')) {
         config.url = BASE_URL + config.url
     }
-    console.log('config',config)
     // 请求拦截
     requestInterceptor(config)
     

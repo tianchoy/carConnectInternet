@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_avatar_1 = common_vendor.resolveComponent("uv-avatar");
@@ -15,11 +16,20 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "userCenter",
   setup(__props) {
-    const userInfo = new UTSJSONObject({
+    const userInfo = common_vendor.ref(new UTSJSONObject({
       avatar: "/static/avatar.png",
-      nickname: "123456789"
-    });
+      username: "123456789"
+    }));
     const carsnumber = common_vendor.ref(3);
+    common_vendor.onLoad(() => {
+      loadData();
+    });
+    const loadData = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_request.getUserInfo();
+        userInfo.value = res.data;
+      });
+    };
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
         a: common_vendor.p({
@@ -30,10 +40,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false
         }),
         b: common_vendor.p({
-          src: userInfo.avatar,
+          src: common_vendor.unref(userInfo).avatar,
           shape: "circle"
         }),
-        c: common_vendor.t(userInfo.nickname),
+        c: common_vendor.t(common_vendor.unref(userInfo).username),
         d: common_vendor.p({
           type: "error",
           value: common_vendor.unref(carsnumber)

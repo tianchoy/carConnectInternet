@@ -2,12 +2,43 @@ import http from "./http";
 
 const loginUrl = '/sys/login'
 const customList = '/sys/dept/deps'
+const customDeviceList = '/group/listByDeptWithDevice?deptId='
+const devicePos = '/gps/lastPosition?deptId='
+const trackPos = '/gps/trackPos?'
+const userinfo = '/sys/user/info'
+const addDeviceUrl = '/userDevice/add'
 
-
-export const login = (method:string,data:UTSJSONObject) =>{
+//登陆接口
+export const login = (data:UTSJSONObject) =>{
 	return http.post(loginUrl,data)
 }
 
+//获取客户列表
 export const getCustomList = ()=>{
 	return http.get(customList)
+}
+
+//获取分组设备
+export const getCustomDeviceList = (deptId:string) => {
+	return http.get(customDeviceList,{deptId})
+}
+
+//获取设备位置(跟踪也用此接口)
+export const getDevicePos = (deptId:string) => {
+	return http.get(devicePos,{deptId})
+}
+
+//轨迹查询。里程查询
+export const getTrackPos = (data:object) => {
+	return http.get(trackPos,data)
+}
+
+//获取用户信息
+export const getUserInfo = () => {
+	return http.get(userinfo)
+}
+
+//添加设备
+export const addDevice = (data:object) => {
+	return http.post(addDeviceUrl,data)
 }

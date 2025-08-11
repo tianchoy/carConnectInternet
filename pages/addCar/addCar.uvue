@@ -8,8 +8,8 @@
 					<uv-input border="none" v-model="carInfo.deviceName" placeholder="请输入设备名称">
 					</uv-input>
 				</uv-form-item>
-				<uv-form-item label="*设备IMEI" labelWidth="150rpx" prop="deviceImei" borderBottom>
-					<uv-input border="none" v-model="carInfo.deviceImei" placeholder="请输入设备IMEI(必填)">
+				<uv-form-item label="*设备IMEI" labelWidth="150rpx" prop="imei" borderBottom>
+					<uv-input border="none" v-model="carInfo.imei" placeholder="请输入设备IMEI(必填)">
 					</uv-input>
 				</uv-form-item>
 				<uv-form-item label="*设备类型" labelWidth="150rpx" prop="deviceType" borderBottom
@@ -33,10 +33,11 @@
 
 <script setup lang="ts">
 	import { ref } from 'vue'
+	import { addDevice } from '../../api/request'
 
 	interface FormData {
 		deviceName : string
-		deviceImei : string
+		imei : string
 		deviceType : string
 		carNumber : string
 	}
@@ -45,7 +46,7 @@
 	const deviceTypeSelect = ref(null)
 	const carInfo = ref<FormData>({
 		deviceName: '',
-		deviceImei: '',
+		imei: '',
 		deviceType: '',
 		carNumber: ''
 	})
@@ -62,7 +63,7 @@
 	])
 
 	const rules = {
-		deviceImei: [
+		imei: [
 			{
 				required: true,
 				message: '请输入设备IMEI',
@@ -88,12 +89,14 @@
 
 
 	const submit = () => {
-		formRef.value?.validate().then(() => {
+		formRef.value?.validate().then(async () => {
 			uni.showToast({
 				icon: 'success',
 				title: '校验通过'
 			})
 			console.log('表单数据:', carInfo.value)
+			const res = await addDevice(carInfo.value)
+			// console.log(res)
 		}).catch((errors : any) => {
 			uni.showToast({
 				icon: 'error',
@@ -102,6 +105,7 @@
 			console.error('验证错误:', errors)
 		})
 	}
+	
 </script>
 
 <style lang="scss" scoped>

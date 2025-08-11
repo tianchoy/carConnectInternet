@@ -37,6 +37,7 @@
   padding: 20rpx;
   background-color: #fff;
   border-radius: 10rpx;
+  margin-bottom: 20rpx;
 }
 .list-container .content .list-item .title {
   display: flex;
@@ -51,4 +52,12 @@
 }
 .list-container .content .list-item .imei text {
   color: #ccc;
+}
+.list-container .empty {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: #ccc;
+  height: 100vh;
 }

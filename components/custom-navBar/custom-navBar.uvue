@@ -56,7 +56,6 @@
 		try {
 			const menuRect = uni.getMenuButtonBoundingClientRect();
 			if (menuRect) {
-				console.log('menuRect',menuRect);
 				menuButtonInfo.value = menuRect;
 				const gap = menuRect.top - statusBarHeight.value;
 				navBarHeight.value = gap * 2 + menuRect.height + 4;
@@ -69,7 +68,6 @@
 	// 返回按钮处理
 	const handleBack = () => {
 		const pages = getCurrentPages();
-		console.log('back', pages.length);
 		if (pages.length > 1) {
 			uni.navigateBack();
 		} else {

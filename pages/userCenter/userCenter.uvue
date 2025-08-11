@@ -8,7 +8,7 @@
 				<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
 			</view>
 			<view class="user-info">
-				<text>{{userInfo.nickname}}</text>
+				<text>{{userInfo.username}}</text>
 			</view>
 		</view>
 		<view>
@@ -23,12 +23,21 @@
 </template>
 
 <script setup lang="uts">
-	
-	const userInfo = {
+	import { getUserInfo } from '../../api/request';
+	const userInfo = ref({
 		avatar: '/static/avatar.png',
-		nickname: '123456789',
-	};
+		username: '123456789',
+	})
 	const carsnumber = ref(3)
+	
+	onLoad(()=>{
+		loadData()
+	})
+	
+	const loadData = async () => {
+		const res = await getUserInfo()
+		userInfo.value = res.data
+	}
 </script>
 
 <style lang="scss">

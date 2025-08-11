@@ -79,7 +79,6 @@
 	//获取系统信息
 	const getSystemInfo = () => {
 		const res = uni.getSystemInfoSync()
-		console.log(res)
 		deviceModel.value = res.deviceModel
 	}
 
@@ -105,23 +104,11 @@
 				type: "USER"
 			}
 			// 请求登陆接口
-			// login('POST',newFormData).then(res=>{
-			// 	console.log('1111:',res.data.token)
-			// 	uni.setStorageSync('token',res.data.token)
-			// 	uni.reLaunch({
-			// 		url:'/pages/index/index'
-			// 	})
-			// })
-			uni.request({
-				url: 'https://car.zdiot.cn:18443/api/sys/login',
-				method: 'POST',
-				data: newFormData,
-				success: res => {
-					console.log(res)
-				},
-				fail: err => {
-					console.log(err)
-				}
+			login('POST', newFormData).then(res => {
+				uni.setStorageSync('token', res.data.token)
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
 			})
 
 		}).catch(errors => {

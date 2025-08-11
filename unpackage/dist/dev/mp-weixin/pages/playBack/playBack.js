@@ -192,8 +192,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             points: unplayedPoints.map((p) => {
               return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
             }),
-            color: "#ccc",
-            width: 6,
+            color: "#999",
+            width: 3,
             borderColor: "#FFF",
             borderWidth: 1,
             dottedLine: true

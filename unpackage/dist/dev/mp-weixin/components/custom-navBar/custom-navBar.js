@@ -39,18 +39,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         const menuRect = common_vendor.index.getMenuButtonBoundingClientRect();
         if (menuRect) {
-          common_vendor.index.__f__("log", "at components/custom-navBar/custom-navBar.uvue:59", "menuRect", menuRect);
           menuButtonInfo.value = menuRect;
           const gap = menuRect.top - statusBarHeight.value;
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:65", "胶囊按钮信息获取失败", e);
+        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:64", "胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
       const pages = getCurrentPages();
-      common_vendor.index.__f__("log", "at components/custom-navBar/custom-navBar.uvue:72", "back", pages.length);
       if (pages.length > 1) {
         common_vendor.index.navigateBack();
       } else {
