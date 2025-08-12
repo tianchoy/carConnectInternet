@@ -174,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               borderRadius: 10,
               bgColor: "#ffffff",
               content: yield utils_getAdress.getAddress(p.latitude, p.longitude),
-              display: "ALWAYS"
+              display: "BYCLICK"
             })
           }), p));
         });
@@ -211,12 +211,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pickerGroupTitle.value = "全部分组";
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:287", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:288", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
           });
         }
+      });
+    };
+    const loadUserDeviceList = (data = new UTSJSONObject({})) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_request.getUserDeviceList(data);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:298", "loadUserDeviceList:", res);
       });
     };
     common_vendor.onLoad(() => {
@@ -228,6 +234,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } else {
           Login.value = true;
           loadGroupData();
+          loadUserDeviceList();
         }
       });
     });

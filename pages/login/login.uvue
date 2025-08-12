@@ -8,7 +8,7 @@
 		</view>
 
 		<view class="content">
-			<uv-form :model="form" :rules="rules" ref="formRef">
+			<uv-form :model="form" :rules="pswrules" ref="formRef" v-if="loginType">
 				<uv-form-item label="" prop="username" labelWidth="0">
 					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
@@ -21,24 +21,62 @@
 					</uv-input>
 				</uv-form-item>
 			</uv-form>
-			<view class="regisiter_box">
-				<!-- <text @click="toSignUp">立即注册</text> -->
+			<uv-form :model="smsform" :rules="smsrules" ref="smsformRef" v-else>
+				<uv-form-item label="" prop="phone" labelWidth="0">
+					<uv-input prefixIcon="phone-fill" v-model="smsform.phone" placeholder="请输入手机号" />
+				</uv-form-item>
+				<uv-form-item label="" prop="code" labelWidth="0">
+					<uv-input prefixIcon="lock-fill" v-model="smsform.code" placeholder="请输入验证码">
+						<template v-slot:suffix>
+							<uv-code ref="uCode" @change="codeChange" seconds="60" changeText="X秒重新获取"></uv-code>
+							<uv-button @click="getCode" :text="tips" type="success" size="mini"></uv-button>
+						</template>
+					</uv-input>
+				</uv-form-item>
+			</uv-form>
+			<view class="other-login">
+				<text @click="smsLogin">{{loginType ? '短信登陆' : '账号密码登陆'}}</text>
+				<text>忘记密码</text>
 			</view>
 			<uv-button type="primary" @click="submit">提交</uv-button>
+			<view class="documents" @click="isDocState">
+				<uv-checkbox-group>
+					<uv-checkbox :checked="docState"></uv-checkbox>
+					<view class="doc-info-box">
+						已阅读并同意《用户协议》《隐私政策》
+					</view>
+				</uv-checkbox-group>
+			</view>
 		</view>
-		<view class=""></view>
+		<view style="padding:0 40rpx">
+			<uv-divider text="其他登陆方式"></uv-divider>
+		</view>
+		<view>
+			<button open-type="getPhoneNumber" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
+				<uv-icon name="weixin-circle-fill" size="35" color="#1AAD19"></uv-icon>
+				<text>微信登陆</text>
+			</button>
+		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, onMounted } from 'vue'
-	import { login } from '../../api/request.uts'
+	import { login ,PostWechatlogin} from '../../api/request.uts'
 	const showpw = ref(true)
+	const docState = ref(false)
+	const loginType = ref(true)
+	const tips = ref('')
+	const uCode = ref(null)
 
 	// 定义表单类型
 	type FormData = {
 		username : string
 		password : string
+	}
+	type smsFormData = {
+		phone : string,
+		code : string
 	}
 
 	type UvFormInstance = {
@@ -50,11 +88,16 @@
 		username: '',
 		password: ''
 	})
+	const smsform = ref<smsFormData>({
+		phone: '',
+		code: ''
+	})
 
 	const formRef = ref<UvFormInstance | null>(null)
+	const smsformRef = ref<UvFormInstance | null>(null)
 	const deviceModel = ref('')
 
-	const rules = {
+	const pswrules = {
 		username: [
 			{
 				required: true,
@@ -71,10 +114,114 @@
 		]
 	}
 
+	const smsrules = {
+		phone: [
+			{
+				required: true,
+				message: '请输入手机号',
+				trigger: ['blur', 'change']
+			},
+			{
+				validator: (rule, value, callback) => {
+					const phoneReg = /^1[3-9]\d{9}$/
+					if (!phoneReg.test(value)) {
+						callback(new Error('请输入正确的手机号'))
+					} else {
+						callback()
+					}
+				},
+				trigger: ['blur', 'change']
+			}
+		],
+		code: [
+			{
+				required: true,
+				message: '请输入验证码',
+				trigger: ['blur', 'change']
+			},
+			{
+				len: 6,
+				message: '验证码长度为6位',
+				trigger: ['blur', 'change']
+			}
+		]
+	}
+
+	const codeChange = (text) => {
+		tips.value = text
+	}
+
+	const getCode = () => {
+		// 1. 先检查手机号是否为空
+		if (!smsform.value.phone) {
+			uni.showToast({
+				title: '请先输入手机号',
+				icon: 'none'
+			})
+			return
+		}
+
+		// 2. 验证手机号格式是否正确
+		const phoneReg = /^1[3-9]\d{9}$/
+		if (!phoneReg.test(smsform.value.phone)) {
+			uni.showToast({
+				title: '手机号格式不正确',
+				icon: 'none'
+			})
+			return
+		}
+
+		// 3. 检查是否在冷却期内
+		if (!uCode.value?.canGetCode) {
+			uni.showToast({
+				title: '请稍后再试',
+				icon: 'none'
+			})
+			return
+		}
+
+		// 所有验证通过，开始获取验证码
+		uni.showLoading({
+			title: '验证码发送中...'
+		})
+
+		// 获取验证码
+		// apiSendSmsCode({ 
+		//   phone: smsform.value.phone 
+		// }).then(() => {
+		//   uni.hideLoading()
+		//   uCode.value.start() // 启动倒计时
+		// }).catch(err => {
+		//   uni.hideLoading()
+		//   uni.showToast({
+		//     title: '发送失败: ' + err.message,
+		//     icon: 'none'
+		//   })
+		// })
+
+		// 模拟请求
+		setTimeout(() => {
+			uni.hideLoading()
+			uCode.value.start() // 启动倒计时
+			uni.showToast({
+				title: '验证码已发送',
+				icon: 'success'
+			})
+		}, 1000)
+	}
+
 	const showpwfun = () => {
 		showpw.value = !showpw.value
 	}
 
+	const isDocState = () => {
+		console.log('docState.value:', docState.value)
+		docState.value = !docState.value
+	}
+
+	const smsLogin = () => {
+		loginType.value = !loginType.value
+	}
 
 	//获取系统信息
 	const getSystemInfo = () => {
@@ -82,41 +229,148 @@
 		deviceModel.value = res.deviceModel
 	}
 
-	//注册按钮
-	const toSignUp = () => {
-		uni.reLaunch({
-			url: '/pages/signUp/signUp'
-		})
-	}
-
 	onMounted(() => {
 		getSystemInfo()
 		if (formRef.value) {
-			formRef.value.setRules(rules)
+			formRef.value.setRules(pswrules)
+		}
+		if (smsformRef.value) {
+			smsformRef.value.setRules(smsrules)
 		}
 	})
 
-	const submit = () => {
-		formRef.value?.validate().then(res => {
-			const newFormData = {
-				...form.value,
-				from: deviceModel.value,
-				type: "USER"
-			}
-			// 请求登陆接口
-			login('POST', newFormData).then(res => {
-				uni.setStorageSync('token', res.data.token)
-				uni.reLaunch({
-					url: '/pages/index/index'
+	// 微信登录处理函数
+	const handleGetPhoneNumber = async (e) => {
+		if (!docState.value) {
+			uni.showToast({
+				title: '请先阅读并同意用户协议',
+				icon: 'error'
+			})
+			return
+		}
+
+		// 处理授权结果
+		if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
+			uni.showToast({
+				title: '您拒绝了授权',
+				icon: 'none'
+			})
+			return
+		}
+
+		if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+			uni.showToast({
+				title: '获取手机号失败',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			uni.showLoading({ title: '登录中...' })
+
+			// 1. 获取微信登录code
+			const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
+				uni.login({
+					provider: 'weixin',
+					success: resolve,
+					fail: reject
 				})
 			})
+			
+			console.log(loginRes)
+			console.log(e)
 
-		}).catch(errors => {
-			uni.showToast({
-				icon: 'error',
-				title: '校验失败'
+			// 2. 发送到后端解密处理
+			const res = await PostWechatlogin({
+				code: loginRes.code,
+				encryptedData: e.detail.encryptedData,
+				iv: e.detail.iv
 			})
-		})
+			
+			console.log('res',res)
+
+			// // 3. 登录成功处理
+			// uni.setStorageSync('token', res.data.token)
+			// uni.reLaunch({
+			// 	url: '/pages/index/index'
+			// })
+
+		} catch (error) {
+			console.error('微信登录失败:', error)
+			uni.showToast({
+				title: '微信登录失败',
+				icon: 'none'
+			})
+		} finally {
+			uni.hideLoading()
+		}
+	}
+
+	const submit = () => {
+		console.log(docState.value)
+		if (!docState.value) {
+			uni.showToast({
+				title: '请先阅读并同意用户协议',
+				icon: 'error'
+			})
+			return
+		}
+
+		if (loginType.value) {
+			// 账号密码登录
+			formRef.value?.validate().then(res => {
+				const newFormData = {
+					...form.value,
+					from: deviceModel.value,
+					type: "USER"
+				}
+				// 请求登陆接口
+				login(newFormData).then(res => {
+					uni.setStorageSync('token', res.data.token)
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+				}).catch(err => {
+					uni.showToast({
+						title: err.message || '登录失败',
+						icon: 'error'
+					})
+				})
+			}).catch(errors => {
+				uni.showToast({
+					icon: 'error',
+					title: '请填写正确的账号密码'
+				})
+			})
+		} else {
+			// 短信验证码登录
+			smsformRef.value?.validate().then(res => {
+				const params = {
+					phone: smsform.value.phone,
+					code: smsform.value.code,
+					from: deviceModel.value,
+					type: "SMS"
+				}
+				// 请求短信登录接口
+				// apiSmsLogin(params).then(res => {
+				// 	uni.setStorageSync('token', res.data.token)
+				// 	uni.reLaunch({
+				// 		url: '/pages/index/index'
+				// 	})
+				// }).catch(err => {
+				// 	uni.showToast({
+				// 		title: err.message || '登录失败',
+				// 		icon: 'error'
+				// 	})
+				// })
+			}).catch(errors => {
+				uni.showToast({
+					icon: 'error',
+					title: '请填写正确的手机号和验证码'
+				})
+			})
+		}
 	}
 </script>
 
@@ -152,10 +406,47 @@
 			background-color: #fff;
 			padding: 20rpx 100rpx;
 
-			.regisiter_box {
+			.other-login {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				margin: 20rpx 0 30rpx;
 				font-size: 25rpx;
-				margin: 10rpx 0 30rpx;
 			}
+
+			.documents {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				font-size: 25rpx;
+				margin-top: 40rpx;
+			}
+		}
+
+		.wechat-login-btn {
+			background-color: #fff !important;
+			color: #ccc !important;
+			border: none !important;
+			border-radius: 50px !important;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 10px 20px;
+			font-size: 22rpx;
+
+			text {
+				margin-top: 10rpx;
+			}
+		}
+
+		.wechat-login-btn::after {
+			border: none;
+		}
+
+		.btn-text {
+			margin-left: 10px;
 		}
 	}
 </style>

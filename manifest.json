@@ -17,6 +17,9 @@
 		"permission": {
 			"scope.userLocation": {
 				"desc": "你的位置信息将用于小程序定位服务"
+			},
+			"scope.userPhoneNumber": {
+				"desc": "获取你的手机号"
 			}
 		},
 		"requiredPrivateInfos": [

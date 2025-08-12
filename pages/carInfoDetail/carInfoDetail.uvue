@@ -19,7 +19,7 @@
 		<view class="tools-panel">
 			<view class="Imei-box">
 				<view class="imei-info">
-					<text>IMEI 12345678</text>
+					<text>IMEI {{imei}}</text>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
 				</view>
 				<text>定位时间</text>
@@ -609,8 +609,8 @@
 		updatePolyline()
 	}
 	
-	const loadData = async (deptId) => {
-		const res = await getDevicePos(deptId)
+	const loadData = async (data:object) => {
+		const res = await getDevicePos(data)
 		
 		console.log(res)
 	}
@@ -619,7 +619,10 @@
 		console.log('option',option)
 		deptId.value = option.deptId
 		imei.value = option.imei
-		loadData(option.deptId)
+		const data = {
+			imei:imei.value
+		}
+		loadData(data)
 	})
 </script>
 

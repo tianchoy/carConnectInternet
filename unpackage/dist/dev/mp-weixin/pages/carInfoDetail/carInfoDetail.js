@@ -361,9 +361,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       updatePolyline();
     };
-    const loadData = (deptId2 = null) => {
+    const loadData = (data) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.getDevicePos(deptId2);
+        const res = yield api_request.getDevicePos(data);
         common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:615", res);
       });
     };
@@ -371,7 +371,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:619", "option", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
-      loadData(option.deptId);
+      const data = new UTSJSONObject({
+        imei: imei.value
+      });
+      loadData(data);
     });
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
@@ -406,12 +409,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         o: common_assets._imports_0$2,
         p: common_vendor.o(navTo),
-        q: common_vendor.p(new UTSJSONObject({
+        q: common_vendor.t(common_vendor.unref(imei)),
+        r: common_vendor.p(new UTSJSONObject({
           name: "arrow-right",
           bold: true,
           size: 25
         })),
-        r: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
+        s: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return new UTSJSONObject({
             a: "6cb34a81-6-" + i0 + "," + ("6cb34a81-5-" + i0),
             b: common_vendor.p(new UTSJSONObject({
@@ -426,27 +430,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: "6cb34a81-5-" + i0 + ",6cb34a81-4"
           });
         }),
-        s: common_vendor.o(click),
-        t: common_vendor.p(new UTSJSONObject({
+        t: common_vendor.o(click),
+        v: common_vendor.p(new UTSJSONObject({
           col: 4
         })),
-        v: common_vendor.unref(currentToolItem) == 4
+        w: common_vendor.unref(currentToolItem) == 4
       }), common_vendor.unref(currentToolItem) == 4 ? new UTSJSONObject({
-        w: common_vendor.o(startDrawing),
-        x: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.o(startDrawing),
+        y: common_vendor.p(new UTSJSONObject({
           disabled: common_vendor.unref(isDrawing)
         })),
-        y: common_vendor.o(addPoint),
-        z: common_vendor.p(new UTSJSONObject({
+        z: common_vendor.o(addPoint),
+        A: common_vendor.p(new UTSJSONObject({
           disabled: !common_vendor.unref(isDrawing)
         })),
-        A: common_vendor.o(finishDrawing),
-        B: common_vendor.p(new UTSJSONObject({
+        B: common_vendor.o(finishDrawing),
+        C: common_vendor.p(new UTSJSONObject({
           disabled: !common_vendor.unref(isDrawing) || common_vendor.unref(points).length < 3
         })),
-        C: common_vendor.o(clearAll)
+        D: common_vendor.o(clearAll)
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        E: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

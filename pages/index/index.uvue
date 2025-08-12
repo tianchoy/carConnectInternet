@@ -38,7 +38,7 @@
 
 <script setup lang="uts">
 	import { ref } from 'vue'
-	import { getCustomList, getCustomDeviceList, getUserInfo } from '../../api/request.uts'
+	import { getCustomList, getCustomDeviceList, getUserInfo,getUserDeviceList } from '../../api/request.uts'
 	import {getAddress} from '../../utils/getAdress.uts'
 	const Login = ref<boolean>(false)
 	//高德地图相关
@@ -248,7 +248,7 @@
 						borderRadius: 10,
 						bgColor: '#ffffff',
 						content: await getAddress(p.latitude, p.longitude),
-						display: 'ALWAYS'
+						display: 'BYCLICK'
 					}
 				}, p)
 			)
@@ -261,7 +261,8 @@
 			}
 		})
 	}
-
+	
+	//获取用户分组数据
 	const loadGroupData = async () => {
 		try {
 			const userRes = await getUserInfo();
@@ -291,6 +292,11 @@
 			});
 		}
 	}
+	//获取用户设备列表数据
+	const loadUserDeviceList = async (data={}) => {
+		const res = await getUserDeviceList(data)
+		console.log('loadUserDeviceList:',res)
+	}
 	onLoad(async () => {
 		const token = uni.getStorageSync('token');
 		if (token == '') {
@@ -299,6 +305,7 @@
 		} else {
 			Login.value = true;
 			loadGroupData()
+			loadUserDeviceList()
 		}
 	});
 </script>
