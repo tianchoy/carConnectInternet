@@ -4,7 +4,7 @@
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei)">
 				<view class="title">
 					<text class="car-number">deviceId:{{item.deviceId}}</text>
-					<uv-tags :text="item.status == 0 ? '在线' : '离线'" :type="item.status== 0 ? 'success' : 'error'"></uv-tags>
+					<uv-tags :text="item.status == 1 ? '在线' : '离线'" :type="item.status== 1 ? 'success' : 'error'"></uv-tags>
 				</view>
 				<view class="imei">
 					<text>IMEI {{item.imei}}</text>
@@ -46,6 +46,8 @@
 
 		.content {
 			margin-top: 120rpx;
+			max-height: calc(100vh - 120rpx); 
+			overflow-y: auto;
 
 			.list-item {
 				padding: 20rpx;
@@ -77,7 +79,7 @@
 			justify-content: center;
 			align-items: center;
 			color: #ccc;
-			height: 100vh;
+			height: calc(100vh - 120rpx);
 		}
 	}
 </style>

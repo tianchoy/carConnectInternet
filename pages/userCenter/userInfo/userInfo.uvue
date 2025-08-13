@@ -1,0 +1,117 @@
+<template>
+	<view class="container">
+		<custom-navBar title="个人信息" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="content">
+			<view class="title">
+				基本信息
+			</view>
+			<view class="list">
+				<view class="item">
+					<text>账号</text>
+					<view class="right">
+						<text class="info">{{userInfo.id}}</text>
+						<uv-icon name="arrow-right" size="18"></uv-icon>
+					</view>
+				</view>
+				<view class="item">
+					<text>手机号</text>
+					<view class="right">
+						<text class="info">{{userInfo.mobile}}</text>
+						<uv-icon name="arrow-right" size="18"></uv-icon>
+					</view>
+				</view>
+			</view>
+			<view class="title">
+				安全信息
+			</view>
+			<view class="list" @click="editPassword">
+				<view class="item">
+					<text>修改密码</text>
+					<uv-icon name="arrow-right" size="18"></uv-icon>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	type UserInfo = {
+		id : string,
+		mobile : string,
+	}
+	const userInfo = ref<UserInfo>({
+		id: "",
+		mobile: ""
+	})
+
+	onLoad((options) => {
+		if (options.userInfo) {
+			try {
+				const parsedInfo = JSON.parse(decodeURIComponent(options.userInfo)) as UTSJSONObject
+				console.log(parsedInfo)
+				userInfo.value = {
+					id: parsedInfo.getString("userId") || "",
+					mobile: parsedInfo.getString("mobile") || ""
+				}
+				console.log("用户信息:", userInfo.value)
+			} catch (e) {
+				console.error("解析用户信息失败:", e)
+			}
+		}
+	})
+	
+	const editPassword = () => {
+		uni.navigateTo({
+			url:'/pages/userCenter/editPassword/editPassword'
+		})
+	}
+</script>
+
+<style lang="scss">
+	.container {
+		width: 100%;
+		height: 100vh;
+		background-color: #f5f5f5;
+
+		.content {
+			padding: 20rpx;
+
+			.title {
+				color: #666;
+				font-size: 26rpx;
+				margin: 30rpx 0 20rpx 0;
+			}
+
+			.list {
+				background-color: #fff;
+				border-radius: 10rpx;
+				padding: 20rpx;
+
+				.item {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding: 30rpx 20rpx;
+					border-bottom: 1rpx solid #e5e5e5;
+
+					.right {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						align-items: center;
+
+						.info {
+							margin-right: 10rpx;
+						}
+					}
+				}
+
+				.item:last-child {
+					border: none;
+				}
+			}
+		}
+	}
+</style>

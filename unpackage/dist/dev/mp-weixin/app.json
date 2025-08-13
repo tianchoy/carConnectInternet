@@ -10,7 +10,10 @@
     "pages/playBack/playBack",
     "uni_modules/lime-action-sheet/pages/index",
     "pages/vehicleTracking/vehicleTracking",
-    "pages/mileageRecord/mileageRecord"
+    "pages/mileageRecord/mileageRecord",
+    "pages/stopRecord/stopRecord",
+    "pages/userCenter/userInfo/userInfo",
+    "pages/userCenter/editPassword/editPassword"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -48,6 +51,9 @@
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序定位服务"
+    },
+    "scope.userPhoneNumber": {
+      "desc": "获取你的手机号"
     }
   },
   "requiredPrivateInfos": [

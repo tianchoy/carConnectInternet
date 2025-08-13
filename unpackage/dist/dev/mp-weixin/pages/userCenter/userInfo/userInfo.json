@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "custom-nav-bar": "../../../components/custom-navBar/custom-navBar",
+    "uv-icon": "../../../uni_modules/uv-icon/components/uv-icon/uv-icon"
+  }
+}

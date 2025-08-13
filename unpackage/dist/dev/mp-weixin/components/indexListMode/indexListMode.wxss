@@ -32,6 +32,8 @@
 }
 .list-container .content {
   margin-top: 120rpx;
+  max-height: calc(100vh - 120rpx);
+  overflow-y: auto;
 }
 .list-container .content .list-item {
   padding: 20rpx;
@@ -59,5 +61,5 @@
   justify-content: center;
   align-items: center;
   color: #ccc;
-  height: 100vh;
+  height: calc(100vh - 120rpx);
 }

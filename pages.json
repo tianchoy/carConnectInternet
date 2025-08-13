@@ -76,6 +76,27 @@
 	{
 		"navigationBarTitleText" : ""
 	}
+},
+{
+	"path" : "pages/stopRecord/stopRecord",
+	"style" : 
+	{
+		"navigationBarTitleText" : ""
+	}
+},
+{
+	"path" : "pages/userCenter/userInfo/userInfo",
+	"style" : 
+	{
+		"navigationBarTitleText" : ""
+	}
+},
+{
+	"path" : "pages/userCenter/editPassword/editPassword",
+	"style" : 
+	{
+		"navigationBarTitleText" : ""
+	}
 }
 ],
 	"tabBar": {

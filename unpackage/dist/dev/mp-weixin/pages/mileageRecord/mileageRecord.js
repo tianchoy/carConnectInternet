@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
@@ -23,9 +24,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerTitle = common_vendor.ref("选择开始时间");
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
+    const imei = common_vendor.ref("");
     common_vendor.onMounted(() => {
       initDateTime();
+      loadMileageData();
     });
+    common_vendor.onLoad((option) => {
+      imei.value = option.imei;
+    });
+    const loadMileageData = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const data = new UTSJSONObject({
+          imei: imei.value,
+          startTime: startTime.value,
+          endTime: endTime.value,
+          minParkTime: 60,
+          withStop: true,
+          withPos: true,
+          withTrip: true
+        });
+        const res = yield api_request.getTrackPos(data);
+        common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:71", res);
+      });
+    };
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
       const formatTime = (date) => {

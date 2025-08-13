@@ -83,8 +83,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.t(__props.currentCar),
         f: common_assets._imports_0$4,
         g: common_vendor.o(handleCar),
-        h: common_vendor.t(__props.carStatus),
-        i: common_vendor.n(__props.carStatus === "在线" ? "success" : "error"),
+        h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
+        i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
         j: common_vendor.sr(picker, "f630fc82-0", new UTSJSONObject({
           "k": "picker"
         })),

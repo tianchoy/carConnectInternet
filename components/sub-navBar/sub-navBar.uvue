@@ -10,8 +10,8 @@
 				<cover-view>{{ currentCar }}</cover-view>
 				<cover-image class="down_icon" src="/static/down_icon.png"></cover-image>
 			</cover-view>
-			<cover-view class="car-state" :class="carStatus === '在线' ? 'success' : 'error'">
-				<cover-view>{{carStatus}}</cover-view>
+			<cover-view class="car-state" :class="carStatus == 'online' ? 'success' : 'error'">
+				<cover-view>{{carStatus == 'online' ? '在线' : '离线'}}</cover-view>
 			</cover-view>
 		</cover-view>
 	</cover-view>

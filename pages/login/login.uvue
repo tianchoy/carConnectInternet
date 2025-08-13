@@ -41,7 +41,7 @@
 			<uv-button type="primary" @click="submit">提交</uv-button>
 			<view class="documents" @click="isDocState">
 				<uv-checkbox-group>
-					<uv-checkbox :checked="docState"></uv-checkbox>
+					<uv-checkbox :checked="docState" @change="isDocState"></uv-checkbox>
 					<view class="doc-info-box">
 						已阅读并同意《用户协议》《隐私政策》
 					</view>

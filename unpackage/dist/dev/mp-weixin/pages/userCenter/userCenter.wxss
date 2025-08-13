@@ -32,10 +32,18 @@
 }
 .container .user-info-box {
   width: 100%;
-  padding: 40rpx 80rpx;
+  padding: 40rpx 60rpx;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+}
+.container .user-info-box .userinfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  flex: 1;
 }
 .container .user-info-box .user-info {
   margin-left: 40rpx;

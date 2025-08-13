@@ -111,6 +111,7 @@
 .container .tools-panel {
   width: 100%;
   background-color: #fff;
+  padding-bottom: 50rpx;
 }
 .container .tools-panel .Imei-box {
   padding: 20rpx 30rpx 0;

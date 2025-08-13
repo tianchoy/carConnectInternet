@@ -437,20 +437,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         E: common_vendor.p(new UTSJSONObject({
           type: "primary"
         })),
-        F: common_vendor.p(new UTSJSONObject({
+        F: common_vendor.o(isDocState),
+        G: common_vendor.p(new UTSJSONObject({
           checked: docState.value
         })),
-        G: common_vendor.o(isDocState),
-        H: common_vendor.p(new UTSJSONObject({
+        H: common_vendor.o(isDocState),
+        I: common_vendor.p(new UTSJSONObject({
           text: "其他登陆方式"
         })),
-        I: common_vendor.p(new UTSJSONObject({
+        J: common_vendor.p(new UTSJSONObject({
           name: "weixin-circle-fill",
           size: "35",
           color: "#1AAD19"
         })),
-        J: common_vendor.o(handleGetPhoneNumber),
-        K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        K: common_vendor.o(handleGetPhoneNumber),
+        L: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

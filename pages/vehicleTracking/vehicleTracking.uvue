@@ -8,7 +8,7 @@
 				@regionchange="handleRegionChange">
 				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" :cars="cars"
 					@update:current-time="(val) => (currentTime = val)"
-					@update:current-car="(val) => (currentCar = val)"></sub-navBar>
+					@update:current-car="(val) => (currentCar = val)" :carStatus='connectionStatus'></sub-navBar>
 			</map>
 		</view>
 
@@ -38,9 +38,12 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted } from 'vue'
-	import amap from '../../utils/amap-wx.130'
+	import { ref, reactive, onMounted, watch } from 'vue'
+	import { getRoutePlan } from '@/utils/tiandituRoute'
+	import { getDevicePos } from '../../api/request.uts'
 
+	const imei = ref<string | null>('')
+	const connectionStatus = ref<string | null>('')
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -60,21 +63,16 @@
 		duration: 0
 	})
 
-	// 高德地图实例
-	const amapInstance = ref(null)
-
 	// 跟踪状态
 	const isTracking = ref(false)
-	const trackingInterval = ref(null)
-	const trackPoints = ref<Array<any>>([])
+	const trackingInterval = ref<number | null>(null)
+	const trackPoints = ref<Array<{ latitude : number, longitude : number }>>([])
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const carStatus = ref('在线')
 	const currentTime = ref('10s')
 	const currentCar = ref('京A12345')
-
 
 	const times = ref([
 		[
@@ -92,32 +90,124 @@
 			{ label: '京A12347', value: '12347' }
 		]
 	])
-	
+
 	// 监听 currentTime 变化
 	watch(currentTime, (newVal) => {
-	  console.log("时间变化:", newVal);
+		console.log("时间变化:", newVal);
 	});
-	
+
 	// 监听 currentCar 变化
 	watch(currentCar, (newVal) => {
-	  console.log("车辆变化:", newVal);
+		console.log("车辆变化:", newVal);
 	});
-	
 
-	// 初始化地图
-	onMounted(() => {
-		initAMap()
+
+	// 在script部分修改以下内容
+
+	onLoad((option) => {
+		connectionStatus.value = option.connectionStatus
+		imei.value = option.imei
+
+		// 进入页面立即加载车辆位置
+		loadInitialPosition()
 	})
 
-	// 初始化高德地图
-	const initAMap = () => {
-		amapInstance.value = new amap.AMapWX({
-			key: '' // 替换为你的key
+	// 新增方法：加载初始位置
+	const loadInitialPosition = async () => {
+		uni.showLoading({
+			title: '获取车辆位置中...'
 		})
+
+		try {
+			const data = { deviceids: imei.value }
+			const res = await getDevicePos(data)
+
+			if (res?.code === 0 && res.data?.length > 0) {
+				const deviceData = res.data[0]
+				const position = {
+					latitude: Number(deviceData.latitude),
+					longitude: Number(deviceData.longitude)
+				}
+
+				// 设置地图中心点
+				center.latitude = position.latitude
+				center.longitude = position.longitude
+
+				// 设置初始标记点
+				markers.value = [{
+					id: 0,
+					latitude: position.latitude,
+					longitude: position.longitude,
+					iconPath: '/static/car.png',
+					width: 40,
+					height: 40,
+					rotate: deviceData.direction || 0,
+					callout: {
+						content: `车辆位置 | 速度: ${deviceData.speed || 0}km/h`,
+						color: '#ffffff',
+						bgColor: '#1296db',
+						padding: 5,
+						borderRadius: 4,
+						display: 'ALWAYS'
+					}
+				}]
+
+				// 更新车辆信息
+				currentSpeed.value = deviceData.speed || 0
+				currentAddress.value = deviceData.positionUpdateTime
+					? `最后定位: ${deviceData.positionUpdateTime}`
+					: '未知位置'
+				connectionStatus.value = deviceData.connectionStatus || 'unknown'
+			}
+		} catch (err) {
+			console.error('获取初始位置失败:', err)
+			uni.showToast({
+				title: '获取车辆位置失败',
+				icon: 'none'
+			})
+		} finally {
+			uni.hideLoading()
+		}
+	}
+
+	//请求位置数据
+	const loadTrackData = async () => {
+		try {
+			const data = { deviceids: imei.value }
+			const res = await getDevicePos(data)
+
+			if (res?.code === 0 && res.data?.length > 0) {
+				const deviceData = res.data[0]
+				const position = {
+					latitude: Number(deviceData.latitude),
+					longitude: Number(deviceData.longitude)
+				}
+
+				// 更新中心点
+				center.latitude = position.latitude
+				center.longitude = position.longitude
+
+				// 更新车辆信息
+				currentSpeed.value = deviceData.speed || 0
+				currentAddress.value = deviceData.positionUpdateTime || '未知位置'
+				connectionStatus.value = deviceData.connectionStatus || 'unknown'
+
+				// 追踪状态下记录轨迹点
+				if (isTracking.value) {
+					trackPoints.value.push(position)
+					drawTempRoute()
+				}
+
+				setMarkers(deviceData.direction)
+			}
+		} catch (err) {
+			console.error('获取位置失败:', err)
+			uni.showToast({ title: '获取位置失败', icon: 'none' })
+		}
 	}
 
 	// 设置标记点
-	const setMarkers = () => {
+	const setMarkers = (direction : number = 0) => {
 		if (trackPoints.value.length === 0) return
 
 		markers.value = [
@@ -147,7 +237,7 @@
 				width: 60,
 				height: 60,
 				callout: {
-					content: '终点',
+					content: '当前位置',
 					color: '#ffffff',
 					bgColor: '#e64340',
 					padding: 5,
@@ -155,7 +245,6 @@
 					display: 'ALWAYS'
 				}
 			},
-			// 当前位置
 			{
 				id: 2,
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
@@ -163,9 +252,9 @@
 				iconPath: '/static/car.png',
 				width: 40,
 				height: 40,
-				rotate: getCarDirection(),
+				rotate: direction,
 				callout: {
-					content: '当前位置',
+					content: `速度: ${currentSpeed.value}km/h`,
 					color: '#ffffff',
 					bgColor: '#1296db',
 					padding: 5,
@@ -201,16 +290,18 @@
 
 	// 开始跟踪
 	const startTracking = () => {
-		isTracking.value = true
 		trackPoints.value = []
-
-		const interval = parseInt(currentTime.value.replace('s', '')) * 1000
 
 		getCurrentPosition()
 
+		const interval = parseInt(currentTime.value) * 1000
+		isTracking.value = true
+		if (trackingInterval.value) {
+			clearInterval(trackingInterval.value)
+		}
 		trackingInterval.value = setInterval(() => {
 			getCurrentPosition()
-		}, interval)
+		}, interval) as unknown as number
 	}
 
 	// 停止跟踪
@@ -231,49 +322,15 @@
 		uni.showLoading({
 			title: '获取位置中...'
 		})
-
+		loadTrackData()
 		setTimeout(() => {
-			if (trackPoints.value.length === 0) {
-				// 第一个点使用当前位置
-				trackPoints.value.push({
-					latitude: center.latitude,
-					longitude: center.longitude
-				})
-				currentAddress.value = getAddressName(center.latitude, center.longitude)
-			} else {
-				// 模拟车辆移动
-				const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-				const randomLat = Math.random() * 0.01 - 0.005
-				const randomLng = Math.random() * 0.01 - 0.005
-
-				const newPoint = {
-					latitude: lastPoint.latitude + randomLat,
-					longitude: lastPoint.longitude + randomLng
-				}
-				trackPoints.value.push(newPoint)
-				currentAddress.value = getAddressName(newPoint.latitude, newPoint.longitude)
-			}
-
-			currentSpeed.value = Math.floor(Math.random() * 80 + 20)
-
-			const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-			center.latitude = lastPoint.latitude
-			center.longitude = lastPoint.longitude
-
-			setMarkers()
-
-			if (isTracking.value && trackPoints.value.length >= 2) {
-				drawTempRoute()
-			}
-
 			uni.hideLoading()
-		}, 500)
+		}, 1000)
 	}
 
-	// 模拟获取地址名称
+	// 获取地址名称
 	const getAddressName = (lat, lng) => {
 		// 这里应该是调用逆地理编码API获取实际地址
-		// 模拟返回
 		const streets = ['朝阳路', '建国路', '东三环', '西直门大街', '中关村大街']
 		const numbers = Math.floor(Math.random() * 100) + '号'
 		return '北京市' + streets[Math.floor(Math.random() * streets.length)] + numbers
@@ -281,16 +338,22 @@
 
 	// 绘制临时路线
 	const drawTempRoute = () => {
-		polylines.value = [
-			{
-				points: trackPoints.value,
-				color: '#1296db',
-				width: 6,
-				arrowLine: true,
-				borderColor: '#ffffff',
-				borderWidth: 2
-			}
-		]
+		if (trackPoints.value.length < 2) return
+		const validPoints = trackPoints.value.map(point => ({
+			latitude: Number(point.latitude),
+			longitude: Number(point.longitude)
+		}))
+
+		polylines.value = [{
+			points: validPoints,
+			color: '#1296db',
+			width: 6,
+			arrowLine: true,
+			borderColor: '#ffffff',
+			borderWidth: 2
+		}]
+
+		console.log('绘制临时路线:', JSON.stringify(polylines.value))
 	}
 
 	// 获取真实道路路线
@@ -310,49 +373,35 @@
 		const waypoints = trackPoints.value
 			.slice(1, -1)
 			.map(point => `${point.longitude},${point.latitude}`)
-			.join(';')
 
-		amapInstance.value.getDrivingRoute({
+		getRoutePlan({
 			origin: `${trackPoints.value[0].longitude},${trackPoints.value[0].latitude}`,
 			destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
-			waypoints: waypoints || undefined,
-			strategy: 5,
-			success: (res : any) => {
-				uni.hideLoading()
-				if (res.paths && res.paths[0]) {
-					drawRoadRoute(res.paths[0])
-				} else {
-					uni.showToast({
-						title: '未找到合适路线',
-						icon: 'none'
-					})
-				}
-			},
-			fail: (err : any) => {
-				uni.hideLoading()
+			waypoints: waypoints,
+			style: "0" // 0-推荐路线
+		}).then((res : any) => {
+			uni.hideLoading()
+			if (res && res.data) {
+				drawRoadRoute(res.data)
+			} else {
 				uni.showToast({
-					title: '路线获取失败',
+					title: '未找到合适路线',
 					icon: 'none'
 				})
-				console.error('路线规划失败:', err)
 			}
+		}).catch((err : any) => {
+			uni.hideLoading()
+			uni.showToast({
+				title: '路线获取失败',
+				icon: 'none'
+			})
+			console.error('路线规划失败:', err)
 		})
 	}
 
 	// 绘制道路路线
 	const drawRoadRoute = (path : any) => {
-		const roadPoints = []
-
-		path.steps.forEach((step : any) => {
-			const polyline = step.polyline.split(';')
-			polyline.forEach((item : string) => {
-				const coords = item.split(',')
-				roadPoints.push({
-					longitude: parseFloat(coords[0]),
-					latitude: parseFloat(coords[1])
-				})
-			})
-		})
+		const roadPoints = path.points || []
 
 		polylines.value = [
 			// 道路底色
@@ -379,9 +428,8 @@
 				level: 'highest'
 			}
 		]
-
-		routeInfo.distance = path.distance
-		routeInfo.duration = path.duration
+		routeInfo.distance = path.distance || 0
+		routeInfo.duration = path.duration || 0
 
 		adjustMapView(roadPoints)
 	}
@@ -440,8 +488,6 @@
 			return `${hours}小时${remainingMins}分钟`
 		}
 	}
-
-
 
 	// 地图区域变化事件
 	const handleRegionChange = (e : any) => {

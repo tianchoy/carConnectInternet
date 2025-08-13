@@ -31,6 +31,7 @@
 
 <script setup lang="uts">
 	import { ref, reactive, onMounted } from 'vue'
+	import {getTrackPos} from '../../api/request.uts'
 
 
 	const carStatus = ref('在线')
@@ -42,12 +43,33 @@
 
 	const startTime = ref('')
 	const endTime = ref('')
+	const imei = ref<string | null>('')
 
 
 	// 初始化加载
 	onMounted(() => {
 		initDateTime()
+		loadMileageData()
 	})
+	
+	onLoad((option)=>{
+		imei.value = option.imei
+	})
+	
+	const loadMileageData = async () => {
+		const data = {
+			imei: imei.value,
+			startTime: startTime.value,
+			endTime: endTime.value,
+			minParkTime: 60,
+			withStop: true,
+			withPos: true,
+			withTrip: true,
+		}
+		const res = await getTrackPos(data)
+		
+		console.log(res)
+	}
 
 	// 初始化时间
 	const initDateTime = () => {

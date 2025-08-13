@@ -13,6 +13,9 @@ if (!Math) {
   "./uni_modules/lime-action-sheet/pages/index.js";
   "./pages/vehicleTracking/vehicleTracking.js";
   "./pages/mileageRecord/mileageRecord.js";
+  "./pages/stopRecord/stopRecord.js";
+  "./pages/userCenter/userInfo/userInfo.js";
+  "./pages/userCenter/editPassword/editPassword.js";
 }
 const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onLaunch: function() {

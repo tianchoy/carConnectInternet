@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
@@ -27,7 +28,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(18);
-    common_vendor.ref("在线");
+    const imei = common_vendor.ref("");
+    const carStatus = common_vendor.ref("");
     const showDateTimePicker = common_vendor.ref(false);
     const currentPickerType = common_vendor.ref("start");
     const pickerTitle = common_vendor.ref("选择开始时间");
@@ -37,6 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const playbackSpeed = common_vendor.ref(1);
     const totalDistance = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
+    const currentTime = common_vendor.ref("");
     const playbackInterval = common_vendor.ref(null);
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
@@ -52,12 +55,67 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       ]
     ]);
     common_vendor.watch(currentCar, (newVal) => {
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:120", "车辆变化:", newVal);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:122", "车辆变化:", newVal);
     });
-    common_vendor.onMounted(() => {
-      loadSampleTrack();
+    common_vendor.onLoad((option) => {
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:126", "option", option);
+      imei.value = option.imei;
+      carStatus.value = option.connectionStatus;
       initDateTime();
+      loadTrackPos();
     });
+    const loadTrackPos = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const data = new UTSJSONObject({
+          imei: imei.value,
+          startTime: startTime.value,
+          endTime: endTime.value,
+          minParkTime: 60,
+          withStop: true,
+          withPos: true,
+          withTrip: false
+        });
+        const res = yield api_request.getTrackPos(data);
+        common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:145", res.data);
+        if (res.data && res.data.positions) {
+          processTrackData(res.data.positions);
+        }
+      });
+    };
+    const processTrackData = (positions) => {
+      const processedPoints = [];
+      for (let i = 0; i < positions.length; i++) {
+        const point = positions[i];
+        const processedPoint = new UTSJSONObject(
+          {
+            latitude: point.getNumber("latitude", 0),
+            longitude: point.getNumber("longitude", 0),
+            speed: point.getNumber("speed", 0),
+            deviceTime: point.getString("deviceTime", ""),
+            timestamp: new Date(point.getString("deviceTime", "")).getTime()
+          }
+          // 计算方向角
+        );
+        if (i > 0) {
+          const prevPoint = processedPoints[i - 1];
+          processedPoint.rotation = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint.latitude, processedPoint.longitude);
+        } else {
+          processedPoint.rotation = 0;
+        }
+        processedPoints.push(processedPoint);
+      }
+      if (processedPoints.length > 1) {
+        processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation;
+      }
+      trackPoints.value = processedPoints;
+      calculateTrackDistance();
+      initCarMarker();
+      updatePolyline();
+      adjustMapToFitTrack();
+      if (trackPoints.value.length > 0) {
+        currentTime.value = trackPoints.value[0].deviceTime;
+      }
+    };
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
       const formatTime = (date) => {
@@ -78,51 +136,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } else {
         endTime.value = value;
       }
+      loadTrackPos();
       showDateTimePicker.value = false;
     };
     const onCancel = () => {
       showDateTimePicker.value = false;
-    };
-    const loadSampleTrack = () => {
-      const rawTrack = [
-        new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 }),
-        new UTSJSONObject({ "latitude": 35.23764782824115, "longitude": 115.39397562325496 }),
-        new UTSJSONObject({ "latitude": 35.23905101311781, "longitude": 115.44459367195407 }),
-        new UTSJSONObject({ "latitude": 35.270452534471225, "longitude": 115.44611973480175 }),
-        new UTSJSONObject({ "latitude": 35.26677197770503, "longitude": 115.40126244387386 })
-      ];
-      const interpolatedTrack = [];
-      for (let i = 0; i < rawTrack.length - 1; i++) {
-        const start = rawTrack[i];
-        const end = rawTrack[i + 1];
-        interpolatedTrack.push(Object.assign({}, start));
-        const steps = 5;
-        for (let j = 1; j < steps; j++) {
-          const ratio = j / steps;
-          interpolatedTrack.push({
-            latitude: start.latitude + (end.latitude - start.latitude) * ratio,
-            longitude: start.longitude + (end.longitude - start.longitude) * ratio,
-            rotation: calculateBearing(start.latitude, start.longitude, end.latitude, end.longitude)
-          });
-        }
-      }
-      interpolatedTrack.push(Object.assign({}, rawTrack[rawTrack.length - 1]));
-      for (let i = 0; i < interpolatedTrack.length - 1; i++) {
-        const current = interpolatedTrack[i];
-        const next = interpolatedTrack[i + 1];
-        current.rotation = calculateBearing(current.latitude, current.longitude, next.latitude, next.longitude);
-        const distance = getDistance(current.latitude, current.longitude, next.latitude, next.longitude);
-        current.speed = Math.min(100, Math.round(distance * 3.6));
-      }
-      if (interpolatedTrack.length > 1) {
-        interpolatedTrack[interpolatedTrack.length - 1].rotation = interpolatedTrack[interpolatedTrack.length - 2].rotation;
-        interpolatedTrack[interpolatedTrack.length - 1].speed = interpolatedTrack[interpolatedTrack.length - 2].speed;
-      }
-      trackPoints.value = interpolatedTrack;
-      calculateTrackDistance();
-      initCarMarker();
-      updatePolyline();
-      adjustMapToFitTrack();
     };
     const calculateBearing = (lat1, lng1, lat2, lng2) => {
       const degToRad = (d) => {
@@ -269,9 +287,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentIndex.value++;
       updateCarPosition();
       updatePolyline();
-      if (trackPoints.value[currentIndex.value].speed) {
-        currentSpeed.value = trackPoints.value[currentIndex.value].speed;
-      }
+      const point = trackPoints.value[currentIndex.value];
+      currentSpeed.value = point.speed || 0;
+      currentTime.value = point.deviceTime || "";
     };
     const updateCarPosition = () => {
       if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
@@ -301,6 +319,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       pausePlayback();
       currentIndex.value = 0;
       currentSpeed.value = 0;
+      if (trackPoints.value.length > 0) {
+        currentTime.value = trackPoints.value[0].deviceTime || "";
+      }
       updateCarPosition();
       updatePolyline();
     };
@@ -308,7 +329,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       playbackSpeed.value = e;
       if (isPlaying.value) {
         pausePlayback();
-        const intervalDuration = 2e3 / playbackSpeed.value;
+        const intervalDuration = 1e3 / playbackSpeed.value;
         playbackInterval.value = setInterval(playNextPoint, intervalDuration);
         isPlaying.value = true;
       }
@@ -347,7 +368,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.p(new UTSJSONObject({
           showTime: false,
           currentCar: currentCar.value,
-          cars: cars.value
+          cars: cars.value,
+          carStatus: carStatus.value
         })),
         e: carMarker.value.id,
         f: common_vendor.p(new UTSJSONObject({
@@ -403,7 +425,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: playbackSpeed.value
         })),
         x: common_vendor.t(playbackSpeed.value),
-        y: common_vendor.t(startTime.value),
+        y: common_vendor.t(currentTime.value),
         z: common_vendor.t(currentSpeed.value),
         A: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
         B: common_vendor.o(onConfirm),

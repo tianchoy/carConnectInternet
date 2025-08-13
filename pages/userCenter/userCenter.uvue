@@ -3,13 +3,16 @@
 		<custom-navBar title="个人中心" :show-back="false" backgroundColor="#fff" textColor="#333"
 			:showCapsule="false">
 		</custom-navBar>
-		<view class="user-info-box">
-			<view>
-				<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
+		<view class="user-info-box" @click="userInfoDetail">
+			<view class="userinfo">
+				<view>
+					<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
+				</view>
+				<view class="user-info">
+					<text>{{userInfo.username}}</text>
+				</view>
 			</view>
-			<view class="user-info">
-				<text>{{userInfo.username}}</text>
-			</view>
+			<uv-icon name="arrow-right" size="25"></uv-icon>
 		</view>
 		<view>
 			<view class="list">
@@ -37,6 +40,13 @@
 	const loadData = async () => {
 		const res = await getUserInfo()
 		userInfo.value = res.data
+		console.log(userInfo.value)
+	}
+	
+	const userInfoDetail = () => {
+	  uni.navigateTo({
+	    url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
+	  })
 	}
 </script>
 
@@ -48,10 +58,18 @@
 
 		.user-info-box {
 			width: 100%;
-			padding: 40rpx 80rpx;
+			padding: 40rpx 60rpx;
 			display: flex;
 			flex-direction: row;
+			justify-content: space-between;
 			align-items: center;
+			.userinfo{
+				display: flex;
+				flex-direction: row;
+				justify-content: left;
+				align-items: center;
+				flex: 1;
+			}
 
 			.user-info {
 				margin-left: 40rpx;

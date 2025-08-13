@@ -3,6 +3,7 @@ const api_http = require("./http.js");
 const loginUrl = "/sys/login";
 const customDeviceList = "/group/listByDeptWithDevice?deptId=";
 const devicePos = "/gps/lastPosition?deptId=";
+const trackPos = "/gps/trackPos?";
 const userinfo = "/sys/user/info";
 const addDeviceUrl = "/userDevice/add";
 const userDeviceList = "/userDevice/list";
@@ -15,6 +16,9 @@ const getCustomDeviceList = (deptId) => {
 };
 const getDevicePos = (data) => {
   return api_http.http.get(devicePos, data);
+};
+const getTrackPos = (data) => {
+  return api_http.http.get(trackPos, data);
 };
 const getUserInfo = () => {
   return api_http.http.get(userinfo);
@@ -32,6 +36,7 @@ exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
 exports.getCustomDeviceList = getCustomDeviceList;
 exports.getDevicePos = getDevicePos;
+exports.getTrackPos = getTrackPos;
 exports.getUserDeviceList = getUserDeviceList;
 exports.getUserInfo = getUserInfo;
 exports.login = login;

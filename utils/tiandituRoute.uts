@@ -1,0 +1,62 @@
+// utils/tiandituRoute.js
+
+// 配置常量（建议将密钥放在配置文件中）
+const TD_MAP_CONFIG = {
+  API_KEY: 'fcaf46a375259f6bf44c387383a212a1',
+  BASE_URL: 'https://api.tianditu.gov.cn/drive'
+};
+
+/**
+ * 天地图路线规划函数
+ * @param {Object} options 配置参数
+ * @param {string} options.origin 起点坐标，格式为"lng,lat"
+ * @param {string} options.destination 终点坐标，格式为"lng,lat"
+ * @param {Array<string>} [options.waypoints] 途经点数组，每个元素格式为"lng,lat"
+ * @param {string} [options.style="0"] 路线样式，0-推荐路线，1-最少时间，2-最短距离，3-避开高速
+ * @returns {Promise} 返回Promise对象，成功时返回路线数据，失败时返回错误信息
+ */
+export function getRoutePlan(options) {
+  return new Promise((resolve, reject) => {
+    // 参数校验
+    if (!options?.origin || !options?.destination) {
+      reject(new Error('缺少必要参数：起点或终点坐标'));
+      return;
+    }
+
+    // 构建途经点字符串
+    const midParam = options.waypoints?.join(';') || '';
+
+    // 构建请求参数
+    const requestData = {
+      postStr: JSON.stringify({
+        orig: options.origin,
+        dest: options.destination,
+        mid: midParam,
+        style: options.style || "0"
+      }),
+      type: 'search',
+      tk: TD_MAP_CONFIG.API_KEY
+    };
+
+    // 微信小程序请求
+    wx.request({
+      url: TD_MAP_CONFIG.BASE_URL,
+      method: 'GET',
+      data: requestData,
+      success(res) {
+        if (res.statusCode === 200) {
+          if (res.data && !res.data.error) {
+            resolve(res.data);
+          } else {
+            reject(new Error(res.data?.message || '路线规划数据解析失败'));
+          }
+        } else {
+          reject(new Error(`请求失败，状态码：${res.statusCode}`));
+        }
+      },
+      fail(err) {
+        reject(new Error(`网络请求失败: ${err.errMsg || '未知错误'}`));
+      }
+    });
+  });
+}
