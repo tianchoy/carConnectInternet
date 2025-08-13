@@ -19,6 +19,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     backgroundColor: { type: String, default: "#ffffff" },
     textColor: { type: String, default: "#000000" },
     isIcon: { type: Boolean, default: true },
+    Icon: { type: String, default: "plus-circle" },
     rightText: { type: String, default: "" }
   },
   emits: ["back", "capsuleClick"],
@@ -44,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:64", "胶囊按钮信息获取失败", e);
+        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:65", "胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
@@ -73,7 +74,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: __props.isIcon
       }), __props.isIcon ? new UTSJSONObject({
         j: common_vendor.p(new UTSJSONObject({
-          name: "grid",
+          name: __props.Icon,
           size: "28"
         }))
       }) : new UTSJSONObject({

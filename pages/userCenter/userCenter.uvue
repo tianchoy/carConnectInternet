@@ -1,7 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="个人中心" :show-back="false" backgroundColor="#fff" textColor="#333"
-			:showCapsule="false">
+		<custom-navBar title="个人中心" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="user-info-box" @click="userInfoDetail">
 			<view class="userinfo">
@@ -15,7 +14,7 @@
 			<uv-icon name="arrow-right" size="25"></uv-icon>
 		</view>
 		<view>
-			<view class="list">
+			<view class="list" @click="carList">
 				<text>我的车辆</text>
 				<text class="badge"><uv-badge type="error" :value="carsnumber"></uv-badge></text>
 			</view>
@@ -32,21 +31,28 @@
 		username: '123456789',
 	})
 	const carsnumber = ref(3)
-	
-	onLoad(()=>{
+
+	onLoad(() => {
 		loadData()
 	})
-	
+
 	const loadData = async () => {
 		const res = await getUserInfo()
 		userInfo.value = res.data
 		console.log(userInfo.value)
 	}
-	
+
 	const userInfoDetail = () => {
-	  uni.navigateTo({
-	    url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
-	  })
+		uni.navigateTo({
+			url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
+		})
+	}
+
+	const carList = () => {
+		console.log('aaaaaa')
+		uni.navigateTo({
+			url: '/pages/userCenter/carList/carList'
+		})
 	}
 </script>
 
@@ -63,7 +69,8 @@
 			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
-			.userinfo{
+
+			.userinfo {
 				display: flex;
 				flex-direction: row;
 				justify-content: left;
@@ -96,7 +103,3 @@
 		}
 	}
 </style>
-
-
-
-

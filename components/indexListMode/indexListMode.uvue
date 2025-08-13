@@ -3,7 +3,7 @@
 		<view class="content" v-if="props.lists.length != 0">
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei)">
 				<view class="title">
-					<text class="car-number">deviceId:{{item.deviceId}}</text>
+					<text class="car-number">{{item.plateNo}}</text>
 					<uv-tags :text="item.status == 1 ? '在线' : '离线'" :type="item.status== 1 ? 'success' : 'error'"></uv-tags>
 				</view>
 				<view class="imei">
@@ -20,7 +20,7 @@
 <script setup lang="uts">
 	import { getCustomList } from '../../api/request.uts'
 	interface DeviceItem {
-		deviceId : string
+		plateNo : string
 		imei : string,
 		status: number,
 		companyId:string
@@ -58,6 +58,7 @@
 				.title {
 					display: flex;
 					flex-direction: row;
+					justify-content: space-between;
 					align-items: center;
 					margin-bottom: 20rpx;
 

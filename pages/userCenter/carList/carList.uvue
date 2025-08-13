@@ -1,0 +1,69 @@
+<template>
+	<view class="container">
+		<custom-navBar title="车辆管理" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="true"
+			:isIcon="true" @capsuleClick="addCar">
+		</custom-navBar>
+		<view class="content">
+			<view class="list" v-for="(item,index) in carList" :key="index">
+				<text>{{item.companyId}}</text>
+				<view class="device-info">
+					<text>{{item.plateNo}}</text>
+					<text class="tel">{{item.imei}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { getUserDeviceList } from '../../../api/request.uts'
+	
+	const carList = ref<UTSJSONObject>({})
+	
+	
+	
+	const addCar=()=>{
+		uni.navigateTo({
+			url:'/pages/addCar/addCar'
+		})
+	}
+	
+	onLoad(()=>{
+		loadCarListData()
+	})
+	
+	const loadCarListData = async () => {
+		const data = {}
+		const res = await getUserDeviceList(data)
+		carList.value = res.data.list
+		console.log(res.data)
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container{
+		height: 100%;
+		background-color: #f5f5f5;
+		.content{
+			margin: 20rpx;
+			.list{
+				background-color: #fff;
+				border-radius: 20rpx;
+				padding: 30rpx 40rpx;
+				margin-bottom: 30rpx;
+				font-size: 25rpx;
+				.device-info{
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding-top: 20rpx;
+					.tel{
+						color: #999;
+						font-size: 22rpx;
+					}
+				}
+			}
+		}
+	}
+</style>

@@ -212,7 +212,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           size: 25
         }),
-        m: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
+        m: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
+        n: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return {
             a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p({
@@ -227,11 +228,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           };
         }),
-        n: common_vendor.o(click),
-        o: common_vendor.p({
+        o: common_vendor.o(click),
+        p: common_vendor.p({
           col: 4
         }),
-        p: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

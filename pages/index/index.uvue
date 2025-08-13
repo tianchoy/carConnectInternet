@@ -1,15 +1,14 @@
 <template>
 	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="true">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:scale="mapScale" style="width:100%;height:100%" :show-location="true"
-				@regionchange="handleRegionChange" @markertap="handleTap">
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true" @markertap="handleTap">
 			</map>
 		</view>
 		<view v-else>
-			<indexListMode :lists="carList" />
+			<indexListMode :lists="filteredDevices" />
 		</view>
 		<view class="tool-nav">
 			<view class="addCar" @click="addCar">
@@ -20,9 +19,9 @@
 			</view>
 		</view>
 		<view class="right-bar" v-if="showMap">
-			<view class="allCar">全部 40</view>
-			<view class="onlineCar">在线 20</view>
-			<view class="offlineCar">离线 20</view>
+			<view class="allCar">全部 {{totalCount}}</view>
+			<view class="onlineCar">在线 {{onlineCount}}</view>
+			<view class="offlineCar">离线 {{offlineCount}}</view>
 		</view>
 		<view class="left-bar" @click="handStatePicker">
 			<text style="margin-right: 20rpx;">{{pickerStateTitle}}</text>
@@ -37,25 +36,22 @@
 </template>
 
 <script setup lang="uts">
-	import { ref } from 'vue'
-	import { getCustomList, getCustomDeviceList, getUserInfo,getUserDeviceList } from '../../api/request.uts'
-	import {getAddress} from '../../utils/getAdress.uts'
-	const Login = ref<boolean>(false)
-	//高德地图相关
-	const address = ref('')
+	import { ref, reactive, onMounted, computed, watch } from 'vue'
+	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList } from '../../api/request.uts'
 
-	// 地图状态
+	const Login = ref<boolean>(false)
 	const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
 	const mapScale = ref(12)
 	const showMap = ref(true)
-	// 标记点集合
 	const markers = ref<Array<any>>([])
 	let mapCtx = undefined
 	const currentPickerType = ref('')
-	const picker = ref(null);
+	const picker = ref(null)
+
+	// 状态选项
 	const carState = ref([
 		[{
 			label: '全部状态',
@@ -69,13 +65,53 @@
 			label: '离线',
 			value: '2'
 		}]
-
 	])
+
+	// 分组选项
 	const carGroup = ref<any>([])
 	const columns = ref<Array<{ label : string, value : string }>>([[]])
 	const pickerStateTitle = ref('全部状态')
 	const pickerGroupTitle = ref('全部分组')
-	const carList = ref([])
+	
+	// 原始设备列表
+	const originalDeviceList = ref<Array<any>>([])
+	
+	// 计算属性 - 统一筛选逻辑
+	const filteredDevices = computed(() => {
+		if (!Array.isArray(originalDeviceList.value)) return []
+		
+		let result = [...originalDeviceList.value]
+		
+		// 状态筛选
+		if (pickerStateTitle.value == '在线') {
+			result = result.filter(device => device?.status == 1)
+		} else if (pickerStateTitle.value === '离线') {
+			result = result.filter(device => device?.status == 0)
+		}
+		
+		// 分组筛选（如果不在"全部分组"状态）
+		if (pickerGroupTitle.value !== '全部分组') {
+			const selectedGroup = carGroup.value[0]?.find(group => group.label === pickerGroupTitle.value)
+			if (selectedGroup && Array.isArray(selectedGroup.devices)) {
+				const groupDeviceIds = selectedGroup.devices.map(d => d.id)
+				result = result.filter(device => groupDeviceIds.includes(device.id))
+			}
+		}
+		
+		return result
+	})
+	
+	// 计算设备数量统计
+	const totalCount = computed(() => originalDeviceList.value.length)
+	const onlineCount = computed(() => originalDeviceList.value.filter(d => d?.status === '1').length)
+	const offlineCount = computed(() => totalCount.value - onlineCount.value)
+
+	// 自动更新地图标记
+	watch([filteredDevices, showMap], ([devices, isMapVisible]) => {
+		if (isMapVisible) {
+			updateMarkers(devices)
+		}
+	})
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -89,225 +125,154 @@
 		picker.value?.open()
 	}
 
-	const confirm = (e : { value : Array<{ label : string, value : string, devices : array }> }) => {
+	const confirm = (e : { value : Array<{ label : string, value : string, devices : Array<any> }> }) => {
 		const selected = e.value[0]
-
-		if (currentPickerType.value === 'state') {
+		if (currentPickerType.value == 'state') {
 			pickerStateTitle.value = selected.label
-			console.log('选择了状态:', selected.value)
-		} else if (currentPickerType.value === 'group') {
+		} else if (currentPickerType.value == 'group') {
 			pickerGroupTitle.value = selected.label
-			carList.value = selected.devices
 		}
-
 		currentPickerType.value = ''
 	}
 
 	const addCar = () => {
 		uni.navigateTo({
 			url: '/pages/addCar/addCar',
-		});
-	}
-
-	// 初始化加载测试的电子围栏
-	onMounted(async () => {
-		mapCtx = uni.createMapContext('myMap', this)
-		if (Login.value) {
-			getlocation() //获取当前位置	
-			mapCtx.initMarkerCluster({
-				enableDefaultStyle: true,
-				zoomOnClick: true,
-				gridSize: 10,
-				maxZoom: 17,
-				minClusterSize: 2,
-				complete(res) {
-					console.log('initMarkerCluster', res)
-				}
-			})
-
-			mapCtx.on("markerClusterCreate", (e) => {
-				console.log("markerClusterCreate", e);
-			});
-
-			addMarkers()
-		}
-
-	})
-
-	//获取当前位置
-	const getlocation = () => {
-		uni.getLocation({
-			success: async (res) => {
-				center.latitude = res.latitude
-				center.longitude = res.longitude
-				address.value = await getAddress(res.latitude, res.longitude)
-			}
 		})
 	}
 
-
-	const handleTap = (e) => {
-		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail',
-		});
-
-	}
-	// 切换地图/列表视图
 	const toggleMapMode = () => {
 		showMap.value = !showMap.value
 	}
 
-	//聚合点
-	const handleRegionChange = (e) => {
-		if (e.type == 'end') {
-			// mapCtx.getScale({
-			// 	success: res => {
-			// 		console.log(res.scale);
-			// 	}
-			// })
+	const handleTap = (e) => {
+		uni.navigateTo({
+			url: '/pages/carInfoDetail/carInfoDetail',
+		})
+	}
 
-			// //运动轨迹
-			// mapCtx.moveAlong({
-			// 	markerId:1,
-			// 	autoRotate:false,
-			// 	path:[
-			// 		{
-			// 			latitude: '35.297468099059046',
-			// 			longitude: '115.40080913614395',
-			// 		},
-			// 		{
-			// 			latitude: '35.2892924000666',
-			// 			longitude: '115.47252411687543',
-			// 		},
-			// 		{
-			// 			latitude: '35.276764674702385',
-			// 			longitude: '115.37423373457307',
-			// 		}
-			// 	],
-			// 	duration:1000,
-			// 	precision:{},
-			// 	success:res =>{
-			// 		console.log(res);
-			// 	}
-			// })
-
+	const updateMarkers = (devices) => {
+		if (!Array.isArray(devices)) {
+			console.error('updateMarkers: devices参数不是数组', devices)
+			devices = []
 		}
 
-	}
-
-	const addMarkers = () => {
-		const positions = [
-			{
-				id: 1,
-				latitude: 35.297468099059046,
-				longitude: 115.40080913614395,
-			},
-			{
-				id: 4,
-				latitude: 35.26338122455396,
-				longitude: 115.3737993948281,
-			},
-			{
-				id: 5,
-				latitude: 35.24911026114625,
-				longitude: 115.37670948421612,
-			},
-			{
-				id: 7,
-				latitude: 35.265920623714884,
-				longitude: 115.47432047397626,
-			},
-			{
-				id: 8,
-				latitude: 35.280857632699494,
-				longitude: 115.48226198671648,
-			},
-			{
-				id: 9,
-				latitude: 35.2892924000666,
-				longitude: 115.47252411687543,
-			},
-			{
-				id: 11,
-				latitude: 35.27709737493474,
-				longitude: 115.42029729381204,
-			},
-		]
-
-		positions.forEach(async (p, i) => {
-			markers.value.push(
-				Object.assign({}, {
-					id: i + 1,
-					iconPath: '/static/marker.png',
-					width: 50,
-					height: 50,
-					joinCluster: true, // 指定了该参数才会参与聚合
-					callout: {
-						padding: 5,
-						borderWidth: 1,
-						borderRadius: 10,
-						bgColor: '#ffffff',
-						content: await getAddress(p.latitude, p.longitude),
-						display: 'BYCLICK'
-					}
-				}, p)
-			)
-		})
-		mapCtx.addMarkers({
-			markers: markers.value,
-			clear: false,
-			complete(res) {
-				console.log('addMarkers', res)
+		markers.value = devices.map(device => {
+			if (!device || typeof device !== 'object') {
+				console.warn('无效的设备数据', device)
+				return null
 			}
-		})
+
+			// 确保经纬度是数字类型
+			const lat = Number(device.latitude)
+			const lng = Number(device.longitude)
+
+			if (isNaN(lat) || isNaN(lng)) {
+				console.warn('设备经纬度无效', device)
+				return null
+			}
+
+			return {
+				id: device.id || Math.random().toString(36).substr(2, 9),
+				latitude: lat,
+				longitude: lng,
+				iconPath: device.status === '1' ? '/static/online-marker.png' : '/static/offline-marker.png',
+				width: 50,
+				height: 50,
+				callout: {
+					padding: 5,
+					borderWidth: 1,
+					borderRadius: 10,
+					bgColor: '#ffffff',
+					content: device.name || '未命名设备',
+					display: 'BYCLICK'
+				}
+			}
+		}).filter(marker => marker !== null)
 	}
-	
-	//获取用户分组数据
+
 	const loadGroupData = async () => {
 		try {
-			const userRes = await getUserInfo();
-			const deviceRes = await getCustomDeviceList(userRes.data.deptId);
-			const formattedData = deviceRes.data.map(item => ({
-				label: item.name,
-				value: item.id.toString(),
-				devices: item.devices
-			}));
-
-			carGroup.value = [formattedData];
-			if (formattedData.length > 0) {
-				let allDevices = [];
-				formattedData.forEach(group => {
-					if (group.devices && group.devices.length > 0) {
-						allDevices = allDevices.concat(group.devices);
-					}
-				});
-				carList.value = allDevices;
-				pickerGroupTitle.value = '全部分组';
+			const userRes = await getUserInfo()
+			if (!userRes?.data?.deptId) {
+				throw new Error('获取部门ID失败')
 			}
+
+			const deviceRes = await getCustomDeviceList(userRes.data.deptId)
+			if (!deviceRes?.data) {
+				throw new Error('获取分组数据失败')
+			}
+
+			const formattedData = deviceRes.data.map(item => ({
+				label: item.name || '未命名分组',
+				value: item.id?.toString() || Math.random().toString(36).substr(2, 9),
+				devices: Array.isArray(item.devices) ? item.devices : []
+			}))
+
+			carGroup.value = [formattedData]
+
+			// 合并所有设备
+			let allDevices = []
+			formattedData.forEach(group => {
+				if (Array.isArray(group.devices)) {
+					allDevices = allDevices.concat(group.devices)
+				}
+			})
+
+			originalDeviceList.value = allDevices
+			pickerGroupTitle.value = '全部分组'
 		} catch (err) {
-			console.error('加载分组数据失败:', err);
+			console.error('加载分组数据失败:', err)
 			uni.showToast({
 				title: '加载分组失败',
 				icon: 'none'
-			});
+			})
 		}
 	}
-	//获取用户设备列表数据
-	const loadUserDeviceList = async (data={}) => {
-		const res = await getUserDeviceList(data)
-		console.log('loadUserDeviceList:',res)
+
+	const loadUserDeviceList = async (data = {}) => {
+		try {
+			const res = await getUserDeviceList(data)
+			console.log('API响应数据:', res)
+
+			let deviceList = []
+			if (res?.data) {
+				if (Array.isArray(res.data)) {
+					deviceList = res.data
+				} else if (Array.isArray(res.data.list)) {
+					deviceList = res.data.list
+				} else if (Array.isArray(res.data.devices)) {
+					deviceList = res.data.devices
+				} else if (Array.isArray(res.data.items)) {
+					deviceList = res.data.items
+				}
+			}
+
+			console.log('解析后的设备列表:', deviceList)
+			originalDeviceList.value = deviceList
+		} catch (err) {
+			console.error('获取设备列表失败:', err)
+			uni.showToast({
+				title: '获取设备列表失败',
+				icon: 'none'
+			})
+		}
 	}
+
 	onLoad(async () => {
-		const token = uni.getStorageSync('token');
-		if (token == '') {
-			uni.redirectTo({ url: '/pages/login/login' });
-			Login.value = false;
+		const token = uni.getStorageSync('token')
+		if (!token) {
+			uni.redirectTo({ url: '/pages/login/login' })
+			Login.value = false
 		} else {
-			Login.value = true;
-			loadGroupData()
-			loadUserDeviceList()
+			Login.value = true
+			await loadGroupData()
+			await loadUserDeviceList()
+
+			// 初始化地图上下文
+			mapCtx = uni.createMapContext('myMap', this)
 		}
-	});
+	})
 </script>
 
 <style lang="scss">
@@ -338,7 +303,6 @@
 			.btn-map-list {
 				width: 60rpx;
 				height: 60rpx;
-
 			}
 
 			.btn-map-list-icon {
@@ -358,7 +322,6 @@
 					width: 100%;
 					height: 100%;
 				}
-
 			}
 		}
 

@@ -16,6 +16,7 @@ if (!Math) {
   "./pages/stopRecord/stopRecord.js";
   "./pages/userCenter/userInfo/userInfo.js";
   "./pages/userCenter/editPassword/editPassword.js";
+  "./pages/userCenter/carList/carList.js";
 }
 const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onLaunch: function() {

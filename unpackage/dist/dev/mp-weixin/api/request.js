@@ -8,6 +8,7 @@ const userinfo = "/sys/user/info";
 const addDeviceUrl = "/userDevice/add";
 const userDeviceList = "/userDevice/list";
 const wechatLogin = "/authLogin";
+const userMsgList = "/usermessage/listForUser";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
@@ -32,6 +33,9 @@ const getUserDeviceList = (data) => {
 const PostWechatlogin = (data) => {
   return api_http.http.post(wechatLogin, data);
 };
+const getUserMsgList = () => {
+  return api_http.http.get(userMsgList);
+};
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
 exports.getCustomDeviceList = getCustomDeviceList;
@@ -39,5 +43,6 @@ exports.getDevicePos = getDevicePos;
 exports.getTrackPos = getTrackPos;
 exports.getUserDeviceList = getUserDeviceList;
 exports.getUserInfo = getUserInfo;
+exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

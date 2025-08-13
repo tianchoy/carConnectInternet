@@ -19,7 +19,7 @@
 					<text>IMEI {{imei}}</text>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
 				</view>
-				<text>定位时间</text>
+				<text class="pos-time">定位时间 {{datainfo.positionUpdateTime}}</text>
 			</view>
 			<uv-grid :col="4" @click="click">
 				<uv-grid-item v-for="(item,index) in baseList" :key="index">
@@ -325,6 +325,10 @@
 					justify-content: space-between;
 					align-items: center;
 					padding: 20rpx 0;
+				}
+				.pos-time{
+					font-size: 25rpx;
+					color: #999;
 				}
 			}
 

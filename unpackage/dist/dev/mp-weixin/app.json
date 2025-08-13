@@ -13,7 +13,8 @@
     "pages/mileageRecord/mileageRecord",
     "pages/stopRecord/stopRecord",
     "pages/userCenter/userInfo/userInfo",
-    "pages/userCenter/editPassword/editPassword"
+    "pages/userCenter/editPassword/editPassword",
+    "pages/userCenter/carList/carList"
   ],
   "window": {
     "navigationStyle": "custom",

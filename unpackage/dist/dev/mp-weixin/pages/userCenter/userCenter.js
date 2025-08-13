@@ -30,12 +30,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:43", userInfo.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:42", userInfo.value);
       });
     };
     const userInfoDetail = () => {
       common_vendor.index.navigateTo({
         url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
+      });
+    };
+    const carList = () => {
+      common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:52", "aaaaaa");
+      common_vendor.index.navigateTo({
+        url: "/pages/userCenter/carList/carList"
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -61,7 +67,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: "error",
           value: common_vendor.unref(carsnumber)
         }),
-        g: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        g: common_vendor.o(carList),
+        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

@@ -9,6 +9,8 @@ const userinfo = '/sys/user/info'
 const addDeviceUrl = '/userDevice/add'
 const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
+const changePSW = '/sys/user/password'
+const userMsgList = '/usermessage/listForUser'
 
 //登陆接口
 export const login = (data : UTSJSONObject) => {
@@ -50,6 +52,16 @@ export const getUserDeviceList = (data : object) => {
 	return http.post(userDeviceList, data)
 }
 
+//微信授权登陆
 export const PostWechatlogin = (data:object) => {
 	return http.post(wechatLogin,data)
+}
+
+//修改密码
+export const changePassWord = (data:object) => {
+	return http.post(changePSW,data)
+}
+
+export const getUserMsgList = () => {
+	return http.get(userMsgList)
 }

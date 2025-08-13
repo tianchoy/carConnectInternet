@@ -28,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }), props.lists.length != 0 ? new UTSJSONObject({
         b: common_vendor.f(props.lists, (item = null, index = null, i0 = null) => {
           return new UTSJSONObject({
-            a: common_vendor.t(item.deviceId),
+            a: common_vendor.t(item.plateNo),
             b: "245c735a-0-" + i0,
             c: common_vendor.p(new UTSJSONObject({
               text: item.status == 1 ? "在线" : "离线",

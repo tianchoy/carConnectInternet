@@ -124,6 +124,10 @@
   align-items: center;
   padding: 20rpx 0;
 }
+.container .tools-panel .Imei-box .pos-time {
+  font-size: 25rpx;
+  color: #999;
+}
 .container .tools-panel .h-line {
   width: 90%;
   height: 2rpx;
