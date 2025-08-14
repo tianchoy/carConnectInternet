@@ -104,6 +104,13 @@
 	{
 		"navigationBarTitleText" : ""
 	}
+},
+{
+	"path" : "pages/userCenter/carDetail/carDetail",
+	"style" : 
+	{
+		"navigationBarTitleText" : ""
+	}
 }
 ],
 	"tabBar": {

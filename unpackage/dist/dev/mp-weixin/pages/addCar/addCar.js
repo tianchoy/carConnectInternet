@@ -5,30 +5,34 @@ if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
   const _easycom_uv_form_item_1 = common_vendor.resolveComponent("uv-form-item");
+  const _easycom_car_number_input_1 = common_vendor.resolveComponent("car-number-input");
   const _easycom_uv_action_sheet_1 = common_vendor.resolveComponent("uv-action-sheet");
   const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
   const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_action_sheet_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_car_number_input_1 + _easycom_uv_action_sheet_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
 const _easycom_uv_form_item = () => "../../uni_modules/uv-form/components/uv-form-item/uv-form-item.js";
+const _easycom_car_number_input = () => "../../uni_modules/car-number-input/components/car-number-input/car-number-input.js";
 const _easycom_uv_action_sheet = () => "../../uni_modules/uv-action-sheet/components/uv-action-sheet/uv-action-sheet.js";
 const _easycom_uv_form = () => "../../uni_modules/uv-form/components/uv-form/uv-form.js";
 const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_action_sheet + _easycom_uv_form + _easycom_uv_button)();
+  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_car_number_input + _easycom_uv_action_sheet + _easycom_uv_form + _easycom_uv_button)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "addCar",
   setup(__props) {
     const formRef = common_vendor.ref(null);
     const deviceTypeSelect = common_vendor.ref(null);
+    const loading = common_vendor.ref(false);
     const carInfo = common_vendor.ref({
       deviceName: "",
       imei: "",
       deviceType: "",
-      carNumber: ""
+      deviceTypeValue: "",
+      plateNo: ""
     });
     const actions = common_vendor.ref([
       new UTSJSONObject({
@@ -40,11 +44,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         value: "2"
       })
     ]);
+    const handlePlateNumberChange = (e) => {
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:69", e);
+      carInfo.value.plateNo = e;
+    };
     const rules = new UTSJSONObject({
       imei: [
         new UTSJSONObject({
           required: true,
           message: "请输入设备IMEI",
+          trigger: ["blur", "change"]
+        }),
+        new UTSJSONObject({
+          min: 15,
+          max: 17,
+          message: "IMEI长度应在15-17位之间",
           trigger: ["blur", "change"]
         })
       ],
@@ -55,31 +69,59 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           trigger: ["blur", "change"]
         })
       ]
+      // 已移除车牌号验证规则
     });
     const deviceTypeSelectFun = () => {
       var _a;
       (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.open();
     };
-    const deviceTypeSelectsFun = (e) => {
+    const deviceTypeSelectsFun = (e = null) => {
       carInfo.value.deviceType = e.name;
+      carInfo.value.deviceTypeValue = e.value;
     };
     const submit = () => {
       var _a;
       (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then(() => {
         return common_vendor.__awaiter(this, void 0, void 0, function* () {
-          common_vendor.index.showToast({
-            icon: "success",
-            title: "校验通过"
-          });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:97", "表单数据:", carInfo.value);
-          yield api_request.addDevice(carInfo.value);
+          loading.value = true;
+          try {
+            const submitData = new UTSJSONObject({
+              deviceName: carInfo.value.deviceName,
+              imei: carInfo.value.imei,
+              deviceType: carInfo.value.deviceTypeValue,
+              plateNo: carInfo.value.plateNo
+            });
+            const res = yield api_request.addDevice(submitData);
+            if (res.code === 200) {
+              common_vendor.index.showToast({
+                title: "添加成功",
+                icon: "success"
+              });
+              setTimeout(() => {
+                common_vendor.index.navigateBack();
+              }, 1500);
+            } else {
+              common_vendor.index.showToast({
+                title: res.message || "添加失败",
+                icon: "none"
+              });
+            }
+          } catch (error) {
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:134", "添加设备错误:", error);
+            common_vendor.index.showToast({
+              title: "请求失败，请稍后重试",
+              icon: "none"
+            });
+          } finally {
+            loading.value = false;
+          }
         });
       }).catch((errors = null) => {
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:143", "验证错误:", errors);
         common_vendor.index.showToast({
-          icon: "error",
-          title: "校验失败"
+          title: "请检查表单",
+          icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:105", "验证错误:", errors);
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -137,18 +179,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           prop: "deviceType",
           borderBottom: true
         }),
-        l: common_vendor.o(($event = null) => {
-          return carInfo.value.carNumber = $event;
-        }),
+        l: common_vendor.o(handlePlateNumberChange),
         m: common_vendor.p({
-          border: "none",
-          placeholder: "请输入车牌号",
-          modelValue: carInfo.value.carNumber
+          defaultStr: "京A"
         }),
         n: common_vendor.p({
           label: "车牌号",
           labelWidth: "150rpx",
-          prop: "carNumber",
+          prop: "plateNo",
           borderBottom: true
         }),
         o: common_vendor.sr(deviceTypeSelect, "6409e324-10,6409e324-1", {
@@ -169,7 +207,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         t: common_vendor.o(submit),
         v: common_vendor.p({
-          type: "primary"
+          type: "primary",
+          loading: loading.value
         }),
         w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };

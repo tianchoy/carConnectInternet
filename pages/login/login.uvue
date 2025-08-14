@@ -34,10 +34,10 @@
 					</uv-input>
 				</uv-form-item>
 			</uv-form>
-			<view class="other-login">
+			<!-- <view class="other-login">
 				<text @click="smsLogin">{{loginType ? '短信登陆' : '账号密码登陆'}}</text>
 				<text>忘记密码</text>
-			</view>
+			</view> -->
 			<uv-button type="primary" @click="submit">提交</uv-button>
 			<view class="documents" @click="isDocState">
 				<uv-checkbox-group>

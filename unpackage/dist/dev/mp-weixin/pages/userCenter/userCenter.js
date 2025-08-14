@@ -24,13 +24,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const carsnumber = common_vendor.ref(3);
     common_vendor.onLoad(() => {
+      carsnumber.value = common_vendor.index.getStorageSync("carTotalCount");
       loadData();
     });
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:42", userInfo.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:44", userInfo.value);
       });
     };
     const userInfoDetail = () => {
@@ -39,7 +40,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const carList = () => {
-      common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:52", "aaaaaa");
       common_vendor.index.navigateTo({
         url: "/pages/userCenter/carList/carList"
       });

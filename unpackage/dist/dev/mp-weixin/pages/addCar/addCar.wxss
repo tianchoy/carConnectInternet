@@ -39,3 +39,44 @@
 .container .btn.data-v-6409e324 {
   margin: 50rpx 20rpx 0 20rpx;
 }
+.container .plate-input.data-v-6409e324 {
+  width: 100%;
+}
+.container .plate-input.data-v-6409e324 .input-wrapper {
+  padding: 0;
+  border: none;
+}
+.container.data-v-6409e324 .car-input-container {
+  display: flex;
+  flex-direction: row;
+}
+.container.data-v-6409e324 .car-number-input {
+  width: 60%;
+  text-align: right;
+}
+.container.data-v-6409e324 .car-number-container .plate-close {
+  height: 40px;
+  display: flex;
+  text-align: right;
+  background-color: #FFF;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+.container.data-v-6409e324 .car-input-container .car-input-box .car-input-item {
+  position: relative;
+  border: 1px solid #E2E2E2;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-size: 17px;
+}
+.container.data-v-6409e324 .car-input-container .car-input-box .car-input-item .new-item-img {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  margin-left: -15px;
+  height: 13px;
+  width: 30px;
+  z-index: 9;
+}

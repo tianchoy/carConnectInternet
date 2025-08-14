@@ -7988,9 +7988,9 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.3.34,169.254.140.114";
+  const hosts = "127.0.0.1,192.168.3.34";
   const port = "8090";
-  const id = "mp-weixin_V1oI5D";
+  const id = "mp-weixin_1Vhglp";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9687,11 +9687,17 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
 const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
   !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
 };
+const onShow = /* @__PURE__ */ createLifeCycleHook(
+  ON_SHOW,
+  1 | 2
+  /* HookFlags.PAGE */
+);
 const onLoad = /* @__PURE__ */ createLifeCycleHook(
   ON_LOAD,
   2
   /* HookFlags.PAGE */
 );
+const onPageShow = onShow;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports._export_sfc = _export_sfc;
@@ -9712,6 +9718,7 @@ exports.o = o;
 exports.onBeforeUnmount = onBeforeUnmount;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
+exports.onPageShow = onPageShow;
 exports.p = p;
 exports.provide = provide;
 exports.reactive = reactive;

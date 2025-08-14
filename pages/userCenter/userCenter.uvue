@@ -33,6 +33,8 @@
 	const carsnumber = ref(3)
 
 	onLoad(() => {
+		
+		carsnumber.value = uni.getStorageSync('carTotalCount')
 		loadData()
 	})
 
@@ -49,7 +51,6 @@
 	}
 
 	const carList = () => {
-		console.log('aaaaaa')
 		uni.navigateTo({
 			url: '/pages/userCenter/carList/carList'
 		})

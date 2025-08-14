@@ -11,6 +11,8 @@ const userDeviceList = '/userDevice/list'
 const wechatLogin = '/authLogin'
 const changePSW = '/sys/user/password'
 const userMsgList = '/usermessage/listForUser'
+const msgState = '/usermessage/detail/'
+const updateDevice = '/device/update'
 
 //登陆接口
 export const login = (data : UTSJSONObject) => {
@@ -62,6 +64,17 @@ export const changePassWord = (data:object) => {
 	return http.post(changePSW,data)
 }
 
+//获取消息列表
 export const getUserMsgList = () => {
 	return http.get(userMsgList)
+}
+
+//设置消息状态
+export const setMsgState = (msgId: string) => {
+  return http.get(`${msgState}${msgId}`);
+};
+
+//编辑设备信息
+export const editDeviceInfo = (data:object) => {
+	return http.put(updateDevice,data)
 }

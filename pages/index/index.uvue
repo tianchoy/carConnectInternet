@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="true">
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
@@ -44,7 +44,7 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(12)
+	const mapScale = ref(4)
 	const showMap = ref(true)
 	const markers = ref<Array<any>>([])
 	let mapCtx = undefined
@@ -72,24 +72,24 @@
 	const columns = ref<Array<{ label : string, value : string }>>([[]])
 	const pickerStateTitle = ref('全部状态')
 	const pickerGroupTitle = ref('全部分组')
-	
+
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
-	
-	// 计算属性 - 统一筛选逻辑
+
+	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
 		if (!Array.isArray(originalDeviceList.value)) return []
-		
+
 		let result = [...originalDeviceList.value]
-		
+
 		// 状态筛选
 		if (pickerStateTitle.value == '在线') {
 			result = result.filter(device => device?.status == 1)
 		} else if (pickerStateTitle.value === '离线') {
 			result = result.filter(device => device?.status == 0)
 		}
-		
-		// 分组筛选（如果不在"全部分组"状态）
+
+		// 分组筛选
 		if (pickerGroupTitle.value !== '全部分组') {
 			const selectedGroup = carGroup.value[0]?.find(group => group.label === pickerGroupTitle.value)
 			if (selectedGroup && Array.isArray(selectedGroup.devices)) {
@@ -97,10 +97,10 @@
 				result = result.filter(device => groupDeviceIds.includes(device.id))
 			}
 		}
-		
+
 		return result
 	})
-	
+
 	// 计算设备数量统计
 	const totalCount = computed(() => originalDeviceList.value.length)
 	const onlineCount = computed(() => originalDeviceList.value.filter(d => d?.status === '1').length)
@@ -146,24 +146,28 @@
 	}
 
 	const handleTap = (e) => {
-		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail',
-		})
+	  const markerId = e.detail.markerId
+	  const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
+	  
+	  if (selectedDevice) {
+	    uni.navigateTo({
+	      url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}`,
+	    })
+	  } else {
+	    console.warn('未找到对应的设备信息', markerId)
+	  }
 	}
 
 	const updateMarkers = (devices) => {
 		if (!Array.isArray(devices)) {
-			console.error('updateMarkers: devices参数不是数组', devices)
 			devices = []
 		}
 
-		markers.value = devices.map(device => {
+		markers.value = devices.map((device, index) => {
 			if (!device || typeof device !== 'object') {
 				console.warn('无效的设备数据', device)
 				return null
 			}
-
-			// 确保经纬度是数字类型
 			const lat = Number(device.latitude)
 			const lng = Number(device.longitude)
 
@@ -173,23 +177,27 @@
 			}
 
 			return {
-				id: device.id || Math.random().toString(36).substr(2, 9),
+				id: Number(device.deviceId),
 				latitude: lat,
 				longitude: lng,
-				iconPath: device.status === '1' ? '/static/online-marker.png' : '/static/offline-marker.png',
-				width: 50,
-				height: 50,
+				iconPath: device.status == '1' ? '/static/online-marker.png' : '/static/marker.png',
+				width: 30,
+				height: 30,
 				callout: {
 					padding: 5,
 					borderWidth: 1,
 					borderRadius: 10,
 					bgColor: '#ffffff',
-					content: device.name || '未命名设备',
-					display: 'BYCLICK'
-				}
+					content: device.plateNo || '未命名设备',
+					display: 'ALWAYS'
+				},
+				joinCluster: true, // 允许聚合
+				clusterId: Number(device.deviceId),
+				
 			}
 		}).filter(marker => marker !== null)
 	}
+
 
 	const loadGroupData = async () => {
 		try {
@@ -234,6 +242,8 @@
 		try {
 			const res = await getUserDeviceList(data)
 			console.log('API响应数据:', res)
+			
+			uni.setStorageSync('carTotalCount',res.data.totalCount)
 
 			let deviceList = []
 			if (res?.data) {
@@ -271,6 +281,18 @@
 
 			// 初始化地图上下文
 			mapCtx = uni.createMapContext('myMap', this)
+
+			// 启用点聚合
+			if (mapCtx && mapCtx.initMarkerCluster) {
+				mapCtx.initMarkerCluster({
+					enableDefaultStyle: true,
+					zoomOnClick: true,
+					gridSize: 60,
+					complete: () => {
+						console.log('聚合初始化完成')
+					}
+				})
+			}
 		}
 	})
 </script>

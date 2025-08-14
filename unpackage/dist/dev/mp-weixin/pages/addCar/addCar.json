@@ -4,6 +4,7 @@
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
     "uv-form-item": "../../uni_modules/uv-form/components/uv-form-item/uv-form-item",
+    "car-number-input": "../../uni_modules/car-number-input/components/car-number-input/car-number-input",
     "uv-action-sheet": "../../uni_modules/uv-action-sheet/components/uv-action-sheet/uv-action-sheet",
     "uv-form": "../../uni_modules/uv-form/components/uv-form/uv-form",
     "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"

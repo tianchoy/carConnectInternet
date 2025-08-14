@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "custom-nav-bar": "../../../components/custom-navBar/custom-navBar",
+    "uv-input": "../../../uni_modules/uv-input/components/uv-input/uv-input",
+    "car-number-input": "../../../uni_modules/car-number-input/components/car-number-input/car-number-input"
+  }
+}

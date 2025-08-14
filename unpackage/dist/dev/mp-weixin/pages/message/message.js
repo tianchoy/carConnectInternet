@@ -19,10 +19,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "message",
   setup(__props) {
     const modal = common_vendor.ref(null);
+    const modalContent = common_vendor.ref(new UTSJSONObject({}));
     const handleItemClick = (item = null) => {
-      var _a;
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:23", "点击", item);
-      (_a = modal.value) === null || _a === void 0 ? null : _a.open();
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
+        modalContent.value = item;
+        (_a = modal.value) === null || _a === void 0 ? null : _a.open();
+        const res = yield api_request.setMsgState(item.messageId);
+        common_vendor.index.__f__("log", "at pages/message/message.uvue:28", "消息状态：", res);
+        if (res.msg == "success") {
+          loadMsgList();
+        }
+      });
     };
     const msgList = common_vendor.ref(new UTSJSONObject({}));
     common_vendor.onLoad(() => {
@@ -34,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserMsgList();
         msgList.value = res.data.list;
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:38", res);
+        common_vendor.index.__f__("log", "at pages/message/message.uvue:45", res);
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -70,8 +78,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(ReadIt),
         e: common_vendor.p({
-          title: "标题",
-          content: "不知天上宫阙，今夕是何年"
+          title: modalContent.value.messageType == 1 ? "警告" : modalContent.value.messageType == 2 ? "事件" : "通知",
+          content: modalContent.value.content
         }),
         f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };

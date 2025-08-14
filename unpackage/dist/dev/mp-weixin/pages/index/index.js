@@ -24,9 +24,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(12);
+    const mapScale = common_vendor.ref(4);
     const showMap = common_vendor.ref(true);
     const markers = common_vendor.ref([]);
+    let mapCtx = void 0;
     const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
     const carState = common_vendor.ref([
@@ -122,41 +123,50 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showMap.value = !showMap.value;
     };
     const handleTap = (e = null) => {
-      common_vendor.index.navigateTo({
-        url: "/pages/carInfoDetail/carInfoDetail"
+      const markerId = e.detail.markerId;
+      const selectedDevice = UTS.arrayFind(originalDeviceList.value, (device = null) => {
+        return device.deviceId == markerId;
       });
+      if (selectedDevice) {
+        common_vendor.index.navigateTo({
+          url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}`
+        });
+      } else {
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:157", "未找到对应的设备信息", markerId);
+      }
     };
     const updateMarkers = (devices = null) => {
       if (!Array.isArray(devices)) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:156", "updateMarkers: devices参数不是数组", devices);
         devices = [];
       }
-      markers.value = devices.map((device = null) => {
+      markers.value = devices.map((device = null, index = null) => {
         if (!device || typeof device !== "object") {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:162", "无效的设备数据", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:168", "无效的设备数据", device);
           return null;
         }
         const lat = Number(device.latitude);
         const lng = Number(device.longitude);
         if (isNaN(lat) || isNaN(lng)) {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:171", "设备经纬度无效", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:175", "设备经纬度无效", device);
           return null;
         }
         return new UTSJSONObject({
-          id: device.id || Math.random().toString(36).substr(2, 9),
+          id: Number(device.deviceId),
           latitude: lat,
           longitude: lng,
-          iconPath: device.status === "1" ? "/static/online-marker.png" : "/static/offline-marker.png",
-          width: 50,
-          height: 50,
+          iconPath: device.status == "1" ? "/static/online-marker.png" : "/static/marker.png",
+          width: 30,
+          height: 30,
           callout: new UTSJSONObject({
             padding: 5,
             borderWidth: 1,
             borderRadius: 10,
             bgColor: "#ffffff",
-            content: device.name || "未命名设备",
-            display: "BYCLICK"
-          })
+            content: device.plateNo || "未命名设备",
+            display: "ALWAYS"
+          }),
+          joinCluster: true,
+          clusterId: Number(device.deviceId)
         });
       }).filter((marker = null) => {
         return marker !== null;
@@ -192,7 +202,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = allDevices;
           pickerGroupTitle.value = "全部分组";
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:225", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:233", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
@@ -204,7 +214,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getUserDeviceList(data);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:236", "API响应数据:", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:244", "API响应数据:", res);
+          common_vendor.index.setStorageSync("carTotalCount", res.data.totalCount);
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -217,10 +228,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = res.data.items;
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:251", "解析后的设备列表:", deviceList);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:261", "解析后的设备列表:", deviceList);
           originalDeviceList.value = deviceList;
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:254", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:264", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -238,7 +249,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           Login.value = true;
           yield loadGroupData();
           yield loadUserDeviceList();
-          common_vendor.index.createMapContext("myMap", this);
+          mapCtx = common_vendor.index.createMapContext("myMap", this);
+          if (mapCtx && mapCtx.initMarkerCluster) {
+            mapCtx.initMarkerCluster(new UTSJSONObject({
+              enableDefaultStyle: true,
+              zoomOnClick: true,
+              gridSize: 60,
+              complete: () => {
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:292", "聚合初始化完成");
+              }
+            }));
+          }
         }
       });
     });
@@ -249,7 +270,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: true
+          showCapsule: false
         })),
         b: showMap.value
       }), showMap.value ? new UTSJSONObject({

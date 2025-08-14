@@ -14,7 +14,7 @@
 		</view>
 
 		<view class="tools-panel">
-			<view class="Imei-box">
+			<view class="Imei-box" @click="carDetail">
 				<view class="imei-info">
 					<text>IMEI {{imei}}</text>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
@@ -122,6 +122,12 @@
 				url:'/pages/stopRecord/stopRecord?imei='+imei.value+'&connectionStatus='+ datainfo.value.connectionStatus
 			})
 		}
+	}
+	
+	const carDetail = () => {
+		uni.navigateTo({
+			url:'/pages/userCenter/carDetail/carDetail?imei='+imei.value
+		})
 	}
 
 	const navTo = () => {

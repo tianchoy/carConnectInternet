@@ -96,8 +96,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
+    const carDetail = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/userCenter/carDetail/carDetail?imei=" + imei.value
+      });
+    };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:128", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:134", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -114,7 +119,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:146", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:152", "调起地图失败:", err);
         }
       });
     };
@@ -127,9 +132,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               datainfo.value = item;
               center.latitude = item.latitude;
               center.longitude = item.longitude;
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:158", item);
+              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:164", item);
               const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:160", "Address:", addr);
+              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:166", "Address:", addr);
               address.value = addr.result.formatted_address;
               const deviceMarker = createMarker(
                 1,
@@ -213,7 +218,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: 25
         }),
         m: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
-        n: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
+        n: common_vendor.o(carDetail),
+        o: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return {
             a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p({
@@ -228,11 +234,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           };
         }),
-        o: common_vendor.o(click),
-        p: common_vendor.p({
+        p: common_vendor.o(click),
+        q: common_vendor.p({
           col: 4
         }),
-        q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

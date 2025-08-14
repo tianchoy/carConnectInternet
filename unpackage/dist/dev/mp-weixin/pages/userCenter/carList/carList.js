@@ -18,7 +18,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/addCar/addCar"
       });
     };
-    common_vendor.onLoad(() => {
+    common_vendor.onPageShow(() => {
       loadCarListData();
     });
     const loadCarListData = () => {
@@ -26,7 +26,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const data = new UTSJSONObject({});
         const res = yield api_request.getUserDeviceList(data);
         carList.value = res.data.list;
-        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:39", res.data);
+        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:36", res.data);
+      });
+    };
+    const carDetail = (imei) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/userCenter/carDetail/carDetail?imei=" + imei
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -45,7 +50,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             a: common_vendor.t(item.companyId),
             b: common_vendor.t(item.plateNo),
             c: common_vendor.t(item.imei),
-            d: index
+            d: index,
+            e: common_vendor.o(($event = null) => {
+              return carDetail(item.imei);
+            }, index)
           };
         }),
         d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")

@@ -4,7 +4,7 @@
 			:isIcon="true" @capsuleClick="addCar">
 		</custom-navBar>
 		<view class="content">
-			<view class="list" v-for="(item,index) in carList" :key="index">
+			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.imei)">
 				<text>{{item.companyId}}</text>
 				<view class="device-info">
 					<text>{{item.plateNo}}</text>
@@ -19,16 +19,13 @@
 	import { getUserDeviceList } from '../../../api/request.uts'
 	
 	const carList = ref<UTSJSONObject>({})
-	
-	
-	
 	const addCar=()=>{
 		uni.navigateTo({
 			url:'/pages/addCar/addCar'
 		})
 	}
 	
-	onLoad(()=>{
+	onPageShow(()=>{
 		loadCarListData()
 	})
 	
@@ -37,6 +34,12 @@
 		const res = await getUserDeviceList(data)
 		carList.value = res.data.list
 		console.log(res.data)
+	}
+	
+	const carDetail = (imei:string) => {
+		uni.navigateTo({
+			url:'/pages/userCenter/carDetail/carDetail?imei='+imei
+		})
 	}
 </script>
 

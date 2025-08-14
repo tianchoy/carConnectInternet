@@ -1,0 +1,233 @@
+<template>
+	<view class="container">
+		<custom-navBar title="车辆详情" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="true"
+			:isIcon="true" @capsuleClick="toggleEdit" Icon="edit-pen">
+		</custom-navBar>
+		<view class="content">
+			<view class="list">
+				<text class="title">设备ID</text>
+				<text class="info" v-if="!isEditing">{{carInfo.deviceId}}</text>
+				<uv-input v-else v-model="editInfo.deviceId" border="surround" inputAlign="right" class="input" />
+			</view>
+			<view class="list">
+				<text class="title">品牌型号</text>
+				<text class="info" v-if="!isEditing">{{carInfo.carType}}</text>
+				<uv-input v-else v-model="editInfo.carType" border="surround" inputAlign="right" class="input" />
+			</view>
+			<view class="list">
+				<text class="title">车牌号</text>
+				<text class="info" v-if="!isEditing">{{carInfo.plateNo}}</text>
+				<view class="info" v-else>
+					<car-number-input @numberInputResult="handlePlateNumberChange"
+						:defaultStr="editInfo.plateNo || '京A'" />
+				</view>
+			</view>
+			<view class="list">
+				<text class="title">车架号</text>
+				<text class="info" v-if="!isEditing">{{carInfo.carVin}}</text>
+				<uv-input v-else v-model="editInfo.carVin" border="surround" inputAlign="right" class="input" />
+			</view>
+			<view class="list">
+				<text class="title">发动机号</text>
+				<text class="info" v-if="!isEditing">{{carInfo.engineNum}}</text>
+				<uv-input v-else v-model="editInfo.engineNum" border="surround" inputAlign="right" class="input" />
+			</view>
+		</view>
+		<view v-if="isEditing" class="button-group">
+			<button @click="saveChanges" class="save-btn">保存</button>
+			<button @click="cancelEdit" class="cancel-btn">取消</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { getUserDeviceList, editDeviceInfo } from '../../../api/request.uts'
+
+	const Imei = ref<string | null>('')
+	const carList = ref<UTSJSONObject>({})
+	const isEditing = ref(false)
+	const carInfo = ref<UTSJSONObject>({})
+	const editInfo = ref<UTSJSONObject>({})
+
+	// 处理车牌号输入结果
+	const handlePlateNumberChange = (e : string) => {
+		editInfo.value.plateNo = e
+	}
+
+	// 切换编辑状态
+	const toggleEdit = () => {
+		isEditing.value = !isEditing.value
+		if (isEditing.value) {
+			// 进入编辑模式时，复制原始数据到编辑对象
+			editInfo.value = JSON.parse(JSON.stringify(carInfo.value))
+		}
+	}
+
+	// 保存修改
+	const saveChanges = async () => {
+		const data = {
+			deviceId: editInfo.value.deviceId,
+			carType: editInfo.value.carType,
+			plateNo: editInfo.value.plateNo,
+			carVin: editInfo.value.carVin,
+			engineNum: editInfo.value.engineNum
+		}
+		carInfo.value = JSON.parse(JSON.stringify(editInfo.value))
+		isEditing.value = false
+
+		const res = await editDeviceInfo(data)
+		console.log(res)
+		uni.showToast({
+			title: '保存成功',
+			icon: 'success'
+		})
+	}
+
+	// 取消编辑
+	const cancelEdit = () => {
+		isEditing.value = false
+	}
+
+	onLoad((option) => {
+		Imei.value = option.imei
+		loadCarListData()
+	})
+
+	const loadCarListData = async () => {
+		const res = await getUserDeviceList({})
+		res.data.list.forEach(item => {
+			if (item.imei == Imei.value) {
+				carInfo.value = {
+					deviceId: item.deviceId,
+					carType: item.carType,
+					plateNo: item.plateNo || item.licensePlate || '',
+					carVin: item.carVin,
+					engineNum: item.engineNum
+				}
+				console.log('当前车辆数据:', JSON.stringify(carInfo.value)) // 调试用
+			}
+		})
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		height: 100vh;
+		background-color: #f5f5f5;
+
+		.content {
+			margin: 20rpx;
+			background-color: #fff;
+			padding: 40rpx;
+			border-radius: 20rpx;
+
+			.list {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 20rpx 10rpx;
+				border-bottom: 1rpx solid #eee;
+
+				.title {
+					width: 30vw;
+				}
+
+				.input {
+					text-align: right;
+					padding: 10rpx;
+					border-radius: 8rpx;
+					width: 60%;
+				}
+
+				.info {
+					color: #333;
+					text-align: right;
+
+					&:empty::after {
+						content: '（无）';
+						color: #999;
+					}
+
+					flex: 1;
+				}
+
+				// 车牌输入组件样式
+				:deep(.car-input-container) {
+					display: flex;
+					flex-direction: row;
+					padding: 0;
+				}
+
+				:deep(.car-number-input) {
+					width: 60%;
+					text-align: right;
+				}
+
+				:deep(.car-number-container .plate-close) {
+					height: 40px;
+					display: flex;
+					text-align: right;
+					background-color: #FFF;
+					flex-direction: row;
+					justify-content: flex-end;
+					align-items: center;
+				}
+
+				:deep(.car-input-container .car-input-box .car-input-item) {
+					position: relative;
+					border: 1px solid #E2E2E2;
+					height: 40px;
+					line-height: 40px;
+					text-align: center;
+					font-size: 17px;
+					width: auto;
+					margin-left: 5%;
+				}
+
+				:deep(.car-input-container .car-input-box .car-input-item .new-item-img) {
+					position: absolute;
+					top: -2px;
+					left: 50%;
+					margin-left: -15px;
+					height: 13px;
+					width: 30px;
+					z-index: 9;
+				}
+
+				:deep(.car-input-container .car-input-box) {
+					display: inline-block;
+					vertical-align: middle;
+					flex: 1;
+				}
+			}
+		}
+
+		.button-group {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			margin: 40rpx 40rpx 0;
+
+			button {
+				width: 40%;
+				border-radius: 8rpx;
+				font-size: 32rpx;
+				height: 80rpx;
+				line-height: 80rpx;
+
+				&.save-btn {
+					background-color: #007AFF;
+					color: white;
+				}
+
+				&.cancel-btn {
+					background-color: #f5f5f5;
+					color: #333;
+					border: 1rpx solid #ddd;
+				}
+			}
+		}
+	}
+</style>

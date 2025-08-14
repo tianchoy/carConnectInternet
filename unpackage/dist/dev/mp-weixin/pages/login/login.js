@@ -204,9 +204,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.__f__("log", "at pages/login/login.uvue:218", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
-    const smsLogin = () => {
-      loginType.value = !loginType.value;
-    };
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
@@ -431,27 +428,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rules: smsrules
         }))
       }), new UTSJSONObject({
-        B: common_vendor.t(loginType.value ? "短信登陆" : "账号密码登陆"),
-        C: common_vendor.o(smsLogin),
-        D: common_vendor.o(submit),
-        E: common_vendor.p(new UTSJSONObject({
+        B: common_vendor.o(submit),
+        C: common_vendor.p(new UTSJSONObject({
           type: "primary"
+        })),
+        D: common_vendor.o(isDocState),
+        E: common_vendor.p(new UTSJSONObject({
+          checked: docState.value
         })),
         F: common_vendor.o(isDocState),
         G: common_vendor.p(new UTSJSONObject({
-          checked: docState.value
-        })),
-        H: common_vendor.o(isDocState),
-        I: common_vendor.p(new UTSJSONObject({
           text: "其他登陆方式"
         })),
-        J: common_vendor.p(new UTSJSONObject({
+        H: common_vendor.p(new UTSJSONObject({
           name: "weixin-circle-fill",
           size: "35",
           color: "#1AAD19"
         })),
-        K: common_vendor.o(handleGetPhoneNumber),
-        L: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        I: common_vendor.o(handleGetPhoneNumber),
+        J: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

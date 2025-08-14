@@ -10,18 +10,25 @@
 				</uv-list-item>
 			</uv-list>
 		</view>
-		<uv-modal ref="modal" title="标题" content="不知天上宫阙，今夕是何年" @confirm="ReadIt"></uv-modal>
+		<uv-modal ref="modal" :title="modalContent.messageType == 1 ? '警告' : modalContent.messageType == 2 ? '事件' : '通知'":content="modalContent.content" @confirm="ReadIt"></uv-modal>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref } from 'vue'
-	import { getUserMsgList } from '../../api/request.uts'
+	import { getUserMsgList,setMsgState } from '../../api/request.uts'
 	const modal = ref(null);
+	
+	const modalContent = ref<UTSJSONObject>({})
 
-	const handleItemClick = (item) => {
-		console.log('点击', item);
+	const handleItemClick = async (item) => {
+		modalContent.value = item
 		modal.value?.open();
+		const res = await setMsgState(item.messageId)
+		console.log('消息状态：',res)
+		if(res.msg== 'success'){
+			loadMsgList()
+		}
 	}
 
 	const msgList = ref<UTSJSONObject>({})
