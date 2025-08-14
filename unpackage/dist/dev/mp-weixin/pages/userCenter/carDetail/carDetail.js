@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = UTS.JSON.parse(UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:79", res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:78", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -68,7 +68,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               carVin: item.carVin,
               engineNum: item.engineNum
             });
-            common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:107", "当前车辆数据:", UTS.JSON.stringify(carInfo.value));
+            common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:106", "当前车辆数据:", UTS.JSON.stringify(carInfo.value));
           }
         });
       });
@@ -85,73 +85,61 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isIcon: true,
           Icon: "edit-pen"
         })),
-        c: !common_vendor.unref(isEditing)
+        c: common_vendor.t(common_vendor.unref(carInfo).deviceId),
+        d: !common_vendor.unref(isEditing)
       }), !common_vendor.unref(isEditing) ? new UTSJSONObject({
-        d: common_vendor.t(common_vendor.unref(carInfo).deviceId)
+        e: common_vendor.t(common_vendor.unref(carInfo).carType)
       }) : new UTSJSONObject({
-        e: common_vendor.o(($event = null) => {
-          return common_vendor.unref(editInfo).deviceId = $event;
-        }),
-        f: common_vendor.p(new UTSJSONObject({
-          border: "surround",
-          inputAlign: "right",
-          modelValue: common_vendor.unref(editInfo).deviceId
-        }))
-      }), new UTSJSONObject({
-        g: !common_vendor.unref(isEditing)
-      }), !common_vendor.unref(isEditing) ? new UTSJSONObject({
-        h: common_vendor.t(common_vendor.unref(carInfo).carType)
-      }) : new UTSJSONObject({
-        i: common_vendor.o(($event = null) => {
+        f: common_vendor.o(($event = null) => {
           return common_vendor.unref(editInfo).carType = $event;
         }),
-        j: common_vendor.p(new UTSJSONObject({
+        g: common_vendor.p(new UTSJSONObject({
           border: "surround",
           inputAlign: "right",
           modelValue: common_vendor.unref(editInfo).carType
         }))
       }), new UTSJSONObject({
-        k: !common_vendor.unref(isEditing)
+        h: !common_vendor.unref(isEditing)
       }), !common_vendor.unref(isEditing) ? new UTSJSONObject({
-        l: common_vendor.t(common_vendor.unref(carInfo).plateNo)
+        i: common_vendor.t(common_vendor.unref(carInfo).plateNo)
       }) : new UTSJSONObject({
-        m: common_vendor.o(handlePlateNumberChange),
-        n: common_vendor.p(new UTSJSONObject({
+        j: common_vendor.o(handlePlateNumberChange),
+        k: common_vendor.p(new UTSJSONObject({
           defaultStr: common_vendor.unref(editInfo).plateNo || "京A"
         }))
       }), new UTSJSONObject({
-        o: !common_vendor.unref(isEditing)
+        l: !common_vendor.unref(isEditing)
       }), !common_vendor.unref(isEditing) ? new UTSJSONObject({
-        p: common_vendor.t(common_vendor.unref(carInfo).carVin)
+        m: common_vendor.t(common_vendor.unref(carInfo).carVin)
       }) : new UTSJSONObject({
-        q: common_vendor.o(($event = null) => {
+        n: common_vendor.o(($event = null) => {
           return common_vendor.unref(editInfo).carVin = $event;
         }),
-        r: common_vendor.p(new UTSJSONObject({
+        o: common_vendor.p(new UTSJSONObject({
           border: "surround",
           inputAlign: "right",
           modelValue: common_vendor.unref(editInfo).carVin
         }))
       }), new UTSJSONObject({
-        s: !common_vendor.unref(isEditing)
+        p: !common_vendor.unref(isEditing)
       }), !common_vendor.unref(isEditing) ? new UTSJSONObject({
-        t: common_vendor.t(common_vendor.unref(carInfo).engineNum)
+        q: common_vendor.t(common_vendor.unref(carInfo).engineNum)
       }) : new UTSJSONObject({
-        v: common_vendor.o(($event = null) => {
+        r: common_vendor.o(($event = null) => {
           return common_vendor.unref(editInfo).engineNum = $event;
         }),
-        w: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.p(new UTSJSONObject({
           border: "surround",
           inputAlign: "right",
           modelValue: common_vendor.unref(editInfo).engineNum
         }))
       }), new UTSJSONObject({
-        x: common_vendor.unref(isEditing)
+        t: common_vendor.unref(isEditing)
       }), common_vendor.unref(isEditing) ? new UTSJSONObject({
-        y: common_vendor.o(saveChanges),
-        z: common_vendor.o(cancelEdit)
+        v: common_vendor.o(saveChanges),
+        w: common_vendor.o(cancelEdit)
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        A: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

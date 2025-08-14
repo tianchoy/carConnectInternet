@@ -6,8 +6,7 @@
 		<view class="content">
 			<view class="list">
 				<text class="title">设备ID</text>
-				<text class="info" v-if="!isEditing">{{carInfo.deviceId}}</text>
-				<uv-input v-else v-model="editInfo.deviceId" border="surround" inputAlign="right" class="input" />
+				<text class="info">{{carInfo.deviceId}}</text>
 			</view>
 			<view class="list">
 				<text class="title">品牌型号</text>
