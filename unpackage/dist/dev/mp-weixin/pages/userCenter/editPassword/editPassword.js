@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
@@ -85,16 +86,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             password: formData.value.password,
             newPassword: formData.value.newPassword
           });
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:87", "提交数据:", submitData);
-          common_vendor.index.hideLoading();
-          common_vendor.index.showToast({
-            title: "密码修改成功",
-            icon: "success",
-            duration: 2e3
-          });
-          setTimeout(() => {
-            common_vendor.index.navigateBack();
-          }, 1500);
+          const res = yield api_request.changePassWord(submitData);
+          if (res.msg == "success") {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "密码修改成功",
+              icon: "success",
+              duration: 2e3
+            });
+            setTimeout(() => {
+              common_vendor.index.navigateBack();
+            }, 1500);
+          } else {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "密码修改失败",
+              icon: "error",
+              duration: 2e3
+            });
+          }
         } catch (error) {
           common_vendor.index.hideLoading();
           if (error) {
@@ -111,14 +121,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo) {
         try {
           const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:115", parsedInfo);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", parsedInfo);
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
             mobile: parsedInfo.getString("mobile") || ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:120", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:132", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:122", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:134", "解析用户信息失败:", e);
         }
       }
     });

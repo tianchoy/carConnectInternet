@@ -6,10 +6,10 @@
 		</cover-view>
 		<cover-view class="slot" v-else></cover-view>
 		<cover-view class="car-box">
-			<cover-view class="selectCar" @click="handleCar">
+			<!-- <cover-view class="selectCar" @click="handleCar">
 				<cover-view>{{ currentCar }}</cover-view>
 				<cover-image class="down_icon" src="/static/down_icon.png"></cover-image>
-			</cover-view>
+			</cover-view> -->
 			<cover-view class="car-state" :class="carStatus == 'online' ? 'success' : 'error'">
 				<cover-view>{{carStatus == 'online' ? '在线' : '离线'}}</cover-view>
 			</cover-view>
@@ -133,7 +133,7 @@
 
 			.times {
 				margin-right: 10rpx;
-				font-size: 30rpx;
+				font-size: 25rpx;
 			}
 		}
 

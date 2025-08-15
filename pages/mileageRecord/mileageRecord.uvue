@@ -6,10 +6,10 @@
 			<view class="Datetime-box">
 				<view class="date-box">
 					<uv-icon name="calendar" size="25"></uv-icon>
-					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
+					<text class="Date" @click="showPicker('start')">{{formatDisplayTime(startTime)}}</text>
 					<uv-icon name="arrow-down" @click="showPicker('start')" size="16"></uv-icon>
 					<text>至</text>
-					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
+					<text class="Date" @click="showPicker('end')">{{formatDisplayTime(endTime)}}</text>
 					<uv-icon name="arrow-down" @click="showPicker('end')" size="16"></uv-icon>
 				</view>
 			</view>
@@ -19,22 +19,80 @@
 				</l-date-time-picker>
 			</l-popup>
 		</view>
-		<view class="mileage_title">
-			<text>设备名称</text>
-			<text>里程0Km</text>
+
+		<view class="summary-panel">
+			<view class="summary-item">
+				<text class="label">总里程</text>
+				<text class="value">{{(totalMileage/1000).toFixed(2)}} Km</text>
+			</view>
+			<view class="summary-item">
+				<text class="label">行程次数</text>
+				<text class="value">{{totalTrips}} 次</text>
+			</view>
+			<view class="summary-item">
+				<text class="label">平均速度</text>
+				<text class="value">{{averageSpeed.toFixed(1)}} km/h</text>
+			</view>
 		</view>
+
 		<view class="content">
-			
+			<uv-loading-icon v-if="loading" mode="circle" size="40"></uv-loading-icon>
+			<uv-empty v-if="!loading && groupedTrips.length === 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
+			<view v-else class="trip-list">
+				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
+					<view class="group-header">
+						<view class="group-header-title">
+							<text class="group-date">{{group.date}}</text>
+							<uv-tags :text="group.trips.length+'段'" type="success" size="mini"></uv-tags>
+						</view>
+						<text>里程 {{(group.totalDistance/1000).toFixed(0)}} km</text>
+					</view>
+					<view class="group-separator"></view>
+					<view v-for="(item, index) in group.trips" :key="index" class="trip-item"
+						@click="showTripDetail(item)">
+						<view class="trip-index">
+							<text class="icon">{{index + 1}}</text>
+							<view class="trip-distance-time">
+								<text>{{(item.distance /1000).toFixed(0)}} km</text>
+								<text>{{formatDuration(item.duration)}}</text>
+							</view>
+						</view>
+						<view class="trip-content">
+
+							<view class="trip-locations">
+								<uv-steps  current="1" direction="column" active-color="#3c9cff" inactive-color="#999">
+									<uv-steps-item :title="item.startAddress || '未知地点'" :desc="item.startTime">
+										<template v-slot:icon>
+											<image class="icons" src="/static/start.png" mode="aspectFit" />
+										</template>
+									</uv-steps-item>
+									<uv-steps-item :title="item.endAddress || '未知地点'" :desc="item.endTime">
+										<template v-slot:icon>
+											<image class="icons" src="/static/end.png" mode="aspectFit"  />
+										</template>
+									</uv-steps-item>
+								</uv-steps>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted } from 'vue'
-	import {getTrackPos} from '../../api/request.uts'
+	import { ref, reactive, onMounted, computed } from 'vue'
+	import { getTrackPos } from '../../api/request.uts'
+	import { getAddress } from '../../utils/getAdress.uts'
 
+	type GroupType = { date : string; trips : any; totalDistance : number; }
 
 	const carStatus = ref('在线')
+	const loading = ref(false)
+	const totalMileage = ref(0)
+	const averageSpeed = ref(0)
+	const tripData = ref<Array<any>>([])
 
 	// 日期时间选择器相关
 	const showDateTimePicker = ref(false)
@@ -45,30 +103,149 @@
 	const endTime = ref('')
 	const imei = ref<string | null>('')
 
+	// 计算属性：按日期分组的行程数据
+	const groupedTrips = computed(() => {
+		const groups = [] as GroupType[]
+		const tripsByDate = {}
+
+		// 按日期分组
+		tripData.value.forEach(trip => {
+			const date = trip.startTime ? trip.startTime.split(' ')[0] : '未知日期'
+			if (!tripsByDate[date]) {
+				tripsByDate[date] = []
+			}
+			tripsByDate[date].push(trip)
+		})
+
+		// 转换为数组并计算每组的统计信息
+		for (const date in tripsByDate) {
+			const trips = tripsByDate[date]
+			let totalDistance = 0
+
+			trips.forEach(trip => {
+				totalDistance += trip.distance || 0
+			})
+
+			groups.push({
+				date,
+				trips,
+				totalDistance
+			})
+		}
+
+		// 按日期倒序排列
+		return groups.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+	})
+
+	// 计算属性：总行程数
+	const totalTrips = computed(() => {
+		return tripData.value.length
+	})
 
 	// 初始化加载
 	onMounted(() => {
 		initDateTime()
+	})
+
+	onLoad((option) => {
+		imei.value = option.imei
 		loadMileageData()
 	})
-	
-	onLoad((option)=>{
-		imei.value = option.imei
-	})
-	
+
 	const loadMileageData = async () => {
-		const data = {
-			imei: imei.value,
-			startTime: startTime.value,
-			endTime: endTime.value,
-			minParkTime: 60,
-			withStop: true,
-			withPos: true,
-			withTrip: true,
+		if (!imei.value) return;
+
+		loading.value = true;
+		try {
+			const data = {
+				imei: imei.value,
+				startTime: startTime.value,
+				endTime: endTime.value,
+				minParkTime: 60,
+				withStop: true,
+				withPos: true,
+				withTrip: true,
+			};
+			const res = await getTrackPos(data);
+
+			if (res && res.data) {
+				await processTripData(res.data); // 等待地址获取完成
+			}
+		} catch (e) {
+			console.error('获取里程数据失败:', e);
+			uni.showToast({
+				title: '数据加载失败',
+				icon: 'none',
+			});
+		} finally {
+			loading.value = false;
 		}
-		const res = await getTrackPos(data)
-		
-		console.log(res)
+	};
+
+	// 处理行程数据
+	const processTripData = async (data : any) => {
+		if (data.trips && data.trips.length > 0) {
+			// 遍历所有行程，获取地址
+			const processedTrips = await Promise.all(
+				data.trips.map(async (trip : any) => {
+					const startAddress = await getAddress(trip.startLat, trip.startLon);
+					const endAddress = await getAddress(trip.endLat, trip.endLon);
+
+					return {
+						...trip,
+						startAddress: startAddress?.result?.formatted_address || '未知地点',
+						endAddress: endAddress?.result?.formatted_address || '未知地点',
+					};
+				})
+			);
+
+			tripData.value = processedTrips;
+
+			// 计算总里程和平均速度
+			let totalDistance = 0;
+			let totalDuration = 0;
+			let totalAvgSpeed = 0;
+
+			processedTrips.forEach((trip : any) => {
+				totalDistance += trip.distance || 0;
+				totalDuration += trip.duration || 0;
+				totalAvgSpeed += trip.averageSpeed || 0;
+			});
+
+			totalMileage.value = totalDistance;
+			averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
+		} else {
+			tripData.value = [];
+			totalMileage.value = 0;
+			averageSpeed.value = 0;
+		}
+	};
+
+	// 格式化显示时间 (只显示日期)
+	const formatDisplayTime = (timeString : string) : string => {
+		if (!timeString) return '选择时间'
+		return timeString
+	}
+
+	// 格式化时间 (只显示时分)
+	const formatTime = (timeString : string) : string => {
+		if (!timeString) return ''
+		return timeString.split(' ')[1].substring(0, 5)
+	}
+
+	// 格式化持续时间 (毫秒转为时分秒)
+	const formatDuration = (milliseconds : number) : string => {
+		const seconds = Math.floor(milliseconds / 1000)
+		const hours = Math.floor(seconds / 3600)
+		const minutes = Math.floor((seconds % 3600) / 60)
+
+		if (hours > 0) {
+			return `${hours}小时${minutes}分`
+		} else if (minutes > 0) {
+			return `${minutes}分钟`
+		} else {
+			return `${seconds % 60}秒`
+		}
 	}
 
 	// 初始化时间
@@ -79,8 +256,8 @@
 		}
 
 		endTime.value = formatTime(now)
-		// 开始时间默认为当前时间前1小时
-		const startDate = new Date(now.getTime() - 3600000)
+		// 开始时间默认为当前时间前1天
+		const startDate = new Date(now.getTime() - 24 * 3600000)
 		startTime.value = formatTime(startDate)
 	}
 
@@ -99,10 +276,19 @@
 			endTime.value = value
 		}
 		showDateTimePicker.value = false
+		// 时间变更后重新加载数据
+		loadMileageData()
 	}
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
+	}
+
+	// 显示行程详情
+	const showTripDetail = (trip : any) => {
+		uni.navigateTo({
+			url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(JSON.stringify(trip))}`
+		})
 	}
 </script>
 
@@ -110,6 +296,7 @@
 	.container {
 		height: 100vh;
 		background-color: #f5f7fa;
+		padding-bottom: 20rpx;
 
 		.tools-panel {
 			background-color: #fff;
@@ -134,22 +321,147 @@
 						font-size: 25rpx;
 						border-radius: 5rpx;
 						padding: 0 10rpx;
+						color: #333;
 					}
 				}
 			}
 		}
-		.mileage_title{
-			margin: 20rpx 40rpx;
-			padding: 20rpx;
+
+		.summary-panel {
 			display: flex;
 			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-		}
-		.content{
-			@extend .mileage_title;
+			justify-content: space-around;
 			background-color: #fff;
+			margin: 20rpx;
+			padding: 20rpx;
 			border-radius: 15rpx;
+			box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+
+			.summary-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
+				.label {
+					font-size: 24rpx;
+					color: #999;
+					margin-bottom: 10rpx;
+				}
+
+				.value {
+					font-size: 28rpx;
+					color: #333;
+					font-weight: bold;
+				}
+			}
+		}
+
+		.content {
+			margin: 0 20rpx;
+			height: calc(80vh - 200rpx);
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+
+			.trip-list {
+				width: 100%;
+
+				.trip-group {
+					margin-bottom: 30rpx;
+					padding: 20rpx;
+					background-color: #fff;
+					border-radius: 15rpx;
+
+					.group-header {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						align-items: center;
+						padding: 15rpx 0;
+
+						.group-header-title {
+							display: flex;
+							flex-direction: row;
+							justify-content: space-between;
+							align-items: center;
+						}
+
+						.group-date {
+							font-size: 30rpx;
+							color: #333;
+							margin-right: 30rpx;
+						}
+					}
+
+					.group-separator {
+						height: 1rpx;
+						background-color: #eee;
+						margin: 10rpx 0;
+					}
+
+					.trip-item {
+						display: flex;
+						padding: 25rpx 0;
+						border-bottom: 1rpx solid #f5f5f5;
+
+						.trip-index {
+							display: flex;
+							flex-direction: row;
+							justify-content: start;
+							align-items: center;
+							padding-top: 5rpx;
+							margin-bottom: 20rpx;
+
+							.icon {
+								width: 40rpx;
+								height: 40rpx;
+								background-color: #69c2f1;
+								color: #fff;
+								border-radius: 50%;
+								display: flex;
+								justify-content: center;
+								align-items: center;
+								font-size: 24rpx;
+								margin-right: 20rpx;
+							}
+
+							.trip-distance-time {
+								display: flex;
+								flex-direction: row;
+								justify-content: space-between;
+								align-items: center;
+
+								text {
+									font-size: 28rpx;
+									color: #333;
+									margin: 0 10rpx;
+
+									&:first-child {
+										font-weight: bold;
+									}
+								}
+							}
+						}
+
+						.trip-content {
+							flex: 1;
+							.trip-locations {
+								.icons{
+									width: 50rpx;
+									height: 50rpx;
+								}
+								.uv-text__value--main{
+									width: 100%;
+									height: 10vh;
+								}
+							}
+						}
+					}
+
+					.trip-item:last-child {
+						border-bottom: none;
+					}
+				}
+			}
 		}
 	}
 </style>

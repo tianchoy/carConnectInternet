@@ -131,7 +131,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showDateTimePicker.value = true;
     };
     const onConfirm = (value) => {
-      if (currentPickerType.value === "start") {
+      if (currentPickerType.value == "start") {
         startTime.value = value;
       } else {
         endTime.value = value;

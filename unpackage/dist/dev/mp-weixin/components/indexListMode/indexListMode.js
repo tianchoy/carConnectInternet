@@ -16,10 +16,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   setup(__props) {
     const props = __props;
-    const todetail = (companyId, imei) => {
+    const todetail = (companyId, imei, deviceId) => {
       common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:33", companyId);
       common_vendor.index.navigateTo({
-        url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei
+        url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.t(item.imei),
             e: index,
             f: common_vendor.o(($event = null) => {
-              return todetail(item.companyId, item.imei);
+              return todetail(item.companyId, item.imei, item.deviceId);
             }, index)
           });
         })

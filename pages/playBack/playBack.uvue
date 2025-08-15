@@ -218,7 +218,7 @@
 
 	// 确认选择时间
 	const onConfirm = (value : string) => {
-		if (currentPickerType.value === 'start') {
+		if (currentPickerType.value == 'start') {
 			startTime.value = value
 		} else {
 			endTime.value = value

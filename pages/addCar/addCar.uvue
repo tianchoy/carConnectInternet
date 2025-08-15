@@ -22,7 +22,7 @@
 					<car-number-input @numberInputResult="handlePlateNumberChange" :defaultStr="'京A'" />
 				</uv-form-item>
 				<uv-action-sheet ref="deviceTypeSelect" :actions="actions" title="请选择设备类型"
-					@select="deviceTypeSelectsFun">
+					@select="deviceTypeSelectsFun" :loading="actions.length === 0">
 				</uv-action-sheet>
 			</uv-form>
 		</view>
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 	import { ref } from 'vue'
-	import { addDevice } from '../../api/request'
+	import { addDevice, getCarType } from '../../api/request'
 
 	interface FormData {
 		deviceName : string
@@ -53,18 +53,9 @@
 		plateNo: ''
 	})
 
-	const actions = ref([
-		{
-			name: '智能车',
-			value: '1',
-		},
-		{
-			name: '智能车2',
-			value: '2',
-		}
-	])
+	const actions = ref([])
 
-	// 车牌号变更处理
+	// 车牌号
 	const handlePlateNumberChange = (e : string) => {
 		console.log(e)
 		carInfo.value.plateNo = e
@@ -91,11 +82,24 @@
 				trigger: ['blur', 'change']
 			}
 		]
-		// 已移除车牌号验证规则
 	}
 
-	const deviceTypeSelectFun = () => {
-		deviceTypeSelect.value?.open()
+	const deviceTypeSelectFun = async () => {
+		// 如果还没有加载过数据
+		if (actions.value.length === 0) {
+			uni.showLoading({
+				title: '加载中...'
+			})
+			try {
+				await loadCarTypeData()
+			} finally {
+				uni.hideLoading()
+			}
+		}
+		// 确保有数据后再打开选择器
+		if (actions.value.length > 0) {
+			deviceTypeSelect.value?.open()
+		}
 	}
 
 	const deviceTypeSelectsFun = (e) => {
@@ -146,6 +150,33 @@
 				icon: 'none'
 			})
 		})
+	}
+
+	onLoad(() => {
+		loadCarTypeData()
+	})
+
+	const loadCarTypeData = async () => {
+		try {
+			const res = await getCarType()
+			if (res.msg == 'success') {
+				// 转换数据结构，匹配组件需要的格式
+				actions.value = res.data.map(item => ({
+					name: item.typeName,  // 显示的名称
+					value: item.id.toString()  // 实际值
+				}))
+			} else {
+				uni.showToast({
+					title: '获取车辆品牌失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			uni.showToast({
+				title: '请求失败，请重试',
+				icon: 'none'
+			})
+		}
 	}
 </script>
 

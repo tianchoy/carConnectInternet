@@ -4,7 +4,7 @@
 			:isIcon="true" @capsuleClick="addCar">
 		</custom-navBar>
 		<view class="content">
-			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.imei)">
+			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
 				<text>{{item.companyId}}</text>
 				<view class="device-info">
 					<text>{{item.plateNo}}</text>
@@ -36,9 +36,9 @@
 		console.log(res.data)
 	}
 	
-	const carDetail = (imei:string) => {
+	const carDetail = (deviceId:string) => {
 		uni.navigateTo({
-			url:'/pages/userCenter/carDetail/carDetail?imei='+imei
+			url:'/pages/userCenter/carDetail/carDetail?deviceId='+deviceId
 		})
 	}
 </script>

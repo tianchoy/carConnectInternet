@@ -40,9 +40,9 @@
 </template>
 
 <script setup lang="uts">
-	import { getUserDeviceList, editDeviceInfo } from '../../../api/request.uts'
+	import { getDeviceDetail, editDeviceInfo } from '../../../api/request.uts'
 
-	const Imei = ref<string | null>('')
+	const deviceId = ref<string>('')
 	const carList = ref<UTSJSONObject>({})
 	const isEditing = ref(false)
 	const carInfo = ref<UTSJSONObject>({})
@@ -88,24 +88,27 @@
 	}
 
 	onLoad((option) => {
-		Imei.value = option.imei
-		loadCarListData()
+		console.log('option',option)
+	    if (option.deviceId != null) {
+	        deviceId.value = option.deviceId
+	        loadCarListData()
+	    } else {
+	        // 处理 deviceId 为 null 的情况
+	        console.error('deviceId is null')
+	    }
 	})
 
 	const loadCarListData = async () => {
-		const res = await getUserDeviceList({})
-		res.data.list.forEach(item => {
-			if (item.imei == Imei.value) {
-				carInfo.value = {
-					deviceId: item.deviceId,
-					carType: item.carType,
-					plateNo: item.plateNo || item.licensePlate || '',
-					carVin: item.carVin,
-					engineNum: item.engineNum
-				}
-				console.log('当前车辆数据:', JSON.stringify(carInfo.value)) // 调试用
-			}
-		})
+		const res = await getDeviceDetail(deviceId.value)
+		
+		if(res.msg=='success'){
+			carInfo.value = res.data
+		}else{
+			uni.showToast({
+				title:'获取车辆详情失败'
+			})
+		}
+		
 	}
 </script>
 

@@ -16,7 +16,7 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carDetail",
   setup(__props) {
-    const Imei = common_vendor.ref("");
+    const deviceId = common_vendor.ref("");
     common_vendor.ref(new UTSJSONObject({}));
     const isEditing = common_vendor.ref(false);
     const carInfo = common_vendor.ref(new UTSJSONObject({}));
@@ -53,24 +53,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      Imei.value = option.imei;
-      loadCarListData();
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:91", "option", option);
+      if (option.deviceId != null) {
+        deviceId.value = option.deviceId;
+        loadCarListData();
+      } else {
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:97", "deviceId is null");
+      }
     });
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.getUserDeviceList({});
-        res.data.list.forEach((item = null) => {
-          if (item.imei == Imei.value) {
-            carInfo.value = new UTSJSONObject({
-              deviceId: item.deviceId,
-              carType: item.carType,
-              plateNo: item.plateNo || item.licensePlate || "",
-              carVin: item.carVin,
-              engineNum: item.engineNum
-            });
-            common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:106", "当前车辆数据:", UTS.JSON.stringify(carInfo.value));
-          }
-        });
+        const res = yield api_request.getDeviceDetail(deviceId.value);
+        if (res.msg == "success") {
+          carInfo.value = res.data;
+        } else {
+          common_vendor.index.showToast({
+            title: "获取车辆详情失败"
+          });
+        }
       });
     };
     return (_ctx = null, _cache = null) => {

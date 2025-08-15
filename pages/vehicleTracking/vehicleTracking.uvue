@@ -111,8 +111,7 @@
 		// 进入页面立即加载车辆位置
 		loadInitialPosition()
 	})
-
-	// 新增方法：加载初始位置
+	
 	const loadInitialPosition = async () => {
 		uni.showLoading({
 			title: '获取车辆位置中...'

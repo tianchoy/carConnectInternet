@@ -54,14 +54,40 @@
   padding: 0 10rpx;
 }
 .container .mileage_title, .container .content {
-  margin: 20rpx 40rpx;
+  margin: 20rpx 40rpx 0;
   padding: 20rpx;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
+.container .content-box {
+  height: 80%;
+  overflow-y: scroll;
+}
 .container .content {
   background-color: #fff;
   border-radius: 15rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+}
+.container .content .item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 15rpx 0;
+}
+.container .content .item .icons {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 15rpx;
+}
+.container .content .item text {
+  flex: 1;
+  font-size: 25rpx;
+  word-break: break-all;
+  flex-wrap: wrap;
 }

@@ -29,9 +29,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:36", res.data);
       });
     };
-    const carDetail = (imei) => {
+    const carDetail = (deviceId) => {
       common_vendor.index.navigateTo({
-        url: "/pages/userCenter/carDetail/carDetail?imei=" + imei
+        url: "/pages/userCenter/carDetail/carDetail?deviceId=" + deviceId
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -52,7 +52,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             c: common_vendor.t(item.imei),
             d: index,
             e: common_vendor.o(($event = null) => {
-              return carDetail(item.imei);
+              return carDetail(item.deviceId);
             }, index)
           };
         }),

@@ -1,7 +1,7 @@
 <template>
 	<view class="list-container">
 		<view class="content" v-if="props.lists.length != 0">
-			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei)">
+			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
 				<view class="title">
 					<text class="car-number">{{item.plateNo}}</text>
 					<uv-tags :text="item.status == 1 ? '在线' : '离线'" :type="item.status== 1 ? 'success' : 'error'"></uv-tags>
@@ -29,10 +29,10 @@
 		lists : DeviceItem[]
 	}>()
 
-	const todetail = (companyId:string,imei:string) => {
+	const todetail = (companyId:string,imei:string,deviceId:string) => {
 		console.log(companyId)
 		uni.navigateTo({
-			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei
+			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei + '&deviceId=' + deviceId
 		})
 	}
 </script>

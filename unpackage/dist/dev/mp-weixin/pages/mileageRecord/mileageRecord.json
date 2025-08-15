@@ -4,6 +4,11 @@
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
     "l-date-time-picker": "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker",
-    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup"
+    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup",
+    "uv-loading-icon": "../../uni_modules/uv-loading-icon/components/uv-loading-icon/uv-loading-icon",
+    "uv-empty": "../../uni_modules/uv-empty/components/uv-empty/uv-empty",
+    "uv-tags": "../../uni_modules/uv-tags/components/uv-tags/uv-tags",
+    "uv-steps-item": "../../uni_modules/uv-steps/components/uv-steps-item/uv-steps-item",
+    "uv-steps": "../../uni_modules/uv-steps/components/uv-steps/uv-steps"
   }
 }

@@ -19,20 +19,37 @@
 				</l-date-time-picker>
 			</l-popup>
 		</view>
-		<view class="mileage_title">
+		<!-- <view class="mileage_title">
 			<text>设备名称</text>
-			<text>里程0Km</text>
-		</view>
-		<view class="content">
-			
+		</view> -->
+		<view class="content-box">
+			<uv-empty v-if="carStopDetail.length === 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
+			<view class="content" v-else v-for="(item,index) in carStopDetail" :key="index">
+				<view class="item">
+					<image class="icons" mode="aspectFit" src="/static/startTime.png" />
+					<text>{{item.startTime}}</text>
+				</view>
+				<view class="item">
+					<image class="icons" mode="aspectFit" src="/static/endTime.png" />
+					<text>{{item.endTime}}</text>
+				</view>
+				<view class="item">
+					<image class="icons" mode="aspectFit" src="/static/stopTime.png" />
+					<text>停留 {{calculateDuration(item.startTime, item.endTime)}}</text>
+				</view>
+				<view class="item">
+					<image class="icons" mode="aspectFit" src="/static/user_location.png" />
+					<text class="address">{{item.address || '加载中...'}}</text>
+				</view>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, reactive, onMounted } from 'vue'
-	import {getTrackPos} from '../../api/request.uts'
-
+	import { getTrackPos } from '../../api/request.uts'
+	import { getAddress } from '../../utils/getAdress.uts'
 
 	const carStatus = ref('在线')
 
@@ -44,6 +61,7 @@
 	const startTime = ref('')
 	const endTime = ref('')
 	const imei = ref<string | null>('')
+	const carStopDetail = ref({})
 
 
 	// 初始化加载
@@ -51,11 +69,11 @@
 		initDateTime()
 		loadStopData()
 	})
-	
-	onLoad((option)=>{
+
+	onLoad((option) => {
 		imei.value = option.imei
 	})
-	
+
 	const loadStopData = async () => {
 		const data = {
 			imei: imei.value,
@@ -67,7 +85,17 @@
 			withTrip: false,
 		}
 		const res = await getTrackPos(data)
-		
+
+		console.log(res.data.stops)
+		const stopsWithAddress = await Promise.all(res.data.stops.map(async (stop) => {
+			const address = await getAddress(stop.latitude, stop.longitude)
+			return {
+				...stop,
+				address: address.result.formatted_address
+			}
+		}))
+
+		carStopDetail.value = stopsWithAddress
 		console.log(res)
 	}
 
@@ -98,11 +126,24 @@
 		} else {
 			endTime.value = value
 		}
+		loadStopData()
 		showDateTimePicker.value = false
 	}
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
+	}
+
+	const calculateDuration = (start : string, end : string) : string => {
+		const startDate = new Date(start)
+		const endDate = new Date(end)
+		const diff = endDate.getTime() - startDate.getTime() // difference in milliseconds
+
+		const hours = Math.floor(diff / (1000 * 60 * 60))
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+		return `${hours}小时${minutes}分${seconds}秒`
 	}
 </script>
 
@@ -138,18 +179,50 @@
 				}
 			}
 		}
-		.mileage_title{
-			margin: 20rpx 40rpx;
+
+		.mileage_title {
+			margin: 20rpx 40rpx 0;
 			padding: 20rpx;
 			display: flex;
 			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
 		}
-		.content{
+		
+		.content-box{
+			height: 80%;
+			overflow-y: scroll;
+		}
+
+		.content {
 			@extend .mileage_title;
 			background-color: #fff;
 			border-radius: 15rpx;
+			margin-bottom: 20rpx;
+			display: flex;
+			flex-direction: column;
+			justify-content: start;
+			align-items: start;
+
+			.item {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding: 15rpx 0;
+
+				.icons {
+					width: 40rpx;
+					height: 40rpx;
+					margin-right: 15rpx;
+				}
+
+				text {
+					flex: 1;
+					font-size: 25rpx;
+					word-break: break-all;
+					flex-wrap: wrap;
+				}
+			}
 		}
 	}
 </style>

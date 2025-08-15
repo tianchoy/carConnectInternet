@@ -103,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             connectionStatus.value = deviceData.connectionStatus || "unknown";
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:163", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:162", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -140,7 +140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             setMarkers(deviceData.direction);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:204", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:203", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
@@ -261,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         borderColor: "#ffffff",
         borderWidth: 2
       })];
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:356", "绘制临时路线:", UTS.JSON.stringify(polylines.value));
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:355", "绘制临时路线:", UTS.JSON.stringify(polylines.value));
     };
     const getRealRoute = () => {
       if (trackPoints.value.length < 2) {
@@ -299,7 +299,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:398", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:397", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {
@@ -385,7 +385,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleRegionChange = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:494", "地图区域变化:", e);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:493", "地图区域变化:", e);
     };
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
