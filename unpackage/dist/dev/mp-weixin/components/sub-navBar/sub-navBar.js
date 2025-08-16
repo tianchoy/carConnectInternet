@@ -16,6 +16,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       type: Boolean,
       default: true
     },
+    showCar: {
+      type: Boolean,
+      default: false
+    },
     currentTime: {
       type: String,
       default: ""
@@ -56,6 +60,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentPickerType.value = "time";
       (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.open();
     };
+    const handleCar = () => {
+      var _a2;
+      columns.value = props.cars;
+      currentPickerType.value = "car";
+      (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.open();
+    };
     const confirm = (e) => {
       const selected = e.value[0];
       if (currentPickerType.value === "time") {
@@ -74,13 +84,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_assets._imports_0$6,
         d: common_vendor.o(handleTime)
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        e: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
-        f: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
-        g: common_vendor.sr(picker, "f630fc82-0", new UTSJSONObject({
+        e: __props.showCar
+      }), __props.showCar ? new UTSJSONObject({
+        f: common_vendor.t(__props.currentCar),
+        g: common_vendor.o(handleCar)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
+        i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
+        j: common_vendor.sr(picker, "f630fc82-0", new UTSJSONObject({
           "k": "picker"
         })),
-        h: common_vendor.o(confirm),
-        i: common_vendor.p(new UTSJSONObject({
+        k: common_vendor.o(confirm),
+        l: common_vendor.p(new UTSJSONObject({
           columns: common_vendor.unref(columns),
           keyName: "label"
         }))

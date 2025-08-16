@@ -31,8 +31,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             a: common_vendor.t(item.plateNo),
             b: "245c735a-0-" + i0,
             c: common_vendor.p(new UTSJSONObject({
-              text: item.status == 1 ? "在线" : "离线",
-              type: item.status == 1 ? "success" : "error"
+              text: item.connectionStatus == "online" ? "在线" : "离线",
+              type: item.connectionStatus == "online" ? "success" : "error"
             })),
             d: common_vendor.t(item.imei),
             e: index,

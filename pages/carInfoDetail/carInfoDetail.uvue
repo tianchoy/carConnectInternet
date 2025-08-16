@@ -6,9 +6,8 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
 				<sub-navBar :currentTime="currentTime" :showTime="true"
-					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCar" :times="times"
-					:cars="cars" @update:current-car="(val) => (currentCar = val)"
-					:carStatus="datainfo.connectionStatus"></sub-navBar>
+					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo" :times="times"
+					:carStatus="datainfo.connectionStatus" :showCar="true"></sub-navBar>
 			</map>
 			<view class="navTo" @click="navTo">
 				<image src="/static/navto.png" mode="aspectFit"></image>
@@ -35,7 +34,7 @@
 
 <script setup lang="uts">
 	import amapFile from '../../utils/amap-wx.130'
-	import { getDevicePos, getUserDeviceList } from '../../api/request.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 
 	const deptId = ref<string | null>('')
@@ -59,8 +58,8 @@
 			{ label: '停止刷新', value: '0' }
 		]
 	])
-	const refreshTimer = ref<number | null>(null) 
-	const isRefreshing = ref(false) 
+	const refreshTimer = ref<number | null>(null)
+	const isRefreshing = ref(false)
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
@@ -81,57 +80,48 @@
 	})
 
 	const currentToolItem = ref(0)
-	const currentCar = ref('京A12345')
+	const currentCarInfo = ref<UTSJSONObject>({})
 
-	const cars = ref([
-		[
-			{ label: '京A12345', value: '12345' },
-			{ label: '京A12346', value: '12346' },
-			{ label: '京A12347', value: '12347' }
-		]
-	])
-	
 	watch(currentTime, (newVal) => {
-	  console.log("时间变化:", newVal);
-	  setupAutoRefresh(newVal); // 当时间间隔变化时，重新设置自动刷新
+		setupAutoRefresh(newVal); // 当时间间隔变化时，重新设置自动刷新
 	});
-	
-	// 添加自动刷新设置方法
+
 	const setupAutoRefresh = (intervalValue : string) => {
-	  // 清除现有的定时器
-	  if (refreshTimer.value !== null) {
-	    clearInterval(refreshTimer.value)
-	    refreshTimer.value = null
-	    isRefreshing.value = false
-	  }
-	  
-	  // 如果选择"停止刷新"(值为'0')，则直接返回
-	  if (intervalValue == '0') {
-	    return
-	  }
-	  
-	  // 将字符串值转换为数字(秒)
-	  const intervalSeconds = parseInt(intervalValue)
-	  
-	  if (intervalSeconds > 0) {
-	    isRefreshing.value = true
-	    // 将秒转换为毫秒
-	    const intervalMs = intervalSeconds * 1000
-	    
-	    // 立即加载一次数据
-	    loadData({
-	      deptId: deptId.value,
-	      deviceids: imei.value
-	    })
-	    
-	    // 设置定时器
-	    refreshTimer.value = setInterval(() => {
-	      loadData({
-	        deptId: deptId.value,
-	        deviceids: imei.value
-	      })
-	    }, intervalMs) as unknown as number
-	  }
+		// 清除现有的定时器
+		if (refreshTimer.value !== null) {
+			clearInterval(refreshTimer.value)
+			refreshTimer.value = null
+			isRefreshing.value = false
+		}
+
+		// 如果选择"停止刷新"(值为'0')，则直接返回
+		if (intervalValue == '0') {
+			isRefreshing.value = false
+			return
+		}
+
+		// 将字符串值转换为数字(秒)
+		const intervalSeconds = parseInt(intervalValue)
+
+		if (intervalSeconds > 0) {
+			isRefreshing.value = true
+			// 将秒转换为毫秒
+			const intervalMs = intervalSeconds * 1000
+
+			// 立即加载一次数据
+			loadData({
+				deptId: deptId.value,
+				deviceids: imei.value
+			})
+
+			// 设置定时器
+			refreshTimer.value = setInterval(() => {
+				loadData({
+					deptId: deptId.value,
+					deviceids: imei.value
+				})
+			}, intervalMs) as unknown as number
+		}
 	}
 
 	const baseList = ref([{
@@ -153,31 +143,26 @@
 		// }
 	])
 
-	// 监听 currentCar 变化
-	// watch(currentCar, (newVal) => {
-	// 	console.log("车辆变化:", newVal);
-	// });
-
 	const click = (name) => {
 		currentToolItem.value = name
 		if (name == 0) {
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' +currentCarInfo.value.plateNo
 			})
 		}
 		if (name == 1) {
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' +currentCarInfo.value.plateNo
 			})
 		}
 		if (name == 2) {
 			uni.navigateTo({
-				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus
+				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value
 			})
 		}
 		if (name == 3) {
 			uni.navigateTo({
-				url: '/pages/stopRecord/stopRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus
+				url: '/pages/stopRecord/stopRecord?imei=' + imei.value 
 			})
 		}
 	}
@@ -214,6 +199,8 @@
 
 	const loadData = async (data : object) => {
 		const res = await getDevicePos(data)
+		
+		console.log('loadData',res)
 
 		res.data.forEach(async item => {
 			if (item.imei == imei.value) {
@@ -222,7 +209,6 @@
 				center.longitude = item.longitude
 				console.log(item)
 				const addr = await getAddress(item.latitude, item.longitude);
-				console.log('Address:', addr);
 				address.value = addr.result.formatted_address;
 
 				const deviceMarker = createMarker(
@@ -254,8 +240,19 @@
 			deviceids: imei.value
 		}
 		loadData(data)
-		setupAutoRefresh(currentTime.value)
+		loadDeviceDetail()
+		// setupAutoRefresh(currentTime.value)
 	})
+
+	const loadDeviceDetail = async () => {
+		if (deviceId.value !== null) {
+			const res = await getDeviceDetail(deviceId.value)
+			console.log(res.data)
+			currentCarInfo.value = res.data
+		} else {
+			console.error("设备id获取失败")
+		}
+	}
 
 	//封装markers
 	const createMarker = (id : number, lat : number, lng : number, type : string, title ?: string) => {
@@ -266,18 +263,18 @@
 			width: 30,
 			height: 30,
 			callout: {
-				content: title || (type === 'device' ? '设备位置' : '我的位置'),
+				content: title || (type == 'device' ? '设备位置' : '我的位置'),
 				color: '#ffffff',
 				fontSize: 14,
 				borderRadius: 10,
-				bgColor: type === 'device' ? '#07C160' : '#007AFF',
+				bgColor: type == 'device' ? '#07C160' : '#007AFF',
 				padding: 5,
 				display: 'ALWAYS'
 			}
 		}
 
 		// 设置不同图标
-		if (type === 'device') {
+		if (type == 'device') {
 			marker.iconPath = '/static/car.png'
 		} else {
 			marker.iconPath = '/static/marker.png'
@@ -285,11 +282,17 @@
 
 		return marker
 	}
-	
+
+	// 新增页面隐藏时的处理
+	onHide(() => {
+		clearInterval(refreshTimer.value)
+		refreshTimer.value = null
+		isRefreshing.value = false
+	})
+
 	onUnmounted(() => {
-	  if (refreshTimer.value !== null) {
-	    clearInterval(refreshTimer.value)
-	  }
+		clearInterval(refreshTimer.value)
+		refreshTimer.value = null
 	})
 </script>
 
@@ -393,7 +396,7 @@
 		.tools-panel {
 			width: 100%;
 			background-color: #fff;
-			padding-bottom: 50rpx;
+			padding-bottom: 70rpx;
 
 			.Imei-box {
 				padding: 20rpx 30rpx 0;

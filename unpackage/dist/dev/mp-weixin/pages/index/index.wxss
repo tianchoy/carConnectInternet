@@ -86,13 +86,13 @@
   color: #fff;
 }
 .container .right-bar .allCar {
-  background: rgba(67, 181, 241, 0.8);
+  background-color: #1296db;
 }
 .container .right-bar .onlineCar {
-  background: rgba(113, 239, 168, 0.8);
+  background-color: #0da117;
 }
 .container .right-bar .offlineCar {
-  background: #848383;
+  background-color: #d81e06;
 }
 .container .left-bar,
 .container .left-bar-state {

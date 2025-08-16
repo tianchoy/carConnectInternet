@@ -47,8 +47,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         c: common_vendor.f(common_vendor.unref(carList), (item = null, index = null, i0 = null) => {
           return {
-            a: common_vendor.t(item.companyId),
-            b: common_vendor.t(item.plateNo),
+            a: common_vendor.t(item.plateNo),
+            b: common_vendor.t(item.companyId),
             c: common_vendor.t(item.imei),
             d: index,
             e: common_vendor.o(($event = null) => {

@@ -6,12 +6,12 @@
 		</cover-view>
 		<cover-view class="slot" v-else></cover-view>
 		<cover-view class="car-box">
-			<!-- <cover-view class="selectCar" @click="handleCar">
-				<cover-view>{{ currentCar }}</cover-view>
-				<cover-image class="down_icon" src="/static/down_icon.png"></cover-image>
-			</cover-view> -->
+			<cover-view class="selectCar" @click="handleCar" v-if="showCar">
+				<cover-view class="plateNo">{{ currentCar }}</cover-view>
+				<!-- <cover-image class="down_icon" src="/static/down_icon.png"></cover-image> -->
+			</cover-view>
 			<cover-view class="car-state" :class="carStatus == 'online' ? 'success' : 'error'">
-				<cover-view>{{carStatus == 'online' ? '在线' : '离线'}}</cover-view>
+				<cover-view class="state">{{carStatus == 'online' ? '在线' : '离线'}}</cover-view>
 			</cover-view>
 		</cover-view>
 	</cover-view>
@@ -24,6 +24,10 @@
 		showTime: {
 			type: Boolean,
 			default: true,
+		},
+		showCar: {
+			type: Boolean,
+			default: false,
 		},
 		currentTime: {
 			type: String,
@@ -105,14 +109,22 @@
 				background-color: rgba(3, 109, 246, 0.71);
 				padding: 10rpx;
 				border-radius: 10rpx;
+
+				.plateNo {
+					font-size: 25rpx;
+				}
 			}
 
 			.car-state {
-			  @extend .tools-box;
-			  border-radius: 10rpx;
-			  color: #fff;
-			  padding: 10rpx 15rpx;
-			  font-size: 25rpx;
+				@extend .tools-box;
+				border-radius: 10rpx;
+				color: #fff;
+				padding: 10rpx 15rpx;
+				font-size: 25rpx;
+
+				.state {
+					font-size: 25rpx;
+				}
 			}
 
 			.success {
@@ -138,8 +150,8 @@
 		}
 
 		.down_icon {
-			width: 32rpx;
-			height: 32rpx;
+			width: 30rpx;
+			height: 30rpx;
 		}
 	}
 </style>

@@ -5,9 +5,9 @@
 		</custom-navBar>
 		<view class="content">
 			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
-				<text>{{item.companyId}}</text>
+				<text class="title">{{item.plateNo}}</text>
 				<view class="device-info">
-					<text>{{item.plateNo}}</text>
+					<text>{{item.companyId}}</text>
 					<text class="tel">{{item.imei}}</text>
 				</view>
 			</view>
@@ -55,6 +55,9 @@
 				padding: 30rpx 40rpx;
 				margin-bottom: 30rpx;
 				font-size: 25rpx;
+				.title{
+					font-weight: bold;
+				}
 				.device-info{
 					display: flex;
 					flex-direction: row;

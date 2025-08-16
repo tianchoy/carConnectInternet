@@ -59,16 +59,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       address: ""
     }));
     const currentToolItem = common_vendor.ref(0);
-    const currentCar = common_vendor.ref("京A12345");
-    const cars = common_vendor.ref([
-      [
-        new UTSJSONObject({ label: "京A12345", value: "12345" }),
-        new UTSJSONObject({ label: "京A12346", value: "12346" }),
-        new UTSJSONObject({ label: "京A12347", value: "12347" })
-      ]
-    ]);
+    const currentCarInfo = common_vendor.ref(new UTSJSONObject({}));
     common_vendor.watch(currentTime, (newVal) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:95", "时间变化:", newVal);
       setupAutoRefresh(newVal);
     });
     const setupAutoRefresh = (intervalValue) => {
@@ -78,6 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isRefreshing.value = false;
       }
       if (intervalValue == "0") {
+        isRefreshing.value = false;
         return null;
       }
       const intervalSeconds = parseInt(intervalValue);
@@ -122,22 +115,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentToolItem.value = name;
       if (name == 0) {
         common_vendor.index.navigateTo({
-          url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus
+          url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
         });
       }
       if (name == 1) {
         common_vendor.index.navigateTo({
-          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus
+          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
         });
       }
       if (name == 2) {
         common_vendor.index.navigateTo({
-          url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus
+          url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value
         });
       }
       if (name == 3) {
         common_vendor.index.navigateTo({
-          url: "/pages/stopRecord/stopRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus
+          url: "/pages/stopRecord/stopRecord?imei=" + imei.value
         });
       }
     };
@@ -147,7 +140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:192", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:177", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -164,22 +157,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:210", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:195", "调起地图失败:", err);
         }
       });
     };
     const loadData = (data) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getDevicePos(data);
+        common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:203", "loadData", res);
         res.data.forEach((item = null) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             if (item.imei == imei.value) {
               datainfo.value = item;
               center.latitude = item.latitude;
               center.longitude = item.longitude;
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:223", item);
+              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:210", item);
               const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:225", "Address:", addr);
               address.value = addr.result.formatted_address;
               const deviceMarker = createMarker(
                 1,
@@ -196,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:248", "ssss", option);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:234", "ssss", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
       deviceId.value = option.deviceId;
@@ -205,8 +198,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceids: imei.value
       });
       loadData(data);
-      setupAutoRefresh(currentTime.value);
+      loadDeviceDetail();
     });
+    const loadDeviceDetail = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (deviceId.value !== null) {
+          const res = yield api_request.getDeviceDetail(deviceId.value);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:250", res.data);
+          currentCarInfo.value = res.data;
+        } else {
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:253", "设备id获取失败");
+        }
+      });
+    };
     const createMarker = (id, lat, lng, type, title = null) => {
       const marker = new UTSJSONObject(
         {
@@ -216,28 +220,32 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: 30,
           height: 30,
           callout: new UTSJSONObject({
-            content: title || (type === "device" ? "设备位置" : "我的位置"),
+            content: title || (type == "device" ? "设备位置" : "我的位置"),
             color: "#ffffff",
             fontSize: 14,
             borderRadius: 10,
-            bgColor: type === "device" ? "#07C160" : "#007AFF",
+            bgColor: type == "device" ? "#07C160" : "#007AFF",
             padding: 5,
             display: "ALWAYS"
           })
         }
         // 设置不同图标
       );
-      if (type === "device") {
+      if (type == "device") {
         marker.iconPath = "/static/car.png";
       } else {
         marker.iconPath = "/static/marker.png";
       }
       return marker;
     };
+    common_vendor.onHide(() => {
+      clearInterval(refreshTimer.value);
+      refreshTimer.value = null;
+      isRefreshing.value = false;
+    });
     common_vendor.onUnmounted(() => {
-      if (refreshTimer.value !== null) {
-        clearInterval(refreshTimer.value);
-      }
+      clearInterval(refreshTimer.value);
+      refreshTimer.value = null;
     });
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
@@ -251,33 +259,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.o((val = null) => {
           return currentTime.value = val;
         }),
-        c: common_vendor.o((val = null) => {
-          return currentCar.value = val;
-        }),
-        d: common_vendor.p({
+        c: common_vendor.p({
           currentTime: common_vendor.unref(currentTime),
           showTime: true,
-          currentCar: common_vendor.unref(currentCar),
+          currentCar: common_vendor.unref(currentCarInfo).plateNo,
           times: common_vendor.unref(times),
-          cars: common_vendor.unref(cars),
-          carStatus: common_vendor.unref(datainfo).connectionStatus
+          carStatus: common_vendor.unref(datainfo).connectionStatus,
+          showCar: true
         }),
-        e: common_vendor.sei("myMap", "map"),
-        f: common_vendor.unref(center).latitude,
-        g: common_vendor.unref(center).longitude,
-        h: common_vendor.unref(markers),
-        i: common_vendor.unref(mapScale),
-        j: common_assets._imports_0$2,
-        k: common_vendor.o(navTo),
-        l: common_vendor.t(common_vendor.unref(imei)),
-        m: common_vendor.p({
+        d: common_vendor.sei("myMap", "map"),
+        e: common_vendor.unref(center).latitude,
+        f: common_vendor.unref(center).longitude,
+        g: common_vendor.unref(markers),
+        h: common_vendor.unref(mapScale),
+        i: common_assets._imports_0$2,
+        j: common_vendor.o(navTo),
+        k: common_vendor.t(common_vendor.unref(imei)),
+        l: common_vendor.p({
           name: "arrow-right",
           bold: true,
           size: 25
         }),
-        n: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
-        o: common_vendor.o(carDetail),
-        p: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
+        m: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
+        n: common_vendor.o(carDetail),
+        o: common_vendor.f(common_vendor.unref(baseList), (item = null, index = null, i0 = null) => {
           return {
             a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p({
@@ -292,11 +297,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           };
         }),
-        q: common_vendor.o(click),
-        r: common_vendor.p({
+        p: common_vendor.o(click),
+        q: common_vendor.p({
           col: 4
         }),
-        s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

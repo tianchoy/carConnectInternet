@@ -39,6 +39,9 @@
   margin-bottom: 30rpx;
   font-size: 25rpx;
 }
+.container .content .list .title.data-v-4d1d23ef {
+  font-weight: bold;
+}
 .container .content .list .device-info.data-v-4d1d23ef {
   display: flex;
   flex-direction: row;

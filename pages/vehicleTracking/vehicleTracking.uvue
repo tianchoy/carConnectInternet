@@ -6,9 +6,8 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
 				@regionchange="handleRegionChange">
-				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" :cars="cars"
-					@update:current-time="(val) => (currentTime = val)"
-					@update:current-car="(val) => (currentCar = val)" :carStatus='connectionStatus'></sub-navBar>
+				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" showCar="true"
+					@update:current-time="(val) => (currentTime = val)" :carStatus='connectionStatus'></sub-navBar>
 			</map>
 		</view>
 
@@ -72,7 +71,7 @@
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
 	const currentTime = ref('10s')
-	const currentCar = ref('京A12345')
+	const currentCar = ref<string | null>('京A12345')
 
 	const times = ref([
 		[
@@ -83,35 +82,21 @@
 		]
 	])
 
-	const cars = ref([
-		[
-			{ label: '京A12345', value: '12345' },
-			{ label: '京A12346', value: '12346' },
-			{ label: '京A12347', value: '12347' }
-		]
-	])
-
 	// 监听 currentTime 变化
 	watch(currentTime, (newVal) => {
 		console.log("时间变化:", newVal);
 	});
-
-	// 监听 currentCar 变化
-	watch(currentCar, (newVal) => {
-		console.log("车辆变化:", newVal);
-	});
-
 
 	// 在script部分修改以下内容
 
 	onLoad((option) => {
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
-
+		currentCar.value = option.plateNo
 		// 进入页面立即加载车辆位置
 		loadInitialPosition()
 	})
-	
+
 	const loadInitialPosition = async () => {
 		uni.showLoading({
 			title: '获取车辆位置中...'
@@ -492,6 +477,13 @@
 	const handleRegionChange = (e : any) => {
 		console.log('地图区域变化:', e)
 	}
+
+	onUnmounted(() => {
+		if (trackingInterval.value) {
+			clearInterval(trackingInterval.value)
+			trackingInterval.value = null
+		}
+	})
 </script>
 
 <style lang="scss">

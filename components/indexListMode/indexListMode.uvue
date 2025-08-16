@@ -4,7 +4,7 @@
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
 				<view class="title">
 					<text class="car-number">{{item.plateNo}}</text>
-					<uv-tags :text="item.status == 1 ? '在线' : '离线'" :type="item.status== 1 ? 'success' : 'error'"></uv-tags>
+					<uv-tags :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></uv-tags>
 				</view>
 				<view class="imei">
 					<text>IMEI {{item.imei}}</text>
