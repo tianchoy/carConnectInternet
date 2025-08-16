@@ -20,6 +20,35 @@ const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/
 if (!Math) {
   (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
 }
+class polyData extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          points: { type: "Unknown", optional: false },
+          color: { type: String, optional: false },
+          width: { type: Number, optional: false },
+          arrowLine: { type: Boolean, optional: false },
+          borderColor: { type: String, optional: false },
+          borderWidth: { type: Number, optional: false }
+        };
+      },
+      name: "polyData"
+    };
+  }
+  constructor(options, metadata = polyData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.points = this.__props__.points;
+    this.color = this.__props__.color;
+    this.width = this.__props__.width;
+    this.arrowLine = this.__props__.arrowLine;
+    this.borderColor = this.__props__.borderColor;
+    this.borderWidth = this.__props__.borderWidth;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
   setup(__props) {
@@ -41,9 +70,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const totalDistance = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentTime = common_vendor.ref("");
-    const playbackInterval = common_vendor.ref(null);
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
+    let playbackTimer = null;
+    let lastTimestamp = 0;
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
     const markers = common_vendor.ref([]);
@@ -58,10 +88,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (!isNaN(isoDate.getTime())) {
           return isoDate.getTime();
         }
-        const parts = dateStr.split(/[- :/]/);
-        if (parts.length >= 6) {
-          return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), parseInt(parts[3]), parseInt(parts[4]), parseInt(parts[5])).getTime();
-        }
         return 0;
       }
       return date.getTime();
@@ -71,8 +97,254 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return "";
       return dateStr.replace(/\//g, "-");
     }
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+      const degToRad = (d) => {
+        return d * Math.PI / 180;
+      };
+      const radToDeg = (r) => {
+        return r * 180 / Math.PI;
+      };
+      const φ1 = degToRad(lat1);
+      const φ2 = degToRad(lat2);
+      const Δλ = degToRad(lng2 - lng1);
+      const y = Math.sin(Δλ) * Math.cos(φ2);
+      const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+      const θ = Math.atan2(y, x);
+      return (radToDeg(θ) + 360) % 360;
+    }
+    function getDistance(lat1, lng1, lat2, lng2) {
+      const rad = (d) => {
+        return d * Math.PI / 180;
+      };
+      const radLat1 = rad(lat1);
+      const radLat2 = rad(lat2);
+      const a = radLat1 - radLat2;
+      const b = rad(lng1) - rad(lng2);
+      const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+      return s * 6378.137 * 1e3;
+    }
+    function calculateTrackBounds() {
+      if (trackPoints.value.length === 0)
+        return null;
+      let minLat = trackPoints.value[0].latitude;
+      let maxLat = trackPoints.value[0].latitude;
+      let minLng = trackPoints.value[0].longitude;
+      let maxLng = trackPoints.value[0].longitude;
+      trackPoints.value.forEach((point = null) => {
+        minLat = Math.min(minLat, point.latitude);
+        maxLat = Math.max(maxLat, point.latitude);
+        minLng = Math.min(minLng, point.longitude);
+        maxLng = Math.max(maxLng, point.longitude);
+      });
+      return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
+    }
+    function adjustMapToFitTrack() {
+      const bounds = calculateTrackBounds();
+      if (!bounds)
+        return null;
+      center.latitude = (bounds.minLat + bounds.maxLat) / 2;
+      center.longitude = (bounds.minLng + bounds.maxLng) / 2;
+      const latDiff = bounds.maxLat - bounds.minLat;
+      const lngDiff = bounds.maxLng - bounds.minLng;
+      const maxDiff = Math.max(latDiff, lngDiff);
+      if (maxDiff > 0.1)
+        mapScale.value = 11;
+      else if (maxDiff > 0.05)
+        mapScale.value = 12;
+      else if (maxDiff > 0.02)
+        mapScale.value = 13;
+      else
+        mapScale.value = 14;
+    }
+    function calculateTrackDistance() {
+      totalDistance.value = 0;
+      for (let i = 1; i < trackPoints.value.length; i++) {
+        totalDistance.value += getDistance(trackPoints.value[i - 1].latitude, trackPoints.value[i - 1].longitude, trackPoints.value[i].latitude, trackPoints.value[i].longitude);
+      }
+    }
+    function initDateTime() {
+      const now = /* @__PURE__ */ new Date();
+      const formatTime = (date) => {
+        return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+      };
+      endTime.value = formatTime(now);
+      const startDate = new Date(now.getTime() - 36e5);
+      startTime.value = formatTime(startDate);
+    }
+    function initCarMarker() {
+      if (trackPoints.value.length > 0) {
+        carMarker.value = new UTSJSONObject({
+          id: 999,
+          latitude: trackPoints.value[0].latitude,
+          longitude: trackPoints.value[0].longitude,
+          iconPath: "/static/car.png",
+          width: 32,
+          height: 32,
+          rotate: trackPoints.value[0].rotation || 0,
+          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          callout: new UTSJSONObject({
+            content: "起点",
+            borderRadius: 5,
+            padding: 5,
+            display: "ALWAYS"
+          })
+        });
+        markers.value = [carMarker.value];
+      }
+    }
+    function updatePolyline() {
+      if (!trackPoints.value || trackPoints.value.length < 2) {
+        polyline.value = [];
+        return null;
+      }
+      const newPolyline = [];
+      if (currentIndex.value > 0) {
+        const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
+        if (playedPoints.length >= 2) {
+          newPolyline.push(new UTSJSONObject({
+            points: playedPoints.map((p = null) => {
+              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
+            }),
+            color: "#1890FF",
+            width: 6,
+            arrowLine: true,
+            borderColor: "#FFF",
+            borderWidth: 1
+          }));
+        }
+      }
+      if (currentIndex.value < trackPoints.value.length - 1) {
+        const unplayedPoints = trackPoints.value.slice(currentIndex.value);
+        if (unplayedPoints.length >= 2) {
+          newPolyline.push(new UTSJSONObject({
+            points: unplayedPoints.map((p = null) => {
+              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
+            }),
+            color: "#999",
+            width: 3,
+            borderColor: "#FFF",
+            borderWidth: 1,
+            dottedLine: true
+          }));
+        }
+      }
+      polyline.value = newPolyline;
+    }
+    function updateCarPosition() {
+      if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+        const point = trackPoints.value[currentIndex.value];
+        carMarker.value.latitude = point.latitude;
+        carMarker.value.longitude = point.longitude;
+        carMarker.value.rotate = point.rotation || 0;
+        if (currentIndex.value % 5 === 0 || currentIndex.value === 0 || currentIndex.value === trackPoints.value.length - 1) {
+          center.latitude = point.latitude;
+          center.longitude = point.longitude;
+        }
+      }
+    }
+    function showPicker(type) {
+      currentPickerType.value = type;
+      pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
+      showDateTimePicker.value = true;
+    }
+    function onConfirm(value) {
+      let formattedValue = value;
+      if (formattedValue.includes("-")) {
+        formattedValue = formattedValue.replace(/-/g, "/");
+      }
+      if (currentPickerType.value == "start") {
+        startTime.value = formattedValue;
+      } else {
+        endTime.value = formattedValue;
+      }
+      loadTrackPos();
+      showDateTimePicker.value = false;
+    }
+    function onCancel() {
+      showDateTimePicker.value = false;
+    }
+    function togglePlayback() {
+      if (isPlaying.value) {
+        pausePlayback();
+      } else {
+        startPlayback();
+      }
+    }
+    function startPlayback() {
+      if (trackPoints.value.length === 0) {
+        common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
+        return null;
+      }
+      if (currentIndex.value >= trackPoints.value.length - 1) {
+        resetPlayback();
+      }
+      isPlaying.value = true;
+      lastTimestamp = Date.now();
+      playbackStep();
+    }
+    function playbackStep() {
+      if (!isPlaying.value)
+        return null;
+      const now = Date.now();
+      const elapsed = now - lastTimestamp;
+      const interval = 1e3 / playbackSpeed.value;
+      if (elapsed >= interval) {
+        playNextPoint();
+        lastTimestamp = now - elapsed % interval;
+      }
+      if (isPlaying.value) {
+        playbackTimer = setTimeout(playbackStep, 16);
+      }
+    }
+    function playNextPoint() {
+      if (currentIndex.value >= trackPoints.value.length - 1) {
+        pausePlayback();
+        updatePolyline();
+        common_vendor.index.showToast({
+          title: "轨迹回放完成",
+          icon: "none",
+          duration: 1500
+        });
+        setTimeout(() => {
+          resetPlayback();
+        }, 2e3);
+        return null;
+      }
+      currentIndex.value++;
+      updateCarPosition();
+      updatePolyline();
+      const point = trackPoints.value[currentIndex.value];
+      currentSpeed.value = point.speed || 0;
+      currentTime.value = point.deviceTime || "";
+    }
+    function pausePlayback() {
+      isPlaying.value = false;
+      if (playbackTimer) {
+        clearTimeout(playbackTimer);
+        playbackTimer = null;
+      }
+    }
+    function resetPlayback() {
+      pausePlayback();
+      currentIndex.value = 0;
+      currentSpeed.value = 0;
+      if (trackPoints.value.length > 0) {
+        currentTime.value = trackPoints.value[0].deviceTime || "";
+      }
+      updateCarPosition();
+      updatePolyline();
+    }
+    function setPlaybackSpeed(e = null) {
+      const wasPlaying = isPlaying.value;
+      if (wasPlaying) {
+        pausePlayback();
+      }
+      playbackSpeed.value = e;
+      if (wasPlaying) {
+        startPlayback();
+      }
+    }
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:149", "option", option);
       imei.value = option.imei;
       carStatus.value = option.connectionStatus;
       plateNo.value = option.plateNo;
@@ -96,7 +368,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const processTrackData = (positions) => {
+    function processTrackData(positions) {
       const processedPoints = [];
       for (let i = 0; i < positions.length; i++) {
         const point = positions[i];
@@ -107,7 +379,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           speed: point.getNumber("speed", 0),
           deviceTime: formatDateForDisplay(deviceTimeStr),
           timestamp: safeParseDate(deviceTimeStr)
-          // 使用安全的日期解析
         });
         if (i > 0) {
           const prevPoint = processedPoints[i - 1];
@@ -128,246 +399,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (trackPoints.value.length > 0) {
         currentTime.value = trackPoints.value[0].deviceTime;
       }
-    };
-    const initDateTime = () => {
-      const now = /* @__PURE__ */ new Date();
-      const formatTime = (date) => {
-        return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
-      };
-      endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5);
-      startTime.value = formatTime(startDate);
-    };
-    const showPicker = (type) => {
-      currentPickerType.value = type;
-      pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
-      showDateTimePicker.value = true;
-    };
-    const onConfirm = (value) => {
-      let formattedValue = value;
-      if (formattedValue.includes("-")) {
-        formattedValue = formattedValue.replace(/-/g, "/");
-      }
-      if (currentPickerType.value == "start") {
-        startTime.value = formattedValue;
-      } else {
-        endTime.value = formattedValue;
-      }
-      loadTrackPos();
-      showDateTimePicker.value = false;
-    };
-    const onCancel = () => {
-      showDateTimePicker.value = false;
-    };
-    const calculateBearing = (lat1, lng1, lat2, lng2) => {
-      const degToRad = (d) => {
-        return d * Math.PI / 180;
-      };
-      const radToDeg = (r) => {
-        return r * 180 / Math.PI;
-      };
-      const φ1 = degToRad(lat1);
-      const φ2 = degToRad(lat2);
-      const Δλ = degToRad(lng2 - lng1);
-      const y = Math.sin(Δλ) * Math.cos(φ2);
-      const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-      const θ = Math.atan2(y, x);
-      return (radToDeg(θ) + 360) % 360;
-    };
-    const initCarMarker = () => {
-      if (trackPoints.value.length > 0) {
-        carMarker.value = new UTSJSONObject({
-          id: 999,
-          latitude: trackPoints.value[0].latitude,
-          longitude: trackPoints.value[0].longitude,
-          iconPath: "/static/car.png",
-          width: 32,
-          height: 32,
-          rotate: trackPoints.value[0].rotation || 0,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
-          animation: new UTSJSONObject({
-            duration: 1e3,
-            type: "move"
-          }),
-          callout: new UTSJSONObject({
-            content: "起点",
-            borderRadius: 5,
-            padding: 5,
-            display: "ALWAYS"
-          })
-        });
-        markers.value = [carMarker.value];
-      }
-    };
-    const updatePolyline = () => {
-      if (!trackPoints.value || trackPoints.value.length < 2) {
-        polyline.value = [];
-        return null;
-      }
-      const newPolyline = [];
-      if (currentIndex.value > 0) {
-        const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
-        if (playedPoints.length >= 2) {
-          newPolyline.push({
-            points: playedPoints.map((p) => {
-              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
-            }),
-            color: "#1890FF",
-            width: 6,
-            arrowLine: true,
-            borderColor: "#FFF",
-            borderWidth: 1
-          });
-        }
-      }
-      if (currentIndex.value < trackPoints.value.length - 1) {
-        const unplayedPoints = trackPoints.value.slice(currentIndex.value);
-        if (unplayedPoints.length >= 2) {
-          newPolyline.push({
-            points: unplayedPoints.map((p) => {
-              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
-            }),
-            color: "#999",
-            width: 3,
-            borderColor: "#FFF",
-            borderWidth: 1,
-            dottedLine: true
-          });
-        }
-      }
-      polyline.value = newPolyline;
-    };
-    const adjustMapToFitTrack = () => {
-      if (trackPoints.value.length === 0)
-        return null;
-      const bounds = calculateTrackBounds();
-      center.latitude = (bounds.minLat + bounds.maxLat) / 2;
-      center.longitude = (bounds.minLng + bounds.maxLng) / 2;
-      const latDiff = bounds.maxLat - bounds.minLat;
-      const lngDiff = bounds.maxLng - bounds.minLng;
-      const maxDiff = Math.max(latDiff, lngDiff);
-      if (maxDiff > 0.1)
-        mapScale.value = 11;
-      else if (maxDiff > 0.05)
-        mapScale.value = 12;
-      else if (maxDiff > 0.02)
-        mapScale.value = 13;
-      else
-        mapScale.value = 14;
-    };
-    const calculateTrackBounds = () => {
-      let minLat = trackPoints.value[0].latitude;
-      let maxLat = trackPoints.value[0].latitude;
-      let minLng = trackPoints.value[0].longitude;
-      let maxLng = trackPoints.value[0].longitude;
-      trackPoints.value.forEach((point) => {
-        minLat = Math.min(minLat, point.latitude);
-        maxLat = Math.max(maxLat, point.latitude);
-        minLng = Math.min(minLng, point.longitude);
-        maxLng = Math.max(maxLng, point.longitude);
-      });
-      return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
-    };
-    const togglePlayback = () => {
-      if (isPlaying.value) {
-        pausePlayback();
-      } else {
-        startPlayback();
-      }
-    };
-    const startPlayback = () => {
-      if (trackPoints.value.length === 0) {
-        common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
-        return null;
-      }
-      if (currentIndex.value >= trackPoints.value.length - 1) {
-        resetPlayback();
-      }
-      isPlaying.value = true;
-      const intervalDuration = 1e3 / playbackSpeed.value;
-      playbackInterval.value = setInterval(playNextPoint, intervalDuration);
-    };
-    const playNextPoint = () => {
-      if (currentIndex.value >= trackPoints.value.length - 1) {
-        pausePlayback();
-        updatePolyline();
-        common_vendor.index.showToast({
-          title: "轨迹回放完成",
-          icon: "none",
-          duration: 1500
-        });
-        setTimeout(() => {
-          resetPlayback();
-        }, 2e3);
-        return null;
-      }
-      currentIndex.value++;
-      updateCarPosition();
-      updatePolyline();
-      const point = trackPoints.value[currentIndex.value];
-      currentSpeed.value = point.speed || 0;
-      currentTime.value = point.deviceTime || "";
-    };
-    const updateCarPosition = () => {
-      if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
-        const point = trackPoints.value[currentIndex.value];
-        Object.assign(carMarker.value, new UTSJSONObject({
-          latitude: point.latitude,
-          longitude: point.longitude,
-          rotate: point.rotation || 0,
-          animation: new UTSJSONObject({
-            duration: 1e3 / playbackSpeed.value,
-            type: "move"
-          })
-        }));
-        markers.value = [carMarker.value];
-        center.latitude = point.latitude;
-        center.longitude = point.longitude;
-      }
-    };
-    const pausePlayback = () => {
-      isPlaying.value = false;
-      if (playbackInterval.value) {
-        clearInterval(playbackInterval.value);
-        playbackInterval.value = null;
-      }
-    };
-    const resetPlayback = () => {
-      pausePlayback();
-      currentIndex.value = 0;
-      currentSpeed.value = 0;
-      if (trackPoints.value.length > 0) {
-        currentTime.value = trackPoints.value[0].deviceTime || "";
-      }
-      updateCarPosition();
-      updatePolyline();
-    };
-    const setPlaybackSpeed = (e = null) => {
-      playbackSpeed.value = e;
-      if (isPlaying.value) {
-        pausePlayback();
-        const intervalDuration = 1e3 / playbackSpeed.value;
-        playbackInterval.value = setInterval(playNextPoint, intervalDuration);
-        isPlaying.value = true;
-      }
-    };
-    const calculateTrackDistance = () => {
-      totalDistance.value = 0;
-      for (let i = 1; i < trackPoints.value.length; i++) {
-        totalDistance.value += getDistance(trackPoints.value[i - 1].latitude, trackPoints.value[i - 1].longitude, trackPoints.value[i].latitude, trackPoints.value[i].longitude);
-      }
-    };
-    const getDistance = (lat1, lng1, lat2, lng2) => {
-      const rad = (d) => {
-        return d * Math.PI / 180;
-      };
-      const radLat1 = rad(lat1);
-      const radLat2 = rad(lat2);
-      const a = radLat1 - radLat2;
-      const b = rad(lng1) - rad(lng2);
-      const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
-      return s * 6378.137 * 1e3;
-    };
+    }
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
         a: common_vendor.p(new UTSJSONObject({

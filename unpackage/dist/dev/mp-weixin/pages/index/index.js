@@ -50,11 +50,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let result = [...originalDeviceList.value];
       if (pickerStateTitle.value == "在线") {
         result = result.filter((device = null) => {
-          return (device === null || device === void 0 ? null : device.status) == 1;
+          return (device === null || device === void 0 ? null : device.connectionStatus) == "online";
         });
       } else if (pickerStateTitle.value === "离线") {
         result = result.filter((device = null) => {
-          return (device === null || device === void 0 ? null : device.status) == 0;
+          return (device === null || device === void 0 ? null : device.connectionStatus) == "offline";
         });
       }
       if (pickerGroupTitle.value !== "全部分组") {

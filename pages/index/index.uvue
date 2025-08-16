@@ -80,9 +80,9 @@
 
 		// 状态筛选
 		if (pickerStateTitle.value == '在线') {
-			result = result.filter(device => device?.status == 1)
+			result = result.filter(device => device?.connectionStatus == 'online')
 		} else if (pickerStateTitle.value === '离线') {
-			result = result.filter(device => device?.status == 0)
+			result = result.filter(device => device?.connectionStatus == 'offline')
 		}
 
 		// 分组筛选
