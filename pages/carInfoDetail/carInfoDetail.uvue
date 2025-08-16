@@ -241,7 +241,7 @@
 		}
 		loadData(data)
 		loadDeviceDetail()
-		// setupAutoRefresh(currentTime.value)
+		setupAutoRefresh(currentTime.value)
 	})
 
 	const loadDeviceDetail = async () => {

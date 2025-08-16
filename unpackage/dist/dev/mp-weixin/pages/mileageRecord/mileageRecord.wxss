@@ -134,7 +134,7 @@
 .container .content .trip-list .trip-group .trip-item .trip-index .icon {
   width: 40rpx;
   height: 40rpx;
-  background-color: #69c2f1;
+  background-color: #1296db;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -164,9 +164,12 @@
   width: 50rpx;
   height: 50rpx;
 }
-.container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--main {
+.container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--main,
+.container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--content {
   width: 100%;
-  height: 10vh;
+  height: 5vh;
+  font-size: 25rpx !important;
+  line-height: unset !important;
 }
 .container .content .trip-list .trip-group .trip-item:last-child {
   border-bottom: none;

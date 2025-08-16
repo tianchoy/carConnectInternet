@@ -22,7 +22,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       avatar: "/static/avatar.png",
       username: "123456789"
     }));
-    const carsnumber = common_vendor.ref(3);
+    const carsnumber = common_vendor.ref(0);
     common_vendor.onLoad(() => {
       carsnumber.value = common_vendor.index.getStorageSync("carTotalCount");
       loadData();
@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:44", userInfo.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:47", userInfo.value);
       });
     };
     const userInfoDetail = () => {
@@ -64,11 +64,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.o(userInfoDetail),
         f: common_vendor.p({
+          numberType: "overflow",
           type: "error",
+          max: "99",
           value: common_vendor.unref(carsnumber)
         }),
-        g: common_vendor.o(carList),
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        g: common_vendor.p({
+          name: "arrow-right",
+          size: "22"
+        }),
+        h: common_vendor.o(carList),
+        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

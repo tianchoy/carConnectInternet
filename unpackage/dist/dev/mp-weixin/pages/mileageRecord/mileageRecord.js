@@ -287,11 +287,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               type: "success",
               size: "mini"
             })),
-            d: common_vendor.t((group.totalDistance / 1e3).toFixed(0)),
+            d: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
             e: common_vendor.f(group.trips, (item = null, index = null, i1 = null) => {
               return new UTSJSONObject({
                 a: common_vendor.t(index + 1),
-                b: common_vendor.t((item.distance / 1e3).toFixed(0)),
+                b: common_vendor.t((item.distance / 1e3).toFixed(2)),
                 c: common_vendor.t(formatDuration(item.duration)),
                 d: "5f5c5231-10-" + i0 + "-" + i1 + "," + ("5f5c5231-9-" + i0 + "-" + i1),
                 e: common_vendor.p(new UTSJSONObject({

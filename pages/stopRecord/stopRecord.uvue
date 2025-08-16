@@ -107,8 +107,8 @@
 		}
 
 		endTime.value = formatTime(now)
-		// 开始时间默认为当前时间前1小时
-		const startDate = new Date(now.getTime() - 3600000)
+		// 开始时间默认为当前时间前2小时
+		const startDate = new Date(now.getTime() - 7200000)
 		startTime.value = formatTime(startDate)
 	}
 

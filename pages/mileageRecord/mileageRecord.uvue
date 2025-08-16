@@ -45,7 +45,7 @@
 							<text class="group-date">{{group.date}}</text>
 							<uv-tags :text="group.trips.length+'段'" type="success" size="mini"></uv-tags>
 						</view>
-						<text>里程 {{(group.totalDistance/1000).toFixed(0)}} km</text>
+						<text>里程 {{(group.totalDistance/1000).toFixed(2)}} km</text>
 					</view>
 					<view class="group-separator"></view>
 					<view v-for="(item, index) in group.trips" :key="index" class="trip-item"
@@ -53,14 +53,14 @@
 						<view class="trip-index">
 							<text class="icon">{{index + 1}}</text>
 							<view class="trip-distance-time">
-								<text>{{(item.distance /1000).toFixed(0)}} km</text>
+								<text>{{(item.distance /1000).toFixed(2)}} km</text>
 								<text>{{formatDuration(item.duration)}}</text>
 							</view>
 						</view>
 						<view class="trip-content">
 
 							<view class="trip-locations">
-								<uv-steps  current="1" direction="column" active-color="#3c9cff" inactive-color="#999">
+								<uv-steps current="1" direction="column" active-color="#3c9cff" inactive-color="#999">
 									<uv-steps-item :title="item.startAddress || '未知地点'" :desc="item.startTime">
 										<template v-slot:icon>
 											<image class="icons" src="/static/start.png" mode="aspectFit" />
@@ -68,7 +68,7 @@
 									</uv-steps-item>
 									<uv-steps-item :title="item.endAddress || '未知地点'" :desc="item.endTime">
 										<template v-slot:icon>
-											<image class="icons" src="/static/end.png" mode="aspectFit"  />
+											<image class="icons" src="/static/end.png" mode="aspectFit" />
 										</template>
 									</uv-steps-item>
 								</uv-steps>
@@ -414,7 +414,7 @@
 							.icon {
 								width: 40rpx;
 								height: 40rpx;
-								background-color: #69c2f1;
+								background-color: #1296db;
 								color: #fff;
 								border-radius: 50%;
 								display: flex;
@@ -444,14 +444,19 @@
 
 						.trip-content {
 							flex: 1;
+
 							.trip-locations {
-								.icons{
+								.icons {
 									width: 50rpx;
 									height: 50rpx;
 								}
-								.uv-text__value--main{
+
+								.uv-text__value--main,
+								.uv-text__value--content {
 									width: 100%;
-									height: 10vh;
+									height: 5vh;
+									font-size: 25rpx !important;
+									line-height: unset !important;
 								}
 							}
 						}

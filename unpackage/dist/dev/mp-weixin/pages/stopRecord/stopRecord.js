@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
       };
       endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5);
+      const startDate = new Date(now.getTime() - 72e5);
       startTime.value = formatTime(startDate);
     };
     const showPicker = (type) => {

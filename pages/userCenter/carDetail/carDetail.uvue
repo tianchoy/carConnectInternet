@@ -18,7 +18,7 @@
 				<text class="info" v-if="!isEditing">{{carInfo.plateNo}}</text>
 				<view class="info" v-else>
 					<car-number-input @numberInputResult="handlePlateNumberChange"
-						:defaultStr="editInfo.plateNo || '京A'" />
+						:defaultStr="formattedPlateNo" />
 				</view>
 			</view>
 			<view class="list">
@@ -52,6 +52,13 @@
 	const handlePlateNumberChange = (e : string) => {
 		editInfo.value.plateNo = e
 	}
+	
+	const formattedPlateNo = computed(() => {
+	  if (!editInfo.value.plateNo) return '京A'
+	  return editInfo.value.plateNo.length > 8 
+	    ? editInfo.value.plateNo.substring(0, 8) 
+	    : editInfo.value.plateNo
+	})
 
 	// 切换编辑状态
 	const toggleEdit = () => {

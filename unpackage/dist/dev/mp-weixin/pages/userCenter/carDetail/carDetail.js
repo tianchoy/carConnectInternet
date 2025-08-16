@@ -24,6 +24,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handlePlateNumberChange = (e) => {
       editInfo.value.plateNo = e;
     };
+    const formattedPlateNo = common_vendor.computed(() => {
+      if (!editInfo.value.plateNo)
+        return "京A";
+      return editInfo.value.plateNo.length > 8 ? editInfo.value.plateNo.substring(0, 8) : editInfo.value.plateNo;
+    });
     const toggleEdit = () => {
       isEditing.value = !isEditing.value;
       if (isEditing.value) {
@@ -42,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = UTS.JSON.parse(UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:78", res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:85", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -53,12 +58,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:91", "option", option);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:98", "option", option);
       if (option.deviceId != null) {
         deviceId.value = option.deviceId;
         loadCarListData();
       } else {
-        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:97", "deviceId is null");
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:104", "deviceId is null");
       }
     });
     const loadCarListData = () => {
@@ -105,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : new UTSJSONObject({
         j: common_vendor.o(handlePlateNumberChange),
         k: common_vendor.p(new UTSJSONObject({
-          defaultStr: common_vendor.unref(editInfo).plateNo || "京A"
+          defaultStr: common_vendor.unref(formattedPlateNo)
         }))
       }), new UTSJSONObject({
         l: !common_vendor.unref(isEditing)

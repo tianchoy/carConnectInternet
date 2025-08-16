@@ -22,7 +22,6 @@
 					<text>至</text>
 					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
 				</view>
-				<!-- <text class="playbackdetail">轨迹明细</text> -->
 			</view>
 			<view class="tool-tag-item">
 				<view class="">
@@ -31,11 +30,7 @@
 				</view>
 				<view class="slider">
 					<uv-slider v-model="playbackSpeed" backgroundColor="#f5f5f5" activeColor="#1890FF" min="1" max="10"
-						@change="setPlaybackSpeed" :blockStyle="{
-              width: '32rpx',
-              height: '32rpx',
-              background: 'url(/static/slider.png) no-repeat center/cover',
-            }">
+						@change="setPlaybackSpeed" block-color="#1890FF">
 					</uv-slider>
 				</view>
 				<text class="speed-label">{{playbackSpeed}}x</text>
@@ -93,7 +88,7 @@
 	}>>([])
 	const polyline = ref<Array<any>>([])
 	const isPlaying = ref(false)
-	const playbackSpeed = ref(1)
+	const playbackSpeed = ref(5)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
@@ -107,6 +102,49 @@
 	// 标记点集合
 	const markers = ref<Array<any>>([])
 
+	// 安全解析日期函数，兼容iOS
+	function safeParseDate(dateStr : string) : number {
+		if (!dateStr) return 0
+
+		// 尝试替换-为/以兼容iOS
+		const iosCompatibleStr = dateStr.replace(/-/g, '/')
+		const date = new Date(iosCompatibleStr)
+
+		// 如果解析失败，尝试其他格式
+		if (isNaN(date.getTime())) {
+			// 尝试ISO格式（替换空格为T）
+			const isoStr = dateStr.replace(' ', 'T')
+			const isoDate = new Date(isoStr)
+			if (!isNaN(isoDate.getTime())) {
+				return isoDate.getTime()
+			}
+
+			// 尝试手动解析
+			const parts = dateStr.split(/[- :/]/)
+			if (parts.length >= 6) {
+				return new Date(
+					parseInt(parts[0]),
+					parseInt(parts[1]) - 1,
+					parseInt(parts[2]),
+					parseInt(parts[3]),
+					parseInt(parts[4]),
+					parseInt(parts[5])
+				).getTime()
+			}
+
+			return 0
+		}
+
+		return date.getTime()
+	}
+
+	// 格式化日期显示
+	function formatDateForDisplay(dateStr : string) : string {
+		if (!dateStr) return ''
+		// 统一显示为 yyyy-MM-dd HH:mm:ss 格式
+		return dateStr.replace(/\//g, '-')
+	}
+
 	onLoad((option) => {
 		console.log('option', option)
 		imei.value = option.imei
@@ -119,8 +157,8 @@
 	const loadTrackPos = async () => {
 		const data = {
 			imei: imei.value,
-			startTime: startTime.value,
-			endTime: endTime.value,
+			startTime: startTime.value.replace(/\//g, '-'), // 确保发送给后端的格式正确
+			endTime: endTime.value.replace(/\//g, '-'),
 			minParkTime: 60,
 			withStop: true,
 			withPos: true,
@@ -140,12 +178,14 @@
 
 		for (let i = 0; i < positions.length; i++) {
 			const point = positions[i]
+			const deviceTimeStr = point.getString('deviceTime', '')
+
 			const processedPoint = {
 				latitude: point.getNumber('latitude', 0),
 				longitude: point.getNumber('longitude', 0),
 				speed: point.getNumber('speed', 0),
-				deviceTime: point.getString('deviceTime', ''),
-				timestamp: new Date(point.getString('deviceTime', '')).getTime()
+				deviceTime: formatDateForDisplay(deviceTimeStr), // 格式化显示
+				timestamp: safeParseDate(deviceTimeStr) // 使用安全的日期解析
 			}
 
 			if (i > 0) {
@@ -182,7 +222,8 @@
 	const initDateTime = () => {
 		const now = new Date()
 		const formatTime = (date : Date) : string => {
-			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
+			// 使用/分隔符以兼容iOS
+			return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
 		}
 
 		endTime.value = formatTime(now)
@@ -200,10 +241,16 @@
 
 	// 确认选择时间
 	const onConfirm = (value : string) => {
+		let formattedValue = value
+		// 确保存储的格式是iOS兼容的
+		if (formattedValue.includes('-')) {
+			formattedValue = formattedValue.replace(/-/g, '/')
+		}
+
 		if (currentPickerType.value == 'start') {
-			startTime.value = value
+			startTime.value = formattedValue
 		} else {
-			endTime.value = value
+			endTime.value = formattedValue
 		}
 		loadTrackPos()
 		showDateTimePicker.value = false

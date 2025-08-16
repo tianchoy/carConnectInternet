@@ -15,11 +15,14 @@
 		</view>
 		<view>
 			<view class="list" @click="carList">
-				<text>我的车辆</text>
-				<text class="badge"><uv-badge type="error" :value="carsnumber"></uv-badge></text>
+				<view class="left">
+					<text>我的车辆</text>
+					<text class="badge"><uv-badge numberType="overflow" type="error" max="99"  :value="carsnumber"></uv-badge></text>
+				</view>
+				<uv-icon name="arrow-right" size="22"></uv-icon>
 			</view>
-			<view class="list">流量充值</view>
-			<view class="list">平台续费</view>
+<!-- 			<view class="list">流量充值</view>
+			<view class="list">平台续费</view> -->
 		</view>
 	</view>
 </template>
@@ -30,7 +33,7 @@
 		avatar: '/static/avatar.png',
 		username: '123456789',
 	})
-	const carsnumber = ref(3)
+	const carsnumber = ref(0)
 
 	onLoad(() => {
 		
@@ -94,12 +97,17 @@
 			margin: 30rpx;
 			display: flex;
 			flex-direction: row;
+			justify-content: space-between;
 			align-items: center;
 
-			.badge {
-				width: 33rpx;
-				height: 33rpx;
-				margin-left: 20rpx;
+			.left{
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				.badge {
+					margin-left: 20rpx;
+				}
 			}
 		}
 	}
