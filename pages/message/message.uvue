@@ -24,11 +24,15 @@
 	const handleItemClick = async (item) => {
 		modalContent.value = item
 		modal.value?.open();
-		const res = await setMsgState(item.messageId)
-		console.log('消息状态：',res)
-		if(res.msg== 'success'){
-			loadMsgList()
+		console.log('item:',item)
+		if(item.status == 1){
+			const res = await setMsgState(item.messageId)
+			console.log('消息状态：',res)
+			if(res.msg== 'success'){
+				loadMsgList()
+			}
 		}
+		
 	}
 
 	const msgList = ref<UTSJSONObject>({})
@@ -42,7 +46,6 @@
 	const loadMsgList = async () => {
 		const res = await getUserMsgList()
 		msgList.value = res.data.list
-		console.log(res)
 	}
 </script>
 
@@ -54,8 +57,9 @@
 
 		.list-box {
 			width: 100%;
-			height: 100%;
+			height: 88vh;
 			padding: 20rpx;
+			overflow-y: scroll;
 
 			.uv-list {
 				margin-bottom: 20rpx;

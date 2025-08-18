@@ -25,10 +25,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         var _a;
         modalContent.value = item;
         (_a = modal.value) === null || _a === void 0 ? null : _a.open();
-        const res = yield api_request.setMsgState(item.messageId);
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:28", "消息状态：", res);
-        if (res.msg == "success") {
-          loadMsgList();
+        common_vendor.index.__f__("log", "at pages/message/message.uvue:27", "item:", item);
+        if (item.status == 1) {
+          const res = yield api_request.setMsgState(item.messageId);
+          common_vendor.index.__f__("log", "at pages/message/message.uvue:30", "消息状态：", res);
+          if (res.msg == "success") {
+            loadMsgList();
+          }
         }
       });
     };
@@ -42,7 +45,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserMsgList();
         msgList.value = res.data.list;
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:45", res);
       });
     };
     return (_ctx = null, _cache = null) => {
