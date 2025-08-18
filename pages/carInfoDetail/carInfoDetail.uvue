@@ -45,10 +45,10 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(18)
+	const mapScale = ref(17)
 	const datainfo = ref<object>({})
 	const address = ref('')
-	const currentTime = ref('10s')
+	const currentTime = ref('5s')
 	const times = ref([
 		[
 			{ label: '5s', value: '5' },
@@ -199,8 +199,6 @@
 
 	const loadData = async (data : object) => {
 		const res = await getDevicePos(data)
-		
-		console.log('loadData',res)
 
 		res.data.forEach(async item => {
 			if (item.imei == imei.value) {

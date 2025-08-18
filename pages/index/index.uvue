@@ -108,6 +108,7 @@
 			updateMarkers(devices)
 		}
 	})
+	
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -188,7 +189,7 @@
 					display: 'ALWAYS'
 				},
 				joinCluster: true, // 允许聚合
-				clusterId: Number(device.deviceId),
+				clusterId: `${lat.toFixed(2)}_${lng.toFixed(2)}`,
 				
 			}
 		}).filter(marker => marker !== null)

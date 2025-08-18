@@ -6,7 +6,7 @@
 		}
 	},
 	"pages": [
-		
+
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -26,93 +26,80 @@
 			}
 		},
 		{
-			"path" : "pages/login/login",
-			"style" : 
-			{
-				"navigationBarTitleText" : "登陆"
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登陆"
 			}
 		},
 		{
-			"path" : "pages/signUp/signUp",
-			"style" : 
-			{
-				"navigationBarTitleText" : "注册"
+			"path": "pages/signUp/signUp",
+			"style": {
+				"navigationBarTitleText": "注册"
 			}
 		},
 		{
-			"path" : "pages/carInfoDetail/carInfoDetail",
-			"style" : 
-			{
-				"navigationBarTitleText" : "车辆详情"
+			"path": "pages/carInfoDetail/carInfoDetail",
+			"style": {
+				"navigationBarTitleText": "车辆详情"
 			}
 		},
 		{
-			"path" : "pages/addCar/addCar",
-			"style" : 
-			{
-				"navigationBarTitleText" : "添加车辆"
+			"path": "pages/addCar/addCar",
+			"style": {
+				"navigationBarTitleText": "添加车辆"
 			}
 		},
 		{
-			"path" : "pages/playBack/playBack",
-			"style" : 
-			{
-				"navigationBarTitleText" : "轨迹回放"
+			"path": "pages/playBack/playBack",
+			"style": {
+				"navigationBarTitleText": "轨迹回放"
+			}
+		}, {
+			"path": "uni_modules/lime-action-sheet/pages/index"
+		},
+		{
+			"path": "pages/vehicleTracking/vehicleTracking",
+			"style": {
+				"navigationBarTitleText": "车辆跟踪"
+			}
+		},
+		{
+			"path": "pages/mileageRecord/mileageRecord",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/stopRecord/stopRecord",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/userCenter/userInfo/userInfo",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/userCenter/editPassword/editPassword",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/userCenter/carList/carList",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/userCenter/carDetail/carDetail",
+			"style": {
+				"navigationBarTitleText": ""
 			}
 		}
-	,{
-    "path": "uni_modules/lime-action-sheet/pages/index"
-},
-{
-	"path" : "pages/vehicleTracking/vehicleTracking",
-	"style" : 
-	{
-		"navigationBarTitleText" : "车辆跟踪"
-	}
-},
-{
-	"path" : "pages/mileageRecord/mileageRecord",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-},
-{
-	"path" : "pages/stopRecord/stopRecord",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-},
-{
-	"path" : "pages/userCenter/userInfo/userInfo",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-},
-{
-	"path" : "pages/userCenter/editPassword/editPassword",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-},
-{
-	"path" : "pages/userCenter/carList/carList",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-},
-{
-	"path" : "pages/userCenter/carDetail/carDetail",
-	"style" : 
-	{
-		"navigationBarTitleText" : ""
-	}
-}
-],
+	],
 	"tabBar": {
 		"color": "#2c2c2c",
 		"selectedColor": "#d81e06",
@@ -139,7 +126,7 @@
 		]
 	},
 	"globalStyle": {
-		"navigationStyle": "custom" ,
+		"navigationStyle": "custom",
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app x",
 		"navigationBarBackgroundColor": "#F8F8F8",

@@ -50,6 +50,7 @@
 
 	// 处理车牌号输入结果
 	const handlePlateNumberChange = (e : string) => {
+		console.log(e.length)
 		editInfo.value.plateNo = e
 	}
 	

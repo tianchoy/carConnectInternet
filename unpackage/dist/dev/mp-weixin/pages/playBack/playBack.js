@@ -183,7 +183,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rotate: trackPoints.value[0].rotation || 0,
           anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
           callout: new UTSJSONObject({
-            content: "起点",
+            content: plateNo,
             borderRadius: 5,
             padding: 5,
             display: "ALWAYS"
@@ -271,7 +271,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function startPlayback() {
-      if (trackPoints.value.length === 0) {
+      if (trackPoints.value.length == 0) {
         common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
         return null;
       }
@@ -305,9 +305,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "none",
           duration: 1500
         });
-        setTimeout(() => {
-          resetPlayback();
-        }, 2e3);
         return null;
       }
       currentIndex.value++;

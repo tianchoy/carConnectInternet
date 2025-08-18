@@ -60,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(common_vendor.unref(userInfo).username),
         d: common_vendor.p({
           name: "arrow-right",
-          size: "25"
+          size: "20"
         }),
         e: common_vendor.o(userInfoDetail),
         f: common_vendor.p({
@@ -71,7 +71,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.p({
           name: "arrow-right",
-          size: "22"
+          size: "20"
         }),
         h: common_vendor.o(carList),
         i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")

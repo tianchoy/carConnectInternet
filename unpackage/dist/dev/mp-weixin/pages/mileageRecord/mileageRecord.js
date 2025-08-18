@@ -232,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
-          size: "16"
+          size: "13"
         })),
         g: common_vendor.t(formatDisplayTime(endTime.value)),
         h: common_vendor.o(($event = null) => {
@@ -243,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
-          size: "16"
+          size: "13"
         })),
         k: common_vendor.o(onConfirm),
         l: common_vendor.o(onCancel),

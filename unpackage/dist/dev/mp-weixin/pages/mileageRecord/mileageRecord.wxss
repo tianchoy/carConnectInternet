@@ -52,7 +52,6 @@
 .container .tools-panel .Datetime-box .date-box .Date {
   font-size: 25rpx;
   border-radius: 5rpx;
-  padding: 0 10rpx;
   color: #333;
 }
 .container .summary-panel {

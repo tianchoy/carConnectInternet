@@ -9702,6 +9702,11 @@ const onLoad = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onReachBottom = /* @__PURE__ */ createLifeCycleHook(
+  ON_REACH_BOTTOM,
+  2
+  /* HookFlags.PAGE */
+);
 const onPageShow = onShow;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
@@ -9725,6 +9730,7 @@ exports.onHide = onHide;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onPageShow = onPageShow;
+exports.onReachBottom = onReachBottom;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.provide = provide;

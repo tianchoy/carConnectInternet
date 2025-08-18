@@ -7,10 +7,10 @@
 				<view class="date-box">
 					<uv-icon name="calendar" size="25"></uv-icon>
 					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('start')" size="16"></uv-icon>
-					<text>至</text>
+					<uv-icon name="arrow-down" @click="showPicker('start')" size="13"></uv-icon>
+					<text style="padding: 0 10rpx;">至</text>
 					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('end')" size="16"></uv-icon>
+					<uv-icon name="arrow-down" @click="showPicker('end')" size="13"></uv-icon>
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
@@ -55,13 +55,13 @@
 
 	// 日期时间选择器相关
 	const showDateTimePicker = ref(false)
-	const currentPickerType = ref('start') // 'start' or 'end'
+	const currentPickerType = ref('start')
 	const pickerTitle = ref('选择开始时间')
 
 	const startTime = ref('')
 	const endTime = ref('')
 	const imei = ref<string | null>('')
-	const carStopDetail = ref({})
+	const carStopDetail = ref<UTSJSONObject>({})
 
 
 	// 初始化加载
@@ -85,8 +85,6 @@
 			withTrip: false,
 		}
 		const res = await getTrackPos(data)
-
-		console.log(res.data.stops)
 		const stopsWithAddress = await Promise.all(res.data.stops.map(async (stop) => {
 			const address = await getAddress(stop.latitude, stop.longitude)
 			return {
@@ -96,7 +94,6 @@
 		}))
 
 		carStopDetail.value = stopsWithAddress
-		console.log(res)
 	}
 
 	// 初始化时间
@@ -137,7 +134,7 @@
 	const calculateDuration = (start : string, end : string) : string => {
 		const startDate = new Date(start)
 		const endDate = new Date(end)
-		const diff = endDate.getTime() - startDate.getTime() // difference in milliseconds
+		const diff = endDate.getTime() - startDate.getTime()
 
 		const hours = Math.floor(diff / (1000 * 60 * 60))
 		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -174,7 +171,6 @@
 					.Date {
 						font-size: 25rpx;
 						border-radius: 5rpx;
-						padding: 0 10rpx;
 					}
 				}
 			}

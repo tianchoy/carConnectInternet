@@ -29,10 +29,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(18);
+    const mapScale = common_vendor.ref(17);
     const datainfo = common_vendor.ref({});
     const address = common_vendor.ref("");
-    const currentTime = common_vendor.ref("10s");
+    const currentTime = common_vendor.ref("5s");
     const times = common_vendor.ref([
       [
         new UTSJSONObject({ label: "5s", value: "5" }),
@@ -164,14 +164,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadData = (data) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getDevicePos(data);
-        common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:203", "loadData", res);
         res.data.forEach((item = null) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             if (item.imei == imei.value) {
               datainfo.value = item;
               center.latitude = item.latitude;
               center.longitude = item.longitude;
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:210", item);
+              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:208", item);
               const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
               address.value = addr.result.formatted_address;
               const deviceMarker = createMarker(
@@ -189,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:234", "ssss", option);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:232", "ssss", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
       deviceId.value = option.deviceId;
@@ -205,10 +204,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (deviceId.value !== null) {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:250", res.data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:248", res.data);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:253", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:251", "设备id获取失败");
         }
       });
     };

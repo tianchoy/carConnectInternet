@@ -7,10 +7,10 @@
 				<view class="date-box">
 					<uv-icon name="calendar" size="25"></uv-icon>
 					<text class="Date" @click="showPicker('start')">{{formatDisplayTime(startTime)}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('start')" size="16"></uv-icon>
-					<text>至</text>
+					<uv-icon name="arrow-down" @click="showPicker('start')" size="13"></uv-icon>
+					<text style="padding: 0 10rpx;">至</text>
 					<text class="Date" @click="showPicker('end')">{{formatDisplayTime(endTime)}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('end')" size="16"></uv-icon>
+					<uv-icon name="arrow-down" @click="showPicker('end')" size="13"></uv-icon>
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
@@ -320,7 +320,6 @@
 					.Date {
 						font-size: 25rpx;
 						border-radius: 5rpx;
-						padding: 0 10rpx;
 						color: #333;
 					}
 				}

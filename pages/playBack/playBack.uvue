@@ -229,7 +229,7 @@
 				rotate: trackPoints.value[0].rotation || 0,
 				anchor: { x: 0.5, y: 0.5 },
 				callout: {
-					content: '起点',
+					content: plateNo,
 					borderRadius: 5,
 					padding: 5,
 					display: 'ALWAYS'
@@ -338,7 +338,8 @@
 	}
 
 	function startPlayback() {
-		if (trackPoints.value.length === 0) {
+		// resetPlayback()
+		if (trackPoints.value.length == 0) {
 			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
 			return
 		}
@@ -378,9 +379,6 @@
 				icon: 'none',
 				duration: 1500
 			})
-			setTimeout(() => {
-				resetPlayback()
-			}, 2000)
 			return
 		}
 

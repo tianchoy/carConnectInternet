@@ -49,7 +49,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           withTrip: false
         });
         const res = yield api_request.getTrackPos(data);
-        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:89", res.data.stops);
         const stopsWithAddress = yield Promise.all(res.data.stops.map((stop = null) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             const address = yield utils_getAdress.getAddress(stop.latitude, stop.longitude);
@@ -57,7 +56,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }));
         carStopDetail.value = stopsWithAddress;
-        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:99", res);
       });
     };
     const initDateTime = () => {
@@ -117,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
-          size: "16"
+          size: "13"
         })),
         g: common_vendor.t(endTime.value),
         h: common_vendor.o(($event = null) => {
@@ -128,7 +126,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.p(new UTSJSONObject({
           name: "arrow-down",
-          size: "16"
+          size: "13"
         })),
         k: common_vendor.o(onConfirm),
         l: common_vendor.o(onCancel),

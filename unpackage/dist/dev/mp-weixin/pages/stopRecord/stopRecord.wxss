@@ -51,7 +51,6 @@
 .container .tools-panel .Datetime-box .date-box .Date {
   font-size: 25rpx;
   border-radius: 5rpx;
-  padding: 0 10rpx;
 }
 .container .mileage_title, .container .content {
   margin: 20rpx 40rpx 0;

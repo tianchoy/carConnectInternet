@@ -39,14 +39,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad(() => {
       loadMsgList();
     });
-    const ReadIt = () => {
-    };
     const loadMsgList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getUserMsgList();
         msgList.value = res.data.list;
       });
     };
+    common_vendor.onReachBottom(() => {
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:49", "aaaaa");
+    });
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
         a: common_vendor.p({
@@ -78,12 +79,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.sr(modal, "1993bd19-3", {
           "k": "modal"
         }),
-        d: common_vendor.o(ReadIt),
-        e: common_vendor.p({
+        d: common_vendor.p({
           title: modalContent.value.messageType == 1 ? "警告" : modalContent.value.messageType == 2 ? "事件" : "通知",
           content: modalContent.value.content
-        }),
-        f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        })
       };
       return __returned__;
     };
