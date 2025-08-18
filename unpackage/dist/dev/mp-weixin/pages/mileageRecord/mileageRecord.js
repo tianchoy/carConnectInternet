@@ -271,8 +271,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "40"
         }))
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        v: !loading.value && groupedTrips.value.length === 0
-      }), !loading.value && groupedTrips.value.length === 0 ? new UTSJSONObject({
+        v: !loading.value && groupedTrips.value.length == 0
+      }), !loading.value && groupedTrips.value.length == 0 ? new UTSJSONObject({
         w: common_vendor.p(new UTSJSONObject({
           mode: "data",
           text: "当前时间点暂无行程数据"

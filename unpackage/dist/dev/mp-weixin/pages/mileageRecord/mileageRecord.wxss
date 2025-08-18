@@ -168,7 +168,7 @@
 .container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--content {
   width: 100%;
   height: 5vh;
-  font-size: 25rpx !important;
+  font-size: 24rpx !important;
   line-height: unset !important;
 }
 .container .content .trip-list .trip-group .trip-item:last-child {

@@ -146,8 +146,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           closeable: false,
           modelValue: showDateTimePicker.value
         })),
-        p: carStopDetail.value.length === 0
-      }), carStopDetail.value.length === 0 ? new UTSJSONObject({
+        p: carStopDetail.value.length == 0
+      }), carStopDetail.value.length == 0 ? new UTSJSONObject({
         q: common_vendor.p(new UTSJSONObject({
           mode: "data",
           text: "当前时间暂无停车数据"

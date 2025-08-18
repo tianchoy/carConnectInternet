@@ -20,6 +20,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       type: Boolean,
       default: false
     },
+    showPicker: {
+      type: Boolean,
+      default: true
+    },
     currentTime: {
       type: String,
       default: ""
@@ -87,7 +91,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: __props.showCar
       }), __props.showCar ? new UTSJSONObject({
         f: common_vendor.t(__props.currentCar),
-        g: common_vendor.o(handleCar)
+        g: common_vendor.o(($event = null) => {
+          return __props.showPicker ? handleCar : null;
+        })
       }) : new UTSJSONObject({}), new UTSJSONObject({
         h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
@@ -96,6 +102,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         k: common_vendor.o(confirm),
         l: common_vendor.p(new UTSJSONObject({
+          showPicker: true,
           columns: common_vendor.unref(columns),
           keyName: "label"
         }))

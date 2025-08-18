@@ -23,7 +23,7 @@
 			<text>设备名称</text>
 		</view> -->
 		<view class="content-box">
-			<uv-empty v-if="carStopDetail.length === 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
+			<uv-empty v-if="carStopDetail.length == 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
 			<view class="content" v-else v-for="(item,index) in carStopDetail" :key="index">
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/startTime.png" />

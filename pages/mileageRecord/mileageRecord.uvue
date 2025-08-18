@@ -37,7 +37,7 @@
 
 		<view class="content">
 			<uv-loading-icon v-if="loading" mode="circle" size="40"></uv-loading-icon>
-			<uv-empty v-if="!loading && groupedTrips.length === 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
+			<uv-empty v-if="!loading && groupedTrips.length == 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
 			<view v-else class="trip-list">
 				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
 					<view class="group-header">
@@ -455,7 +455,7 @@
 								.uv-text__value--content {
 									width: 100%;
 									height: 5vh;
-									font-size: 25rpx !important;
+									font-size: 24rpx !important;
 									line-height: unset !important;
 								}
 							}

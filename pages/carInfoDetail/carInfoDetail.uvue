@@ -7,7 +7,7 @@
 				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
 				<sub-navBar :currentTime="currentTime" :showTime="true"
 					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo" :times="times"
-					:carStatus="datainfo.connectionStatus" :showCar="true"></sub-navBar>
+					:carStatus="datainfo.connectionStatus" :showPicker="false" :showCar="true"></sub-navBar>
 			</map>
 			<view class="navTo" @click="navTo">
 				<image src="/static/navto.png" mode="aspectFit"></image>

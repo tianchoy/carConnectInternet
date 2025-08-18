@@ -6,7 +6,7 @@
 		</cover-view>
 		<cover-view class="slot" v-else></cover-view>
 		<cover-view class="car-box">
-			<cover-view class="selectCar" @click="handleCar" v-if="showCar">
+			<cover-view class="selectCar" @click="showPicker? handleCar : null" v-if="showCar">
 				<cover-view class="plateNo">{{ currentCar }}</cover-view>
 				<!-- <cover-image class="down_icon" src="/static/down_icon.png"></cover-image> -->
 			</cover-view>
@@ -16,7 +16,7 @@
 		</cover-view>
 	</cover-view>
 
-	<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
+	<uv-picker showPicker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
 </template>
 
 <script lang="uts" setup>
@@ -28,6 +28,10 @@
 		showCar: {
 			type: Boolean,
 			default: false,
+		},
+		showPicker:{
+			type:Boolean,
+			default:true
 		},
 		currentTime: {
 			type: String,

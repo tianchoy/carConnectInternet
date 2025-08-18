@@ -266,6 +266,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           currentCar: common_vendor.unref(currentCarInfo).plateNo,
           times: common_vendor.unref(times),
           carStatus: common_vendor.unref(datainfo).connectionStatus,
+          showPicker: false,
           showCar: true
         }),
         d: common_vendor.sei("myMap", "map"),
