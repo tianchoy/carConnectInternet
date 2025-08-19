@@ -5,49 +5,107 @@ if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_list_item_1 = common_vendor.resolveComponent("uv-list-item");
   const _easycom_uv_list_1 = common_vendor.resolveComponent("uv-list");
+  const _easycom_uv_load_more_1 = common_vendor.resolveComponent("uv-load-more");
   const _easycom_uv_modal_1 = common_vendor.resolveComponent("uv-modal");
-  (_easycom_custom_navBar_1 + _easycom_uv_list_item_1 + _easycom_uv_list_1 + _easycom_uv_modal_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_list_item_1 + _easycom_uv_list_1 + _easycom_uv_load_more_1 + _easycom_uv_modal_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_list_item = () => "../../uni_modules/uv-list/components/uv-list-item/uv-list-item.js";
 const _easycom_uv_list = () => "../../uni_modules/uv-list/components/uv-list/uv-list.js";
+const _easycom_uv_load_more = () => "../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more.js";
 const _easycom_uv_modal = () => "../../uni_modules/uv-modal/components/uv-modal/uv-modal.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_list_item + _easycom_uv_list + _easycom_uv_modal)();
+  (_easycom_custom_navBar + _easycom_uv_list_item + _easycom_uv_list + _easycom_uv_load_more + _easycom_uv_modal)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "message",
   setup(__props) {
     const modal = common_vendor.ref(null);
     const modalContent = common_vendor.ref(new UTSJSONObject({}));
+    const msgList = common_vendor.ref([]);
+    const currPage = common_vendor.ref(1);
+    const pageSize = common_vendor.ref(10);
+    const totalPage = common_vendor.ref(1);
+    const loadStatus = common_vendor.ref("loadmore");
+    const isLoading = common_vendor.ref(false);
+    common_vendor.onLoad(() => {
+      loadMsgList(true);
+    });
+    common_vendor.onReachBottom(() => {
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:41", "currPage.value----", currPage.value, "totalPage---", totalPage.value);
+      if (loadStatus.value == "loadmore") {
+        loadMore();
+      }
+    });
+    const loadMsgList = (isInit = false) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (isInit) {
+          currPage.value = 1;
+          msgList.value = [];
+        }
+        if (isLoading.value)
+          return Promise.resolve(null);
+        isLoading.value = true;
+        try {
+          if (!isInit) {
+            loadStatus.value = "loading";
+          }
+          const res = yield api_request.getUserMsgList(new UTSJSONObject({
+            page: currPage.value,
+            pageSize: pageSize.value
+          }));
+          if (res.code === 0 && res.msg === "success") {
+            const data = res.data;
+            totalPage.value = data.totalPage;
+            if (isInit) {
+              msgList.value = data.list;
+            } else {
+              msgList.value = [...msgList.value, ...data.list];
+            }
+            if (currPage.value >= totalPage.value) {
+              loadStatus.value = "nomore";
+            } else {
+              loadStatus.value = "loadmore";
+            }
+          } else {
+            loadStatus.value = "loadmore";
+            common_vendor.index.__f__("error", "at pages/message/message.uvue:91", "获取消息列表失败:", res.msg);
+          }
+        } catch (error) {
+          loadStatus.value = "loadmore";
+          common_vendor.index.__f__("error", "at pages/message/message.uvue:95", "获取消息列表异常:", error);
+        } finally {
+          isLoading.value = false;
+        }
+      });
+    };
+    const loadMore = () => {
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:103", currPage.value, totalPage.value);
+      if (currPage.value < totalPage.value) {
+        currPage.value++;
+        loadMsgList();
+      } else {
+        loadStatus.value = "nomore";
+      }
+    };
     const handleItemClick = (item = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         modalContent.value = item;
         (_a = modal.value) === null || _a === void 0 ? null : _a.open();
-        common_vendor.index.__f__("log", "at pages/message/message.uvue:27", "item:", item);
         if (item.status == 1) {
           const res = yield api_request.setMsgState(item.messageId);
-          common_vendor.index.__f__("log", "at pages/message/message.uvue:30", "消息状态：", res);
-          if (res.msg == "success") {
+          common_vendor.index.__f__("log", "at pages/message/message.uvue:121", "消息状态更新结果：", res);
+          if (res.msg === "success") {
             loadMsgList();
           }
         }
       });
     };
-    const msgList = common_vendor.ref(new UTSJSONObject({}));
-    common_vendor.onLoad(() => {
-      loadMsgList();
-    });
-    const loadMsgList = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.getUserMsgList();
-        msgList.value = res.data.list;
-      });
+    const ReadIt = () => {
+      var _a;
+      (_a = modal.value) === null || _a === void 0 ? null : _a.close();
     };
-    common_vendor.onReachBottom(() => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:49", "aaaaa");
-    });
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
         a: common_vendor.p({
@@ -55,13 +113,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          isShowStyle: true
         }),
         b: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
           return {
             a: common_vendor.o(($event = null) => {
               return handleItemClick(item);
-            }, item.messageId),
+            }, index),
             b: "1993bd19-2-" + i0 + "," + ("1993bd19-1-" + i0),
             c: common_vendor.p({
               title: item.messageType == 1 ? "警告" : item.messageType == 2 ? "事件" : "通知",
@@ -72,14 +131,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 value: "未读"
               }
             }),
-            d: item.messageId,
+            d: index,
             e: "1993bd19-1-" + i0
           };
         }),
-        c: common_vendor.sr(modal, "1993bd19-3", {
+        c: common_vendor.o(loadMore),
+        d: common_vendor.p({
+          status: loadStatus.value
+        }),
+        e: common_vendor.sr(modal, "1993bd19-4", {
           "k": "modal"
         }),
-        d: common_vendor.p({
+        f: common_vendor.o(ReadIt),
+        g: common_vendor.p({
           title: modalContent.value.messageType == 1 ? "警告" : modalContent.value.messageType == 2 ? "事件" : "通知",
           content: modalContent.value.content
         })

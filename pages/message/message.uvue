@@ -1,60 +1,143 @@
 <template>
-	<custom-navBar title="消息中心" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+	<custom-navBar title="消息中心" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false" :isShowStyle="true">
 	</custom-navBar>
 	<view class="container">
+		
 		<view class="list-box">
-			<uv-list v-for="(item,index) in msgList" :key="item.messageId">
+			<uv-list v-for="(item,index) in msgList" :key="index">
 				<uv-list-item :title="item.messageType == 1 ? '警告' : item.messageType == 2 ? '事件' : '通知'"
 					:note="item.content" @click="handleItemClick(item)" :clickable="true"
 					:show-badge="item.status == 1" :badge="{value: '未读'}">
 				</uv-list-item>
 			</uv-list>
+			<uv-load-more :status="loadStatus" @loadmore="loadMore" />
 		</view>
-		<uv-modal ref="modal" :title="modalContent.messageType == 1 ? '警告' : modalContent.messageType == 2 ? '事件' : '通知'":content="modalContent.content"></uv-modal>
+		<uv-modal ref="modal" :title="modalContent.messageType == 1 ? '警告' : modalContent.messageType == 2 ? '事件' : '通知'":content="modalContent.content" @confirm="ReadIt"></uv-modal>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref } from 'vue'
-	import { getUserMsgList,setMsgState } from '../../api/request.uts'
-	const modal = ref(null);
+	import { ref} from 'vue'
+	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 	
+	const modal = ref(null);
 	const modalContent = ref<UTSJSONObject>({})
-
+	
+	// 消息列表相关
+	const msgList = ref<UTSJSONObject[]>([])
+	const currPage = ref(1)          // 当前页码
+	const pageSize = ref(10)         // 每页条数
+	const totalPage = ref(1)         // 总页数
+	const loadStatus = ref('loadmore') // 加载状态：loadmore(加载更多)、loading(加载中)、nomore(没有更多)
+	const isLoading = ref(false)     // 是否正在加载中，防止重复请求
+	
+	// 页面加载时初始化数据
+	onLoad(() => {
+		loadMsgList(true)
+	})
+	
+	// 监听页面滚动到底部，触发加载更多
+	onReachBottom(() => {
+		console.log('currPage.value----',currPage.value,'totalPage---',totalPage.value)
+		if (loadStatus.value == 'loadmore') {
+			loadMore()
+		}
+	})
+	
+	// 加载消息列表
+	const loadMsgList = async (isInit = false) => {
+		if (isInit) {
+			currPage.value = 1
+			msgList.value = []
+		}
+		
+		// 防止重复请求
+		if (isLoading.value) return
+		isLoading.value = true
+		
+		try {
+			// 显示加载中状态
+			if (!isInit) {
+				loadStatus.value = 'loading'
+			}
+			
+			// 调用接口获取数据，传递当前页码和每页条数
+			const res = await getUserMsgList({
+				page: currPage.value,
+				pageSize: pageSize.value
+			})
+			
+			if (res.code === 0 && res.msg === 'success') {
+				const data = res.data
+				// 更新总页数
+				totalPage.value = data.totalPage
+				
+				// 赋值
+				if (isInit) {
+					msgList.value = data.list
+				} else {
+					msgList.value = [...msgList.value, ...data.list]
+				}
+				
+				// 判断是否还有更多数据
+				if (currPage.value >= totalPage.value) {
+					loadStatus.value = 'nomore'
+				} else {
+					loadStatus.value = 'loadmore'
+				}
+			} else {
+				// 接口返回错误
+				loadStatus.value = 'loadmore'
+				console.error('获取消息列表失败:', res.msg)
+			}
+		} catch (error) {
+			loadStatus.value = 'loadmore'
+			console.error('获取消息列表异常:', error)
+		} finally {
+			isLoading.value = false
+		}
+	}
+	
+	// 加载更多数据
+	const loadMore = () => {
+		console.log(currPage.value , totalPage.value)
+		// 检查是否还有更多数据
+		if (currPage.value < totalPage.value) {
+			currPage.value++
+			loadMsgList()
+		} else {
+			loadStatus.value = 'nomore'
+		}
+	}
+	
+	// 处理消息点击
 	const handleItemClick = async (item) => {
 		modalContent.value = item
 		modal.value?.open();
-		console.log('item:',item)
-		if(item.status == 1){
+		
+		// 如果是未读消息，标记为已读
+		if (item.status == 1) {
 			const res = await setMsgState(item.messageId)
-			console.log('消息状态：',res)
-			if(res.msg== 'success'){
+			console.log('消息状态更新结果：', res)
+			if (res.msg === 'success') {
+				// 重新加载当前页数据
 				loadMsgList()
 			}
 		}
-		
-	}
-
-	const msgList = ref<UTSJSONObject>({})
-	
-	onLoad(() => {
-		loadMsgList()
-	})
-	const loadMsgList = async () => {
-		const res = await getUserMsgList()
-		msgList.value = res.data.list
 	}
 	
-	onReachBottom(()=>{
-		console.log('aaaaa')
-	})
+	// 模态框确认按钮
+	const ReadIt = () => {
+		modal.value?.close();
+	}
 </script>
 
 <style lang="scss">
 	.container {
 		width: 100%;
-		height: 100%;
+		min-height: 100vh;
 		background-color: #f5f5f5;
+		margin-top: 190rpx;
 
 		.list-box {
 			width: 100%;
@@ -63,6 +146,12 @@
 			.uv-list {
 				margin-bottom: 20rpx;
 				border-radius: 20rpx;
+			}
+			
+			// 加载更多组件样式
+			.uv-load-more {
+				padding: 30rpx 0;
+				text-align: center;
 			}
 		}
 	}

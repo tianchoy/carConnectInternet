@@ -1,7 +1,13 @@
 <template>
-	<view :style="{ height: statusBarHeight + 'px','background-color':'#fff' }"></view>
-	<view class="navbar" :style="{
-    height: navBarHeight + 'px',
+	<view
+		:style="isShowStyle?{ height: statusBarHeight + 'px','background-color':'#fff',position:'fixed',width:'100%',letf:'0',top:0,'z-index':'100'}:{ height: statusBarHeight + 'px','background-color':'#fff',} ">
+	</view>
+	<view class="navbar" :style="isShowStyle?{
+    height: navBarHeight +10+ 'px',
+    background: backgroundColor,
+	position:'fixed',width:'100%',letf:'0',top:navBarHeight + 'px','z-index':'100'
+  }:{
+    height: navBarHeight +10+ 'px',
     background: backgroundColor
   }">
 		<view class="back-btn">
@@ -14,8 +20,7 @@
       right: 170+'rpx',
     }">
 			<view class="capsule-item">
-				<view v-if="showCapsule"
-						@click="emit('capsuleClick', 'menu')">
+				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
 					<uv-icon :name="Icon" v-if="isIcon" size="28"></uv-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
@@ -32,9 +37,10 @@
 		showCapsule: { type: Boolean, default: true },
 		backgroundColor: { type: String, default: '#ffffff' },
 		textColor: { type: String, default: '#000000' },
-		isIcon:{type:Boolean, default:true},
-		Icon:{type:String,default:'plus-circle'},
-		rightText:{type:String,default:''}
+		isIcon: { type: Boolean, default: true },
+		Icon: { type: String, default: 'plus-circle' },
+		rightText: { type: String, default: '' },
+		isShowStyle: { type: Boolean, default: false }
 	});
 
 	const emit = defineEmits(['back', 'capsuleClick']);

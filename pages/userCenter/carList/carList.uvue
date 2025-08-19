@@ -1,8 +1,9 @@
 <template>
+	<custom-navBar title="车辆管理" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="true"
+		:isIcon="true" @capsuleClick="addCar" :isShowStyle="true">
+	</custom-navBar>
 	<view class="container">
-		<custom-navBar title="车辆管理" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="true"
-			:isIcon="true" @capsuleClick="addCar">
-		</custom-navBar>
+
 		<view class="content">
 			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
 				<text class="title">{{item.plateNo}}</text>
@@ -11,64 +12,154 @@
 					<text class="tel">{{item.imei}}</text>
 				</view>
 			</view>
+
+			<!-- 加载提示 -->
+			<view class="loading" v-if="loading">
+				<text>加载中...</text>
+			</view>
+			<view class="no-more" v-if="!hasMore && !loading">
+				<text>没有更多数据了</text>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { getUserDeviceList } from '../../../api/request.uts'
-	
-	const carList = ref<UTSJSONObject>({})
-	const addCar=()=>{
+
+	const carList = ref<Array<UTSJSONObject>>([])
+	// 当前页码
+	const currPage = ref(1)
+	// 每页条数
+	const pageSize = ref(10)
+	// 总页数
+	const totalPage = ref(0)
+	// 是否正在加载
+	const loading = ref(false)
+	// 是否还有更多数据
+	const hasMore = ref(true)
+
+	const addCar = () => {
 		uni.navigateTo({
-			url:'/pages/addCar/addCar'
+			url: '/pages/addCar/addCar'
 		})
 	}
-	
-	onPageShow(()=>{
+
+	onPageShow(() => {
+		resetData()
 		loadCarListData()
 	})
-	
-	const loadCarListData = async () => {
-		const data = {}
-		const res = await getUserDeviceList(data)
-		carList.value = res.data.list
-		console.log(res.data)
+
+	// 重置数据
+	const resetData = () => {
+		carList.value = []
+		currPage.value = 1
+		totalPage.value = 0
+		hasMore.value = true
 	}
-	
-	const carDetail = (deviceId:string) => {
+
+	// 加载车辆列表数据
+	const loadCarListData = async () => {
+		
+		if (loading.value || !hasMore.value) return
+
+		loading.value = true
+		try {
+			const data = {
+				page: currPage.value,
+				pageSize: pageSize.value
+			}
+			const res = await getUserDeviceList(data)
+
+			if (res.code == 0) {
+				// 保存总页数
+				totalPage.value = res.data.totalPage
+
+				// 如果是第一页，直接赋值
+				if (currPage.value == 1) {
+					carList.value = res.data.list
+				} else {
+					carList.value = [...carList.value, ...res.data.list]
+				}
+
+				// 判断是否还有更多数据
+				hasMore.value = currPage.value < totalPage.value
+
+				// 还有更多数据时增加页码
+				if (hasMore.value) {
+					currPage.value++
+				}
+			} else {
+				uni.showToast({
+					title: res.msg || '加载失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('加载车辆列表失败:', error)
+			uni.showToast({
+				title: '加载失败，请重试',
+				icon: 'none'
+			})
+		} finally {
+			loading.value = false
+		}
+	}
+
+	// 监听页面滚动到底部，触发加载更多
+	onReachBottom(() => {
+		loadCarListData()
+	})
+
+	const carDetail = (deviceId : string) => {
 		uni.navigateTo({
-			url:'/pages/userCenter/carDetail/carDetail?deviceId='+deviceId
+			url: `/pages/userCenter/carDetail/carDetail?deviceId=${deviceId}`
 		})
 	}
 </script>
 
 <style lang="scss" scoped>
-	.container{
-		height: 100%;
+	.container {
+		width: 100%;
+		min-height: 100vh;
 		background-color: #f5f5f5;
-		.content{
+		margin-top: 190rpx;
+
+		.content {
 			margin: 20rpx;
-			.list{
+
+			.list {
 				background-color: #fff;
 				border-radius: 20rpx;
 				padding: 30rpx 40rpx;
 				margin-bottom: 30rpx;
 				font-size: 25rpx;
-				.title{
+
+				.title {
 					font-weight: bold;
 				}
-				.device-info{
+
+				.device-info {
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
 					align-items: center;
 					padding-top: 20rpx;
-					.tel{
+
+					.tel {
 						color: #999;
 						font-size: 22rpx;
 					}
 				}
+			}
+
+			// 加载提示样式
+			.loading,
+			.no-more {
+				text-align: center;
+				padding: 30rpx 0;
+				color: #999;
+				font-size: 24rpx;
 			}
 		}
 	}

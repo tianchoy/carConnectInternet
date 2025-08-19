@@ -20,7 +20,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     textColor: { type: String, default: "#000000" },
     isIcon: { type: Boolean, default: true },
     Icon: { type: String, default: "plus-circle" },
-    rightText: { type: String, default: "" }
+    rightText: { type: String, default: "" },
+    isShowStyle: { type: Boolean, default: false }
   },
   emits: ["back", "capsuleClick"],
   setup(__props, _a) {
@@ -45,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:65", "胶囊按钮信息获取失败", e);
+        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:71", "胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
@@ -60,7 +61,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(initDimensions);
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.unref(statusBarHeight) + "px",
+        a: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
+          height: common_vendor.unref(statusBarHeight) + "px",
+          "background-color": "#fff",
+          position: "fixed",
+          width: "100%",
+          letf: "0",
+          top: 0,
+          "z-index": "100"
+        }) : new UTSJSONObject({
+          height: common_vendor.unref(statusBarHeight) + "px",
+          "background-color": "#fff"
+        })),
         b: __props.showBack
       }), __props.showBack ? new UTSJSONObject({
         c: common_assets._imports_0$5,
@@ -85,8 +97,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       })) : new UTSJSONObject({}), new UTSJSONObject({
         m: "170rpx",
-        n: common_vendor.unref(navBarHeight) + "px",
-        o: __props.backgroundColor
+        n: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
+          height: common_vendor.unref(navBarHeight) + 10 + "px",
+          background: __props.backgroundColor,
+          position: "fixed",
+          width: "100%",
+          letf: "0",
+          top: common_vendor.unref(navBarHeight) + "px",
+          "z-index": "100"
+        }) : new UTSJSONObject({
+          height: common_vendor.unref(navBarHeight) + 10 + "px",
+          background: __props.backgroundColor
+        }))
       }));
       return __returned__;
     };

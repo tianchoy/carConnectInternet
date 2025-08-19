@@ -12,41 +12,88 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carList",
   setup(__props) {
-    const carList = common_vendor.ref(new UTSJSONObject({}));
+    const carList = common_vendor.ref([]);
+    const currPage = common_vendor.ref(1);
+    const pageSize = common_vendor.ref(10);
+    const totalPage = common_vendor.ref(0);
+    const loading = common_vendor.ref(false);
+    const hasMore = common_vendor.ref(true);
     const addCar = () => {
       common_vendor.index.navigateTo({
         url: "/pages/addCar/addCar"
       });
     };
     common_vendor.onPageShow(() => {
+      resetData();
       loadCarListData();
     });
+    const resetData = () => {
+      carList.value = [];
+      currPage.value = 1;
+      totalPage.value = 0;
+      hasMore.value = true;
+    };
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const data = new UTSJSONObject({});
-        const res = yield api_request.getUserDeviceList(data);
-        carList.value = res.data.list;
-        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:36", res.data);
+        if (loading.value || !hasMore.value)
+          return Promise.resolve(null);
+        loading.value = true;
+        try {
+          const data = new UTSJSONObject({
+            page: currPage.value,
+            pageSize: pageSize.value
+          });
+          const res = yield api_request.getUserDeviceList(data);
+          if (res.code == 0) {
+            totalPage.value = res.data.totalPage;
+            if (currPage.value == 1) {
+              carList.value = res.data.list;
+            } else {
+              carList.value = [...carList.value, ...res.data.list];
+            }
+            hasMore.value = currPage.value < totalPage.value;
+            if (hasMore.value) {
+              currPage.value++;
+            }
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "加载失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:99", "加载车辆列表失败:", error);
+          common_vendor.index.showToast({
+            title: "加载失败，请重试",
+            icon: "none"
+          });
+        } finally {
+          loading.value = false;
+        }
       });
     };
+    common_vendor.onReachBottom(() => {
+      loadCarListData();
+    });
     const carDetail = (deviceId) => {
       common_vendor.index.navigateTo({
-        url: "/pages/userCenter/carDetail/carDetail?deviceId=" + deviceId
+        url: `/pages/userCenter/carDetail/carDetail?deviceId=${deviceId}`
       });
     };
     return (_ctx = null, _cache = null) => {
-      const __returned__ = {
+      const __returned__ = common_vendor.e(new UTSJSONObject({
         a: common_vendor.o(addCar),
-        b: common_vendor.p({
+        b: common_vendor.p(new UTSJSONObject({
           title: "车辆管理",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: true,
-          isIcon: true
-        }),
+          isIcon: true,
+          isShowStyle: true
+        })),
         c: common_vendor.f(common_vendor.unref(carList), (item = null, index = null, i0 = null) => {
-          return {
+          return new UTSJSONObject({
             a: common_vendor.t(item.plateNo),
             b: common_vendor.t(item.companyId),
             c: common_vendor.t(item.imei),
@@ -54,10 +101,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: common_vendor.o(($event = null) => {
               return carDetail(item.deviceId);
             }, index)
-          };
+          });
         }),
-        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      };
+        d: common_vendor.unref(loading)
+      }), common_vendor.unref(loading) ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+        e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
+      }), !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? new UTSJSONObject({}) : new UTSJSONObject({}));
       return __returned__;
     };
   }
