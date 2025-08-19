@@ -173,23 +173,56 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function initCarMarker() {
       if (trackPoints.value.length > 0) {
-        carMarker.value = new UTSJSONObject({
-          id: 999,
+        carMarker.value = new UTSJSONObject(
+          {
+            id: 999,
+            latitude: trackPoints.value[0].latitude,
+            longitude: trackPoints.value[0].longitude,
+            iconPath: "/static/car.png",
+            width: 32,
+            height: 32,
+            rotate: trackPoints.value[0].rotation || 0,
+            anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+            callout: new UTSJSONObject({
+              content: plateNo,
+              borderRadius: 5,
+              padding: 5,
+              display: "ALWAYS"
+            })
+          }
+          // 添加起点和终点标记
+        );
+        const startMarker = new UTSJSONObject({
+          id: 1e3,
           latitude: trackPoints.value[0].latitude,
           longitude: trackPoints.value[0].longitude,
-          iconPath: "/static/car.png",
-          width: 32,
-          height: 32,
-          rotate: trackPoints.value[0].rotation || 0,
+          iconPath: "/static/start.png",
+          width: 24,
+          height: 24,
           anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
           callout: new UTSJSONObject({
-            content: plateNo,
+            content: "起点",
             borderRadius: 5,
             padding: 5,
             display: "ALWAYS"
           })
         });
-        markers.value = [carMarker.value];
+        const endMarker = new UTSJSONObject({
+          id: 1001,
+          latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
+          longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+          iconPath: "/static/end.png",
+          width: 24,
+          height: 24,
+          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          callout: new UTSJSONObject({
+            content: "终点",
+            borderRadius: 5,
+            padding: 5,
+            display: "ALWAYS"
+          })
+        });
+        markers.value = [carMarker.value, startMarker, endMarker];
       }
     }
     function updatePolyline() {
@@ -257,6 +290,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } else {
         endTime.value = formattedValue;
       }
+      resetPlayback();
       loadTrackPos();
       showDateTimePicker.value = false;
     }

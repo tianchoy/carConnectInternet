@@ -235,10 +235,43 @@
 					display: 'ALWAYS'
 				}
 			}
-			markers.value = [carMarker.value]
+			
+			// 添加起点和终点标记
+			const startMarker = {
+				id: 1000,
+				latitude: trackPoints.value[0].latitude,
+				longitude: trackPoints.value[0].longitude,
+				iconPath: '/static/start.png',
+				width: 24,
+				height: 24,
+				anchor: { x: 0.5, y: 0.5 },
+				callout: {
+					content: '起点',
+					borderRadius: 5,
+					padding: 5,
+					display: 'ALWAYS'
+				}
+			}
+			
+			const endMarker = {
+				id: 1001,
+				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
+				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+				iconPath: '/static/end.png',
+				width: 24,
+				height: 24,
+				anchor: { x: 0.5, y: 0.5 },
+				callout: {
+					content: '终点',
+					borderRadius: 5,
+					padding: 5,
+					display: 'ALWAYS'
+				}
+			}
+			
+			markers.value = [carMarker.value, startMarker, endMarker]
 		}
 	}
-
 
 	// 更新轨迹线
 	function updatePolyline() {
@@ -320,6 +353,7 @@
 		} else {
 			endTime.value = formattedValue
 		}
+		resetPlayback()
 		loadTrackPos()
 		showDateTimePicker.value = false
 	}
@@ -338,7 +372,6 @@
 	}
 
 	function startPlayback() {
-		// resetPlayback()
 		if (trackPoints.value.length == 0) {
 			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
 			return
