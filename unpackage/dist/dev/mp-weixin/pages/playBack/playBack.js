@@ -124,7 +124,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return s * 6378.137 * 1e3;
     }
     function calculateTrackBounds() {
-      if (trackPoints.value.length === 0)
+      if (trackPoints.value.length == 0)
         return null;
       let minLat = trackPoints.value[0].latitude;
       let maxLat = trackPoints.value[0].latitude;
@@ -204,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             content: "起点",
             borderRadius: 5,
             padding: 5,
-            display: "ALWAYS"
+            display: "BYCLICK"
           })
         });
         const endMarker = new UTSJSONObject({
@@ -219,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             content: "终点",
             borderRadius: 5,
             padding: 5,
-            display: "ALWAYS"
+            display: "BYCLICK"
           })
         });
         markers.value = [carMarker.value, startMarker, endMarker];
@@ -269,7 +269,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carMarker.value.latitude = point.latitude;
         carMarker.value.longitude = point.longitude;
         carMarker.value.rotate = point.rotation || 0;
-        if (currentIndex.value % 5 === 0 || currentIndex.value === 0 || currentIndex.value === trackPoints.value.length - 1) {
+        if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
           center.latitude = point.latitude;
           center.longitude = point.longitude;
         }
@@ -277,7 +277,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function showPicker(type) {
       currentPickerType.value = type;
-      pickerTitle.value = type === "start" ? "选择开始时间" : "选择结束时间";
+      pickerTitle.value = type == "start" ? "选择开始时间" : "选择结束时间";
       showDateTimePicker.value = true;
     }
     function onConfirm(value) {

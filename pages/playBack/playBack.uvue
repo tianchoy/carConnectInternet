@@ -156,7 +156,7 @@
 
 	// 计算轨迹边界
 	function calculateTrackBounds() {
-		if (trackPoints.value.length === 0) return null
+		if (trackPoints.value.length == 0) return null
 
 		let minLat = trackPoints.value[0].latitude
 		let maxLat = trackPoints.value[0].latitude
@@ -249,7 +249,7 @@
 					content: '起点',
 					borderRadius: 5,
 					padding: 5,
-					display: 'ALWAYS'
+					display: 'BYCLICK'
 				}
 			}
 			
@@ -265,7 +265,7 @@
 					content: '终点',
 					borderRadius: 5,
 					padding: 5,
-					display: 'ALWAYS'
+					display: 'BYCLICK'
 				}
 			}
 			
@@ -325,9 +325,9 @@
 			carMarker.value.rotate = point.rotation || 0
 
 			// 每5个点更新一次中心点
-			if (currentIndex.value % 5 === 0 ||
-				currentIndex.value === 0 ||
-				currentIndex.value === trackPoints.value.length - 1) {
+			if (currentIndex.value % 5 == 0 ||
+				currentIndex.value == 0 ||
+				currentIndex.value == trackPoints.value.length - 1) {
 				center.latitude = point.latitude
 				center.longitude = point.longitude
 			}
@@ -337,7 +337,7 @@
 	// 显示日期时间选择器
 	function showPicker(type : string) {
 		currentPickerType.value = type
-		pickerTitle.value = type === 'start' ? '选择开始时间' : '选择结束时间'
+		pickerTitle.value = type == 'start' ? '选择开始时间' : '选择结束时间'
 		showDateTimePicker.value = true
 	}
 

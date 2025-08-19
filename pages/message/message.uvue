@@ -88,7 +88,7 @@
 				const data = res.data || { list: [], totalPage: 0 }
 				totalPage.value = data.totalPage || 1
 				
-				// 关键日志：打印当前页数据
+				// 打印当前页数据
 				console.log('第', currPage.value, '页接口返回:', data);
 				console.log('第', currPage.value, '页列表长度:', data.list?.length);
 				

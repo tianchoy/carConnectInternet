@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const BASE_URL = "http://182.40.96.184:8081/api";
+const BASE_URL = "https://car.zdiot.cn:18443/api";
 function requestInterceptor(config) {
   const token = common_vendor.index.getStorageSync("token");
   if (token) {
