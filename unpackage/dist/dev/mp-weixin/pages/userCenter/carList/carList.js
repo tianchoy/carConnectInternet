@@ -35,6 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:63", currPage.value, totalPage.value);
         if (loading.value || !hasMore.value)
           return Promise.resolve(null);
         loading.value = true;

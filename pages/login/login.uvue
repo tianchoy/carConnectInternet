@@ -13,7 +13,8 @@
 					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
 				<uv-form-item label="" prop="password" labelWidth="0">
-					<uv-input prefixIcon="lock-fill" v-model="form.password" placeholder="请输入密码" :password="showpw"
+					<uv-input prefixIcon="lock-fill" v-model="form.password" :type="showpw?'password':'text'"
+						@input="filterNonLatin" placeholder="请输入密码" :password="showpw"
 						customStyle="border:1rpx solid red;height:80rpx">
 						<template v-slot:suffix>
 							<uv-icon :name="showpw?'eye-off-outline':'eye'" @click="showpwfun" />
@@ -62,7 +63,7 @@
 
 <script setup lang="uts">
 	import { ref, onMounted } from 'vue'
-	import { login ,PostWechatlogin} from '../../api/request.uts'
+	import { login, PostWechatlogin } from '../../api/request.uts'
 	const showpw = ref(true)
 	const docState = ref(false)
 	const loginType = ref(true)
@@ -96,6 +97,10 @@
 	const formRef = ref<UvFormInstance | null>(null)
 	const smsformRef = ref<UvFormInstance | null>(null)
 	const deviceModel = ref('')
+
+	const filterNonLatin = (e) => {
+		form.value.password = e.replace(/[^\x00-\x7F]/g, '')
+	}
 
 	const pswrules = {
 		username: [
@@ -277,7 +282,7 @@
 					fail: reject
 				})
 			})
-			
+
 			console.log(loginRes)
 			console.log(e)
 
@@ -287,8 +292,8 @@
 				encryptedData: e.detail.encryptedData,
 				iv: e.detail.iv
 			})
-			
-			console.log('res',res)
+
+			console.log('res', res)
 
 			// // 3. 登录成功处理
 			// uni.setStorageSync('token', res.data.token)

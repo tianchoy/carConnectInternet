@@ -110,6 +110,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const formRef = common_vendor.ref(null);
     const smsformRef = common_vendor.ref(null);
     const deviceModel = common_vendor.ref("");
+    const filterNonLatin = (e = null) => {
+      form.value.password = e.replace(/[^\x00-\x7F]/g, "");
+    };
     const pswrules = new UTSJSONObject({
       username: [
         new UTSJSONObject({
@@ -201,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:218", "docState.value:", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:223", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -249,16 +252,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               fail: reject
             }));
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:281", loginRes);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:282", e);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:286", loginRes);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:287", e);
           const res = yield api_request.PostWechatlogin({
             code: loginRes.code,
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:291", "res", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:296", "res", res);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:300", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:305", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -270,7 +273,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:311", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:316", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -357,96 +360,98 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         h: common_vendor.p(new UTSJSONObject({
           name: showpw.value ? "eye-off-outline" : "eye"
         })),
-        i: common_vendor.o(($event = null) => {
+        i: common_vendor.o(filterNonLatin),
+        j: common_vendor.o(($event = null) => {
           return form.value.password = $event;
         }),
-        j: common_vendor.p(new UTSJSONObject({
+        k: common_vendor.p(new UTSJSONObject({
           prefixIcon: "lock-fill",
+          type: showpw.value ? "password" : "text",
           placeholder: "请输入密码",
           password: showpw.value,
           customStyle: "border:1rpx solid red;height:80rpx",
           modelValue: form.value.password
         })),
-        k: common_vendor.p(new UTSJSONObject({
+        l: common_vendor.p(new UTSJSONObject({
           label: "",
           prop: "password",
           labelWidth: "0"
         })),
-        l: common_vendor.sr(formRef, "27a30816-1", new UTSJSONObject({
+        m: common_vendor.sr(formRef, "27a30816-1", new UTSJSONObject({
           "k": "formRef"
         })),
-        m: common_vendor.p(new UTSJSONObject({
+        n: common_vendor.p(new UTSJSONObject({
           model: form.value,
           rules: pswrules
         }))
       }) : new UTSJSONObject({
-        n: common_vendor.o(($event = null) => {
+        o: common_vendor.o(($event = null) => {
           return smsform.value.phone = $event;
         }),
-        o: common_vendor.p(new UTSJSONObject({
+        p: common_vendor.p(new UTSJSONObject({
           prefixIcon: "phone-fill",
           placeholder: "请输入手机号",
           modelValue: smsform.value.phone
         })),
-        p: common_vendor.p(new UTSJSONObject({
+        q: common_vendor.p(new UTSJSONObject({
           label: "",
           prop: "phone",
           labelWidth: "0"
         })),
-        q: common_vendor.sr(uCode, "27a30816-12,27a30816-11", new UTSJSONObject({
+        r: common_vendor.sr(uCode, "27a30816-12,27a30816-11", new UTSJSONObject({
           "k": "uCode"
         })),
-        r: common_vendor.o(codeChange),
-        s: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.o(codeChange),
+        t: common_vendor.p(new UTSJSONObject({
           seconds: "60",
           changeText: "X秒重新获取"
         })),
-        t: common_vendor.o(getCode),
-        v: common_vendor.p(new UTSJSONObject({
+        v: common_vendor.o(getCode),
+        w: common_vendor.p(new UTSJSONObject({
           text: tips.value,
           type: "success",
           size: "mini"
         })),
-        w: common_vendor.o(($event = null) => {
+        x: common_vendor.o(($event = null) => {
           return smsform.value.code = $event;
         }),
-        x: common_vendor.p(new UTSJSONObject({
+        y: common_vendor.p(new UTSJSONObject({
           prefixIcon: "lock-fill",
           placeholder: "请输入验证码",
           modelValue: smsform.value.code
         })),
-        y: common_vendor.p(new UTSJSONObject({
+        z: common_vendor.p(new UTSJSONObject({
           label: "",
           prop: "code",
           labelWidth: "0"
         })),
-        z: common_vendor.sr(smsformRef, "27a30816-7", new UTSJSONObject({
+        A: common_vendor.sr(smsformRef, "27a30816-7", new UTSJSONObject({
           "k": "smsformRef"
         })),
-        A: common_vendor.p(new UTSJSONObject({
+        B: common_vendor.p(new UTSJSONObject({
           model: smsform.value,
           rules: smsrules
         }))
       }), new UTSJSONObject({
-        B: common_vendor.o(submit),
-        C: common_vendor.p(new UTSJSONObject({
+        C: common_vendor.o(submit),
+        D: common_vendor.p(new UTSJSONObject({
           type: "primary"
         })),
-        D: common_vendor.o(isDocState),
-        E: common_vendor.p(new UTSJSONObject({
+        E: common_vendor.o(isDocState),
+        F: common_vendor.p(new UTSJSONObject({
           checked: docState.value
         })),
-        F: common_vendor.o(isDocState),
-        G: common_vendor.p(new UTSJSONObject({
+        G: common_vendor.o(isDocState),
+        H: common_vendor.p(new UTSJSONObject({
           text: "其他登陆方式"
         })),
-        H: common_vendor.p(new UTSJSONObject({
+        I: common_vendor.p(new UTSJSONObject({
           name: "weixin-circle-fill",
           size: "35",
           color: "#1AAD19"
         })),
-        I: common_vendor.o(handleGetPhoneNumber),
-        J: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        J: common_vendor.o(handleGetPhoneNumber),
+        K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

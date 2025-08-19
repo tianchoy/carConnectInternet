@@ -40,7 +40,7 @@
 }
 .container .content .list {
   background-color: #fff;
-  border-radius: 10rpx;
+  border-radius: 20rpx;
   padding: 20rpx;
 }
 .container .content .list .item {

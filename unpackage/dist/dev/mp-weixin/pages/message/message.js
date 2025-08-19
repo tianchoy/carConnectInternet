@@ -32,16 +32,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadMsgList(true);
     });
     common_vendor.onReachBottom(() => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:41", "currPage.value----", currPage.value, "totalPage---", totalPage.value);
-      if (loadStatus.value == "loadmore") {
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:57", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
+      if (loadStatus.value == "loadmore" && !isLoading.value) {
         loadMore();
       }
     });
     const loadMsgList = (isInit = false) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
         if (isInit) {
           currPage.value = 1;
           msgList.value = [];
+          loadStatus.value = "loadmore";
         }
         if (isLoading.value)
           return Promise.resolve(null);
@@ -50,17 +52,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (!isInit) {
             loadStatus.value = "loading";
           }
+          common_vendor.index.__f__("log", "at pages/message/message.uvue:79", "请求数据 - 页码:", currPage.value);
           const res = yield api_request.getUserMsgList(new UTSJSONObject({
             page: currPage.value,
             pageSize: pageSize.value
           }));
-          if (res.code === 0 && res.msg === "success") {
-            const data = res.data;
-            totalPage.value = data.totalPage;
+          if (res.code == 0 && res.msg == "success") {
+            const data = res.data || new UTSJSONObject({ list: [], totalPage: 0 });
+            totalPage.value = data.totalPage || 1;
+            common_vendor.index.__f__("log", "at pages/message/message.uvue:92", "第", currPage.value, "页接口返回:", data);
+            common_vendor.index.__f__("log", "at pages/message/message.uvue:93", "第", currPage.value, "页列表长度:", (_a = data.list) === null || _a === void 0 ? null : _a.length);
             if (isInit) {
-              msgList.value = data.list;
+              msgList.value = data.list || [];
             } else {
-              msgList.value = [...msgList.value, ...data.list];
+              const newData = data.list || [];
+              common_vendor.index.__f__("log", "at pages/message/message.uvue:100", "即将添加的新数据长度:", newData.length);
+              msgList.value = [...msgList.value, ...newData];
+              msgList.value = [...msgList.value];
             }
             if (currPage.value >= totalPage.value) {
               loadStatus.value = "nomore";
@@ -69,18 +77,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           } else {
             loadStatus.value = "loadmore";
-            common_vendor.index.__f__("error", "at pages/message/message.uvue:91", "获取消息列表失败:", res.msg);
+            common_vendor.index.__f__("error", "at pages/message/message.uvue:114", "接口返回错误:", res.msg);
           }
         } catch (error) {
           loadStatus.value = "loadmore";
-          common_vendor.index.__f__("error", "at pages/message/message.uvue:95", "获取消息列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/message/message.uvue:118", "请求异常:", error);
         } finally {
           isLoading.value = false;
         }
       });
     };
     const loadMore = () => {
-      common_vendor.index.__f__("log", "at pages/message/message.uvue:103", currPage.value, totalPage.value);
+      common_vendor.index.__f__("log", "at pages/message/message.uvue:126", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
       if (currPage.value < totalPage.value) {
         currPage.value++;
         loadMsgList();
@@ -94,10 +102,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         modalContent.value = item;
         (_a = modal.value) === null || _a === void 0 ? null : _a.open();
         if (item.status == 1) {
-          const res = yield api_request.setMsgState(item.messageId);
-          common_vendor.index.__f__("log", "at pages/message/message.uvue:121", "消息状态更新结果：", res);
-          if (res.msg === "success") {
-            loadMsgList();
+          try {
+            const res = yield api_request.setMsgState(item.messageId);
+            if (res.msg == "success") {
+              const index = msgList.value.findIndex((msg) => {
+                return msg.messageId == item.messageId;
+              });
+              if (index !== -1) {
+                msgList.value[index].status = 0;
+              }
+            }
+          } catch (error) {
+            common_vendor.index.__f__("error", "at pages/message/message.uvue:150", "更新状态失败:", error);
           }
         }
       });
@@ -107,47 +123,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       (_a = modal.value) === null || _a === void 0 ? null : _a.close();
     };
     return (_ctx = null, _cache = null) => {
-      const __returned__ = {
-        a: common_vendor.p({
+      const __returned__ = common_vendor.e(new UTSJSONObject({
+        a: common_vendor.p(new UTSJSONObject({
           title: "消息中心",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false,
           isShowStyle: true
-        }),
-        b: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
-          return {
+        })),
+        b: msgList.value.length == 0 && !isLoading.value
+      }), msgList.value.length == 0 && !isLoading.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+        c: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
+          return new UTSJSONObject({
             a: common_vendor.o(($event = null) => {
               return handleItemClick(item);
             }, index),
             b: "1993bd19-2-" + i0 + "," + ("1993bd19-1-" + i0),
-            c: common_vendor.p({
+            c: common_vendor.p(new UTSJSONObject({
               title: item.messageType == 1 ? "警告" : item.messageType == 2 ? "事件" : "通知",
               note: item.content,
               clickable: true,
               ["show-badge"]: item.status == 1,
-              badge: {
+              badge: new UTSJSONObject({
                 value: "未读"
-              }
-            }),
+              })
+            })),
             d: index,
             e: "1993bd19-1-" + i0
-          };
+          });
         }),
-        c: common_vendor.o(loadMore),
-        d: common_vendor.p({
+        d: common_vendor.o(loadMore),
+        e: common_vendor.p(new UTSJSONObject({
           status: loadStatus.value
-        }),
-        e: common_vendor.sr(modal, "1993bd19-4", {
+        })),
+        f: common_vendor.sr(modal, "1993bd19-4", new UTSJSONObject({
           "k": "modal"
-        }),
-        f: common_vendor.o(ReadIt),
-        g: common_vendor.p({
+        })),
+        g: common_vendor.o(ReadIt),
+        h: common_vendor.p(new UTSJSONObject({
           title: modalContent.value.messageType == 1 ? "警告" : modalContent.value.messageType == 2 ? "事件" : "通知",
           content: modalContent.value.content
-        })
-      };
+        }))
+      }));
       return __returned__;
     };
   }

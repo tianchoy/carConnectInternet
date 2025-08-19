@@ -32,7 +32,7 @@
 }
 .list-container .content {
   margin-top: 120rpx;
-  max-height: calc(100vh - 120rpx);
+  max-height: calc(100vh - 290rpx);
   overflow-y: auto;
 }
 .list-container .content .list-item {

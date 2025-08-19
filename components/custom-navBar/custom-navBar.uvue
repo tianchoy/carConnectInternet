@@ -1,13 +1,16 @@
 <template>
-	<view
-		:style="isShowStyle?{ height: statusBarHeight + 'px','background-color':'#fff',position:'fixed',width:'100%',letf:'0',top:0,'z-index':'100'}:{ height: statusBarHeight + 'px','background-color':'#fff',} ">
+	<view :style="isShowStyle?{ height: statusBarHeight + 'px','background-color':'#fff',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'}
+		:
+		{ height: statusBarHeight + 'px','background-color':'#fff',} ">
 	</view>
 	<view class="navbar" :style="isShowStyle?{
-    height: navBarHeight +10+ 'px',
+    height: navBarHeight +'px',
     background: backgroundColor,
-	position:'fixed',width:'100%',letf:'0',top:navBarHeight + 'px','z-index':'100'
-  }:{
-    height: navBarHeight +10+ 'px',
+	position:'fixed',width:'100%',letf:'0',top:statusBarHeight + 'px','z-index':'100'
+  }
+  :
+  {
+    height: navBarHeight +'px',
     background: backgroundColor
   }">
 		<view class="back-btn">

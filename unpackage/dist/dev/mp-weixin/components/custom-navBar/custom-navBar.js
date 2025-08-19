@@ -46,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:71", "胶囊按钮信息获取失败", e);
+        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:74", "胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "background-color": "#fff",
           position: "fixed",
           width: "100%",
-          letf: "0",
+          letf: 0,
           top: 0,
           "z-index": "100"
         }) : new UTSJSONObject({
@@ -98,15 +98,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       })) : new UTSJSONObject({}), new UTSJSONObject({
         m: "170rpx",
         n: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
-          height: common_vendor.unref(navBarHeight) + 10 + "px",
+          height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor,
           position: "fixed",
           width: "100%",
           letf: "0",
-          top: common_vendor.unref(navBarHeight) + "px",
+          top: common_vendor.unref(statusBarHeight) + "px",
           "z-index": "100"
         }) : new UTSJSONObject({
-          height: common_vendor.unref(navBarHeight) + 10 + "px",
+          height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor
         }))
       }));

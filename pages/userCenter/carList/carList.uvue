@@ -60,7 +60,7 @@
 
 	// 加载车辆列表数据
 	const loadCarListData = async () => {
-		
+		console.log(currPage.value,totalPage.value)
 		if (loading.value || !hasMore.value) return
 
 		loading.value = true
@@ -123,7 +123,7 @@
 		width: 100%;
 		min-height: 100vh;
 		background-color: #f5f5f5;
-		margin-top: 190rpx;
+		margin-top: 170rpx;
 
 		.content {
 			margin: 20rpx;
