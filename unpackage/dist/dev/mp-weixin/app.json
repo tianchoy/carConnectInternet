@@ -15,7 +15,8 @@
     "pages/userCenter/userInfo/userInfo",
     "pages/userCenter/editPassword/editPassword",
     "pages/userCenter/carList/carList",
-    "pages/userCenter/carDetail/carDetail"
+    "pages/userCenter/carDetail/carDetail",
+    "pages/geofencing/geofencing"
   ],
   "window": {
     "navigationStyle": "custom",

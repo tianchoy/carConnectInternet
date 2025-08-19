@@ -18,6 +18,7 @@ if (!Math) {
   "./pages/userCenter/editPassword/editPassword.js";
   "./pages/userCenter/carList/carList.js";
   "./pages/userCenter/carDetail/carDetail.js";
+  "./pages/geofencing/geofencing.js";
 }
 const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onLaunch: function() {

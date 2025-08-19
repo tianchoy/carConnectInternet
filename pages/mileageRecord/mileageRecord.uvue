@@ -145,11 +145,12 @@
 	// 初始化加载
 	onMounted(() => {
 		initDateTime()
+		loadMileageData()
 	})
 
 	onLoad((option) => {
 		imei.value = option.imei
-		loadMileageData()
+		
 	})
 
 	const loadMileageData = async () => {
@@ -257,7 +258,7 @@
 
 		endTime.value = formatTime(now)
 		// 开始时间默认为当前时间前1天
-		const startDate = new Date(now.getTime() - 24 * 3600000)
+		const startDate = new Date(now.getTime() -  3600000)
 		startTime.value = formatTime(startDate)
 	}
 
@@ -360,6 +361,8 @@
 			height: calc(80vh - 200rpx);
 			overflow-y: auto;
 			-webkit-overflow-scrolling: touch;
+			background-color: #fff;
+			border-radius: 20rpx;
 
 			.trip-list {
 				width: 100%;

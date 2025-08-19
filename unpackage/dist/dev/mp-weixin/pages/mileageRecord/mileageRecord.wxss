@@ -84,6 +84,8 @@
   height: calc(80vh - 200rpx);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background-color: #fff;
+  border-radius: 20rpx;
 }
 .container .content .trip-list {
   width: 100%;

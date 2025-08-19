@@ -6,8 +6,9 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
 				<sub-navBar :currentTime="currentTime" :showTime="true"
-					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo" :times="times"
-					:carStatus="datainfo.connectionStatus" :showPicker="false" :showCar="true"></sub-navBar>
+					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo"
+					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
+					:showCar="true"></sub-navBar>
 			</map>
 			<view class="navTo" @click="navTo">
 				<image src="/static/navto.png" mode="aspectFit"></image>
@@ -137,22 +138,22 @@
 		name: '/static/tcjl.png',
 		title: '停车记录'
 	},
-		// {
-		// 	name: '/static/dzwl.png',
-		// 	title: '电子围栏'
-		// }
+	// {
+	// 	name: '/static/dzwl.png',
+	// 	title: '电子围栏'
+	// }
 	])
 
 	const click = (name) => {
 		currentToolItem.value = name
 		if (name == 0) {
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' +currentCarInfo.value.plateNo
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
 			})
 		}
 		if (name == 1) {
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' +currentCarInfo.value.plateNo
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
 			})
 		}
 		if (name == 2) {
@@ -162,7 +163,12 @@
 		}
 		if (name == 3) {
 			uni.navigateTo({
-				url: '/pages/stopRecord/stopRecord?imei=' + imei.value 
+				url: '/pages/stopRecord/stopRecord?imei=' + imei.value
+			})
+		}
+		if (name == 4) {
+			uni.navigateTo({
+				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
 			})
 		}
 	}

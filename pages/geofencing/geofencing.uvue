@@ -1,0 +1,227 @@
+<template>
+	<view class="container">
+		<custom-navBar title="地理围栏" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="map-container">
+			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
+				style="width:100%;height:100%" :show-location="true" :polygons="polygons">
+				<sub-navBar :showTime="false" :currentCar="currentCar" showCar="true"
+					:carStatus='connectionStatus'></sub-navBar>
+			</map>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, reactive, onMounted, watch } from 'vue'
+	import { getRoutePlan } from '@/utils/tiandituRoute'
+	import { getGeofence } from '../../api/request.uts'
+
+	const imei = ref<string | null>('')
+	const connectionStatus = ref<string | null>('')
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(15)
+	const polygons = ref<any[]>([]) // 存储地理围栏多边形数据
+
+	const currentCar = ref<string | null>('京A12345')
+
+	onLoad((option) => {
+		connectionStatus.value = option.connectionStatus
+		imei.value = option.imei
+		currentCar.value = option.plateNo
+		loadGeoData()
+	})
+
+	// 解析POLYGON字符串为坐标数组
+	const parsePolygon = (polygonStr : string) => {
+		// 去除字符串中的"POLYGON (("和"))"
+		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
+		// 按逗号分割坐标点
+		const points = coordStr.split(',')
+
+		return points.map(point => {
+			// 注意：接口返回的是纬度在前，经度在后
+			const [lat, lng] = point.trim().split(' ').map(Number)
+			return {
+				latitude: lat,
+				longitude: lng
+			}
+		})
+	}
+
+	// 调整地图中心到围栏中心位置
+	const setMapCenterToFence = (fencePoints : any[]) => {
+		if (fencePoints.length === 0) return
+
+		// 计算中心点
+		let totalLat = 0
+		let totalLng = 0
+
+		fencePoints.forEach(point => {
+			totalLat += point.latitude
+			totalLng += point.longitude
+		})
+
+		center.latitude = totalLat / fencePoints.length
+		center.longitude = totalLng / fencePoints.length
+	}
+
+	const loadGeoData = async () => {
+		if (imei.value != null) {
+			try {
+				// const res = await getGeofence(imei.value)
+				const res = {
+					"code": 0,
+					"msg": "success",
+					"data": [
+						{
+							"id": "geofence-1132635302368776192",
+							"name": "临沂护台小区",
+							"area": "POLYGON ((35.00224297962699 118.27432551316393, 35.0073007687663 118.27558949681305, 35.005152652989636 118.27515650223386, 35.00568851180233 118.27490360192313, 35.005690652725086 118.27962994512339, 35.001147079095205 118.27937666309187, 35.00128942430292 118.2764536042161))",
+							"attributes": null,
+							"description": null,
+							"companyId": "1",
+							"icon": "el-icon-map-location",
+							"createTime": "2025-06-18 08:49:25",
+							"updateTime": "2025-08-07 18:00:51",
+							"alarmType": 1,
+							"fenceType": null,
+							"deviceCount": 1
+						},
+						{
+							"id": "geofence-1150895307245096960",
+							"name": "汝州",
+							"area": "POLYGON ((33.998197999928564 112.90414666428558, 34.02528923431426 112.90762061246076, 34.02123597411279 112.95297470703494, 33.997317780676376 112.93513604401471))",
+							"attributes": null,
+							"description": null,
+							"companyId": "1",
+							"icon": "el-icon-map-location",
+							"createTime": "2025-08-07 18:08:09",
+							"updateTime": null,
+							"alarmType": 1,
+							"fenceType": null,
+							"deviceCount": 1
+						}
+					]
+				}
+				console.log('地理围栏数据:', res)
+
+				if (res.code === 0 && res.data && res.data.length > 0) {
+					// 处理每个围栏
+					const fencePolygons = res.data.map((fence : any, index : number) => {
+						// 解析围栏坐标
+						const points = parsePolygon(fence.area)
+
+						// 如果是第一个围栏，调整地图中心
+						if (index === 0) {
+							setMapCenterToFence(points)
+						}
+
+						// 定义不同围栏的颜色，便于区分
+						const colors = [
+							{ fillColor: '#7cb30580', strokeColor: '#7cb305' }, // 浅绿色
+							{ fillColor: '#1890ff80', strokeColor: '#1890ff' }, // 浅蓝色
+							{ fillColor: '#fa8c1680', strokeColor: '#fa8c16' }, // 橙色
+							{ fillColor: '#f5222d80', strokeColor: '#f5222d' }  // 红色
+						]
+						const colorIndex = index % colors.length
+
+						return {
+							points,
+							fillColor: colors[colorIndex].fillColor, // 填充色，带透明度
+							strokeColor: colors[colorIndex].strokeColor, // 边框色
+							strokeWidth: 2, // 边框宽度
+							zIndex: 10,
+							id: fence.id
+						}
+					})
+
+					polygons.value = fencePolygons
+				}
+			} catch (error) {
+				console.error('加载地理围栏失败:', error)
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f7fa;
+
+		.map-container {
+			flex: 1;
+			width: 100%;
+			position: relative;
+		}
+
+		.tools-panel {
+			width: 100%;
+			background-color: #fff;
+			padding: 20rpx 40rpx;
+			display: flex;
+			flex-direction: column;
+			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+			.btn {
+				margin-bottom: 20rpx;
+
+				button {
+					width: 100%;
+					margin: 0;
+					background-color: #1296db;
+					color: white;
+					font-size: 28rpx;
+				}
+			}
+
+			.pos-info-box {
+				padding: 10rpx 0;
+
+				.speed,
+				.address {
+					display: flex;
+					flex-direction: row;
+					justify-content: start;
+					align-items: center;
+					padding: 8rpx 0;
+					font-size: 28rpx;
+
+					text:first-child {
+						color: #666;
+						width: 100rpx;
+					}
+
+					text:last-child {
+						color: #333;
+						font-weight: 500;
+					}
+				}
+			}
+		}
+
+		.info-panel {
+			width: 100%;
+			background-color: #fff;
+			padding: 20rpx;
+			display: flex;
+			flex-direction: column;
+			font-size: 26rpx;
+			color: #666;
+			border-top: 1rpx solid #eee;
+
+			text {
+				padding: 5rpx 0;
+			}
+		}
+	}
+</style>

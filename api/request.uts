@@ -15,6 +15,7 @@ const msgState = '/usermessage/detail/'
 const updateDevice = '/device/update'
 const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
+const geofence ='/geofence/getDeviceGeofences'
 
 //登陆接口
 export const login = (data : UTSJSONObject) => {
@@ -89,4 +90,9 @@ export const getDeviceDetail = (deviceId:string) => {
 //获取车辆品牌型号
 export const getCarType = () => {
 	return http.get(carType)
+}
+
+//获取地理围栏
+export const getGeofence = (imei:string) => {
+	return http.get(geofence,{imei})
 }
