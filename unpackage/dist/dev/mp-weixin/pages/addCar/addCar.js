@@ -47,9 +47,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           trigger: ["blur", "change"]
         }),
         new UTSJSONObject({
-          min: 15,
-          max: 17,
-          message: "IMEI长度应在15-17位之间",
+          min: 8,
+          max: 15,
+          message: "IMEI长度应在8-15位之间",
           trigger: ["blur", "change"]
         })
       ],
@@ -96,7 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               plateNo: carInfo.value.plateNo
             });
             const res = yield api_request.addDevice(submitData);
-            if (res.code === 200) {
+            if (res.code == 200) {
               common_vendor.index.showToast({
                 title: "添加成功",
                 icon: "success"
@@ -106,12 +106,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }, 1500);
             } else {
               common_vendor.index.showToast({
-                title: res.message || "添加失败",
-                icon: "none"
+                title: res.msg || "添加失败",
+                icon: "none",
+                duration: 2e3
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:138", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:139", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -121,7 +122,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:147", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:148", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"

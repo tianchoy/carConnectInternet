@@ -252,16 +252,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               fail: reject
             }));
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:286", loginRes);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:287", e);
           const res = yield api_request.PostWechatlogin({
             code: loginRes.code,
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:296", "res", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:293", "res", res);
+          common_vendor.index.setStorageSync("token", res.data.token);
+          common_vendor.index.reLaunch({
+            url: "/pages/index/index"
+          });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:305", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:302", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -273,7 +275,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:316", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:313", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -291,7 +293,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }).catch((err = null) => {
             common_vendor.index.showToast({
-              title: err.message || "登录失败",
+              title: err.msg || "登录失败",
               icon: "error"
             });
           });
@@ -358,7 +360,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         g: common_vendor.o(showpwfun),
         h: common_vendor.p(new UTSJSONObject({
-          name: showpw.value ? "eye-off-outline" : "eye"
+          name: showpw.value ? "eye-off-outline" : "eye",
+          size: "20"
         })),
         i: common_vendor.o(filterNonLatin),
         j: common_vendor.o(($event = null) => {
@@ -446,9 +449,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: "其他登陆方式"
         })),
         I: common_vendor.p(new UTSJSONObject({
-          name: "weixin-circle-fill",
-          size: "35",
-          color: "#1AAD19"
+          name: "phone",
+          color: "#ccc",
+          size: "20"
         })),
         J: common_vendor.o(handleGetPhoneNumber),
         K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")

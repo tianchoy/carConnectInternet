@@ -69,9 +69,9 @@
 				trigger: ['blur', 'change']
 			},
 			{
-				min: 15,
-				max: 17,
-				message: 'IMEI长度应在15-17位之间',
+				min: 8,
+				max: 15,
+				message: 'IMEI长度应在8-15位之间',
 				trigger: ['blur', 'change']
 			}
 		],
@@ -120,7 +120,7 @@
 
 				const res = await addDevice(submitData)
 
-				if (res.code === 200) {
+				if (res.code == 200) {
 					uni.showToast({
 						title: '添加成功',
 						icon: 'success'
@@ -130,8 +130,9 @@
 					}, 1500)
 				} else {
 					uni.showToast({
-						title: res.message || '添加失败',
-						icon: 'none'
+						title: res.msg || '添加失败',
+						icon: 'none',
+						duration:2000
 					})
 				}
 			} catch (error) {

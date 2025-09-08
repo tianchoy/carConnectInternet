@@ -17,7 +17,7 @@
 						@input="filterNonLatin" placeholder="请输入密码" :password="showpw"
 						customStyle="border:1rpx solid red;height:80rpx">
 						<template v-slot:suffix>
-							<uv-icon :name="showpw?'eye-off-outline':'eye'" @click="showpwfun" />
+							<uv-icon :name="showpw?'eye-off-outline':'eye'" size="20" @click="showpwfun" />
 						</template>
 					</uv-input>
 				</uv-form-item>
@@ -54,8 +54,8 @@
 		</view>
 		<view>
 			<button open-type="getPhoneNumber" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
-				<uv-icon name="weixin-circle-fill" size="35" color="#1AAD19"></uv-icon>
-				<text>微信登陆</text>
+				<uv-icon name="phone" color="#ccc" size="20"></uv-icon>
+				<text class="quicker">快捷登录</text>
 			</button>
 		</view>
 	</view>
@@ -283,9 +283,6 @@
 				})
 			})
 
-			console.log(loginRes)
-			console.log(e)
-
 			// 2. 发送到后端解密处理
 			const res = await PostWechatlogin({
 				code: loginRes.code,
@@ -295,11 +292,11 @@
 
 			console.log('res', res)
 
-			// // 3. 登录成功处理
-			// uni.setStorageSync('token', res.data.token)
-			// uni.reLaunch({
-			// 	url: '/pages/index/index'
-			// })
+			// 3. 登录成功处理
+			uni.setStorageSync('token', res.data.token)
+			uni.reLaunch({
+				url: '/pages/index/index'
+			})
 
 		} catch (error) {
 			console.error('微信登录失败:', error)
@@ -338,7 +335,7 @@
 					})
 				}).catch(err => {
 					uni.showToast({
-						title: err.message || '登录失败',
+						title: err.msg || '登录失败',
 						icon: 'error'
 					})
 				})
@@ -436,13 +433,14 @@
 			border: none !important;
 			border-radius: 50px !important;
 			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: center;
 			padding: 10px 20px;
-			font-size: 22rpx;
-
-			text {
-				margin-top: 10rpx;
+			
+			.quicker{
+				margin: -10rpx 0 0 10rpx;
+				font-size: 25rpx;
 			}
 		}
 

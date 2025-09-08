@@ -14,8 +14,12 @@ const msgState = "/usermessage/detail/";
 const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const carType = "/carType/listAll";
+const logoutUrl = "/sys/logout";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
+};
+const logout = () => {
+  return api_http.http.post(logoutUrl);
 };
 const getCustomDeviceList = (deptId) => {
   return api_http.http.get(customDeviceList, new UTSJSONObject({ deptId }));
@@ -69,5 +73,6 @@ exports.getUserDeviceList = getUserDeviceList;
 exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
 exports.login = login;
+exports.logout = logout;
 exports.setMsgState = setMsgState;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

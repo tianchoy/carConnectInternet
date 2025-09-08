@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
@@ -42,20 +43,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo) {
         try {
           const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:52", parsedInfo);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:56", parsedInfo);
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
             mobile: parsedInfo.getString("mobile") || ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:57", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:61", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:59", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:63", "解析用户信息失败:", e);
         }
       }
     });
     const editPassword = () => {
       common_vendor.index.navigateTo({
         url: "/pages/userCenter/editPassword/editPassword"
+      });
+    };
+    const logoutBtn = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_request.logout();
+        if (res.code == 0) {
+          common_vendor.index.removeStorageSync("token");
+          common_vendor.index.reLaunch({
+            url: "/pages/login/login"
+          });
+        } else {
+          common_vendor.index.showToast({
+            title: "退出账户失败"
+          });
+        }
       });
     };
     return (_ctx = null, _cache = null) => {
@@ -82,7 +98,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "18"
         }),
         g: common_vendor.o(editPassword),
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        h: common_vendor.o(logoutBtn),
+        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

@@ -16,10 +16,16 @@ const updateDevice = '/device/update'
 const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
 const geofence ='/geofence/getDeviceGeofences'
+const logoutUrl = '/sys/logout'
 
 //登陆接口
 export const login = (data : UTSJSONObject) => {
 	return http.post(loginUrl, data)
+}
+
+//退出接口
+export const logout = () => {
+	return http.post(logoutUrl)
 }
 
 //获取客户列表

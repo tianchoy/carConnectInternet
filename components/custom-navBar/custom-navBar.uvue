@@ -20,7 +20,7 @@
 			<slot name="title">{{ title }}</slot>
 		</view>
 		<view class="capsule" :style="{
-      right: 170+'rpx',
+      right: 200+'rpx',
     }">
 			<view class="capsule-item">
 				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">

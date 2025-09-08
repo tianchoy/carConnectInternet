@@ -96,7 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return emit("capsuleClick", "menu");
         })
       })) : new UTSJSONObject({}), new UTSJSONObject({
-        m: "170rpx",
+        m: "200rpx",
         n: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor,
