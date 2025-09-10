@@ -194,13 +194,13 @@
 				currentAddress.value = deviceData.positionUpdateTime || '未知位置'
 				connectionStatus.value = deviceData.connectionStatus || 'unknown'
 
-				// 追踪状态下记录轨迹点
-				if (isTracking.value) {
-					trackPoints.value.push(position)
-					drawTempRoute()
-				}
+				// 追踪状态下记录轨迹点 暂时不用
+				// if (isTracking.value) {
+				// 	trackPoints.value.push(position)
+				// 	drawTempRoute()
+				// }
 
-				setMarkers(deviceData.direction)
+				// setMarkers(deviceData.direction)
 			}
 		} catch (err) {
 			console.error('获取位置失败:', err)

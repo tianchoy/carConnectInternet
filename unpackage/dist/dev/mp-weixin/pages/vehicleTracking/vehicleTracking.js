@@ -135,56 +135,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             currentSpeed.value = deviceData.speed || 0;
             currentAddress.value = deviceData.positionUpdateTime || "未知位置";
             connectionStatus.value = deviceData.connectionStatus || "unknown";
-            if (isTracking.value) {
-              trackPoints.value.push(position);
-              drawTempRoute();
-            }
-            setMarkers(deviceData.direction);
           }
         } catch (err) {
           common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:206", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
-    };
-    const setMarkers = (direction = 0) => {
-      if (trackPoints.value.length === 0)
-        return null;
-      markers.value = [
-        new UTSJSONObject(
-          // 起点
-          {
-            id: 0,
-            latitude: trackPoints.value[0].latitude,
-            longitude: trackPoints.value[0].longitude
-          }
-        ),
-        new UTSJSONObject(
-          // 终点
-          {
-            id: 1,
-            latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-            longitude: trackPoints.value[trackPoints.value.length - 1].longitude
-          }
-        ),
-        new UTSJSONObject({
-          id: 2,
-          latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-          longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-          iconPath: "/static/car.png",
-          width: 40,
-          height: 40,
-          rotate: direction,
-          callout: new UTSJSONObject({
-            content: `速度: ${currentSpeed.value}km/h`,
-            color: "#ffffff",
-            bgColor: "#1296db",
-            padding: 5,
-            borderRadius: 4,
-            display: "ALWAYS"
-          })
-        })
-      ];
     };
     const toggleTracking = () => {
       if (isTracking.value) {
@@ -223,25 +179,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       setTimeout(() => {
         common_vendor.index.hideLoading();
       }, 1e3);
-    };
-    const drawTempRoute = () => {
-      if (trackPoints.value.length < 2)
-        return null;
-      const validPoints = trackPoints.value.map((point) => {
-        return new UTSJSONObject({
-          latitude: Number(point.latitude),
-          longitude: Number(point.longitude)
-        });
-      });
-      polylines.value = [new UTSJSONObject({
-        points: validPoints,
-        color: "#1296db",
-        width: 6,
-        arrowLine: true,
-        borderColor: "#ffffff",
-        borderWidth: 2
-      })];
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:336", "绘制临时路线:", UTS.JSON.stringify(polylines.value));
     };
     const getRealRoute = () => {
       if (trackPoints.value.length < 2) {
