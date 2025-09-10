@@ -245,10 +245,6 @@
 
 			const res = await getUserDeviceList(params)
 			console.log('API响应数据:', res)
-			
-			if (res?.data?.totalCount) {
-				uni.setStorageSync('carTotalCount', res.data.totalCount)
-			}
 
 			let deviceList = []
 			if (res?.data) {
@@ -261,7 +257,6 @@
 				} else if (Array.isArray(res.data.items)) {
 					deviceList = res.data.items
 				} else if (res.data.totalCount !== undefined) {
-					// 如果只有总数，可能需要其他处理
 					deviceList = []
 				}
 			}

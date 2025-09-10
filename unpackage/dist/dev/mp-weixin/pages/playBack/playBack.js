@@ -414,7 +414,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           speed: point.getNumber("speed", 0),
           deviceTime: formatDateForDisplay(deviceTimeStr),
           timestamp: safeParseDate(deviceTimeStr),
-          // 保留原始坐标信息（可选）
+          // 保留原始坐标信息
           originalLatitude: originalLat,
           originalLongitude: originalLng
         });

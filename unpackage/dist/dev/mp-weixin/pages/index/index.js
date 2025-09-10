@@ -195,7 +195,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadUserDeviceList = (groupId = "") => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
         try {
           let params = new UTSJSONObject(
             {}
@@ -206,9 +205,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           const res = yield api_request.getUserDeviceList(params);
           common_vendor.index.__f__("log", "at pages/index/index.uvue:247", "API响应数据:", res);
-          if ((_a = res === null || res === void 0 ? null : res.data) === null || _a === void 0 ? null : _a.totalCount) {
-            common_vendor.index.setStorageSync("carTotalCount", res.data.totalCount);
-          }
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -223,10 +219,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:269", "解析后的设备列表:", deviceList);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:264", "解析后的设备列表:", deviceList);
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:275", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:270", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -235,7 +231,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:285", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:280", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList(currentGroupId.value);
     };
     const getUserIn = () => {
@@ -246,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:296", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:291", "获取用户信息失败:", err);
         }
       });
     };
@@ -284,7 +280,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:340", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:335", "聚合初始化完成");
               }
             }));
           }

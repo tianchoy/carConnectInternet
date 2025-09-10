@@ -359,7 +359,7 @@
 		loadTrackPos()
 		showDateTimePicker.value = false
 	}
-
+	// 取消选择时间
 	function onCancel() {
 		showDateTimePicker.value = false
 	}
@@ -372,7 +372,7 @@
 			startPlayback()
 		}
 	}
-
+	// 开始回放
 	function startPlayback() {
 		if (trackPoints.value.length == 0) {
 			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
@@ -387,7 +387,7 @@
 		lastTimestamp = Date.now()
 		playbackStep()
 	}
-
+	// 回放步骤
 	function playbackStep() {
 		if (!isPlaying.value) return
 
@@ -404,7 +404,7 @@
 			playbackTimer = setTimeout(playbackStep, 16) // 约60fps
 		}
 	}
-
+	// 播放下一个点
 	function playNextPoint() {
 		if (currentIndex.value >= trackPoints.value.length - 1) {
 			pausePlayback()
@@ -425,7 +425,7 @@
 		currentSpeed.value = point.speed || 0
 		currentTime.value = point.deviceTime || ''
 	}
-
+	// 暂停回放
 	function pausePlayback() {
 		isPlaying.value = false
 		if (playbackTimer) {
@@ -433,7 +433,7 @@
 			playbackTimer = null
 		}
 	}
-
+	// 重置回放
 	function resetPlayback() {
 		pausePlayback()
 		currentIndex.value = 0
@@ -445,6 +445,7 @@
 		updatePolyline()
 	}
 
+	// 设置回放速度
 	function setPlaybackSpeed(e : any) {
 		const wasPlaying = isPlaying.value
 		if (wasPlaying) {
@@ -484,7 +485,7 @@
 		}
 	}
 
-	// 处理轨迹数据 - 新增坐标转换
+	// 处理轨迹数据
 	function processTrackData(positions : Array<any>) {
 		const processedPoints = []
 
@@ -505,7 +506,7 @@
 				speed: point.getNumber('speed', 0),
 				deviceTime: formatDateForDisplay(deviceTimeStr),
 				timestamp: safeParseDate(deviceTimeStr),
-				// 保留原始坐标信息（可选）
+				// 保留原始坐标信息
 				originalLatitude: originalLat,
 				originalLongitude: originalLng
 			}

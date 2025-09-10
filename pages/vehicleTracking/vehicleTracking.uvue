@@ -107,52 +107,54 @@
 		})
 
 		try {
-			const data = { deptId:deptId.value,deviceids: imei.value }
+			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
+			console.log('跟踪位置', res.data, imei.value)
 
-			if (res?.code === 0 && res.data?.length > 0) {
-				const deviceData = res.data[0]
-				// 转换坐标到腾讯地图坐标系
-				const convertedCoord = CoordTransform.wgs84ToTencent(
-					Number(deviceData.latitude),
-					Number(deviceData.longitude)
-				)
-				
-				const position = {
-					latitude: convertedCoord.lat,
-					longitude: convertedCoord.lng
-				}
+			res.data.forEach(async item => {
+				if (item.imei == imei.value) {
+					const deviceData = item
+					// 转换坐标到腾讯地图坐标系
+					const convertedCoord = CoordTransform.wgs84ToTencent(
+						Number(deviceData.latitude),
+						Number(deviceData.longitude)
+					)
+					center.latitude = convertedCoord.lat
+					center.longitude = convertedCoord.lng
 
-				// 设置地图中心点
-				center.latitude = position.latitude
-				center.longitude = position.longitude
-
-				// 设置初始标记点
-				markers.value = [{
-					id: 0,
-					latitude: position.latitude,
-					longitude: position.longitude,
-					iconPath: connectionStatus.value  == 'online' ? '/static/car.png' : '/static/offline.png',
-					width: 40,
-					height: 40,
-					rotate: deviceData.direction || 0,
-					callout: {
-						content: connectionStatus.value  == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
-						color: connectionStatus.value  == 'online' ? '#fff' : '#666',
-						bgColor: connectionStatus.value  == 'online' ? '#1296db' : '#ccc',
-						padding: 5,
-						borderRadius: 4,
-						display: 'ALWAYS'
+					const position = {
+						latitude: convertedCoord.lat,
+						longitude: convertedCoord.lng
 					}
-				}]
 
-				// 更新车辆信息
-				currentSpeed.value = deviceData.speed || 0
-				currentAddress.value = deviceData.positionUpdateTime
-					? `最后定位: ${deviceData.positionUpdateTime}`
-					: '未知位置'
-				connectionStatus.value = deviceData.connectionStatus || 'unknown'
-			}
+					// 设置初始标记点
+					markers.value = [{
+						id: 0,
+						latitude: position.latitude,
+						longitude: position.longitude,
+						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
+						width: 40,
+						height: 40,
+						rotate: deviceData.direction || 0,
+						callout: {
+							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
+							color: connectionStatus.value == 'online' ? '#fff' : '#666',
+							bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
+							padding: 5,
+							borderRadius: 4,
+							display: 'ALWAYS'
+						}
+					}]
+
+					// 更新车辆信息
+					currentSpeed.value = deviceData.speed || 0
+					currentAddress.value = deviceData.positionUpdateTime
+						? `最后定位: ${deviceData.positionUpdateTime}`
+						: '未知位置'
+					connectionStatus.value = deviceData.connectionStatus || 'unknown'
+				}
+			})
+
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
 			uni.showToast({
@@ -177,7 +179,7 @@
 					Number(deviceData.latitude),
 					Number(deviceData.longitude)
 				)
-				
+
 				const position = {
 					latitude: convertedCoord.lat,
 					longitude: convertedCoord.lng
@@ -348,7 +350,7 @@
 			title: '路线规划中...'
 		})
 
-		// 注意：路线规划API通常需要WGS84坐标，所以使用原始坐标
+		//路线规划API需要WGS84坐标，所以使用原始坐标
 		const waypoints = trackPoints.value
 			.slice(1, -1)
 			.map(point => `${point.longitude},${point.latitude}`)
@@ -382,7 +384,7 @@
 	const drawRoadRoute = (path : any) => {
 		const roadPoints = path.points || []
 
-		// 如果路线规划返回的是WGS84坐标，需要转换为腾讯地图坐标
+		//转换为腾讯地图坐标
 		const convertedPoints = roadPoints.map(point => {
 			const converted = CoordTransform.wgs84ToTencent(point.latitude, point.longitude)
 			return {

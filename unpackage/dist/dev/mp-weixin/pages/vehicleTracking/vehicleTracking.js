@@ -59,48 +59,52 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadInitialPosition = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
         common_vendor.index.showLoading({
           title: "获取车辆位置中..."
         });
         try {
           const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          if ((res === null || res === void 0 ? null : res.code) === 0 && ((_a = res.data) === null || _a === void 0 ? null : _a.length) > 0) {
-            const deviceData = res.data[0];
-            const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
-            const position = new UTSJSONObject(
-              {
-                latitude: convertedCoord.lat,
-                longitude: convertedCoord.lng
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:112", "跟踪位置", res.data, imei.value);
+          res.data.forEach((item = null) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              if (item.imei == imei.value) {
+                const deviceData = item;
+                const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
+                center.latitude = convertedCoord.lat;
+                center.longitude = convertedCoord.lng;
+                const position = new UTSJSONObject(
+                  {
+                    latitude: convertedCoord.lat,
+                    longitude: convertedCoord.lng
+                  }
+                  // 设置初始标记点
+                );
+                markers.value = [new UTSJSONObject({
+                  id: 0,
+                  latitude: position.latitude,
+                  longitude: position.longitude,
+                  iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
+                  width: 40,
+                  height: 40,
+                  rotate: deviceData.direction || 0,
+                  callout: new UTSJSONObject({
+                    content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
+                    color: connectionStatus.value == "online" ? "#fff" : "#666",
+                    bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
+                    padding: 5,
+                    borderRadius: 4,
+                    display: "ALWAYS"
+                  })
+                })];
+                currentSpeed.value = deviceData.speed || 0;
+                currentAddress.value = deviceData.positionUpdateTime ? `最后定位: ${deviceData.positionUpdateTime}` : "未知位置";
+                connectionStatus.value = deviceData.connectionStatus || "unknown";
               }
-              // 设置地图中心点
-            );
-            center.latitude = position.latitude;
-            center.longitude = position.longitude;
-            markers.value = [new UTSJSONObject({
-              id: 0,
-              latitude: position.latitude,
-              longitude: position.longitude,
-              iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-              width: 40,
-              height: 40,
-              rotate: deviceData.direction || 0,
-              callout: new UTSJSONObject({
-                content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
-                color: connectionStatus.value == "online" ? "#fff" : "#666",
-                bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
-                padding: 5,
-                borderRadius: 4,
-                display: "ALWAYS"
-              })
-            })];
-            currentSpeed.value = deviceData.speed || 0;
-            currentAddress.value = deviceData.positionUpdateTime ? `最后定位: ${deviceData.positionUpdateTime}` : "未知位置";
-            connectionStatus.value = deviceData.connectionStatus || "unknown";
-          }
+            });
+          });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:157", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:159", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -138,7 +142,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             setMarkers(deviceData.direction);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:204", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:206", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
@@ -237,7 +241,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         borderColor: "#ffffff",
         borderWidth: 2
       })];
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:334", "绘制临时路线:", UTS.JSON.stringify(polylines.value));
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:336", "绘制临时路线:", UTS.JSON.stringify(polylines.value));
     };
     const getRealRoute = () => {
       if (trackPoints.value.length < 2) {
@@ -275,7 +279,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:377", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:379", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {
@@ -368,7 +372,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleRegionChange = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:482", "地图区域变化:", e);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:484", "地图区域变化:", e);
     };
     common_vendor.onUnmounted(() => {
       if (trackingInterval.value) {
