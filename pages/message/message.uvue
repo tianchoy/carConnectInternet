@@ -5,9 +5,9 @@
 		
 		<view class="list-box">
 			<!-- 显示空状态 -->
-			<view v-if="msgList.length == 0 && !isLoading" class="empty-state">
+			<!-- <view v-if="msgList.length == 0 && !isLoading" class="empty-state">
 				<text>暂无消息</text>
-			</view>
+			</view> -->
 			
 			<uv-list v-for="(item,index) in msgList" :key="index">
 				<uv-list-item 

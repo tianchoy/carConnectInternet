@@ -50,12 +50,11 @@
 			</view>
 		</view>
 		<view style="padding:0 40rpx">
-			<uv-divider text="其他登陆方式"></uv-divider>
+			<uv-divider text="快捷登录"></uv-divider>
 		</view>
 		<view>
 			<button open-type="getPhoneNumber" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
-				<uv-icon name="phone" color="#ccc" size="20"></uv-icon>
-				<text class="quicker">快捷登录</text>
+				<uv-icon name="/static/fast_login.png" size="40"></uv-icon>
 			</button>
 		</view>
 	</view>
@@ -429,7 +428,7 @@
 
 		.wechat-login-btn {
 			background-color: #fff !important;
-			color: #ccc !important;
+			color: #666 !important;
 			border: none !important;
 			border-radius: 50px !important;
 			display: flex;
@@ -439,8 +438,8 @@
 			padding: 10px 20px;
 			
 			.quicker{
-				margin: -10rpx 0 0 10rpx;
-				font-size: 25rpx;
+				margin-left: 10rpx;
+				font-size: 27rpx;
 			}
 		}
 

@@ -11,21 +11,21 @@
 					<text>账号</text>
 					<view class="right">
 						<text class="info">{{userInfo.id}}</text>
-						<uv-icon name="arrow-right" size="18"></uv-icon>
+						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
 					</view>
 				</view>
 				<view class="item">
 					<text>手机号</text>
 					<view class="right">
 						<text class="info">{{userInfo.mobile}}</text>
-						<uv-icon name="arrow-right" size="18"></uv-icon>
+						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
 					</view>
 				</view>
 			</view>
-			<view class="title">
+			<view class="title" v-if="userInfo.type == 1">
 				安全信息
 			</view>
-			<view class="list" @click="editPassword">
+			<view class="list" @click="editPassword" v-if="userInfo.type == 1">
 				<view class="item">
 					<text>修改密码</text>
 					<uv-icon name="arrow-right" size="18"></uv-icon>
@@ -43,20 +43,23 @@
 	type UserInfo = {
 		id : string,
 		mobile : string,
+		type: number,
 	}
 	const userInfo = ref<UserInfo>({
 		id: "",
-		mobile: ""
+		mobile: "",
+		type: 0
 	})
 
 	onLoad((options) => {
+		
 		if (options.userInfo) {
 			try {
 				const parsedInfo = JSON.parse(decodeURIComponent(options.userInfo)) as UTSJSONObject
-				console.log(parsedInfo)
 				userInfo.value = {
 					id: parsedInfo.getString("userId") || "",
-					mobile: parsedInfo.getString("mobile") || ""
+					mobile: parsedInfo.getString("mobile") || "",
+					type: parsedInfo.getNumber("type") || 0
 				}
 				console.log("用户信息:", userInfo.value)
 			} catch (e) {

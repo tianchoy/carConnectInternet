@@ -123,49 +123,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       (_a = modal.value) === null || _a === void 0 ? null : _a.close();
     };
     return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+      const __returned__ = {
+        a: common_vendor.p({
           title: "消息中心",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false,
           isShowStyle: true
-        })),
-        b: msgList.value.length == 0 && !isLoading.value
-      }), msgList.value.length == 0 && !isLoading.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        c: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
-          return new UTSJSONObject({
+        }),
+        b: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
+          return {
             a: common_vendor.o(($event = null) => {
               return handleItemClick(item);
             }, index),
             b: "1993bd19-2-" + i0 + "," + ("1993bd19-1-" + i0),
-            c: common_vendor.p(new UTSJSONObject({
+            c: common_vendor.p({
               title: item.messageType == 1 ? "警告" : item.messageType == 2 ? "事件" : "通知",
               note: item.content,
               clickable: true,
               ["show-badge"]: item.status == 1,
-              badge: new UTSJSONObject({
+              badge: {
                 value: "未读"
-              })
-            })),
+              }
+            }),
             d: index,
             e: "1993bd19-1-" + i0
-          });
+          };
         }),
-        d: common_vendor.o(loadMore),
-        e: common_vendor.p(new UTSJSONObject({
+        c: common_vendor.o(loadMore),
+        d: common_vendor.p({
           status: loadStatus.value
-        })),
-        f: common_vendor.sr(modal, "1993bd19-4", new UTSJSONObject({
+        }),
+        e: common_vendor.sr(modal, "1993bd19-4", {
           "k": "modal"
-        })),
-        g: common_vendor.o(ReadIt),
-        h: common_vendor.p(new UTSJSONObject({
+        }),
+        f: common_vendor.o(ReadIt),
+        g: common_vendor.p({
           title: modalContent.value.messageType == 1 ? "警告" : modalContent.value.messageType == 2 ? "事件" : "通知",
           content: modalContent.value.content
-        }))
-      }));
+        })
+      };
       return __returned__;
     };
   }

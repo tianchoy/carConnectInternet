@@ -18,7 +18,8 @@ class UserInfo extends UTS.UTSType {
       get fields() {
         return {
           id: { type: String, optional: false },
-          mobile: { type: String, optional: false }
+          mobile: { type: String, optional: false },
+          type: { type: Number, optional: false }
         };
       },
       name: "UserInfo"
@@ -29,6 +30,7 @@ class UserInfo extends UTS.UTSType {
     this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.id = this.__props__.id;
     this.mobile = this.__props__.mobile;
+    this.type = this.__props__.type;
     delete this.__props__;
   }
 }
@@ -37,20 +39,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const userInfo = common_vendor.ref(new UserInfo({
       id: "",
-      mobile: ""
+      mobile: "",
+      type: 0
     }));
     common_vendor.onLoad((options) => {
       if (options.userInfo) {
         try {
           const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:56", parsedInfo);
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
-            mobile: parsedInfo.getString("mobile") || ""
+            mobile: parsedInfo.getString("mobile") || "",
+            type: parsedInfo.getNumber("type") || 0
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:61", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:64", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:63", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:66", "解析用户信息失败:", e);
         }
       }
     });
@@ -75,32 +78,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     return (_ctx = null, _cache = null) => {
-      const __returned__ = {
-        a: common_vendor.p({
+      const __returned__ = common_vendor.e(new UTSJSONObject({
+        a: common_vendor.p(new UTSJSONObject({
           title: "个人信息",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        }),
+        })),
         b: common_vendor.t(common_vendor.unref(userInfo).id),
-        c: common_vendor.p({
+        c: common_vendor.t(common_vendor.unref(userInfo).mobile),
+        d: common_vendor.unref(userInfo).type == 1
+      }), common_vendor.unref(userInfo).type == 1 ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+        e: common_vendor.unref(userInfo).type == 1
+      }), common_vendor.unref(userInfo).type == 1 ? new UTSJSONObject({
+        f: common_vendor.p(new UTSJSONObject({
           name: "arrow-right",
           size: "18"
-        }),
-        d: common_vendor.t(common_vendor.unref(userInfo).mobile),
-        e: common_vendor.p({
-          name: "arrow-right",
-          size: "18"
-        }),
-        f: common_vendor.p({
-          name: "arrow-right",
-          size: "18"
-        }),
-        g: common_vendor.o(editPassword),
+        })),
+        g: common_vendor.o(editPassword)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
         h: common_vendor.o(logoutBtn),
         i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      };
+      }));
       return __returned__;
     };
   }

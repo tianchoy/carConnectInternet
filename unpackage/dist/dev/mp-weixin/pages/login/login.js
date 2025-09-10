@@ -204,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:223", "docState.value:", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:222", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -257,13 +257,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:293", "res", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:292", "res", res);
           common_vendor.index.setStorageSync("token", res.data.token);
           common_vendor.index.reLaunch({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:302", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:301", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -275,7 +275,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:313", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:312", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -446,12 +446,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })),
         G: common_vendor.o(isDocState),
         H: common_vendor.p(new UTSJSONObject({
-          text: "其他登陆方式"
+          text: "快捷登录"
         })),
         I: common_vendor.p(new UTSJSONObject({
-          name: "phone",
-          color: "#ccc",
-          size: "20"
+          name: "/static/fast_login.png",
+          size: "40"
         })),
         J: common_vendor.o(handleGetPhoneNumber),
         K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")

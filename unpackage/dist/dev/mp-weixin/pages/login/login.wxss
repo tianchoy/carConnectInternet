@@ -69,7 +69,7 @@
 }
 .container .wechat-login-btn.data-v-27a30816 {
   background-color: #fff !important;
-  color: #ccc !important;
+  color: #666 !important;
   border: none !important;
   border-radius: 50px !important;
   display: flex;
@@ -79,8 +79,8 @@
   padding: 10px 20px;
 }
 .container .wechat-login-btn .quicker.data-v-27a30816 {
-  margin: -10rpx 0 0 10rpx;
-  font-size: 25rpx;
+  margin-left: 10rpx;
+  font-size: 27rpx;
 }
 .container .wechat-login-btn.data-v-27a30816::after {
   border: none;
