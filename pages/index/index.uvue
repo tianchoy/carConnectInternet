@@ -31,13 +31,15 @@
 			<text style="margin-right: 20rpx;">{{pickerGroupTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
-		<uv-picker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
+		<uv-picker ref="picker" :columns="columns" keyName="name" @confirm="confirm"></uv-picker>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
-	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList } from '../../api/request.uts'
+	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList } from '../../api/request.uts'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	const Login = ref<boolean>(false)
 	const mapScale = ref(4)
@@ -50,27 +52,29 @@
 	// 状态选项
 	const carState = ref([
 		[{
-			label: '全部状态',
+			name: '全部状态',
 			value: '0'
 		},
 		{
-			label: '在线',
+			name: '在线',
 			value: '1'
 		},
 		{
-			label: '离线',
+			name: '离线',
 			value: '2'
 		}]
 	])
 
 	// 分组选项
 	const carGroup = ref<any>([])
-	const columns = ref<Array<{ label : string, value : string }>>([[]])
+	const columns = ref<Array<{ name : string, value : string }>>([[]])
 	const pickerStateTitle = ref('全部状态')
 	const pickerGroupTitle = ref('全部分组')
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
+	// 当前选中的分组ID
+	const currentGroupId = ref<string>('')
 
 	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
@@ -83,15 +87,6 @@
 			result = result.filter(device => device?.connectionStatus == 'online')
 		} else if (pickerStateTitle.value === '离线') {
 			result = result.filter(device => device?.connectionStatus == 'offline')
-		}
-
-		// 分组筛选
-		if (pickerGroupTitle.value !== '全部分组') {
-			const selectedGroup = carGroup.value[0]?.find(group => group.label === pickerGroupTitle.value)
-			if (selectedGroup && Array.isArray(selectedGroup.devices)) {
-				const groupDeviceIds = selectedGroup.devices.map(d => d.id)
-				result = result.filter(device => groupDeviceIds.includes(device.id))
-			}
 		}
 
 		return result
@@ -122,12 +117,15 @@
 		picker.value?.open()
 	}
 
-	const confirm = (e : { value : Array<{ label : string, value : string, devices : Array<any> }> }) => {
+	const confirm = async (e : { value : Array<{ name : string, value : string, id : string }> }) => {
 		const selected = e.value[0]
 		if (currentPickerType.value == 'state') {
-			pickerStateTitle.value = selected.label
+			pickerStateTitle.value = selected.name
 		} else if (currentPickerType.value == 'group') {
-			pickerGroupTitle.value = selected.label
+			pickerGroupTitle.value = selected.name
+			currentGroupId.value = selected.id
+			// 根据选择的分组重新加载设备列表
+			await loadUserDeviceList(selected.id)
 		}
 		currentPickerType.value = ''
 	}
@@ -160,11 +158,15 @@
 			devices = []
 		}
 
-		markers.value = devices.map((device, index) => {
+		// 使用插件转换坐标后再创建markers
+		const convertedDevices = CoordTransform.batchConvertCoordinates(devices, 'tencent')
+
+		markers.value = convertedDevices.map((device, index) => {
 			if (!device || typeof device !== 'object') {
 				console.warn('无效的设备数据', device)
 				return null
 			}
+			
 			const lat = Number(device.latitude)
 			const lng = Number(device.longitude)
 
@@ -198,34 +200,32 @@
 
 	const loadGroupData = async () => {
 		try {
-			const userRes = await getUserInfo()
-			if (!userRes?.data?.deptId) {
-				throw new Error('获取部门ID失败')
-			}
-
-			const deviceRes = await getCustomDeviceList(userRes.data.deptId)
-			if (!deviceRes?.data) {
+			// 使用新的 getUserGroupList 接口
+			const groupRes = await getUserGroupList()
+			if (groupRes?.code !== 0 || !Array.isArray(groupRes.data)) {
 				throw new Error('获取分组数据失败')
 			}
 
-			const formattedData = deviceRes.data.map(item => ({
-				label: item.name || '未命名分组',
-				value: item.id?.toString() || Math.random().toString(36).substr(2, 9),
-				devices: Array.isArray(item.devices) ? item.devices : []
+			// 格式化分组数据，添加全部分组选项
+			const allGroupOption = {
+				name: '全部分组',
+				value: 'all',
+				id: 'all'
+			}
+
+			const formattedData = groupRes.data.map(item => ({
+				name: item.name || '未命名分组',
+				value: item.id || '',
+				id: item.id || ''
 			}))
 
+			// 将全部分组选项添加到最前面
+			formattedData.unshift(allGroupOption)
+
 			carGroup.value = [formattedData]
-
-			// 合并所有设备
-			let allDevices = []
-			formattedData.forEach(group => {
-				if (Array.isArray(group.devices)) {
-					allDevices = allDevices.concat(group.devices)
-				}
-			})
-
-			originalDeviceList.value = allDevices
 			pickerGroupTitle.value = '全部分组'
+			currentGroupId.value = 'all'
+			
 		} catch (err) {
 			console.error('加载分组数据失败:', err)
 			uni.showToast({
@@ -235,12 +235,20 @@
 		}
 	}
 
-	const loadUserDeviceList = async (data = {}) => {
+	const loadUserDeviceList = async (groupId : string = '') => {
 		try {
-			const res = await getUserDeviceList(data)
+			let params = {}
+			// 如果不是全部分组，添加分组ID参数
+			if (groupId && groupId !== 'all') {
+				params = { groupId: groupId }
+			}
+
+			const res = await getUserDeviceList(params)
 			console.log('API响应数据:', res)
 			
-			uni.setStorageSync('carTotalCount',res.data.totalCount)
+			if (res?.data?.totalCount) {
+				uni.setStorageSync('carTotalCount', res.data.totalCount)
+			}
 
 			let deviceList = []
 			if (res?.data) {
@@ -252,11 +260,17 @@
 					deviceList = res.data.devices
 				} else if (Array.isArray(res.data.items)) {
 					deviceList = res.data.items
+				} else if (res.data.totalCount !== undefined) {
+					// 如果只有总数，可能需要其他处理
+					deviceList = []
 				}
 			}
 
 			console.log('解析后的设备列表:', deviceList)
-			originalDeviceList.value = deviceList
+			
+			// 使用插件转换坐标
+			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
+			
 		} catch (err) {
 			console.error('获取设备列表失败:', err)
 			uni.showToast({
@@ -265,6 +279,42 @@
 			})
 		}
 	}
+	
+	// 添加全局事件监听，用于从添加页面返回时刷新
+	const refreshDeviceList = () => {
+		console.log('收到刷新事件，重新加载设备列表')
+		loadUserDeviceList(currentGroupId.value)
+	}
+
+	const getUserIn = async () => {
+		try {
+			const res = await getUserInfo()
+			if (res?.code === 0) {
+				uni.setStorageSync('userType', res.data.type)
+			}
+		} catch (err) {
+			console.error('获取用户信息失败:', err)
+		}
+	}
+
+	onShow(async () => {
+		const token = uni.getStorageSync('token')
+		if(token){
+			// 监听全局刷新事件
+			uni.$on('refreshDeviceList', refreshDeviceList)
+			
+			const needRefresh = uni.getStorageSync('needRefreshHome')
+			if (needRefresh) {
+				await loadUserDeviceList(currentGroupId.value)
+				uni.removeStorageSync('needRefreshHome')
+			}
+		}
+	})
+	
+	onHide(() => {
+		// 移除事件监听
+		uni.$off('refreshDeviceList', refreshDeviceList)
+	})
 
 	onLoad(async () => {
 		const token = uni.getStorageSync('token')
@@ -275,6 +325,7 @@
 			Login.value = true
 			await loadGroupData()
 			await loadUserDeviceList()
+			await getUserIn()
 
 			// 初始化地图上下文
 			mapCtx = uni.createMapContext('myMap', this)
@@ -292,6 +343,12 @@
 			}
 		}
 	})
+	
+	onUnload(() => {
+		// 清理事件监听
+		uni.$off('refreshDeviceList', refreshDeviceList)
+	})
+
 </script>
 
 <style lang="scss">

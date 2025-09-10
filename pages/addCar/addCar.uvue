@@ -107,6 +107,12 @@
 		carInfo.value.deviceTypeValue = e.value
 	}
 
+	// 刷新首页设备列表的方法
+	const refreshDeviceList = () => {
+		uni.$emit('refreshDeviceList')
+		console.log('已触发首页设备列表刷新')
+	}
+
 	const submit = () => {
 		formRef.value?.validate().then(async () => {
 			loading.value = true
@@ -120,11 +126,15 @@
 
 				const res = await addDevice(submitData)
 
-				if (res.code == 200) {
+				if (res.code == 0) {
 					uni.showToast({
 						title: '添加成功',
 						icon: 'success'
 					})
+					
+					// 添加成功后触发首页刷新
+					refreshDeviceList()
+					
 					setTimeout(() => {
 						uni.navigateBack()
 					}, 1500)

@@ -7988,9 +7988,9 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.3.22";
+  const hosts = "127.0.0.1,192.168.3.67";
   const port = "8090";
-  const id = "mp-weixin_01Liib";
+  const id = "mp-weixin_h2bS-V";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9702,12 +9702,16 @@ const onLoad = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onUnload = /* @__PURE__ */ createLifeCycleHook(
+  ON_UNLOAD,
+  2
+  /* HookFlags.PAGE */
+);
 const onReachBottom = /* @__PURE__ */ createLifeCycleHook(
   ON_REACH_BOTTOM,
   2
   /* HookFlags.PAGE */
 );
-const onPageShow = onShow;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports._export_sfc = _export_sfc;
@@ -9729,8 +9733,9 @@ exports.onBeforeUnmount = onBeforeUnmount;
 exports.onHide = onHide;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
-exports.onPageShow = onPageShow;
 exports.onReachBottom = onReachBottom;
+exports.onShow = onShow;
+exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.provide = provide;

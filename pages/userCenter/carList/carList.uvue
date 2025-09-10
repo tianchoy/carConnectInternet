@@ -45,7 +45,7 @@
 		})
 	}
 
-	onPageShow(() => {
+	onShow(() => {
 		resetData()
 		loadCarListData()
 	})

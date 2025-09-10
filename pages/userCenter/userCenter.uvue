@@ -28,23 +28,29 @@
 </template>
 
 <script setup lang="uts">
-	import { getUserInfo } from '../../api/request';
+	import { getUserInfo, getUserDeviceList } from '../../api/request';
 	const userInfo = ref({
 		avatar: '/static/avatar.png',
 		username: '123456789',
 	})
 	const carsnumber = ref(0)
 
-	onLoad(() => {
+	onShow(() => {
 		
-		carsnumber.value = uni.getStorageSync('carTotalCount')
 		loadData()
 	})
 
 	const loadData = async () => {
+		let params = {}
 		const res = await getUserInfo()
 		userInfo.value = res.data
-		console.log(userInfo.value)
+
+		const resCars = await getUserDeviceList(params)
+			console.log('API响应数据:', resCars)
+			
+			if (resCars?.data?.totalCount) {
+				 carsnumber.value = resCars.data.totalCount
+			}
 	}
 
 	const userInfoDetail = () => {
@@ -83,9 +89,9 @@
 			}
 
 			.user-info {
-				margin-left: 40rpx;
+				margin-left: 20rpx;
 				text-align: center;
-				font-size: 32rpx;
+				font-size: 30rpx;
 				color: #333;
 			}
 		}

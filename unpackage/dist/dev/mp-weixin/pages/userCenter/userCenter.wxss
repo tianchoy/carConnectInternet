@@ -46,9 +46,9 @@
   flex: 1;
 }
 .container .user-info-box .user-info {
-  margin-left: 40rpx;
+  margin-left: 20rpx;
   text-align: center;
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #333;
 }
 .container .list {

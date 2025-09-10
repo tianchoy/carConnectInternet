@@ -17,6 +17,8 @@ const deviceDetail = '/device/info/'
 const carType = '/carType/listAll'
 const geofence ='/geofence/getDeviceGeofences'
 const logoutUrl = '/sys/logout'
+const groupList = '/group/userGroupList'
+const sendcmd = '/command/sendCmd'
 
 //登陆接口
 export const login = (data : UTSJSONObject) => {
@@ -37,6 +39,17 @@ export const getCustomList = () => {
 export const getCustomDeviceList = (deptId : string) => {
 	return http.get(customDeviceList, { deptId })
 }
+
+//获取用户分组设备
+export const getUserGroupList = ()=> {
+	return http.get(groupList)
+}
+
+//发送远程指令
+export const sendCommand = (data:object) => {
+	return http.post(sendcmd,data)
+}
+
 
 //获取设备位置(跟踪也用此接口)
 export const getDevicePos = (data:object) => {

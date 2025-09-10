@@ -23,7 +23,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/addCar/addCar"
       });
     };
-    common_vendor.onPageShow(() => {
+    common_vendor.onShow(() => {
       resetData();
       loadCarListData();
     });

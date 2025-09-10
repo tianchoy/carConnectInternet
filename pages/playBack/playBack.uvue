@@ -61,6 +61,8 @@
 <script setup lang="uts">
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	type polyData = {
 		points : Array<{ latitude : number; longitude : number }>;
@@ -95,7 +97,7 @@
 	const currentTime = ref('')
 	const currentIndex = ref(0)
 	const carMarker = ref<any>(null)
-	let playbackTimer : number | null = null
+	let playbackTimer : number | null = 0
 	let lastTimestamp = 0
 
 	const startTime = ref('')
@@ -482,7 +484,7 @@
 		}
 	}
 
-	// 处理轨迹数据
+	// 处理轨迹数据 - 新增坐标转换
 	function processTrackData(positions : Array<any>) {
 		const processedPoints = []
 
@@ -490,12 +492,22 @@
 			const point = positions[i]
 			const deviceTimeStr = point.getString('deviceTime', '')
 
+			// 获取原始坐标
+			const originalLat = point.getNumber('latitude', 0)
+			const originalLng = point.getNumber('longitude', 0)
+			
+			// 转换坐标到腾讯地图坐标系
+			const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+
 			const processedPoint = {
-				latitude: point.getNumber('latitude', 0),
-				longitude: point.getNumber('longitude', 0),
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
 				speed: point.getNumber('speed', 0),
 				deviceTime: formatDateForDisplay(deviceTimeStr),
-				timestamp: safeParseDate(deviceTimeStr)
+				timestamp: safeParseDate(deviceTimeStr),
+				// 保留原始坐标信息（可选）
+				originalLatitude: originalLat,
+				originalLongitude: originalLng
 			}
 
 			if (i > 0) {
@@ -525,6 +537,7 @@
 		if (trackPoints.value.length > 0) {
 			currentTime.value = trackPoints.value[0].deviceTime
 		}
+		
 	}
 </script>
 

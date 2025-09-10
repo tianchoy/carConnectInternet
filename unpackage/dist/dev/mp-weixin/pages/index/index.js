@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
+const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
@@ -28,13 +29,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const picker = common_vendor.ref(null);
     const carState = common_vendor.ref([
       [new UTSJSONObject({
-        label: "全部状态",
+        name: "全部状态",
         value: "0"
       }), new UTSJSONObject({
-        label: "在线",
+        name: "在线",
         value: "1"
       }), new UTSJSONObject({
-        label: "离线",
+        name: "离线",
         value: "2"
       })]
     ]);
@@ -43,8 +44,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pickerStateTitle = common_vendor.ref("全部状态");
     const pickerGroupTitle = common_vendor.ref("全部分组");
     const originalDeviceList = common_vendor.ref([]);
+    const currentGroupId = common_vendor.ref("");
     const filteredDevices = common_vendor.computed(() => {
-      var _a;
       if (!Array.isArray(originalDeviceList.value))
         return [];
       let result = [...originalDeviceList.value];
@@ -56,19 +57,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         result = result.filter((device = null) => {
           return (device === null || device === void 0 ? null : device.connectionStatus) == "offline";
         });
-      }
-      if (pickerGroupTitle.value !== "全部分组") {
-        const selectedGroup = (_a = carGroup.value[0]) === null || _a === void 0 ? null : _a.find((group = null) => {
-          return group.label === pickerGroupTitle.value;
-        });
-        if (selectedGroup && Array.isArray(selectedGroup.devices)) {
-          const groupDeviceIds = selectedGroup.devices.map((d = null) => {
-            return d.id;
-          });
-          result = result.filter((device = null) => {
-            return groupDeviceIds.includes(device.id);
-          });
-        }
       }
       return result;
     });
@@ -102,13 +90,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       (_a = picker.value) === null || _a === void 0 ? null : _a.open();
     };
     const confirm = (e) => {
-      const selected = e.value[0];
-      if (currentPickerType.value == "state") {
-        pickerStateTitle.value = selected.label;
-      } else if (currentPickerType.value == "group") {
-        pickerGroupTitle.value = selected.label;
-      }
-      currentPickerType.value = "";
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const selected = e.value[0];
+        if (currentPickerType.value == "state") {
+          pickerStateTitle.value = selected.name;
+        } else if (currentPickerType.value == "group") {
+          pickerGroupTitle.value = selected.name;
+          currentGroupId.value = selected.id;
+          yield loadUserDeviceList(selected.id);
+        }
+        currentPickerType.value = "";
+      });
     };
     const addCar = () => {
       common_vendor.index.navigateTo({
@@ -128,22 +120,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
         });
       } else {
-        common_vendor.index.__f__("warn", "at pages/index/index.uvue:154", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:152", "未找到对应的设备信息", markerId);
       }
     };
     const updateMarkers = (devices = null) => {
       if (!Array.isArray(devices)) {
         devices = [];
       }
-      markers.value = devices.map((device = null, index = null) => {
+      const convertedDevices = utils_coordTransform.CoordTransform.batchConvertCoordinates(devices, "tencent");
+      markers.value = convertedDevices.map((device = null, index) => {
         if (!device || typeof device !== "object") {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:165", "无效的设备数据", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:166", "无效的设备数据", device);
           return null;
         }
         const lat = Number(device.latitude);
         const lng = Number(device.longitude);
         if (isNaN(lat) || isNaN(lng)) {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:172", "设备经纬度无效", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:174", "设备经纬度无效", device);
           return null;
         }
         return new UTSJSONObject({
@@ -170,33 +163,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadGroupData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
         try {
-          const userRes = yield api_request.getUserInfo();
-          if (!((_a = userRes === null || userRes === void 0 ? null : userRes.data) === null || _a === void 0 ? null : _a.deptId)) {
-            throw new Error("获取部门ID失败");
-          }
-          const deviceRes = yield api_request.getCustomDeviceList(userRes.data.deptId);
-          if (!(deviceRes === null || deviceRes === void 0 ? null : deviceRes.data)) {
+          const groupRes = yield api_request.getUserGroupList();
+          if ((groupRes === null || groupRes === void 0 ? null : groupRes.code) !== 0 || !Array.isArray(groupRes.data)) {
             throw new Error("获取分组数据失败");
           }
-          const formattedData = deviceRes.data.map((item = null) => {
-            var _a2;
-            return {
-              label: item.name || "未命名分组",
-              value: ((_a2 = item.id) === null || _a2 === void 0 ? null : _a2.toString()) || Math.random().toString(36).substr(2, 9),
-              devices: Array.isArray(item.devices) ? item.devices : []
-            };
+          const allGroupOption = new UTSJSONObject({
+            name: "全部分组",
+            value: "all",
+            id: "all"
           });
+          const formattedData = groupRes.data.map((item = null) => {
+            return new UTSJSONObject({
+              name: item.name || "未命名分组",
+              value: item.id || "",
+              id: item.id || ""
+            });
+          });
+          formattedData.unshift(allGroupOption);
           carGroup.value = [formattedData];
-          let allDevices = [];
-          formattedData.forEach((group = null) => {
-            if (Array.isArray(group.devices)) {
-              allDevices = allDevices.concat(group.devices);
-            }
-          });
-          originalDeviceList.value = allDevices;
           pickerGroupTitle.value = "全部分组";
+          currentGroupId.value = "all";
         } catch (err) {
           common_vendor.index.__f__("error", "at pages/index/index.uvue:230", "加载分组数据失败:", err);
           common_vendor.index.showToast({
@@ -206,12 +193,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const loadUserDeviceList = (data = new UTSJSONObject({})) => {
+    const loadUserDeviceList = (groupId = "") => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
         try {
-          const res = yield api_request.getUserDeviceList(data);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:241", "API响应数据:", res);
-          common_vendor.index.setStorageSync("carTotalCount", res.data.totalCount);
+          let params = new UTSJSONObject(
+            {}
+            // 如果不是全部分组，添加分组ID参数
+          );
+          if (groupId && groupId !== "all") {
+            params = new UTSJSONObject({ groupId });
+          }
+          const res = yield api_request.getUserDeviceList(params);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:247", "API响应数据:", res);
+          if ((_a = res === null || res === void 0 ? null : res.data) === null || _a === void 0 ? null : _a.totalCount) {
+            common_vendor.index.setStorageSync("carTotalCount", res.data.totalCount);
+          }
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -222,12 +219,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = res.data.devices;
             } else if (Array.isArray(res.data.items)) {
               deviceList = res.data.items;
+            } else if (res.data.totalCount !== void 0) {
+              deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:258", "解析后的设备列表:", deviceList);
-          originalDeviceList.value = deviceList;
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:269", "解析后的设备列表:", deviceList);
+          originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:261", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:275", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -235,6 +234,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const refreshDeviceList = () => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:285", "收到刷新事件，重新加载设备列表");
+      loadUserDeviceList(currentGroupId.value);
+    };
+    const getUserIn = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_request.getUserInfo();
+          if ((res === null || res === void 0 ? null : res.code) === 0) {
+            common_vendor.index.setStorageSync("userType", res.data.type);
+          }
+        } catch (err) {
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:296", "获取用户信息失败:", err);
+        }
+      });
+    };
+    common_vendor.onShow(() => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const token = common_vendor.index.getStorageSync("token");
+        if (token) {
+          common_vendor.index.$on("refreshDeviceList", refreshDeviceList);
+          const needRefresh = common_vendor.index.getStorageSync("needRefreshHome");
+          if (needRefresh) {
+            yield loadUserDeviceList(currentGroupId.value);
+            common_vendor.index.removeStorageSync("needRefreshHome");
+          }
+        }
+      });
+    });
+    common_vendor.onHide(() => {
+      common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
+    });
     common_vendor.onLoad(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const token = common_vendor.index.getStorageSync("token");
@@ -245,6 +276,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           Login.value = true;
           yield loadGroupData();
           yield loadUserDeviceList();
+          yield getUserIn();
           mapCtx = common_vendor.index.createMapContext("myMap", this);
           if (mapCtx && mapCtx.initMarkerCluster) {
             mapCtx.initMarkerCluster(new UTSJSONObject({
@@ -252,12 +284,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:289", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:340", "聚合初始化完成");
               }
             }));
           }
         }
       });
+    });
+    common_vendor.onUnload(() => {
+      common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
     });
     return (_ctx = null, _cache = null) => {
       const __returned__ = common_vendor.e(new UTSJSONObject({
@@ -310,7 +345,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         y: common_vendor.o(confirm),
         z: common_vendor.p(new UTSJSONObject({
           columns: columns.value,
-          keyName: "label"
+          keyName: "name"
         })),
         A: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));

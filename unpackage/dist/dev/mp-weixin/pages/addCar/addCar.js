@@ -83,6 +83,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carInfo.value.deviceType = e.name;
       carInfo.value.deviceTypeValue = e.value;
     };
+    const refreshDeviceList = () => {
+      common_vendor.index.$emit("refreshDeviceList");
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:113", "已触发首页设备列表刷新");
+    };
     const submit = () => {
       var _a;
       (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then(() => {
@@ -96,11 +100,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               plateNo: carInfo.value.plateNo
             });
             const res = yield api_request.addDevice(submitData);
-            if (res.code == 200) {
+            if (res.code == 0) {
               common_vendor.index.showToast({
                 title: "添加成功",
                 icon: "success"
               });
+              refreshDeviceList();
               setTimeout(() => {
                 common_vendor.index.navigateBack();
               }, 1500);
@@ -112,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:139", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:149", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -122,7 +127,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:148", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:158", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"

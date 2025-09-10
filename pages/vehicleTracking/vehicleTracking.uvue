@@ -40,9 +40,13 @@
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getRoutePlan } from '@/utils/tiandituRoute'
 	import { getDevicePos } from '../../api/request.uts'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
+	const deviceId = ref<string | null>('')
+	const deptId = ref<string | null>('')
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -87,12 +91,12 @@
 		console.log("时间变化:", newVal);
 	});
 
-	// 在script部分修改以下内容
-
 	onLoad((option) => {
+		console.log(option)
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
 		currentCar.value = option.plateNo
+		deptId.value = option.deptId
 		// 进入页面立即加载车辆位置
 		loadInitialPosition()
 	})
@@ -103,14 +107,20 @@
 		})
 
 		try {
-			const data = { deviceids: imei.value }
+			const data = { deptId:deptId.value,deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			if (res?.code === 0 && res.data?.length > 0) {
 				const deviceData = res.data[0]
+				// 转换坐标到腾讯地图坐标系
+				const convertedCoord = CoordTransform.wgs84ToTencent(
+					Number(deviceData.latitude),
+					Number(deviceData.longitude)
+				)
+				
 				const position = {
-					latitude: Number(deviceData.latitude),
-					longitude: Number(deviceData.longitude)
+					latitude: convertedCoord.lat,
+					longitude: convertedCoord.lng
 				}
 
 				// 设置地图中心点
@@ -122,14 +132,14 @@
 					id: 0,
 					latitude: position.latitude,
 					longitude: position.longitude,
-					iconPath: '/static/car.png',
+					iconPath: connectionStatus.value  == 'online' ? '/static/car.png' : '/static/offline.png',
 					width: 40,
 					height: 40,
 					rotate: deviceData.direction || 0,
 					callout: {
-						content: `车辆位置 | 速度: ${deviceData.speed || 0}km/h`,
-						color: '#ffffff',
-						bgColor: '#1296db',
+						content: connectionStatus.value  == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
+						color: connectionStatus.value  == 'online' ? '#fff' : '#666',
+						bgColor: connectionStatus.value  == 'online' ? '#1296db' : '#ccc',
 						padding: 5,
 						borderRadius: 4,
 						display: 'ALWAYS'
@@ -162,9 +172,15 @@
 
 			if (res?.code === 0 && res.data?.length > 0) {
 				const deviceData = res.data[0]
+				// 转换坐标到腾讯地图坐标系
+				const convertedCoord = CoordTransform.wgs84ToTencent(
+					Number(deviceData.latitude),
+					Number(deviceData.longitude)
+				)
+				
 				const position = {
-					latitude: Number(deviceData.latitude),
-					longitude: Number(deviceData.longitude)
+					latitude: convertedCoord.lat,
+					longitude: convertedCoord.lng
 				}
 
 				// 更新中心点
@@ -199,35 +215,13 @@
 			{
 				id: 0,
 				latitude: trackPoints.value[0].latitude,
-				longitude: trackPoints.value[0].longitude,
-				iconPath: '/static/start.png',
-				width: 60,
-				height: 60,
-				callout: {
-					content: '起点',
-					color: '#ffffff',
-					bgColor: '#1aad19',
-					padding: 5,
-					borderRadius: 4,
-					display: 'ALWAYS'
-				}
+				longitude: trackPoints.value[0].longitude
 			},
 			// 终点
 			{
 				id: 1,
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
 				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-				iconPath: '/static/end.png',
-				width: 60,
-				height: 60,
-				callout: {
-					content: '当前位置',
-					color: '#ffffff',
-					bgColor: '#e64340',
-					padding: 5,
-					borderRadius: 4,
-					display: 'ALWAYS'
-				}
 			},
 			{
 				id: 2,
@@ -354,6 +348,7 @@
 			title: '路线规划中...'
 		})
 
+		// 注意：路线规划API通常需要WGS84坐标，所以使用原始坐标
 		const waypoints = trackPoints.value
 			.slice(1, -1)
 			.map(point => `${point.longitude},${point.latitude}`)
@@ -387,17 +382,26 @@
 	const drawRoadRoute = (path : any) => {
 		const roadPoints = path.points || []
 
+		// 如果路线规划返回的是WGS84坐标，需要转换为腾讯地图坐标
+		const convertedPoints = roadPoints.map(point => {
+			const converted = CoordTransform.wgs84ToTencent(point.latitude, point.longitude)
+			return {
+				latitude: converted.lat,
+				longitude: converted.lng
+			}
+		})
+
 		polylines.value = [
 			// 道路底色
 			{
-				points: roadPoints,
+				points: convertedPoints,
 				color: '#4a90e2',
 				width: 12,
 				level: 'low'
 			},
 			// 主路线
 			{
-				points: roadPoints,
+				points: convertedPoints,
 				color: '#1a73e8',
 				width: 8,
 				arrowLine: true,
@@ -406,7 +410,7 @@
 			},
 			// 路线高亮
 			{
-				points: roadPoints,
+				points: convertedPoints,
 				color: '#ffffff',
 				width: 2,
 				level: 'highest'
@@ -415,7 +419,7 @@
 		routeInfo.distance = path.distance || 0
 		routeInfo.duration = path.duration || 0
 
-		adjustMapView(roadPoints)
+		adjustMapView(convertedPoints)
 	}
 
 	// 调整地图视野
@@ -515,7 +519,7 @@
 				button {
 					width: 100%;
 					margin: 0;
-					background-color: #1296db;
+					background-color: '#1296db';
 					color: white;
 					font-size: 28rpx;
 				}

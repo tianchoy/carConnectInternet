@@ -3,21 +3,26 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
 const utils_getAdress = require("../../utils/getAdress.js");
+const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
   const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1)();
+  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
+  const _easycom_uv_modal_1 = common_vendor.resolveComponent("uv-modal");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1 + _easycom_uv_input_1 + _easycom_uv_modal_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
 const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
+const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
+const _easycom_uv_modal = () => "../../uni_modules/uv-modal/components/uv-modal/uv-modal.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_input + _easycom_uv_modal)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carInfoDetail",
@@ -29,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(17);
+    const mapScale = common_vendor.ref(15);
     const datainfo = common_vendor.ref({});
     const address = common_vendor.ref("");
     const currentTime = common_vendor.ref("5s");
@@ -44,6 +49,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     ]);
     const refreshTimer = common_vendor.ref(null);
     const isRefreshing = common_vendor.ref(false);
+    const popupRef = common_vendor.ref(null);
+    const psw = common_vendor.ref("");
+    const currentOperation = common_vendor.ref(0);
+    const modalTitle = common_vendor.ref("验证密码");
+    const userType = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     common_vendor.ref(false);
     common_vendor.ref(new UTSJSONObject({
@@ -89,28 +99,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }, intervalMs);
       }
     };
-    const baseList = common_vendor.ref([
-      new UTSJSONObject({
-        name: "/static/gjhf.png",
-        title: "轨迹回放"
-      }),
-      new UTSJSONObject({
-        name: "/static/clgz.png",
-        title: "车辆跟踪"
-      }),
-      new UTSJSONObject({
-        name: "/static/lcjl.png",
-        title: "里程记录"
-      }),
-      new UTSJSONObject({
-        name: "/static/tcjl.png",
-        title: "停车记录"
-      })
+    const baseList = common_vendor.ref([new UTSJSONObject({
+      name: "/static/gjhf.png",
+      title: "轨迹回放"
+    }), new UTSJSONObject({
+      name: "/static/clgz.png",
+      title: "车辆跟踪"
+    }), new UTSJSONObject({
+      name: "/static/lcjl.png",
+      title: "里程记录"
+    }), new UTSJSONObject({
+      name: "/static/tcjl.png",
+      title: "停车记录"
+    }), new UTSJSONObject({
+      name: "/static/power.png",
+      title: "恢复油电"
+    }), new UTSJSONObject(
+      {
+        name: "/static/offpower.png",
+        title: "断开油电"
+      }
       // {
       // 	name: '/static/dzwl.png',
       // 	title: '电子围栏'
       // }
-    ]);
+    )]);
     const click = (name = null) => {
       currentToolItem.value = name;
       if (name == 0) {
@@ -120,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (name == 1) {
         common_vendor.index.navigateTo({
-          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
+          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
         });
       }
       if (name == 2) {
@@ -134,10 +147,89 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
       if (name == 4) {
-        common_vendor.index.navigateTo({
-          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
-        });
+        if (userType.value == "1") {
+          psw.value = "";
+          currentOperation.value = 1;
+          modalTitle.value = "验证密码";
+          popupRef.value.open();
+        } else {
+          executeOperation(1);
+        }
       }
+      if (name == 5) {
+        if (userType.value == "1") {
+          psw.value = "";
+          currentOperation.value = 2;
+          modalTitle.value = "验证密码";
+          popupRef.value.open();
+        } else {
+          executeOperation(2);
+        }
+      }
+    };
+    const executeOperation = (operationType = null) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        let predictCmdId = 0;
+        let type = 0;
+        if (operationType == 1) {
+          predictCmdId = 2;
+          type = 2;
+        } else if (operationType == 2) {
+          predictCmdId = 1;
+          type = 1;
+        } else {
+          common_vendor.index.showToast({
+            title: "操作类型错误",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        try {
+          common_vendor.index.showLoading({
+            title: "执行中...",
+            mask: true
+          });
+          const res = yield api_request.sendCommand({
+            imei: imei.value,
+            password: userType.value == "1" ? psw.value : "",
+            params: ["1111"],
+            predictCmdId,
+            type
+          });
+          common_vendor.index.hideLoading();
+          if (res.code == 0) {
+            common_vendor.index.showToast({
+              title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
+              icon: "success"
+            });
+            psw.value = "";
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "操作失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.hideLoading();
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:283", "操作失败:", error);
+          common_vendor.index.showToast({
+            title: "操作失败，请重试",
+            icon: "none"
+          });
+        }
+      });
+    };
+    const confirm = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (userType.value == "1" && psw.value == "") {
+          common_vendor.index.showToast({
+            title: "请输入密码",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        executeOperation(currentOperation.value);
+      });
     };
     const carDetail = () => {
       common_vendor.index.navigateTo({
@@ -145,7 +237,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:183", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:311", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -162,7 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:201", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:329", "调起地图失败:", err);
         }
       });
     };
@@ -173,15 +265,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             if (item.imei == imei.value) {
               datainfo.value = item;
-              center.latitude = item.latitude;
-              center.longitude = item.longitude;
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:214", item);
-              const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
+              const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(item.latitude, item.longitude);
+              center.latitude = convertedCoord.lat;
+              center.longitude = convertedCoord.lng;
+              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:346", "坐标转换:", new UTSJSONObject({
+                original: new UTSJSONObject({ lat: item.latitude, lng: item.longitude }),
+                converted: convertedCoord
+              }));
+              const addr = yield utils_getAdress.getAddress(convertedCoord.lat, convertedCoord.lng);
               address.value = addr.result.formatted_address;
               const deviceMarker = createMarker(
                 1,
-                item.latitude,
-                item.longitude,
+                convertedCoord.lat,
+                convertedCoord.lng,
                 "device",
                 item.deviceName
                 // 使用设备名称作为标题
@@ -193,10 +289,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:238", "ssss", option);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:374", "ssss", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
       deviceId.value = option.deviceId;
+      userType.value = common_vendor.index.getStorageSync("userType");
       const data = new UTSJSONObject({
         deptId: deptId.value,
         deviceids: imei.value
@@ -209,38 +306,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (deviceId.value !== null) {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:254", res.data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:392", res.data);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:257", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:395", "设备id获取失败");
         }
       });
     };
     const createMarker = (id, lat, lng, type, title = null) => {
-      const marker = new UTSJSONObject(
-        {
-          id,
-          latitude: lat,
-          longitude: lng,
-          width: 30,
-          height: 30,
-          callout: new UTSJSONObject({
-            content: title || (type == "device" ? "设备位置" : "我的位置"),
-            color: "#ffffff",
-            fontSize: 14,
-            borderRadius: 10,
-            bgColor: type == "device" ? "#07C160" : "#007AFF",
-            padding: 5,
-            display: "ALWAYS"
-          })
-        }
-        // 设置不同图标
-      );
-      if (type == "device") {
-        marker.iconPath = "/static/car.png";
-      } else {
-        marker.iconPath = "/static/marker.png";
-      }
+      const marker = new UTSJSONObject({
+        id,
+        latitude: lat,
+        longitude: lng,
+        width: 30,
+        height: 30,
+        iconPath: datainfo.value.connectionStatus == "online" ? "/static/car.png" : "/static/offline.png",
+        callout: new UTSJSONObject({
+          content: title || (datainfo.value.connectionStatus == "online" ? "设备位置" : "设备已离线"),
+          color: datainfo.value.connectionStatus == "online" ? "#fff" : "#666",
+          fontSize: 14,
+          borderRadius: 10,
+          bgColor: datainfo.value.connectionStatus == "online" ? "#07C160" : "#ccc",
+          padding: 5,
+          display: "ALWAYS"
+        })
+      });
       return marker;
     };
     common_vendor.onHide(() => {
@@ -307,7 +397,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.p({
           col: 4
         }),
-        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        r: common_vendor.o(($event = null) => {
+          return common_vendor.isRef(psw) ? psw.value = $event : null;
+        }),
+        s: common_vendor.p({
+          placeholder: "请输入账户密码",
+          prefixIcon: "lock",
+          border: "surround",
+          clearable: true,
+          password: "true",
+          modelValue: common_vendor.unref(psw)
+        }),
+        t: common_vendor.sr(popupRef, "6cb34a81-6", {
+          "k": "popupRef"
+        }),
+        v: common_vendor.o(confirm),
+        w: common_vendor.p({
+          title: common_vendor.unref(modalTitle)
+        }),
+        x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

@@ -23,15 +23,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       username: "123456789"
     }));
     const carsnumber = common_vendor.ref(0);
-    common_vendor.onLoad(() => {
-      carsnumber.value = common_vendor.index.getStorageSync("carTotalCount");
+    common_vendor.onShow(() => {
       loadData();
     });
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
+        let params = new UTSJSONObject({});
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:47", userInfo.value);
+        const resCars = yield api_request.getUserDeviceList(params);
+        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:49", "API响应数据:", resCars);
+        if ((_a = resCars === null || resCars === void 0 ? null : resCars.data) === null || _a === void 0 ? null : _a.totalCount) {
+          carsnumber.value = resCars.data.totalCount;
+        }
       });
     };
     const userInfoDetail = () => {

@@ -1,7 +1,6 @@
 "use strict";
 const api_http = require("./http.js");
 const loginUrl = "/sys/login";
-const customDeviceList = "/group/listByDeptWithDevice?deptId=";
 const devicePos = "/gps/lastPosition?deptId=";
 const trackPos = "/gps/trackPos?";
 const userinfo = "/sys/user/info";
@@ -15,14 +14,19 @@ const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const carType = "/carType/listAll";
 const logoutUrl = "/sys/logout";
+const groupList = "/group/userGroupList";
+const sendcmd = "/command/sendCmd";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
 const logout = () => {
   return api_http.http.post(logoutUrl);
 };
-const getCustomDeviceList = (deptId) => {
-  return api_http.http.get(customDeviceList, new UTSJSONObject({ deptId }));
+const getUserGroupList = () => {
+  return api_http.http.get(groupList);
+};
+const sendCommand = (data) => {
+  return api_http.http.post(sendcmd, data);
 };
 const getDevicePos = (data) => {
   return api_http.http.get(devicePos, data);
@@ -65,14 +69,15 @@ exports.addDevice = addDevice;
 exports.changePassWord = changePassWord;
 exports.editDeviceInfo = editDeviceInfo;
 exports.getCarType = getCarType;
-exports.getCustomDeviceList = getCustomDeviceList;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getTrackPos = getTrackPos;
 exports.getUserDeviceList = getUserDeviceList;
+exports.getUserGroupList = getUserGroupList;
 exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 exports.logout = logout;
+exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

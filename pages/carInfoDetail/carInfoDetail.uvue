@@ -30,13 +30,21 @@
 				</uv-grid-item>
 			</uv-grid>
 		</view>
+		<view class="popup">
+			<uv-modal ref="popupRef" :title="modalTitle" @confirm="confirm">
+				<view class="content">
+					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable password="true" v-model="psw" ></uv-input>
+				</view>
+			</uv-modal>
+		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import amapFile from '../../utils/amap-wx.130'
-	import { getDevicePos, getUserDeviceList, getDeviceDetail } from '../../api/request.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail ,sendCommand} from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	const deptId = ref<string | null>('')
 	const imei = ref<string | null>('')
@@ -46,7 +54,7 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(17)
+	const mapScale = ref(15)
 	const datainfo = ref<object>({})
 	const address = ref('')
 	const currentTime = ref('5s')
@@ -61,6 +69,12 @@
 	])
 	const refreshTimer = ref<number | null>(null)
 	const isRefreshing = ref(false)
+
+	const popupRef = ref(null);
+	const psw = ref('')
+	const currentOperation = ref(0) // 0:无操作 1:恢复油电 2:断开油电
+	const modalTitle = ref('验证密码')
+	const userType = ref('')
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
@@ -138,6 +152,14 @@
 		name: '/static/tcjl.png',
 		title: '停车记录'
 	},
+	{
+		name:'/static/power.png',
+		title:'恢复油电'
+	},
+	{
+		name:'/static/offpower.png',
+		title:'断开油电'
+	}
 	// {
 	// 	name: '/static/dzwl.png',
 	// 	title: '电子围栏'
@@ -153,7 +175,7 @@
 		}
 		if (name == 1) {
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
 			})
 		}
 		if (name == 2) {
@@ -167,10 +189,116 @@
 			})
 		}
 		if (name == 4) {
-			uni.navigateTo({
-				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+			// 恢复油电
+			if (userType.value == '1') {
+				// 需要密码验证
+				psw.value = ''
+				currentOperation.value = 1
+				modalTitle.value = '验证密码'
+				popupRef.value.open();
+			} else {
+				// 不需要密码验证，直接执行操作
+				executeOperation(1);
+			}
+		}
+		if (name == 5) {
+			// 断开油电
+			if (userType.value == '1') {
+				// 需要密码验证
+				psw.value = ''
+				currentOperation.value = 2
+				modalTitle.value = '验证密码'
+				popupRef.value.open();
+			} else {
+				// 不需要密码验证，直接执行操作
+				executeOperation(2);
+			}
+		}
+		// if (name == 4) {
+		// 	uni.navigateTo({
+		// 		url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+		// 	})
+		// }
+	}
+
+	// 执行操作的统一方法
+	const executeOperation = async (operationType) => {
+		let predictCmdId = 0
+		let type = 0
+		
+		if (operationType == 1) {
+			// 恢复油电
+			predictCmdId = 2
+			type = 2
+		} else if (operationType == 2) {
+			// 断开油电
+			predictCmdId = 1
+			type = 1
+		} else {
+			uni.showToast({
+				title: '操作类型错误',
+				icon: 'none'
+			})
+			return
+		}
+		
+		try {
+			// 显示加载中
+			uni.showLoading({
+				title: '执行中...',
+				mask: true
+			})
+			
+			// 调用接口
+			const res = await sendCommand({
+				imei: imei.value,
+				password: userType.value == '1' ? psw.value : '', // 根据用户类型决定是否传密码
+				params:['1111'],
+				predictCmdId: predictCmdId,
+				type: type
+			})
+			
+			// 隐藏加载中
+			uni.hideLoading()
+			
+			// 根据响应处理结果
+			if (res.code == 0) {
+				uni.showToast({
+					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+					icon: 'success'
+				})
+				
+				// 清空密码
+				psw.value = ''
+			} else {
+				uni.showToast({
+					title: res.msg || '操作失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			// 隐藏加载中
+			uni.hideLoading()
+			
+			console.error('操作失败:', error)
+			uni.showToast({
+				title: '操作失败，请重试',
+				icon: 'none'
 			})
 		}
+	}
+
+	const confirm = async () => {
+		if(userType.value == '1' && psw.value == ''){
+			uni.showToast({
+				title: '请输入密码',
+				icon: 'none'
+			})
+			return
+		}
+		
+		// 执行当前操作
+		executeOperation(currentOperation.value);
 	}
 
 	const carDetail = () => {
@@ -209,16 +337,24 @@
 		res.data.forEach(async item => {
 			if (item.imei == imei.value) {
 				datainfo.value = item
-				center.latitude = item.latitude
-				center.longitude = item.longitude
-				console.log(item)
-				const addr = await getAddress(item.latitude, item.longitude);
+				
+				// 转换坐标到腾讯地图坐标系
+				const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
+				center.latitude = convertedCoord.lat
+				center.longitude = convertedCoord.lng
+				
+				console.log('坐标转换:', {
+					original: { lat: item.latitude, lng: item.longitude },
+					converted: convertedCoord
+				})
+				
+				const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
 				address.value = addr.result.formatted_address;
 
 				const deviceMarker = createMarker(
 					1,
-					item.latitude,
-					item.longitude,
+					convertedCoord.lat,
+					convertedCoord.lng,
 					'device',
 					item.deviceName // 使用设备名称作为标题
 				)
@@ -239,6 +375,8 @@
 		deptId.value = option.deptId
 		imei.value = option.imei
 		deviceId.value = option.deviceId
+		userType.value = uni.getStorageSync('userType')
+
 		const data = {
 			deptId: deptId.value,
 			deviceids: imei.value
@@ -266,22 +404,16 @@
 			longitude: lng,
 			width: 30,
 			height: 30,
+			iconPath:datainfo.value.connectionStatus == 'online' ? '/static/car.png' : '/static/offline.png',
 			callout: {
-				content: title || (type == 'device' ? '设备位置' : '我的位置'),
-				color: '#ffffff',
+				content: title || (datainfo.value.connectionStatus == 'online' ? '设备位置' : '设备已离线'),
+				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',
 				fontSize: 14,
 				borderRadius: 10,
-				bgColor: type == 'device' ? '#07C160' : '#007AFF',
+				bgColor: datainfo.value.connectionStatus == 'online' ? '#07C160' : '#ccc',
 				padding: 5,
 				display: 'ALWAYS'
 			}
-		}
-
-		// 设置不同图标
-		if (type == 'device') {
-			marker.iconPath = '/static/car.png'
-		} else {
-			marker.iconPath = '/static/marker.png'
 		}
 
 		return marker

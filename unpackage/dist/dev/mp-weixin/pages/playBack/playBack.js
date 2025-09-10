@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
+const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _component_marker = common_vendor.resolveComponent("marker");
@@ -72,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentTime = common_vendor.ref("");
     const currentIndex = common_vendor.ref(0);
     const carMarker = common_vendor.ref(null);
-    let playbackTimer = null;
+    let playbackTimer = 0;
     let lastTimestamp = 0;
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
@@ -404,12 +405,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       for (let i = 0; i < positions.length; i++) {
         const point = positions[i];
         const deviceTimeStr = point.getString("deviceTime", "");
+        const originalLat = point.getNumber("latitude", 0);
+        const originalLng = point.getNumber("longitude", 0);
+        const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(originalLat, originalLng);
         const processedPoint = new UTSJSONObject({
-          latitude: point.getNumber("latitude", 0),
-          longitude: point.getNumber("longitude", 0),
+          latitude: convertedCoord.lat,
+          longitude: convertedCoord.lng,
           speed: point.getNumber("speed", 0),
           deviceTime: formatDateForDisplay(deviceTimeStr),
-          timestamp: safeParseDate(deviceTimeStr)
+          timestamp: safeParseDate(deviceTimeStr),
+          // 保留原始坐标信息（可选）
+          originalLatitude: originalLat,
+          originalLongitude: originalLng
         });
         if (i > 0) {
           const prevPoint = processedPoints[i - 1];
