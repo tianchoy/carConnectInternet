@@ -127,16 +127,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!Array.isArray(devices)) {
         devices = [];
       }
-      const convertedDevices = utils_coordTransform.CoordTransform.batchConvertCoordinates(devices, "tencent");
-      markers.value = convertedDevices.map((device = null, index) => {
+      markers.value = devices.map((device = null, index = null) => {
         if (!device || typeof device !== "object") {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:166", "无效的设备数据", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:163", "无效的设备数据", device);
           return null;
         }
         const lat = Number(device.latitude);
         const lng = Number(device.longitude);
         if (isNaN(lat) || isNaN(lng)) {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:174", "设备经纬度无效", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:171", "设备经纬度无效", device);
           return null;
         }
         return new UTSJSONObject({
@@ -185,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pickerGroupTitle.value = "全部分组";
           currentGroupId.value = "all";
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:230", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:227", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
@@ -204,7 +203,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             params = new UTSJSONObject({ groupId });
           }
           const res = yield api_request.getUserDeviceList(params);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:247", "API响应数据:", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:244", "API响应数据:", res);
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -219,10 +218,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:264", "解析后的设备列表:", deviceList);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:261", "解析后的设备列表:", deviceList);
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:270", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:267", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -231,7 +230,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:280", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:277", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList(currentGroupId.value);
     };
     const getUserIn = () => {
@@ -242,7 +241,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:291", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:288", "获取用户信息失败:", err);
         }
       });
     };
@@ -280,7 +279,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:335", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:332", "聚合初始化完成");
               }
             }));
           }

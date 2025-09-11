@@ -121,7 +121,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const calculateMapRotation = (direction) => {
-      let rotation = 360 - direction;
+      let rotation = direction;
       if (rotation >= 360)
         rotation -= 360;
       if (rotation < 0)
@@ -161,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             setMarkers();
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:235", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:236", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
@@ -178,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let angle = Math.atan2(dy, dx) * 180 / Math.PI;
       if (angle < 0)
         angle += 360;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:260", "计算方向:", angle);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:261", "计算方向:", angle);
       return angle;
     };
     const setMarkers = () => {
@@ -312,7 +312,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:417", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:418", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {
@@ -405,7 +405,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleRegionChange = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:522", "地图区域变化:", e);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:523", "地图区域变化:", e);
     };
     common_vendor.onUnmounted(() => {
       if (trackingInterval.value) {

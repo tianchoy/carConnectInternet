@@ -177,7 +177,8 @@
 
 	// 计算地图上的旋转角度（修正方向）
 	const calculateMapRotation = (direction : number) : number => {
-		let rotation = 360 - direction
+		let rotation = direction
+		// let rotation = 360 - direction
 		// let rotation = direction + 180
 		// let rotation = 180 - direction
 		if (rotation >= 360) rotation -= 360
