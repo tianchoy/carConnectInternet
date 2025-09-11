@@ -70,6 +70,7 @@
 	const isTracking = ref(false)
 	const trackingInterval = ref<number | null>(null)
 	const trackPoints = ref<Array<{ latitude : number, longitude : number }>>([])
+	const lastDirection = ref(0) // 保存上一次的方向值
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
@@ -89,6 +90,11 @@
 	// 监听 currentTime 变化
 	watch(currentTime, (newVal) => {
 		console.log("时间变化:", newVal);
+		if (isTracking.value) {
+			// 如果正在跟踪，重新设置定时器
+			stopTracking()
+			startTracking()
+		}
 	});
 
 	onLoad((option) => {
@@ -127,6 +133,9 @@
 						longitude: convertedCoord.lng
 					}
 
+					// 记录初始方向
+					lastDirection.value = deviceData.direction || 0
+					
 					// 设置初始标记点
 					markers.value = [{
 						id: 0,
@@ -135,7 +144,7 @@
 						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
 						width: 40,
 						height: 40,
-						rotate: deviceData.direction || 0,
+						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
 							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
 							color: connectionStatus.value == 'online' ? '#fff' : '#666',
@@ -166,13 +175,25 @@
 		}
 	}
 
+	// 计算地图上的旋转角度（修正方向）
+	const calculateMapRotation = (direction : number) : number => {
+		let rotation = 360 - direction
+		// let rotation = direction + 180
+		// let rotation = 180 - direction
+		if (rotation >= 360) rotation -= 360
+		if (rotation < 0) rotation += 360
+		
+		// console.log("方向计算 - 原始:", direction, "修正后:", rotation)
+		return rotation
+	}
+
 	//请求位置数据
 	const loadTrackData = async () => {
 		try {
-			const data = { deviceids: imei.value }
+			const data = {deptId: deptId.value,  deviceids: imei.value }
 			const res = await getDevicePos(data)
 
-			if (res?.code === 0 && res.data?.length > 0) {
+			if (res?.code == 0 && res.data?.length > 0) {
 				const deviceData = res.data[0]
 				// 转换坐标到腾讯地图坐标系
 				const convertedCoord = CoordTransform.wgs84ToTencent(
@@ -194,13 +215,21 @@
 				currentAddress.value = deviceData.positionUpdateTime || '未知位置'
 				connectionStatus.value = deviceData.connectionStatus || 'unknown'
 
-				// 追踪状态下记录轨迹点 暂时不用
-				// if (isTracking.value) {
-				// 	trackPoints.value.push(position)
-				// 	drawTempRoute()
-				// }
+				// 如果有方向数据，更新方向
+				if (deviceData.direction !== undefined && deviceData.direction !== null) {
+					lastDirection.value = deviceData.direction
+				} else if (trackPoints.value.length >= 2) {
+					// 如果没有方向数据，根据轨迹计算方向
+					lastDirection.value = calculateDirectionFromTrack()
+				}
 
-				// setMarkers(deviceData.direction)
+				// 追踪状态下记录轨迹点
+				if (isTracking.value) {
+					trackPoints.value.push(position)
+					drawTempRoute()
+				}
+
+				setMarkers()
 			}
 		} catch (err) {
 			console.error('获取位置失败:', err)
@@ -208,55 +237,55 @@
 		}
 	}
 
+	// 根据轨迹计算方向
+	const calculateDirectionFromTrack = () : number => {
+		if (trackPoints.value.length < 2) return lastDirection.value
+		
+		const lastIndex = trackPoints.value.length - 1
+		const prevIndex = trackPoints.value.length - 2
+		
+		const lastPoint = trackPoints.value[lastIndex]
+		const prevPoint = trackPoints.value[prevIndex]
+		
+		// 计算两点之间的角度
+		const dx = lastPoint.longitude - prevPoint.longitude
+		const dy = lastPoint.latitude - prevPoint.latitude
+		
+		// 计算角度（弧度）
+		let angle = Math.atan2(dy, dx) * 180 / Math.PI
+		
+		// 转换为0-360度范围
+		if (angle < 0) angle += 360
+		
+		console.log("计算方向:", angle)
+		return angle
+	}
+
 	// 设置标记点
-	const setMarkers = (direction : number = 0) => {
+	const setMarkers = () => {
 		if (trackPoints.value.length === 0) return
 
+		// 只保留车辆标记点，ID从0开始
 		markers.value = [
-			// 起点
+			// 车辆位置
 			{
-				id: 0,
-				latitude: trackPoints.value[0].latitude,
-				longitude: trackPoints.value[0].longitude
-			},
-			// 终点
-			{
-				id: 1,
+				id: 0, // 修改ID从0开始
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
 				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-			},
-			{
-				id: 2,
-				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-				iconPath: '/static/car.png',
+				iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
 				width: 40,
 				height: 40,
-				rotate: direction,
+				rotate: calculateMapRotation(lastDirection.value), // 使用修正后的方向
 				callout: {
 					content: `速度: ${currentSpeed.value}km/h`,
 					color: '#ffffff',
-					bgColor: '#1296db',
+					bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
 					padding: 5,
 					borderRadius: 4,
 					display: 'ALWAYS'
 				}
 			}
 		]
-	}
-
-	// 计算车辆方向
-	const getCarDirection = () => {
-		if (trackPoints.value.length < 2) return 0
-
-		const last = trackPoints.value[trackPoints.value.length - 1]
-		const prev = trackPoints.value[trackPoints.value.length - 2]
-
-		const dx = last.longitude - prev.longitude
-		const dy = last.latitude - prev.latitude
-		const angle = Math.atan2(dy, dx) * 180 / Math.PI
-
-		return angle
 	}
 
 	// 开始/停止跟踪
@@ -270,9 +299,15 @@
 
 	// 开始跟踪
 	const startTracking = () => {
-		trackPoints.value = []
-
-		getCurrentPosition()
+		// 保留最后一个点作为起点
+		if (trackPoints.value.length > 0) {
+			const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+			trackPoints.value = [lastPoint]
+		} else {
+			trackPoints.value = []
+			// 如果没有点，先获取当前位置
+			getCurrentPosition()
+		}
 
 		const interval = parseInt(currentTime.value) * 1000
 		isTracking.value = true
@@ -282,6 +317,11 @@
 		trackingInterval.value = setInterval(() => {
 			getCurrentPosition()
 		}, interval) as unknown as number
+		
+		uni.showToast({
+			title: '开始跟踪',
+			icon: 'success'
+		})
 	}
 
 	// 停止跟踪
@@ -295,9 +335,14 @@
 		if (trackPoints.value.length >= 2) {
 			getRealRoute()
 		}
+		
+		uni.showToast({
+			title: '停止跟踪',
+			icon: 'success'
+		})
 	}
 
-	// 获取当前位置（模拟）
+	// 获取当前位置
 	const getCurrentPosition = () => {
 		uni.showLoading({
 			title: '获取位置中...'
@@ -306,14 +351,6 @@
 		setTimeout(() => {
 			uni.hideLoading()
 		}, 1000)
-	}
-
-	// 获取地址名称
-	const getAddressName = (lat, lng) => {
-		// 这里应该是调用逆地理编码API获取实际地址
-		const streets = ['朝阳路', '建国路', '东三环', '西直门大街', '中关村大街']
-		const numbers = Math.floor(Math.random() * 100) + '号'
-		return '北京市' + streets[Math.floor(Math.random() * streets.length)] + numbers
 	}
 
 	// 绘制临时路线
@@ -329,11 +366,12 @@
 			color: '#1296db',
 			width: 6,
 			arrowLine: true,
+			arrowIconPath: '/static/arrow.png', // 确保箭头图标方向正确
 			borderColor: '#ffffff',
 			borderWidth: 2
 		}]
 
-		console.log('绘制临时路线:', JSON.stringify(polylines.value))
+		// console.log('绘制临时路线:', JSON.stringify(polylines.value))
 	}
 
 	// 获取真实道路路线
@@ -359,7 +397,7 @@
 			origin: `${trackPoints.value[0].longitude},${trackPoints.value[0].latitude}`,
 			destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
 			waypoints: waypoints,
-			style: "0" // 0-推荐路线
+			style: "0" 
 		}).then((res : any) => {
 			uni.hideLoading()
 			if (res && res.data) {
@@ -407,7 +445,7 @@
 				color: '#1a73e8',
 				width: 8,
 				arrowLine: true,
-				arrowIconPath: '/static/road-arrow.png',
+				arrowIconPath: '/static/road-arrow.png', // 确保箭头方向正确
 				level: 'high'
 			},
 			// 路线高亮

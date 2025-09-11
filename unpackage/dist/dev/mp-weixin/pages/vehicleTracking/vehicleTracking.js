@@ -34,6 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isTracking = common_vendor.ref(false);
     const trackingInterval = common_vendor.ref(null);
     const trackPoints = common_vendor.ref([]);
+    const lastDirection = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentAddress = common_vendor.ref("获取中...");
     const currentTime = common_vendor.ref("10s");
@@ -47,10 +48,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       ]
     ]);
     common_vendor.watch(currentTime, (newVal) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:91", "时间变化:", newVal);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:92", "时间变化:", newVal);
+      if (isTracking.value) {
+        stopTracking();
+        startTracking();
+      }
     });
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:95", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:101", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
       currentCar.value = option.plateNo;
@@ -65,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:112", "跟踪位置", res.data, imei.value);
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:118", "跟踪位置", res.data, imei.value);
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               if (item.imei == imei.value) {
@@ -78,8 +83,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     latitude: convertedCoord.lat,
                     longitude: convertedCoord.lng
                   }
-                  // 设置初始标记点
+                  // 记录初始方向
                 );
+                lastDirection.value = deviceData.direction || 0;
                 markers.value = [new UTSJSONObject({
                   id: 0,
                   latitude: position.latitude,
@@ -87,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
                   width: 40,
                   height: 40,
-                  rotate: deviceData.direction || 0,
+                  rotate: calculateMapRotation(lastDirection.value),
                   callout: new UTSJSONObject({
                     content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
                     color: connectionStatus.value == "online" ? "#fff" : "#666",
@@ -104,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:159", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:168", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -114,13 +120,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const calculateMapRotation = (direction) => {
+      let rotation = 360 - direction;
+      if (rotation >= 360)
+        rotation -= 360;
+      if (rotation < 0)
+        rotation += 360;
+      return rotation;
+    };
     const loadTrackData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         try {
-          const data = new UTSJSONObject({ deviceids: imei.value });
+          const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          if ((res === null || res === void 0 ? null : res.code) === 0 && ((_a = res.data) === null || _a === void 0 ? null : _a.length) > 0) {
+          if ((res === null || res === void 0 ? null : res.code) == 0 && ((_a = res.data) === null || _a === void 0 ? null : _a.length) > 0) {
             const deviceData = res.data[0];
             const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
             const position = new UTSJSONObject(
@@ -135,12 +149,63 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             currentSpeed.value = deviceData.speed || 0;
             currentAddress.value = deviceData.positionUpdateTime || "未知位置";
             connectionStatus.value = deviceData.connectionStatus || "unknown";
+            if (deviceData.direction !== void 0 && deviceData.direction !== null) {
+              lastDirection.value = deviceData.direction;
+            } else if (trackPoints.value.length >= 2) {
+              lastDirection.value = calculateDirectionFromTrack();
+            }
+            if (isTracking.value) {
+              trackPoints.value.push(position);
+              drawTempRoute();
+            }
+            setMarkers();
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:206", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:235", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
+    };
+    const calculateDirectionFromTrack = () => {
+      if (trackPoints.value.length < 2)
+        return lastDirection.value;
+      const lastIndex = trackPoints.value.length - 1;
+      const prevIndex = trackPoints.value.length - 2;
+      const lastPoint = trackPoints.value[lastIndex];
+      const prevPoint = trackPoints.value[prevIndex];
+      const dx = lastPoint.longitude - prevPoint.longitude;
+      const dy = lastPoint.latitude - prevPoint.latitude;
+      let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      if (angle < 0)
+        angle += 360;
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:260", "计算方向:", angle);
+      return angle;
+    };
+    const setMarkers = () => {
+      if (trackPoints.value.length === 0)
+        return null;
+      markers.value = [
+        new UTSJSONObject(
+          // 车辆位置
+          {
+            id: 0,
+            latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
+            longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+            iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
+            width: 40,
+            height: 40,
+            rotate: calculateMapRotation(lastDirection.value),
+            callout: new UTSJSONObject({
+              content: `速度: ${currentSpeed.value}km/h`,
+              color: "#ffffff",
+              bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
+              padding: 5,
+              borderRadius: 4,
+              display: "ALWAYS"
+            })
+          }
+        )
+      ];
     };
     const toggleTracking = () => {
       if (isTracking.value) {
@@ -150,8 +215,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const startTracking = () => {
-      trackPoints.value = [];
-      getCurrentPosition();
+      if (trackPoints.value.length > 0) {
+        const lastPoint = trackPoints.value[trackPoints.value.length - 1];
+        trackPoints.value = [lastPoint];
+      } else {
+        trackPoints.value = [];
+        getCurrentPosition();
+      }
       const interval = parseInt(currentTime.value) * 1e3;
       isTracking.value = true;
       if (trackingInterval.value) {
@@ -160,6 +230,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       trackingInterval.value = setInterval(() => {
         getCurrentPosition();
       }, interval);
+      common_vendor.index.showToast({
+        title: "开始跟踪",
+        icon: "success"
+      });
     };
     const stopTracking = () => {
       isTracking.value = false;
@@ -170,6 +244,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (trackPoints.value.length >= 2) {
         getRealRoute();
       }
+      common_vendor.index.showToast({
+        title: "停止跟踪",
+        icon: "success"
+      });
     };
     const getCurrentPosition = () => {
       common_vendor.index.showLoading({
@@ -179,6 +257,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       setTimeout(() => {
         common_vendor.index.hideLoading();
       }, 1e3);
+    };
+    const drawTempRoute = () => {
+      if (trackPoints.value.length < 2)
+        return null;
+      const validPoints = trackPoints.value.map((point) => {
+        return new UTSJSONObject({
+          latitude: Number(point.latitude),
+          longitude: Number(point.longitude)
+        });
+      });
+      polylines.value = [new UTSJSONObject({
+        points: validPoints,
+        color: "#1296db",
+        width: 6,
+        arrowLine: true,
+        arrowIconPath: "/static/arrow.png",
+        borderColor: "#ffffff",
+        borderWidth: 2
+      })];
     };
     const getRealRoute = () => {
       if (trackPoints.value.length < 2) {
@@ -199,7 +296,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
         waypoints,
         style: "0"
-        // 0-推荐路线
       })).then((res = null) => {
         common_vendor.index.hideLoading();
         if (res && res.data) {
@@ -216,7 +312,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:379", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:417", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {
@@ -309,7 +405,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleRegionChange = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:484", "地图区域变化:", e);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:522", "地图区域变化:", e);
     };
     common_vendor.onUnmounted(() => {
       if (trackingInterval.value) {
