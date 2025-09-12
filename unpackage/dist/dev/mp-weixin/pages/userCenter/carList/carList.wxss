@@ -32,7 +32,7 @@
   margin-top: 170rpx;
 }
 .container .content.data-v-4d1d23ef {
-  margin: 20rpx;
+  margin: 30rpx 20rpx 20rpx;
 }
 .container .content .list.data-v-4d1d23ef {
   background-color: #fff;

@@ -126,7 +126,7 @@
 		margin-top: 170rpx;
 
 		.content {
-			margin: 20rpx;
+			margin: 30rpx 20rpx 20rpx ;
 
 			.list {
 				background-color: #fff;
