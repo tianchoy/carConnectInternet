@@ -159,11 +159,11 @@
 	{
 		name:'/static/offpower.png',
 		title:'断开油电'
+	},
+	{
+		name: '/static/dzwl.png',
+		title: '电子围栏'
 	}
-	// {
-	// 	name: '/static/dzwl.png',
-	// 	title: '电子围栏'
-	// }
 	])
 
 	const click = (name) => {
@@ -185,7 +185,7 @@
 		}
 		if (name == 3) {
 			uni.navigateTo({
-				url: '/pages/stopRecord/stopRecord?imei=' + imei.value
+				url: '/pages/stopRecord/stopRecord?imei=' + imei.value+ '&deptId=' + deptId.value
 			})
 		}
 		if (name == 4) {
@@ -214,11 +214,11 @@
 				executeOperation(2);
 			}
 		}
-		// if (name == 4) {
-		// 	uni.navigateTo({
-		// 		url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
-		// 	})
-		// }
+		if (name == 6) {
+			uni.navigateTo({
+				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+			})
+		}
 	}
 
 	// 执行操作的统一方法
@@ -343,10 +343,10 @@
 				center.latitude = convertedCoord.lat
 				center.longitude = convertedCoord.lng
 				
-				console.log('坐标转换:', {
-					original: { lat: item.latitude, lng: item.longitude },
-					converted: convertedCoord
-				})
+				// console.log('坐标转换:', {
+				// 	original: { lat: item.latitude, lng: item.longitude },
+				// 	converted: convertedCoord
+				// })
 				
 				const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
 				address.value = addr.result.formatted_address;
@@ -371,7 +371,6 @@
 	// }
 
 	onLoad((option) => {
-		console.log('ssss', option)
 		deptId.value = option.deptId
 		imei.value = option.imei
 		deviceId.value = option.deviceId

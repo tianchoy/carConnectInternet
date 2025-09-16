@@ -2,6 +2,13 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "sub-nav-bar": "../../components/sub-navBar/sub-navBar"
+    "sub-nav-bar": "../../components/sub-navBar/sub-navBar",
+    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup",
+    "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
+    "uv-radio": "../../uni_modules/uv-radio/components/uv-radio/uv-radio",
+    "uv-radio-group": "../../uni_modules/uv-radio/components/uv-radio-group/uv-radio-group",
+    "uv-switch": "../../uni_modules/uv-switch/components/uv-switch/uv-switch"
   }
 }

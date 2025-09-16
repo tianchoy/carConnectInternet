@@ -11,6 +11,9 @@
 			<indexListMode :lists="filteredDevices" />
 		</view>
 		<view class="tool-nav">
+			<view class="refresh" @click="refresh">
+				<image src="/static/refresh.png" />
+			</view>
 			<view class="addCar" @click="addCar">
 				<image src="/static/add.png" />
 			</view>
@@ -231,6 +234,10 @@
 			})
 		}
 	}
+	
+	const refresh = async () => {
+		await loadUserDeviceList()
+	}
 
 	const loadUserDeviceList = async (groupId : string = '') => {
 		try {
@@ -377,7 +384,7 @@
 				width: 100%;
 				height: 100%;
 				padding: 8rpx;
-				border-radius: 10rpx;
+				border-radius: 50%;
 				background-color: rgba(3, 109, 246, 0.71);
 			}
 
@@ -389,6 +396,18 @@
 				image {
 					width: 100%;
 					height: 100%;
+					border-radius: 50%;
+				}
+			}
+			.refresh{
+				width: 68rpx;
+				height: 68rpx;
+				margin-right: 20rpx;
+				
+				image {
+					width: 100%;
+					height: 100%;
+					border-radius: 50%;
 				}
 			}
 		}

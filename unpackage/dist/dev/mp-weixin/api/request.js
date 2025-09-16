@@ -16,6 +16,12 @@ const carType = "/carType/listAll";
 const logoutUrl = "/sys/logout";
 const groupList = "/group/userGroupList";
 const sendcmd = "/command/sendCmd";
+const getGeofence = "/geofence";
+const deleteGeo = "/geofence/";
+const unbindDeviceList = "/device/unbindGeofenceList";
+const bindDeviceList = "/device/bindGeofenceList";
+const bindGeofence = "/geofence/bind";
+const unbindGeofence = "/geofence/unbind";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
@@ -64,14 +70,44 @@ const getDeviceDetail = (deviceId) => {
 const getCarType = () => {
   return api_http.http.get(carType);
 };
+const getGeofenceList = () => {
+  return api_http.http.get(getGeofence);
+};
+const addGeofence = (data) => {
+  return api_http.http.post(getGeofence, data);
+};
+const updateGeofence = (data) => {
+  return api_http.http.put(getGeofence, data);
+};
+const deleteGeofence = (id) => {
+  return api_http.http.delete(`${deleteGeo}${id}`);
+};
+const getUnboundDevices = (params) => {
+  return api_http.http.get(unbindDeviceList, params);
+};
+const getBoundDevices = (params) => {
+  return api_http.http.get(bindDeviceList, params);
+};
+const bindDevices = (data) => {
+  return api_http.http.post(bindGeofence, data);
+};
+const unbindDevices = (data) => {
+  return api_http.http.post(unbindGeofence, data);
+};
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
+exports.addGeofence = addGeofence;
+exports.bindDevices = bindDevices;
 exports.changePassWord = changePassWord;
+exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
+exports.getBoundDevices = getBoundDevices;
 exports.getCarType = getCarType;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
+exports.getGeofenceList = getGeofenceList;
 exports.getTrackPos = getTrackPos;
+exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;
 exports.getUserGroupList = getUserGroupList;
 exports.getUserInfo = getUserInfo;
@@ -80,4 +116,6 @@ exports.login = login;
 exports.logout = logout;
 exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;
+exports.unbindDevices = unbindDevices;
+exports.updateGeofence = updateGeofence;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

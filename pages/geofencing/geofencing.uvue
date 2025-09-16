@@ -4,46 +4,328 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
-				style="width:100%;height:100%" :show-location="true" :polygons="polygons">
-				<sub-navBar :showTime="false" :currentCar="currentCar" showCar="true"
+				style="width:100%;height:100%" :show-location="true" :polygons="polygons" :markers="markers"
+				@click="handleMapTap">
+				<sub-navBar :showTime="false" :currentCar="currentCar" :showCar="true"
 					:carStatus='connectionStatus'></sub-navBar>
 			</map>
+			
+			<!-- 绘制提示 -->
+			<view v-if="isDrawing" class="drag-hint">
+				点击地图添加围栏顶点，至少需要3个点
+			</view>
+			
+			<!-- 围栏操作面板 -->
+			<view class="fence-operations" v-if="selectedFence">
+				<view class="fence-header">
+					<text class="fence-name">{{ selectedFence.name }}</text>
+					<uv-icon name="close" @click="selectedFence = null; "></uv-icon>
+				</view>
+				<view class="fence-actions">
+					<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
+					<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
+					<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
+				</view>
+			</view>
 		</view>
+		
+		<!-- 绘制控制面板 -->
+		<view class="tools-panel">
+			<view class="tool-tag-item">
+				<uv-button @click="startDrawing" :disabled="isDrawing || selectedFence">
+					开始绘制
+				</uv-button>
+				<uv-button @click="finishDrawing" :disabled="!isDrawing || points.length < 3">
+					完成绘制
+				</uv-button>
+				<uv-button @click="clearDrawing">
+					重置绘制
+				</uv-button>
+				<uv-button @click="showFenceList">
+					围栏列表
+				</uv-button>
+			</view>
+			
+			<view class="status-info">
+				<text>围栏状态: {{ polygons.length > 0 ? '已设置' : '未设置' }}</text>
+				<text>顶点数量: {{ points.length }}</text>
+			</view>
+		</view>
+		
+		<!-- 围栏列表弹窗 -->
+		<uv-popup ref="fencesPopup" mode="bottom" round="10">
+			<view class="fence-list">
+				<view class="list-header">
+					<text class="title">围栏列表</text>
+					<uv-icon name="close" @click="fencesPopup.close()"></uv-icon>
+				</view>
+				<scroll-view class="list-content" scroll-y>
+					<view v-for="fence in fenceList" :key="fence.id" class="fence-item" @click="selectFence(fence)">
+						<view class="fence-info">
+							<text class="name">{{ fence.name }}</text>
+							<text class="devices">绑定设备: {{ fence.deviceCount || 0 }}台</text>
+						</view>
+						<uv-icon name="arrow-right"></uv-icon>
+					</view>
+					<view v-if="fenceList.length === 0" class="empty">
+						暂无围栏数据
+					</view>
+				</scroll-view>
+			</view>
+		</uv-popup>
+		
+		<!-- 围栏编辑弹窗 -->
+		<uv-popup ref="editDialogPopup" mode="center" round="10">
+			<view class="edit-dialog">
+				<view class="dialog-header">
+					<text>{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
+				</view>
+				<view class="dialog-content">
+					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="bottom"></uv-input>
+					<view class="radio-group">
+						<text class="label">告警类型:</text>
+						<uv-radio-group v-model="fenceForm.alarmType">
+							<uv-radio name="0">不告警</uv-radio>
+							<uv-radio name="1">出入告警</uv-radio>
+							<uv-radio name="2">出告警</uv-radio>
+							<uv-radio name="3">入告警</uv-radio>
+						</uv-radio-group>
+					</view>
+				</view>
+				<view class="dialog-actions">
+					<uv-button @click="editDialogPopup.close()">取消</uv-button>
+					<uv-button type="primary" @click="saveFence">保存</uv-button>
+				</view>
+			</view>
+		</uv-popup>
+		
+		<!-- 设备绑定弹窗 -->
+		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10">
+			<view class="device-dialog">
+				<view class="dialog-header">
+					<text>设备绑定 - {{ currentFenceName }}</text>
+					<uv-icon name="close" @click="deviceDialogPopup.close()"></uv-icon>
+				</view>
+				<view class="dialog-tabs">
+					<view :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="activeTab = 'bind'">
+						已绑定设备
+					</view>
+					<view :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="activeTab = 'unbind'">
+						未绑定设备
+					</view>
+				</view>
+				<scroll-view class="device-list" scroll-y>
+					<view v-for="device in deviceList" :key="device.imei" class="device-item">
+						<view class="device-info">
+							<text class="name">{{ device.plateNo || device.imei }}</text>
+							<text class="status">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text>
+						</view>
+						<uv-switch 
+							:model-value="isDeviceBound(device.imei)" 
+							@change="toggleDeviceBinding(device.imei, $event)"
+							:disabled="loading">
+						</uv-switch>
+					</view>
+					<view v-if="deviceList.length === 0" class="empty">
+						{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}
+					</view>
+				</scroll-view>
+				<view class="dialog-actions">
+					<uv-button @click="deviceDialogPopup.close()">完成</uv-button>
+				</view>
+			</view>
+		</uv-popup>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted, watch } from 'vue'
-	import { getRoutePlan } from '@/utils/tiandituRoute'
-	import { getGeofence } from '../../api/request.uts'
+	import { ref, reactive, onMounted,  watch } from 'vue'
+	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
+	const deptId = ref<string | null>('')
+	
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
+	const markers = ref<any[]>([]) // 标记点
+	const carMarker = ref<any>(null) // 车辆标记点
+	const carInFence = ref(false) // 车辆是否在围栏内
+	
+	// 电子围栏相关状态
+	const isDrawing = ref(false)
+	const points = ref<Array<{ latitude : number, longitude : number }>>([])
 	const polygons = ref<any[]>([]) // 存储地理围栏多边形数据
-
+	const currentSpeed = ref(0)
+	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
+	const lastDirection = ref(0)
+	
+	// 围栏管理状态
+	const fenceList = ref<any[]>([])
+	const selectedFence = ref<any>(null)
+	const fencesPopup = ref<any>(null)
+	const editDialogPopup = ref<any>(null)
+	const editingFence = ref<any>(null)
+	const fenceForm = reactive({
+		name: '',
+		alarmType: '1'
+	})
+	
+	// 设备绑定状态
+	const deviceDialogPopup = ref<any>(null)
+	const activeTab = ref('bind')
+	const deviceList = ref<any[]>([])
+	const boundDevices = ref<any[]>([])
+	const currentFenceName = ref('')
+	const currentFenceId = ref('')
+	const loading = ref(false)
 
 	onLoad((option) => {
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
 		currentCar.value = option.plateNo
-		loadGeoData()
+		deptId.value = option.deptId
+		loadInitialPosition()
+		loadGeofenceList() // 页面加载时获取围栏列表
 	})
+	
+	const loadInitialPosition = async () => {
+		uni.showLoading({
+			title: '获取车辆位置中...'
+		})
+	
+		try {
+			const data = { deptId: deptId.value, deviceids: imei.value }
+			const res = await getDevicePos(data)
+			console.log('跟踪位置', res.data, imei.value)
+	
+			res.data.forEach(async item => {
+				if (item.imei == imei.value) {
+					const deviceData = item
+					// 转换坐标到腾讯地图坐标系
+					const convertedCoord = CoordTransform.wgs84ToTencent(
+						Number(deviceData.latitude),
+						Number(deviceData.longitude)
+					)
+					center.latitude = convertedCoord.lat
+					center.longitude = convertedCoord.lng
+	
+					const position = {
+						latitude: convertedCoord.lat,
+						longitude: convertedCoord.lng
+					}
+	
+					// 记录初始方向
+					lastDirection.value = deviceData.direction || 0
+					
+					// 创建车辆标记点
+					carMarker.value = {
+						id: 0,
+						latitude: position.latitude,
+						longitude: position.longitude,
+						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
+						width: 40,
+						height: 40,
+						rotate: calculateMapRotation(lastDirection.value), // 修正方向
+						callout: {
+							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
+							color: connectionStatus.value == 'online' ? '#fff' : '#666',
+							bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
+							padding: 5,
+							borderRadius: 4,
+							display: 'ALWAYS'
+						}
+					}
+					
+					// 更新标记点数组，保留车辆标记点
+					updateMarkers()
+
+					// 更新车辆信息
+					currentSpeed.value = deviceData.speed || 0
+					currentAddress.value = deviceData.positionUpdateTime
+						? `最后定位: ${deviceData.positionUpdateTime}`
+						: '未知位置'
+					connectionStatus.value = deviceData.connectionStatus || 'unknown'
+				}
+			})
+	
+		} catch (err) {
+			console.error('获取初始位置失败:', err)
+			uni.showToast({
+				title: '获取车辆位置失败',
+				icon: 'none'
+			})
+		} finally {
+			uni.hideLoading()
+		}
+	}
+	
+	// 计算地图上的旋转角度（修正方向）
+	const calculateMapRotation = (direction : number) : number => {
+		let rotation = direction
+		if (rotation >= 360) rotation -= 360
+		if (rotation < 0) rotation += 360
+		
+		return rotation
+	}
+
+	// 加载围栏列表
+	const loadGeofenceList = async () => {
+		try {
+			const res = await getGeofenceList()
+			if (res.code === 0) {
+				fenceList.value = res.data
+				// 将围栏渲染到地图上
+				renderFencesOnMap()
+			} else {
+				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('加载围栏列表失败:', error)
+			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+		}
+	}
+	
+	// 将围栏数据渲染到地图上
+	const renderFencesOnMap = () => {
+		if (!fenceList.value || fenceList.value.length === 0) return
+		
+		const fencePolygons = []
+		
+		// 为每个围栏创建多边形
+		fenceList.value.forEach((fence, index) => {
+			const fencePoints = parsePolygon(fence.area)
+			if (fencePoints.length >= 3) {
+				fencePolygons.push({
+					id: fence.id,
+					points: fencePoints,
+					strokeWidth: 3,
+					strokeColor: '#FF0000',
+					fillColor: index === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+					zIndex: 1
+				})
+			}
+		})
+		
+		polygons.value = fencePolygons
+	}
 
 	// 解析POLYGON字符串为坐标数组
 	const parsePolygon = (polygonStr : string) => {
+		if (!polygonStr) return []
+		
 		// 去除字符串中的"POLYGON (("和"))"
 		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
 		// 按逗号分割坐标点
-		const points = coordStr.split(',')
+		const coordPoints = coordStr.split(',')
 
-		return points.map(point => {
+		return coordPoints.map(point => {
 			// 注意：接口返回的是纬度在前，经度在后
 			const [lat, lng] = point.trim().split(' ').map(Number)
 			return {
@@ -51,6 +333,12 @@
 				longitude: lng
 			}
 		})
+	}
+	
+	// 生成POLYGON字符串
+	const generatePolygonString = (points : Array<{ latitude : number, longitude : number }>) => {
+		const coords = points.map(point => `${point.latitude} ${point.longitude}`).join(',')
+		return `POLYGON ((${coords}))`
 	}
 
 	// 调整地图中心到围栏中心位置
@@ -68,84 +356,312 @@
 
 		center.latitude = totalLat / fencePoints.length
 		center.longitude = totalLng / fencePoints.length
+		
+		// 根据围栏大小自动调整缩放级别
+		const bounds = calculateBounds(fencePoints)
+		const latDiff = bounds.maxLat - bounds.minLat
+		const lngDiff = bounds.maxLng - bounds.minLng
+		const maxDiff = Math.max(latDiff, lngDiff)
+		
+		if (maxDiff > 0.1) mapScale.value = 11
+		else if (maxDiff > 0.05) mapScale.value = 12
+		else if (maxDiff > 0.02) mapScale.value = 13
+		else mapScale.value = 14
+	}
+	
+	// 计算坐标边界
+	const calculateBounds = (points : any[]) => {
+		let minLat = points[0].latitude
+		let maxLat = points[0].latitude
+		let minLng = points[0].longitude
+		let maxLng = points[0].longitude
+		
+		points.forEach(point => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+		
+		return { minLat, maxLat, minLng, maxLng }
 	}
 
-	const loadGeoData = async () => {
-		if (imei.value != null) {
-			try {
-				// const res = await getGeofence(imei.value)
-				const res = {
-					"code": 0,
-					"msg": "success",
-					"data": [
-						{
-							"id": "geofence-1132635302368776192",
-							"name": "临沂护台小区",
-							"area": "POLYGON ((35.00224297962699 118.27432551316393, 35.0073007687663 118.27558949681305, 35.005152652989636 118.27515650223386, 35.00568851180233 118.27490360192313, 35.005690652725086 118.27962994512339, 35.001147079095205 118.27937666309187, 35.00128942430292 118.2764536042161))",
-							"attributes": null,
-							"description": null,
-							"companyId": "1",
-							"icon": "el-icon-map-location",
-							"createTime": "2025-06-18 08:49:25",
-							"updateTime": "2025-08-07 18:00:51",
-							"alarmType": 1,
-							"fenceType": null,
-							"deviceCount": 1
-						},
-						{
-							"id": "geofence-1150895307245096960",
-							"name": "汝州",
-							"area": "POLYGON ((33.998197999928564 112.90414666428558, 34.02528923431426 112.90762061246076, 34.02123597411279 112.95297470703494, 33.997317780676376 112.93513604401471))",
-							"attributes": null,
-							"description": null,
-							"companyId": "1",
-							"icon": "el-icon-map-location",
-							"createTime": "2025-08-07 18:08:09",
-							"updateTime": null,
-							"alarmType": 1,
-							"fenceType": null,
-							"deviceCount": 1
+	// 显示围栏列表
+	const showFenceList = () => {
+		fencesPopup.value?.open()
+	}
+	
+	// 选择围栏
+	const selectFence = (fence : any) => {
+		selectedFence.value = fence
+		fencesPopup.value?.close()
+		
+		// 解析并显示围栏
+		const fencePoints = parsePolygon(fence.area)
+		points.value = fencePoints
+		setMapCenterToFence(fencePoints)
+		updateFencePolygon()
+	}
+	
+	// 编辑围栏
+	const editFence = (fence : any) => {
+		editingFence.value = fence
+		fenceForm.name = fence.name
+		fenceForm.alarmType = fence.alarmType.toString()
+		editDialogPopup.value?.open()
+	}
+	
+	// 删除围栏
+	const deleteFence = async (id : string) => {
+		uni.showModal({
+			title: '确认删除',
+			content: '确定要删除这个围栏吗？',
+			success: async (res) => {
+				if (res.confirm) {
+					try {
+						const result = await deleteGeofence(id)
+						if (result.code === 0) {
+							uni.showToast({ title: '删除成功' })
+							selectedFence.value = null
+							clearDrawing()
+							loadGeofenceList() // 重新加载围栏列表
+						} else {
+							uni.showToast({ title: '删除失败', icon: 'none' })
 						}
-					]
+					} catch (error) {
+						console.error('删除围栏失败:', error)
+						uni.showToast({ title: '删除失败', icon: 'none' })
+					}
 				}
-				console.log('地理围栏数据:', res)
-
-				if (res.code === 0 && res.data && res.data.length > 0) {
-					// 处理每个围栏
-					const fencePolygons = res.data.map((fence : any, index : number) => {
-						// 解析围栏坐标
-						const points = parsePolygon(fence.area)
-
-						// 如果是第一个围栏，调整地图中心
-						if (index === 0) {
-							setMapCenterToFence(points)
-						}
-
-						// 定义不同围栏的颜色，便于区分
-						const colors = [
-							{ fillColor: '#7cb30580', strokeColor: '#7cb305' }, // 浅绿色
-							{ fillColor: '#1890ff80', strokeColor: '#1890ff' }, // 浅蓝色
-							{ fillColor: '#fa8c1680', strokeColor: '#fa8c16' }, // 橙色
-							{ fillColor: '#f5222d80', strokeColor: '#f5222d' }  // 红色
-						]
-						const colorIndex = index % colors.length
-
-						return {
-							points,
-							fillColor: colors[colorIndex].fillColor, // 填充色，带透明度
-							strokeColor: colors[colorIndex].strokeColor, // 边框色
-							strokeWidth: 2, // 边框宽度
-							zIndex: 10,
-							id: fence.id
-						}
-					})
-
-					polygons.value = fencePolygons
-				}
-			} catch (error) {
-				console.error('加载地理围栏失败:', error)
 			}
+		})
+	}
+	
+	// 保存围栏
+	const saveFence = async () => {
+		if (!fenceForm.name) {
+			uni.showToast({ title: '请输入围栏名称', icon: 'none' })
+			return
 		}
+		
+		if (points.value.length < 3) {
+			uni.showToast({ title: '请绘制有效的围栏区域', icon: 'none' })
+			return
+		}
+		
+		const fenceData = {
+			name: fenceForm.name,
+			area: generatePolygonString(points.value),
+			alarmType: parseInt(fenceForm.alarmType)
+		}
+		
+		try {
+			let result
+			if (editingFence.value) {
+				result = await updateGeofence({ id: editingFence.value.id, ...fenceData })
+			} else {
+				result = await addGeofence(fenceData)
+			}
+			
+			if (result.code === 0) {
+				uni.showToast({ title: '保存成功' })
+				editDialogPopup.value?.close()
+				editingFence.value = null
+				isDrawing.value = false
+				loadGeofenceList() // 重新加载围栏列表
+			} else {
+				uni.showToast({ title: '保存失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('保存围栏失败:', error)
+			uni.showToast({ title: '保存失败', icon: 'none' })
+		}
+	}
+	
+	// 显示绑定设备对话框
+	const showBindDevices = async (fenceId : string) => {
+		currentFenceId.value = fenceId
+		currentFenceName.value = selectedFence.value.name
+		deviceDialogPopup.value?.open()
+		activeTab.value = 'bind'
+		await loadBoundDevices(fenceId)
+	}
+	
+	// 加载已绑定设备
+	const loadBoundDevices = async (fenceId : string) => {
+		try {
+			const res = await getBoundDevices({
+				pageNum: 1,
+				pageSize: 100,
+				geoId: fenceId
+			})
+			
+			if (res.code === 0) {
+				boundDevices.value = res.data.list || []
+				deviceList.value = boundDevices.value
+			}
+		} catch (error) {
+			console.error('加载已绑定设备失败:', error)
+		}
+	}
+	
+	// 加载未绑定设备
+	const loadUnboundDevices = async () => {
+		try {
+			const res = await getUnboundDevices({
+				pageNum: 1,
+				pageSize: 100
+			})
+			
+			if (res.code === 0) {
+				deviceList.value = res.data.list || []
+			}
+		} catch (error) {
+			console.error('加载未绑定设备失败:', error)
+		}
+	}
+	
+	// 切换设备绑定状态
+	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) => {
+		loading.value = true
+		try {
+			const params = {
+				geofenceId: currentFenceId.value,
+				imeis: [deviceImei]
+			}
+			
+			let result
+			if (bound) {
+				result = await bindDevices(params)
+			} else {
+				result = await unbindDevices(params)
+			}
+			
+			if (result.code === 0) {
+				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
+				// 刷新设备列表
+				if (activeTab.value === 'bind') {
+					await loadBoundDevices(currentFenceId.value)
+				} else {
+					await loadUnboundDevices()
+				}
+			} else {
+				uni.showToast({ title: '操作失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('设备绑定操作失败:', error)
+			uni.showToast({ title: '操作失败', icon: 'none' })
+		} finally {
+			loading.value = false
+		}
+	}
+	
+	// 检查设备是否已绑定
+	const isDeviceBound = (deviceImei : string) => {
+		return boundDevices.value.some(device => device.imei === deviceImei)
+	}
+	
+	// 监听标签页切换
+	watch(activeTab, (newVal) => {
+		if (newVal === 'bind') {
+			loadBoundDevices(currentFenceId.value)
+		} else {
+			loadUnboundDevices()
+		}
+	})
+
+	/* 电子围栏绘制功能 */
+	const startDrawing = () => {
+		isDrawing.value = true
+		points.value = []
+		selectedFence.value = null
+		updateMapDisplay()
+	}
+
+	const handleMapTap = (e : any) => {
+		if (isDrawing.value) {
+			addNewPoint(e.detail.latitude, e.detail.longitude)
+		}
+	}
+
+	const addNewPoint = (lat : number, lng : number) => {
+		points.value.push({ latitude: lat, longitude: lng })
+		updateMapDisplay()
+	}
+
+	const finishDrawing = () => {
+		if (points.value.length < 3) {
+			uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
+			return
+		}
+		isDrawing.value = false
+		
+		// 弹出编辑对话框
+		fenceForm.name = `围栏${fenceList.value.length + 1}`
+		editDialogPopup.value?.open()
+	}
+
+	// 更新标记点数组，保留车辆标记点
+	const updateMarkers = () => {
+		const newMarkers = []
+		
+		// 首先添加车辆标记点（如果存在）
+		if (carMarker.value) {
+			newMarkers.push(carMarker.value)
+		}
+		
+		// 添加围栏顶点标记（仅在绘制模式下）
+		if (isDrawing.value) {
+			points.value.forEach((point, index) => {
+				newMarkers.push({
+					id: 1000 + index,
+					latitude: point.latitude,
+					longitude: point.longitude,
+					iconPath: '/static/marker.png',
+					width: 32,
+					height: 32,
+					callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+					anchor: { x: 0.5, y: 0.5 }
+				})
+			})
+		}
+		
+		markers.value = newMarkers
+	}
+
+	// 更新围栏多边形显示
+	const updateFencePolygon = () => {
+		polygons.value = [{
+			points: points.value,
+			strokeWidth: 2,
+			strokeColor: '#FF0000',
+			fillColor: 'rgba(255,0,0,0.2)',
+			zIndex: 1
+		}]
+	}
+
+	// 更新地图显示
+	const updateMapDisplay = () => {
+		// 更新标记点（保留车辆标记点）
+		updateMarkers()
+
+		// 更新围栏多边形
+		if (points.value.length >= 3) {
+			updateFencePolygon()
+		} else if (!isDrawing.value) {
+			polygons.value = []
+		}
+	}
+	
+	// 重置绘制（只清除围栏，保留车辆位置）
+	const clearDrawing = () => {
+		isDrawing.value = false
+		points.value = []
+		polygons.value = []
+		selectedFence.value = null
+		// 重新渲染所有围栏
+		renderFencesOnMap()
+		updateMapDisplay()
 	}
 </script>
 
@@ -162,65 +678,285 @@
 			flex: 1;
 			width: 100%;
 			position: relative;
+			
+			.drag-hint {
+				position: absolute;
+				top: 20rpx;
+				left: 0;
+				right: 0;
+				z-index: 100;
+				background-color: rgba(255, 255, 255, 0.9);
+				padding: 16rpx;
+				text-align: center;
+				font-size: 28rpx;
+				color: #00aa00;
+				font-weight: bold;
+				box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
+				animation: pulse 1.5s infinite;
+			}
+			
+			.fence-operations {
+				position: absolute;
+				bottom: 40%;
+				left: 20rpx;
+				right: 20rpx;
+				background-color: #fff;
+				border-radius: 12rpx;
+				padding: 20rpx 20rpx 50rpx 20rpx;
+				box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+				z-index: 100;
+				
+				.fence-header {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					margin-bottom: 40rpx;
+					padding-bottom: 20rpx;
+					border-bottom: 1rpx solid #eee;
+					
+					.fence-name {
+						font-size: 32rpx;
+						font-weight: bold;
+					}
+				}
+				
+				.fence-actions {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					
+					uv-button {
+						flex: 1;
+						margin: 0 10rpx;
+					}
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					opacity: 0.7;
+				}
+
+				50% {
+					opacity: 1;
+				}
+
+				100% {
+					opacity: 0.7;
+				}
+			}
 		}
 
 		.tools-panel {
 			width: 100%;
 			background-color: #fff;
-			padding: 20rpx 40rpx;
-			display: flex;
-			flex-direction: column;
-			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-
-			.btn {
-				margin-bottom: 20rpx;
-
-				button {
-					width: 100%;
-					margin: 0;
-					background-color: #1296db;
-					color: white;
-					font-size: 28rpx;
-				}
-			}
-
-			.pos-info-box {
-				padding: 10rpx 0;
-
-				.speed,
-				.address {
-					display: flex;
-					flex-direction: row;
-					justify-content: start;
-					align-items: center;
-					padding: 8rpx 0;
-					font-size: 28rpx;
-
-					text:first-child {
-						color: #666;
-						width: 100rpx;
-					}
-
-					text:last-child {
-						color: #333;
-						font-weight: 500;
-					}
-				}
-			}
-		}
-
-		.info-panel {
-			width: 100%;
-			background-color: #fff;
 			padding: 20rpx;
 			display: flex;
 			flex-direction: column;
-			font-size: 26rpx;
-			color: #666;
-			border-top: 1rpx solid #eee;
-
-			text {
-				padding: 5rpx 0;
+			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+			
+			.tool-tag-item {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20rpx;
+				
+				uv-button {
+					flex: 1;
+					margin: 0 10rpx;
+				}
+			}
+			
+			.status-info {
+				display: flex;
+				justify-content: space-between;
+				padding: 20rpx 0;
+				font-size: 28rpx;
+				color: #333;
+				border-top: 1rpx solid #eee;
+			}
+		}
+		
+		.fence-list {
+			height: 70vh;
+			background-color: #fff;
+			
+			.list-header {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 30rpx;
+				border-bottom: 1rpx solid #eee;
+				
+				.title {
+					font-size: 32rpx;
+					font-weight: bold;
+				}
+			}
+			
+			.list-content {
+				height: calc(70vh - 100rpx);
+				padding: 20rpx;
+				
+				.fence-item {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding: 24rpx;
+					border-bottom: 1rpx solid #f5f5f5;
+					
+					&:active {
+						background-color: #f9f9f9;
+					}
+					
+					.fence-info {
+						display: flex;
+						flex-direction: column;
+						
+						.name {
+							font-size: 30rpx;
+							font-weight: 500;
+							margin-bottom: 8rpx;
+						}
+						
+						.devices {
+							font-size: 24rpx;
+							color: #999;
+						}
+					}
+				}
+				
+				.empty {
+					text-align: center;
+					padding: 100rpx 0;
+					color: #999;
+				}
+			}
+		}
+		
+		.edit-dialog {
+			width: 600rpx;
+			background-color: #fff;
+			border-radius: 16rpx;
+			overflow: hidden;
+			
+			.dialog-header {
+				padding: 30rpx;
+				text-align: center;
+				font-size: 32rpx;
+				font-weight: bold;
+				border-bottom: 1rpx solid #eee;
+			}
+			
+			.dialog-content {
+				padding: 30rpx;
+				
+				.radio-group {
+					margin-top: 30rpx;
+					
+					.label {
+						display: block;
+						margin-bottom: 20rpx;
+						font-size: 28rpx;
+						font-weight: 500;
+					}
+					
+					uv-radio {
+						margin-right: 20rpx;
+						margin-bottom: 15rpx;
+					}
+				}
+			}
+			
+			.dialog-actions {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				padding: 20rpx 30rpx;
+				border-top: 1rpx solid #eee;
+				
+				uv-button {
+					flex: 1;
+					margin: 0 10rpx;
+				}
+			}
+		}
+		
+		.device-dialog {
+			height: 80vh;
+			background-color: #fff;
+			
+			.dialog-header {
+				display: flex;
+				justify-content: space-between;
+				flex-direction: row;
+				align-items: center;
+				padding: 30rpx;
+				border-bottom: 1rpx solid #eee;
+				font-size: 32rpx;
+				font-weight: bold;
+			}
+			
+			.dialog-tabs {
+				display: flex;
+				flex-direction: row;
+				border-bottom: 1rpx solid #eee;
+				
+				.tab {
+					flex: 1;
+					text-align: center;
+					padding: 24rpx;
+					font-size: 28rpx;
+					
+					&.active {
+						color: #2979ff;
+						border-bottom: 4rpx solid #2979ff;
+					}
+				}
+			}
+			
+			.device-list {
+				height: calc(80vh - 200rpx);
+				padding: 20rpx;
+				
+				.device-item {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding: 24rpx;
+					border-bottom: 1rpx solid #f5f5f5;
+					
+					.device-info {
+						display: flex;
+						flex-direction: column;
+						
+						.name {
+							font-size: 30rpx;
+							margin-bottom: 8rpx;
+						}
+						
+						.status {
+							font-size: 24rpx;
+							color: #999;
+						}
+					}
+				}
+				
+				.empty {
+					text-align: center;
+					padding: 100rpx 0;
+					color: #999;
+				}
+			}
+			
+			.dialog-actions {
+				padding: 20rpx 30rpx;
+				border-top: 1rpx solid #eee;
 			}
 		}
 	}

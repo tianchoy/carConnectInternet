@@ -300,11 +300,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.hideLoading();
         if (res && res.data) {
           drawRoadRoute(res.data);
-        } else {
-          common_vendor.index.showToast({
-            title: "未找到合适路线",
-            icon: "none"
-          });
         }
       }).catch((err = null) => {
         common_vendor.index.hideLoading();
@@ -405,7 +400,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleRegionChange = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:523", "地图区域变化:", e);
     };
     common_vendor.onUnmounted(() => {
       if (trackingInterval.value) {
@@ -429,7 +423,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           currentTime: currentTime.value,
           currentCar: currentCar.value,
           times: times.value,
-          showCar: "true",
+          showCar: true,
           carStatus: connectionStatus.value
         })),
         d: common_vendor.sei("myMap", "map"),

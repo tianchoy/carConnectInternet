@@ -114,16 +114,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }), new UTSJSONObject({
       name: "/static/power.png",
       title: "恢复油电"
-    }), new UTSJSONObject(
-      {
-        name: "/static/offpower.png",
-        title: "断开油电"
-      }
-      // {
-      // 	name: '/static/dzwl.png',
-      // 	title: '电子围栏'
-      // }
-    )]);
+    }), new UTSJSONObject({
+      name: "/static/offpower.png",
+      title: "断开油电"
+    }), new UTSJSONObject({
+      name: "/static/dzwl.png",
+      title: "电子围栏"
+    })]);
     const click = (name = null) => {
       currentToolItem.value = name;
       if (name == 0) {
@@ -143,7 +140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (name == 3) {
         common_vendor.index.navigateTo({
-          url: "/pages/stopRecord/stopRecord?imei=" + imei.value
+          url: "/pages/stopRecord/stopRecord?imei=" + imei.value + "&deptId=" + deptId.value
         });
       }
       if (name == 4) {
@@ -165,6 +162,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } else {
           executeOperation(2);
         }
+      }
+      if (name == 6) {
+        common_vendor.index.navigateTo({
+          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo
+        });
       }
     };
     const executeOperation = (operationType = null) => {
@@ -268,10 +270,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(item.latitude, item.longitude);
               center.latitude = convertedCoord.lat;
               center.longitude = convertedCoord.lng;
-              common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:346", "坐标转换:", new UTSJSONObject({
-                original: new UTSJSONObject({ lat: item.latitude, lng: item.longitude }),
-                converted: convertedCoord
-              }));
               const addr = yield utils_getAdress.getAddress(convertedCoord.lat, convertedCoord.lng);
               address.value = addr.result.formatted_address;
               const deviceMarker = createMarker(
@@ -289,7 +287,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:374", "ssss", option);
       deptId.value = option.deptId;
       imei.value = option.imei;
       deviceId.value = option.deviceId;
@@ -306,10 +303,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (deviceId.value !== null) {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:392", res.data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:391", res.data);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:395", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:394", "设备id获取失败");
         }
       });
     };
