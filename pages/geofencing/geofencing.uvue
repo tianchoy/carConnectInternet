@@ -12,21 +12,21 @@
 
 			<!-- 绘制提示 -->
 			<view v-if="isDrawing" class="drag-hint">
-				<text v-if="drawingMode === 'polygon'">点击地图添加围栏顶点，至少需要3个点</text>
+				<text v-if="drawingMode === 'polygon'">点击地图添加围栏点,至少需要3个点</text>
 				<text v-if="drawingMode === 'circle'">点击地图确定圆心，再点一下地图确定半径</text>
 			</view>
+		</view>
 
-			<!-- 围栏操作面板 -->
-			<view class="fence-operations" v-if="selectedFence">
-				<view class="fence-header">
-					<text class="fence-name">{{ selectedFence.name }}</text>
-					<uv-icon name="close" @click="selectedFence = null; "></uv-icon>
-				</view>
-				<view class="fence-actions">
-					<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
-					<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
-					<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
-				</view>
+		<!-- 围栏操作面板 -->
+		<view class="fence-operations" v-if="selectedFence">
+			<view class="fence-header">
+				<text class="fence-name">{{ selectedFence.name }}</text>
+				<uv-icon name="close" @click="selectedFence = null; "></uv-icon>
+			</view>
+			<view class="fence-actions">
+				<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
+				<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
+				<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
 			</view>
 		</view>
 
@@ -36,12 +36,12 @@
 			<view class="drawing-mode-selector" v-if="!isDrawing && !selectedFence">
 				<view class="mode-title">选择围栏类型:</view>
 				<view class="mode-buttons">
-					<uv-button :type="drawingMode == 'polygon' ? 'success' : 'default'" size="small" customStyle="border:1rpx solid #ebedf0"
-						@click="setDrawingMode('polygon')">
+					<uv-button :type="drawingMode == 'polygon' ? 'success' : 'default'" size="small"
+						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('polygon')">
 						多边形
 					</uv-button>
-					<uv-button :type="drawingMode == 'circle' ? 'success' : 'default'" size="small" customStyle="border:1rpx solid #ebedf0"
-						@click="setDrawingMode('circle')">
+					<uv-button :type="drawingMode == 'circle' ? 'success' : 'default'" size="small"
+						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('circle')">
 						圆形
 					</uv-button>
 				</view>
@@ -65,7 +65,7 @@
 			<view class="status-info">
 				<text>围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
 				<text v-if="drawingMode === 'polygon'">顶点数量: {{ points.length }}</text>
-				<text v-if="drawingMode === 'circle' && circleRadius > 0">半径: {{ circleRadius.toFixed(2) }}米</text>
+				<text v-if="drawingMode === 'circle'">半径: {{ circleRadius.toFixed(2) || 0 }}米</text>
 			</view>
 		</view>
 
@@ -133,15 +133,16 @@
 						未绑定设备
 					</view>
 				</view>
-				<!-- 滚动列表添加scrolltolower事件实现加载更多 -->
 				<scroll-view class="device-list" scroll-y @scrolltolower="handleLoadMore">
 					<view v-for="device in deviceList" :key="device.imei" class="device-item">
 						<view class="device-info">
 							<text class="name">{{ device.plateNo || device.imei }}</text>
-							<!-- <text class="status">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text> -->
+							<text class="status"
+								v-if="device.connectionStatus">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text>
 						</view>
 						<uv-switch :model-value="isDeviceBound(device.imei)"
-							@change="toggleDeviceBinding(device.imei, $event)" :disabled="loading || loadingMore">
+							@change="toggleDeviceBinding(device.imei, $event)" :disabled="loading || loadingMore"
+							size="20">
 						</uv-switch>
 					</view>
 					<!-- 空数据提示 -->
@@ -208,7 +209,7 @@
 		alarmType: '1'
 	})
 
-	// 设备绑定状态 - 新增分页相关变量
+	// 设备绑定状态
 	const deviceDialogPopup = ref<any>(null)
 	const activeTab = ref('bind')
 	const deviceList = ref<any[]>([]) // 当前显示的设备列表
@@ -217,7 +218,7 @@
 	const currentFenceId = ref('')
 	const loading = ref(false)
 
-	// 分页控制变量（区分已绑定/未绑定设备）
+	// 分页控制变量（已绑定/未绑定设备）
 	const pagination = reactive({
 		bind: {
 			pageNum: 1, // 当前页码
@@ -351,15 +352,19 @@
 		try {
 			const res = await getGeofenceList()
 			if (res.code === 0) {
-				fenceList.value = res.data
-				// 将围栏渲染到地图上
-				renderFencesOnMap()
+				// 确保 fenceList 始终是数组（避免 null/undefined）
+				fenceList.value = res.data || [];
 			} else {
 				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+				fenceList.value = []; // 失败时也清空列表
 			}
+			// 无论数据是否为空，都重新渲染
+			renderFencesOnMap()
 		} catch (error) {
 			console.error('加载围栏列表失败:', error)
 			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+			fenceList.value = []; // 异常时强制清空
+			renderFencesOnMap()
 		}
 	}
 
@@ -379,7 +384,13 @@
 
 	// 将围栏数据渲染到地图上
 	const renderFencesOnMap = () => {
-		if (!fenceList.value || fenceList.value.length === 0) return
+		// 当围栏列表为空时，强制清空地图上所有围栏和标记
+		if (!fenceList.value || fenceList.value.length === 0) {
+			polygons.value = []; // 清空多边形围栏
+			circles.value = [];  // 清空圆形围栏
+			updateMarkers();    // 清空围栏相关标记（如顶点、圆心）
+			return;
+		}
 
 		const fencePolygons = []
 		const fenceCircles = []
@@ -633,9 +644,18 @@
 						const result = await deleteGeofence(id)
 						if (result.code === 0) {
 							uni.showToast({ title: '删除成功' })
-							selectedFence.value = null
-							clearDrawing()
-							loadGeofenceList() // 重新加载围栏列表
+
+							selectedFence.value = null;       // 取消选中围栏
+							points.value = [];                 // 清空多边形顶点
+							circleCenter.value = null;         // 清空圆形圆心
+							circleRadius.value = 0;            // 清空圆形半径
+							isDrawing.value = false;           // 退出绘制模式
+
+							polygons.value = [];
+							circles.value = [];
+							updateMarkers();                   // 清空围栏标记（保留车辆标记）
+
+							await loadGeofenceList();
 						} else {
 							uni.showToast({ title: '删除失败', icon: 'none' })
 						}
@@ -1086,9 +1106,13 @@
 		circleCenter.value = null
 		circleRadius.value = 0
 		selectedFence.value = null
-		// 重新渲染所有围栏
-		renderFencesOnMap()
-		updateMapDisplay()
+
+		// 清空地图上的所有围栏和标记
+		polygons.value = [];
+		circles.value = [];
+		updateMarkers(); // 保留车辆标记，仅清空围栏相关标记
+
+		renderFencesOnMap(); // 重新渲染（空列表时触发清空逻辑）
 	}
 </script>
 
@@ -1122,43 +1146,7 @@
 				animation: pulse 1.5s infinite;
 			}
 
-			.fence-operations {
-				position: absolute;
-				bottom: 40%;
-				left: 20rpx;
-				right: 20rpx;
-				background-color: #fff;
-				border-radius: 12rpx;
-				padding: 20rpx 20rpx 50rpx 20rpx;
-				box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
-				z-index: 100;
 
-				.fence-header {
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
-					margin-bottom: 40rpx;
-					padding-bottom: 20rpx;
-					border-bottom: 1rpx solid #eee;
-
-					.fence-name {
-						font-size: 32rpx;
-						font-weight: bold;
-					}
-				}
-
-				.fence-actions {
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-
-					uv-button {
-						flex: 1;
-						margin: 0 10rpx;
-					}
-				}
-			}
 
 			@keyframes pulse {
 				0% {
@@ -1171,6 +1159,44 @@
 
 				100% {
 					opacity: 0.7;
+				}
+			}
+		}
+
+		.fence-operations {
+			position: absolute;
+			bottom: 40%;
+			left: 20rpx;
+			right: 20rpx;
+			background-color: #fff;
+			border-radius: 12rpx;
+			padding: 20rpx 20rpx 50rpx 20rpx;
+			box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+			z-index: 100;
+
+			.fence-header {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 40rpx;
+				padding-bottom: 20rpx;
+				border-bottom: 1rpx solid #eee;
+
+				.fence-name {
+					font-size: 32rpx;
+					font-weight: bold;
+				}
+			}
+
+			.fence-actions {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+
+				uv-button {
+					flex: 1;
+					margin: 0 10rpx;
 				}
 			}
 		}
@@ -1201,6 +1227,7 @@
 					justify-content: flex-start;
 					align-items: center;
 					gap: 20rpx;
+
 					uv-button {
 						flex: 1;
 						margin: 0 10rpx;
