@@ -195,7 +195,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               latitude: circleData.latitude,
               longitude: circleData.longitude,
               radius: displayRadius,
-              strokeWidth: 3,
+              strokeWidth: 2,
               strokeColor: "#FF0000",
               fillColor: `rgba(255,0,0,0.2)`,
               zIndex: 1,
@@ -208,7 +208,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             fencePolygons.push({
               id: fence.id,
               points: fencePoints,
-              strokeWidth: 3,
+              strokeWidth: 2,
               strokeColor: "#FF0000",
               fillColor: index === 0 ? "rgba(255,0,0,0.2)" : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
               zIndex: 1
@@ -849,7 +849,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         X: common_vendor.p(new UTSJSONObject({
           placeholder: "请输入围栏名称",
-          border: "bottom",
+          border: "surround",
           modelValue: fenceForm.name
         })),
         Y: common_vendor.p(new UTSJSONObject({
@@ -868,6 +868,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return fenceForm.alarmType = $event;
         }),
         ad: common_vendor.p(new UTSJSONObject({
+          iconPlacement: "left",
+          customStyle: "display:flex;flex-direction:row;align-items: center;justify-content: left;",
           modelValue: fenceForm.alarmType
         })),
         ae: common_vendor.o(($event = null) => {

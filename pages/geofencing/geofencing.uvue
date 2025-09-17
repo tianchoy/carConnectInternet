@@ -103,14 +103,14 @@
 					<text>{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
 				</view>
 				<view class="dialog-content">
-					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="bottom"></uv-input>
+					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></uv-input>
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
-						<uv-radio-group v-model="fenceForm.alarmType">
-							<uv-radio name="0">不告警</uv-radio>
-							<uv-radio name="1">出入告警</uv-radio>
-							<uv-radio name="2">出告警</uv-radio>
-							<uv-radio name="3">入告警</uv-radio>
+						<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left" customStyle="display:flex;flex-direction:row;align-items: center;justify-content: left;">
+							<uv-radio style="padding: 0 10px;" name="0">不告警</uv-radio>
+							<uv-radio style="padding: 0 10px;" name="1">出入告警</uv-radio>
+							<uv-radio style="padding: 0 10px;" name="2">出告警</uv-radio>
+							<uv-radio style="padding: 0 10px;" name="3">入告警</uv-radio>
 						</uv-radio-group>
 					</view>
 				</view>
@@ -364,7 +364,7 @@
 						latitude: circleData.latitude,
 						longitude: circleData.longitude,
 						radius: displayRadius,
-						strokeWidth: 3,
+						strokeWidth: 2,
 						strokeColor: '#FF0000',
 						fillColor: `rgba(255,0,0,0.2)`,
 						zIndex: 1,
@@ -378,7 +378,7 @@
 					fencePolygons.push({
 						id: fence.id,
 						points: fencePoints,
-						strokeWidth: 3,
+						strokeWidth: 2,
 						strokeColor: '#FF0000',
 						fillColor: index === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
 						zIndex: 1
