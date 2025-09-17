@@ -39,10 +39,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const mapScale = common_vendor.ref(15);
     const markers = common_vendor.ref([]);
     const carMarker = common_vendor.ref(null);
+    const circles = common_vendor.ref([]);
     common_vendor.ref(false);
     const isDrawing = common_vendor.ref(false);
+    const drawingMode = common_vendor.ref("polygon");
     const points = common_vendor.ref([]);
     const polygons = common_vendor.ref([]);
+    const circleCenter = common_vendor.ref(null);
+    const circleRadius = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentAddress = common_vendor.ref("获取中...");
     const currentCar = common_vendor.ref("京A12345");
@@ -63,6 +67,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentFenceName = common_vendor.ref("");
     const currentFenceId = common_vendor.ref("");
     const loading = common_vendor.ref(false);
+    const canFinishDrawing = common_vendor.computed(() => {
+      if (drawingMode.value === "polygon") {
+        return points.value.length >= 3;
+      } else if (drawingMode.value === "circle") {
+        return circleCenter.value !== null && circleRadius.value > 0;
+      }
+      return false;
+    });
     common_vendor.onLoad((option) => {
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
@@ -79,7 +91,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:206", "跟踪位置", res.data, imei.value);
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               if (item.imei == imei.value) {
@@ -123,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:259", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:294", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -152,29 +163,67 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "获取围栏列表失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:290", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:325", "加载围栏列表失败:", error);
           common_vendor.index.showToast({ title: "获取围栏列表失败", icon: "none" });
         }
       });
+    };
+    const getFenceType = (fence = null) => {
+      if (fence.type && fence.type !== "null") {
+        return fence.type;
+      }
+      if (fence.area && fence.area.startsWith("CIRCLE")) {
+        return "circle";
+      } else if (fence.area && fence.area.startsWith("POLYGON")) {
+        return "polygon";
+      }
+      return "polygon";
     };
     const renderFencesOnMap = () => {
       if (!fenceList.value || fenceList.value.length === 0)
         return null;
       const fencePolygons = [];
+      const fenceCircles = [];
       fenceList.value.forEach((fence = null, index) => {
-        const fencePoints = parsePolygon(fence.area);
-        if (fencePoints.length >= 3) {
-          fencePolygons.push({
-            id: fence.id,
-            points: fencePoints,
-            strokeWidth: 3,
-            strokeColor: "#FF0000",
-            fillColor: index === 0 ? "rgba(255,0,0,0.2)" : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
-            zIndex: 1
-          });
+        const fenceType = getFenceType(fence);
+        if (fenceType === "circle") {
+          const circleData = parseCircle(fence.area);
+          if (circleData) {
+            const displayRadius = circleData.radius > 1e5 ? 1e5 : circleData.radius;
+            fenceCircles.push({
+              id: fence.id,
+              latitude: circleData.latitude,
+              longitude: circleData.longitude,
+              radius: displayRadius,
+              strokeWidth: 3,
+              strokeColor: "#FF0000",
+              fillColor: `rgba(255,0,0,0.2)`,
+              zIndex: 1,
+              centerMarker: true
+            });
+          }
+        } else {
+          const fencePoints = parsePolygon(fence.area);
+          if (fencePoints.length >= 3) {
+            fencePolygons.push({
+              id: fence.id,
+              points: fencePoints,
+              strokeWidth: 3,
+              strokeColor: "#FF0000",
+              fillColor: index === 0 ? "rgba(255,0,0,0.2)" : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+              zIndex: 1
+            });
+          }
         }
       });
       polygons.value = fencePolygons;
+      circles.value = fenceCircles;
+      if (fenceCircles.length > 0 && !selectedFence.value) {
+        const firstCircle = fenceCircles[0];
+        center.latitude = firstCircle.latitude;
+        center.longitude = firstCircle.longitude;
+        mapScale.value = calculateZoomLevelFromRadius(firstCircle.radius);
+      }
     };
     const parsePolygon = (polygonStr) => {
       if (!polygonStr)
@@ -183,41 +232,104 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const coordPoints = coordStr.split(",");
       return coordPoints.map((point) => {
         const _a = common_vendor.__read(point.trim().split(" ").map(Number), 2), lat = _a[0], lng = _a[1];
+        const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
         return new UTSJSONObject({
-          latitude: lat,
-          longitude: lng
+          latitude: convertedCoord.lat,
+          longitude: convertedCoord.lng
         });
       });
     };
+    const parseCircle = (circleStr) => {
+      if (!circleStr || !circleStr.startsWith("CIRCLE"))
+        return null;
+      try {
+        const coordStr = circleStr.replace(/CIRCLE \(/, "").replace(/\)/, "");
+        const parts = coordStr.split(",");
+        if (parts.length !== 2)
+          return null;
+        const _a = common_vendor.__read(parts, 2), centerStr = _a[0], radiusStr = _a[1];
+        const _b = common_vendor.__read(centerStr.trim().split(" ").map(Number), 2), lat = _b[0], lng = _b[1];
+        const radius = Number(radiusStr.trim());
+        if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:446", "无效的圆形围栏数据:", circleStr);
+          return null;
+        }
+        const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
+        return new UTSJSONObject({
+          latitude: convertedCoord.lat,
+          longitude: convertedCoord.lng,
+          radius
+        });
+      } catch (error) {
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:459", "解析圆形围栏失败:", error, "数据:", circleStr);
+        return null;
+      }
+    };
     const generatePolygonString = (points2) => {
       const coords = points2.map((point) => {
-        return `${point.latitude} ${point.longitude}`;
-      }).join(",");
+        const originalCoord = utils_coordTransform.CoordTransform.tencentToWgs84(point.latitude, point.longitude);
+        return `${originalCoord.lat} ${originalCoord.lng}`;
+      }).join(", ");
       return `POLYGON ((${coords}))`;
     };
-    const setMapCenterToFence = (fencePoints) => {
-      if (fencePoints.length === 0)
-        return null;
-      let totalLat = 0;
-      let totalLng = 0;
-      fencePoints.forEach((point = null) => {
-        totalLat += point.latitude;
-        totalLng += point.longitude;
-      });
-      center.latitude = totalLat / fencePoints.length;
-      center.longitude = totalLng / fencePoints.length;
-      const bounds = calculateBounds(fencePoints);
-      const latDiff = bounds.maxLat - bounds.minLat;
-      const lngDiff = bounds.maxLng - bounds.minLng;
-      const maxDiff = Math.max(latDiff, lngDiff);
-      if (maxDiff > 0.1)
-        mapScale.value = 11;
-      else if (maxDiff > 0.05)
-        mapScale.value = 12;
-      else if (maxDiff > 0.02)
-        mapScale.value = 13;
-      else
-        mapScale.value = 14;
+    const generateCircleString = (center2, radius) => {
+      const originalCoord = utils_coordTransform.CoordTransform.tencentToWgs84(center2.latitude, center2.longitude);
+      return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`;
+    };
+    const setMapCenterToFence = (fence = null) => {
+      const fenceType = getFenceType(fence);
+      if (fenceType === "circle") {
+        const circleData = parseCircle(fence.area);
+        if (circleData) {
+          center.latitude = circleData.latitude;
+          center.longitude = circleData.longitude;
+          const displayRadius = circleData.radius > 1e5 ? 1e5 : circleData.radius;
+          mapScale.value = calculateZoomLevelFromRadius(displayRadius);
+        }
+      } else {
+        const fencePoints = parsePolygon(fence.area);
+        if (fencePoints.length === 0)
+          return null;
+        let totalLat = 0;
+        let totalLng = 0;
+        fencePoints.forEach((point) => {
+          totalLat += point.latitude;
+          totalLng += point.longitude;
+        });
+        center.latitude = totalLat / fencePoints.length;
+        center.longitude = totalLng / fencePoints.length;
+        const bounds = calculateBounds(fencePoints);
+        const latDiff = bounds.maxLat - bounds.minLat;
+        const lngDiff = bounds.maxLng - bounds.minLng;
+        const maxDiff = Math.max(latDiff, lngDiff);
+        if (maxDiff > 0.1)
+          mapScale.value = 11;
+        else if (maxDiff > 0.05)
+          mapScale.value = 12;
+        else if (maxDiff > 0.02)
+          mapScale.value = 13;
+        else
+          mapScale.value = 14;
+      }
+    };
+    const calculateZoomLevelFromRadius = (radius) => {
+      if (radius > 5e4)
+        return 8;
+      if (radius > 2e4)
+        return 9;
+      if (radius > 1e4)
+        return 10;
+      if (radius > 5e3)
+        return 11;
+      if (radius > 2e3)
+        return 12;
+      if (radius > 1e3)
+        return 13;
+      if (radius > 500)
+        return 14;
+      if (radius > 200)
+        return 15;
+      return 16;
     };
     const calculateBounds = (points2) => {
       let minLat = points2[0].latitude;
@@ -240,16 +352,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       selectedFence.value = fence;
       (_a = fencesPopup.value) === null || _a === void 0 ? null : _a.close();
-      const fencePoints = parsePolygon(fence.area);
-      points.value = fencePoints;
-      setMapCenterToFence(fencePoints);
-      updateFencePolygon();
+      const fenceType = getFenceType(fence);
+      if (fenceType === "circle") {
+        const circleData = parseCircle(fence.area);
+        if (circleData) {
+          circleCenter.value = { latitude: circleData.latitude, longitude: circleData.longitude };
+          circleRadius.value = circleData.radius;
+          points.value = [];
+        }
+      } else {
+        const fencePoints = parsePolygon(fence.area);
+        points.value = fencePoints;
+        circleCenter.value = null;
+        circleRadius.value = 0;
+      }
+      setMapCenterToFence(fence);
+      updateMapDisplay();
     };
     const editFence = (fence = null) => {
       var _a;
       editingFence.value = fence;
       fenceForm.name = fence.name;
       fenceForm.alarmType = fence.alarmType.toString();
+      drawingMode.value = getFenceType(fence);
       (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.open();
     };
     const deleteFence = (id) => {
@@ -271,7 +396,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:432", "删除围栏失败:", error);
+                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:614", "删除围栏失败:", error);
                   common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                 }
               }
@@ -287,14 +412,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.showToast({ title: "请输入围栏名称", icon: "none" });
           return Promise.resolve(null);
         }
-        if (points.value.length < 3) {
+        let area = "";
+        if (drawingMode.value === "polygon" && points.value.length < 3) {
           common_vendor.index.showToast({ title: "请绘制有效的围栏区域", icon: "none" });
           return Promise.resolve(null);
+        } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
+          common_vendor.index.showToast({ title: "请绘制有效的圆形围栏", icon: "none" });
+          return Promise.resolve(null);
+        }
+        if (drawingMode.value === "polygon") {
+          area = generatePolygonString(points.value);
+        } else if (drawingMode.value === "circle" && circleCenter.value) {
+          area = generateCircleString(circleCenter.value, circleRadius.value);
         }
         const fenceData = new UTSJSONObject({
           name: fenceForm.name,
-          area: generatePolygonString(points.value),
-          alarmType: parseInt(fenceForm.alarmType)
+          area,
+          alarmType: parseInt(fenceForm.alarmType),
+          type: drawingMode.value
+          // 确保保存时设置正确的类型
         });
         try {
           let result = null;
@@ -313,7 +449,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "保存失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:476", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:670", "保存围栏失败:", error);
           common_vendor.index.showToast({ title: "保存失败", icon: "none" });
         }
       });
@@ -341,7 +477,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceList.value = boundDevices.value;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:504", "加载已绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:698", "加载已绑定设备失败:", error);
         }
       });
     };
@@ -356,7 +492,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceList.value = res.data.list || [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:520", "加载未绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:714", "加载未绑定设备失败:", error);
         }
       });
     };
@@ -385,7 +521,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:552", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:746", "设备绑定操作失败:", error);
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -404,16 +540,50 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadUnboundDevices();
       }
     });
+    const setDrawingMode = (mode) => {
+      drawingMode.value = mode;
+      if (isDrawing.value) {
+        points.value = [];
+        circleCenter.value = null;
+        circleRadius.value = 0;
+        updateMapDisplay();
+      }
+    };
     const startDrawing = () => {
       isDrawing.value = true;
       points.value = [];
+      circleCenter.value = null;
+      circleRadius.value = 0;
       selectedFence.value = null;
       updateMapDisplay();
     };
     const handleMapTap = (e = null) => {
       if (isDrawing.value) {
-        addNewPoint(e.detail.latitude, e.detail.longitude);
+        if (drawingMode.value === "polygon") {
+          addNewPoint(e.detail.latitude, e.detail.longitude);
+        } else if (drawingMode.value === "circle") {
+          if (!circleCenter.value) {
+            circleCenter.value = {
+              latitude: e.detail.latitude,
+              longitude: e.detail.longitude
+            };
+            updateMapDisplay();
+          } else {
+            const radius = calculateDistance(circleCenter.value.latitude, circleCenter.value.longitude, e.detail.latitude, e.detail.longitude);
+            circleRadius.value = radius < 10 ? 10 : radius;
+            updateMapDisplay();
+          }
+        }
       }
+    };
+    const calculateDistance = (lat1, lng1, lat2, lng2) => {
+      const R = 6371e3;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+      return distance;
     };
     const addNewPoint = (lat, lng) => {
       points.value.push({ latitude: lat, longitude: lng });
@@ -421,12 +591,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const finishDrawing = () => {
       var _a;
-      if (points.value.length < 3) {
+      if (drawingMode.value === "polygon" && points.value.length < 3) {
         common_vendor.index.showToast({ title: "至少需要3个顶点", icon: "none" });
+        return null;
+      } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
+        common_vendor.index.showToast({ title: "请设置有效的圆形围栏", icon: "none" });
         return null;
       }
       isDrawing.value = false;
-      fenceForm.name = `围栏${fenceList.value.length + 1}`;
+      fenceForm.name = `${drawingMode.value === "circle" ? "圆形" : "多边形"}围栏${fenceList.value.length + 1}`;
       (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.open();
     };
     const updateMarkers = () => {
@@ -435,42 +608,112 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         newMarkers.push(carMarker.value);
       }
       if (isDrawing.value) {
-        points.value.forEach((point, index) => {
+        if (drawingMode.value === "polygon") {
+          points.value.forEach((point, index) => {
+            newMarkers.push({
+              id: 1e3 + index,
+              latitude: point.latitude,
+              longitude: point.longitude,
+              iconPath: "/static/marker.png",
+              width: 32,
+              height: 32,
+              callout: { content: `顶点${index + 1}`, display: "ALWAYS" },
+              anchor: { x: 0.5, y: 0.5 }
+            });
+          });
+        } else if (drawingMode.value === "circle" && circleCenter.value) {
           newMarkers.push({
-            id: 1e3 + index,
-            latitude: point.latitude,
-            longitude: point.longitude,
+            id: 1e3,
+            latitude: circleCenter.value.latitude,
+            longitude: circleCenter.value.longitude,
             iconPath: "/static/marker.png",
             width: 32,
             height: 32,
-            callout: { content: `顶点${index + 1}`, display: "ALWAYS" },
+            callout: { content: "圆心", display: "ALWAYS" },
             anchor: { x: 0.5, y: 0.5 }
           });
-        });
+        }
+      } else if (selectedFence.value) {
+        const fenceType = getFenceType(selectedFence.value);
+        if (fenceType === "circle") {
+          const circleData = parseCircle(selectedFence.value.area);
+          if (circleData) {
+            newMarkers.push({
+              id: 2e3,
+              latitude: circleData.latitude,
+              longitude: circleData.longitude,
+              iconPath: "/static/marker.png",
+              width: 32,
+              height: 32,
+              callout: { content: "圆心", display: "ALWAYS" },
+              anchor: { x: 0.5, y: 0.5 }
+            });
+          }
+        } else {
+          const fencePoints = parsePolygon(selectedFence.value.area);
+          fencePoints.forEach((point, index) => {
+            newMarkers.push({
+              id: 2e3 + index,
+              latitude: point.latitude,
+              longitude: point.longitude,
+              iconPath: "/static/marker.png",
+              width: 32,
+              height: 32,
+              callout: { content: `顶点${index + 1}`, display: "ALWAYS" },
+              anchor: { x: 0.5, y: 0.5 }
+            });
+          });
+        }
       }
       markers.value = newMarkers;
     };
     const updateFencePolygon = () => {
-      polygons.value = [new UTSJSONObject({
-        points: points.value,
-        strokeWidth: 2,
-        strokeColor: "#FF0000",
-        fillColor: "rgba(255,0,0,0.2)",
-        zIndex: 1
-      })];
+      if (drawingMode.value === "polygon") {
+        polygons.value = points.value.length >= 3 ? [new UTSJSONObject({
+          points: points.value,
+          strokeWidth: 2,
+          strokeColor: "#FF0000",
+          fillColor: "rgba(255,0,0,0.2)",
+          zIndex: 1
+        })] : [];
+      } else {
+        polygons.value = [];
+      }
+    };
+    const updateFenceCircle = () => {
+      if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
+        circles.value = [new UTSJSONObject({
+          latitude: circleCenter.value.latitude,
+          longitude: circleCenter.value.longitude,
+          radius: circleRadius.value,
+          strokeWidth: 2,
+          strokeColor: "#FF0000",
+          fillColor: "rgba(255,0,0,0.2)",
+          zIndex: 1
+        })];
+      } else {
+        circles.value = [];
+      }
     };
     const updateMapDisplay = () => {
       updateMarkers();
-      if (points.value.length >= 3) {
-        updateFencePolygon();
-      } else if (!isDrawing.value) {
-        polygons.value = [];
+      if (isDrawing.value) {
+        if (drawingMode.value === "polygon") {
+          updateFencePolygon();
+          circles.value = [];
+        } else if (drawingMode.value === "circle") {
+          updateFenceCircle();
+          polygons.value = [];
+        }
+      } else {
+        renderFencesOnMap();
       }
     };
     const clearDrawing = () => {
       isDrawing.value = false;
       points.value = [];
-      polygons.value = [];
+      circleCenter.value = null;
+      circleRadius.value = 0;
       selectedFence.value = null;
       renderFencesOnMap();
       updateMapDisplay();
@@ -496,144 +739,174 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: mapScale.value,
         g: polygons.value,
         h: markers.value,
-        i: common_vendor.o(handleMapTap),
-        j: isDrawing.value
-      }), isDrawing.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        k: selectedFence.value
+        i: circles.value,
+        j: common_vendor.o(handleMapTap),
+        k: isDrawing.value
+      }), isDrawing.value ? common_vendor.e(new UTSJSONObject({
+        l: drawingMode.value === "polygon"
+      }), drawingMode.value === "polygon" ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+        m: drawingMode.value === "circle"
+      }), drawingMode.value === "circle" ? new UTSJSONObject({}) : new UTSJSONObject({})) : new UTSJSONObject({}), new UTSJSONObject({
+        n: selectedFence.value
       }), selectedFence.value ? new UTSJSONObject({
-        l: common_vendor.t(selectedFence.value.name),
-        m: common_vendor.o(($event = null) => {
+        o: common_vendor.t(selectedFence.value.name),
+        p: common_vendor.o(($event = null) => {
           selectedFence.value = null;
         }),
-        n: common_vendor.p(new UTSJSONObject({
+        q: common_vendor.p(new UTSJSONObject({
           name: "close"
         })),
-        o: common_vendor.o(($event = null) => {
+        r: common_vendor.o(($event = null) => {
           return editFence(selectedFence.value);
         }),
-        p: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.p(new UTSJSONObject({
           size: "small"
         })),
-        q: common_vendor.o(($event = null) => {
+        t: common_vendor.o(($event = null) => {
           return deleteFence(selectedFence.value.id);
         }),
-        r: common_vendor.p(new UTSJSONObject({
+        v: common_vendor.p(new UTSJSONObject({
           size: "small",
           type: "error"
         })),
-        s: common_vendor.o(($event = null) => {
+        w: common_vendor.o(($event = null) => {
           return showBindDevices(selectedFence.value.id);
         }),
-        t: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.p(new UTSJSONObject({
           size: "small",
           type: "primary"
         }))
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        v: common_vendor.o(startDrawing),
-        w: common_vendor.p(new UTSJSONObject({
+        y: !isDrawing.value && !selectedFence.value
+      }), !isDrawing.value && !selectedFence.value ? new UTSJSONObject({
+        z: common_vendor.o(($event = null) => {
+          return setDrawingMode("polygon");
+        }),
+        A: common_vendor.p(new UTSJSONObject({
+          type: drawingMode.value == "polygon" ? "primary" : "default",
+          size: "small"
+        })),
+        B: common_vendor.o(($event = null) => {
+          return setDrawingMode("circle");
+        }),
+        C: common_vendor.p(new UTSJSONObject({
+          type: drawingMode.value == "circle" ? "primary" : "default",
+          size: "small"
+        }))
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        D: common_vendor.o(startDrawing),
+        E: common_vendor.p(new UTSJSONObject({
           disabled: isDrawing.value || selectedFence.value
         })),
-        x: common_vendor.o(finishDrawing),
-        y: common_vendor.p(new UTSJSONObject({
-          disabled: !isDrawing.value || points.value.length < 3
+        F: common_vendor.o(finishDrawing),
+        G: common_vendor.p(new UTSJSONObject({
+          disabled: !isDrawing.value || !canFinishDrawing.value
         })),
-        z: common_vendor.o(clearDrawing),
-        A: common_vendor.o(showFenceList),
-        B: common_vendor.t(polygons.value.length > 0 ? "已设置" : "未设置"),
-        C: common_vendor.t(points.value.length),
-        D: common_vendor.o(($event = null) => {
+        H: common_vendor.o(clearDrawing),
+        I: common_vendor.o(showFenceList),
+        J: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
+        K: drawingMode.value === "polygon"
+      }), drawingMode.value === "polygon" ? new UTSJSONObject({
+        L: common_vendor.t(points.value.length)
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        M: drawingMode.value === "circle" && circleRadius.value > 0
+      }), drawingMode.value === "circle" && circleRadius.value > 0 ? new UTSJSONObject({
+        N: common_vendor.t(circleRadius.value.toFixed(2))
+      }) : new UTSJSONObject({}), new UTSJSONObject({
+        O: common_vendor.o(($event = null) => {
           return fencesPopup.value.close();
         }),
-        E: common_vendor.p(new UTSJSONObject({
+        P: common_vendor.p(new UTSJSONObject({
           name: "close"
         })),
-        F: common_vendor.f(fenceList.value, (fence = null, k0 = null, i0 = null) => {
+        Q: common_vendor.f(fenceList.value, (fence = null, k0 = null, i0 = null) => {
           return new UTSJSONObject({
             a: common_vendor.t(fence.name),
-            b: common_vendor.t(fence.deviceCount || 0),
-            c: "45be0509-12-" + i0 + ",45be0509-10",
-            d: fence.id,
-            e: common_vendor.o(($event = null) => {
+            b: common_vendor.t(getFenceType(fence) === "circle" ? "圆形" : "多边形"),
+            c: common_vendor.t(fence.deviceCount || 0),
+            d: "45be0509-14-" + i0 + ",45be0509-12",
+            e: fence.id,
+            f: common_vendor.o(($event = null) => {
               return selectFence(fence);
             }, fence.id)
           });
         }),
-        G: common_vendor.p(new UTSJSONObject({
+        R: common_vendor.p(new UTSJSONObject({
           name: "arrow-right"
         })),
-        H: fenceList.value.length === 0
+        S: fenceList.value.length === 0
       }), fenceList.value.length === 0 ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        I: common_vendor.sr(fencesPopup, "45be0509-10", new UTSJSONObject({
+        T: common_vendor.sr(fencesPopup, "45be0509-12", new UTSJSONObject({
           "k": "fencesPopup"
         })),
-        J: common_vendor.p(new UTSJSONObject({
+        U: common_vendor.p(new UTSJSONObject({
           mode: "bottom",
           round: "10"
         })),
-        K: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
-        L: common_vendor.o(($event = null) => {
+        V: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
+        W: common_vendor.o(($event = null) => {
           return fenceForm.name = $event;
         }),
-        M: common_vendor.p(new UTSJSONObject({
+        X: common_vendor.p(new UTSJSONObject({
           placeholder: "请输入围栏名称",
           border: "bottom",
           modelValue: fenceForm.name
         })),
-        N: common_vendor.p(new UTSJSONObject({
+        Y: common_vendor.p(new UTSJSONObject({
           name: "0"
         })),
-        O: common_vendor.p(new UTSJSONObject({
+        Z: common_vendor.p(new UTSJSONObject({
           name: "1"
         })),
-        P: common_vendor.p(new UTSJSONObject({
+        aa: common_vendor.p(new UTSJSONObject({
           name: "2"
         })),
-        Q: common_vendor.p(new UTSJSONObject({
+        ab: common_vendor.p(new UTSJSONObject({
           name: "3"
         })),
-        R: common_vendor.o(($event = null) => {
+        ac: common_vendor.o(($event = null) => {
           return fenceForm.alarmType = $event;
         }),
-        S: common_vendor.p(new UTSJSONObject({
+        ad: common_vendor.p(new UTSJSONObject({
           modelValue: fenceForm.alarmType
         })),
-        T: common_vendor.o(($event = null) => {
+        ae: common_vendor.o(($event = null) => {
           return editDialogPopup.value.close();
         }),
-        U: common_vendor.o(saveFence),
-        V: common_vendor.p(new UTSJSONObject({
+        af: common_vendor.o(saveFence),
+        ag: common_vendor.p(new UTSJSONObject({
           type: "primary"
         })),
-        W: common_vendor.sr(editDialogPopup, "45be0509-13", new UTSJSONObject({
+        ah: common_vendor.sr(editDialogPopup, "45be0509-15", new UTSJSONObject({
           "k": "editDialogPopup"
         })),
-        X: common_vendor.p(new UTSJSONObject({
+        ai: common_vendor.p(new UTSJSONObject({
           mode: "center",
           round: "10"
         })),
-        Y: common_vendor.t(currentFenceName.value),
-        Z: common_vendor.o(($event = null) => {
+        aj: common_vendor.t(currentFenceName.value),
+        ak: common_vendor.o(($event = null) => {
           return deviceDialogPopup.value.close();
         }),
-        aa: common_vendor.p(new UTSJSONObject({
+        al: common_vendor.p(new UTSJSONObject({
           name: "close"
         })),
-        ab: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
-        ac: common_vendor.o(($event = null) => {
+        am: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
+        an: common_vendor.o(($event = null) => {
           return activeTab.value = "bind";
         }),
-        ad: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
-        ae: common_vendor.o(($event = null) => {
+        ao: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
+        ap: common_vendor.o(($event = null) => {
           return activeTab.value = "unbind";
         }),
-        af: common_vendor.f(deviceList.value, (device = null, k0 = null, i0 = null) => {
+        aq: common_vendor.f(deviceList.value, (device = null, k0 = null, i0 = null) => {
           return new UTSJSONObject({
             a: common_vendor.t(device.plateNo || device.imei),
             b: common_vendor.t(device.connectionStatus === "online" ? "在线" : "离线"),
             c: common_vendor.o(($event = null) => {
               return toggleDeviceBinding(device.imei, $event);
             }, device.imei),
-            d: "45be0509-24-" + i0 + ",45be0509-22",
+            d: "45be0509-26-" + i0 + ",45be0509-24",
             e: common_vendor.p(new UTSJSONObject({
               ["model-value"]: isDeviceBound(device.imei),
               disabled: loading.value
@@ -641,21 +914,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: device.imei
           });
         }),
-        ag: deviceList.value.length === 0
+        ar: deviceList.value.length === 0
       }), deviceList.value.length === 0 ? new UTSJSONObject({
-        ah: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
+        as: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       }) : new UTSJSONObject({}), new UTSJSONObject({
-        ai: common_vendor.o(($event = null) => {
+        at: common_vendor.o(($event = null) => {
           return deviceDialogPopup.value.close();
         }),
-        aj: common_vendor.sr(deviceDialogPopup, "45be0509-22", new UTSJSONObject({
+        av: common_vendor.sr(deviceDialogPopup, "45be0509-24", new UTSJSONObject({
           "k": "deviceDialogPopup"
         })),
-        ak: common_vendor.p(new UTSJSONObject({
+        aw: common_vendor.p(new UTSJSONObject({
           mode: "bottom",
           round: "10"
         })),
-        al: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        ax: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       }));
       return __returned__;
     };

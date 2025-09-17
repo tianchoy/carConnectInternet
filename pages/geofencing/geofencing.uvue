@@ -5,14 +5,15 @@
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
 				style="width:100%;height:100%" :show-location="true" :polygons="polygons" :markers="markers"
-				@click="handleMapTap">
+				:circles="circles" @click="handleMapTap">
 				<sub-navBar :showTime="false" :currentCar="currentCar" :showCar="true"
 					:carStatus='connectionStatus'></sub-navBar>
 			</map>
 			
 			<!-- 绘制提示 -->
 			<view v-if="isDrawing" class="drag-hint">
-				点击地图添加围栏顶点，至少需要3个点
+				<text v-if="drawingMode === 'polygon'">点击地图添加围栏顶点，至少需要3个点</text>
+				<text v-if="drawingMode === 'circle'">点击地图确定圆心，拖动调整半径</text>
 			</view>
 			
 			<!-- 围栏操作面板 -->
@@ -31,11 +32,30 @@
 		
 		<!-- 绘制控制面板 -->
 		<view class="tools-panel">
+			<!-- 绘制模式选择 -->
+			<view class="drawing-mode-selector" v-if="!isDrawing && !selectedFence">
+				<view class="mode-title">选择围栏类型:</view>
+				<view class="mode-buttons">
+					<uv-button 
+						:type="drawingMode == 'polygon' ? 'primary' : 'default'" 
+						size="small" 
+						@click="setDrawingMode('polygon')">
+						多边形
+					</uv-button>
+					<uv-button 
+						:type="drawingMode == 'circle' ? 'primary' : 'default'" 
+						size="small" 
+						@click="setDrawingMode('circle')">
+						圆形
+					</uv-button>
+				</view>
+			</view>
+			
 			<view class="tool-tag-item">
 				<uv-button @click="startDrawing" :disabled="isDrawing || selectedFence">
 					开始绘制
 				</uv-button>
-				<uv-button @click="finishDrawing" :disabled="!isDrawing || points.length < 3">
+				<uv-button @click="finishDrawing" :disabled="!isDrawing || !canFinishDrawing">
 					完成绘制
 				</uv-button>
 				<uv-button @click="clearDrawing">
@@ -47,8 +67,9 @@
 			</view>
 			
 			<view class="status-info">
-				<text>围栏状态: {{ polygons.length > 0 ? '已设置' : '未设置' }}</text>
-				<text>顶点数量: {{ points.length }}</text>
+				<text>围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
+				<text v-if="drawingMode === 'polygon'">顶点数量: {{ points.length }}</text>
+				<text v-if="drawingMode === 'circle' && circleRadius > 0">半径: {{ circleRadius.toFixed(2) }}米</text>
 			</view>
 		</view>
 		
@@ -63,6 +84,7 @@
 					<view v-for="fence in fenceList" :key="fence.id" class="fence-item" @click="selectFence(fence)">
 						<view class="fence-info">
 							<text class="name">{{ fence.name }}</text>
+							<text class="type">{{ getFenceType(fence) === 'circle' ? '圆形' : '多边形' }}</text>
 							<text class="devices">绑定设备: {{ fence.deviceCount || 0 }}台</text>
 						</view>
 						<uv-icon name="arrow-right"></uv-icon>
@@ -139,7 +161,7 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted,  watch } from 'vue'
+	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -155,12 +177,16 @@
 	const mapScale = ref(15)
 	const markers = ref<any[]>([]) // 标记点
 	const carMarker = ref<any>(null) // 车辆标记点
+	const circles = ref<any[]>([]) // 圆形围栏
 	const carInFence = ref(false) // 车辆是否在围栏内
 	
 	// 电子围栏相关状态
 	const isDrawing = ref(false)
+	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
 	const points = ref<Array<{ latitude : number, longitude : number }>>([])
 	const polygons = ref<any[]>([]) // 存储地理围栏多边形数据
+	const circleCenter = ref<{ latitude : number, longitude : number } | null>(null)
+	const circleRadius = ref(0) // 圆形围栏半径（米）
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
@@ -185,6 +211,16 @@
 	const currentFenceName = ref('')
 	const currentFenceId = ref('')
 	const loading = ref(false)
+	
+	// 计算是否可以完成绘制
+	const canFinishDrawing = computed(() => {
+		if (drawingMode.value === 'polygon') {
+			return points.value.length >= 3
+		} else if (drawingMode.value === 'circle') {
+			return circleCenter.value !== null && circleRadius.value > 0
+		}
+		return false
+	})
 
 	onLoad((option) => {
 		connectionStatus.value = option.connectionStatus
@@ -203,7 +239,6 @@
 		try {
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
-			console.log('跟踪位置', res.data, imei.value)
 	
 			res.data.forEach(async item => {
 				if (item.imei == imei.value) {
@@ -292,31 +327,82 @@
 		}
 	}
 	
+	// 获取围栏类型（根据area字段判断）
+	const getFenceType = (fence: any) => {
+		if (fence.type && fence.type !== 'null') {
+			return fence.type
+		}
+		// 根据area字段内容判断围栏类型
+		if (fence.area && fence.area.startsWith('CIRCLE')) {
+			return 'circle'
+		} else if (fence.area && fence.area.startsWith('POLYGON')) {
+			return 'polygon'
+		}
+		return 'polygon' // 默认多边形
+	}
+	
 	// 将围栏数据渲染到地图上
 	const renderFencesOnMap = () => {
 		if (!fenceList.value || fenceList.value.length === 0) return
 		
 		const fencePolygons = []
+		const fenceCircles = []
 		
-		// 为每个围栏创建多边形
+		// 为每个围栏创建多边形或圆形
 		fenceList.value.forEach((fence, index) => {
-			const fencePoints = parsePolygon(fence.area)
-			if (fencePoints.length >= 3) {
-				fencePolygons.push({
-					id: fence.id,
-					points: fencePoints,
-					strokeWidth: 3,
-					strokeColor: '#FF0000',
-					fillColor: index === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
-					zIndex: 1
-				})
+			const fenceType = getFenceType(fence)
+			
+			if (fenceType === 'circle') {
+				// 处理圆形围栏
+				const circleData = parseCircle(fence.area)
+				if (circleData) {
+					// 处理过大半径，避免无法显示
+					const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
+					
+					fenceCircles.push({
+						id: fence.id,
+						latitude: circleData.latitude,
+						longitude: circleData.longitude,
+						radius: displayRadius,
+						strokeWidth: 3,
+						strokeColor: '#FF0000',
+						fillColor: `rgba(255,0,0,0.2)`,
+						zIndex: 1,
+						centerMarker: true
+					})
+				}
+			} else {
+				// 处理多边形围栏
+				const fencePoints = parsePolygon(fence.area)
+				if (fencePoints.length >= 3) {
+					fencePolygons.push({
+						id: fence.id,
+						points: fencePoints,
+						strokeWidth: 3,
+						strokeColor: '#FF0000',
+						fillColor: index === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+						zIndex: 1
+					})
+				}
 			}
 		})
 		
 		polygons.value = fencePolygons
+		circles.value = fenceCircles
+		
+		// 确保圆形围栏能显示在地图视野中
+		if (fenceCircles.length > 0 && !selectedFence.value) {
+			// 自动定位到第一个圆形围栏
+			const firstCircle = fenceCircles[0]
+			center.latitude = firstCircle.latitude
+			center.longitude = firstCircle.longitude
+			// 根据半径设置合适的缩放级别
+			mapScale.value = calculateZoomLevelFromRadius(firstCircle.radius)
+		}
 	}
 
 	// 解析POLYGON字符串为坐标数组
+	// 格式: "POLYGON ((lat1 lng1, lat2 lng2, ...))"
 	const parsePolygon = (polygonStr : string) => {
 		if (!polygonStr) return []
 		
@@ -326,47 +412,128 @@
 		const coordPoints = coordStr.split(',')
 
 		return coordPoints.map(point => {
-			// 注意：接口返回的是纬度在前，经度在后
+			// 注意：格式是纬度在前，经度在后
 			const [lat, lng] = point.trim().split(' ').map(Number)
+			// 转换坐标到腾讯地图坐标系
+			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
 			return {
-				latitude: lat,
-				longitude: lng
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng
 			}
 		})
 	}
 	
+	// 解析CIRCLE字符串为圆心和半径
+	// 格式: "CIRCLE (lat lng, radius)"
+	const parseCircle = (circleStr : string) => {
+		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
+		
+		try {
+			// 去除字符串中的"CIRCLE ("和")"
+			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
+			// 按逗号分割坐标点和半径
+			const parts = coordStr.split(',')
+			
+			if (parts.length !== 2) return null
+			
+			const [centerStr, radiusStr] = parts
+			// 解析经纬度（注意：格式是纬度在前，经度在后）
+			const [lat, lng] = centerStr.trim().split(' ').map(Number)
+			const radius = Number(radiusStr.trim())
+			
+			// 验证数据有效性
+			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+				console.error('无效的圆形围栏数据:', circleStr)
+				return null
+			}
+			
+			// 转换坐标到腾讯地图坐标系
+			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
+			
+			return {
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
+				radius: radius
+			}
+		} catch (error) {
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr)
+			return null
+		}
+	}
+	
 	// 生成POLYGON字符串
+	// 格式: "POLYGON ((lat1 lng1, lat2 lng2, ...))"
 	const generatePolygonString = (points : Array<{ latitude : number, longitude : number }>) => {
-		const coords = points.map(point => `${point.latitude} ${point.longitude}`).join(',')
+		const coords = points.map(point => {
+			// 转换回WGS84坐标系存储
+			const originalCoord = CoordTransform.tencentToWgs84(point.latitude, point.longitude)
+			return `${originalCoord.lat} ${originalCoord.lng}`
+		}).join(', ')
 		return `POLYGON ((${coords}))`
+	}
+	
+	// 生成CIRCLE字符串
+	// 格式: "CIRCLE (lat lng, radius)"
+	const generateCircleString = (center : { latitude : number, longitude : number }, radius : number) => {
+		// 转换回WGS84坐标系存储
+		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
+		return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`
 	}
 
 	// 调整地图中心到围栏中心位置
-	const setMapCenterToFence = (fencePoints : any[]) => {
-		if (fencePoints.length === 0) return
-
-		// 计算中心点
-		let totalLat = 0
-		let totalLng = 0
-
-		fencePoints.forEach(point => {
-			totalLat += point.latitude
-			totalLng += point.longitude
-		})
-
-		center.latitude = totalLat / fencePoints.length
-		center.longitude = totalLng / fencePoints.length
+	const setMapCenterToFence = (fence : any) => {
+		const fenceType = getFenceType(fence)
 		
-		// 根据围栏大小自动调整缩放级别
-		const bounds = calculateBounds(fencePoints)
-		const latDiff = bounds.maxLat - bounds.minLat
-		const lngDiff = bounds.maxLng - bounds.minLng
-		const maxDiff = Math.max(latDiff, lngDiff)
-		
-		if (maxDiff > 0.1) mapScale.value = 11
-		else if (maxDiff > 0.05) mapScale.value = 12
-		else if (maxDiff > 0.02) mapScale.value = 13
-		else mapScale.value = 14
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(fence.area)
+			if (circleData) {
+				center.latitude = circleData.latitude
+				center.longitude = circleData.longitude
+				// 处理过大半径，设置合理的缩放级别
+				const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
+				// 根据半径调整缩放级别
+				mapScale.value = calculateZoomLevelFromRadius(displayRadius)
+			}
+		} else {
+			const fencePoints = parsePolygon(fence.area)
+			if (fencePoints.length === 0) return
+
+			// 计算中心点
+			let totalLat = 0
+			let totalLng = 0
+
+			fencePoints.forEach(point => {
+				totalLat += point.latitude
+				totalLng += point.longitude
+			})
+
+			center.latitude = totalLat / fencePoints.length
+			center.longitude = totalLng / fencePoints.length
+			
+			// 根据围栏大小自动调整缩放级别
+			const bounds = calculateBounds(fencePoints)
+			const latDiff = bounds.maxLat - bounds.minLat
+			const lngDiff = bounds.maxLng - bounds.minLng
+			const maxDiff = Math.max(latDiff, lngDiff)
+			
+			if (maxDiff > 0.1) mapScale.value = 11
+			else if (maxDiff > 0.05) mapScale.value = 12
+			else if (maxDiff > 0.02) mapScale.value = 13
+			else mapScale.value = 14
+		}
+	}
+	
+	// 根据半径计算合适的缩放级别
+	const calculateZoomLevelFromRadius = (radius : number) => {
+		if (radius > 50000) return 8   // 50公里以上
+		if (radius > 20000) return 9    // 20-50公里
+		if (radius > 10000) return 10    // 10-20公里
+		if (radius > 5000) return 11     // 5-10公里
+		if (radius > 2000) return 12     // 2-5公里
+		if (radius > 1000) return 13    // 1-2公里
+		if (radius > 500) return 14      // 500米-1公里
+		if (radius > 200) return 15      // 200-500米
+		return 16                       // 200米以下
 	}
 	
 	// 计算坐标边界
@@ -396,11 +563,24 @@
 		selectedFence.value = fence
 		fencesPopup.value?.close()
 		
-		// 解析并显示围栏
-		const fencePoints = parsePolygon(fence.area)
-		points.value = fencePoints
-		setMapCenterToFence(fencePoints)
-		updateFencePolygon()
+		// 根据围栏类型显示
+		const fenceType = getFenceType(fence)
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(fence.area)
+			if (circleData) {
+				circleCenter.value = { latitude: circleData.latitude, longitude: circleData.longitude }
+				circleRadius.value = circleData.radius
+				points.value = []
+			}
+		} else {
+			const fencePoints = parsePolygon(fence.area)
+			points.value = fencePoints
+			circleCenter.value = null
+			circleRadius.value = 0
+		}
+		
+		setMapCenterToFence(fence)
+		updateMapDisplay()
 	}
 	
 	// 编辑围栏
@@ -408,6 +588,8 @@
 		editingFence.value = fence
 		fenceForm.name = fence.name
 		fenceForm.alarmType = fence.alarmType.toString()
+		// 设置当前绘制模式为围栏实际类型
+		drawingMode.value = getFenceType(fence)
 		editDialogPopup.value?.open()
 	}
 	
@@ -444,15 +626,27 @@
 			return
 		}
 		
-		if (points.value.length < 3) {
+		let area = ''
+		if (drawingMode.value === 'polygon' && points.value.length < 3) {
 			uni.showToast({ title: '请绘制有效的围栏区域', icon: 'none' })
 			return
+		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
+			uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+			return
+		}
+		
+		// 根据绘制模式生成不同的区域字符串
+		if (drawingMode.value === 'polygon') {
+			area = generatePolygonString(points.value)
+		} else if (drawingMode.value === 'circle' && circleCenter.value) {
+			area = generateCircleString(circleCenter.value, circleRadius.value)
 		}
 		
 		const fenceData = {
 			name: fenceForm.name,
-			area: generatePolygonString(points.value),
-			alarmType: parseInt(fenceForm.alarmType)
+			area: area,
+			alarmType: parseInt(fenceForm.alarmType),
+			type: drawingMode.value // 确保保存时设置正确的类型
 		}
 		
 		try {
@@ -571,33 +765,92 @@
 	})
 
 	/* 电子围栏绘制功能 */
+	// 设置绘制模式
+	const setDrawingMode = (mode : string) => {
+		drawingMode.value = mode
+		// 切换模式时清空当前绘制
+		if (isDrawing.value) {
+			points.value = []
+			circleCenter.value = null
+			circleRadius.value = 0
+			updateMapDisplay()
+		}
+	}
+	
+	// 开始绘制
 	const startDrawing = () => {
 		isDrawing.value = true
 		points.value = []
+		circleCenter.value = null
+		circleRadius.value = 0
 		selectedFence.value = null
 		updateMapDisplay()
 	}
 
+	// 处理地图点击事件
 	const handleMapTap = (e : any) => {
 		if (isDrawing.value) {
-			addNewPoint(e.detail.latitude, e.detail.longitude)
+			if (drawingMode.value === 'polygon') {
+				addNewPoint(e.detail.latitude, e.detail.longitude)
+			} else if (drawingMode.value === 'circle') {
+				if (!circleCenter.value) {
+					// 第一次点击设置圆心
+					circleCenter.value = {
+						latitude: e.detail.latitude,
+						longitude: e.detail.longitude
+					}
+					// 添加圆心标记
+					updateMapDisplay()
+				} else {
+					// 第二次点击确定半径
+					const radius = calculateDistance(
+						circleCenter.value.latitude,
+						circleCenter.value.longitude,
+						e.detail.latitude,
+						e.detail.longitude
+					)
+					// 限制最小半径为10米
+					circleRadius.value = radius < 10 ? 10 : radius
+					updateMapDisplay()
+				}
+			}
 		}
 	}
 
+	// 计算两点之间的距离（米）
+	const calculateDistance = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) => {
+		const R = 6371000 // 地球半径（米）
+		const dLat = (lat2 - lat1) * Math.PI / 180
+		const dLng = (lng2 - lng1) * Math.PI / 180
+		const a = 
+			Math.sin(dLat/2) * Math.sin(dLat/2) +
+			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+			Math.sin(dLng/2) * Math.sin(dLng/2)
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+		const distance = R * c
+		return distance
+	}
+
+	// 添加新点（多边形模式）
 	const addNewPoint = (lat : number, lng : number) => {
 		points.value.push({ latitude: lat, longitude: lng })
 		updateMapDisplay()
 	}
 
+	// 完成绘制
 	const finishDrawing = () => {
-		if (points.value.length < 3) {
+		if (drawingMode.value === 'polygon' && points.value.length < 3) {
 			uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
 			return
+		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
+			uni.showToast({ title: '请设置有效的圆形围栏', icon: 'none' })
+			return
 		}
+		
 		isDrawing.value = false
 		
 		// 弹出编辑对话框
-		fenceForm.name = `围栏${fenceList.value.length + 1}`
+		fenceForm.name = `${drawingMode.value === 'circle' ? '圆形' : '多边形'}围栏${fenceList.value.length + 1}`
 		editDialogPopup.value?.open()
 	}
 
@@ -612,18 +865,65 @@
 		
 		// 添加围栏顶点标记（仅在绘制模式下）
 		if (isDrawing.value) {
-			points.value.forEach((point, index) => {
+			if (drawingMode.value === 'polygon') {
+				// 多边形顶点标记
+				points.value.forEach((point, index) => {
+					newMarkers.push({
+						id: 1000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				})
+			} else if (drawingMode.value === 'circle' && circleCenter.value) {
+				// 圆形圆心标记
 				newMarkers.push({
-					id: 1000 + index,
-					latitude: point.latitude,
-					longitude: point.longitude,
+					id: 1000,
+					latitude: circleCenter.value.latitude,
+					longitude: circleCenter.value.longitude,
 					iconPath: '/static/marker.png',
 					width: 32,
 					height: 32,
-					callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+					callout: { content: '圆心', display: 'ALWAYS' },
 					anchor: { x: 0.5, y: 0.5 }
 				})
-			})
+			}
+		} else if (selectedFence.value) {
+			// 选中围栏时显示标记
+			const fenceType = getFenceType(selectedFence.value)
+			if (fenceType === 'circle') {
+				const circleData = parseCircle(selectedFence.value.area)
+				if (circleData) {
+					newMarkers.push({
+						id: 2000,
+						latitude: circleData.latitude,
+						longitude: circleData.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: '圆心', display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				}
+			} else {
+				const fencePoints = parsePolygon(selectedFence.value.area)
+				fencePoints.forEach((point, index) => {
+					newMarkers.push({
+						id: 2000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				})
+			}
 		}
 		
 		markers.value = newMarkers
@@ -631,13 +931,34 @@
 
 	// 更新围栏多边形显示
 	const updateFencePolygon = () => {
-		polygons.value = [{
-			points: points.value,
-			strokeWidth: 2,
-			strokeColor: '#FF0000',
-			fillColor: 'rgba(255,0,0,0.2)',
-			zIndex: 1
-		}]
+		if (drawingMode.value === 'polygon') {
+			polygons.value = points.value.length >= 3 ? [{
+				points: points.value,
+				strokeWidth: 2,
+				strokeColor: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)',
+				zIndex: 1
+			}] : []
+		} else {
+			polygons.value = []
+		}
+	}
+	
+	// 更新圆形围栏显示
+	const updateFenceCircle = () => {
+		if (drawingMode.value === 'circle' && circleCenter.value && circleRadius.value > 0) {
+			circles.value = [{
+				latitude: circleCenter.value.latitude,
+				longitude: circleCenter.value.longitude,
+				radius: circleRadius.value,
+				strokeWidth: 2,
+				strokeColor: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)',
+				zIndex: 1
+			}]
+		} else {
+			circles.value = []
+		}
 	}
 
 	// 更新地图显示
@@ -645,11 +966,18 @@
 		// 更新标记点（保留车辆标记点）
 		updateMarkers()
 
-		// 更新围栏多边形
-		if (points.value.length >= 3) {
-			updateFencePolygon()
-		} else if (!isDrawing.value) {
-			polygons.value = []
+		// 更新围栏显示
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				updateFencePolygon()
+				circles.value = []
+			} else if (drawingMode.value === 'circle') {
+				updateFenceCircle()
+				polygons.value = []
+			}
+		} else {
+			// 如果不是绘制模式，重新渲染所有围栏
+			renderFencesOnMap()
 		}
 	}
 	
@@ -657,7 +985,8 @@
 	const clearDrawing = () => {
 		isDrawing.value = false
 		points.value = []
-		polygons.value = []
+		circleCenter.value = null
+		circleRadius.value = 0
 		selectedFence.value = null
 		// 重新渲染所有围栏
 		renderFencesOnMap()
@@ -756,6 +1085,30 @@
 			flex-direction: column;
 			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 			
+			.drawing-mode-selector {
+				margin-bottom: 20rpx;
+				padding-bottom: 20rpx;
+				border-bottom: 1rpx solid #eee;
+				
+				.mode-title {
+					font-size: 28rpx;
+					margin-bottom: 15rpx;
+					color: #333;
+					font-weight: 500;
+				}
+				
+				.mode-buttons {
+					display: flex;
+					flex-direction: row;
+					justify-content:flex-start;
+					
+					uv-button {
+						flex: 1;
+						margin: 0 10rpx;
+					}
+				}
+			}
+			
 			.tool-tag-item {
 				display: flex;
 				flex-direction: row;
@@ -771,11 +1124,15 @@
 			
 			.status-info {
 				display: flex;
-				justify-content: space-between;
+				flex-direction: column;
 				padding: 20rpx 0;
 				font-size: 28rpx;
 				color: #333;
 				border-top: 1rpx solid #eee;
+				
+				text {
+					margin-bottom: 10rpx;
+				}
 			}
 		}
 		
@@ -816,10 +1173,17 @@
 					.fence-info {
 						display: flex;
 						flex-direction: column;
+						flex: 1;
 						
 						.name {
 							font-size: 30rpx;
 							font-weight: 500;
+							margin-bottom: 8rpx;
+						}
+						
+						.type {
+							font-size: 24rpx;
+							color: #2979ff;
 							margin-bottom: 8rpx;
 						}
 						

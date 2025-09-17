@@ -105,6 +105,26 @@
   flex-direction: column;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
+.container .tools-panel .drawing-mode-selector {
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+.container .tools-panel .drawing-mode-selector .mode-title {
+  font-size: 28rpx;
+  margin-bottom: 15rpx;
+  color: #333;
+  font-weight: 500;
+}
+.container .tools-panel .drawing-mode-selector .mode-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.container .tools-panel .drawing-mode-selector .mode-buttons uv-button {
+  flex: 1;
+  margin: 0 10rpx;
+}
 .container .tools-panel .tool-tag-item {
   display: flex;
   flex-direction: row;
@@ -118,11 +138,14 @@
 }
 .container .tools-panel .status-info {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 20rpx 0;
   font-size: 28rpx;
   color: #333;
   border-top: 1rpx solid #eee;
+}
+.container .tools-panel .status-info text {
+  margin-bottom: 10rpx;
 }
 .container .fence-list {
   height: 70vh;
@@ -158,10 +181,16 @@
 .container .fence-list .list-content .fence-item .fence-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 .container .fence-list .list-content .fence-item .fence-info .name {
   font-size: 30rpx;
   font-weight: 500;
+  margin-bottom: 8rpx;
+}
+.container .fence-list .list-content .fence-item .fence-info .type {
+  font-size: 24rpx;
+  color: #2979ff;
   margin-bottom: 8rpx;
 }
 .container .fence-list .list-content .fence-item .fence-info .devices {
