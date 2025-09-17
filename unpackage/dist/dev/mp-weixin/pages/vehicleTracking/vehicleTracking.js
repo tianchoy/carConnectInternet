@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const lastDirection = common_vendor.ref(0);
     const currentSpeed = common_vendor.ref(0);
     const currentAddress = common_vendor.ref("获取中...");
-    const currentTime = common_vendor.ref("10s");
+    const currentTime = common_vendor.ref("5s");
     const currentCar = common_vendor.ref("京A12345");
     const times = common_vendor.ref([
       [

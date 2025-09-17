@@ -75,7 +75,7 @@
 	// 当前车辆信息
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const currentTime = ref('10s')
+	const currentTime = ref('5s')
 	const currentCar = ref<string | null>('京A12345')
 
 	const times = ref([
