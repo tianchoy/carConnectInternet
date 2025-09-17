@@ -153,5 +153,5 @@ export const bindDevices = (data: { geofenceId: string, imeis: string[] }) => {
 
 // 设备解绑围栏
 export const unbindDevices = (data: { geofenceId: string, imeis: string[] }) => {
-    return http.post(unbindGeofence, data)
+    return http.delete(unbindGeofence, data)
 }

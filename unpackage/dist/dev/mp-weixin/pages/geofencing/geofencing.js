@@ -860,15 +860,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return setDrawingMode("polygon");
         }),
         A: common_vendor.p(new UTSJSONObject({
-          type: drawingMode.value == "polygon" ? "primary" : "default",
-          size: "small"
+          type: drawingMode.value == "polygon" ? "success" : "default",
+          size: "small",
+          customStyle: "border:1rpx solid #ebedf0"
         })),
         B: common_vendor.o(($event = null) => {
           return setDrawingMode("circle");
         }),
         C: common_vendor.p(new UTSJSONObject({
-          type: drawingMode.value == "circle" ? "primary" : "default",
-          size: "small"
+          type: drawingMode.value == "circle" ? "success" : "default",
+          size: "small",
+          customStyle: "border:1rpx solid #ebedf0"
         }))
       }) : new UTSJSONObject({}), new UTSJSONObject({
         D: common_vendor.o(startDrawing),
@@ -981,16 +983,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         aq: common_vendor.f(deviceList.value, (device = null, k0 = null, i0 = null) => {
           return new UTSJSONObject({
             a: common_vendor.t(device.plateNo || device.imei),
-            b: common_vendor.t(device.connectionStatus === "online" ? "在线" : "离线"),
-            c: common_vendor.o(($event = null) => {
+            b: common_vendor.o(($event = null) => {
               return toggleDeviceBinding(device.imei, $event);
             }, device.imei),
-            d: "45be0509-26-" + i0 + ",45be0509-24",
-            e: common_vendor.p(new UTSJSONObject({
+            c: "45be0509-26-" + i0 + ",45be0509-24",
+            d: common_vendor.p(new UTSJSONObject({
               ["model-value"]: isDeviceBound(device.imei),
               disabled: loading.value || loadingMore.value
             })),
-            f: device.imei
+            e: device.imei
           });
         }),
         ar: deviceList.value.length === 0 && !loading.value

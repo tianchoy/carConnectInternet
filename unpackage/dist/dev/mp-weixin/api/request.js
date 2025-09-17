@@ -92,7 +92,7 @@ const bindDevices = (data) => {
   return api_http.http.post(bindGeofence, data);
 };
 const unbindDevices = (data) => {
-  return api_http.http.post(unbindGeofence, data);
+  return api_http.http.delete(unbindGeofence, data);
 };
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
