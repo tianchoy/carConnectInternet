@@ -300,6 +300,23 @@
   padding: 100rpx 0;
   color: #999;
 }
+.container .device-dialog .device-list .loading-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 0;
+  color: #666;
+  font-size: 26rpx;
+}
+.container .device-dialog .device-list .loading-tip uv-loading {
+  margin-right: 15rpx;
+}
+.container .device-dialog .device-list .no-more {
+  text-align: center;
+  padding: 30rpx 0;
+  color: #999;
+  font-size: 26rpx;
+}
 .container .device-dialog .dialog-actions {
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;

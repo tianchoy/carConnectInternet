@@ -9,13 +9,13 @@
 				<sub-navBar :showTime="false" :currentCar="currentCar" :showCar="true"
 					:carStatus='connectionStatus'></sub-navBar>
 			</map>
-			
+
 			<!-- 绘制提示 -->
 			<view v-if="isDrawing" class="drag-hint">
 				<text v-if="drawingMode === 'polygon'">点击地图添加围栏顶点，至少需要3个点</text>
 				<text v-if="drawingMode === 'circle'">点击地图确定圆心，拖动调整半径</text>
 			</view>
-			
+
 			<!-- 围栏操作面板 -->
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
@@ -29,28 +29,24 @@
 				</view>
 			</view>
 		</view>
-		
+
 		<!-- 绘制控制面板 -->
 		<view class="tools-panel">
 			<!-- 绘制模式选择 -->
 			<view class="drawing-mode-selector" v-if="!isDrawing && !selectedFence">
 				<view class="mode-title">选择围栏类型:</view>
 				<view class="mode-buttons">
-					<uv-button 
-						:type="drawingMode == 'polygon' ? 'primary' : 'default'" 
-						size="small" 
+					<uv-button :type="drawingMode == 'polygon' ? 'primary' : 'default'" size="small"
 						@click="setDrawingMode('polygon')">
 						多边形
 					</uv-button>
-					<uv-button 
-						:type="drawingMode == 'circle' ? 'primary' : 'default'" 
-						size="small" 
+					<uv-button :type="drawingMode == 'circle' ? 'primary' : 'default'" size="small"
 						@click="setDrawingMode('circle')">
 						圆形
 					</uv-button>
 				</view>
 			</view>
-			
+
 			<view class="tool-tag-item">
 				<uv-button @click="startDrawing" :disabled="isDrawing || selectedFence">
 					开始绘制
@@ -65,14 +61,14 @@
 					围栏列表
 				</uv-button>
 			</view>
-			
+
 			<view class="status-info">
 				<text>围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
 				<text v-if="drawingMode === 'polygon'">顶点数量: {{ points.length }}</text>
 				<text v-if="drawingMode === 'circle' && circleRadius > 0">半径: {{ circleRadius.toFixed(2) }}米</text>
 			</view>
 		</view>
-		
+
 		<!-- 围栏列表弹窗 -->
 		<uv-popup ref="fencesPopup" mode="bottom" round="10">
 			<view class="fence-list">
@@ -95,7 +91,7 @@
 				</scroll-view>
 			</view>
 		</uv-popup>
-		
+
 		<!-- 围栏编辑弹窗 -->
 		<uv-popup ref="editDialogPopup" mode="center" round="10">
 			<view class="edit-dialog">
@@ -106,7 +102,8 @@
 					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></uv-input>
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
-						<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left" customStyle="display:flex;flex-direction:row;align-items: center;justify-content: left;">
+						<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left"
+							customStyle="display:flex;flex-direction:row;align-items: center;justify-content: left;">
 							<uv-radio style="padding: 0 10px;" name="0">不告警</uv-radio>
 							<uv-radio style="padding: 0 10px;" name="1">出入告警</uv-radio>
 							<uv-radio style="padding: 0 10px;" name="2">出告警</uv-radio>
@@ -120,7 +117,7 @@
 				</view>
 			</view>
 		</uv-popup>
-		
+
 		<!-- 设备绑定弹窗 -->
 		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10">
 			<view class="device-dialog">
@@ -136,20 +133,28 @@
 						未绑定设备
 					</view>
 				</view>
-				<scroll-view class="device-list" scroll-y>
+				<!-- 滚动列表添加scrolltolower事件实现加载更多 -->
+				<scroll-view class="device-list" scroll-y @scrolltolower="handleLoadMore">
 					<view v-for="device in deviceList" :key="device.imei" class="device-item">
 						<view class="device-info">
 							<text class="name">{{ device.plateNo || device.imei }}</text>
 							<text class="status">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text>
 						</view>
-						<uv-switch 
-							:model-value="isDeviceBound(device.imei)" 
-							@change="toggleDeviceBinding(device.imei, $event)"
-							:disabled="loading">
+						<uv-switch :model-value="isDeviceBound(device.imei)"
+							@change="toggleDeviceBinding(device.imei, $event)" :disabled="loading || loadingMore">
 						</uv-switch>
 					</view>
-					<view v-if="deviceList.length === 0" class="empty">
+					<!-- 空数据提示 -->
+					<view v-if="deviceList.length === 0 && !loading" class="empty">
 						{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}
+					</view>
+					<!-- 加载中提示 -->
+					<view v-if="loadingMore" class="loading-tip">
+						<text>正在加载更多...</text>
+					</view>
+					<!-- 无更多数据提示 -->
+					<view v-if="deviceList.length > 0 && !hasMore && !loadingMore" class="no-more">
+						暂无更多数据
 					</view>
 				</scroll-view>
 				<view class="dialog-actions">
@@ -168,7 +173,7 @@
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
 	const deptId = ref<string | null>('')
-	
+
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -179,7 +184,7 @@
 	const carMarker = ref<any>(null) // 车辆标记点
 	const circles = ref<any[]>([]) // 圆形围栏
 	const carInFence = ref(false) // 车辆是否在围栏内
-	
+
 	// 电子围栏相关状态
 	const isDrawing = ref(false)
 	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
@@ -191,7 +196,7 @@
 	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
 	const lastDirection = ref(0)
-	
+
 	// 围栏管理状态
 	const fenceList = ref<any[]>([])
 	const selectedFence = ref<any>(null)
@@ -202,16 +207,37 @@
 		name: '',
 		alarmType: '1'
 	})
-	
-	// 设备绑定状态
+
+	// 设备绑定状态 - 新增分页相关变量
 	const deviceDialogPopup = ref<any>(null)
 	const activeTab = ref('bind')
-	const deviceList = ref<any[]>([])
-	const boundDevices = ref<any[]>([])
+	const deviceList = ref<any[]>([]) // 当前显示的设备列表
+	const boundDevices = ref<any[]>([]) // 已绑定设备完整列表
 	const currentFenceName = ref('')
 	const currentFenceId = ref('')
 	const loading = ref(false)
-	
+
+	// 分页控制变量（区分已绑定/未绑定设备）
+	const pagination = reactive({
+		bind: {
+			pageNum: 1, // 当前页码
+			pageSize: 10, // 每页条数
+			hasMore: true, // 是否还有更多数据
+			loadingMore: false // 加载更多中状态
+		},
+		unbind: {
+			pageNum: 1,
+			pageSize: 10,
+			hasMore: true,
+			loadingMore: false
+		}
+	})
+
+	// 计算当前标签页的分页信息
+	const currentPagination = computed(() => {
+		return pagination[activeTab.value]
+	})
+
 	// 计算是否可以完成绘制
 	const canFinishDrawing = computed(() => {
 		if (drawingMode.value === 'polygon') {
@@ -222,6 +248,16 @@
 		return false
 	})
 
+	// 计算当前加载更多状态
+	const loadingMore = computed(() => {
+		return currentPagination.value.loadingMore
+	})
+
+	// 计算是否还有更多数据
+	const hasMore = computed(() => {
+		return currentPagination.value.hasMore
+	})
+
 	onLoad((option) => {
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
@@ -230,16 +266,16 @@
 		loadInitialPosition()
 		loadGeofenceList() // 页面加载时获取围栏列表
 	})
-	
+
 	const loadInitialPosition = async () => {
 		uni.showLoading({
 			title: '获取车辆位置中...'
 		})
-	
+
 		try {
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
-	
+
 			res.data.forEach(async item => {
 				if (item.imei == imei.value) {
 					const deviceData = item
@@ -250,15 +286,15 @@
 					)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
-	
+
 					const position = {
 						latitude: convertedCoord.lat,
 						longitude: convertedCoord.lng
 					}
-	
+
 					// 记录初始方向
 					lastDirection.value = deviceData.direction || 0
-					
+
 					// 创建车辆标记点
 					carMarker.value = {
 						id: 0,
@@ -277,7 +313,7 @@
 							display: 'ALWAYS'
 						}
 					}
-					
+
 					// 更新标记点数组，保留车辆标记点
 					updateMarkers()
 
@@ -289,7 +325,7 @@
 					connectionStatus.value = deviceData.connectionStatus || 'unknown'
 				}
 			})
-	
+
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
 			uni.showToast({
@@ -300,13 +336,13 @@
 			uni.hideLoading()
 		}
 	}
-	
+
 	// 计算地图上的旋转角度（修正方向）
 	const calculateMapRotation = (direction : number) : number => {
 		let rotation = direction
 		if (rotation >= 360) rotation -= 360
 		if (rotation < 0) rotation += 360
-		
+
 		return rotation
 	}
 
@@ -326,9 +362,9 @@
 			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
 		}
 	}
-	
+
 	// 获取围栏类型（根据area字段判断）
-	const getFenceType = (fence: any) => {
+	const getFenceType = (fence : any) => {
 		if (fence.type && fence.type !== 'null') {
 			return fence.type
 		}
@@ -340,25 +376,25 @@
 		}
 		return 'polygon' // 默认多边形
 	}
-	
+
 	// 将围栏数据渲染到地图上
 	const renderFencesOnMap = () => {
 		if (!fenceList.value || fenceList.value.length === 0) return
-		
+
 		const fencePolygons = []
 		const fenceCircles = []
-		
+
 		// 为每个围栏创建多边形或圆形
 		fenceList.value.forEach((fence, index) => {
 			const fenceType = getFenceType(fence)
-			
+
 			if (fenceType === 'circle') {
 				// 处理圆形围栏
 				const circleData = parseCircle(fence.area)
 				if (circleData) {
 					// 处理过大半径，避免无法显示
 					const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
-					
+
 					fenceCircles.push({
 						id: fence.id,
 						latitude: circleData.latitude,
@@ -386,10 +422,10 @@
 				}
 			}
 		})
-		
+
 		polygons.value = fencePolygons
 		circles.value = fenceCircles
-		
+
 		// 确保圆形围栏能显示在地图视野中
 		if (fenceCircles.length > 0 && !selectedFence.value) {
 			// 自动定位到第一个圆形围栏
@@ -402,17 +438,15 @@
 	}
 
 	// 解析POLYGON字符串为坐标数组
-	// 格式: "POLYGON ((lat1 lng1, lat2 lng2, ...))"
 	const parsePolygon = (polygonStr : string) => {
 		if (!polygonStr) return []
-		
-		// 去除字符串中的"POLYGON (("和"))"
+
+		// 去除字符串中的"POLYGON
 		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
 		// 按逗号分割坐标点
 		const coordPoints = coordStr.split(',')
 
 		return coordPoints.map(point => {
-			// 注意：格式是纬度在前，经度在后
 			const [lat, lng] = point.trim().split(' ').map(Number)
 			// 转换坐标到腾讯地图坐标系
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -422,34 +456,32 @@
 			}
 		})
 	}
-	
+
 	// 解析CIRCLE字符串为圆心和半径
-	// 格式: "CIRCLE (lat lng, radius)"
 	const parseCircle = (circleStr : string) => {
 		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
-		
+
 		try {
-			// 去除字符串中的"CIRCLE ("和")"
+			// 去除字符串中的"CIRCLE
 			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
 			// 按逗号分割坐标点和半径
 			const parts = coordStr.split(',')
-			
+
 			if (parts.length !== 2) return null
-			
+
 			const [centerStr, radiusStr] = parts
-			// 解析经纬度（注意：格式是纬度在前，经度在后）
 			const [lat, lng] = centerStr.trim().split(' ').map(Number)
 			const radius = Number(radiusStr.trim())
-			
+
 			// 验证数据有效性
 			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
 				console.error('无效的圆形围栏数据:', circleStr)
 				return null
 			}
-			
+
 			// 转换坐标到腾讯地图坐标系
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-			
+
 			return {
 				latitude: convertedCoord.lat,
 				longitude: convertedCoord.lng,
@@ -460,20 +492,17 @@
 			return null
 		}
 	}
-	
+
 	// 生成POLYGON字符串
-	// 格式: "POLYGON ((lat1 lng1, lat2 lng2, ...))"
 	const generatePolygonString = (points : Array<{ latitude : number, longitude : number }>) => {
 		const coords = points.map(point => {
-			// 转换回WGS84坐标系存储
 			const originalCoord = CoordTransform.tencentToWgs84(point.latitude, point.longitude)
 			return `${originalCoord.lat} ${originalCoord.lng}`
 		}).join(', ')
 		return `POLYGON ((${coords}))`
 	}
-	
+
 	// 生成CIRCLE字符串
-	// 格式: "CIRCLE (lat lng, radius)"
 	const generateCircleString = (center : { latitude : number, longitude : number }, radius : number) => {
 		// 转换回WGS84坐标系存储
 		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
@@ -483,7 +512,7 @@
 	// 调整地图中心到围栏中心位置
 	const setMapCenterToFence = (fence : any) => {
 		const fenceType = getFenceType(fence)
-		
+
 		if (fenceType === 'circle') {
 			const circleData = parseCircle(fence.area)
 			if (circleData) {
@@ -509,20 +538,20 @@
 
 			center.latitude = totalLat / fencePoints.length
 			center.longitude = totalLng / fencePoints.length
-			
+
 			// 根据围栏大小自动调整缩放级别
 			const bounds = calculateBounds(fencePoints)
 			const latDiff = bounds.maxLat - bounds.minLat
 			const lngDiff = bounds.maxLng - bounds.minLng
 			const maxDiff = Math.max(latDiff, lngDiff)
-			
+
 			if (maxDiff > 0.1) mapScale.value = 11
 			else if (maxDiff > 0.05) mapScale.value = 12
 			else if (maxDiff > 0.02) mapScale.value = 13
 			else mapScale.value = 14
 		}
 	}
-	
+
 	// 根据半径计算合适的缩放级别
 	const calculateZoomLevelFromRadius = (radius : number) => {
 		if (radius > 50000) return 8   // 50公里以上
@@ -535,21 +564,21 @@
 		if (radius > 200) return 15      // 200-500米
 		return 16                       // 200米以下
 	}
-	
+
 	// 计算坐标边界
 	const calculateBounds = (points : any[]) => {
 		let minLat = points[0].latitude
 		let maxLat = points[0].latitude
 		let minLng = points[0].longitude
 		let maxLng = points[0].longitude
-		
+
 		points.forEach(point => {
 			minLat = Math.min(minLat, point.latitude)
 			maxLat = Math.max(maxLat, point.latitude)
 			minLng = Math.min(minLng, point.longitude)
 			maxLng = Math.max(maxLng, point.longitude)
 		})
-		
+
 		return { minLat, maxLat, minLng, maxLng }
 	}
 
@@ -557,12 +586,12 @@
 	const showFenceList = () => {
 		fencesPopup.value?.open()
 	}
-	
+
 	// 选择围栏
 	const selectFence = (fence : any) => {
 		selectedFence.value = fence
 		fencesPopup.value?.close()
-		
+
 		// 根据围栏类型显示
 		const fenceType = getFenceType(fence)
 		if (fenceType === 'circle') {
@@ -578,11 +607,11 @@
 			circleCenter.value = null
 			circleRadius.value = 0
 		}
-		
+
 		setMapCenterToFence(fence)
 		updateMapDisplay()
 	}
-	
+
 	// 编辑围栏
 	const editFence = (fence : any) => {
 		editingFence.value = fence
@@ -592,7 +621,7 @@
 		drawingMode.value = getFenceType(fence)
 		editDialogPopup.value?.open()
 	}
-	
+
 	// 删除围栏
 	const deleteFence = async (id : string) => {
 		uni.showModal({
@@ -618,14 +647,14 @@
 			}
 		})
 	}
-	
+
 	// 保存围栏
 	const saveFence = async () => {
 		if (!fenceForm.name) {
 			uni.showToast({ title: '请输入围栏名称', icon: 'none' })
 			return
 		}
-		
+
 		let area = ''
 		if (drawingMode.value === 'polygon' && points.value.length < 3) {
 			uni.showToast({ title: '请绘制有效的围栏区域', icon: 'none' })
@@ -634,21 +663,21 @@
 			uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
 			return
 		}
-		
+
 		// 根据绘制模式生成不同的区域字符串
 		if (drawingMode.value === 'polygon') {
 			area = generatePolygonString(points.value)
 		} else if (drawingMode.value === 'circle' && circleCenter.value) {
 			area = generateCircleString(circleCenter.value, circleRadius.value)
 		}
-		
+
 		const fenceData = {
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
 			type: drawingMode.value // 确保保存时设置正确的类型
 		}
-		
+
 		try {
 			let result
 			if (editingFence.value) {
@@ -656,7 +685,7 @@
 			} else {
 				result = await addGeofence(fenceData)
 			}
-			
+
 			if (result.code === 0) {
 				uni.showToast({ title: '保存成功' })
 				editDialogPopup.value?.close()
@@ -671,50 +700,114 @@
 			uni.showToast({ title: '保存失败', icon: 'none' })
 		}
 	}
-	
+
 	// 显示绑定设备对话框
 	const showBindDevices = async (fenceId : string) => {
 		currentFenceId.value = fenceId
 		currentFenceName.value = selectedFence.value.name
 		deviceDialogPopup.value?.open()
 		activeTab.value = 'bind'
+		// 初始化分页状态并加载第一页
+		initPagination('bind')
 		await loadBoundDevices(fenceId)
 	}
-	
+
+	// 初始化分页状态
+	const initPagination = (tabType : 'bind' | 'unbind') => {
+		pagination[tabType] = {
+			pageNum: 1,
+			pageSize: 10,
+			hasMore: true,
+			loadingMore: false
+		}
+		// 清空当前设备列表
+		if (activeTab.value === tabType) {
+			deviceList.value = []
+		}
+	}
+
 	// 加载已绑定设备
 	const loadBoundDevices = async (fenceId : string) => {
+		const { pageNum, pageSize, hasMore } = pagination.bind
+		// 没有更多数据时停止加载
+		if (!hasMore) return
+
+		pagination.bind.loadingMore = true
 		try {
 			const res = await getBoundDevices({
-				pageNum: 1,
-				pageSize: 100,
+				pageNum,
+				pageSize,
 				geoId: fenceId
 			})
-			
+
 			if (res.code === 0) {
-				boundDevices.value = res.data.list || []
-				deviceList.value = boundDevices.value
+				const dataList = res.data.list || []
+				// 首次加载时覆盖数据，后续加载时追加数据
+				if (pageNum === 1) {
+					boundDevices.value = dataList
+					deviceList.value = dataList
+				} else {
+					boundDevices.value = [...boundDevices.value, ...dataList]
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				// 判断是否还有更多数据（当前页数据量小于每页条数则无更多）
+				pagination.bind.hasMore = dataList.length >= pageSize
+				// 页码自增
+				pagination.bind.pageNum += 1
 			}
 		} catch (error) {
 			console.error('加载已绑定设备失败:', error)
+		} finally {
+			// 结束加载状态
+			pagination.bind.loadingMore = false
 		}
 	}
-	
-	// 加载未绑定设备
+
+	// 加载未绑定设备（改造为分页加载）
 	const loadUnboundDevices = async () => {
+		const { pageNum, pageSize, hasMore } = pagination.unbind
+		// 没有更多数据时停止加载
+		if (!hasMore) return
+
+		pagination.unbind.loadingMore = true
 		try {
 			const res = await getUnboundDevices({
-				pageNum: 1,
-				pageSize: 100
+				pageNum,
+				pageSize
 			})
-			
+
 			if (res.code === 0) {
-				deviceList.value = res.data.list || []
+				const dataList = res.data.list || []
+				// 首次加载时覆盖数据，后续加载时追加数据
+				if (pageNum === 1) {
+					deviceList.value = dataList
+				} else {
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				// 判断是否还有更多数据
+				pagination.unbind.hasMore = dataList.length >= pageSize
+				// 页码自增
+				pagination.unbind.pageNum += 1
 			}
 		} catch (error) {
 			console.error('加载未绑定设备失败:', error)
+		} finally {
+			// 结束加载状态
+			pagination.unbind.loadingMore = false
 		}
 	}
-	
+
+	// 处理滚动到底部加载更多
+	const handleLoadMore = () => {
+		if (loadingMore.value || !hasMore.value) return
+
+		if (activeTab.value === 'bind') {
+			loadBoundDevices(currentFenceId.value)
+		} else {
+			loadUnboundDevices()
+		}
+	}
+
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) => {
 		loading.value = true
@@ -723,20 +816,22 @@
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-			
+
 			let result
 			if (bound) {
 				result = await bindDevices(params)
 			} else {
 				result = await unbindDevices(params)
 			}
-			
+
 			if (result.code === 0) {
 				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
-				// 刷新设备列表
+				// 刷新当前标签页数据
 				if (activeTab.value === 'bind') {
+					initPagination('bind')
 					await loadBoundDevices(currentFenceId.value)
 				} else {
+					initPagination('unbind')
 					await loadUnboundDevices()
 				}
 			} else {
@@ -749,18 +844,21 @@
 			loading.value = false
 		}
 	}
-	
+
 	// 检查设备是否已绑定
 	const isDeviceBound = (deviceImei : string) => {
 		return boundDevices.value.some(device => device.imei === deviceImei)
 	}
-	
+
 	// 监听标签页切换
-	watch(activeTab, (newVal) => {
+	watch(activeTab, async (newVal, oldVal) => {
+		// 初始化新标签页的分页状态
+		initPagination(newVal)
+		// 加载新标签页数据
 		if (newVal === 'bind') {
-			loadBoundDevices(currentFenceId.value)
+			await loadBoundDevices(currentFenceId.value)
 		} else {
-			loadUnboundDevices()
+			await loadUnboundDevices()
 		}
 	})
 
@@ -776,7 +874,7 @@
 			updateMapDisplay()
 		}
 	}
-	
+
 	// 开始绘制
 	const startDrawing = () => {
 		isDrawing.value = true
@@ -822,16 +920,16 @@
 		const R = 6371000 // 地球半径（米）
 		const dLat = (lat2 - lat1) * Math.PI / 180
 		const dLng = (lng2 - lng1) * Math.PI / 180
-		const a = 
-			Math.sin(dLat/2) * Math.sin(dLat/2) +
-			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-			Math.sin(dLng/2) * Math.sin(dLng/2)
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+		const a =
+			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+			Math.sin(dLng / 2) * Math.sin(dLng / 2)
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 		const distance = R * c
 		return distance
 	}
 
-	// 添加新点（多边形模式）
+	// 添加新点
 	const addNewPoint = (lat : number, lng : number) => {
 		points.value.push({ latitude: lat, longitude: lng })
 		updateMapDisplay()
@@ -846,9 +944,9 @@
 			uni.showToast({ title: '请设置有效的圆形围栏', icon: 'none' })
 			return
 		}
-		
+
 		isDrawing.value = false
-		
+
 		// 弹出编辑对话框
 		fenceForm.name = `${drawingMode.value === 'circle' ? '圆形' : '多边形'}围栏${fenceList.value.length + 1}`
 		editDialogPopup.value?.open()
@@ -857,13 +955,13 @@
 	// 更新标记点数组，保留车辆标记点
 	const updateMarkers = () => {
 		const newMarkers = []
-		
-		// 首先添加车辆标记点（如果存在）
+
+		// 首先添加车辆标记点
 		if (carMarker.value) {
 			newMarkers.push(carMarker.value)
 		}
-		
-		// 添加围栏顶点标记（仅在绘制模式下）
+
+		// 添加围栏顶点标记
 		if (isDrawing.value) {
 			if (drawingMode.value === 'polygon') {
 				// 多边形顶点标记
@@ -925,7 +1023,7 @@
 				})
 			}
 		}
-		
+
 		markers.value = newMarkers
 	}
 
@@ -943,7 +1041,7 @@
 			polygons.value = []
 		}
 	}
-	
+
 	// 更新圆形围栏显示
 	const updateFenceCircle = () => {
 		if (drawingMode.value === 'circle' && circleCenter.value && circleRadius.value > 0) {
@@ -963,7 +1061,7 @@
 
 	// 更新地图显示
 	const updateMapDisplay = () => {
-		// 更新标记点（保留车辆标记点）
+		// 更新标记点
 		updateMarkers()
 
 		// 更新围栏显示
@@ -980,8 +1078,8 @@
 			renderFencesOnMap()
 		}
 	}
-	
-	// 重置绘制（只清除围栏，保留车辆位置）
+
+	// 重置绘制
 	const clearDrawing = () => {
 		isDrawing.value = false
 		points.value = []
@@ -1007,7 +1105,7 @@
 			flex: 1;
 			width: 100%;
 			position: relative;
-			
+
 			.drag-hint {
 				position: absolute;
 				top: 20rpx;
@@ -1023,7 +1121,7 @@
 				box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
 				animation: pulse 1.5s infinite;
 			}
-			
+
 			.fence-operations {
 				position: absolute;
 				bottom: 40%;
@@ -1034,7 +1132,7 @@
 				padding: 20rpx 20rpx 50rpx 20rpx;
 				box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
 				z-index: 100;
-				
+
 				.fence-header {
 					display: flex;
 					flex-direction: row;
@@ -1043,18 +1141,18 @@
 					margin-bottom: 40rpx;
 					padding-bottom: 20rpx;
 					border-bottom: 1rpx solid #eee;
-					
+
 					.fence-name {
 						font-size: 32rpx;
 						font-weight: bold;
 					}
 				}
-				
+
 				.fence-actions {
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
-					
+
 					uv-button {
 						flex: 1;
 						margin: 0 10rpx;
@@ -1084,44 +1182,44 @@
 			display: flex;
 			flex-direction: column;
 			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-			
+
 			.drawing-mode-selector {
 				margin-bottom: 20rpx;
 				padding-bottom: 20rpx;
 				border-bottom: 1rpx solid #eee;
-				
+
 				.mode-title {
 					font-size: 28rpx;
 					margin-bottom: 15rpx;
 					color: #333;
 					font-weight: 500;
 				}
-				
+
 				.mode-buttons {
 					display: flex;
 					flex-direction: row;
-					justify-content:flex-start;
-					
+					justify-content: flex-start;
+
 					uv-button {
 						flex: 1;
 						margin: 0 10rpx;
 					}
 				}
 			}
-			
+
 			.tool-tag-item {
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 20rpx;
-				
+
 				uv-button {
 					flex: 1;
 					margin: 0 10rpx;
 				}
 			}
-			
+
 			.status-info {
 				display: flex;
 				flex-direction: column;
@@ -1129,17 +1227,17 @@
 				font-size: 28rpx;
 				color: #333;
 				border-top: 1rpx solid #eee;
-				
+
 				text {
 					margin-bottom: 10rpx;
 				}
 			}
 		}
-		
+
 		.fence-list {
 			height: 70vh;
 			background-color: #fff;
-			
+
 			.list-header {
 				display: flex;
 				flex-direction: row;
@@ -1147,17 +1245,17 @@
 				align-items: center;
 				padding: 30rpx;
 				border-bottom: 1rpx solid #eee;
-				
+
 				.title {
 					font-size: 32rpx;
 					font-weight: bold;
 				}
 			}
-			
+
 			.list-content {
 				height: calc(70vh - 100rpx);
 				padding: 20rpx;
-				
+
 				.fence-item {
 					display: flex;
 					flex-direction: row;
@@ -1165,35 +1263,35 @@
 					align-items: center;
 					padding: 24rpx;
 					border-bottom: 1rpx solid #f5f5f5;
-					
+
 					&:active {
 						background-color: #f9f9f9;
 					}
-					
+
 					.fence-info {
 						display: flex;
 						flex-direction: column;
 						flex: 1;
-						
+
 						.name {
 							font-size: 30rpx;
 							font-weight: 500;
 							margin-bottom: 8rpx;
 						}
-						
+
 						.type {
 							font-size: 24rpx;
 							color: #2979ff;
 							margin-bottom: 8rpx;
 						}
-						
+
 						.devices {
 							font-size: 24rpx;
 							color: #999;
 						}
 					}
 				}
-				
+
 				.empty {
 					text-align: center;
 					padding: 100rpx 0;
@@ -1201,13 +1299,13 @@
 				}
 			}
 		}
-		
+
 		.edit-dialog {
 			width: 600rpx;
 			background-color: #fff;
 			border-radius: 16rpx;
 			overflow: hidden;
-			
+
 			.dialog-header {
 				padding: 30rpx;
 				text-align: center;
@@ -1215,45 +1313,45 @@
 				font-weight: bold;
 				border-bottom: 1rpx solid #eee;
 			}
-			
+
 			.dialog-content {
 				padding: 30rpx;
-				
+
 				.radio-group {
 					margin-top: 30rpx;
-					
+
 					.label {
 						display: block;
 						margin-bottom: 20rpx;
 						font-size: 28rpx;
 						font-weight: 500;
 					}
-					
+
 					uv-radio {
 						margin-right: 20rpx;
 						margin-bottom: 15rpx;
 					}
 				}
 			}
-			
+
 			.dialog-actions {
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
-				
+
 				uv-button {
 					flex: 1;
 					margin: 0 10rpx;
 				}
 			}
 		}
-		
+
 		.device-dialog {
 			height: 80vh;
 			background-color: #fff;
-			
+
 			.dialog-header {
 				display: flex;
 				justify-content: space-between;
@@ -1264,29 +1362,29 @@
 				font-size: 32rpx;
 				font-weight: bold;
 			}
-			
+
 			.dialog-tabs {
 				display: flex;
 				flex-direction: row;
 				border-bottom: 1rpx solid #eee;
-				
+
 				.tab {
 					flex: 1;
 					text-align: center;
 					padding: 24rpx;
 					font-size: 28rpx;
-					
+
 					&.active {
 						color: #2979ff;
 						border-bottom: 4rpx solid #2979ff;
 					}
 				}
 			}
-			
+
 			.device-list {
 				height: calc(80vh - 200rpx);
 				padding: 20rpx;
-				
+
 				.device-item {
 					display: flex;
 					flex-direction: row;
@@ -1294,30 +1392,52 @@
 					align-items: center;
 					padding: 24rpx;
 					border-bottom: 1rpx solid #f5f5f5;
-					
+
 					.device-info {
 						display: flex;
 						flex-direction: column;
-						
+
 						.name {
 							font-size: 30rpx;
 							margin-bottom: 8rpx;
 						}
-						
+
 						.status {
 							font-size: 24rpx;
 							color: #999;
 						}
 					}
 				}
-				
+
 				.empty {
 					text-align: center;
 					padding: 100rpx 0;
 					color: #999;
 				}
+
+				// 加载中提示样式
+				.loading-tip {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					padding: 30rpx 0;
+					color: #666;
+					font-size: 26rpx;
+
+					uv-loading {
+						margin-right: 15rpx;
+					}
+				}
+
+				// 无更多数据提示样式
+				.no-more {
+					text-align: center;
+					padding: 30rpx 0;
+					color: #999;
+					font-size: 26rpx;
+				}
 			}
-			
+
 			.dialog-actions {
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
