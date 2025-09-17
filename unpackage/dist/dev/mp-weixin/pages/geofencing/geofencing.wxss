@@ -65,15 +65,10 @@
 }
 }
 .container .fence-operations {
-  position: absolute;
-  bottom: 40%;
-  left: 20rpx;
-  right: 20rpx;
   background-color: #fff;
-  border-radius: 12rpx;
   padding: 20rpx 20rpx 50rpx 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  width: 500rpx;
+  height: 170rpx;
 }
 .container .fence-operations .fence-header {
   display: flex;
@@ -322,4 +317,7 @@
 .container .device-dialog .dialog-actions {
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
+}
+.container .uv-popup__content {
+  border-radius: 20rpx;
 }

@@ -18,10 +18,11 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		<view class="fence-operations" v-if="selectedFence">
+		 <uv-popup ref="showFenceModal" title="标题">
+			<view class="fence-operations" v-if="selectedFence">
 			<view class="fence-header">
 				<text class="fence-name">{{ selectedFence.name }}</text>
-				<uv-icon name="close" @click="selectedFence = null; "></uv-icon>
+				<uv-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></uv-icon>
 			</view>
 			<view class="fence-actions">
 				<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
@@ -29,6 +30,8 @@
 				<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
 			</view>
 		</view>
+		</uv-popup>
+		
 
 		<!-- 绘制控制面板 -->
 		<view class="tools-panel">
@@ -197,6 +200,7 @@
 	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
 	const lastDirection = ref(0)
+	const showFenceModal = ref<any>(null)
 
 	// 围栏管理状态
 	const fenceList = ref<any[]>([])
@@ -602,6 +606,7 @@
 	const selectFence = (fence : any) => {
 		selectedFence.value = fence
 		fencesPopup.value?.close()
+		showFenceModal.value?.open()
 
 		// 根据围栏类型显示
 		const fenceType = getFenceType(fence)
@@ -653,7 +658,8 @@
 
 							polygons.value = [];
 							circles.value = [];
-							updateMarkers();                   // 清空围栏标记（保留车辆标记）
+							updateMarkers();  
+							showFenceModal.value?.close();                 // 清空围栏标记（保留车辆标记）
 
 							await loadGeofenceList();
 						} else {
@@ -1164,16 +1170,10 @@
 		}
 
 		.fence-operations {
-			position: absolute;
-			bottom: 40%;
-			left: 20rpx;
-			right: 20rpx;
 			background-color: #fff;
-			border-radius: 12rpx;
 			padding: 20rpx 20rpx 50rpx 20rpx;
-			box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
-			z-index: 100;
-
+			width: 500rpx;
+			height: 170rpx;
 			.fence-header {
 				display: flex;
 				flex-direction: row;
@@ -1470,6 +1470,9 @@
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
 			}
+		}
+		.uv-popup__content{
+			border-radius: 20rpx;
 		}
 	}
 </style>
