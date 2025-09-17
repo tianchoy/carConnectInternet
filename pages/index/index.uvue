@@ -180,8 +180,8 @@
 				latitude: lat,
 				longitude: lng,
 				iconPath: device.connectionStatus == 'online' ? '/static/car.png' : '/static/offline.png',
-				width: 30,
-				height: 30,
+				width: 25,
+				height: 25,
 				callout: {
 					padding: 5,
 					borderWidth: 1,

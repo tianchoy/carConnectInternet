@@ -180,8 +180,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             latitude: trackPoints.value[0].latitude,
             longitude: trackPoints.value[0].longitude,
             iconPath: "/static/car.png",
-            width: 32,
-            height: 32,
+            width: 25,
+            height: 25,
             rotate: trackPoints.value[0].rotation || 0,
             anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
             callout: new UTSJSONObject({

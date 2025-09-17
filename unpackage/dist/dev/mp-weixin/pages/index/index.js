@@ -143,8 +143,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           latitude: lat,
           longitude: lng,
           iconPath: device.connectionStatus == "online" ? "/static/car.png" : "/static/offline.png",
-          width: 30,
-          height: 30,
+          width: 25,
+          height: 25,
           callout: new UTSJSONObject({
             padding: 5,
             borderWidth: 1,

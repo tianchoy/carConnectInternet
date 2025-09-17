@@ -327,8 +327,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         id,
         latitude: lat,
         longitude: lng,
-        width: 30,
-        height: 30,
+        width: 25,
+        height: 25,
         iconPath: datainfo.value.connectionStatus == "online" ? "/static/car.png" : "/static/offline.png",
         callout: new UTSJSONObject({
           content: title || (datainfo.value.connectionStatus == "online" ? "设备位置" : "设备已离线"),
