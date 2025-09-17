@@ -83,6 +83,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isRefreshing.value = false;
         return null;
       }
+      if (datainfo.value.connectionStatus != "online") {
+        isRefreshing.value = false;
+        return null;
+      }
       const intervalSeconds = parseInt(intervalValue);
       if (intervalSeconds > 0) {
         isRefreshing.value = true;
@@ -213,7 +217,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:283", "操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:290", "操作失败:", error);
           common_vendor.index.showToast({
             title: "操作失败，请重试",
             icon: "none"
@@ -239,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:311", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:318", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -256,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:329", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:336", "调起地图失败:", err);
         }
       });
     };
@@ -281,6 +285,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 // 使用设备名称作为标题
               );
               markers.value = [deviceMarker];
+              if (item.connectionStatus != "online" && refreshTimer.value !== null) {
+                clearInterval(refreshTimer.value);
+                refreshTimer.value = null;
+                isRefreshing.value = false;
+              }
             }
           });
         });
@@ -295,18 +304,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deptId: deptId.value,
         deviceids: imei.value
       });
-      loadData(data);
+      loadData(data).then(() => {
+        if (datainfo.value.connectionStatus == "online") {
+          setupAutoRefresh(currentTime.value);
+        }
+      });
       loadDeviceDetail();
-      setupAutoRefresh(currentTime.value);
     });
     const loadDeviceDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (deviceId.value !== null) {
           const res = yield api_request.getDeviceDetail(deviceId.value);
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:391", res.data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:409", res.data);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:394", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:412", "设备id获取失败");
         }
       });
     };

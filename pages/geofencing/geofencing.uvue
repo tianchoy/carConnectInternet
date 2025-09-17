@@ -18,7 +18,7 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		 <uv-popup ref="showFenceModal" title="标题">
+		 <uv-popup ref="showFenceModal" mode="center" round='10'>
 			<view class="fence-operations" v-if="selectedFence">
 			<view class="fence-header">
 				<text class="fence-name">{{ selectedFence.name }}</text>
@@ -519,7 +519,6 @@
 
 	// 生成CIRCLE字符串
 	const generateCircleString = (center : { latitude : number, longitude : number }, radius : number) => {
-		// 转换回WGS84坐标系存储
 		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
 		return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`
 	}
@@ -659,7 +658,7 @@
 							polygons.value = [];
 							circles.value = [];
 							updateMarkers();  
-							showFenceModal.value?.close();                 // 清空围栏标记（保留车辆标记）
+							showFenceModal.value?.close();    // 清空围栏标记
 
 							await loadGeofenceList();
 						} else {
@@ -701,7 +700,7 @@
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
-			type: drawingMode.value // 确保保存时设置正确的类型
+			type: drawingMode.value 
 		}
 
 		try {

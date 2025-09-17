@@ -437,7 +437,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:669", "删除围栏失败:", error);
+                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:668", "删除围栏失败:", error);
                   common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                 }
               }
@@ -471,7 +471,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           area,
           alarmType: parseInt(fenceForm.alarmType),
           type: drawingMode.value
-          // 确保保存时设置正确的类型
         });
         try {
           let result = null;
@@ -490,7 +489,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "保存失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:725", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:724", "保存围栏失败:", error);
           common_vendor.index.showToast({ title: "保存失败", icon: "none" });
         }
       });
@@ -542,7 +541,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.bind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:785", "加载已绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:784", "加载已绑定设备失败:", error);
         } finally {
           pagination.bind.loadingMore = false;
         }
@@ -570,7 +569,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.unbind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:819", "加载未绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:818", "加载未绑定设备失败:", error);
         } finally {
           pagination.unbind.loadingMore = false;
         }
@@ -612,7 +611,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:867", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:866", "设备绑定操作失败:", error);
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -879,7 +878,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "k": "showFenceModal"
         })),
         z: common_vendor.p(new UTSJSONObject({
-          title: "标题"
+          mode: "center",
+          round: "10"
         })),
         A: !isDrawing.value && !selectedFence.value
       }), !isDrawing.value && !selectedFence.value ? new UTSJSONObject({
