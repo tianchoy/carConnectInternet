@@ -357,7 +357,6 @@
 		try {
 			const res = await getGeofenceList()
 			if (res.code === 0) {
-				// 确保 fenceList 始终是数组（避免 null/undefined）
 				fenceList.value = res.data || [];
 			} else {
 				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })

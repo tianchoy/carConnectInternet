@@ -193,7 +193,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           renderFencesOnMap();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:369", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:368", "加载围栏列表失败:", error);
           common_vendor.index.showToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -287,7 +287,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const _b = common_vendor.__read(centerStr.trim().split(" ").map(Number), 2), lat = _b[0], lng = _b[1];
         const radius = Number(radiusStr.trim());
         if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:494", "无效的圆形围栏数据:", circleStr);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:493", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -297,7 +297,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:507", "解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:506", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     };
@@ -441,7 +441,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:669", "删除围栏失败:", error);
+                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:668", "删除围栏失败:", error);
                   common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                 }
               }
@@ -493,7 +493,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "保存失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:725", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:724", "保存围栏失败:", error);
           common_vendor.index.showToast({ title: "保存失败", icon: "none" });
         }
       });
@@ -545,7 +545,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.bind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:785", "加载已绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:784", "加载已绑定设备失败:", error);
         } finally {
           pagination.bind.loadingMore = false;
         }
@@ -573,7 +573,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.unbind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:819", "加载未绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:818", "加载未绑定设备失败:", error);
         } finally {
           pagination.unbind.loadingMore = false;
         }
@@ -615,7 +615,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:867", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:866", "设备绑定操作失败:", error);
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;

@@ -20,7 +20,7 @@
 				<view class="imei-info">
 					<view class="imeis">
 						<text>IMEI {{imei}}</text>
-						<text class="battery" :style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量 {{datainfo.batteryPercent+'%' || '未知'}}</text>
+						<text class="battery" v-if="datainfo.batteryPercent" :style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量 {{datainfo.batteryPercent}}%</text>
 					</view>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
 				</view>
@@ -33,9 +33,9 @@
 				</uv-grid-item>
 			</uv-grid>
 		</view>
-		<view class="popup">
+		<view>
 			<uv-modal ref="popupRef" :title="modalTitle" @confirm="confirm">
-				<view class="content">
+				<view>
 					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable :password="true" v-model="psw" ></uv-input>
 				</view>
 			</uv-modal>
@@ -393,11 +393,6 @@
 		})
 	}
 
-	// const loadCarList = async (data={}) => {
-	// 	const res = await getUserDeviceList(data)
-
-	// 	console.log(res)
-	// }
 
 	onLoad((option) => {
 		deptId.value = option.deptId
