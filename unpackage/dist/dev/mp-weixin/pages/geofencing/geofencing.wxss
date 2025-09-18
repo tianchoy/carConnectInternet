@@ -323,4 +323,5 @@
 }
 .container .uv-grid-item {
   align-items: flex-start !important;
+  margin: 10rpx 0;
 }

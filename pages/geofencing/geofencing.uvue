@@ -18,20 +18,20 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		 <uv-popup ref="showFenceModal" mode="center" round='10'>
+		<uv-popup ref="showFenceModal" mode="center" round='10'>
 			<view class="fence-operations" v-if="selectedFence">
-			<view class="fence-header">
-				<text class="fence-name">{{ selectedFence.name }}</text>
-				<uv-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></uv-icon>
+				<view class="fence-header">
+					<text class="fence-name">{{ selectedFence.name }}</text>
+					<uv-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></uv-icon>
+				</view>
+				<view class="fence-actions">
+					<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
+					<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
+					<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
+				</view>
 			</view>
-			<view class="fence-actions">
-				<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
-				<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
-				<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
-			</view>
-		</view>
 		</uv-popup>
-		
+
 
 		<!-- 绘制控制面板 -->
 		<view class="tools-panel">
@@ -178,7 +178,10 @@
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
 	const deptId = ref<string | null>('')
-
+	type Coordinate = {
+		latitude : number;
+		longitude : number;
+	};
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -195,7 +198,7 @@
 	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
 	const points = ref<Array<{ latitude : number, longitude : number }>>([])
 	const polygons = ref<any[]>([]) // 存储地理围栏多边形数据
-	const circleCenter = ref<{ latitude : number, longitude : number } | null>(null)
+	const circleCenter = ref<Coordinate | null>(null);
 	const circleRadius = ref(0) // 圆形围栏半径（米）
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
@@ -307,8 +310,8 @@
 						latitude: position.latitude,
 						longitude: position.longitude,
 						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-						width: 40,
-						height: 40,
+						width: 20,
+						height: 20,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
 							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
@@ -657,7 +660,7 @@
 
 							polygons.value = [];
 							circles.value = [];
-							updateMarkers();  
+							updateMarkers();
 							showFenceModal.value?.close();    // 清空围栏标记
 
 							await loadGeofenceList();
@@ -700,7 +703,7 @@
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
-			type: drawingMode.value 
+			type: drawingMode.value
 		}
 
 		try {
@@ -1173,6 +1176,7 @@
 			padding: 20rpx 20rpx 50rpx 20rpx;
 			width: 500rpx;
 			height: 170rpx;
+
 			.fence-header {
 				display: flex;
 				flex-direction: row;
@@ -1470,11 +1474,14 @@
 				border-top: 1rpx solid #eee;
 			}
 		}
-		.uv-popup__content{
+
+		.uv-popup__content {
 			border-radius: 20rpx;
 		}
-		.uv-grid-item{
+
+		.uv-grid-item {
 			align-items: flex-start !important;
+			margin: 10rpx 0;
 		}
 	}
 </style>
