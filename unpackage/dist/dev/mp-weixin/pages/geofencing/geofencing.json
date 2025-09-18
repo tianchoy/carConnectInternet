@@ -8,7 +8,9 @@
     "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup",
     "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
     "uv-radio": "../../uni_modules/uv-radio/components/uv-radio/uv-radio",
+    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
     "uv-radio-group": "../../uni_modules/uv-radio/components/uv-radio-group/uv-radio-group",
+    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
     "uv-switch": "../../uni_modules/uv-switch/components/uv-switch/uv-switch"
   }
 }

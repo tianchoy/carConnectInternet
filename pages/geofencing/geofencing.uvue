@@ -105,13 +105,14 @@
 					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></uv-input>
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
-						<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left"
-							customStyle="display:flex;flex-direction:row;align-items: center;justify-content: left;">
-							<uv-radio style="padding: 0 10px;" name="0">不告警</uv-radio>
-							<uv-radio style="padding: 0 10px;" name="1">出入告警</uv-radio>
-							<uv-radio style="padding: 0 10px;" name="2">出告警</uv-radio>
-							<uv-radio style="padding: 0 10px;" name="3">入告警</uv-radio>
-						</uv-radio-group>
+						<uv-grid :col="2">
+							<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left">
+								<uv-grid-item><uv-radio name="0">不告警</uv-radio></uv-grid-item>
+								<uv-grid-item><uv-radio name="1">出入告警</uv-radio></uv-grid-item>
+								<uv-grid-item><uv-radio name="2">出告警</uv-radio></uv-grid-item>
+								<uv-grid-item><uv-radio name="3">入告警</uv-radio></uv-grid-item>
+							</uv-radio-group>
+						</uv-grid>
 					</view>
 				</view>
 				<view class="dialog-actions">

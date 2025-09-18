@@ -49,6 +49,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/userCenter/carList/carList"
       });
     };
+    const platformRenewal = () => {
+      common_vendor.index.showToast({
+        title: "功能开发中…",
+        icon: "none"
+      });
+    };
     return (_ctx = null, _cache = null) => {
       const __returned__ = {
         a: common_vendor.p({
@@ -79,7 +85,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "20"
         }),
         h: common_vendor.o(carList),
-        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        i: common_vendor.o(platformRenewal),
+        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

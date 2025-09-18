@@ -18,7 +18,10 @@
 		<view class="tools-panel">
 			<view class="Imei-box" @click="carDetail">
 				<view class="imei-info">
-					<text>IMEI {{imei}}</text>
+					<view class="imeis">
+						<text>IMEI {{imei}}</text>
+						<text class="battery" :style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量 {{datainfo.batteryPercent+'%' || '未知'}}</text>
+					</view>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
 				</view>
 				<text class="pos-time">定位时间 {{datainfo.positionUpdateTime}}</text>
@@ -33,7 +36,7 @@
 		<view class="popup">
 			<uv-modal ref="popupRef" :title="modalTitle" @confirm="confirm">
 				<view class="content">
-					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable password="true" v-model="psw" ></uv-input>
+					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable :password="true" v-model="psw" ></uv-input>
 				</view>
 			</uv-modal>
 		</view>
@@ -96,6 +99,23 @@
 
 	const currentToolItem = ref(0)
 	const currentCarInfo = ref<UTSJSONObject>({})
+
+	// 获取电池颜色
+	const getBatteryColor = (batteryPercent) => {
+		if (!batteryPercent) return '#c9c9c9'
+		
+		const batteryValue = parseInt(batteryPercent)
+		
+		if (batteryValue >= 70) {
+			return '#07C160' // 绿色，电量充足
+		} else if (batteryValue >= 30) {
+			return '#FF9C19' // 橙色，电量中等
+		} else if (batteryValue >= 10) {
+			return '#FF6B00' // 深橙色，电量低
+		} else {
+			return '#FF0000' // 红色，电量严重不足
+		}
+	}
 
 	watch(currentTime, (newVal) => {
 		setupAutoRefresh(newVal); // 当时间间隔变化时，重新设置自动刷新
@@ -350,11 +370,6 @@
 				center.latitude = convertedCoord.lat
 				center.longitude = convertedCoord.lng
 				
-				// console.log('坐标转换:', {
-				// 	original: { lat: item.latitude, lng: item.longitude },
-				// 	converted: convertedCoord
-				// })
-				
 				const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
 				address.value = addr.result.formatted_address;
 
@@ -561,6 +576,17 @@
 					justify-content: space-between;
 					align-items: center;
 					padding: 20rpx 0;
+					.imeis{
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-start;
+						align-items: center;
+						.battery{
+							display: inline-block;
+							font-size: 25rpx;
+							margin-left: 50rpx;
+						}
+					}
 				}
 
 				.pos-time {
