@@ -53,7 +53,7 @@
 }
 .container .list {
   background-color: #f5f5f5;
-  padding: 20rpx 30rpx;
+  padding: 30rpx;
   border-radius: 20rpx;
   margin: 15rpx;
   display: flex;

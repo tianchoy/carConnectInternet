@@ -220,7 +220,7 @@
 }
 .container .edit-dialog .dialog-content .radio-group .label {
   display: block;
-  margin-bottom: 20rpx;
+  margin-bottom: 30rpx;
   font-size: 28rpx;
   font-weight: 500;
 }
@@ -320,4 +320,7 @@
 }
 .container .uv-popup__content {
   border-radius: 20rpx;
+}
+.container .uv-grid-item {
+  align-items: flex-start !important;
 }

@@ -1349,7 +1349,7 @@
 
 					.label {
 						display: block;
-						margin-bottom: 20rpx;
+						margin-bottom: 30rpx;
 						font-size: 28rpx;
 						font-weight: 500;
 					}
@@ -1472,6 +1472,9 @@
 		}
 		.uv-popup__content{
 			border-radius: 20rpx;
+		}
+		.uv-grid-item{
+			align-items: flex-start !important;
 		}
 	}
 </style>
