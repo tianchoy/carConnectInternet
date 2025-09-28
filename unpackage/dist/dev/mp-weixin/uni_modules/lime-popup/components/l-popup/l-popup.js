@@ -114,30 +114,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       innerValue.value = false;
       emit("click-close");
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: _ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay
-      }), (_ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay) ? new UTSJSONObject({
+      }, (_ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay) ? {
         b: common_vendor.o(handleOverlayClick),
-        c: common_vendor.p(new UTSJSONObject({
+        c: common_vendor.p({
           visible: common_vendor.unref(innerValue),
           zIndex: common_vendor.unref(overlayZIndex),
           appear: true,
           preventScrollThrough: _ctx.preventScrollThrough,
           ["l-style"]: _ctx.overlayStyle
-        }))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+        })
+      } : {}, {
         d: _ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)
-      }), (_ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)) ? common_vendor.e(new UTSJSONObject({
+      }, (_ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)) ? common_vendor.e({
         e: _ctx.closeable
-      }), _ctx.closeable ? new UTSJSONObject({
-        f: common_vendor.p(new UTSJSONObject({
+      }, _ctx.closeable ? {
+        f: common_vendor.p({
           name: _ctx.closeIcon,
           size: "27px",
           color: _ctx.iconColor
-        })),
+        }),
         g: common_vendor.o(handleClose)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         h: common_vendor.sei("r0-7cb52a4a", "view", "popupRef"),
         i: common_vendor.n(common_vendor.unref(rootClass)),
         j: common_vendor.s(common_vendor.unref(styles)),
@@ -145,7 +146,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.o((...args) => {
           return common_vendor.unref(finished) && common_vendor.unref(finished)(...args);
         })
-      })) : new UTSJSONObject({}));
+      }) : {});
       return __returned__;
     };
   }

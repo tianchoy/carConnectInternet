@@ -135,45 +135,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const imageload = () => {
       isError.value = false;
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: !common_vendor.unref(isImage) && !common_vendor.unref(isIconify) && !common_vendor.unref(isSVG)
-      }), !common_vendor.unref(isImage) && !common_vendor.unref(isIconify) && !common_vendor.unref(isSVG) ? new UTSJSONObject({
+      }, !common_vendor.unref(isImage) && !common_vendor.unref(isIconify) && !common_vendor.unref(isSVG) ? {
         b: common_vendor.t(common_vendor.unref(iconCode)),
         c: common_vendor.n(common_vendor.unref(classes)),
         d: common_vendor.n(__props.lClass),
         e: common_vendor.s(common_vendor.unref(styles)),
         f: common_vendor.s(__props.lStyle),
-        g: common_vendor.o(($event = null) => {
+        g: common_vendor.o(($event) => {
           return _ctx.$emit("click");
         })
-      }) : !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage) ? new UTSJSONObject({
+      } : !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage) ? {
         i: common_vendor.n(common_vendor.unref(classes)),
         j: common_vendor.n(__props.lClass),
         k: common_vendor.s(common_vendor.unref(styles)),
         l: common_vendor.s(__props.lStyle),
         m: common_vendor.unref(iconUrl),
-        n: common_vendor.o(($event = null) => {
+        n: common_vendor.o(($event) => {
           return _ctx.$emit("click");
         })
-      }) : new UTSJSONObject({
+      } : {
         o: common_vendor.n(common_vendor.unref(classes)),
         p: common_vendor.n(__props.lClass),
         q: common_vendor.s(common_vendor.unref(styles)),
         r: common_vendor.s(__props.lStyle),
         s: common_vendor.o(imageError),
         t: common_vendor.o(imageload),
-        v: common_vendor.o(($event = null) => {
+        v: common_vendor.o(($event) => {
           return _ctx.$emit("click");
         }),
-        w: common_vendor.p(new UTSJSONObject({
+        w: common_vendor.p({
           color: __props.color,
           src: common_vendor.unref(iconUrl),
           web: __props.web
-        }))
-      }), new UTSJSONObject({
+        })
+      }, {
         h: !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage)
-      }));
+      });
       return __returned__;
     };
   }

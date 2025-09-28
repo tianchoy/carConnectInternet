@@ -407,25 +407,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         trackingInterval.value = null;
       }
     });
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "车辆跟踪",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
-        b: common_vendor.o((val = null) => {
+        }),
+        b: common_vendor.o((val) => {
           return currentTime.value = val;
         }),
-        c: common_vendor.p(new UTSJSONObject({
+        c: common_vendor.p({
           currentTime: currentTime.value,
           currentCar: currentCar.value,
           times: times.value,
           showCar: true,
           carStatus: connectionStatus.value
-        })),
+        }),
         d: common_vendor.sei("myMap", "map"),
         e: center.latitude,
         f: center.longitude,
@@ -439,12 +440,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         n: common_vendor.t(currentSpeed.value),
         o: common_vendor.t(currentAddress.value),
         p: routeInfo.distance
-      }), routeInfo.distance ? new UTSJSONObject({
+      }, routeInfo.distance ? {
         q: common_vendor.t(formatDistance(routeInfo.distance)),
         r: common_vendor.t(formatDuration(routeInfo.duration))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

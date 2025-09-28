@@ -93,6 +93,7 @@ if (!Math) {
   _easycom_uv_loading_icon();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return {
     a: common_vendor.s($options.bgStyle),
     b: common_vendor.p({

@@ -184,6 +184,7 @@ if (!Math) {
   (_easycom_uv_toolbar + _easycom_uv_loading_icon + _easycom_uv_popup)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: _ctx.showToolbar
   }, _ctx.showToolbar ? {

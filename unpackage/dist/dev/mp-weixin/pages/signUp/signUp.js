@@ -145,7 +145,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.__f__("error", "at pages/signUp/signUp.uvue:126", "验证错误:", errors);
       });
     };
-    return (_ctx = null, _cache = null) => {
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
         a: common_vendor.p({
           title: "注册",
@@ -154,7 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.o(($event = null) => {
+        b: common_vendor.o(($event) => {
           return form.value.mobile = $event;
         }),
         c: common_vendor.p({
@@ -165,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           label: "账号",
           prop: "mobile"
         }),
-        e: common_vendor.o(($event = null) => {
+        e: common_vendor.o(($event) => {
           return form.value.password = $event;
         }),
         f: common_vendor.p({

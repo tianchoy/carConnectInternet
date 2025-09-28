@@ -57,6 +57,7 @@ if (!Math) {
   _easycom_uv_icon();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: _ctx.show
   }, _ctx.show ? common_vendor.e({

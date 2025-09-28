@@ -135,6 +135,12 @@
   font-size: 25rpx;
   margin-left: 50rpx;
 }
+.container .tools-panel .Imei-box .imei-info .imeis .power {
+  display: inline-block;
+  font-size: 25rpx;
+  margin-left: 30rpx;
+  color: #69c2f1;
+}
 .container .tools-panel .Imei-box .pos-time {
   font-size: 25rpx;
   color: #999;

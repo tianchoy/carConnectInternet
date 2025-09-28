@@ -16,7 +16,8 @@
     "pages/userCenter/editPassword/editPassword",
     "pages/userCenter/carList/carList",
     "pages/userCenter/carDetail/carDetail",
-    "pages/geofencing/geofencing"
+    "pages/geofencing/geofencing",
+    "pages/scancode/scancode"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -57,14 +58,10 @@
     },
     "scope.userPhoneNumber": {
       "desc": "获取你的手机号"
+    },
+    "scope.camera": {
+      "desc": "需要摄像头权限进行扫码"
     }
   },
-  "requiredPrivateInfos": [
-    "getLocation",
-    "onLocationChange",
-    "startLocationUpdate",
-    "startLocationUpdateBackground",
-    "chooseLocation"
-  ],
   "usingComponents": {}
 }

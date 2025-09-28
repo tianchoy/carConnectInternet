@@ -122,16 +122,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onBeforeUnmount(() => {
       manageChildInList === null || manageChildInList === void 0 ? null : manageChildInList(instance.proxy, false);
     });
-    __expose(new UTSJSONObject({
+    __expose({
       setIndex,
       setValue,
       // setOptions,
       // setUpdateItems,
       getIndexByValue
-    }));
-    return (_ctx = null, _cache = null) => {
+    });
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
-        a: common_vendor.f(_ctx.options, (item = null, i = null, i0 = null) => {
+        a: common_vendor.f(_ctx.options, (item, i, i0) => {
           return {
             a: common_vendor.t(item.label),
             b: common_vendor.s(common_vendor.unref(curIndex) == i ? common_vendor.unref(itemActiveStyles) : {}),

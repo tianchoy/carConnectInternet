@@ -438,19 +438,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentTime.value = trackPoints.value[0].deviceTime;
       }
     }
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "轨迹回放",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
+        }),
         b: carMarker.value
-      }), carMarker.value ? new UTSJSONObject({
+      }, carMarker.value ? {
         c: carMarker.value.id,
-        d: common_vendor.p(new UTSJSONObject({
+        d: common_vendor.p({
           id: carMarker.value.id,
           latitude: carMarker.value.latitude,
           longitude: carMarker.value.longitude,
@@ -461,71 +462,71 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           anchor: carMarker.value.anchor,
           callout: carMarker.value.callout,
           animation: carMarker.value.animation
-        }))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
-        e: common_vendor.p(new UTSJSONObject({
+        })
+      } : {}, {
+        e: common_vendor.p({
           showTime: false,
           currentCar: plateNo.value,
           showCar: true,
           carStatus: carStatus.value
-        })),
+        }),
         f: common_vendor.sei("myMap", "map"),
         g: center.latitude,
         h: center.longitude,
         i: markers.value,
         j: polyline.value,
         k: mapScale.value,
-        l: common_vendor.p(new UTSJSONObject({
+        l: common_vendor.p({
           name: "calendar",
           size: "25"
-        })),
+        }),
         m: common_vendor.t(startTime.value),
-        n: common_vendor.o(($event = null) => {
+        n: common_vendor.o(($event) => {
           return showPicker("start");
         }),
         o: common_vendor.t(endTime.value),
-        p: common_vendor.o(($event = null) => {
+        p: common_vendor.o(($event) => {
           return showPicker("end");
         }),
         q: common_vendor.o(togglePlayback),
-        r: common_vendor.p(new UTSJSONObject({
+        r: common_vendor.p({
           name: isPlaying.value ? "pause-circle" : "play-circle",
           size: "30"
-        })),
+        }),
         s: common_vendor.o(setPlaybackSpeed),
-        t: common_vendor.o(($event = null) => {
+        t: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
         }),
-        v: common_vendor.p(new UTSJSONObject({
+        v: common_vendor.p({
           backgroundColor: "#f5f5f5",
           activeColor: "#1890FF",
           min: "1",
           max: "10",
           ["block-color"]: "#1890FF",
           modelValue: playbackSpeed.value
-        })),
+        }),
         w: common_vendor.t(playbackSpeed.value),
         x: common_vendor.t(currentTime.value),
         y: common_vendor.t(currentSpeed.value),
         z: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
         A: common_vendor.o(onConfirm),
         B: common_vendor.o(onCancel),
-        C: common_vendor.p(new UTSJSONObject({
+        C: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
-        })),
-        D: common_vendor.o(($event = null) => {
+        }),
+        D: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
         }),
-        E: common_vendor.p(new UTSJSONObject({
+        E: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
-        })),
+        }),
         F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

@@ -42,6 +42,7 @@ if (!Math) {
   _easycom_uv_transition();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return {
     a: common_vendor.gei(_ctx, ""),
     b: common_vendor.o($options.clickHandler),

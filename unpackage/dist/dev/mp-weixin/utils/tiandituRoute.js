@@ -22,7 +22,7 @@ function getRoutePlan(options = null) {
       type: "search",
       tk: TD_MAP_CONFIG.API_KEY
     });
-    common_vendor.wx$1.request({
+    common_vendor.wx$1.request(new UTSJSONObject({
       url: TD_MAP_CONFIG.BASE_URL,
       method: "GET",
       data: requestData,
@@ -41,7 +41,7 @@ function getRoutePlan(options = null) {
       fail(err = null) {
         reject(new Error(`网络请求失败: ${err.errMsg || "未知错误"}`));
       }
-    });
+    }));
   });
 }
 exports.getRoutePlan = getRoutePlan;

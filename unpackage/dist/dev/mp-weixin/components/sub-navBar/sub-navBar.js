@@ -80,33 +80,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentPickerType.value = "";
     };
     const emit = __emit;
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: __props.showTime
-      }), __props.showTime ? new UTSJSONObject({
+      }, __props.showTime ? {
         b: common_vendor.t(__props.currentTime),
         c: common_assets._imports_0$6,
         d: common_vendor.o(handleTime)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         e: __props.showCar
-      }), __props.showCar ? new UTSJSONObject({
+      }, __props.showCar ? {
         f: common_vendor.t(__props.currentCar),
-        g: common_vendor.o(($event = null) => {
+        g: common_vendor.o(($event) => {
           return __props.showPicker ? handleCar : null;
         })
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
-        j: common_vendor.sr(picker, "f630fc82-0", new UTSJSONObject({
+        j: common_vendor.sr(picker, "f630fc82-0", {
           "k": "picker"
-        })),
+        }),
         k: common_vendor.o(confirm),
-        l: common_vendor.p(new UTSJSONObject({
+        l: common_vendor.p({
           showPicker: true,
           columns: common_vendor.unref(columns),
           keyName: "label"
-        }))
-      }));
+        })
+      });
       return __returned__;
     };
   }

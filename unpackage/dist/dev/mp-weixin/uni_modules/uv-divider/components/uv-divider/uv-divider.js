@@ -57,6 +57,7 @@ if (!Math) {
   _easycom_uv_line();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: common_vendor.p({
       color: _ctx.lineColor,

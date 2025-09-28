@@ -72,6 +72,7 @@ const _sfc_main = common_vendor.defineComponent({
   }
 });
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: $options.isImg
   }, $options.isImg ? {

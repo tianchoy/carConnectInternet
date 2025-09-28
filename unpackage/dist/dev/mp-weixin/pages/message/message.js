@@ -122,7 +122,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       (_a = modal.value) === null || _a === void 0 ? null : _a.close();
     };
-    return (_ctx = null, _cache = null) => {
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
         a: common_vendor.p({
           title: "消息中心",
@@ -132,9 +133,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           isShowStyle: true
         }),
-        b: common_vendor.f(msgList.value, (item = null, index = null, i0 = null) => {
+        b: common_vendor.f(msgList.value, (item, index, i0) => {
           return {
-            a: common_vendor.o(($event = null) => {
+            a: common_vendor.o(($event) => {
               return handleItemClick(item);
             }, index),
             b: "1993bd19-2-" + i0 + "," + ("1993bd19-1-" + i0),

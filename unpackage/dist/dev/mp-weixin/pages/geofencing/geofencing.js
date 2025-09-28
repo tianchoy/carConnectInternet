@@ -437,7 +437,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const deleteFence = (id) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showModal({
+        common_vendor.index.showModal(new UTSJSONObject({
           title: "确认删除",
           content: "确定要删除这个围栏吗？",
           success: (res) => {
@@ -468,7 +468,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
             });
           }
-        });
+        }));
       });
     };
     const saveFence = () => {
@@ -838,21 +838,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       updateMarkers();
       renderFencesOnMap();
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "地理围栏",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
-        b: common_vendor.p(new UTSJSONObject({
+        }),
+        b: common_vendor.p({
           showTime: false,
           currentCar: currentCar.value,
           showCar: true,
           carStatus: connectionStatus.value
-        })),
+        }),
         c: common_vendor.sei("myMap", "map"),
         d: center.latitude,
         e: center.longitude,
@@ -862,218 +863,218 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: circles.value,
         j: common_vendor.o(handleMapTap),
         k: isDrawing.value
-      }), isDrawing.value ? common_vendor.e(new UTSJSONObject({
+      }, isDrawing.value ? common_vendor.e({
         l: drawingMode.value === "polygon"
-      }), drawingMode.value === "polygon" ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, drawingMode.value === "polygon" ? {} : {}, {
         m: drawingMode.value === "circle"
-      }), drawingMode.value === "circle" ? new UTSJSONObject({}) : new UTSJSONObject({})) : new UTSJSONObject({}), new UTSJSONObject({
+      }, drawingMode.value === "circle" ? {} : {}) : {}, {
         n: selectedFence.value
-      }), selectedFence.value ? {
+      }, selectedFence.value ? {
         o: common_vendor.t(selectedFence.value.name),
-        p: common_vendor.o(($event = null) => {
+        p: common_vendor.o(($event) => {
           var _a;
           selectedFence.value = null;
-          (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.close();
+          (_a = showFenceModal.value) == null ? void 0 : _a.close();
         }),
-        q: common_vendor.p(new UTSJSONObject({
+        q: common_vendor.p({
           name: "close"
-        })),
-        r: common_vendor.o(($event = null) => {
+        }),
+        r: common_vendor.o(($event) => {
           return editFence(selectedFence.value);
         }),
-        s: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.p({
           size: "small"
-        })),
-        t: common_vendor.o(($event = null) => {
+        }),
+        t: common_vendor.o(($event) => {
           return deleteFence(selectedFence.value.id);
         }),
-        v: common_vendor.p(new UTSJSONObject({
+        v: common_vendor.p({
           size: "small",
           type: "error"
-        })),
-        w: common_vendor.o(($event = null) => {
+        }),
+        w: common_vendor.o(($event) => {
           return showBindDevices(selectedFence.value.id);
         }),
-        x: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.p({
           size: "small",
           type: "primary"
-        }))
-      } : new UTSJSONObject({}), new UTSJSONObject({
-        y: common_vendor.sr(showFenceModal, "45be0509-2", new UTSJSONObject({
+        })
+      } : {}, {
+        y: common_vendor.sr(showFenceModal, "45be0509-2", {
           "k": "showFenceModal"
-        })),
-        z: common_vendor.p(new UTSJSONObject({
+        }),
+        z: common_vendor.p({
           mode: "center",
           round: "10"
-        })),
+        }),
         A: !isDrawing.value && !selectedFence.value
-      }), !isDrawing.value && !selectedFence.value ? new UTSJSONObject({
-        B: common_vendor.o(($event = null) => {
+      }, !isDrawing.value && !selectedFence.value ? {
+        B: common_vendor.o(($event) => {
           return setDrawingMode("polygon");
         }),
-        C: common_vendor.p(new UTSJSONObject({
+        C: common_vendor.p({
           type: drawingMode.value == "polygon" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0"
-        })),
-        D: common_vendor.o(($event = null) => {
+        }),
+        D: common_vendor.o(($event) => {
           return setDrawingMode("circle");
         }),
-        E: common_vendor.p(new UTSJSONObject({
+        E: common_vendor.p({
           type: drawingMode.value == "circle" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0"
-        }))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+        })
+      } : {}, {
         F: common_vendor.o(startDrawing),
-        G: common_vendor.p(new UTSJSONObject({
+        G: common_vendor.p({
           disabled: isDrawing.value || selectedFence.value
-        })),
+        }),
         H: common_vendor.o(finishDrawing),
-        I: common_vendor.p(new UTSJSONObject({
+        I: common_vendor.p({
           disabled: !isDrawing.value || !canFinishDrawing.value
-        })),
+        }),
         J: common_vendor.o(clearDrawing),
         K: common_vendor.o(showFenceList),
         L: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
         M: drawingMode.value === "polygon"
-      }), drawingMode.value === "polygon" ? new UTSJSONObject({
+      }, drawingMode.value === "polygon" ? {
         N: common_vendor.t(points.value.length)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         O: drawingMode.value === "circle"
-      }), drawingMode.value === "circle" ? new UTSJSONObject({
+      }, drawingMode.value === "circle" ? {
         P: common_vendor.t(circleRadius.value.toFixed(2) || 0)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
-        Q: common_vendor.o(($event = null) => {
+      } : {}, {
+        Q: common_vendor.o(($event) => {
           return fencesPopup.value.close();
         }),
-        R: common_vendor.p(new UTSJSONObject({
+        R: common_vendor.p({
           name: "close"
-        })),
-        S: common_vendor.f(fenceList.value, (fence = null, k0 = null, i0 = null) => {
-          return new UTSJSONObject({
+        }),
+        S: common_vendor.f(fenceList.value, (fence, k0, i0) => {
+          return {
             a: common_vendor.t(fence.name),
             b: common_vendor.t(getFenceType(fence) === "circle" ? "圆形" : "多边形"),
             c: common_vendor.t(fence.deviceCount || 0),
             d: "45be0509-15-" + i0 + ",45be0509-13",
             e: fence.id,
-            f: common_vendor.o(($event = null) => {
+            f: common_vendor.o(($event) => {
               return selectFence(fence);
             }, fence.id)
-          });
+          };
         }),
-        T: common_vendor.p(new UTSJSONObject({
+        T: common_vendor.p({
           name: "arrow-right"
-        })),
+        }),
         U: fenceList.value.length === 0
-      }), fenceList.value.length === 0 ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        V: common_vendor.sr(fencesPopup, "45be0509-13", new UTSJSONObject({
+      }, fenceList.value.length === 0 ? {} : {}, {
+        V: common_vendor.sr(fencesPopup, "45be0509-13", {
           "k": "fencesPopup"
-        })),
-        W: common_vendor.p(new UTSJSONObject({
+        }),
+        W: common_vendor.p({
           mode: "bottom",
           round: "10"
-        })),
+        }),
         X: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
-        Y: common_vendor.o(($event = null) => {
+        Y: common_vendor.o(($event) => {
           return fenceForm.name = $event;
         }),
-        Z: common_vendor.p(new UTSJSONObject({
+        Z: common_vendor.p({
           placeholder: "请输入围栏名称",
           border: "surround",
           modelValue: fenceForm.name
-        })),
-        aa: common_vendor.p(new UTSJSONObject({
+        }),
+        aa: common_vendor.p({
           name: "0"
-        })),
-        ab: common_vendor.p(new UTSJSONObject({
+        }),
+        ab: common_vendor.p({
           name: "1"
-        })),
-        ac: common_vendor.p(new UTSJSONObject({
+        }),
+        ac: common_vendor.p({
           name: "2"
-        })),
-        ad: common_vendor.p(new UTSJSONObject({
+        }),
+        ad: common_vendor.p({
           name: "3"
-        })),
-        ae: common_vendor.o(($event = null) => {
+        }),
+        ae: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
         }),
-        af: common_vendor.p(new UTSJSONObject({
+        af: common_vendor.p({
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
-        })),
-        ag: common_vendor.p(new UTSJSONObject({
+        }),
+        ag: common_vendor.p({
           col: 2
-        })),
-        ah: common_vendor.o(($event = null) => {
+        }),
+        ah: common_vendor.o(($event) => {
           return editDialogPopup.value.close();
         }),
         ai: common_vendor.o(saveFence),
-        aj: common_vendor.p(new UTSJSONObject({
+        aj: common_vendor.p({
           type: "primary"
-        })),
-        ak: common_vendor.sr(editDialogPopup, "45be0509-16", new UTSJSONObject({
+        }),
+        ak: common_vendor.sr(editDialogPopup, "45be0509-16", {
           "k": "editDialogPopup"
-        })),
-        al: common_vendor.p(new UTSJSONObject({
+        }),
+        al: common_vendor.p({
           mode: "center",
           round: "10"
-        })),
+        }),
         am: common_vendor.t(currentFenceName.value),
-        an: common_vendor.o(($event = null) => {
+        an: common_vendor.o(($event) => {
           return deviceDialogPopup.value.close();
         }),
-        ao: common_vendor.p(new UTSJSONObject({
+        ao: common_vendor.p({
           name: "close"
-        })),
+        }),
         ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
-        aq: common_vendor.o(($event = null) => {
+        aq: common_vendor.o(($event) => {
           return activeTab.value = "bind";
         }),
         ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
-        as: common_vendor.o(($event = null) => {
+        as: common_vendor.o(($event) => {
           return activeTab.value = "unbind";
         }),
-        at: common_vendor.f(deviceList.value, (device = null, k0 = null, i0 = null) => {
-          return common_vendor.e(new UTSJSONObject({
+        at: common_vendor.f(deviceList.value, (device, k0, i0) => {
+          return common_vendor.e({
             a: common_vendor.t(device.plateNo || device.imei),
             b: device.connectionStatus
-          }), device.connectionStatus ? new UTSJSONObject({
+          }, device.connectionStatus ? {
             c: common_vendor.t(device.connectionStatus === "online" ? "在线" : "离线")
-          }) : new UTSJSONObject({}), new UTSJSONObject({
-            d: common_vendor.o(($event = null) => {
+          } : {}, {
+            d: common_vendor.o(($event) => {
               return toggleDeviceBinding(device.imei, $event);
             }, device.imei),
             e: "45be0509-32-" + i0 + ",45be0509-30",
-            f: common_vendor.p(new UTSJSONObject({
+            f: common_vendor.p({
               ["model-value"]: isDeviceBound(device.imei),
               disabled: loading.value || loadingMore.value,
               size: "20"
-            })),
+            }),
             g: device.imei
-          }));
+          });
         }),
         av: deviceList.value.length === 0 && !loading.value
-      }), deviceList.value.length === 0 && !loading.value ? new UTSJSONObject({
+      }, deviceList.value.length === 0 && !loading.value ? {
         aw: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         ax: loadingMore.value
-      }), loadingMore.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, loadingMore.value ? {} : {}, {
         ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
-      }), deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
         az: common_vendor.o(handleLoadMore),
-        aA: common_vendor.o(($event = null) => {
+        aA: common_vendor.o(($event) => {
           return deviceDialogPopup.value.close();
         }),
-        aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", new UTSJSONObject({
+        aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
           "k": "deviceDialogPopup"
-        })),
-        aC: common_vendor.p(new UTSJSONObject({
+        }),
+        aC: common_vendor.p({
           mode: "bottom",
           round: "10"
-        })),
+        }),
         aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

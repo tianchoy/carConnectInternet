@@ -47,10 +47,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const onClick = (event) => {
     emit("click", !props.visible);
   };
-  return (_ctx = null, _cache = null) => {
-    const __returned__ = common_vendor.e(new UTSJSONObject({
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
       a: common_vendor.unref(inited)
-    }), common_vendor.unref(inited) ? new UTSJSONObject({
+    }, common_vendor.unref(inited) ? {
       b: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-85e95612"), "view", "overlayRef"),
       c: common_vendor.n(_ctx.lClass),
       d: common_vendor.n(common_vendor.unref(classes)),
@@ -63,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       }),
       j: _ctx.ariaRole,
       k: _ctx.ariaLabel
-    }) : new UTSJSONObject({}));
+    } : {});
     return __returned__;
   };
 } }));

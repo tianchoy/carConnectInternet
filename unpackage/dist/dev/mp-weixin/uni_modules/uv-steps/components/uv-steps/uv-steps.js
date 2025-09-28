@@ -41,6 +41,7 @@ const _sfc_main = common_vendor.defineComponent({
   }
 });
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     b: common_vendor.n(`uv-steps--${_ctx.direction}`),

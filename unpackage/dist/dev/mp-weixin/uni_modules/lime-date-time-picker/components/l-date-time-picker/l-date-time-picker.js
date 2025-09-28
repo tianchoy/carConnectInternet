@@ -227,7 +227,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onBeforeUnmount(() => {
       stop();
     });
-    return (_ctx = null, _cache = null) => {
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
         b: common_vendor.o(onConfirm),

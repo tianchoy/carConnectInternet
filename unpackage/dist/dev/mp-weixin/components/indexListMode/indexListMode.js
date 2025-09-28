@@ -22,28 +22,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
       });
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: props.lists.length != 0
-      }), props.lists.length != 0 ? new UTSJSONObject({
-        b: common_vendor.f(props.lists, (item = null, index = null, i0 = null) => {
-          return new UTSJSONObject({
+      }, props.lists.length != 0 ? {
+        b: common_vendor.f(props.lists, (item, index, i0) => {
+          return {
             a: common_vendor.t(item.plateNo),
             b: "245c735a-0-" + i0,
-            c: common_vendor.p(new UTSJSONObject({
+            c: common_vendor.p({
               text: item.connectionStatus == "online" ? "在线" : "离线",
               type: item.connectionStatus == "online" ? "success" : "error"
-            })),
+            }),
             d: common_vendor.t(item.imei),
             e: index,
-            f: common_vendor.o(($event = null) => {
+            f: common_vendor.o(($event) => {
               return todetail(item.companyId, item.imei, item.deviceId);
             }, index)
-          });
+          };
         })
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         c: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

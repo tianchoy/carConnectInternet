@@ -101,95 +101,94 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
       common_vendor.index.$emit(parentKey.value, selected.value);
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: common_vendor.unref(description).length > 0
-      }), common_vendor.unref(description).length > 0 ? new UTSJSONObject({
+      }, common_vendor.unref(description).length > 0 ? {
         b: common_vendor.t(common_vendor.unref(description)),
         c: common_vendor.unref(align) == "left" ? 1 : ""
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         d: common_vendor.unref(rowCol) == null
-      }), common_vendor.unref(rowCol) == null ? {
-        e: common_vendor.f(common_vendor.unref(actionItems), (item = null, index = null, i0 = null) => {
-          var _a;
-          return common_vendor.e(new UTSJSONObject({
+      }, common_vendor.unref(rowCol) == null ? {
+        e: common_vendor.f(common_vendor.unref(actionItems), (item, index, i0) => {
+          return common_vendor.e({
             a: item.icon != null
-          }), item.icon != null ? {
+          }, item.icon != null ? {
             b: "601a7f4c-1-" + i0 + ",601a7f4c-0",
             c: common_vendor.p({
-              color: (_a = item.iconColor) !== null && _a !== void 0 ? _a : item.color,
+              color: item.iconColor ?? item.color,
               size: item.fontSize,
               name: item.icon
             })
-          } : new UTSJSONObject({}), new UTSJSONObject({
+          } : {}, {
             d: common_vendor.t(item.label),
             e: common_vendor.s(item.color != null ? "color:" + item.color : ""),
             f: common_vendor.s(item.fontSize != null ? "font-size:" + item.fontSize : ""),
             g: !item.disabled ? "l-action-sheet__item--hover" : "",
             h: common_vendor.unref(bordered) && index != common_vendor.unref(actionItems).length - 1 ? 1 : "",
             i: item.disabled ? 1 : "",
-            j: common_vendor.o(($event = null) => {
+            j: common_vendor.o(($event) => {
               return handleSelected(item);
             }, index),
             k: index
-          }));
+          });
         }),
         f: common_vendor.unref(align) == "left" ? 1 : ""
       } : {
-        g: common_vendor.f(common_vendor.unref(actionRowCols), (row = null, rowIndex = null, i0 = null) => {
+        g: common_vendor.f(common_vendor.unref(actionRowCols), (row, rowIndex, i0) => {
           return {
-            a: common_vendor.f(row, (item = null, colIndex = null, i1 = null) => {
-              var _a, _b;
-              return common_vendor.e(new UTSJSONObject({
+            a: common_vendor.f(row, (item, colIndex, i1) => {
+              return common_vendor.e({
                 a: item.icon != null && item.__isImage
-              }), item.icon != null && item.__isImage ? new UTSJSONObject({
+              }, item.icon != null && item.__isImage ? {
                 b: common_vendor.s(item.radius != null ? "border-radius:" + item.radius : ""),
                 c: item.icon
-              }) : item.icon != null ? {
+              } : item.icon != null ? {
                 e: "601a7f4c-2-" + i0 + "-" + i1 + ",601a7f4c-0",
                 f: common_vendor.p({
-                  color: (_a = item.iconColor) !== null && _a !== void 0 ? _a : item.color,
-                  size: (_b = item.fontSize) !== null && _b !== void 0 ? _b : "48rpx",
+                  color: item.iconColor ?? item.color,
+                  size: item.fontSize ?? "48rpx",
                   name: item.icon
                 }),
                 g: common_vendor.s(item.bgColor != null ? "background:" + item.bgColor : ""),
                 h: common_vendor.s(item.radius != null ? "border-radius:" + item.radius : "")
-              } : new UTSJSONObject({}), new UTSJSONObject({
+              } : {}, {
                 d: item.icon != null,
                 i: common_vendor.t(item.label),
                 j: common_vendor.s(item.color != null ? "color:" + item.color : ""),
                 k: common_vendor.s(item.fontSize != null ? "font-size:" + item.fontSize : ""),
                 l: item.disabled ? 1 : "",
-                m: common_vendor.o(($event = null) => {
+                m: common_vendor.o(($event) => {
                   return handleSelected(item);
                 }, colIndex),
                 n: colIndex
-              }));
+              });
             }),
             b: !(row.length > 4) ? 1 : "",
             c: rowIndex > 0 && rowIndex < common_vendor.unref(actionRowCols).length ? 1 : "",
             d: "row" + rowIndex
           };
         })
-      }, new UTSJSONObject({
+      }, {
         h: common_vendor.unref(cancelText).length > 0
-      }), common_vendor.unref(cancelText).length > 0 ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, common_vendor.unref(cancelText).length > 0 ? {} : {}, {
         i: common_vendor.unref(cancelText).length > 0
-      }), common_vendor.unref(cancelText).length > 0 ? new UTSJSONObject({
+      }, common_vendor.unref(cancelText).length > 0 ? {
         j: common_vendor.t(common_vendor.unref(cancelText)),
         k: common_vendor.o(handleCancel)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         l: common_vendor.gei(_ctx, ""),
         m: common_vendor.o(onClose),
-        n: common_vendor.o(($event = null) => {
+        n: common_vendor.o(($event) => {
           return common_vendor.isRef(innerValue) ? innerValue.value = $event : null;
         }),
-        o: common_vendor.p(new UTSJSONObject({
+        o: common_vendor.p({
           position: "bottom",
           modelValue: common_vendor.unref(innerValue),
           id: common_vendor.gei(_ctx, "")
-        }))
-      }));
+        })
+      });
       return __returned__;
     };
   }

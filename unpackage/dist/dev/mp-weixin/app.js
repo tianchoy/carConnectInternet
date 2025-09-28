@@ -19,6 +19,7 @@ if (!Math) {
   "./pages/userCenter/carList/carList.js";
   "./pages/userCenter/carDetail/carDetail.js";
   "./pages/geofencing/geofencing.js";
+  "./pages/scancode/scancode.js";
 }
 let updateManager = null;
 function checkForUpdates() {
@@ -68,7 +69,7 @@ function checkForUpdates() {
     }));
   }
 }
-const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
+const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
     common_vendor.index.__f__("log", "at App.uvue:75", "App onLaunch");
     checkForUpdates();
@@ -82,7 +83,7 @@ const _sfc_main = common_vendor.defineComponent(new UTSJSONObject({
   onExit: function() {
     common_vendor.index.__f__("log", "at App.uvue:104", "App Exit");
   }
-}));
+});
 function createApp() {
   const app = common_vendor.createSSRApp(_sfc_main);
   return {

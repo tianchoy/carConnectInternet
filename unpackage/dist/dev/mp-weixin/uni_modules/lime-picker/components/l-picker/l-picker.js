@@ -189,60 +189,60 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.provide("limePickerUpdateItems", updateItems);
     common_vendor.provide("limePickerItems", pickerItemInstanceArray);
     common_vendor.provide("limePickerManageChildInList", manageChildInList);
-    return (_ctx = null, _cache = null) => {
-      var _a2, _b2, _c2;
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: _ctx.cancelBtn != null || _ctx.title != null || _ctx.confirmBtn != null
-      }), _ctx.cancelBtn != null || _ctx.title != null || _ctx.confirmBtn != null ? common_vendor.e(new UTSJSONObject({
+      }, _ctx.cancelBtn != null || _ctx.title != null || _ctx.confirmBtn != null ? common_vendor.e({
         b: _ctx.cancelBtn != null
-      }), _ctx.cancelBtn != null ? {
+      }, _ctx.cancelBtn != null ? {
         c: common_vendor.t(_ctx.cancelBtn),
         d: common_vendor.unref(ohosShow),
-        e: common_vendor.s((_a2 = _ctx.cancelStyle) !== null && _a2 !== void 0 ? _a2 : ""),
+        e: common_vendor.s(_ctx.cancelStyle ?? ""),
         f: common_vendor.o(onCancel)
-      } : new UTSJSONObject({}), {
+      } : {}, {
         g: common_vendor.t(_ctx.title),
         h: common_vendor.unref(ohosShow),
-        i: common_vendor.s((_b2 = _ctx.titleStyle) !== null && _b2 !== void 0 ? _b2 : ""),
+        i: common_vendor.s(_ctx.titleStyle ?? ""),
         j: _ctx.confirmBtn != null
       }, _ctx.confirmBtn != null ? {
         k: common_vendor.t(_ctx.confirmBtn),
         l: common_vendor.unref(ohosShow),
-        m: common_vendor.s((_c2 = _ctx.confirmStyle) !== null && _c2 !== void 0 ? _c2 : ""),
+        m: common_vendor.s(_ctx.confirmStyle ?? ""),
         n: common_vendor.o(onConfirm)
-      } : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         o: common_vendor.unref(ohosShow)
-      })) : new UTSJSONObject({}), new UTSJSONObject({
-        p: common_vendor.f(props.columns, (options = null, i = null, i0 = null) => {
-          return new UTSJSONObject({
+      }) : {}, {
+        p: common_vendor.f(props.columns, (options, i, i0) => {
+          return {
             a: i,
             b: "070619bb-0-" + i0,
-            c: common_vendor.p(new UTSJSONObject({
+            c: common_vendor.p({
               options,
               column: i,
               value: common_vendor.unref(pickerValue).length > i ? common_vendor.unref(pickerValue)[i] : null
-            }))
-          });
+            })
+          };
         }),
         q: common_vendor.unref(isEmpty)
-      }), common_vendor.unref(isEmpty) ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
-        r: common_vendor.s(_ctx.groupHeight != null ? new UTSJSONObject({
+      }, common_vendor.unref(isEmpty) ? {} : {}, {
+        r: common_vendor.s(_ctx.groupHeight != null ? {
           height: _ctx.groupHeight
-        }) : new UTSJSONObject({})),
+        } : {}),
         s: _ctx.loading
-      }), _ctx.loading ? new UTSJSONObject({
-        t: common_vendor.p(new UTSJSONObject({
+      }, _ctx.loading ? {
+        t: common_vendor.p({
           size: _ctx.loadingSize,
           color: _ctx.loadingColor
-        })),
+        }),
         v: common_vendor.sei("r0-070619bb", "view", "loadingRef"),
-        w: common_vendor.s(_ctx.loadingMaskColor != null ? new UTSJSONObject({
+        w: common_vendor.s(_ctx.loadingMaskColor != null ? {
           background: _ctx.loadingMaskColor
-        }) : new UTSJSONObject({}))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+        } : {})
+      } : {}, {
         x: common_vendor.sei(common_vendor.gei(_ctx, "", "r1-070619bb"), "view", "pickerRef"),
         y: common_vendor.s(common_vendor.unref(styles))
-      }));
+      });
       return __returned__;
     };
   }

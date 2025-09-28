@@ -44,34 +44,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return style;
     });
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: _ctx.type == "ball"
-      }), _ctx.type == "ball" ? new UTSJSONObject({
+      }, _ctx.type == "ball" ? {
         b: common_vendor.s(common_vendor.unref(spinnerStyle))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         c: _ctx.type == "circular"
-      }), _ctx.type == "circular" ? new UTSJSONObject({
+      }, _ctx.type == "circular" ? {
         d: common_vendor.s(common_vendor.unref(spinnerStyle))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         e: _ctx.type == "spinner"
-      }), _ctx.type == "spinner" ? new UTSJSONObject({
-        f: common_vendor.f(12, (item = null, k0 = null, i0 = null) => {
-          return new UTSJSONObject({
+      }, _ctx.type == "spinner" ? {
+        f: common_vendor.f(12, (item, k0, i0) => {
+          return {
             a: item,
             b: item
-          });
+          };
         }),
         g: common_vendor.s(common_vendor.unref(spinnerStyle))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         h: _ctx.$slots["default"] != null || _ctx.text != null
-      }), _ctx.$slots["default"] != null || _ctx.text != null ? new UTSJSONObject({
+      }, _ctx.$slots["default"] != null || _ctx.text != null ? {
         i: common_vendor.t(_ctx.text),
         j: common_vendor.s(common_vendor.unref(textStyle))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         l: common_vendor.n(common_vendor.unref(classes))
-      }));
+      });
       return __returned__;
     };
   }

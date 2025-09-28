@@ -333,128 +333,129 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "登陆",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
+        }),
         b: common_assets._imports_0$1,
         c: loginType.value
-      }), loginType.value ? new UTSJSONObject({
-        d: common_vendor.o(($event = null) => {
+      }, loginType.value ? {
+        d: common_vendor.o(($event) => {
           return form.value.username = $event;
         }),
-        e: common_vendor.p(new UTSJSONObject({
+        e: common_vendor.p({
           prefixIcon: "account-fill",
           placeholder: "请输入账号",
           modelValue: form.value.username
-        })),
-        f: common_vendor.p(new UTSJSONObject({
+        }),
+        f: common_vendor.p({
           label: "",
           prop: "username",
           labelWidth: "0"
-        })),
+        }),
         g: common_vendor.o(showpwfun),
-        h: common_vendor.p(new UTSJSONObject({
+        h: common_vendor.p({
           name: showpw.value ? "eye-off-outline" : "eye",
           size: "20"
-        })),
+        }),
         i: common_vendor.o(filterNonLatin),
-        j: common_vendor.o(($event = null) => {
+        j: common_vendor.o(($event) => {
           return form.value.password = $event;
         }),
-        k: common_vendor.p(new UTSJSONObject({
+        k: common_vendor.p({
           prefixIcon: "lock-fill",
           type: showpw.value ? "password" : "text",
           placeholder: "请输入密码",
           password: showpw.value,
           customStyle: "border:1rpx solid red;height:80rpx",
           modelValue: form.value.password
-        })),
-        l: common_vendor.p(new UTSJSONObject({
+        }),
+        l: common_vendor.p({
           label: "",
           prop: "password",
           labelWidth: "0"
-        })),
-        m: common_vendor.sr(formRef, "27a30816-1", new UTSJSONObject({
+        }),
+        m: common_vendor.sr(formRef, "27a30816-1", {
           "k": "formRef"
-        })),
-        n: common_vendor.p(new UTSJSONObject({
+        }),
+        n: common_vendor.p({
           model: form.value,
           rules: pswrules
-        }))
-      }) : new UTSJSONObject({
-        o: common_vendor.o(($event = null) => {
+        })
+      } : {
+        o: common_vendor.o(($event) => {
           return smsform.value.phone = $event;
         }),
-        p: common_vendor.p(new UTSJSONObject({
+        p: common_vendor.p({
           prefixIcon: "phone-fill",
           placeholder: "请输入手机号",
           modelValue: smsform.value.phone
-        })),
-        q: common_vendor.p(new UTSJSONObject({
+        }),
+        q: common_vendor.p({
           label: "",
           prop: "phone",
           labelWidth: "0"
-        })),
-        r: common_vendor.sr(uCode, "27a30816-12,27a30816-11", new UTSJSONObject({
+        }),
+        r: common_vendor.sr(uCode, "27a30816-12,27a30816-11", {
           "k": "uCode"
-        })),
+        }),
         s: common_vendor.o(codeChange),
-        t: common_vendor.p(new UTSJSONObject({
+        t: common_vendor.p({
           seconds: "60",
           changeText: "X秒重新获取"
-        })),
+        }),
         v: common_vendor.o(getCode),
-        w: common_vendor.p(new UTSJSONObject({
+        w: common_vendor.p({
           text: tips.value,
           type: "success",
           size: "mini"
-        })),
-        x: common_vendor.o(($event = null) => {
+        }),
+        x: common_vendor.o(($event) => {
           return smsform.value.code = $event;
         }),
-        y: common_vendor.p(new UTSJSONObject({
+        y: common_vendor.p({
           prefixIcon: "lock-fill",
           placeholder: "请输入验证码",
           modelValue: smsform.value.code
-        })),
-        z: common_vendor.p(new UTSJSONObject({
+        }),
+        z: common_vendor.p({
           label: "",
           prop: "code",
           labelWidth: "0"
-        })),
-        A: common_vendor.sr(smsformRef, "27a30816-7", new UTSJSONObject({
+        }),
+        A: common_vendor.sr(smsformRef, "27a30816-7", {
           "k": "smsformRef"
-        })),
-        B: common_vendor.p(new UTSJSONObject({
+        }),
+        B: common_vendor.p({
           model: smsform.value,
           rules: smsrules
-        }))
-      }), new UTSJSONObject({
+        })
+      }, {
         C: common_vendor.o(submit),
-        D: common_vendor.p(new UTSJSONObject({
+        D: common_vendor.p({
           type: "primary"
-        })),
+        }),
         E: common_vendor.o(isDocState),
-        F: common_vendor.p(new UTSJSONObject({
+        F: common_vendor.p({
           checked: docState.value
-        })),
+        }),
         G: common_vendor.o(isDocState),
-        H: common_vendor.p(new UTSJSONObject({
+        H: common_vendor.p({
           text: "快捷登录"
-        })),
-        I: common_vendor.p(new UTSJSONObject({
+        }),
+        I: common_vendor.p({
           name: "/static/fast_login.png",
           size: "40"
-        })),
+        }),
         J: common_vendor.o(handleGetPhoneNumber),
         K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

@@ -20,7 +20,11 @@
 			},
 			"scope.userPhoneNumber": {
 				"desc": "获取你的手机号"
+			},
+			"scope.camera": {
+			  "desc": "需要摄像头权限进行扫码"
 			}
+		}
 		},
 		"requiredPrivateInfos": [
 			"getLocation",

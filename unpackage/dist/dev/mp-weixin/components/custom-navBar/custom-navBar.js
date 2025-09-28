@@ -59,9 +59,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       emit("back");
     };
     common_vendor.onMounted(initDimensions);
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(statusBarHeight) + "px",
           "background-color": "#fff",
           position: "fixed",
@@ -69,35 +70,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           letf: 0,
           top: 0,
           "z-index": "100"
-        }) : new UTSJSONObject({
+        } : {
           height: common_vendor.unref(statusBarHeight) + "px",
           "background-color": "#fff"
-        })),
+        }),
         b: __props.showBack
-      }), __props.showBack ? new UTSJSONObject({
+      }, __props.showBack ? {
         c: common_assets._imports_0$5,
         d: common_vendor.o(handleBack)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         e: common_vendor.t(__props.title),
         f: __props.textColor,
         g: common_vendor.unref(navBarHeight) + "px",
         h: __props.showCapsule
-      }), __props.showCapsule ? common_vendor.e(new UTSJSONObject({
+      }, __props.showCapsule ? common_vendor.e({
         i: __props.isIcon
-      }), __props.isIcon ? new UTSJSONObject({
-        j: common_vendor.p(new UTSJSONObject({
+      }, __props.isIcon ? {
+        j: common_vendor.p({
           name: __props.Icon,
           size: "28"
-        }))
-      }) : new UTSJSONObject({
+        })
+      } : {
         k: common_vendor.t(__props.rightText)
-      }), new UTSJSONObject({
-        l: common_vendor.o(($event = null) => {
+      }, {
+        l: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
         })
-      })) : new UTSJSONObject({}), new UTSJSONObject({
+      }) : {}, {
         m: "200rpx",
-        n: common_vendor.s(__props.isShowStyle ? new UTSJSONObject({
+        n: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor,
           position: "fixed",
@@ -105,11 +106,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           letf: "0",
           top: common_vendor.unref(statusBarHeight) + "px",
           "z-index": "100"
-        }) : new UTSJSONObject({
+        } : {
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor
-        }))
-      }));
+        })
+      });
       return __returned__;
     };
   }

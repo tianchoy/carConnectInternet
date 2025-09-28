@@ -294,26 +294,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onUnload(() => {
       common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
     });
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "首页",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
+        }),
         b: showMap.value
-      }), showMap.value ? new UTSJSONObject({
+      }, showMap.value ? {
         c: common_vendor.sei("myMap", "map"),
         d: markers.value,
         e: mapScale.value,
         f: common_vendor.o(handleTap)
-      }) : new UTSJSONObject({
-        g: common_vendor.p(new UTSJSONObject({
+      } : {
+        g: common_vendor.p({
           lists: filteredDevices.value
-        }))
-      }), new UTSJSONObject({
+        })
+      }, {
         h: common_assets._imports_0,
         i: common_vendor.o(refresh),
         j: common_assets._imports_1,
@@ -321,36 +322,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: showMap.value ? "/static/list.png" : "/static/map.png",
         m: common_vendor.o(toggleMapMode),
         n: showMap.value
-      }), showMap.value ? new UTSJSONObject({
+      }, showMap.value ? {
         o: common_vendor.t(totalCount.value),
         p: common_vendor.t(onlineCount.value),
         q: common_vendor.t(offlineCount.value)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         r: common_vendor.t(pickerStateTitle.value),
-        s: common_vendor.p(new UTSJSONObject({
+        s: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
-        })),
+        }),
         t: common_vendor.o(handStatePicker),
         v: !showMap.value
-      }), !showMap.value ? new UTSJSONObject({
+      }, !showMap.value ? {
         w: common_vendor.t(pickerGroupTitle.value),
-        x: common_vendor.p(new UTSJSONObject({
+        x: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
-        })),
+        }),
         y: common_vendor.o(handGroupPicker)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
-        z: common_vendor.sr(picker, "a4fca7fa-4", new UTSJSONObject({
+      } : {}, {
+        z: common_vendor.sr(picker, "a4fca7fa-4", {
           "k": "picker"
-        })),
+        }),
         A: common_vendor.o(confirm),
-        B: common_vendor.p(new UTSJSONObject({
+        B: common_vendor.p({
           columns: columns.value,
           keyName: "name"
-        })),
+        }),
         C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

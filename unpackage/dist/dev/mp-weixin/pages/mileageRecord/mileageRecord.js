@@ -141,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               var _a, _b;
               const startAddress = yield utils_getAdress.getAddress(trip.startLat, trip.startLon);
               const endAddress = yield utils_getAdress.getAddress(trip.endLat, trip.endLon);
-              return Object.assign(Object.assign({}, trip), { startAddress: ((_a = startAddress === null || startAddress === void 0 ? null : startAddress.result) === null || _a === void 0 ? null : _a.formatted_address) || "未知地点", endAddress: ((_b = endAddress === null || endAddress === void 0 ? null : endAddress.result) === null || _b === void 0 ? null : _b.formatted_address) || "未知地点" });
+              return new UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: ((_a = startAddress === null || startAddress === void 0 ? null : startAddress.result) === null || _a === void 0 ? null : _a.formatted_address) || "未知地点", endAddress: ((_b = endAddress === null || endAddress === void 0 ? null : endAddress.result) === null || _b === void 0 ? null : _b.formatted_address) || "未知地点" }));
             });
           }));
           tripData.value = processedTrips;
@@ -210,120 +210,121 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(UTS.JSON.stringify(trip))}`
       });
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "里程记录",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
-        b: common_vendor.p(new UTSJSONObject({
+        }),
+        b: common_vendor.p({
           name: "calendar",
           size: "25"
-        })),
+        }),
         c: common_vendor.t(formatDisplayTime(startTime.value)),
-        d: common_vendor.o(($event = null) => {
+        d: common_vendor.o(($event) => {
           return showPicker("start");
         }),
-        e: common_vendor.o(($event = null) => {
+        e: common_vendor.o(($event) => {
           return showPicker("start");
         }),
-        f: common_vendor.p(new UTSJSONObject({
+        f: common_vendor.p({
           name: "arrow-down",
           size: "13"
-        })),
+        }),
         g: common_vendor.t(formatDisplayTime(endTime.value)),
-        h: common_vendor.o(($event = null) => {
+        h: common_vendor.o(($event) => {
           return showPicker("end");
         }),
-        i: common_vendor.o(($event = null) => {
+        i: common_vendor.o(($event) => {
           return showPicker("end");
         }),
-        j: common_vendor.p(new UTSJSONObject({
+        j: common_vendor.p({
           name: "arrow-down",
           size: "13"
-        })),
+        }),
         k: common_vendor.o(onConfirm),
         l: common_vendor.o(onCancel),
-        m: common_vendor.p(new UTSJSONObject({
+        m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
-        })),
-        n: common_vendor.o(($event = null) => {
+        }),
+        n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
         }),
-        o: common_vendor.p(new UTSJSONObject({
+        o: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
-        })),
+        }),
         p: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         q: common_vendor.t(totalTrips.value),
         r: common_vendor.t(averageSpeed.value.toFixed(1)),
         s: loading.value
-      }), loading.value ? new UTSJSONObject({
-        t: common_vendor.p(new UTSJSONObject({
+      }, loading.value ? {
+        t: common_vendor.p({
           mode: "circle",
           size: "40"
-        }))
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+        })
+      } : {}, {
         v: !loading.value && groupedTrips.value.length == 0
-      }), !loading.value && groupedTrips.value.length == 0 ? new UTSJSONObject({
-        w: common_vendor.p(new UTSJSONObject({
+      }, !loading.value && groupedTrips.value.length == 0 ? {
+        w: common_vendor.p({
           mode: "data",
           text: "当前时间点暂无行程数据"
-        }))
-      }) : new UTSJSONObject({
-        x: common_vendor.f(groupedTrips.value, (group = null, groupIndex = null, i0 = null) => {
-          return new UTSJSONObject({
+        })
+      } : {
+        x: common_vendor.f(groupedTrips.value, (group, groupIndex, i0) => {
+          return {
             a: common_vendor.t(group.date),
             b: "5f5c5231-8-" + i0,
-            c: common_vendor.p(new UTSJSONObject({
+            c: common_vendor.p({
               text: group.trips.length + "段",
               type: "success",
               size: "mini"
-            })),
+            }),
             d: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
-            e: common_vendor.f(group.trips, (item = null, index = null, i1 = null) => {
-              return new UTSJSONObject({
+            e: common_vendor.f(group.trips, (item, index, i1) => {
+              return {
                 a: common_vendor.t(index + 1),
                 b: common_vendor.t((item.distance / 1e3).toFixed(2)),
                 c: common_vendor.t(formatDuration(item.duration)),
                 d: "5f5c5231-10-" + i0 + "-" + i1 + "," + ("5f5c5231-9-" + i0 + "-" + i1),
-                e: common_vendor.p(new UTSJSONObject({
+                e: common_vendor.p({
                   title: item.startAddress || "未知地点",
                   desc: item.startTime
-                })),
+                }),
                 f: "5f5c5231-11-" + i0 + "-" + i1 + "," + ("5f5c5231-9-" + i0 + "-" + i1),
-                g: common_vendor.p(new UTSJSONObject({
+                g: common_vendor.p({
                   title: item.endAddress || "未知地点",
                   desc: item.endTime
-                })),
+                }),
                 h: "5f5c5231-9-" + i0 + "-" + i1,
                 i: index,
-                j: common_vendor.o(($event = null) => {
+                j: common_vendor.o(($event) => {
                   return showTripDetail(item);
                 }, index)
-              });
+              };
             }),
             f: groupIndex
-          });
+          };
         }),
         y: common_assets._imports_0$3,
         z: common_assets._imports_1$1,
-        A: common_vendor.p(new UTSJSONObject({
+        A: common_vendor.p({
           current: "1",
           direction: "column",
           ["active-color"]: "#3c9cff",
           ["inactive-color"]: "#999"
-        }))
-      }), new UTSJSONObject({
+        })
+      }, {
         B: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

@@ -457,7 +457,8 @@ const MINI_PROGRAM_PAGE_RUNTIME_HOOKS = /* @__PURE__ */ (() => {
   return {
     onPageScroll: 1,
     onShareAppMessage: 1 << 1,
-    onShareTimeline: 1 << 2
+    onShareTimeline: 1 << 2,
+    onShareChat: 1 << 3
   };
 })();
 function isUniLifecycleHook(name, value, checkType = true) {
@@ -7050,9 +7051,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.76",
-    uniCompilerVersion: "4.76",
-    uniRuntimeVersion: "4.76",
+    uniCompileVersion: "4.81",
+    uniCompilerVersion: "4.81",
+    uniRuntimeVersion: "4.81",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -7080,8 +7081,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("4.76");
-      parameters.uniRuntimeVersionCode = parseFloat("4.76");
+      parameters.uniCompilerVersionCode = parseFloat("4.81");
+      parameters.uniRuntimeVersionCode = parseFloat("4.81");
     } catch (error) {
     }
   }
@@ -7208,14 +7209,14 @@ const getAppBaseInfo = {
       appLanguage: getAppLanguage(hostLanguage),
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.76",
-      uniCompilerVersion: "4.76",
-      uniRuntimeVersion: "4.76"
+      uniCompileVersion: "4.81",
+      uniCompilerVersion: "4.81",
+      uniRuntimeVersion: "4.81"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("4.76");
-        parameters.uniRuntimeVersionCode = parseFloat("4.76");
+        parameters.uniCompilerVersionCode = parseFloat("4.81");
+        parameters.uniRuntimeVersionCode = parseFloat("4.81");
       } catch (error) {
       }
     }
@@ -7599,18 +7600,22 @@ function initOnError() {
       originalConsole.error(err);
     }
   }
-  if (typeof index.onError === "function") {
-    index.onError(onError2);
-  }
-  if (typeof index.onUnhandledRejection === "function") {
-    index.onUnhandledRejection(onError2);
+  if (typeof index !== "undefined") {
+    if (typeof index.onError === "function") {
+      index.onError(onError2);
+    }
+    if (typeof index.onUnhandledRejection === "function") {
+      index.onUnhandledRejection(onError2);
+    }
   }
   return function offError2() {
-    if (typeof index.offError === "function") {
-      index.offError(onError2);
-    }
-    if (typeof index.offUnhandledRejection === "function") {
-      index.offUnhandledRejection(onError2);
+    if (typeof index !== "undefined") {
+      if (typeof index.offError === "function") {
+        index.offError(onError2);
+      }
+      if (typeof index.offUnhandledRejection === "function") {
+        index.offUnhandledRejection(onError2);
+      }
     }
   };
 }
@@ -7990,7 +7995,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.67";
   const port = "8090";
-  const id = "mp-weixin_bo5U9t";
+  const id = "mp-weixin_B_1Of2";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -8108,7 +8113,6 @@ var IDENTIFIER;
   IDENTIFIER2["UTSJSONObject"] = "UTSJSONObject";
   IDENTIFIER2["JSON"] = "JSON";
   IDENTIFIER2["UTS"] = "UTS";
-  IDENTIFIER2["DEFINE_COMPONENT"] = "defineComponent";
   IDENTIFIER2["VUE"] = "vue";
   IDENTIFIER2["GLOBAL_THIS"] = "globalThis";
   IDENTIFIER2["UTS_TYPE"] = "UTSType";
@@ -8569,8 +8573,25 @@ const UTSJSON = {
       return null;
     }
   },
-  stringify: (value) => {
-    return OriginalJSON.stringify(value);
+  stringify: (value, replacer2, space) => {
+    try {
+      if (!replacer2) {
+        const visited = /* @__PURE__ */ new Set();
+        replacer2 = function(_, v) {
+          if (typeof v === "object") {
+            if (visited.has(v)) {
+              return null;
+            }
+            visited.add(v);
+          }
+          return v;
+        };
+      }
+      return OriginalJSON.stringify(value, replacer2, space);
+    } catch (error) {
+      console.error(error);
+      return "";
+    }
   }
 };
 function mapGet(map, key) {

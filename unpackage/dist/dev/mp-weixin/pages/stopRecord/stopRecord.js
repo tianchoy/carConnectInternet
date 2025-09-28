@@ -93,80 +93,81 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
       return `${hours}小时${minutes}分${seconds}秒`;
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "停车记录",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
-        b: common_vendor.p(new UTSJSONObject({
+        }),
+        b: common_vendor.p({
           name: "calendar",
           size: "25"
-        })),
+        }),
         c: common_vendor.t(startTime.value),
-        d: common_vendor.o(($event = null) => {
+        d: common_vendor.o(($event) => {
           return showPicker("start");
         }),
-        e: common_vendor.o(($event = null) => {
+        e: common_vendor.o(($event) => {
           return showPicker("start");
         }),
-        f: common_vendor.p(new UTSJSONObject({
+        f: common_vendor.p({
           name: "arrow-down",
           size: "13"
-        })),
+        }),
         g: common_vendor.t(endTime.value),
-        h: common_vendor.o(($event = null) => {
+        h: common_vendor.o(($event) => {
           return showPicker("end");
         }),
-        i: common_vendor.o(($event = null) => {
+        i: common_vendor.o(($event) => {
           return showPicker("end");
         }),
-        j: common_vendor.p(new UTSJSONObject({
+        j: common_vendor.p({
           name: "arrow-down",
           size: "13"
-        })),
+        }),
         k: common_vendor.o(onConfirm),
         l: common_vendor.o(onCancel),
-        m: common_vendor.p(new UTSJSONObject({
+        m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
-        })),
-        n: common_vendor.o(($event = null) => {
+        }),
+        n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
         }),
-        o: common_vendor.p(new UTSJSONObject({
+        o: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
-        })),
+        }),
         p: carStopDetail.value.length == 0
-      }), carStopDetail.value.length == 0 ? new UTSJSONObject({
-        q: common_vendor.p(new UTSJSONObject({
+      }, carStopDetail.value.length == 0 ? {
+        q: common_vendor.p({
           mode: "data",
           text: "当前时间暂无停车数据"
-        }))
-      }) : new UTSJSONObject({
-        r: common_vendor.f(carStopDetail.value, (item = null, index = null, i0 = null) => {
-          return new UTSJSONObject({
+        })
+      } : {
+        r: common_vendor.f(carStopDetail.value, (item, index, i0) => {
+          return {
             a: common_vendor.t(item.startTime),
             b: common_vendor.t(item.endTime),
             c: common_vendor.t(calculateDuration(item.startTime, item.endTime)),
             d: common_vendor.t(item.address || "加载中..."),
             e: index
-          });
+          };
         }),
         s: common_assets._imports_0$4,
         t: common_assets._imports_1$2,
         v: common_assets._imports_2,
         w: common_assets._imports_3
-      }), new UTSJSONObject({
+      }, {
         x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

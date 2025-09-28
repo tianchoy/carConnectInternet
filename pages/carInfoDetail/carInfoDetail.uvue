@@ -20,6 +20,7 @@
 				<view class="imei-info">
 					<view class="imeis">
 						<text>IMEI {{imei}}</text>
+						<text class="power" v-if="currentCarInfo.voltage">电压:{{currentCarInfo.voltage}}V</text>
 						<text class="battery" v-if="datainfo.batteryPercent" :style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量 {{datainfo.batteryPercent}}%</text>
 					</view>
 					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
@@ -416,7 +417,6 @@
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
-			console.log(res.data)
 			currentCarInfo.value = res.data
 		} else {
 			console.error("设备id获取失败")
@@ -580,6 +580,12 @@
 							display: inline-block;
 							font-size: 25rpx;
 							margin-left: 50rpx;
+						}
+						.power{
+							display: inline-block;
+							font-size: 25rpx;
+							margin-left: 30rpx;
+							color: #69c2f1;
 						}
 					}
 				}

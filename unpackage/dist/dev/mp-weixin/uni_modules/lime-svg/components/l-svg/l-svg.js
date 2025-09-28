@@ -72,7 +72,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path.value = props.src;
       }
     });
-    return (_ctx = null, _cache = null) => {
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
         a: common_vendor.unref(path),
         b: common_vendor.o(onError),

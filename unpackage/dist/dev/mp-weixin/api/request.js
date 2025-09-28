@@ -4,7 +4,6 @@ const loginUrl = "/sys/login";
 const devicePos = "/gps/lastPosition?deptId=";
 const trackPos = "/gps/trackPos?";
 const userinfo = "/sys/user/info";
-const addDeviceUrl = "/userDevice/add";
 const userDeviceList = "/userDevice/list";
 const wechatLogin = "/authLogin";
 const changePSW = "/sys/user/password";
@@ -42,9 +41,6 @@ const getTrackPos = (data) => {
 };
 const getUserInfo = () => {
   return api_http.http.get(userinfo);
-};
-const addDevice = (data) => {
-  return api_http.http.post(addDeviceUrl, data);
 };
 const getUserDeviceList = (data) => {
   return api_http.http.post(userDeviceList, data);
@@ -95,7 +91,6 @@ const unbindDevices = (data) => {
   return api_http.http.delete(unbindGeofence, data);
 };
 exports.PostWechatlogin = PostWechatlogin;
-exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
 exports.changePassWord = changePassWord;

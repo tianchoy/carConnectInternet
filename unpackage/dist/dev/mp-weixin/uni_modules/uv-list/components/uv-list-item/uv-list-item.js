@@ -274,6 +274,7 @@ if (!Math) {
   (_easycom_uv_icon + _easycom_uv_badge + _easycom_uv_switch)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: !$data.isFirstChild
   }, !$data.isFirstChild ? {

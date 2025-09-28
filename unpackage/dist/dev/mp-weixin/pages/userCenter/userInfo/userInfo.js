@@ -77,30 +77,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
-        a: common_vendor.p(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
+        a: common_vendor.p({
           title: "个人信息",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false
-        })),
+        }),
         b: common_vendor.t(common_vendor.unref(userInfo).id),
         c: common_vendor.t(common_vendor.unref(userInfo).mobile),
         d: common_vendor.unref(userInfo).type == 1
-      }), common_vendor.unref(userInfo).type == 1 ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, common_vendor.unref(userInfo).type == 1 ? {} : {}, {
         e: common_vendor.unref(userInfo).type == 1
-      }), common_vendor.unref(userInfo).type == 1 ? new UTSJSONObject({
-        f: common_vendor.p(new UTSJSONObject({
+      }, common_vendor.unref(userInfo).type == 1 ? {
+        f: common_vendor.p({
           name: "arrow-right",
           size: "18"
-        })),
+        }),
         g: common_vendor.o(editPassword)
-      }) : new UTSJSONObject({}), new UTSJSONObject({
+      } : {}, {
         h: common_vendor.o(logoutBtn),
         i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      }));
+      });
       return __returned__;
     };
   }

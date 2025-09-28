@@ -353,6 +353,7 @@ if (!Math) {
   (_easycom_uv_overlay + _easycom_uv_status_bar + _easycom_uv_safe_bottom + _easycom_uv_icon + _easycom_uv_transition)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: $data.showPopup
   }, $data.showPopup ? common_vendor.e({

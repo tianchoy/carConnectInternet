@@ -81,10 +81,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: `/pages/userCenter/carDetail/carDetail?deviceId=${deviceId}`
       });
     };
-    return (_ctx = null, _cache = null) => {
-      const __returned__ = common_vendor.e(new UTSJSONObject({
+    return (_ctx, _cache) => {
+      "raw js";
+      const __returned__ = common_vendor.e({
         a: common_vendor.o(addCar),
-        b: common_vendor.p(new UTSJSONObject({
+        b: common_vendor.p({
           title: "车辆管理",
           ["show-back"]: true,
           backgroundColor: "#fff",
@@ -92,22 +93,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: true,
           isIcon: true,
           isShowStyle: true
-        })),
-        c: common_vendor.f(common_vendor.unref(carList), (item = null, index = null, i0 = null) => {
-          return new UTSJSONObject({
+        }),
+        c: common_vendor.f(common_vendor.unref(carList), (item, index, i0) => {
+          return {
             a: common_vendor.t(item.plateNo),
             b: common_vendor.t(item.companyId),
             c: common_vendor.t(item.imei),
             d: index,
-            e: common_vendor.o(($event = null) => {
+            e: common_vendor.o(($event) => {
               return carDetail(item.deviceId);
             }, index)
-          });
+          };
         }),
         d: common_vendor.unref(loading)
-      }), common_vendor.unref(loading) ? new UTSJSONObject({}) : new UTSJSONObject({}), new UTSJSONObject({
+      }, common_vendor.unref(loading) ? {} : {}, {
         e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
-      }), !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? new UTSJSONObject({}) : new UTSJSONObject({}));
+      }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? {} : {});
       return __returned__;
     };
   }

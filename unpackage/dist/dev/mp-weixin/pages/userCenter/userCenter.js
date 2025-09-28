@@ -55,7 +55,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "none"
       });
     };
-    return (_ctx = null, _cache = null) => {
+    return (_ctx, _cache) => {
+      "raw js";
       const __returned__ = {
         a: common_vendor.p({
           title: "个人中心",

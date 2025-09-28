@@ -87,6 +87,7 @@ if (!Math) {
   (_easycom_uv_icon + _easycom_uv_text)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  "raw js";
   return common_vendor.e({
     a: _ctx.mpAvatar && $data.allowMp
   }, _ctx.mpAvatar && $data.allowMp ? {
