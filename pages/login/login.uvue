@@ -8,7 +8,7 @@
 		</view>
 
 		<view class="content">
-			<uv-form :model="form" :rules="pswrules" ref="formRef" v-if="loginType">
+			<uv-form :model="form" :rules="pswrules" ref="formRef" v-if="pswLogin">
 				<uv-form-item label="" prop="username" labelWidth="0">
 					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
 				</uv-form-item>
@@ -22,7 +22,7 @@
 					</uv-input>
 				</uv-form-item>
 			</uv-form>
-			<uv-form :model="smsform" :rules="smsrules" ref="smsformRef" v-else>
+			<!-- <uv-form :model="smsform" :rules="smsrules" ref="smsformRef" v-if="false">
 				<uv-form-item label="" prop="phone" labelWidth="0">
 					<uv-input prefixIcon="phone-fill" v-model="smsform.phone" placeholder="请输入手机号" />
 				</uv-form-item>
@@ -35,11 +35,14 @@
 					</uv-input>
 				</uv-form-item>
 			</uv-form>
-			<!-- <view class="other-login">
-				<text @click="smsLogin">{{loginType ? '短信登陆' : '账号密码登陆'}}</text>
-				<text>忘记密码</text>
-			</view> -->
-			<uv-button type="primary" @click="submit">提交</uv-button>
+			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button> -->
+
+			<view v-else>
+				<button open-type="getPhoneNumber" type="primary" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
+					快捷登录
+				</button>
+			</view>
+
 			<view class="documents" @click="isDocState">
 				<uv-checkbox-group>
 					<uv-checkbox :checked="docState" @change="isDocState"></uv-checkbox>
@@ -49,14 +52,8 @@
 				</uv-checkbox-group>
 			</view>
 		</view>
-		<view style="padding:0 40rpx">
-			<uv-divider text="快捷登录"></uv-divider>
-		</view>
-		<view>
-			<button open-type="getPhoneNumber" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
-				<uv-icon name="/static/fast_login.png" size="40"></uv-icon>
-			</button>
-		</view>
+		<view style="padding:0 40rpx;color:#eee;font-size:25rpx;text-align: right;" @click="isPswLogin">{{pswLogin?'快捷登录':'密码登录'}}</view>
+		
 	</view>
 </template>
 
@@ -68,6 +65,7 @@
 	const loginType = ref(true)
 	const tips = ref('')
 	const uCode = ref(null)
+	const pswLogin = ref(false)
 
 	// 定义表单类型
 	type FormData = {
@@ -96,6 +94,10 @@
 	const formRef = ref<UvFormInstance | null>(null)
 	const smsformRef = ref<UvFormInstance | null>(null)
 	const deviceModel = ref('')
+
+	const isPswLogin = () => {
+		pswLogin.value = !pswLogin.value
+	}
 
 	const filterNonLatin = (e) => {
 		form.value.password = e.replace(/[^\x00-\x7F]/g, '')
@@ -427,24 +429,7 @@
 		}
 
 		.wechat-login-btn {
-			background-color: #fff !important;
-			color: #666 !important;
-			border: none !important;
-			border-radius: 50px !important;
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: center;
-			padding: 10px 20px;
-			
-			.quicker{
-				margin-left: 10rpx;
-				font-size: 27rpx;
-			}
-		}
-
-		.wechat-login-btn::after {
-			border: none;
+			color: #fff !important;
 		}
 
 		.btn-text {

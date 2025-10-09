@@ -11,20 +11,16 @@
 			<indexListMode :lists="filteredDevices" />
 		</view>
 		<view class="tool-nav">
-			<view class="refresh" @click="refresh">
-				<image src="/static/refresh.png" />
-			</view>
-			<view class="addCar" @click="addCar">
-				<image src="/static/add.png" />
-			</view>
+			<view class="refresh" @click="refresh">刷新</view>
+			<view class="addCar" @click="addCar">添加</view>
 			<view class="btn-map-list" @click="toggleMapMode">
-				<image :src="showMap ? '/static/list.png' : '/static/map.png'" class="btn-map-list-icon" />
+				{{showMap ? '列表' : '地图'}}
 			</view>
 		</view>
 		<view class="right-bar" v-if="showMap">
-			<view class="allCar">全部 {{totalCount}}</view>
-			<view class="onlineCar">在线 {{onlineCount}}</view>
-			<view class="offlineCar">离线 {{offlineCount}}</view>
+			<view class="allCar" @click="goToList('all')">全部 {{totalCount}}</view>
+			<view class="onlineCar" @click="goToList('online')">在线 {{onlineCount}}</view>
+			<view class="offlineCar" @click="goToList('offline')">离线 {{offlineCount}}</view>
 		</view>
 		<view class="left-bar" @click="handStatePicker">
 			<text style="margin-right: 20rpx;">{{pickerStateTitle}}</text>
@@ -107,6 +103,24 @@
 		}
 	})
 	
+	// 跳转到列表页面
+	const goToList = (status : string) => {
+		// 先切换到列表模式
+		showMap.value = false
+		
+		// 根据状态设置筛选条件
+		switch(status) {
+			case 'all':
+				pickerStateTitle.value = '全部状态'
+				break
+			case 'online':
+				pickerStateTitle.value = '在线'
+				break
+			case 'offline':
+				pickerStateTitle.value = '离线'
+				break
+		}
+	}
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -135,7 +149,7 @@
 
 	const addCar = () => {
 		uni.navigateTo({
-			url: '/pages/addCar/addCar',
+			url: '/pages/addCar/addCar'
 		})
 	}
 
@@ -180,14 +194,14 @@
 				latitude: lat,
 				longitude: lng,
 				iconPath: device.connectionStatus == 'online' ? '/static/car.png' : '/static/offline.png',
-				width: 25,
-				height: 25,
+				width: 20,
+				height: 20,
 				callout: {
 					padding: 5,
 					borderWidth: 1,
 					borderRadius: 10,
 					bgColor: '#ffffff',
-					content: device.plateNo || '未命名设备',
+					content: device.deviceName || '未命名设备',
 					display: 'ALWAYS'
 				},
 				joinCluster: true, // 允许聚合
@@ -317,6 +331,7 @@
 
 	onLoad(async () => {
 		const token = uni.getStorageSync('token')
+		console.log(token)
 		if (!token) {
 			uni.redirectTo({ url: '/pages/login/login' })
 			Login.value = false
@@ -374,41 +389,28 @@
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			font-size: 28rpx;
 
 			.btn-map-list {
-				width: 60rpx;
-				height: 60rpx;
-			}
-
-			.btn-map-list-icon {
-				width: 100%;
-				height: 100%;
-				padding: 8rpx;
-				border-radius: 50%;
-				background-color: rgba(3, 109, 246, 0.71);
+				padding: 10rpx 15rpx;
+				background-color: #1296db;
+				color: #fff;
+				border-radius: 10rpx;
 			}
 
 			.addCar {
-				width: 60rpx;
-				height: 60rpx;
+				padding: 10rpx 15rpx;
+				background-color: #1296db;
+				color: #fff;
+				border-radius: 10rpx;
 				margin-right: 20rpx;
-
-				image {
-					width: 100%;
-					height: 100%;
-					border-radius: 50%;
-				}
 			}
 			.refresh{
-				width: 68rpx;
-				height: 68rpx;
+				padding: 10rpx 15rpx;
+				background-color: #1296db;
+				color: #fff;
+				border-radius: 10rpx;
 				margin-right: 20rpx;
-				
-				image {
-					width: 100%;
-					height: 100%;
-					border-radius: 50%;
-				}
 			}
 		}
 
@@ -428,6 +430,13 @@
 				margin-bottom: 20rpx;
 				border-radius: 10rpx;
 				color: #fff;
+				/* 添加点击效果 */
+				transition: all 0.2s;
+			}
+			
+			view:active {
+				transform: scale(0.95);
+				opacity: 0.8;
 			}
 
 			.allCar {

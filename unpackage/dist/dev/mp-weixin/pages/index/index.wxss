@@ -47,37 +47,27 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  font-size: 28rpx;
 }
 .container .tool-nav .btn-map-list {
-  width: 60rpx;
-  height: 60rpx;
-}
-.container .tool-nav .btn-map-list-icon {
-  width: 100%;
-  height: 100%;
-  padding: 8rpx;
-  border-radius: 50%;
-  background-color: rgba(3, 109, 246, 0.71);
+  padding: 10rpx 15rpx;
+  background-color: #1296db;
+  color: #fff;
+  border-radius: 10rpx;
 }
 .container .tool-nav .addCar {
-  width: 60rpx;
-  height: 60rpx;
+  padding: 10rpx 15rpx;
+  background-color: #1296db;
+  color: #fff;
+  border-radius: 10rpx;
   margin-right: 20rpx;
-}
-.container .tool-nav .addCar image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
 }
 .container .tool-nav .refresh {
-  width: 68rpx;
-  height: 68rpx;
+  padding: 10rpx 15rpx;
+  background-color: #1296db;
+  color: #fff;
+  border-radius: 10rpx;
   margin-right: 20rpx;
-}
-.container .tool-nav .refresh image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
 }
 .container .right-bar {
   position: absolute;
@@ -95,6 +85,12 @@
   margin-bottom: 20rpx;
   border-radius: 10rpx;
   color: #fff;
+  /* 添加点击效果 */
+  transition: all 0.2s;
+}
+.container .right-bar view:active {
+  transform: scale(0.95);
+  opacity: 0.8;
 }
 .container .right-bar .allCar {
   background-color: #1296db;

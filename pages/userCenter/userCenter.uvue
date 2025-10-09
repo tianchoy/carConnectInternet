@@ -70,7 +70,7 @@
 	// 平台续费
 	const platformRenewal = () => {
 		uni.showToast({
-			title: '功能开发中…',
+			title: '流量续费5元每年',
 			icon: 'none'
 		})
 	}

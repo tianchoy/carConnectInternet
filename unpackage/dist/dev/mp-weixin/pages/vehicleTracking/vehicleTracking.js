@@ -91,8 +91,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   latitude: position.latitude,
                   longitude: position.longitude,
                   iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-                  width: 25,
-                  height: 25,
+                  width: 20,
+                  height: 20,
                   rotate: calculateMapRotation(lastDirection.value),
                   callout: new UTSJSONObject({
                     content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
@@ -192,8 +192,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
             longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
             iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-            width: 40,
-            height: 40,
+            width: 20,
+            height: 20,
             rotate: calculateMapRotation(lastDirection.value),
             callout: new UTSJSONObject({
               content: `速度: ${currentSpeed.value}km/h`,

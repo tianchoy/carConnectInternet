@@ -54,13 +54,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imei: [
         new UTSJSONObject({
           required: true,
-          message: "请输入设备IMEI",
+          message: "请输入设备ID",
           trigger: ["blur", "change"]
         }),
         new UTSJSONObject({
           min: 8,
           max: 18,
-          message: "IMEI长度应在8-18位之间",
+          message: "ID长度应在8-18位之间",
           trigger: ["blur", "change"]
         })
       ],
@@ -110,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceType: carInfo.value.deviceTypeValue,
               plateNo: carInfo.value.plateNo
             });
-            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:142", submitData);
+            const res = yield api_request.addDevice(submitData);
             if (res.code == 0) {
               common_vendor.index.showToast({
                 title: "添加成功",
@@ -128,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:166", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:165", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -138,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:175", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:174", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"
@@ -155,9 +155,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadCarTypeData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const res2 = yield api_request.getCarType();
-          if (res2.msg == "success") {
-            actions.value = res2.data.map((item = null) => {
+          const res = yield api_request.getCarType();
+          if (res.msg == "success") {
+            actions.value = res.data.map((item = null) => {
               return new UTSJSONObject({
                 name: item.typeName,
                 value: item.id.toString()
@@ -212,11 +212,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.p({
           border: "none",
-          placeholder: "请输入设备IMEI(必填)",
+          placeholder: "请输入设备ID(必填)",
           modelValue: carInfo.value.imei
         }),
         i: common_vendor.p({
-          label: "*设备IMEI",
+          label: "*设备ID",
           labelWidth: "150rpx",
           prop: "imei",
           borderBottom: true

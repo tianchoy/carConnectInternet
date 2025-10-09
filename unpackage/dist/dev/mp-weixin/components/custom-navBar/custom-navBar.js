@@ -76,7 +76,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: __props.showBack
       }, __props.showBack ? {
-        c: common_assets._imports_0$5,
+        c: common_assets._imports_0$4,
         d: common_vendor.o(handleBack)
       } : {}, {
         e: common_vendor.t(__props.title),

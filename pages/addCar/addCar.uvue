@@ -8,8 +8,8 @@
 					<uv-input border="none" v-model="carInfo.deviceName" placeholder="请输入设备名称">
 					</uv-input>
 				</uv-form-item>
-				<uv-form-item label="*设备IMEI" labelWidth="150rpx" prop="imei" borderBottom>
-					<uv-input border="none" v-model="carInfo.imei" placeholder="请输入设备IMEI(必填)">
+				<uv-form-item label="*设备ID" labelWidth="150rpx" prop="imei" borderBottom>
+					<uv-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
 						<template v-slot:suffix>
 							<uv-icon name="scan" size="25" @click="scanCode"></uv-icon>
 						</template>
@@ -81,13 +81,13 @@
 		imei: [
 			{
 				required: true,
-				message: '请输入设备IMEI',
+				message: '请输入设备ID',
 				trigger: ['blur', 'change']
 			},
 			{
 				min: 8,
 				max: 18,
-				message: 'IMEI长度应在8-18位之间',
+				message: 'ID长度应在8-18位之间',
 				trigger: ['blur', 'change']
 			}
 		],
@@ -139,9 +139,8 @@
 					deviceType: carInfo.value.deviceTypeValue,
 					plateNo: carInfo.value.plateNo
 				}
-				console.log(submitData)
 
-				// const res = await addDevice(submitData)
+				const res = await addDevice(submitData)
 
 				if (res.code == 0) {
 					uni.showToast({

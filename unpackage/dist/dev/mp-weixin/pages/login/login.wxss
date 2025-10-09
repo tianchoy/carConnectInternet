@@ -68,22 +68,7 @@
   margin-top: 40rpx;
 }
 .container .wechat-login-btn.data-v-27a30816 {
-  background-color: #fff !important;
-  color: #666 !important;
-  border: none !important;
-  border-radius: 50px !important;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-}
-.container .wechat-login-btn .quicker.data-v-27a30816 {
-  margin-left: 10rpx;
-  font-size: 27rpx;
-}
-.container .wechat-login-btn.data-v-27a30816::after {
-  border: none;
+  color: #fff !important;
 }
 .container .btn-text.data-v-27a30816 {
   margin-left: 10px;

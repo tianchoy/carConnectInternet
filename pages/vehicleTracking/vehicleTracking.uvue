@@ -142,8 +142,8 @@
 						latitude: position.latitude,
 						longitude: position.longitude,
 						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-						width: 25,
-						height: 25,
+						width: 20,
+						height: 20,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
 							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
@@ -274,8 +274,8 @@
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
 				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
 				iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-				width: 40,
-				height: 40,
+				width: 20,
+				height: 20,
 				rotate: calculateMapRotation(lastDirection.value), // 使用修正后的方向
 				callout: {
 					content: `速度: ${currentSpeed.value}km/h`,

@@ -340,8 +340,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         id,
         latitude: lat,
         longitude: lng,
-        width: 25,
-        height: 25,
+        width: 20,
+        height: 20,
         iconPath: datainfo.value.connectionStatus == "online" ? "/static/car.png" : "/static/offline.png",
         callout: new UTSJSONObject({
           content: title || (datainfo.value.connectionStatus == "online" ? "设备位置" : "设备已离线"),
@@ -391,7 +391,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.unref(center).longitude,
         g: common_vendor.unref(markers),
         h: common_vendor.unref(mapScale),
-        i: common_assets._imports_0$2,
+        i: common_assets._imports_0$1,
         j: common_vendor.o(navTo),
         k: common_vendor.t(common_vendor.unref(imei)),
         l: common_vendor.unref(currentCarInfo).voltage

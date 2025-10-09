@@ -24,9 +24,8 @@
 				</view>
 			</view>
 			<view class="tool-tag-item">
-				<view class="">
-					<uv-icon :name="isPlaying ? 'pause-circle':'play-circle' " size="30"
-						@click="togglePlayback"></uv-icon>
+				<view @click="togglePlayback">
+					{{isPlaying ? '暂停':'播放' }}
 				</view>
 				<view class="slider">
 					<uv-slider v-model="playbackSpeed" backgroundColor="#f5f5f5" activeColor="#1890FF" min="1" max="10"
@@ -214,7 +213,7 @@
 		}
 
 		endTime.value = formatTime(now)
-		const startDate = new Date(now.getTime() - 3600000)
+		const startDate = new Date(now.getTime() - 3600000*24)
 		startTime.value = formatTime(startDate)
 	}
 
@@ -226,8 +225,8 @@
 				latitude: trackPoints.value[0].latitude,
 				longitude: trackPoints.value[0].longitude,
 				iconPath: '/static/car.png',
-				width: 25,
-				height: 25,
+				width: 20,
+				height: 20,
 				rotate: trackPoints.value[0].rotation || 0,
 				anchor: { x: 0.5, y: 0.5 },
 				callout: {

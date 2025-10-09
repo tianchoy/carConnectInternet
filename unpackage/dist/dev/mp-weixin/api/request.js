@@ -1,9 +1,9 @@
 "use strict";
 const api_http = require("./http.js");
-const loginUrl = "/sys/login";
 const devicePos = "/gps/lastPosition?deptId=";
 const trackPos = "/gps/trackPos?";
 const userinfo = "/sys/user/info";
+const addDeviceUrl = "/userDevice/add";
 const userDeviceList = "/userDevice/list";
 const wechatLogin = "/authLogin";
 const changePSW = "/sys/user/password";
@@ -21,9 +21,6 @@ const unbindDeviceList = "/device/unbindGeofenceList";
 const bindDeviceList = "/device/bindGeofenceList";
 const bindGeofence = "/geofence/bind";
 const unbindGeofence = "/geofence/unbind";
-const login = (data) => {
-  return api_http.http.post(loginUrl, data);
-};
 const logout = () => {
   return api_http.http.post(logoutUrl);
 };
@@ -41,6 +38,9 @@ const getTrackPos = (data) => {
 };
 const getUserInfo = () => {
   return api_http.http.get(userinfo);
+};
+const addDevice = (data) => {
+  return api_http.http.post(addDeviceUrl, data);
 };
 const getUserDeviceList = (data) => {
   return api_http.http.post(userDeviceList, data);
@@ -91,6 +91,7 @@ const unbindDevices = (data) => {
   return api_http.http.delete(unbindGeofence, data);
 };
 exports.PostWechatlogin = PostWechatlogin;
+exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
 exports.changePassWord = changePassWord;
@@ -107,7 +108,6 @@ exports.getUserDeviceList = getUserDeviceList;
 exports.getUserGroupList = getUserGroupList;
 exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
-exports.login = login;
 exports.logout = logout;
 exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;

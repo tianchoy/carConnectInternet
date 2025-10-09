@@ -169,7 +169,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
       };
       endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5);
+      const startDate = new Date(now.getTime() - 36e5 * 24);
       startTime.value = formatTime(startDate);
     }
     function initCarMarker() {
@@ -180,8 +180,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             latitude: trackPoints.value[0].latitude,
             longitude: trackPoints.value[0].longitude,
             iconPath: "/static/car.png",
-            width: 25,
-            height: 25,
+            width: 20,
+            height: 20,
             rotate: trackPoints.value[0].rotation || 0,
             anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
             callout: new UTSJSONObject({
@@ -488,11 +488,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: common_vendor.o(($event) => {
           return showPicker("end");
         }),
-        q: common_vendor.o(togglePlayback),
-        r: common_vendor.p({
-          name: isPlaying.value ? "pause-circle" : "play-circle",
-          size: "30"
-        }),
+        q: common_vendor.t(isPlaying.value ? "暂停" : "播放"),
+        r: common_vendor.o(togglePlayback),
         s: common_vendor.o(setPlaybackSpeed),
         t: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
