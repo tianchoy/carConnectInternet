@@ -14,10 +14,10 @@ function handleTokenExpired() {
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:46", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:45", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:49", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:48", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -59,7 +59,7 @@ function errorHandler(error, config) {
   if (config.showLoading !== false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:110", "请求错误详情:", error);
+  common_vendor.index.__f__("log", "at api/http.uts:107", "请求错误详情:", error);
   if (error.statusCode) {
     switch (error.statusCode) {
       case 401:

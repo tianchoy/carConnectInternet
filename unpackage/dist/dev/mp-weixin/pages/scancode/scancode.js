@@ -83,7 +83,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: common_vendor.p({
-          title: "扫码添加IMEI",
+          title: "扫码添加ID",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",

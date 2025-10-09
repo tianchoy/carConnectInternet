@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="扫码添加IMEI" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		<custom-navBar title="扫码添加ID" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="scancode-box">
 			<camera device-position="back" mode="scanCode" flash="off" @scancode="handleScan" @error="error"

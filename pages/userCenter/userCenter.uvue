@@ -8,7 +8,7 @@
 					<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
 				</view>
 				<view class="user-info">
-					<text>{{userInfo.username}}</text>
+					<text>{{userInfo.nickname}}</text>
 				</view>
 			</view>
 			<uv-icon name="arrow-right" size="16"></uv-icon>
@@ -30,12 +30,11 @@
 	import { getUserInfo, getUserDeviceList } from '../../api/request';
 	const userInfo = ref({
 		avatar: '/static/avatar.png',
-		username: '123456789',
+		nickname: '',
 	})
 	const carsnumber = ref(0)
 
 	onShow(() => {
-		
 		loadData()
 	})
 

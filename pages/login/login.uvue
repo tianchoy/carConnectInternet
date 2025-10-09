@@ -38,7 +38,7 @@
 			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button> -->
 
 			<view v-else>
-				<button open-type="getPhoneNumber" type="primary" @getphonenumber="handleGetPhoneNumber" class="wechat-login-btn">
+				<button open-type="getPhoneNumber" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">
 					快捷登录
 				</button>
 			</view>
