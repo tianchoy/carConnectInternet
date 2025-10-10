@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
+const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
@@ -57,6 +58,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const imei = common_vendor.ref("");
     const connectionStatus = common_vendor.ref("");
     const deptId = common_vendor.ref("");
+    const carType = common_vendor.ref("");
     const center = common_vendor.reactive(new UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
@@ -130,6 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imei.value = option.imei;
       currentCar.value = option.plateNo;
       deptId.value = option.deptId;
+      carType.value = option.carType;
       loadInitialPosition();
       loadGeofenceList();
     });
@@ -161,9 +164,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     id: 0,
                     latitude: position.latitude,
                     longitude: position.longitude,
-                    iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-                    width: 20,
-                    height: 20,
+                    iconPath: connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+                    width: 25,
+                    height: 25,
                     rotate: calculateMapRotation(lastDirection.value),
                     callout: new UTSJSONObject({
                       content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
@@ -184,7 +187,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:339", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:342", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -214,7 +217,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           renderFencesOnMap();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:371", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:374", "加载围栏列表失败:", error);
           common_vendor.index.showToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -308,7 +311,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const _b = common_vendor.__read(centerStr.trim().split(" ").map(Number), 2), lat = _b[0], lng = _b[1];
         const radius = Number(radiusStr.trim());
         if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:496", "无效的圆形围栏数据:", circleStr);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:499", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -318,7 +321,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:509", "解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:512", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     };
@@ -462,7 +465,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:671", "删除围栏失败:", error);
+                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:674", "删除围栏失败:", error);
                   common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                 }
               }
@@ -514,7 +517,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "保存失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:727", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:730", "保存围栏失败:", error);
           common_vendor.index.showToast({ title: "保存失败", icon: "none" });
         }
       });
@@ -566,7 +569,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.bind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:787", "加载已绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:790", "加载已绑定设备失败:", error);
         } finally {
           pagination.bind.loadingMore = false;
         }
@@ -594,7 +597,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pagination.unbind.pageNum += 1;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:821", "加载未绑定设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:824", "加载未绑定设备失败:", error);
         } finally {
           pagination.unbind.loadingMore = false;
         }
@@ -636,7 +639,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:869", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:872", "设备绑定操作失败:", error);
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;

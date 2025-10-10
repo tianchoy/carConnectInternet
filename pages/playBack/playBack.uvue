@@ -60,6 +60,7 @@
 <script setup lang="uts">
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
+	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -80,6 +81,7 @@
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
+	const carType = ref<string | null>('')
 
 	// 日期时间选择器相关
 	const showDateTimePicker = ref(false)
@@ -224,9 +226,10 @@
 				id: 999,
 				latitude: trackPoints.value[0].latitude,
 				longitude: trackPoints.value[0].longitude,
-				iconPath: '/static/car.png',
-				width: 20,
-				height: 20,
+				// iconPath: '/static/car.png',
+				iconPath: carStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+				width: 25,
+				height: 25,
 				rotate: trackPoints.value[0].rotation || 0,
 				anchor: { x: 0.5, y: 0.5 },
 				callout: {
@@ -462,6 +465,7 @@
 		imei.value = option.imei
 		carStatus.value = option.connectionStatus
 		plateNo.value = option.plateNo
+		carType.value = option.carType
 		initDateTime()
 		loadTrackPos()
 	})

@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_tiandituRoute = require("../../utils/tiandituRoute.js");
 const api_request = require("../../api/request.js");
+const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -20,6 +21,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const connectionStatus = common_vendor.ref("");
     common_vendor.ref("");
     const deptId = common_vendor.ref("");
+    const carType = common_vendor.ref("");
     const center = common_vendor.reactive(new UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
@@ -48,18 +50,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       ]
     ]);
     common_vendor.watch(currentTime, (newVal) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:92", "时间变化:", newVal);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:94", "时间变化:", newVal);
       if (isTracking.value) {
         stopTracking();
         startTracking();
       }
     });
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:101", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:103", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
       currentCar.value = option.plateNo;
       deptId.value = option.deptId;
+      carType.value = option.carType;
       loadInitialPosition();
     });
     const loadInitialPosition = () => {
@@ -70,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:118", "跟踪位置", res.data, imei.value);
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:121", "跟踪位置", res.data, imei.value);
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               if (item.imei == imei.value) {
@@ -90,9 +93,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   id: 0,
                   latitude: position.latitude,
                   longitude: position.longitude,
-                  iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-                  width: 20,
-                  height: 20,
+                  iconPath: connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+                  width: 25,
+                  height: 25,
                   rotate: calculateMapRotation(lastDirection.value),
                   callout: new UTSJSONObject({
                     content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
@@ -110,7 +113,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:168", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:171", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -161,7 +164,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             setMarkers();
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:236", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:239", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
@@ -178,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let angle = Math.atan2(dy, dx) * 180 / Math.PI;
       if (angle < 0)
         angle += 360;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:261", "计算方向:", angle);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:264", "计算方向:", angle);
       return angle;
     };
     const setMarkers = () => {
@@ -191,9 +194,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             id: 0,
             latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
             longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-            iconPath: connectionStatus.value == "online" ? "/static/car.png" : "/static/offline.png",
-            width: 20,
-            height: 20,
+            iconPath: connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+            width: 25,
+            height: 25,
             rotate: calculateMapRotation(lastDirection.value),
             callout: new UTSJSONObject({
               content: `速度: ${currentSpeed.value}km/h`,
@@ -307,7 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:418", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:421", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {

@@ -15,7 +15,13 @@
 						</template>
 					</uv-input>
 				</uv-form-item>
-				<uv-form-item label="*设备类型" labelWidth="150rpx" prop="deviceType" borderBottom
+				<uv-form-item label="自定义图标" labelWidth="150rpx" prop="deviceType" borderBottom
+					@click="deviceTypeSelectFun">
+					<uv-input border="none" v-model="carInfo.deviceTypeValue" disabled disabledColor="#fff"
+						placeholder="请选择设备图标(必选)" suffixIcon="arrow-down">
+					</uv-input>
+				</uv-form-item>
+				<!-- <uv-form-item label="*设备类型" labelWidth="150rpx" prop="deviceType" borderBottom
 					@click="deviceTypeSelectFun">
 					<uv-input border="none" v-model="carInfo.deviceType" disabled disabledColor="#fff"
 						placeholder="请选择设备类型(必选)" suffixIcon="arrow-down">
@@ -23,10 +29,18 @@
 				</uv-form-item>
 				<uv-form-item label="车牌号" labelWidth="150rpx" prop="plateNo" borderBottom>
 					<car-number-input @numberInputResult="handlePlateNumberChange" :defaultStr="'京A'" />
-				</uv-form-item>
-				<uv-action-sheet ref="deviceTypeSelect" :actions="actions" title="请选择设备类型"
+				</uv-form-item> -->
+				<!-- <uv-action-sheet ref="deviceTypeSelect" :actions="actions" title="请选择设备类型"
 					@select="deviceTypeSelectsFun" :loading="actions.length === 0">
-				</uv-action-sheet>
+				</uv-action-sheet> -->
+				<uv-popup ref="deviceTypeSelect" title="请选择图标" mode="bottom">
+					<uv-grid :col="4">
+						<uv-grid-item v-for="(item,index) in IconList" :key="index" @click="selectIcon(item)">
+							<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.img" :size="50"></uv-icon>
+							<text class="grid-text">{{item.title}}</text>
+						</uv-grid-item>
+					</uv-grid>
+				</uv-popup>
 			</uv-form>
 		</view>
 		<uv-button class="btn" type="primary" @click="submit" :loading="loading">提交</uv-button>
@@ -37,12 +51,14 @@
 	import { ref, onUnmount } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
 
+
 	interface FormData {
 		deviceName : string
 		imei : string
 		deviceType : string
 		deviceTypeValue : string
 		plateNo : string
+		carType : string
 	}
 
 	const formRef = ref(null)
@@ -53,8 +69,52 @@
 		imei: '',
 		deviceType: '',
 		deviceTypeValue: '',
-		plateNo: ''
+		plateNo: '',
+		carType : ''
 	})
+
+	const IconList = [
+		{
+			name: 'car',
+			title: '轿车',
+			img: '/static/cars/online/car.png'
+		},
+		{
+			name: 'bus',
+			title: '公交车',
+			img: '/static/cars/online/bus.png'
+		},
+		{
+			name: 'bike',
+			title: '自行车',
+			img: '/static/cars/online/bike.png'
+		},
+		{
+			name: 'moto',
+			title: '摩托车',
+			img: '/static/cars/online/moto.png'
+		},
+		{
+			name: 'diandong',
+			title: '电动车',
+			img: '/static/cars/online/diandong.png'
+		},
+		{
+			name: 'huoche',
+			title: '货车',
+			img: '/static/cars/online/huoche.png'
+		},
+		{
+			name: 'sanlun',
+			title: '三轮车',
+			img: '/static/cars/online/sanlun.png'
+		},
+		{
+			name: 'tuola',
+			title: '拖拉机',
+			img: '/static/cars/online/tuola.png'
+		}
+	]
 
 	const actions = ref([])
 
@@ -74,7 +134,17 @@
 	// 扫码结果事件处理
 	const handleScanResult = (data: { result: string }) => {
 		console.log('接收到扫码结果:', data.result)
-		carInfo.value.imei = '0' + data.result
+		//检查长度是15位，取后11位，并在前面 补零0 ，若为 11 位，则直接补 0
+		if (data.result.length === 15) {
+			carInfo.value.imei = '0' + data.result.slice(4,15)
+		} else if (data.result.length === 11) {
+			carInfo.value.imei = '0' + data.result
+		} else {
+			uni.showToast({
+				title: '请输入正确的设备ID',
+				icon: 'none'
+			})
+		}
 	}
 
 	const rules = {
@@ -94,28 +164,36 @@
 		deviceType: [
 			{
 				required: true,
-				message: '请选择设备类型',
+				message: '请选择设备图标',
 				trigger: ['blur', 'change']
 			}
 		]
 	}
 
+	const selectIcon = (item) => {
+		console.log(item.name);
+		carInfo.value.deviceType = item.name
+		carInfo.value.deviceTypeValue = item.title
+		deviceTypeSelect.value?.close()
+	}
+
 	const deviceTypeSelectFun = async () => {
 		// 如果还没有加载过数据
-		if (actions.value.length === 0) {
-			uni.showLoading({
-				title: '加载中...'
-			})
-			try {
-				await loadCarTypeData()
-			} finally {
-				uni.hideLoading()
-			}
-		}
-		// 确保有数据后再打开选择器
-		if (actions.value.length > 0) {
-			deviceTypeSelect.value?.open()
-		}
+		// if (actions.value.length === 0) {
+		// 	uni.showLoading({
+		// 		title: '加载中...'
+		// 	})
+		// 	try {
+		// 		await loadCarTypeData()
+		// 	} finally {
+		// 		uni.hideLoading()
+		// 	}
+		// }
+		// // 确保有数据后再打开选择器
+		// if (actions.value.length > 0) {
+		// 	deviceTypeSelect.value?.open()
+		// }
+		deviceTypeSelect.value?.open()
 	}
 
 	const deviceTypeSelectsFun = (e) => {
@@ -136,9 +214,11 @@
 				const submitData = {
 					deviceName: carInfo.value.deviceName,
 					imei: carInfo.value.imei,
-					deviceType: carInfo.value.deviceTypeValue,
-					plateNo: carInfo.value.plateNo
+					carType: carInfo.value.deviceType,
+					// plateNo: carInfo.value.plateNo
 				}
+
+				console.log(submitData)
 
 				const res = await addDevice(submitData)
 
@@ -180,7 +260,7 @@
 	}
 
 	onLoad(() => {
-		loadCarTypeData()
+		// loadCarTypeData()
 		// 注册扫码结果事件监听
 		uni.$on('scanCodeResult', handleScanResult)
 	})
@@ -190,28 +270,28 @@
 		uni.$off('scanCodeResult', handleScanResult)
 	})
 
-	const loadCarTypeData = async () => {
-		try {
-			const res = await getCarType()
-			if (res.msg == 'success') {
-				// 转换数据结构，匹配组件需要的格式
-				actions.value = res.data.map(item => ({
-					name: item.typeName,  // 显示的名称
-					value: item.id.toString()  // 实际值
-				}))
-			} else {
-				uni.showToast({
-					title: '获取车辆品牌失败',
-					icon: 'none'
-				})
-			}
-		} catch (error) {
-			uni.showToast({
-				title: '请求失败，请重试',
-				icon: 'none'
-			})
-		}
-	}
+	// const loadCarTypeData = async () => {
+	// 	try {
+	// 		const res = await getCarType()
+	// 		if (res.msg == 'success') {
+	// 			// 转换数据结构，匹配组件需要的格式
+	// 			actions.value = res.data.map(item => ({
+	// 				name: item.typeName,  // 显示的名称
+	// 				value: item.id.toString()  // 实际值
+	// 			}))
+	// 		} else {
+	// 			uni.showToast({
+	// 				title: '获取车辆品牌失败',
+	// 				icon: 'none'
+	// 			})
+	// 		}
+	// 	} catch (error) {
+	// 		uni.showToast({
+	// 			title: '请求失败，请重试',
+	// 			icon: 'none'
+	// 		})
+	// 	}
+	// }
 </script>
 
 <style lang="scss" scoped>
@@ -225,6 +305,11 @@
 			padding: 20rpx 40rpx;
 			background-color: #fff;
 			border-radius: 20rpx;
+		}
+
+		.grid-text{
+			margin-top: 10rpx;
+			font-size: 20rpx;
 		}
 
 		.btn {

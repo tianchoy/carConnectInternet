@@ -6,6 +6,7 @@
     "uv-form-item": "../../uni_modules/uv-form/components/uv-form-item/uv-form-item",
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
     "uv-form": "../../uni_modules/uv-form/components/uv-form/uv-form",
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
     "uv-checkbox": "../../uni_modules/uv-checkbox/components/uv-checkbox/uv-checkbox",
     "uv-checkbox-group": "../../uni_modules/uv-checkbox/components/uv-checkbox-group/uv-checkbox-group"
   }

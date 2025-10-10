@@ -174,10 +174,12 @@
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
 	const deptId = ref<string | null>('')
+	const carType = ref<string | null>('')
 	type Coordinate = {
 		latitude : number;
 		longitude : number;
@@ -272,6 +274,7 @@
 		imei.value = option.imei
 		currentCar.value = option.plateNo
 		deptId.value = option.deptId
+		carType.value = option.carType
 		loadInitialPosition()
 		loadGeofenceList() // 页面加载时获取围栏列表
 	})
@@ -309,9 +312,9 @@
 						id: 0,
 						latitude: position.latitude,
 						longitude: position.longitude,
-						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-						width: 20,
-						height: 20,
+						iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+						width: 25,
+						height: 25,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
 							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',

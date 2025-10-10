@@ -7051,9 +7051,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.81",
-    uniCompilerVersion: "4.81",
-    uniRuntimeVersion: "4.81",
+    uniCompileVersion: "4.82",
+    uniCompilerVersion: "4.82",
+    uniRuntimeVersion: "4.82",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -7081,8 +7081,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("4.81");
-      parameters.uniRuntimeVersionCode = parseFloat("4.81");
+      parameters.uniCompilerVersionCode = parseFloat("4.82");
+      parameters.uniRuntimeVersionCode = parseFloat("4.82");
     } catch (error) {
     }
   }
@@ -7209,14 +7209,14 @@ const getAppBaseInfo = {
       appLanguage: getAppLanguage(hostLanguage),
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.81",
-      uniCompilerVersion: "4.81",
-      uniRuntimeVersion: "4.81"
+      uniCompileVersion: "4.82",
+      uniCompilerVersion: "4.82",
+      uniRuntimeVersion: "4.82"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("4.81");
-        parameters.uniRuntimeVersionCode = parseFloat("4.81");
+        parameters.uniCompilerVersionCode = parseFloat("4.82");
+        parameters.uniRuntimeVersionCode = parseFloat("4.82");
       } catch (error) {
       }
     }
@@ -7993,9 +7993,9 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.3.67,169.254.193.3";
+  const hosts = "127.0.0.1,192.168.3.67";
   const port = "8090";
-  const id = "mp-weixin_IOlzUm";
+  const id = "mp-weixin_dWoYmZ";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();

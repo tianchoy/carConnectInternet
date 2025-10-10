@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
+const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
@@ -133,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
         });
       } else {
-        common_vendor.index.__f__("warn", "at pages/index/index.uvue:169", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:170", "未找到对应的设备信息", markerId);
       }
     };
     const updateMarkers = (devices = null) => {
@@ -142,28 +143,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       markers.value = devices.map((device = null, index = null) => {
         if (!device || typeof device !== "object") {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:180", "无效的设备数据", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:181", "无效的设备数据", device);
           return null;
         }
         const lat = Number(device.latitude);
         const lng = Number(device.longitude);
         if (isNaN(lat) || isNaN(lng)) {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:188", "设备经纬度无效", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:189", "设备经纬度无效", device);
           return null;
         }
         return new UTSJSONObject({
           id: Number(device.deviceId),
           latitude: lat,
           longitude: lng,
-          iconPath: device.connectionStatus == "online" ? "/static/car.png" : "/static/offline.png",
-          width: 20,
-          height: 20,
+          iconPath: device.connectionStatus == "online" ? utils_cars.getOnlineDeviceIcon(device.carType) : utils_cars.getOfflineDeviceIcon(device.carType),
+          width: 25,
+          height: 25,
           callout: new UTSJSONObject({
             padding: 5,
             borderWidth: 1,
             borderRadius: 10,
             bgColor: "#ffffff",
-            content: device.deviceName || "未命名设备",
+            content: device.deviceName || device.plateNo || "未命名设备",
             display: "ALWAYS"
           }),
           joinCluster: true,
@@ -197,7 +198,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pickerGroupTitle.value = "全部分组";
           currentGroupId.value = "all";
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:244", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:245", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
@@ -221,7 +222,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             params = new UTSJSONObject({ groupId });
           }
           const res = yield api_request.getUserDeviceList(params);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:265", "API响应数据:", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:266", "API响应数据:", res);
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -236,10 +237,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:282", "解析后的设备列表:", deviceList);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:283", "解析后的设备列表:", deviceList);
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:288", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:289", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -248,7 +249,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:298", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:299", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList(currentGroupId.value);
     };
     const getUserIn = () => {
@@ -259,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:309", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:310", "获取用户信息失败:", err);
         }
       });
     };
@@ -282,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const token = common_vendor.index.getStorageSync("token");
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:334", token);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:335", token);
         if (!token) {
           common_vendor.index.redirectTo({ url: "/pages/login/login" });
           Login.value = false;
@@ -298,7 +299,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:354", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:355", "聚合初始化完成");
               }
             }));
           }
@@ -331,7 +332,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         h: common_vendor.o(refresh),
         i: common_vendor.o(addCar),
-        j: common_vendor.t(showMap.value ? "列表" : "地图"),
+        j: common_vendor.t(showMap.value ? "车辆列表" : "地图界面"),
         k: common_vendor.o(toggleMapMode),
         l: showMap.value
       }, showMap.value ? {

@@ -10,9 +10,9 @@
 					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
 					:showCar="true"></sub-navBar>
 			</map>
-			<view class="navTo" @click="navTo">
+			<!-- <view class="navTo" @click="navTo">
 				<image src="/static/navto.png" mode="aspectFit"></image>
-			</view>
+			</view> -->
 		</view>
 
 		<view class="tools-panel">
@@ -27,9 +27,9 @@
 				</view>
 				<text class="pos-time">定位时间 {{datainfo.positionUpdateTime}}</text>
 			</view>
-			<uv-grid :col="4" @click="click">
+			<uv-grid :col="5" @click="click">
 				<uv-grid-item v-for="(item,index) in baseList" :key="index">
-					<uv-icon :customStyle="{paddingTop:40+'rpx'}" :name="item.name" :size="56"></uv-icon>
+					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="45"></uv-icon>
 					<text class="grid-text">{{item.title}}</text>
 				</uv-grid-item>
 			</uv-grid>
@@ -47,6 +47,7 @@
 <script setup lang="uts">
 	import { getDevicePos, getUserDeviceList, getDeviceDetail ,sendCommand} from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
+	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -191,19 +192,23 @@
 	{
 		name: '/static/dzwl.png',
 		title: '电子围栏'
-	}
+	},
+	{
+		name:'/static/navto.png',
+		title:'一键寻车'
+	},
 	])
 
 	const click = (name) => {
 		currentToolItem.value = name
 		if (name == 0) {
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (name == 1) {
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (name == 2) {
@@ -244,8 +249,12 @@
 		}
 		if (name == 6) {
 			uni.navigateTo({
-				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo
+				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
+		}
+		if (name == 7) {
+			// 一键寻车
+			navTo()
 		}
 	}
 
@@ -429,11 +438,11 @@
 			id,
 			latitude: lat,
 			longitude: lng,
-			width: 20,
-			height: 20,
-			iconPath:datainfo.value.connectionStatus == 'online' ? '/static/car.png' : '/static/offline.png',
+			width: 25,
+			height: 25,
+			iconPath:datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
 			callout: {
-				content: title || (datainfo.value.connectionStatus == 'online' ? '设备位置' : '设备已离线'),
+				content: title || '爱车位置',
 				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',
 				fontSize: 14,
 				borderRadius: 10,
@@ -625,7 +634,7 @@
 				/* #ifndef APP-PLUS */
 				box-sizing: border-box;
 				/* #endif */
-				font-size: 30rpx;
+				font-size: 24rpx;
 			}
 		}
 	}

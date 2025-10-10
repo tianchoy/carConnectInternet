@@ -8,19 +8,21 @@ if (!Array) {
   const _easycom_uv_form_item_1 = common_vendor.resolveComponent("uv-form-item");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
+  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
   const _easycom_uv_checkbox_1 = common_vendor.resolveComponent("uv-checkbox");
   const _easycom_uv_checkbox_group_1 = common_vendor.resolveComponent("uv-checkbox-group");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_form_1 + _easycom_uv_checkbox_1 + _easycom_uv_checkbox_group_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_form_1 + _easycom_uv_button_1 + _easycom_uv_checkbox_1 + _easycom_uv_checkbox_group_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
 const _easycom_uv_form_item = () => "../../uni_modules/uv-form/components/uv-form-item/uv-form-item.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 const _easycom_uv_form = () => "../../uni_modules/uv-form/components/uv-form/uv-form.js";
+const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 const _easycom_uv_checkbox = () => "../../uni_modules/uv-checkbox/components/uv-checkbox/uv-checkbox.js";
 const _easycom_uv_checkbox_group = () => "../../uni_modules/uv-checkbox/components/uv-checkbox-group/uv-checkbox-group.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_form + _easycom_uv_checkbox + _easycom_uv_checkbox_group)();
+  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_form + _easycom_uv_button + _easycom_uv_checkbox + _easycom_uv_checkbox_group)();
 }
 class FormData extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -90,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const showpw = common_vendor.ref(true);
     const docState = common_vendor.ref(false);
-    common_vendor.ref(true);
+    const loginType = common_vendor.ref(true);
     common_vendor.ref("");
     common_vendor.ref(null);
     const pswLogin = common_vendor.ref(false);
@@ -98,7 +100,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       username: "",
       password: ""
     }));
-    common_vendor.ref(new smsFormData({
+    const smsform = common_vendor.ref(new smsFormData({
       phone: "",
       code: ""
     }));
@@ -232,6 +234,66 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const submit = () => {
+      var _a, _b;
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:314", docState.value);
+      if (!docState.value) {
+        common_vendor.index.showToast({
+          title: "请先阅读并同意用户协议",
+          icon: "error"
+        });
+        return null;
+      }
+      if (loginType.value) {
+        (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then((res) => {
+          const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
+          api_request.login(newFormData).then((res2 = null) => {
+            common_vendor.index.setStorageSync("token", res2.data.token);
+            common_vendor.index.reLaunch({
+              url: "/pages/index/index"
+            });
+          }).catch((err = null) => {
+            common_vendor.index.showToast({
+              title: err.msg || "登录失败",
+              icon: "error"
+            });
+          });
+        }).catch((errors = null) => {
+          common_vendor.index.showToast({
+            icon: "error",
+            title: "请填写正确的账号密码"
+          });
+        });
+      } else {
+        (_b = smsformRef.value) === null || _b === void 0 ? null : _b.validate().then((res) => {
+          new UTSJSONObject(
+            {
+              phone: smsform.value.phone,
+              code: smsform.value.code,
+              from: deviceModel.value,
+              type: "SMS"
+            }
+            // 请求短信登录接口
+            // apiSmsLogin(params).then(res => {
+            // 	uni.setStorageSync('token', res.data.token)
+            // 	uni.reLaunch({
+            // 		url: '/pages/index/index'
+            // 	})
+            // }).catch(err => {
+            // 	uni.showToast({
+            // 		title: err.message || '登录失败',
+            // 		icon: 'error'
+            // 	})
+            // })
+          );
+        }).catch((errors = null) => {
+          common_vendor.index.showToast({
+            icon: "error",
+            title: "请填写正确的手机号和验证码"
+          });
+        });
+      }
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -250,6 +312,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.p({
           prefixIcon: "account-fill",
+          type: _ctx.text,
           placeholder: "请输入账号",
           modelValue: form.value.username
         }),
@@ -287,17 +350,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           model: form.value,
           rules: pswrules
         })
-      } : {
-        o: common_vendor.o(handleGetPhoneNumber)
-      }, {
-        p: common_vendor.o(isDocState),
+      } : {}, {
+        o: pswLogin.value
+      }, pswLogin.value ? {
+        p: common_vendor.o(submit),
         q: common_vendor.p({
+          type: "primary"
+        })
+      } : {
+        r: common_vendor.o(handleGetPhoneNumber)
+      }, {
+        s: common_vendor.o(isDocState),
+        t: common_vendor.p({
           checked: docState.value
         }),
-        r: common_vendor.o(isDocState),
-        s: common_vendor.t(pswLogin.value ? "快捷登录" : "密码登录"),
-        t: common_vendor.o(isPswLogin),
-        v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        v: common_vendor.o(isDocState),
+        w: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
+        x: common_vendor.o(isPswLogin),
+        y: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

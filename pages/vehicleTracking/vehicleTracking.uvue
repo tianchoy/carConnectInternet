@@ -40,6 +40,7 @@
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getRoutePlan } from '@/utils/tiandituRoute'
 	import { getDevicePos } from '../../api/request.uts'
+	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -47,6 +48,7 @@
 	const connectionStatus = ref<string | null>('')
 	const deviceId = ref<string | null>('')
 	const deptId = ref<string | null>('')
+	const carType = ref<string | null>('')
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -103,6 +105,7 @@
 		imei.value = option.imei
 		currentCar.value = option.plateNo
 		deptId.value = option.deptId
+		carType.value = option.carType
 		// 进入页面立即加载车辆位置
 		loadInitialPosition()
 	})
@@ -141,9 +144,9 @@
 						id: 0,
 						latitude: position.latitude,
 						longitude: position.longitude,
-						iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-						width: 20,
-						height: 20,
+						iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+						width: 25,
+						height: 25,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
 							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
@@ -273,9 +276,9 @@
 				id: 0, // 修改ID从0开始
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
 				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-				iconPath: connectionStatus.value == 'online' ? '/static/car.png' : '/static/offline.png',
-				width: 20,
-				height: 20,
+				iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+				width: 25,
+				height: 25,
 				rotate: calculateMapRotation(lastDirection.value), // 使用修正后的方向
 				callout: {
 					content: `速度: ${currentSpeed.value}km/h`,

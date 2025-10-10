@@ -51,8 +51,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const platformRenewal = () => {
       common_vendor.index.showToast({
-        title: "流量续费5元每年",
-        icon: "none"
+        title: "设备仍在服务期，到期流量续费5元每年",
+        icon: "none",
+        duration: 3e3
       });
     };
     return (_ctx, _cache) => {
@@ -69,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           src: common_vendor.unref(userInfo).avatar,
           shape: "circle"
         }),
-        c: common_vendor.t(common_vendor.unref(userInfo).nickname),
+        c: common_vendor.t(common_vendor.unref(userInfo).mobile),
         d: common_vendor.p({
           name: "arrow-right",
           size: "16"

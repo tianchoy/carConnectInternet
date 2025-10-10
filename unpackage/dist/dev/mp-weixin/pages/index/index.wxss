@@ -47,27 +47,27 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  font-size: 28rpx;
+  font-size: 25rpx;
 }
 .container .tool-nav .btn-map-list {
-  padding: 10rpx 15rpx;
+  padding: 7rpx 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
 }
 .container .tool-nav .addCar {
-  padding: 10rpx 15rpx;
+  padding: 7rpx 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
-  margin-right: 20rpx;
+  margin-right: 10rpx;
 }
 .container .tool-nav .refresh {
-  padding: 10rpx 15rpx;
+  padding: 7rpx 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
-  margin-right: 20rpx;
+  margin-right: 10rpx;
 }
 .container .right-bar {
   position: absolute;
@@ -108,7 +108,7 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  padding: 10rpx 20rpx;
+  padding: 10rpx;
   border-radius: 10rpx;
   background-color: rgba(3, 109, 246, 0.71);
   color: #fff;
@@ -122,5 +122,5 @@
   left: 20rpx;
 }
 .container .left-bar-state {
-  left: 220rpx;
+  left: 180rpx;
 }

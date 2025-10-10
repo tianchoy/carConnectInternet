@@ -1,5 +1,6 @@
 "use strict";
 const api_http = require("./http.js");
+const loginUrl = "/sys/login";
 const devicePos = "/gps/lastPosition?deptId=";
 const trackPos = "/gps/trackPos?";
 const userinfo = "/sys/user/info";
@@ -11,7 +12,6 @@ const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
 const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
-const carType = "/carType/listAll";
 const logoutUrl = "/sys/logout";
 const groupList = "/group/userGroupList";
 const sendcmd = "/command/sendCmd";
@@ -21,6 +21,9 @@ const unbindDeviceList = "/device/unbindGeofenceList";
 const bindDeviceList = "/device/bindGeofenceList";
 const bindGeofence = "/geofence/bind";
 const unbindGeofence = "/geofence/unbind";
+const login = (data) => {
+  return api_http.http.post(loginUrl, data);
+};
 const logout = () => {
   return api_http.http.post(logoutUrl);
 };
@@ -63,9 +66,6 @@ const editDeviceInfo = (data) => {
 const getDeviceDetail = (deviceId) => {
   return api_http.http.get(`${deviceDetail}${deviceId}`);
 };
-const getCarType = () => {
-  return api_http.http.get(carType);
-};
 const getGeofenceList = () => {
   return api_http.http.get(getGeofence);
 };
@@ -98,7 +98,6 @@ exports.changePassWord = changePassWord;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
 exports.getBoundDevices = getBoundDevices;
-exports.getCarType = getCarType;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getGeofenceList = getGeofenceList;
@@ -108,6 +107,7 @@ exports.getUserDeviceList = getUserDeviceList;
 exports.getUserGroupList = getUserGroupList;
 exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
+exports.login = login;
 exports.logout = logout;
 exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;

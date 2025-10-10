@@ -12,9 +12,9 @@
 		</view>
 		<view class="tool-nav">
 			<view class="refresh" @click="refresh">刷新</view>
-			<view class="addCar" @click="addCar">添加</view>
+			<view class="addCar" @click="addCar">添加车辆</view>
 			<view class="btn-map-list" @click="toggleMapMode">
-				{{showMap ? '列表' : '地图'}}
+				{{showMap ? '车辆列表' : '地图界面'}}
 			</view>
 		</view>
 		<view class="right-bar" v-if="showMap">
@@ -23,11 +23,11 @@
 			<view class="offlineCar" @click="goToList('offline')">离线 {{offlineCount}}</view>
 		</view>
 		<view class="left-bar" @click="handStatePicker">
-			<text style="margin-right: 20rpx;">{{pickerStateTitle}}</text>
+			<text>{{pickerStateTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
 		<view class="left-bar-state" @click="handGroupPicker" v-if="!showMap">
-			<text style="margin-right: 20rpx;">{{pickerGroupTitle}}</text>
+			<text>{{pickerGroupTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
 		<uv-picker ref="picker" :columns="columns" keyName="name" @confirm="confirm"></uv-picker>
@@ -39,6 +39,7 @@
 	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList } from '../../api/request.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 
 	const Login = ref<boolean>(false)
 	const mapScale = ref(4)
@@ -193,15 +194,15 @@
 				id: Number(device.deviceId),
 				latitude: lat,
 				longitude: lng,
-				iconPath: device.connectionStatus == 'online' ? '/static/car.png' : '/static/offline.png',
-				width: 20,
-				height: 20,
+				iconPath: device.connectionStatus == 'online' ? getOnlineDeviceIcon(device.carType) : getOfflineDeviceIcon(device.carType),
+				width: 25,
+				height: 25,
 				callout: {
 					padding: 5,
 					borderWidth: 1,
 					borderRadius: 10,
 					bgColor: '#ffffff',
-					content: device.deviceName || '未命名设备',
+					content: device.deviceName || device.plateNo || '未命名设备',
 					display: 'ALWAYS'
 				},
 				joinCluster: true, // 允许聚合
@@ -389,28 +390,28 @@
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
-			font-size: 28rpx;
+			font-size: 25rpx;
 
 			.btn-map-list {
-				padding: 10rpx 15rpx;
+				padding: 7rpx 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
 			}
 
 			.addCar {
-				padding: 10rpx 15rpx;
+				padding: 7rpx 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
-				margin-right: 20rpx;
+				margin-right: 10rpx;
 			}
 			.refresh{
-				padding: 10rpx 15rpx;
+				padding: 7rpx 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
-				margin-right: 20rpx;
+				margin-right: 10rpx;
 			}
 		}
 
@@ -459,7 +460,7 @@
 			z-index: 100;
 			display: flex;
 			align-items: center;
-			padding: 10rpx 20rpx;
+			padding: 10rpx;
 			border-radius: 10rpx;
 			background-color: rgba(3, 109, 246, 0.71);
 			color: #fff;
@@ -475,7 +476,7 @@
 		}
 
 		.left-bar-state {
-			left: 220rpx;
+			left: 180rpx;
 		}
 	}
 </style>

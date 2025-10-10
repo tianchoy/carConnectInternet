@@ -7,13 +7,13 @@
 				基本信息
 			</view>
 			<view class="list">
-				<view class="item">
+				<!-- <view class="item">
 					<text>账号</text>
 					<view class="right">
 						<text class="info">{{userInfo.id}}</text>
-						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
+						<uv-icon name="arrow-right" size="18"></uv-icon>
 					</view>
-				</view>
+				</view> -->
 				<view class="item">
 					<text>手机号</text>
 					<view class="right">
@@ -117,7 +117,7 @@
 					flex-direction: row;
 					justify-content: space-between;
 					align-items: center;
-					padding: 30rpx 20rpx;
+					padding: 10rpx;
 					border-bottom: 1rpx solid #e5e5e5;
 
 					.right {

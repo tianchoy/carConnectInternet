@@ -8,7 +8,7 @@
 					<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
 				</view>
 				<view class="user-info">
-					<text>{{userInfo.nickname}}</text>
+					<text>{{userInfo.mobile}}</text>
 				</view>
 			</view>
 			<uv-icon name="arrow-right" size="16"></uv-icon>
@@ -69,8 +69,9 @@
 	// 平台续费
 	const platformRenewal = () => {
 		uni.showToast({
-			title: '流量续费5元每年',
-			icon: 'none'
+			title: '设备仍在服务期，到期流量续费5元每年',
+			icon: 'none',
+			duration:3000
 		})
 	}
 </script>

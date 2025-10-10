@@ -9,9 +9,10 @@
 				<text class="info">{{carInfo.deviceId}}</text>
 			</view>
 			<view class="list">
-				<text class="title">品牌型号</text>
+				<text class="title">自定义图标</text>
 				<text class="info" v-if="!isEditing">{{carInfo.carType}}</text>
-				<uv-input v-else v-model="editInfo.carType" border="surround" inputAlign="right" class="input" />
+				<!-- <uv-input v-else v-model="editInfo.carType"  @click="deviceTypeSelectFun" disabled="true" border="none" inputAlign="right" class="input" /> -->
+				<text style="flex:1" v-else @click="deviceTypeSelectFun">{{editInfo.carTypeValue || '请选择图标'}}</text>
 			</view>
 			<view class="list">
 				<text class="title">车牌号</text>
@@ -36,6 +37,15 @@
 			<button @click="saveChanges" class="save-btn">保存</button>
 			<button @click="cancelEdit" class="cancel-btn">取消</button>
 		</view>
+
+		<uv-popup ref="deviceTypeSelect" title="请选择图标" mode="bottom">
+			<uv-grid :col="4">
+				<uv-grid-item v-for="(item,index) in IconList" :key="index" @click="selectIcon(item)">
+					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.img" :size="50"></uv-icon>
+					<text class="grid-text">{{item.title}}</text>
+				</uv-grid-item>
+			</uv-grid>
+		</uv-popup>
 	</view>
 </template>
 
@@ -47,7 +57,60 @@
 	const isEditing = ref(false)
 	const carInfo = ref<UTSJSONObject>({})
 	const editInfo = ref<UTSJSONObject>({})
-
+	const deviceTypeSelect = ref(null)
+	const IconList = [
+		{
+			name: 'car',
+			title: '轿车',
+			img: '/static/cars/online/car.png'
+		},
+		{
+			name: 'bus',
+			title: '公交车',
+			img: '/static/cars/online/bus.png'
+		},
+		{
+			name: 'bike',
+			title: '自行车',
+			img: '/static/cars/online/bike.png'
+		},
+		{
+			name: 'moto',
+			title: '摩托车',
+			img: '/static/cars/online/moto.png'
+		},
+		{
+			name: 'diandong',
+			title: '电动车',
+			img: '/static/cars/online/diandong.png'
+		},
+		{
+			name: 'huoche',
+			title: '货车',
+			img: '/static/cars/online/huoche.png'
+		},
+		{
+			name: 'sanlun',
+			title: '三轮车',
+			img: '/static/cars/online/sanlun.png'
+		},
+		{
+			name: 'tuola',
+			title: '拖拉机',
+			img: '/static/cars/online/tuola.png'
+		}
+	]
+	
+	// 选择图标
+	const selectIcon = (item) => {
+		editInfo.value.carType = item.name
+		editInfo.value.carTypeValue = item.title
+		deviceTypeSelect.value?.close()
+	}
+	// 打开图标选择弹窗
+	const deviceTypeSelectFun = async () => {
+		deviceTypeSelect.value?.open()
+	}
 	// 处理车牌号输入结果
 	const handlePlateNumberChange = (e : string) => {
 		console.log(e.length)
@@ -77,7 +140,7 @@
 			carType: editInfo.value.carType,
 			plateNo: editInfo.value.plateNo,
 			carVin: editInfo.value.carVin,
-			engineNum: editInfo.value.engineNum
+			engineNum: editInfo.value.engineNum,
 		}
 		carInfo.value = JSON.parse(JSON.stringify(editInfo.value))
 		isEditing.value = false

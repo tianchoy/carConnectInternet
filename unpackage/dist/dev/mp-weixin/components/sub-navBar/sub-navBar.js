@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: __props.showTime
       }, __props.showTime ? {
         b: common_vendor.t(__props.currentTime),
-        c: common_assets._imports_0$5,
+        c: common_assets._imports_0$4,
         d: common_vendor.o(handleTime)
       } : {}, {
         e: __props.showCar

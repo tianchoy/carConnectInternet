@@ -36,6 +36,10 @@
   background-color: #fff;
   border-radius: 20rpx;
 }
+.container .grid-text.data-v-6409e324 {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+}
 .container .btn.data-v-6409e324 {
   margin: 50rpx 20rpx 0 20rpx;
 }

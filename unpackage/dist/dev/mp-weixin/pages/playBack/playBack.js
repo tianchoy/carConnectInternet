@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
+const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -61,6 +62,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const imei = common_vendor.ref("");
     const carStatus = common_vendor.ref("");
     const plateNo = common_vendor.ref("");
+    const carType = common_vendor.ref("");
     const showDateTimePicker = common_vendor.ref(false);
     const currentPickerType = common_vendor.ref("start");
     const pickerTitle = common_vendor.ref("选择开始时间");
@@ -179,9 +181,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             id: 999,
             latitude: trackPoints.value[0].latitude,
             longitude: trackPoints.value[0].longitude,
-            iconPath: "/static/car.png",
-            width: 20,
-            height: 20,
+            // iconPath: '/static/car.png',
+            iconPath: carStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+            width: 25,
+            height: 25,
             rotate: trackPoints.value[0].rotation || 0,
             anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
             callout: new UTSJSONObject({
@@ -380,6 +383,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imei.value = option.imei;
       carStatus.value = option.connectionStatus;
       plateNo.value = option.plateNo;
+      carType.value = option.carType;
       initDateTime();
       loadTrackPos();
     });

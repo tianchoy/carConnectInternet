@@ -10,7 +10,7 @@
 		<view class="content">
 			<uv-form :model="form" :rules="pswrules" ref="formRef" v-if="pswLogin">
 				<uv-form-item label="" prop="username" labelWidth="0">
-					<uv-input prefixIcon="account-fill" v-model="form.username" placeholder="请输入账号" />
+					<uv-input prefixIcon="account-fill" v-model="form.username" :type="text" placeholder="请输入账号" />
 				</uv-form-item>
 				<uv-form-item label="" prop="password" labelWidth="0">
 					<uv-input prefixIcon="lock-fill" v-model="form.password" :type="showpw?'password':'text'"
@@ -34,12 +34,12 @@
 						</template>
 					</uv-input>
 				</uv-form-item>
-			</uv-form>
-			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button> -->
+			</uv-form> -->
+			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button>
 
 			<view v-else>
 				<button open-type="getPhoneNumber" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">
-					快捷登录
+					个人用户登录
 				</button>
 			</view>
 
@@ -52,7 +52,7 @@
 				</uv-checkbox-group>
 			</view>
 		</view>
-		<view style="padding:0 40rpx;color:#eee;font-size:25rpx;text-align: right;" @click="isPswLogin">{{pswLogin?'快捷登录':'密码登录'}}</view>
+		<view style="padding:0 40rpx;color:#e1e1e1;font-size:25rpx;text-align: right;" @click="isPswLogin">{{pswLogin?'个人用户登录':'企业用户登录'}}</view>
 		
 	</view>
 </template>

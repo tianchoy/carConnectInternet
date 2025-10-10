@@ -168,5 +168,5 @@
 .container .tools-panel .grid-text {
   padding: 20rpx 0 0;
   box-sizing: border-box;
-  font-size: 30rpx;
+  font-size: 24rpx;
 }
