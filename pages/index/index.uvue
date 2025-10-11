@@ -256,7 +256,9 @@
 
 	const loadUserDeviceList = async (groupId : string = '') => {
 		try {
-			let params = {}
+			let params = {
+				pageSize: 1000
+			}
 			// 如果不是全部分组，添加分组ID参数
 			if (groupId && groupId !== 'all') {
 				params = { groupId: groupId }

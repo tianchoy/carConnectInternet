@@ -17,7 +17,9 @@
     "pages/userCenter/carList/carList",
     "pages/userCenter/carDetail/carDetail",
     "pages/geofencing/geofencing",
-    "pages/scancode/scancode"
+    "pages/scancode/scancode",
+    "pages/userCenter/payDeviceList/payDeviceList",
+    "pages/userCenter/renewal/renewal"
   ],
   "window": {
     "navigationStyle": "custom",

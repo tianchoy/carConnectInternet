@@ -1,0 +1,1 @@
+{"version":3,"file":"renewal.js","sources":["pages/userCenter/renewal/renewal.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/carConnectInternet/pages/userCenter/renewal/renewal.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;AACA,GAAG,WAAW,eAAe;"}

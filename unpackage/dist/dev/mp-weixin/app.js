@@ -20,6 +20,8 @@ if (!Math) {
   "./pages/userCenter/carDetail/carDetail.js";
   "./pages/geofencing/geofencing.js";
   "./pages/scancode/scancode.js";
+  "./pages/userCenter/payDeviceList/payDeviceList.js";
+  "./pages/userCenter/renewal/renewal.js";
 }
 let updateManager = null;
 function checkForUpdates() {

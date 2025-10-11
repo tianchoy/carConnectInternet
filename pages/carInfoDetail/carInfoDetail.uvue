@@ -10,23 +10,55 @@
 					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
 					:showCar="true"></sub-navBar>
 			</map>
-			<!-- <view class="navTo" @click="navTo">
-				<image src="/static/navto.png" mode="aspectFit"></image>
-			</view> -->
 		</view>
 
 		<view class="tools-panel">
+			<!-- 刷新状态 -->
+			<!-- <view class="refresh-status">
+				<text class="refresh-text" :class="{ refreshing: isRefreshing }">
+					{{ isRefreshing ? '自动刷新中...' : '手动刷新' }}
+				</text>
+				<text class="refresh-btn" @click="manualRefresh">刷新</text>
+			</view> -->
+
 			<view class="Imei-box" @click="carDetail">
 				<view class="imei-info">
 					<view class="imeis">
 						<text>IMEI {{imei}}</text>
 						<text class="power" v-if="currentCarInfo.voltage">电压:{{currentCarInfo.voltage}}V</text>
-						<text class="battery" v-if="datainfo.batteryPercent" :style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量 {{datainfo.batteryPercent}}%</text>
+						<text class="battery" v-if="datainfo.batteryPercent"
+							:style="{ color: getBatteryColor(datainfo.batteryPercent) }">电量
+							{{datainfo.batteryPercent}}%</text>
 					</view>
-					<uv-icon name="arrow-right" :bold="true" :size="25"></uv-icon>
+					<uv-icon name="arrow-right" :bold="true" :size="16"></uv-icon>
 				</view>
+				<view class="signal-container" v-if="currentCarInfo.attribute?.rssi || currentCarInfo.attribute?.sat">
+					<view v-if="currentCarInfo.attribute?.rssi" class="signal-item">
+						<view class="mobile-signal">
+							<view class="signal-bars-horizontal">
+								<view class="signal-bar-h" :class="getMobileSignalBarClass(0, currentCarInfo.attribute?.rssi)"></view>
+								<view class="signal-bar-h" :class="getMobileSignalBarClass(1, currentCarInfo.attribute?.rssi)"></view>
+								<view class="signal-bar-h" :class="getMobileSignalBarClass(2, currentCarInfo.attribute?.rssi)"></view>
+								<view class="signal-bar-h" :class="getMobileSignalBarClass(3, currentCarInfo.attribute?.rssi)"></view>
+								<view class="signal-bar-h" :class="getMobileSignalBarClass(4, currentCarInfo.attribute?.rssi)"></view>
+							</view>
+							<view class="signal-info-h">
+								<text class="signal-value">{{currentCarInfo.attribute?.rssi}}dBm</text>
+								<text class="experience" :style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">
+									{{getSignalDetail(currentCarInfo.attribute?.rssi).experience}}
+								</text>
+							</view>
+						</view>
+					</view>
+					<view v-if="currentCarInfo.attribute?.sat" class="satellite-item-h">
+						<view class="satellite-icon">🛰️</view>
+						<text class="satellite-text">卫星: {{currentCarInfo.attribute?.sat}}</text>
+					</view>
+				</view>
+				
 				<text class="pos-time">定位时间 {{datainfo.positionUpdateTime}}</text>
 			</view>
+			
 			<uv-grid :col="5" @click="click">
 				<uv-grid-item v-for="(item,index) in baseList" :key="index">
 					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="45"></uv-icon>
@@ -34,18 +66,19 @@
 				</uv-grid-item>
 			</uv-grid>
 		</view>
+		
 		<view>
 			<uv-modal ref="popupRef" :title="modalTitle" @confirm="confirm">
 				<view>
-					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable :password="true" v-model="psw" ></uv-input>
+					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable :password="true"
+						v-model="psw"></uv-input>
 				</view>
 			</uv-modal>
 		</view>
 	</view>
 </template>
-
 <script setup lang="uts">
-	import { getDevicePos, getUserDeviceList, getDeviceDetail ,sendCommand} from '../../api/request.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
@@ -105,9 +138,9 @@
 	// 获取电池颜色
 	const getBatteryColor = (batteryPercent) => {
 		if (!batteryPercent) return '#c9c9c9'
-		
+
 		const batteryValue = parseInt(batteryPercent)
-		
+
 		if (batteryValue >= 70) {
 			return '#07C160' // 绿色，电量充足
 		} else if (batteryValue >= 30) {
@@ -117,6 +150,83 @@
 		} else {
 			return '#FF0000' // 红色，电量严重不足
 		}
+	}
+
+	// 信号强度处理方法
+	function getSignalDetail(rssi) {
+		// 处理 null、undefined 或空字符串的情况
+		if (rssi === null || rssi === undefined || rssi === '') {
+			return { experience: "无信号数据", color: "#999" };
+		}
+		
+		const signalValue = Number(rssi);
+		
+		if (isNaN(signalValue)) {
+			return { experience: "信号数据无效", color: "#999" };
+		}
+		
+		// 判断逻辑
+		if (signalValue > -30) {
+			return { experience: "信号极强", color: "#389e0d" };
+		} else if (signalValue >= -50) {
+			return { experience: "完美", color: "#52c41a" };
+		} else if (signalValue >= -60) {
+			return { experience: "优秀", color: "#73d13d" };
+		} else if (signalValue >= -70) {
+			return { experience: "很好", color: "#1890ff" };
+		} else if (signalValue >= -80) {
+			return { experience: "中等", color: "#faad14" };
+		} else if (signalValue >= -90) {
+			return { experience: "较差", color: "#fa8c16" };
+		} else {
+			return { experience: "无法使用", color: "#f5222d" };
+		}
+	}
+
+	// 样式计算方法
+	const getMobileSignalBarClass = (barIndex, rssi) => {
+		if (rssi === null || rssi === undefined || rssi === '') {
+			return 'bar-off';
+		}
+		
+		const signalValue = Number(rssi);
+		if (isNaN(signalValue)) return 'bar-off';
+		
+		// 根据信号强度决定哪些信号条亮起
+		if (signalValue >= -60) {
+			// 强信号：所有条都亮 (5格)
+			return barIndex <= 4 ? 'bar-active' : 'bar-off';
+		} else if (signalValue >= -70) {
+			// 中等信号：4个条亮
+			return barIndex <= 3 ? 'bar-active' : 'bar-off';
+		} else if (signalValue >= -80) {
+			// 较弱信号：3个条亮
+			return barIndex <= 2 ? 'bar-active' : 'bar-off';
+		} else if (signalValue >= -90) {
+			// 弱信号：2个条亮
+			return barIndex <= 1 ? 'bar-active' : 'bar-off';
+		} else {
+			// 极弱信号：1个条亮或无信号
+			return barIndex <= 0 ? 'bar-active' : 'bar-off';
+		}
+	}
+
+	// 获取手机信号颜色
+	const getMobileSignalColor = (rssi) => {
+		const signalDetail = getSignalDetail(rssi);
+		return signalDetail.color;
+	}
+
+	// 手动刷新方法
+	const manualRefresh = () => {
+		loadData({
+			deptId: deptId.value,
+			deviceids: imei.value
+		})
+		uni.showToast({
+			title: '刷新成功',
+			icon: 'success'
+		})
 	}
 
 	watch(currentTime, (newVal) => {
@@ -146,7 +256,7 @@
 		// 将字符串值转换为数字(秒)
 		const intervalSeconds = parseInt(intervalValue)
 
-		if (intervalSeconds > 0 ) {
+		if (intervalSeconds > 0) {
 
 			isRefreshing.value = true
 			// 将秒转换为毫秒
@@ -182,20 +292,20 @@
 		title: '停车记录'
 	},
 	{
-		name:'/static/power.png',
-		title:'恢复油电'
+		name: '/static/power.png',
+		title: '恢复油电'
 	},
 	{
-		name:'/static/offpower.png',
-		title:'断开油电'
+		name: '/static/offpower.png',
+		title: '断开油电'
 	},
 	{
 		name: '/static/dzwl.png',
 		title: '电子围栏'
 	},
 	{
-		name:'/static/navto.png',
-		title:'一键寻车'
+		name: '/static/navto.png',
+		title: '一键寻车'
 	},
 	])
 
@@ -218,7 +328,7 @@
 		}
 		if (name == 3) {
 			uni.navigateTo({
-				url: '/pages/stopRecord/stopRecord?imei=' + imei.value+ '&deptId=' + deptId.value
+				url: '/pages/stopRecord/stopRecord?imei=' + imei.value + '&deptId=' + deptId.value
 			})
 		}
 		if (name == 4) {
@@ -249,7 +359,7 @@
 		}
 		if (name == 6) {
 			uni.navigateTo({
-				url:'/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (name == 7) {
@@ -262,7 +372,7 @@
 	const executeOperation = async (operationType) => {
 		let predictCmdId = 0
 		let type = 0
-		
+
 		if (operationType == 1) {
 			// 恢复油电
 			predictCmdId = 2
@@ -278,33 +388,33 @@
 			})
 			return
 		}
-		
+
 		try {
 			// 显示加载中
 			uni.showLoading({
 				title: '执行中...',
 				mask: true
 			})
-			
+
 			// 调用接口
 			const res = await sendCommand({
 				imei: imei.value,
 				password: userType.value == '1' ? psw.value : '', // 根据用户类型决定是否传密码
-				params:['1111'],
+				params: ['1111'],
 				predictCmdId: predictCmdId,
 				type: type
 			})
-			
+
 			// 隐藏加载中
 			uni.hideLoading()
-			
+
 			// 根据响应处理结果
 			if (res.code == 0) {
 				uni.showToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
 				})
-				
+
 				// 清空密码
 				psw.value = ''
 			} else {
@@ -316,7 +426,7 @@
 		} catch (error) {
 			// 隐藏加载中
 			uni.hideLoading()
-			
+
 			console.error('操作失败:', error)
 			uni.showToast({
 				title: '操作失败，请重试',
@@ -326,14 +436,14 @@
 	}
 
 	const confirm = async () => {
-		if(userType.value == '1' && psw.value == ''){
+		if (userType.value == '1' && psw.value == '') {
 			uni.showToast({
 				title: '请输入密码',
 				icon: 'none'
 			})
 			return
 		}
-		
+
 		// 执行当前操作
 		executeOperation(currentOperation.value);
 	}
@@ -369,40 +479,61 @@
 	}
 
 	const loadData = async (data : object) => {
-		const res = await getDevicePos(data)
-
-		res.data.forEach(async item => {
-			if (item.imei == imei.value) {
-				datainfo.value = item
-				
-				// 转换坐标到腾讯地图坐标系
-				const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
-				center.latitude = convertedCoord.lat
-				center.longitude = convertedCoord.lng
-				
-				const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
-				address.value = addr.result.formatted_address;
-
-				const deviceMarker = createMarker(
-					1,
-					convertedCoord.lat,
-					convertedCoord.lng,
-					'device',
-					item.deviceName // 使用设备名称作为标题
-				)
-
-				markers.value = [deviceMarker]
-				
-				// 检查设备状态，如果变为离线状态则停止定时器
-				if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
-					clearInterval(refreshTimer.value)
-					refreshTimer.value = null
-					isRefreshing.value = false
+		try {
+			const res = await getDevicePos(data)
+			
+			res.data.forEach(async item => {
+				if (item.imei == imei.value) {
+					datainfo.value = item
+					
+					// 转换坐标到腾讯地图坐标系
+					const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
+					center.latitude = convertedCoord.lat
+					center.longitude = convertedCoord.lng
+					
+					// 获取地址信息
+					const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
+					address.value = addr.result.formatted_address;
+					
+					// 更新设备标记
+					const deviceMarker = createMarker(
+						1,
+						convertedCoord.lat,
+						convertedCoord.lng,
+						'device',
+						item.deviceName
+					)
+					
+					markers.value = [deviceMarker]
+					
+					// 检查设备状态，如果变为离线状态则停止定时器
+					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
+						clearInterval(refreshTimer.value)
+						refreshTimer.value = null
+						isRefreshing.value = false
+						uni.showToast({
+							title: '设备已离线，停止自动刷新',
+							icon: 'none'
+						})
+					}
+					
+					// 信号强度监控提醒
+					if (item.attribute?.rssi) {
+						const signalExp = getSignalDetail(item.attribute.rssi).experience;
+						if (signalExp === '较差' || signalExp === '无法使用') {
+							console.warn(`设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
+						}
+					}
 				}
-			}
-		})
+			})
+		} catch (error) {
+			console.error('加载设备数据失败:', error);
+			uni.showToast({
+				title: '数据加载失败',
+				icon: 'none'
+			})
+		}
 	}
-
 
 	onLoad((option) => {
 		deptId.value = option.deptId
@@ -440,7 +571,7 @@
 			longitude: lng,
 			width: 25,
 			height: 25,
-			iconPath:datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
+			iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
 			callout: {
 				content: title || '爱车位置',
 				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',
@@ -467,7 +598,6 @@
 		refreshTimer.value = null
 	})
 </script>
-
 <style lang="scss">
 	.container {
 		position: relative;
@@ -570,6 +700,40 @@
 			background-color: #fff;
 			padding-bottom: 70rpx;
 
+			// 刷新状态样式
+			.refresh-status {
+				display: flex;
+				align-items: center;
+				padding: 20rpx 30rpx;
+				background: #f8f9fa;
+				border-bottom: 1rpx solid #e8e8e8;
+
+				.refresh-text {
+					font-size: 26rpx;
+					color: #666;
+
+					&.refreshing {
+						color: #1890ff;
+						animation: rotating 2s linear infinite;
+					}
+				}
+
+				.refresh-btn {
+					margin-left: auto;
+					color: #1890ff;
+					font-size: 26rpx;
+				}
+			}
+
+			@keyframes rotating {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
 			.Imei-box {
 				padding: 20rpx 30rpx 0;
 				font-size: 32rpx;
@@ -579,18 +743,20 @@
 					flex-direction: row;
 					justify-content: space-between;
 					align-items: center;
-					padding: 20rpx 0;
-					.imeis{
+
+					.imeis {
 						display: flex;
 						flex-direction: row;
 						justify-content: flex-start;
 						align-items: center;
-						.battery{
+
+						.battery {
 							display: inline-block;
 							font-size: 25rpx;
 							margin-left: 50rpx;
 						}
-						.power{
+
+						.power {
 							display: inline-block;
 							font-size: 25rpx;
 							margin-left: 30rpx;
@@ -602,6 +768,105 @@
 				.pos-time {
 					font-size: 25rpx;
 					color: #999;
+				}
+
+				// 手机信号样式
+				.signal-container {
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-start;
+					align-items: center;
+					padding: 20rpx 0;
+					
+					.signal-item {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						margin-right: 40rpx;
+						
+						.mobile-signal {
+							display: flex;
+							flex-direction: row;
+							align-items: center;
+							justify-content: center;
+							
+							.signal-bars-horizontal {
+								display: flex;
+								flex-direction: row;
+								align-items: flex-end;
+								height: 40rpx;
+								gap: 3rpx;
+								margin-right: 10rpx;
+								
+								.signal-bar-h {
+									width: 8rpx;
+									border-radius: 2rpx 2rpx 0 0;
+									transition: all 0.3s ease;
+									
+									// 不同高度的信号条（类似手机信号格）
+									&:nth-child(1) { 
+										height: 12rpx; 
+									}
+									&:nth-child(2) { 
+										height: 16rpx; 
+									}
+									&:nth-child(3) { 
+										height: 20rpx; 
+									}
+									&:nth-child(4) { 
+										height: 24rpx; 
+									}
+									&:nth-child(5) { 
+										height: 28rpx; 
+									}
+									
+									&.bar-active {
+										background: #52c41a; // 默认绿色，通过父级动态设置颜色
+									}
+									
+									&.bar-off {
+										background: #e8e8e8;
+									}
+								}
+							}
+							
+							.signal-info-h {
+								display: flex;
+								flex-direction: column;
+								
+								.signal-value {
+									font-size: 20rpx;
+									color: #333;
+									margin-bottom: 4rpx;
+								}
+								
+								.experience {
+									font-size: 20rpx;
+									font-weight: normal;
+								}
+							}
+						}
+					}
+					
+					.satellite-item-h {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						background: #f0f8ff;
+						padding: 12rpx 20rpx;
+						border-radius: 20rpx;
+						
+						.satellite-icon {
+							font-size: 32rpx;
+							margin-right: 12rpx;
+						}
+						
+						.satellite-text {
+							font-size: 24rpx;
+							color: #1890ff;
+							font-weight: bold;
+						}
+					}
 				}
 			}
 
@@ -637,5 +902,10 @@
 				font-size: 24rpx;
 			}
 		}
+	}
+
+	// 动态信号颜色
+	.signal-bars-horizontal .signal-bar-h.bar-active {
+		// 颜色通过父级的 experience 文本颜色动态设置
 	}
 </style>

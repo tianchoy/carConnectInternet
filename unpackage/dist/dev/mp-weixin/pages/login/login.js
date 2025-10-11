@@ -219,12 +219,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             iv: e.detail.iv
           });
           common_vendor.index.__f__("log", "at pages/login/login.uvue:294", "res", res);
+          if (!res) {
+            throw new Error("接口返回数据为空");
+          }
+          if (!res.data) {
+            throw new Error("接口返回数据: data为null");
+          }
+          if (!res.data.token) {
+            throw new Error("登录失败: 未获取到token");
+          }
           common_vendor.index.setStorageSync("token", res.data.token);
           common_vendor.index.reLaunch({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:303", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:316", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -236,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:314", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:327", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",

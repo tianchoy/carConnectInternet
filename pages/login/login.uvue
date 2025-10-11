@@ -293,7 +293,20 @@
 
 			console.log('res', res)
 
-			// 3. 登录成功处理
+			// 3. 检查返回数据是否有效
+		if (!res) {
+			throw new Error('接口返回数据为空')
+		}
+
+		if (!res.data) {
+			throw new Error('接口返回数据: data为null')
+		}
+
+		if (!res.data.token) {
+			throw new Error('登录失败: 未获取到token')
+		}
+
+		// 4. 登录成功处理
 			uni.setStorageSync('token', res.data.token)
 			uni.reLaunch({
 				url: '/pages/index/index'

@@ -10,8 +10,7 @@
 			</view>
 			<view class="list">
 				<text class="title">自定义图标</text>
-				<text class="info" v-if="!isEditing">{{carInfo.carType}}</text>
-				<!-- <uv-input v-else v-model="editInfo.carType"  @click="deviceTypeSelectFun" disabled="true" border="none" inputAlign="right" class="input" /> -->
+				<text class="info" v-if="!isEditing">{{carTitle}}</text>
 				<text style="flex:1" v-else @click="deviceTypeSelectFun">{{editInfo.carTypeValue || '请选择图标'}}</text>
 			</view>
 			<view class="list">
@@ -58,6 +57,10 @@
 	const carInfo = ref<UTSJSONObject>({})
 	const editInfo = ref<UTSJSONObject>({})
 	const deviceTypeSelect = ref(null)
+	const carTitle = computed(() => {
+  		const item = IconList.find(item => item.name === carInfo.value.carType)
+			return item ? item.title : '未知'
+	})
 	const IconList = [
 		{
 			name: 'car',

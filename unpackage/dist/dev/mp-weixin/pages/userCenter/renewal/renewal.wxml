@@ -1,0 +1,1 @@
+<view id="{{b}}" change:eS="{{uV.sS}}" eS="{{$eS[b]}}" change:eA="{{uV.sA}}" eA="{{$eA[b]}}" class="{{['container', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}"><custom-nav-bar u-i="3dc9e254-0" bind:__l="__l" u-p="{{a||''}}"></custom-nav-bar></view><wxs src="/common/uniView.wxs" module="uV"/>

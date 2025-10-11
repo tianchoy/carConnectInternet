@@ -30,6 +30,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const carInfo = common_vendor.ref(new UTSJSONObject({}));
     const editInfo = common_vendor.ref(new UTSJSONObject({}));
     const deviceTypeSelect = common_vendor.ref(null);
+    const carTitle = common_vendor.computed(() => {
+      const item = UTS.arrayFind(IconList, (item2) => {
+        return item2.name === carInfo.value.carType;
+      });
+      return item ? item.title : "未知";
+    });
     const IconList = [
       new UTSJSONObject({
         name: "car",
@@ -85,7 +91,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePlateNumberChange = (e) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:116", e.length);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:119", e.length);
       editInfo.value.plateNo = e;
     };
     const formattedPlateNo = common_vendor.computed(() => {
@@ -111,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = UTS.JSON.parse(UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:149", res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:152", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -122,12 +128,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:162", "option", option);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:165", "option", option);
       if (option.deviceId != null) {
         deviceId.value = option.deviceId;
         loadCarListData();
       } else {
-        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:168", "deviceId is null");
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:171", "deviceId is null");
       }
     });
     const loadCarListData = () => {
@@ -158,7 +164,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(common_vendor.unref(carInfo).deviceId),
         d: !common_vendor.unref(isEditing)
       }, !common_vendor.unref(isEditing) ? {
-        e: common_vendor.t(common_vendor.unref(carInfo).carType)
+        e: common_vendor.t(common_vendor.unref(carTitle))
       } : {
         f: common_vendor.t(common_vendor.unref(editInfo).carTypeValue || "请选择图标"),
         g: common_vendor.o(deviceTypeSelectFun)

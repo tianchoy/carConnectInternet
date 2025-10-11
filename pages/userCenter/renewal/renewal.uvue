@@ -1,0 +1,15 @@
+<template>
+	<view class="container">
+		<custom-navBar title="支付" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false"
+			:isIcon="true" :isShowStyle="true">
+		</custom-navBar>
+	</view>
+</template>
+
+<script setup>
+		
+</script>
+
+<style lang="scss">
+
+</style>

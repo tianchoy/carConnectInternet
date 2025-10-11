@@ -71,8 +71,11 @@
 		uni.showToast({
 			title: '设备仍在服务期，到期流量续费5元每年',
 			icon: 'none',
-			duration:3000
+			duration: 3000
 		})
+		// uni.navigateTo({
+		// 	url: '/pages/userCenter/payDeviceList/payDeviceList'
+		// })
 	}
 </script>
 
