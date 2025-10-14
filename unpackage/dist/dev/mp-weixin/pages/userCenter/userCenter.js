@@ -50,8 +50,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const platformRenewal = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/userCenter/payDeviceList/payDeviceList"
+      common_vendor.index.showToast({
+        title: "设备仍在服务期，到期流量续费5元每年",
+        icon: "none",
+        duration: 3e3
       });
     };
     return (_ctx, _cache) => {
