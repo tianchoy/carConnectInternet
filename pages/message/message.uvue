@@ -23,7 +23,7 @@
 				
 				<uv-list v-for="(item,index) in msgList" :key="item.messageId || index">
 					<uv-list-item 
-						:title="getMessageTypeText(item.messageType)"
+						:title="getMessageTypeText(item.messageType) + ' - ' + item.createTime"
 						:note="item.content" 
 						@click="handleItemClick(item)" 
 						:clickable="true"

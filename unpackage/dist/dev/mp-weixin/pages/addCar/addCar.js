@@ -79,6 +79,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         name: "tuola",
         title: "拖拉机",
         img: "/static/cars/online/tuola.png"
+      }),
+      new UTSJSONObject({
+        name: "suv",
+        title: "越野车",
+        img: "/static/cars/online/suv.png"
+      }),
+      new UTSJSONObject({
+        name: "baby",
+        title: "婴儿车",
+        img: "/static/cars/online/baby.png"
+      }),
+      new UTSJSONObject({
+        name: "tank",
+        title: "坦克",
+        img: "/static/cars/online/tank.png"
+      }),
+      new UTSJSONObject({
+        name: "zhuangjia",
+        title: "装甲车",
+        img: "/static/cars/online/zhuangjia.png"
+      }),
+      new UTSJSONObject({
+        name: "wajue",
+        title: "挖掘机",
+        img: "/static/cars/online/wajue.png"
+      }),
+      new UTSJSONObject({
+        name: "plan",
+        title: "飞机",
+        img: "/static/cars/online/plan.png"
+      }),
+      new UTSJSONObject({
+        name: "walk",
+        title: "步行",
+        img: "/static/cars/online/walk.png"
       })
     ];
     common_vendor.ref([]);
@@ -88,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:136", "接收到扫码结果:", data.result);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:171", "接收到扫码结果:", data.result);
       if (data.result.length === 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
       } else if (data.result.length === 11) {
@@ -124,7 +159,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const selectIcon = (item = null) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:174", item.name);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:209", item.name);
       carInfo.value.deviceType = item.name;
       carInfo.value.deviceTypeValue = item.title;
       (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.close();
@@ -137,7 +172,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const refreshDeviceList = () => {
       common_vendor.index.$emit("refreshDeviceList");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:207", "已触发首页设备列表刷新");
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:242", "已触发首页设备列表刷新");
     };
     const submit = () => {
       var _a;
@@ -151,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               carType: carInfo.value.deviceType
               // plateNo: carInfo.value.plateNo
             });
-            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:221", submitData);
+            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:256", submitData);
             const res = yield api_request.addDevice(submitData);
             if (res.code == 0) {
               common_vendor.index.showToast({
@@ -171,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:247", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:282", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -181,7 +216,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:256", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:291", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"
@@ -274,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         o: common_vendor.p({
-          col: 4
+          col: 5
         }),
         p: common_vendor.sr(deviceTypeSelect, "6409e324-9,6409e324-1", {
           "k": "deviceTypeSelect"

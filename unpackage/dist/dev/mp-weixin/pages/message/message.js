@@ -313,7 +313,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, item.messageId || index),
             c: "1993bd19-2-" + i0 + "," + ("1993bd19-1-" + i0),
             d: common_vendor.p({
-              title: getMessageTypeText(item.messageType),
+              title: getMessageTypeText(item.messageType) + " - " + item.createTime,
               note: item.content,
               clickable: true,
               ["show-badge"]: item.status == 1,

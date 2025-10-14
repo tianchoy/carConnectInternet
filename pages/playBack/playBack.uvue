@@ -77,7 +77,7 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(18)
+	const mapScale = ref(15)
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
@@ -188,10 +188,10 @@
 		const lngDiff = bounds.maxLng - bounds.minLng
 		const maxDiff = Math.max(latDiff, lngDiff)
 
-		if (maxDiff > 0.1) mapScale.value = 11
-		else if (maxDiff > 0.05) mapScale.value = 12
-		else if (maxDiff > 0.02) mapScale.value = 13
-		else mapScale.value = 14
+		if (maxDiff > 0.1) mapScale.value = 9
+		else if (maxDiff > 0.05) mapScale.value = 10
+		else if (maxDiff > 0.02) mapScale.value = 11
+		else mapScale.value = 12
 	}
 
 	// 计算轨迹总距离

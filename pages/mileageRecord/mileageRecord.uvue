@@ -258,7 +258,7 @@
 
 		endTime.value = formatTime(now)
 		// 开始时间默认为当前时间前1天
-		const startDate = new Date(now.getTime() -  3600000)
+		const startDate = new Date(now.getTime() -  3600000*24)
 		startTime.value = formatTime(startDate)
 	}
 

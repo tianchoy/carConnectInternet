@@ -17,6 +17,20 @@ export const getOnlineDeviceIcon = (deviceType) => {
 			return '/static/cars/online/sanlun.png'
         case 'tuola':
 			return '/static/cars/online/tuola.png'
+		case 'suv':
+			return '/static/cars/online/suv.png'
+		case 'baby':
+			return '/static/cars/online/baby.png'
+		case 'tank':
+			return '/static/cars/online/tank.png'
+		case 'zhuangjia':
+			return '/static/cars/online/zhuangjia.png'
+		case 'wajue':
+			return '/static/cars/online/wajue.png'
+		case 'plan':
+			return '/static/cars/online/plan.png'
+		case 'walk':
+			return '/static/cars/online/walk.png'
 		default:
 			return '/static/cars/online/default.png'
 	}
@@ -41,6 +55,20 @@ export const getOfflineDeviceIcon = (deviceType) => {
 			return '/static/cars/offline/sanlun.png'
         case 'tuola':
 			return '/static/cars/offline/tuola.png'
+		case 'suv':
+			return '/static/cars/offline/suv.png'
+		case 'baby':
+			return '/static/cars/offline/baby.png'
+		case 'tank':
+			return '/static/cars/offline/tank.png'
+		case 'zhuangjia':
+			return '/static/cars/offline/zhuangjia.png'
+		case 'wajue':
+			return '/static/cars/offline/wajue.png'
+		case 'plan':
+			return '/static/cars/offline/plan.png'
+		case 'walk':
+			return '/static/cars/offline/walk.png'
 		default:
 			return '/static/cars/offline/default.png'
 	}

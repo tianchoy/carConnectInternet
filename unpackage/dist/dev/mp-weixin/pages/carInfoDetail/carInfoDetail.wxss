@@ -166,15 +166,14 @@
 .container .tools-panel .Imei-box .signal-container {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
   padding: 20rpx 0;
+  gap: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal {
   display: flex;
@@ -228,7 +227,6 @@
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .signal-value {
   font-size: 18rpx;
   color: #333;
-  margin-bottom: 4rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .experience {
   font-size: 18rpx;
@@ -241,7 +239,6 @@
   background: #f0f8ff;
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
-  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .satellite-item-h .satellite-icon {
   width: 47rpx;
@@ -262,7 +259,6 @@
   background: #f0f8ff;
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
-  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .power image,
 .container .tools-panel .Imei-box .signal-container .battery image {

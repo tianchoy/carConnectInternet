@@ -49,9 +49,14 @@
   margin-bottom: 20rpx;
 }
 .list-container .content .list-item .title .car-number {
+  display: flex;
   font-size: 35rpx;
   font-weight: bolder;
   margin-right: 20rpx;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
 }
 .list-container .content .list-item .title .device-tools {
   display: flex;

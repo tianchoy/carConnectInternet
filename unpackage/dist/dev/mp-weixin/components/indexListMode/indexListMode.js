@@ -23,7 +23,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       emit("unbindDevice", imei);
     };
     const todetail = (companyId, imei, deviceId) => {
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:45", companyId);
+      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:47", companyId);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
       });
@@ -36,15 +36,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
             a: common_vendor.t(item.plateNo),
-            b: common_vendor.o(($event) => {
-              return unbindDevice(item.imei);
-            }, index),
-            c: "245c735a-0-" + i0,
-            d: "245c735a-1-" + i0,
-            e: common_vendor.p({
+            b: "245c735a-0-" + i0,
+            c: common_vendor.p({
+              size: "mini",
+              shape: "circle",
               text: item.connectionStatus == "online" ? "在线" : "离线",
               type: item.connectionStatus == "online" ? "success" : "error"
             }),
+            d: common_vendor.o(($event) => {
+              return unbindDevice(item.imei);
+            }, index),
+            e: "245c735a-1-" + i0,
             f: common_vendor.t(item.imei),
             g: index,
             h: common_vendor.o(($event) => {

@@ -40,11 +40,11 @@
 									:class="getMobileSignalBarClass(4, currentCarInfo.attribute?.rssi)"></view>
 							</view>
 							<view class="signal-info-h">
-								<text class="signal-value" :style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">{{currentCarInfo.attribute?.rssi}}CSQ</text>
 								<text class="experience"
 									:style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">
 									{{getSignalDetail(currentCarInfo.attribute?.rssi).experience}}
 								</text>
+								<text class="signal-value" :style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">{{currentCarInfo.attribute?.rssi}} CSQ</text>
 							</view>
 						</view>
 					</view>
@@ -135,8 +135,6 @@
 		totalMileage: '',
 		address: ''
 	})
-
-	const currentToolItem = ref(0)
 	const currentCarInfo = ref<UTSJSONObject>({})
 
 	// 获取电池颜色
@@ -335,9 +333,7 @@
 	])
 
 	const click = (name) => {
-		console.log(name.title)
 		const itemTo = name.title
-		currentToolItem.value = name
 		if (itemTo == '轨迹回放') {
 			uni.navigateTo({
 				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
@@ -791,15 +787,14 @@
 				.signal-container {
 					display: flex;
 					flex-direction: row;
-					justify-content: flex-start;
 					align-items: center;
 					padding: 20rpx 0;
+					gap: 10rpx;
 
 					.signal-item {
 						display: flex;
 						flex-direction: row;
 						align-items: center;
-						margin-right: 10rpx;
 
 						.mobile-signal {
 							display: flex;
@@ -863,7 +858,6 @@
 								.signal-value {
 									font-size: 18rpx;
 									color: #333;
-									margin-bottom: 4rpx;
 								}
 
 								.experience {
@@ -881,7 +875,6 @@
 						background: #f0f8ff;
 						padding: 10rpx 20rpx;
 						border-radius: 10rpx;
-						margin-right: 10rpx;
 
 						.satellite-icon {
 							width: 47rpx;
@@ -905,7 +898,6 @@
 						background: #f0f8ff;
 						padding: 10rpx 20rpx;
 						border-radius: 10rpx;
-						margin-right: 10rpx;
 
 						image {
 							width: 47rpx;

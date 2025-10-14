@@ -58,7 +58,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(18);
+    const mapScale = common_vendor.ref(15);
     const imei = common_vendor.ref("");
     const carStatus = common_vendor.ref("");
     const plateNo = common_vendor.ref("");
@@ -151,13 +151,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const lngDiff = bounds.maxLng - bounds.minLng;
       const maxDiff = Math.max(latDiff, lngDiff);
       if (maxDiff > 0.1)
-        mapScale.value = 11;
+        mapScale.value = 9;
       else if (maxDiff > 0.05)
-        mapScale.value = 12;
+        mapScale.value = 10;
       else if (maxDiff > 0.02)
-        mapScale.value = 13;
+        mapScale.value = 11;
       else
-        mapScale.value = 14;
+        mapScale.value = 12;
     }
     function calculateTrackDistance() {
       totalDistance.value = 0;

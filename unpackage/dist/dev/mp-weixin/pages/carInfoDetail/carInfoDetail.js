@@ -69,7 +69,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       totalMileage: "",
       address: ""
     }));
-    const currentToolItem = common_vendor.ref(0);
     const currentCarInfo = common_vendor.ref(new UTSJSONObject({}));
     const getBatteryColor = (batteryPercent = null) => {
       if (!batteryPercent)
@@ -217,9 +216,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       title: "断开油电"
     })]);
     const click = (name = null) => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:338", name.title);
       const itemTo = name.title;
-      currentToolItem.value = name;
       if (itemTo == "轨迹回放") {
         common_vendor.index.navigateTo({
           url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType
@@ -313,7 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:457", "操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:453", "操作失败:", error);
           common_vendor.index.showToast({
             title: "操作失败，请重试",
             icon: "none"
@@ -339,7 +336,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:485", address.value);
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:481", address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -356,7 +353,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:503", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:499", "调起地图失败:", err);
         }
       });
     };
@@ -388,14 +385,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 if ((_a = item.attribute) === null || _a === void 0 ? null : _a.rssi) {
                   const signalExp = getSignalDetail(item.attribute.rssi).experience;
                   if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                    common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:551", `设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
+                    common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:547", `设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
                   }
                 }
               }
             });
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:557", "加载设备数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:553", "加载设备数据失败:", error);
           common_vendor.index.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -425,7 +422,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getDeviceDetail(deviceId.value);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:589", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:585", "设备id获取失败");
         }
       });
     };
@@ -503,9 +500,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.n(getMobileSignalBarClass(3, (_j = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _j.rssi)),
         r: common_vendor.n(getMobileSignalBarClass(4, (_k = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _k.rssi)),
         s: getSignalDetail((_l = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _l.rssi).color,
-        t: common_vendor.t((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi),
+        t: common_vendor.t(getSignalDetail((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi).experience),
         v: getSignalDetail((_n = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _n.rssi).color,
-        w: common_vendor.t(getSignalDetail((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi).experience),
+        w: common_vendor.t((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi),
         x: getSignalDetail((_p = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _p.rssi).color
       } : {}, {
         y: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
