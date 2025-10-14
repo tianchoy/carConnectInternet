@@ -54,7 +54,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         c: common_vendor.p({
           text: "解绑",
-          type: "error"
+          type: "warning"
         })
       } : {}, {
         d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
