@@ -8,7 +8,7 @@
 			</map>
 		</view>
 		<view v-else>
-			<indexListMode :lists="filteredDevices" />
+			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice"/>
 		</view>
 		<view class="tool-nav">
 			<view class="refresh" @click="refresh">刷新</view>
@@ -36,7 +36,7 @@
 
 <script setup lang="uts">
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
-	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList } from '../../api/request.uts'
+	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList, delDevice } from '../../api/request.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
@@ -122,6 +122,24 @@
 				break
 		}
 	}
+
+		// 解绑设备
+		const unbindDevice = async (imei : string) => {
+			const res = await delDevice(imei)
+			if (res.code == 0) {
+				uni.showToast({
+					title: '解绑成功',
+					icon: 'success'
+				})
+			} else {
+				uni.showToast({
+					title: '解绑失败',
+					icon: 'error'
+				})
+			}
+			// 解绑成功后刷新设备列表
+			await loadUserDeviceList(currentGroupId.value)
+		}
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -299,7 +317,7 @@
 	// 添加全局事件监听，用于从添加页面返回时刷新
 	const refreshDeviceList = () => {
 		console.log('收到刷新事件，重新加载设备列表')
-		loadUserDeviceList(currentGroupId.value)
+		loadUserDeviceList()
 	}
 
 	const getUserIn = async () => {
@@ -317,6 +335,7 @@
 		const token = uni.getStorageSync('token')
 		if(token){
 			// 监听全局刷新事件
+			// refreshDeviceList()
 			uni.$on('refreshDeviceList', refreshDeviceList)
 			
 			const needRefresh = uni.getStorageSync('needRefreshHome')

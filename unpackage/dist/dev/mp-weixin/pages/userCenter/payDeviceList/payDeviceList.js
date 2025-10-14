@@ -18,9 +18,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const totalPage = common_vendor.ref(0);
     const loading = common_vendor.ref(false);
     const hasMore = common_vendor.ref(true);
+    const needRefresh = common_vendor.ref(false);
     common_vendor.onShow(() => {
-      resetData();
-      loadPayDeviceListData();
+      if (needRefresh.value || deviceList.value.length === 0) {
+        resetData();
+        loadPayDeviceListData();
+        needRefresh.value = false;
+      }
     });
     const resetData = () => {
       deviceList.value = [];
@@ -30,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadPayDeviceListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:62", currPage.value, totalPage.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:85", "加载数据，当前页码:", currPage.value, "总页数:", totalPage.value);
         if (loading.value || !hasMore.value)
           return Promise.resolve(null);
         loading.value = true;
@@ -51,6 +55,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (hasMore.value) {
               currPage.value++;
             }
+            common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:115", "数据加载成功，当前数据量:", deviceList.value.length, "是否有更多:", hasMore.value);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "加载失败",
@@ -58,7 +63,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:98", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:123", "加载车辆列表失败:", error);
           common_vendor.index.showToast({
             title: "加载失败，请重试",
             icon: "none"
@@ -71,9 +76,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onReachBottom(() => {
       loadPayDeviceListData();
     });
-    const carDetail = (deviceId) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:114", deviceId);
+    const pay = (iccid) => {
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:140", "去支付，ICCID:", iccid);
+      iccid = iccid.substring(0, iccid.length - 1);
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:142", iccid);
+      needRefresh.value = true;
+      common_vendor.index.navigateToMiniProgram(new UTSJSONObject({
+        appId: "wx1d647f2cfdc089e6",
+        path: "/pages/home/userSimRecharge?iccid=" + iccid,
+        envVersion: "release",
+        success(res = null) {
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:152", "打开小程序成功", res);
+        },
+        fail(res = null) {
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", "打开小程序失败", res);
+          needRefresh.value = false;
+          common_vendor.index.showToast({
+            title: "打开支付页面失败",
+            icon: "none"
+          });
+        }
+      }));
     };
+    common_vendor.onPullDownRefresh(() => {
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:169", "下拉刷新");
+      resetData();
+      loadPayDeviceListData().finally(() => {
+        common_vendor.index.stopPullDownRefresh();
+        common_vendor.index.showToast({
+          title: "刷新成功",
+          icon: "success"
+        });
+      });
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -87,20 +122,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isShowStyle: true
         }),
         b: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
-          return {
+          return common_vendor.e({
             a: common_vendor.t(item.plateNo),
             b: common_vendor.t(item.iccid),
-            c: common_vendor.t(item.imei),
-            d: index,
-            e: common_vendor.o(($event) => {
-              return carDetail(item.iccid);
-            }, index)
-          };
+            c: item.customerTime
+          }, item.customerTime ? {
+            d: common_vendor.t(item.customerTime)
+          } : {}, {
+            e: item.simEndDate
+          }, item.simEndDate ? {
+            f: common_vendor.t(item.simEndDate)
+          } : {}, {
+            g: common_vendor.o(($event) => {
+              return pay(item.iccid);
+            }, index),
+            h: index
+          });
         }),
         c: common_vendor.unref(loading)
       }, common_vendor.unref(loading) ? {} : {}, {
-        d: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
-      }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? {} : {});
+        d: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
+      }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0 ? {} : {}, {
+        e: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
+      }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0 ? {} : {});
       return __returned__;
     };
   }

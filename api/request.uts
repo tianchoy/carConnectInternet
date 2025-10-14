@@ -25,6 +25,7 @@ const unbindDeviceList = '/device/unbindGeofenceList'
 const bindDeviceList = '/device/bindGeofenceList'
 const bindGeofence = '/geofence/bind'
 const unbindGeofence = '/geofence/unbind'
+const deleteDevice = '/userDevice/del'
 
 // 登陆接口
 export const login = (data: UTSJSONObject) => {
@@ -74,6 +75,11 @@ export const getUserInfo = () => {
 // 添加设备
 export const addDevice = (data: object) => {
     return http.post(addDeviceUrl, data)
+}
+
+// 删除设备
+export const delDevice = (imei: string) => {
+    return http.post(deleteDevice, { imei })
 }
 
 // 获取用户设备列表

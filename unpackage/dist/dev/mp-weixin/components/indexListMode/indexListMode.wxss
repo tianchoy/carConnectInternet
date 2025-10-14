@@ -53,6 +53,13 @@
   font-weight: bolder;
   margin-right: 20rpx;
 }
+.list-container .content .list-item .title .device-tools {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10rpx;
+}
 .list-container .content .list-item .imei text {
   color: #ccc;
 }

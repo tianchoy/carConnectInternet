@@ -14,10 +14,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   props: {
     lists: {}
   },
-  setup(__props) {
+  emits: ["unbindDevice"],
+  setup(__props, _a) {
+    var __emit = _a.emit;
     const props = __props;
+    const emit = __emit;
+    const unbindDevice = (imei) => {
+      emit("unbindDevice", imei);
+    };
     const todetail = (companyId, imei, deviceId) => {
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:33", companyId);
+      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:45", companyId);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
       });
@@ -30,20 +36,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
             a: common_vendor.t(item.plateNo),
-            b: "245c735a-0-" + i0,
-            c: common_vendor.p({
+            b: common_vendor.o(($event) => {
+              return unbindDevice(item.imei);
+            }, index),
+            c: "245c735a-0-" + i0,
+            d: "245c735a-1-" + i0,
+            e: common_vendor.p({
               text: item.connectionStatus == "online" ? "在线" : "离线",
               type: item.connectionStatus == "online" ? "success" : "error"
             }),
-            d: common_vendor.t(item.imei),
-            e: index,
-            f: common_vendor.o(($event) => {
+            f: common_vendor.t(item.imei),
+            g: index,
+            h: common_vendor.o(($event) => {
               return todetail(item.companyId, item.imei, item.deviceId);
             }, index)
           };
+        }),
+        c: common_vendor.p({
+          text: "解绑",
+          type: "error"
         })
       } : {}, {
-        c: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

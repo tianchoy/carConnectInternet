@@ -228,6 +228,8 @@
 						icon: 'success'
 					})
 
+					uni.setStorageSync('needRefreshHome', true)
+
 					// 添加成功后触发首页刷新
 					refreshDeviceList()
 

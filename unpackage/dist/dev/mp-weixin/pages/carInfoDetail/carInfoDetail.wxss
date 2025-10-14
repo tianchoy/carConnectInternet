@@ -142,8 +142,9 @@
 }
 }
 .container .tools-panel .Imei-box {
-  padding: 20rpx 30rpx 0;
-  font-size: 32rpx;
+  margin: 30rpx 30rpx 0;
+  font-size: 28rpx;
+  border-bottom: 1rpx solid #dcdfe6;
 }
 .container .tools-panel .Imei-box .imei-info {
   display: flex;
@@ -157,20 +158,10 @@
   justify-content: flex-start;
   align-items: center;
 }
-.container .tools-panel .Imei-box .imei-info .imeis .battery {
-  display: inline-block;
-  font-size: 25rpx;
-  margin-left: 50rpx;
-}
-.container .tools-panel .Imei-box .imei-info .imeis .power {
-  display: inline-block;
-  font-size: 25rpx;
-  margin-left: 30rpx;
-  color: #69c2f1;
-}
 .container .tools-panel .Imei-box .pos-time {
-  font-size: 25rpx;
+  font-size: 20rpx;
   color: #999;
+  margin-left: 30rpx;
 }
 .container .tools-panel .Imei-box .signal-container {
   display: flex;
@@ -183,13 +174,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-right: 40rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  background: #f0f8ff;
+  padding: 10rpx 20rpx;
+  border-radius: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal {
   display: flex;
@@ -220,7 +214,7 @@
   height: 28rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.bar-active {
-  background: #52c41a;
+  background: var(--signal-color, #52c41a) !important;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.bar-off {
   background: #e8e8e8;
@@ -228,14 +222,16 @@
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .signal-value {
-  font-size: 20rpx;
+  font-size: 18rpx;
   color: #333;
   margin-bottom: 4rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .experience {
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: normal;
 }
 .container .tools-panel .Imei-box .signal-container .satellite-item-h {
@@ -243,17 +239,36 @@
   flex-direction: row;
   align-items: center;
   background: #f0f8ff;
-  padding: 12rpx 20rpx;
-  border-radius: 20rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 10rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .satellite-item-h .satellite-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
+  width: 47rpx;
+  height: 47rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .satellite-item-h .satellite-text {
   font-size: 24rpx;
   color: #1890ff;
   font-weight: bold;
+}
+.container .tools-panel .Imei-box .signal-container .power,
+.container .tools-panel .Imei-box .signal-container .battery {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 24rpx;
+  background: #f0f8ff;
+  padding: 10rpx 20rpx;
+  border-radius: 10rpx;
+  margin-right: 10rpx;
+}
+.container .tools-panel .Imei-box .signal-container .power image,
+.container .tools-panel .Imei-box .signal-container .battery image {
+  width: 47rpx;
+  height: 47rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .h-line {
   width: 90%;

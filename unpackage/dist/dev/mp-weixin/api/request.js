@@ -21,6 +21,7 @@ const unbindDeviceList = "/device/unbindGeofenceList";
 const bindDeviceList = "/device/bindGeofenceList";
 const bindGeofence = "/geofence/bind";
 const unbindGeofence = "/geofence/unbind";
+const deleteDevice = "/userDevice/del";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
@@ -44,6 +45,9 @@ const getUserInfo = () => {
 };
 const addDevice = (data) => {
   return api_http.http.post(addDeviceUrl, data);
+};
+const delDevice = (imei) => {
+  return api_http.http.post(deleteDevice, new UTSJSONObject({ imei }));
 };
 const getUserDeviceList = (data) => {
   return api_http.http.post(userDeviceList, data);
@@ -95,6 +99,7 @@ exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
 exports.bindDevices = bindDevices;
 exports.changePassWord = changePassWord;
+exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
 exports.getBoundDevices = getBoundDevices;

@@ -4,7 +4,10 @@
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
 				<view class="title">
 					<text class="car-number">{{item.plateNo}}</text>
-					<uv-tags :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></uv-tags>
+					<view class="device-tools">
+						<uv-tags text="解绑" type="error" @click="unbindDevice(item.imei)"></uv-tags>
+						<uv-tags :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></uv-tags>
+					</view>
 				</view>
 				<view class="imei">
 					<text>IMEI {{item.imei}}</text>
@@ -28,7 +31,16 @@
 	const props = defineProps<{
 		lists : DeviceItem[]
 	}>()
-
+		// 解绑设备
+	// 定义emit事件
+	const emit = defineEmits<{
+		(e: 'unbindDevice', imei: string): void
+	}>()
+	
+	// 解绑设备
+	const unbindDevice = (imei : string) => {
+		emit('unbindDevice', imei)
+	}
 	const todetail = (companyId:string,imei:string,deviceId:string) => {
 		console.log(companyId)
 		uni.navigateTo({
@@ -66,6 +78,13 @@
 						font-size: 35rpx;
 						font-weight: bolder;
 						margin-right: 20rpx;
+					}
+					.device-tools {
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-end;
+						align-items: center;
+						gap: 10rpx;
 					}
 				}
 

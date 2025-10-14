@@ -158,6 +158,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 title: "添加成功",
                 icon: "success"
               });
+              common_vendor.index.setStorageSync("needRefreshHome", true);
               refreshDeviceList();
               setTimeout(() => {
                 common_vendor.index.navigateBack();
@@ -170,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:245", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:247", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -180,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:254", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:256", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"

@@ -27,21 +27,56 @@
 /* 文章场景相关 */
 .container {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f5f5f5;
   margin-top: 170rpx;
+  position: relative;
+}
+.container .scroll-container {
+  height: 100%;
+  width: 100%;
 }
 .container .list-box {
   width: 100%;
   padding: 20rpx;
+  position: relative;
+  min-height: 100%;
 }
 .container .list-box .uv-list {
   margin-bottom: 20rpx;
   border-radius: 20rpx;
+  background-color: #fff;
 }
 .container .list-box .empty-state {
   text-align: center;
   padding: 50rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+.container .list-box .new-message-tip {
+  background: linear-gradient(135deg, #2979ff, #07c160);
+  color: white;
+  padding: 20rpx;
+  text-align: center;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  font-size: 26rpx;
+  animation: pulse 2s infinite;
+  cursor: pointer;
+}
+@keyframes pulse {
+0% {
+    opacity: 0.8;
+}
+50% {
+    opacity: 1;
+}
+100% {
+    opacity: 0.8;
+}
+}
+.container .list-box .time-text {
+  font-size: 24rpx;
   color: #999;
 }
 .container .list-box .uv-load-more {
