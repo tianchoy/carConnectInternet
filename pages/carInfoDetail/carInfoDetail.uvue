@@ -509,6 +509,14 @@
 				if (item.imei == imei.value) {
 					datainfo.value = item
 
+					if( !item.latitude || !item.longitude){
+						uni.showToast({
+							title: '位置信息缺失',
+							icon: 'none'
+						})
+						return
+					}
+
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
 					center.latitude = convertedCoord.lat

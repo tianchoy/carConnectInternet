@@ -77,6 +77,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               if (item.imei == imei.value) {
+                if (!item.latitude || !item.longitude) {
+                  common_vendor.index.showToast({
+                    title: "位置信息缺失",
+                    icon: "none"
+                  });
+                  return Promise.resolve(null);
+                }
                 const deviceData = item;
                 const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
                 center.latitude = convertedCoord.lat;
@@ -98,7 +105,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   height: 25,
                   rotate: calculateMapRotation(lastDirection.value),
                   callout: new UTSJSONObject({
-                    content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
+                    content: connectionStatus.value == "online" ? `${deviceData.deviceName} | 速度: ${deviceData.speed || 0}km/h` : "爱车已离线",
                     color: connectionStatus.value == "online" ? "#fff" : "#666",
                     bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
                     padding: 5,
@@ -113,7 +120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:171", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:178", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -164,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             setMarkers();
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:239", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:246", "获取位置失败:", err);
           common_vendor.index.showToast({ title: "获取位置失败", icon: "none" });
         }
       });
@@ -181,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let angle = Math.atan2(dy, dx) * 180 / Math.PI;
       if (angle < 0)
         angle += 360;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:264", "计算方向:", angle);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:271", "计算方向:", angle);
       return angle;
     };
     const setMarkers = () => {
@@ -310,7 +317,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:421", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:428", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {

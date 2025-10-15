@@ -76,6 +76,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         name: "tuola",
         title: "拖拉机",
         img: "/static/cars/online/tuola.png"
+      }),
+      new UTSJSONObject({
+        name: "suv",
+        title: "越野车",
+        img: "/static/cars/online/suv.png"
+      }),
+      new UTSJSONObject({
+        name: "baby",
+        title: "婴儿车",
+        img: "/static/cars/online/baby.png"
+      }),
+      new UTSJSONObject({
+        name: "tank",
+        title: "坦克",
+        img: "/static/cars/online/tank.png"
+      }),
+      new UTSJSONObject({
+        name: "zhuangjia",
+        title: "装甲车",
+        img: "/static/cars/online/zhuangjia.png"
+      }),
+      new UTSJSONObject({
+        name: "wajue",
+        title: "挖掘机",
+        img: "/static/cars/online/wajue.png"
+      }),
+      new UTSJSONObject({
+        name: "plan",
+        title: "飞机",
+        img: "/static/cars/online/plan.png"
+      }),
+      new UTSJSONObject({
+        name: "walk",
+        title: "步行",
+        img: "/static/cars/online/walk.png"
       })
     ];
     const selectIcon = (item = null) => {
@@ -91,7 +126,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePlateNumberChange = (e) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:119", e.length);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:154", e.length);
       editInfo.value.plateNo = e;
     };
     const formattedPlateNo = common_vendor.computed(() => {
@@ -117,7 +152,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = UTS.JSON.parse(UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:152", res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:187", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -128,12 +163,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:165", "option", option);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:200", "option", option);
       if (option.deviceId != null) {
         deviceId.value = option.deviceId;
         loadCarListData();
       } else {
-        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:171", "deviceId is null");
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:206", "deviceId is null");
       }
     });
     const loadCarListData = () => {
@@ -228,7 +263,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         y: common_vendor.p({
-          col: 4
+          col: 5
         }),
         z: common_vendor.sr(deviceTypeSelect, "36223569-4", {
           "k": "deviceTypeSelect"

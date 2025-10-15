@@ -44,7 +44,6 @@
 		emit('unbindDevice', imei)
 	}
 	const todetail = (companyId:string,imei:string,deviceId:string) => {
-		console.log(companyId)
 		uni.navigateTo({
 			url: '/pages/carInfoDetail/carInfoDetail?deptId='+companyId+ '&imei=' + imei + '&deviceId=' + deviceId
 		})

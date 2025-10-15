@@ -366,6 +366,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               var _a;
               if (item.imei == imei.value) {
                 datainfo.value = item;
+                if (!item.latitude || !item.longitude) {
+                  common_vendor.index.showToast({
+                    title: "位置信息缺失",
+                    icon: "none"
+                  });
+                  return Promise.resolve(null);
+                }
                 const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(item.latitude, item.longitude);
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
@@ -385,14 +392,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 if ((_a = item.attribute) === null || _a === void 0 ? null : _a.rssi) {
                   const signalExp = getSignalDetail(item.attribute.rssi).experience;
                   if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                    common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:547", `设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
+                    common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:555", `设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
                   }
                 }
               }
             });
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:553", "加载设备数据失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:561", "加载设备数据失败:", error);
           common_vendor.index.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -422,7 +429,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getDeviceDetail(deviceId.value);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:585", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:593", "设备id获取失败");
         }
       });
     };

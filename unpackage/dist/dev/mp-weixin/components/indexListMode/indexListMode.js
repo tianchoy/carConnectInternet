@@ -23,7 +23,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       emit("unbindDevice", imei);
     };
     const todetail = (companyId, imei, deviceId) => {
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:47", companyId);
       common_vendor.index.navigateTo({
         url: "/pages/carInfoDetail/carInfoDetail?deptId=" + companyId + "&imei=" + imei + "&deviceId=" + deviceId
       });

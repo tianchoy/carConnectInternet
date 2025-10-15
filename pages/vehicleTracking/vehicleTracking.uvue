@@ -122,6 +122,13 @@
 
 			res.data.forEach(async item => {
 				if (item.imei == imei.value) {
+					if( !item.latitude || !item.longitude){
+						uni.showToast({
+							title: '位置信息缺失',
+							icon: 'none'
+						})
+						return
+					}
 					const deviceData = item
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(
@@ -149,7 +156,7 @@
 						height: 25,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
-							content: connectionStatus.value == 'online' ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
+							content: connectionStatus.value == 'online' ? `${deviceData.deviceName} | 速度: ${deviceData.speed || 0}km/h` : '爱车已离线',
 							color: connectionStatus.value == 'online' ? '#fff' : '#666',
 							bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
 							padding: 5,
