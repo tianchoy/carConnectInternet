@@ -137,6 +137,31 @@
 			title: '步行',
 			img: '/static/cars/online/walk.png'
 		},
+		{
+			name: 'muma',
+			title: '木马',
+			img: '/static/cars/online/muma.png'
+		},
+		{
+			name: 'hangmu',
+			title: '航母',
+			img: '/static/cars/online/hangmu.png'
+		},
+		{
+			name: 'junjian',
+			title: '军舰',
+			img: '/static/cars/online/junjian.png'
+		},
+		{
+			name: 'tuiche',
+			title: '手推车',
+			img: '/static/cars/online/tuiche.png'
+		},
+		{
+			name: 'train',
+			title: '火车',
+			img: '/static/cars/online/train.png'
+		},
 	]
 	
 	// 选择图标
@@ -339,6 +364,11 @@
 					border: 1rpx solid #ddd;
 				}
 			}
+		}
+
+		.grid-text{
+			margin-top: 10rpx;
+			font-size: 20rpx;
 		}
 	}
 </style>

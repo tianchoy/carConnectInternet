@@ -31,18 +31,9 @@ function requestInterceptor(config) {
     config.header = config.header || {};
     config.header["token"] = `${token}`;
   }
-  if (config.showLoading !== false) {
-    common_vendor.index.showLoading({
-      title: "加载中...",
-      mask: true
-    });
-  }
   return config;
 }
 function responseInterceptor(response = null, config) {
-  if (config.showLoading !== false) {
-    common_vendor.index.hideLoading();
-  }
   const statusCode = response.statusCode;
   if (statusCode === 200) {
     return response.data;

@@ -31,6 +31,16 @@ const getOnlineDeviceIcon = (deviceType = null) => {
       return "/static/cars/online/plan.png";
     case "walk":
       return "/static/cars/online/walk.png";
+    case "muma":
+      return "/static/cars/online/muma.png";
+    case "hangmu":
+      return "/static/cars/online/hangmu.png";
+    case "junjian":
+      return "/static/cars/online/junjian.png";
+    case "tuiche":
+      return "/static/cars/online/tuiche.png";
+    case "train":
+      return "/static/cars/online/train.png";
     default:
       return "/static/cars/online/default.png";
   }
@@ -67,6 +77,16 @@ const getOfflineDeviceIcon = (deviceType = null) => {
       return "/static/cars/offline/plan.png";
     case "walk":
       return "/static/cars/offline/walk.png";
+    case "muma":
+      return "/static/cars/offline/muma.png";
+    case "hangmu":
+      return "/static/cars/offline/hangmu.png";
+    case "junjian":
+      return "/static/cars/offline/junjian.png";
+    case "tuiche":
+      return "/static/cars/offline/tuiche.png";
+    case "train":
+      return "/static/cars/offline/train.png";
     default:
       return "/static/cars/offline/default.png";
   }

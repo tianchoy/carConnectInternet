@@ -169,7 +169,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     height: 25,
                     rotate: calculateMapRotation(lastDirection.value),
                     callout: new UTSJSONObject({
-                      content: connectionStatus.value == "online" ? `车辆位置 | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
+                      content: connectionStatus.value == "online" ? `${deviceData.deviceName != null ? deviceData.deviceName : "爱车位置"} | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
                       color: connectionStatus.value == "online" ? "#fff" : "#666",
                       bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
                       padding: 5,

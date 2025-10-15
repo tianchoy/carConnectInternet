@@ -69,7 +69,7 @@
 	// 平台续费
 	const platformRenewal = () => {
 		uni.showToast({
-			title: '设备仍在服务期，到期流量续费5元每年',
+			title: '设备仍在服务期,到期流量续费5元每年',
 			icon: 'none',
 			duration: 3000
 		})

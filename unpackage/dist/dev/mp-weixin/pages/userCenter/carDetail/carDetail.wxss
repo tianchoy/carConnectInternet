@@ -126,3 +126,7 @@
   color: #333;
   border: 1rpx solid #ddd;
 }
+.container .grid-text.data-v-36223569 {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+}

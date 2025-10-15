@@ -76,20 +76,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onReachBottom(() => {
       loadPayDeviceListData();
     });
-    const pay = (iccid) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:140", "去支付，ICCID:", iccid);
+    const pay = (iccid, simMerchant) => {
       iccid = iccid.substring(0, iccid.length - 1);
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:142", iccid);
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:145", iccid);
       needRefresh.value = true;
-      common_vendor.index.navigateToMiniProgram(new UTSJSONObject({
+      common_vendor.wx$1.openEmbeddedMiniProgram(new UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:152", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:160", "打开小程序失败", res);
           needRefresh.value = false;
           common_vendor.index.showToast({
             title: "打开支付页面失败",
@@ -99,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     common_vendor.onPullDownRefresh(() => {
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:169", "下拉刷新");
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:173", "下拉刷新");
       resetData();
       loadPayDeviceListData().finally(() => {
         common_vendor.index.stopPullDownRefresh();
@@ -134,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: common_vendor.t(item.simEndDate)
           } : {}, {
             g: common_vendor.o(($event) => {
-              return pay(item.iccid);
+              return pay(item.iccid, item.simMerchant);
             }, index),
             h: index
           });

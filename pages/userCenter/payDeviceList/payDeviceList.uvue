@@ -20,7 +20,7 @@
 				</view>
 				<view class="device-info">
 					<view></view>
-					<text class="pay-btn" @click="pay(item.iccid)">去续费</text>
+					<text class="pay-btn" @click="pay(item.iccid,item.simMerchant)">去续费</text>
 				</view>
 			</view>
 
@@ -136,14 +136,18 @@
 	})
 
 	// 支付
-	const pay = (iccid : string) => {
-		console.log('去支付，ICCID:', iccid)
+	const pay = (iccid : string,simMerchant : string) => {
+		// if(simMerchant == 'zddx'){
+		// 	iccid = iccid.substring(0,iccid.length-1) //电信卡
+		// }
 		iccid = iccid.substring(0,iccid.length-1)
+		
 		console.log(iccid)
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		
-		uni.navigateToMiniProgram({
+		//拉起半屏小程序
+		wx.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
 			path: '/pages/home/userSimRecharge?iccid=' + iccid,
 			envVersion: 'release',
@@ -176,12 +180,6 @@
 			})
 		})
 	})
-
-	// const carDetail = (iccid : string) => {
-	// 	uni.navigateTo({
-	// 		url: `/pages/userCenter/renewal/renewal?iccid=${iccid}`
-	// 	})
-	// }
 </script>
 
 <style lang="scss" scoped>

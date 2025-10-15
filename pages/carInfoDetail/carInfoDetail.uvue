@@ -532,7 +532,7 @@
 						convertedCoord.lat,
 						convertedCoord.lng,
 						'device',
-						item.deviceName
+						currentCarInfo.value.deviceName
 					)
 
 					markers.value = [deviceMarker]

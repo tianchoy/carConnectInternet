@@ -111,6 +111,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         name: "walk",
         title: "步行",
         img: "/static/cars/online/walk.png"
+      }),
+      new UTSJSONObject({
+        name: "muma",
+        title: "木马",
+        img: "/static/cars/online/muma.png"
+      }),
+      new UTSJSONObject({
+        name: "hangmu",
+        title: "航母",
+        img: "/static/cars/online/hangmu.png"
+      }),
+      new UTSJSONObject({
+        name: "junjian",
+        title: "军舰",
+        img: "/static/cars/online/junjian.png"
+      }),
+      new UTSJSONObject({
+        name: "tuiche",
+        title: "手推车",
+        img: "/static/cars/online/tuiche.png"
+      }),
+      new UTSJSONObject({
+        name: "train",
+        title: "火车",
+        img: "/static/cars/online/train.png"
       })
     ];
     const selectIcon = (item = null) => {
@@ -126,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePlateNumberChange = (e) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:154", e.length);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:179", e.length);
       editInfo.value.plateNo = e;
     };
     const formattedPlateNo = common_vendor.computed(() => {
@@ -152,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = UTS.JSON.parse(UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:187", res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:212", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -163,12 +188,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:200", "option", option);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:225", "option", option);
       if (option.deviceId != null) {
         deviceId.value = option.deviceId;
         loadCarListData();
       } else {
-        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:206", "deviceId is null");
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:231", "deviceId is null");
       }
     });
     const loadCarListData = () => {

@@ -64,12 +64,12 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
     }
     
     // 显示加载中
-    if (config.showLoading !== false) {
-        uni.showLoading({
-            title: '加载中...',
-            mask: true
-        })
-    }
+    // if (config.showLoading !== false) {
+    //     uni.showLoading({
+    //         title: '加载中...',
+    //         mask: true
+    //     })
+    // }
     
     return config
 }
@@ -77,9 +77,9 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 // 响应拦截器
 function responseInterceptor(response: any, config: RequestOptions): any {
     // 隐藏加载中
-    if (config.showLoading !== false) {
-        uni.hideLoading()
-    }
+    // if (config.showLoading !== false) {
+    //     uni.hideLoading()
+    // }
     
     // 处理 HTTP 状态码
     const statusCode = response.statusCode

@@ -4,8 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
-				@regionchange="handleRegionChange">
+				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true">
 				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" :showCar="true"
 					@update:current-time="(val) => (currentTime = val)" :carStatus='connectionStatus'></sub-navBar>
 			</map>
@@ -49,12 +48,31 @@
 	const deviceId = ref<string | null>('')
 	const deptId = ref<string | null>('')
 	const carType = ref<string | null>('')
+	
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
+
+	// 动画相关状态
+	const isAnimating = ref(false)
+	const animationTimer = ref<number | null>(null)
+	const currentPosition = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const targetPosition = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const currentRotation = ref(0)
+	const targetRotation = ref(0)
+	
+	// 动画队列管理
+	const animationQueue = ref<Array<any>>([])
+	const isProcessingQueue = ref(false)
 
 	// 标记点集合
 	const markers = ref<Array<any>>([])
@@ -72,12 +90,12 @@
 	const isTracking = ref(false)
 	const trackingInterval = ref<number | null>(null)
 	const trackPoints = ref<Array<{ latitude : number, longitude : number }>>([])
-	const lastDirection = ref(0) // 保存上一次的方向值
+	const lastDirection = ref(0)
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const currentTime = ref('5s')
+	const currentTime = ref('5s') 
 	const currentCar = ref<string | null>('京A12345')
 
 	const times = ref([
@@ -89,11 +107,14 @@
 		]
 	])
 
+	// 数据管理
+	const lastDataTime = ref(0) // 上次有效数据时间戳
+	const isRequesting = ref(false) // 是否正在请求中
+	const lastAnimationEndTime = ref(0) // 上次动画结束时间
+
 	// 监听 currentTime 变化
 	watch(currentTime, (newVal) => {
-		console.log("时间变化:", newVal);
 		if (isTracking.value) {
-			// 如果正在跟踪，重新设置定时器
 			stopTracking()
 			startTracking()
 		}
@@ -111,10 +132,6 @@
 	})
 
 	const loadInitialPosition = async () => {
-		uni.showLoading({
-			title: '获取车辆位置中...'
-		})
-
 		try {
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
@@ -135,42 +152,33 @@
 						Number(deviceData.latitude),
 						Number(deviceData.longitude)
 					)
+					
+					// 设置初始位置
+					currentPosition.latitude = convertedCoord.lat
+					currentPosition.longitude = convertedCoord.lng
+					targetPosition.latitude = convertedCoord.lat
+					targetPosition.longitude = convertedCoord.lng
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
-					const position = {
-						latitude: convertedCoord.lat,
-						longitude: convertedCoord.lng
-					}
-
 					// 记录初始方向
 					lastDirection.value = deviceData.direction || 0
+					currentRotation.value = normalizeRotation(calculateMapRotation(lastDirection.value))
+					targetRotation.value = currentRotation.value
 					
-					// 设置初始标记点
-					markers.value = [{
-						id: 0,
-						latitude: position.latitude,
-						longitude: position.longitude,
-						iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
-						width: 25,
-						height: 25,
-						rotate: calculateMapRotation(lastDirection.value), // 修正方向
-						callout: {
-							content: connectionStatus.value == 'online' ? `${deviceData.deviceName} | 速度: ${deviceData.speed || 0}km/h` : '爱车已离线',
-							color: connectionStatus.value == 'online' ? '#fff' : '#666',
-							bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
-							padding: 5,
-							borderRadius: 4,
-							display: 'ALWAYS'
-						}
-					}]
-
 					// 更新车辆信息
 					currentSpeed.value = deviceData.speed || 0
 					currentAddress.value = deviceData.positionUpdateTime
 						? `最后定位: ${deviceData.positionUpdateTime}`
 						: '未知位置'
 					connectionStatus.value = deviceData.connectionStatus || 'unknown'
+					
+					// 设置初始标记点 - 在更新车辆信息后调用
+					updateMarkers()
+					
+					// 记录数据时间
+					lastDataTime.value = Date.now()
+					lastAnimationEndTime.value = Date.now()
 				}
 			})
 
@@ -180,72 +188,285 @@
 				title: '获取车辆位置失败',
 				icon: 'none'
 			})
-		} finally {
-			uni.hideLoading()
 		}
 	}
 
 	// 计算地图上的旋转角度（修正方向）
 	const calculateMapRotation = (direction : number) : number => {
 		let rotation = direction
-		// let rotation = 360 - direction
-		// let rotation = direction + 180
-		// let rotation = 180 - direction
 		if (rotation >= 360) rotation -= 360
 		if (rotation < 0) rotation += 360
-		
-		// console.log("方向计算 - 原始:", direction, "修正后:", rotation)
 		return rotation
 	}
 
-	//请求位置数据
+	// 规范化旋转角度到0-360度
+	const normalizeRotation = (rotation : number) : number => {
+		let normalized = rotation % 360
+		if (normalized < 0) {
+			normalized += 360
+		}
+		return normalized
+	}
+
+	// 请求位置数据
 	const loadTrackData = async () => {
+		if (isRequesting.value) {
+			console.log('请求正在进行中，跳过本次请求')
+			return
+		}
+		
+		isRequesting.value = true
+		
 		try {
 			const data = {deptId: deptId.value,  deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			if (res?.code == 0 && res.data?.length > 0) {
 				const deviceData = res.data[0]
+				
+				// 检查数据是否有更新
+				const currentTime = Date.now()
+				if (currentTime - lastDataTime.value < 3000) { // 3秒内认为是相同数据
+					console.log('数据更新间隔太短，可能为重复数据，跳过处理')
+					return
+				}
+				
 				// 转换坐标到腾讯地图坐标系
 				const convertedCoord = CoordTransform.wgs84ToTencent(
 					Number(deviceData.latitude),
 					Number(deviceData.longitude)
 				)
 
-				const position = {
+				const newPosition = {
 					latitude: convertedCoord.lat,
-					longitude: convertedCoord.lng
+					longitude: convertedCoord.lng,
+					speed: deviceData.speed || 0,
+					address: deviceData.positionUpdateTime || '未知位置',
+					connectionStatus: deviceData.connectionStatus || 'unknown',
+					direction: deviceData.direction !== undefined && deviceData.direction !== null 
+						? deviceData.direction 
+						: lastDirection.value
 				}
 
-				// 更新中心点
-				center.latitude = position.latitude
-				center.longitude = position.longitude
-
-				// 更新车辆信息
-				currentSpeed.value = deviceData.speed || 0
-				currentAddress.value = deviceData.positionUpdateTime || '未知位置'
-				connectionStatus.value = deviceData.connectionStatus || 'unknown'
-
-				// 如果有方向数据，更新方向
-				if (deviceData.direction !== undefined && deviceData.direction !== null) {
-					lastDirection.value = deviceData.direction
-				} else if (trackPoints.value.length >= 2) {
+				// 处理方向数据
+				let newDirection = newPosition.direction
+				if (newPosition.direction === lastDirection.value && trackPoints.value.length >= 2) {
 					// 如果没有方向数据，根据轨迹计算方向
-					lastDirection.value = calculateDirectionFromTrack()
+					newDirection = calculateDirectionFromTrack()
 				}
+
+				// 立即更新车辆信息（包括速度）
+				currentSpeed.value = newPosition.speed
+				currentAddress.value = newPosition.address
+				connectionStatus.value = newPosition.connectionStatus
+				lastDirection.value = newDirection
+				
+				// 记录数据时间
+				lastDataTime.value = currentTime
+
+				// 添加到动画队列
+				addToAnimationQueue({
+					position: {
+						latitude: newPosition.latitude,
+						longitude: newPosition.longitude
+					},
+					rotation: normalizeRotation(calculateMapRotation(newDirection))
+				})
 
 				// 追踪状态下记录轨迹点
 				if (isTracking.value) {
-					trackPoints.value.push(position)
+					trackPoints.value.push({
+						latitude: newPosition.latitude,
+						longitude: newPosition.longitude
+					})
 					drawTempRoute()
 				}
-
-				setMarkers()
+				
+				// 立即更新标记点，确保速度信息同步
+				updateMarkers()
 			}
 		} catch (err) {
 			console.error('获取位置失败:', err)
-			uni.showToast({ title: '获取位置失败', icon: 'none' })
+			// 不显示Toast，避免频繁提示
+		} finally {
+			isRequesting.value = false
 		}
+	}
+
+	// 添加到动画队列
+	const addToAnimationQueue = (animationData : any) => {
+		// 检查是否与队列中最后一个数据相同
+		if (animationQueue.value.length > 0) {
+			const lastAnimation = animationQueue.value[animationQueue.value.length - 1]
+			const distance = calculateDistance(
+				lastAnimation.position.latitude,
+				lastAnimation.position.longitude,
+				animationData.position.latitude,
+				animationData.position.longitude
+			)
+			
+			if (distance < 5) { // 5米以内认为是相同位置
+				console.log('位置变化太小，跳过动画')
+				return
+			}
+		}
+		
+		animationQueue.value.push(animationData)
+		
+		// 如果队列正在处理，直接返回
+		if (isProcessingQueue.value) {
+			return
+		}
+		
+		// 开始处理队列
+		processAnimationQueue()
+	}
+
+	// 处理动画队列
+	const processAnimationQueue = () => {
+		if (animationQueue.value.length === 0) {
+			isProcessingQueue.value = false
+			return
+		}
+		
+		isProcessingQueue.value = true
+		
+		// 获取下一个动画数据
+		const nextAnimation = animationQueue.value.shift()
+		
+		// 更新目标位置和旋转
+		targetPosition.latitude = nextAnimation.position.latitude
+		targetPosition.longitude = nextAnimation.position.longitude
+		targetRotation.value = nextAnimation.rotation
+		
+		// 计算两点间距离
+		const distance = calculateDistance(
+			currentPosition.latitude,
+			currentPosition.longitude,
+			targetPosition.latitude,
+			targetPosition.longitude
+		)
+		
+		// 根据车速、距离和请求间隔计算动画时长
+		const animationDuration = calculateAnimationDuration(distance, currentSpeed.value)
+		
+		// 开始动画
+		startPositionAnimation(animationDuration, () => {
+			// 记录动画结束时间
+			lastAnimationEndTime.value = Date.now()
+			// 动画完成后继续处理队列
+			processAnimationQueue()
+		})
+	}
+
+	// 计算两点间距离（米）
+	const calculateDistance = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number => {
+		const R = 6371000 // 地球半径（米）
+		const dLat = (lat2 - lat1) * Math.PI / 180
+		const dLng = (lng2 - lng1) * Math.PI / 180
+		const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+			Math.sin(dLng/2) * Math.sin(dLng/2)
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+		return R * c
+	}
+
+	// 根据距离和速度计算动画时长
+	const calculateAnimationDuration = (distance : number, speed : number) : number => {
+		const requestInterval = parseInt(currentTime.value) * 1000 // 请求间隔（毫秒）
+		
+		if (speed <= 0 || distance <= 0) {
+			return requestInterval // 使用请求间隔作为默认时长
+		}
+		
+		// 计算实际行驶时间
+		const actualTime = distance / (speed / 3.6) // 速度从km/h转换为m/s
+		const actualDuration = actualTime * 1000 // 转换为毫秒
+		
+		const minDuration = requestInterval * 0.8
+		const maxDuration = requestInterval * 1.2
+		
+		let duration = actualDuration
+		
+		// 如果实际需要的动画时间太短，延长到最小时长
+		if (duration < minDuration) {
+			duration = minDuration
+		}
+		// 如果实际需要的动画时间太长，缩短到最大时长
+		else if (duration > maxDuration) {
+			duration = maxDuration
+		}
+		
+		return duration
+	}
+
+	// 根据车速控制移动速度
+	const startPositionAnimation = (duration : number, onComplete : () => void) => {
+		if (isAnimating.value) {
+			if (animationTimer.value) {
+				clearInterval(animationTimer.value)
+			}
+		}
+
+		isAnimating.value = true
+		const startTime = Date.now()
+		const startLat = currentPosition.latitude
+		const startLng = currentPosition.longitude
+		const startRot = currentRotation.value
+		
+		const latDiff = targetPosition.latitude - startLat
+		const lngDiff = targetPosition.longitude - startLng
+		const rotDiff = calculateShortestRotation(startRot, targetRotation.value)
+
+		animationTimer.value = setInterval(() => {
+			const currentTime = Date.now()
+			const elapsed = currentTime - startTime
+			const progress = Math.min(elapsed / duration, 1)
+			
+			// 使用线性插值实现匀速运动
+			const linearProgress = progress
+			
+			// 更新当前位置
+			currentPosition.latitude = startLat + latDiff * linearProgress
+			currentPosition.longitude = startLng + lngDiff * linearProgress
+			currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress)
+			
+			// 更新地图中心点（跟随车辆）
+			center.latitude = currentPosition.latitude
+			center.longitude = currentPosition.longitude
+			
+			// 更新标记点
+			updateMarkers()
+			
+			// 动画结束
+			if (progress >= 1) {
+				if (animationTimer.value) {
+					clearInterval(animationTimer.value)
+					animationTimer.value = null
+				}
+				isAnimating.value = false
+				
+				// 确保最终位置准确
+				currentPosition.latitude = targetPosition.latitude
+				currentPosition.longitude = targetPosition.longitude
+				currentRotation.value = normalizeRotation(targetRotation.value)
+				updateMarkers()
+				
+				// 执行完成回调
+				onComplete()
+			}
+		}, 16) as unknown as number // 约60fps
+	}
+
+	// 计算最短旋转路径
+	const calculateShortestRotation = (from : number, to : number) : number => {
+		let diff = to - from
+		if (diff > 180) {
+			diff -= 360
+		} else if (diff < -180) {
+			diff += 360
+		}
+		return diff
 	}
 
 	// 根据轨迹计算方向
@@ -272,23 +493,21 @@
 		return angle
 	}
 
-	// 设置标记点
-	const setMarkers = () => {
-		if (trackPoints.value.length === 0) return
-
-		// 只保留车辆标记点，ID从0开始
+	// 更新标记点
+	const updateMarkers = () => {
 		markers.value = [
-			// 车辆位置
 			{
-				id: 0, // 修改ID从0开始
-				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
+				id: 0,
+				latitude: currentPosition.latitude,
+				longitude: currentPosition.longitude,
 				iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
 				width: 25,
 				height: 25,
-				rotate: calculateMapRotation(lastDirection.value), // 使用修正后的方向
+				rotate: currentRotation.value,
 				callout: {
-					content: `速度: ${currentSpeed.value}km/h`,
+					content: connectionStatus.value == 'online' 
+						? `速度: ${currentSpeed.value}km/h` 
+						: '爱车已离线',
 					color: '#ffffff',
 					bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
 					padding: 5,
@@ -310,6 +529,10 @@
 
 	// 开始跟踪
 	const startTracking = () => {
+		// 清空动画队列
+		animationQueue.value = []
+		isProcessingQueue.value = false
+		
 		// 保留最后一个点作为起点
 		if (trackPoints.value.length > 0) {
 			const lastPoint = trackPoints.value[trackPoints.value.length - 1]
@@ -342,6 +565,10 @@
 			clearInterval(trackingInterval.value)
 			trackingInterval.value = null
 		}
+		
+		// 清空动画队列
+		animationQueue.value = []
+		isProcessingQueue.value = false
 
 		if (trackPoints.value.length >= 2) {
 			getRealRoute()
@@ -355,13 +582,7 @@
 
 	// 获取当前位置
 	const getCurrentPosition = () => {
-		uni.showLoading({
-			title: '获取位置中...'
-		})
 		loadTrackData()
-		setTimeout(() => {
-			uni.hideLoading()
-		}, 1000)
 	}
 
 	// 绘制临时路线
@@ -377,12 +598,10 @@
 			color: '#1296db',
 			width: 6,
 			arrowLine: true,
-			arrowIconPath: '/static/arrow.png', // 确保箭头图标方向正确
+			arrowIconPath: '/static/arrow.png',
 			borderColor: '#ffffff',
 			borderWidth: 2
 		}]
-
-		// console.log('绘制临时路线:', JSON.stringify(polylines.value))
 	}
 
 	// 获取真实道路路线
@@ -399,7 +618,6 @@
 			title: '路线规划中...'
 		})
 
-		//路线规划API需要WGS84坐标，所以使用原始坐标
 		const waypoints = trackPoints.value
 			.slice(1, -1)
 			.map(point => `${point.longitude},${point.latitude}`)
@@ -413,11 +631,6 @@
 			uni.hideLoading()
 			if (res && res.data) {
 				drawRoadRoute(res.data)
-			} else {
-				// uni.showToast({
-				// 	title: '未找到合适路线',
-				// 	icon: 'none'
-				// })
 			}
 		}).catch((err : any) => {
 			uni.hideLoading()
@@ -443,23 +656,20 @@
 		})
 
 		polylines.value = [
-			// 道路底色
 			{
 				points: convertedPoints,
 				color: '#4a90e2',
 				width: 12,
 				level: 'low'
 			},
-			// 主路线
 			{
 				points: convertedPoints,
 				color: '#1a73e8',
 				width: 8,
 				arrowLine: true,
-				arrowIconPath: '/static/road-arrow.png', // 确保箭头方向正确
+				arrowIconPath: '/static/road-arrow.png',
 				level: 'high'
 			},
-			// 路线高亮
 			{
 				points: convertedPoints,
 				color: '#ffffff',
@@ -528,15 +738,14 @@
 		}
 	}
 
-	// 地图区域变化事件
-	const handleRegionChange = (e : any) => {
-		// console.log('地图区域变化:', e)
-	}
-
 	onUnmounted(() => {
 		if (trackingInterval.value) {
 			clearInterval(trackingInterval.value)
 			trackingInterval.value = null
+		}
+		if (animationTimer.value) {
+			clearInterval(animationTimer.value)
+			animationTimer.value = null
 		}
 	})
 </script>
