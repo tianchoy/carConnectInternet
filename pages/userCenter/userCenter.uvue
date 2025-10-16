@@ -35,6 +35,7 @@
 	const carsnumber = ref(0)
 
 	onShow(() => {
+		
 		loadData()
 	})
 

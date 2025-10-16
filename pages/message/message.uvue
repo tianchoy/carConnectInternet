@@ -15,7 +15,6 @@
 				<view v-if="msgList.length == 0 && !isLoading" class="empty-state">
 					<text>暂无消息</text>
 				</view>
-				
 				<!-- 新消息提示 -->
 				<view v-if="hasNewMessages" class="new-message-tip" @click="loadNewMessages">
 					<text>有 {{newMessageCount}} 条新消息，点击查看</text>
@@ -186,9 +185,10 @@
 				if (latestMessage && latestMessage.createTime) {
 					const messageTime = new Date(latestMessage.createTime).getTime()
 					if (messageTime > lastUpdateTime.value) {
-						console.log('发现新消息，时间:', latestMessage.createTime)
 						// 有新消息
 						hasNewMessages.value = true
+						// 触发震动报警
+						vibrateAlert()
 						// 获取新消息数量
 						const countRes = await getUserMsgList({
 							page: 1,
@@ -208,6 +208,13 @@
 			}
 		} catch (error) {
 			console.error('检查新消息失败:', error)
+		}
+	}
+	
+	// 震动报警函数
+	const vibrateAlert = () => {
+		for (let i = 0; i < 3; i++) {
+			uni.vibrateLong()
 		}
 	}
 	
