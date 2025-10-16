@@ -67,13 +67,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isRequesting = common_vendor.ref(false);
     const lastAnimationEndTime = common_vendor.ref(0);
     common_vendor.watch(currentTime, (newVal) => {
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:117", "时间变化:", newVal);
       if (isTracking.value) {
         stopTracking();
         startTracking();
       }
     });
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:124", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:126", option);
       connectionStatus.value = option.connectionStatus;
       imei.value = option.imei;
       currentCar.value = option.plateNo;
@@ -86,7 +87,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:138", "跟踪位置", res.data, imei.value);
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:140", "跟踪位置", res.data, imei.value);
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               if (item.imei == imei.value) {
@@ -118,7 +119,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:186", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:188", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -132,6 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         rotation -= 360;
       if (rotation < 0)
         rotation += 360;
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:202", "方向计算 - 原始:", direction, "修正后:", rotation);
       return rotation;
     };
     const normalizeRotation = (rotation) => {
@@ -145,7 +147,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         if (isRequesting.value) {
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:214", "请求正在进行中，跳过本次请求");
           return Promise.resolve(null);
         }
         isRequesting.value = true;
@@ -156,7 +157,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const deviceData = res.data[0];
             const currentTime_1 = Date.now();
             if (currentTime_1 - lastDataTime.value < 3e3) {
-              common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:230", "数据更新间隔太短，可能为重复数据，跳过处理");
               return Promise.resolve(null);
             }
             const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
@@ -197,7 +197,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             updateMarkers();
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:289", "获取位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:291", "获取位置失败:", err);
         } finally {
           isRequesting.value = false;
         }
@@ -208,7 +208,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const lastAnimation = animationQueue.value[animationQueue.value.length - 1];
         const distance = calculateDistance(lastAnimation.position.latitude, lastAnimation.position.longitude, animationData.position.latitude, animationData.position.longitude);
         if (distance < 5) {
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:309", "位置变化太小，跳过动画");
           return null;
         }
       }
@@ -320,7 +319,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       let angle = Math.atan2(dy, dx) * 180 / Math.PI;
       if (angle < 0)
         angle += 360;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:492", "计算方向:", angle);
       return angle;
     };
     const updateMarkers = () => {
@@ -442,7 +440,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "路线获取失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:641", "路线规划失败:", err);
+        common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:639", "路线规划失败:", err);
       });
     };
     const drawRoadRoute = (path = null) => {

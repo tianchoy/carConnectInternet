@@ -54,6 +54,9 @@
       }
     ]
   },
+  "embeddedAppIdList": [
+    "wx1d647f2cfdc089e6"
+  ],
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序定位服务"

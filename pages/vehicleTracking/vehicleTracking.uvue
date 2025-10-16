@@ -90,12 +90,12 @@
 	const isTracking = ref(false)
 	const trackingInterval = ref<number | null>(null)
 	const trackPoints = ref<Array<{ latitude : number, longitude : number }>>([])
-	const lastDirection = ref(0)
+	const lastDirection = ref(0) // 保存上一次的方向值
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const currentTime = ref('5s') 
+	const currentTime = ref('5s') // 默认改为5秒
 	const currentCar = ref<string | null>('京A12345')
 
 	const times = ref([
@@ -114,7 +114,9 @@
 
 	// 监听 currentTime 变化
 	watch(currentTime, (newVal) => {
+		console.log("时间变化:", newVal);
 		if (isTracking.value) {
+			// 如果正在跟踪，重新设置定时器
 			stopTracking()
 			startTracking()
 		}
@@ -191,11 +193,13 @@
 		}
 	}
 
-	// 计算地图上的旋转角度（修正方向）
+	// 计算地图上的旋转角度
 	const calculateMapRotation = (direction : number) : number => {
 		let rotation = direction
 		if (rotation >= 360) rotation -= 360
 		if (rotation < 0) rotation += 360
+		
+		console.log("方向计算 - 原始:", direction, "修正后:", rotation)
 		return rotation
 	}
 
@@ -210,8 +214,8 @@
 
 	// 请求位置数据
 	const loadTrackData = async () => {
+		// 防止重复请求
 		if (isRequesting.value) {
-			console.log('请求正在进行中，跳过本次请求')
 			return
 		}
 		
@@ -226,8 +230,7 @@
 				
 				// 检查数据是否有更新
 				const currentTime = Date.now()
-				if (currentTime - lastDataTime.value < 3000) { // 3秒内认为是相同数据
-					console.log('数据更新间隔太短，可能为重复数据，跳过处理')
+				if (currentTime - lastDataTime.value < 3000) {
 					return
 				}
 				
@@ -251,11 +254,10 @@
 				// 处理方向数据
 				let newDirection = newPosition.direction
 				if (newPosition.direction === lastDirection.value && trackPoints.value.length >= 2) {
-					// 如果没有方向数据，根据轨迹计算方向
 					newDirection = calculateDirectionFromTrack()
 				}
 
-				// 立即更新车辆信息（包括速度）
+				// 立即更新车辆信息
 				currentSpeed.value = newPosition.speed
 				currentAddress.value = newPosition.address
 				connectionStatus.value = newPosition.connectionStatus
@@ -282,12 +284,11 @@
 					drawTempRoute()
 				}
 				
-				// 立即更新标记点，确保速度信息同步
+				// 立即更新标记点
 				updateMarkers()
 			}
 		} catch (err) {
 			console.error('获取位置失败:', err)
-			// 不显示Toast，避免频繁提示
 		} finally {
 			isRequesting.value = false
 		}
@@ -305,8 +306,8 @@
 				animationData.position.longitude
 			)
 			
-			if (distance < 5) { // 5米以内认为是相同位置
-				console.log('位置变化太小，跳过动画')
+			// 如果距离很小，认为是相同位置，
+			if (distance < 5) { 
 				return
 			}
 		}
@@ -379,20 +380,18 @@
 			return requestInterval // 使用请求间隔作为默认时长
 		}
 		
-		// 计算实际行驶时间
+		// 计算实际行驶时间（秒）
 		const actualTime = distance / (speed / 3.6) // 速度从km/h转换为m/s
 		const actualDuration = actualTime * 1000 // 转换为毫秒
-		
 		const minDuration = requestInterval * 0.8
 		const maxDuration = requestInterval * 1.2
 		
 		let duration = actualDuration
-		
-		// 如果实际需要的动画时间太短，延长到最小时长
+
 		if (duration < minDuration) {
 			duration = minDuration
 		}
-		// 如果实际需要的动画时间太长，缩短到最大时长
+
 		else if (duration > maxDuration) {
 			duration = maxDuration
 		}
@@ -400,7 +399,7 @@
 		return duration
 	}
 
-	// 根据车速控制移动速度
+	// 开始位置动画 - 根据车速控制移动速度
 	const startPositionAnimation = (duration : number, onComplete : () => void) => {
 		if (isAnimating.value) {
 			if (animationTimer.value) {
@@ -431,7 +430,7 @@
 			currentPosition.longitude = startLng + lngDiff * linearProgress
 			currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress)
 			
-			// 更新地图中心点（跟随车辆）
+			// 更新地图中心点
 			center.latitude = currentPosition.latitude
 			center.longitude = currentPosition.longitude
 			
@@ -488,8 +487,7 @@
 		
 		// 转换为0-360度范围
 		if (angle < 0) angle += 360
-		
-		console.log("计算方向:", angle)
+	
 		return angle
 	}
 
