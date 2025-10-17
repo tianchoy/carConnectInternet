@@ -34,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, props.lists.length != 0 ? {
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
-            a: common_vendor.t(item.plateNo),
+            a: common_vendor.t(item.deviceName),
             b: "245c735a-0-" + i0,
             c: common_vendor.p({
               size: "mini",

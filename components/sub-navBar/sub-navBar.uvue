@@ -148,7 +148,7 @@
 			color: #fff;
 
 			.times {
-				margin-right: 10rpx;
+				width: 40rpx;
 				font-size: 25rpx;
 			}
 		}

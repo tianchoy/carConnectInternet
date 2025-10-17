@@ -4,7 +4,7 @@
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
 				<view class="title">
 					<view class="car-number">
-						{{item.plateNo}}
+						{{item.deviceName}}
 						<uv-tags size="mini" shape="circle" :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></uv-tags>
 					</view>
 					<view class="device-tools">
@@ -28,7 +28,8 @@
 		plateNo : string
 		imei : string,
 		status: number,
-		companyId:string
+		companyId:string,
+		deviceName : string
 	}
 	const props = defineProps<{
 		lists : DeviceItem[]

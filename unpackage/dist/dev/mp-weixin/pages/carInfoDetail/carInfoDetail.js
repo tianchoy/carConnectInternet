@@ -497,39 +497,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           size: 16
         }),
-        l: ((_a = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _a.rssi) || ((_b = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _b.sat)
+        l: common_vendor.unref(address)
+      }, common_vendor.unref(address) ? {
+        m: common_vendor.t(common_vendor.unref(address))
+      } : {}, {
+        n: ((_a = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _a.rssi) || ((_b = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _b.sat)
       }, ((_c = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _c.rssi) || ((_d = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _d.sat) ? common_vendor.e({
-        m: (_e = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _e.rssi
+        o: (_e = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _e.rssi
       }, ((_f = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _f.rssi) ? {
-        n: common_vendor.n(getMobileSignalBarClass(0, (_g = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _g.rssi)),
-        o: common_vendor.n(getMobileSignalBarClass(1, (_h = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _h.rssi)),
-        p: common_vendor.n(getMobileSignalBarClass(2, (_i = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _i.rssi)),
-        q: common_vendor.n(getMobileSignalBarClass(3, (_j = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _j.rssi)),
-        r: common_vendor.n(getMobileSignalBarClass(4, (_k = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _k.rssi)),
-        s: getSignalDetail((_l = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _l.rssi).color,
-        t: common_vendor.t(getSignalDetail((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi).experience),
-        v: getSignalDetail((_n = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _n.rssi).color,
-        w: common_vendor.t((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi),
-        x: getSignalDetail((_p = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _p.rssi).color
+        p: common_vendor.n(getMobileSignalBarClass(0, (_g = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _g.rssi)),
+        q: common_vendor.n(getMobileSignalBarClass(1, (_h = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _h.rssi)),
+        r: common_vendor.n(getMobileSignalBarClass(2, (_i = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _i.rssi)),
+        s: common_vendor.n(getMobileSignalBarClass(3, (_j = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _j.rssi)),
+        t: common_vendor.n(getMobileSignalBarClass(4, (_k = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _k.rssi)),
+        v: getSignalDetail((_l = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _l.rssi).color,
+        w: common_vendor.t(getSignalDetail((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi).experience),
+        x: getSignalDetail((_n = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _n.rssi).color,
+        y: common_vendor.t((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi),
+        z: getSignalDetail((_p = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _p.rssi).color
       } : {}, {
-        y: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
+        A: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
       }, ((_r = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _r.sat) ? {
-        z: common_assets._imports_0$1,
-        A: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
+        B: common_assets._imports_0$1,
+        C: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
       } : {}, {
-        B: common_vendor.unref(currentCarInfo).voltage
+        D: common_vendor.unref(currentCarInfo).voltage
       }, common_vendor.unref(currentCarInfo).voltage ? {
-        C: common_assets._imports_1,
-        D: common_vendor.t(common_vendor.unref(currentCarInfo).voltage)
+        E: common_assets._imports_1,
+        F: common_vendor.t(common_vendor.unref(currentCarInfo).voltage)
       } : {}, {
-        E: common_vendor.unref(datainfo).batteryPercent
+        G: common_vendor.unref(datainfo).batteryPercent
       }, common_vendor.unref(datainfo).batteryPercent ? {
-        F: common_assets._imports_2,
-        G: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
-        H: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
+        H: common_assets._imports_2,
+        I: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
+        J: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
       } : {}) : {}, {
-        I: common_vendor.o(carDetail),
-        J: common_vendor.f(common_vendor.unref(baseList), (item, index, i0) => {
+        K: common_vendor.o(carDetail),
+        L: common_vendor.f(common_vendor.unref(baseList), (item, index, i0) => {
           return {
             a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p({
@@ -547,13 +551,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           };
         }),
-        K: common_vendor.p({
+        M: common_vendor.p({
           col: 5
         }),
-        L: common_vendor.o(($event) => {
+        N: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
         }),
-        M: common_vendor.p({
+        O: common_vendor.p({
           placeholder: "请输入账户密码",
           prefixIcon: "lock",
           border: "surround",
@@ -561,14 +565,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        N: common_vendor.sr(popupRef, "6cb34a81-6", {
+        P: common_vendor.sr(popupRef, "6cb34a81-6", {
           "k": "popupRef"
         }),
-        O: common_vendor.o(confirm),
-        P: common_vendor.p({
+        Q: common_vendor.o(confirm),
+        R: common_vendor.p({
           title: common_vendor.unref(modalTitle)
         }),
-        Q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

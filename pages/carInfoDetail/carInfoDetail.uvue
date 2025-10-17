@@ -21,7 +21,7 @@
 					</view>
 					<uv-icon name="arrow-right" :bold="true" :size="16"></uv-icon>
 				</view>
-
+				<view class="addree-box" v-if="address">当前地址：{{address}}</view>
 				<!-- 信号强度显示区域 -->
 				<view class="signal-container" v-if="currentCarInfo.attribute?.rssi || currentCarInfo.attribute?.sat">
 					<view v-if="currentCarInfo.attribute?.rssi" class="signal-item">
@@ -789,6 +789,12 @@
 					font-size: 20rpx;
 					color: #999;
 					margin-left: 30rpx;
+				}
+
+				.addree-box{
+					font-size: 22rpx;
+					margin: 20rpx 0 0;
+					color: #999;
 				}
 
 				// 手机信号样式

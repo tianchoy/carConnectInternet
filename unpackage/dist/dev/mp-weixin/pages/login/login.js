@@ -165,7 +165,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:224", "docState.value:", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:227", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -181,6 +181,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         smsformRef.value.setRules(smsrules);
       }
     });
+    const loginBt = () => {
+      if (!docState.value) {
+        common_vendor.index.showToast({
+          title: "请先阅读并同意用户协议",
+          icon: "error"
+        });
+        return null;
+      }
+    };
     const handleGetPhoneNumber = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!docState.value) {
@@ -218,7 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:294", "res", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:307", "res", res);
           if (!res) {
             throw new Error("接口返回数据为空");
           }
@@ -233,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:316", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:329", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -245,7 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:327", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:340", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -366,17 +375,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.p({
           type: "primary"
         })
-      } : {
-        r: common_vendor.o(handleGetPhoneNumber)
-      }, {
-        s: common_vendor.o(isDocState),
-        t: common_vendor.p({
+      } : common_vendor.e({
+        r: !docState.value
+      }, !docState.value ? {
+        s: common_vendor.o(loginBt)
+      } : {}, {
+        t: docState.value
+      }, docState.value ? {
+        v: common_vendor.o(handleGetPhoneNumber)
+      } : {}), {
+        w: common_vendor.o(isDocState),
+        x: common_vendor.p({
           checked: docState.value
         }),
-        v: common_vendor.o(isDocState),
-        w: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        x: common_vendor.o(isPswLogin),
-        y: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        y: common_vendor.o(isDocState),
+        z: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
+        A: common_vendor.o(isPswLogin),
+        B: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

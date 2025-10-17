@@ -55,6 +55,7 @@
   background-color: "#1296db";
   color: white;
   font-size: 28rpx;
+  border-radius: 8rpx;
 }
 .container .tools-panel .pos-info-box {
   padding: 10rpx 0;
@@ -71,10 +72,11 @@
 .container .tools-panel .pos-info-box .speed text:first-child,
 .container .tools-panel .pos-info-box .address text:first-child {
   color: #666;
-  width: 100rpx;
+  width: 160rpx;
 }
 .container .tools-panel .pos-info-box .speed text:last-child,
 .container .tools-panel .pos-info-box .address text:last-child {
   color: #333;
   font-weight: 500;
+  flex: 1;
 }

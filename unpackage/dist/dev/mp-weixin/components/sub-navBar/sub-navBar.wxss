@@ -70,7 +70,7 @@
   color: #fff;
 }
 .tools-box .second .times.data-v-f630fc82 {
-  margin-right: 10rpx;
+  width: 40rpx;
   font-size: 25rpx;
 }
 .tools-box .down_icon.data-v-f630fc82 {

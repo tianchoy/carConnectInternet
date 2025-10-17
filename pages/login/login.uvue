@@ -38,7 +38,10 @@
 			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button>
 
 			<view v-else>
-				<button open-type="getPhoneNumber" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">
+				<button v-if="!docState" type="primary" plain="true" @click="loginBt">
+					个人用户登录
+				</button>
+				<button open-type="getPhoneNumber" v-if="docState" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">
 					个人用户登录
 				</button>
 			</view>
@@ -244,6 +247,16 @@
 			smsformRef.value.setRules(smsrules)
 		}
 	})
+
+	const loginBt = () => {
+		if (!docState.value) {
+			uni.showToast({
+				title: '请先阅读并同意用户协议',
+				icon: 'error'
+			})
+			return
+		}
+	}
 
 	// 微信登录处理函数
 	const handleGetPhoneNumber = async (e) => {
