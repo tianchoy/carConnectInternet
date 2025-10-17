@@ -33,10 +33,11 @@
 						</template>
 					</uv-list-item>
 				</uv-list>
-				
-				<uv-load-more :status="loadStatus" />
+				<uv-load-more :status="loadStatus" v-if="Login" />
 			</view>
 		</scroll-view>
+		<!-- 登录提示 -->
+		
 		
 		<uv-modal 
 			ref="modal" 
@@ -65,6 +66,7 @@
 	const hasNewMessages = ref(false) // 是否有新消息
 	const newMessageCount = ref(0)   // 新消息数量
 	const lastUpdateTime = ref(new Date().getTime()) // 最后更新时间
+	const Login = ref(false)
 	
 	// 定时器相关
 	let checkTimer: number | null = null
@@ -72,17 +74,31 @@
 	
 	// 页面加载时初始化数据
 	onLoad(() => {
-		console.log('页面加载 - 初始化数据')
-		loadMsgList(true)
+		// 获取 token
+		const token = uni.getStorageSync('token')
+		console.log('获取到的 token:', token)
+		// 如果有 token，加载消息列表
+		if (token) {
+			Login.value = true
+			loadMsgList(true)
+		} else {
+			Login.value = false
+		}
 	})
+
+		const gotoLogin = () => {
+			uni.redirectTo({ url: '/pages/login/login' })
+		}
 	
 	// 页面显示时启动定时器
 	onShow(() => {
-		console.log('页面显示 - 启动自动刷新')
-		isPageActive.value = true
-		startNewMessageCheck()
-		// 立即检查一次新消息
-		checkNewMessages()
+		if (Login.value) {
+			console.log('页面显示 - 启动自动刷新')
+			isPageActive.value = true
+			startNewMessageCheck()
+			// 立即检查一次新消息
+			checkNewMessages()
+		}
 	})
 	
 	// 页面隐藏时停止定时器

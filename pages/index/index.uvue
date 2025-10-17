@@ -10,9 +10,10 @@
 		<view v-else>
 			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice"/>
 		</view>
+		<view class="login-view-more" v-if="!Login" @click="gotoLogin">登录查看更多</view>
 		<view class="tool-nav">
-			<view class="refresh" @click="refresh">刷新</view>
-			<view class="addCar" @click="addCar">添加车辆</view>
+			<view class="refresh" @click="refresh" v-if="Login">刷新</view>
+			<view class="addCar" @click="addCar" v-if="Login">添加车辆</view>
 			<view class="btn-map-list" @click="toggleMapMode">
 				{{showMap ? '车辆列表' : '地图界面'}}
 			</view>
@@ -26,7 +27,7 @@
 			<text>{{pickerStateTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
-		<view class="left-bar-state" @click="handGroupPicker" v-if="!showMap">
+		<view class="left-bar-state" @click="handGroupPicker" v-if=" Login && !showMap">
 			<text>{{pickerGroupTitle}}</text>
 			<uv-icon name="arrow-down" color="#fff"></uv-icon>
 		</view>
@@ -355,7 +356,7 @@
 		const token = uni.getStorageSync('token')
 		console.log(token)
 		if (!token) {
-			uni.redirectTo({ url: '/pages/login/login' })
+			// uni.redirectTo({ url: '/pages/login/login' })
 			Login.value = false
 		} else {
 			Login.value = true
@@ -384,6 +385,10 @@
 		// 清理事件监听
 		uni.$off('refreshDeviceList', refreshDeviceList)
 	})
+		// 跳转登录页面
+		const gotoLogin = () => {
+			uni.redirectTo({ url: '/pages/login/login' })
+		}
 
 </script>
 
@@ -498,6 +503,21 @@
 
 		.left-bar-state {
 			left: 180rpx;
+		}
+		.login-view-more {
+			position: absolute;
+			bottom: 50rpx;
+			width: 100%;
+			left: 0rpx;
+			z-index: 100;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			font-size: 28rpx;
+			color: #fff;
+			background-color: #999;
+			padding: 20rpx 0;
 		}
 	}
 </style>

@@ -67,6 +67,22 @@
   font-size: 25rpx;
   margin-top: 40rpx;
 }
+.container .other-way.data-v-27a30816 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 25rpx;
+  margin-top: 40rpx;
+  color: #999;
+}
+.container .other-way .noLogin.data-v-27a30816 {
+  border-right: 1rpx solid #999;
+  padding-right: 50rpx;
+}
+.container .other-way .BLogin.data-v-27a30816 {
+  padding-left: 50rpx;
+}
 .container .wechat-login-btn.data-v-27a30816 {
   color: #fff !important;
 }

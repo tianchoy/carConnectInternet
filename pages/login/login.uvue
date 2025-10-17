@@ -55,7 +55,10 @@
 				</uv-checkbox-group>
 			</view>
 		</view>
-		<view style="padding:0 40rpx;color:#e1e1e1;font-size:25rpx;text-align: right;" @click="isPswLogin">{{pswLogin?'个人用户登录':'企业用户登录'}}</view>
+		<view class="other-way">
+			<view class="noLogin" @click="gotoIndex">暂不登录</view>
+			<view class="BLogin" @click="isPswLogin">{{pswLogin?'个人用户登录':'企业用户登录'}}</view>
+		</view>
 		
 	</view>
 </template>
@@ -257,6 +260,11 @@
 			return
 		}
 	}
+	const gotoIndex = () => {
+		uni.reLaunch({
+			url: '/pages/index/index'
+		})
+	}
 
 	// 微信登录处理函数
 	const handleGetPhoneNumber = async (e) => {
@@ -453,7 +461,22 @@
 				margin-top: 40rpx;
 			}
 		}
-
+		.other-way{
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			font-size: 25rpx;
+			margin-top: 40rpx;
+			color: #999;
+			.noLogin{
+				border-right: 1rpx solid #999;
+				padding-right: 50rpx;
+			}
+			.BLogin{
+				padding-left: 50rpx;
+			}
+		}
 		.wechat-login-btn {
 			color: #fff !important;
 		}

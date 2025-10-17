@@ -23,8 +23,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       nickname: ""
     }));
     const carsnumber = common_vendor.ref(0);
+    const Login = common_vendor.ref(false);
     common_vendor.onShow(() => {
-      loadData();
+      const token = common_vendor.index.getStorageSync("token");
+      if (token) {
+        Login.value = true;
+        loadData();
+      } else {
+        Login.value = false;
+      }
     });
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -33,31 +40,57 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
         const resCars = yield api_request.getUserDeviceList(params);
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:49", "API响应数据:", resCars);
+        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:56", "API响应数据:", resCars);
         if ((_a = resCars === null || resCars === void 0 ? null : resCars.data) === null || _a === void 0 ? null : _a.totalCount) {
           carsnumber.value = resCars.data.totalCount;
         }
       });
     };
     const userInfoDetail = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
-      });
+      if (Login.value) {
+        common_vendor.index.navigateTo({
+          url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
+        });
+      } else {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+      }
     };
     const carList = () => {
+      if (Login.value) {
+        common_vendor.index.navigateTo({
+          url: "/pages/userCenter/carList/carList"
+        });
+      } else {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+      }
+    };
+    const gotoLogin = () => {
       common_vendor.index.navigateTo({
-        url: "/pages/userCenter/carList/carList"
+        url: "/pages/login/login"
       });
     };
     const platformRenewal = () => {
-      common_vendor.index.showToast({
-        title: "设备仍在服务期",
-        icon: "none"
-      });
+      if (Login.value) {
+        common_vendor.index.showToast({
+          title: "设备仍在服务期",
+          icon: "none"
+        });
+      } else {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+      }
     };
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "个人中心",
           ["show-back"]: false,
@@ -69,26 +102,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           src: common_vendor.unref(userInfo).avatar,
           shape: "circle"
         }),
-        c: common_vendor.t(common_vendor.unref(userInfo).mobile),
-        d: common_vendor.p({
+        c: common_vendor.unref(Login)
+      }, common_vendor.unref(Login) ? {
+        d: common_vendor.t(common_vendor.unref(userInfo).mobile)
+      } : {
+        e: common_vendor.o(gotoLogin)
+      }, {
+        f: common_vendor.p({
           name: "arrow-right",
           size: "16"
         }),
-        e: common_vendor.o(userInfoDetail),
-        f: common_vendor.p({
+        g: common_vendor.o(userInfoDetail),
+        h: common_vendor.p({
           numberType: "overflow",
           type: "error",
           max: "99",
           value: common_vendor.unref(carsnumber)
         }),
-        g: common_vendor.p({
+        i: common_vendor.p({
           name: "arrow-right",
           size: "16"
         }),
-        h: common_vendor.o(carList),
-        i: common_vendor.o(platformRenewal),
-        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
-      };
+        j: common_vendor.o(carList),
+        k: common_vendor.o(platformRenewal),
+        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+      });
       return __returned__;
     };
   }

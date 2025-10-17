@@ -8,7 +8,8 @@
 					<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
 				</view>
 				<view class="user-info">
-					<text>{{userInfo.mobile}}</text>
+					<text v-if="Login">{{userInfo.mobile}}</text>
+					<text v-else @click="gotoLogin">点击登录</text>
 				</view>
 			</view>
 			<uv-icon name="arrow-right" size="16"></uv-icon>
@@ -33,10 +34,16 @@
 		nickname: '',
 	})
 	const carsnumber = ref(0)
-
+	const Login = ref(false)
 	onShow(() => {
-		
-		loadData()
+		// 如果有 token，加载用户信息
+		const token = uni.getStorageSync('token')
+		if (token) {
+			Login.value = true
+			loadData()
+		} else {
+			Login.value = false
+		}
 	})
 
 	// 加载数据
@@ -55,27 +62,54 @@
 
 	// 用户信息详情
 	const userInfoDetail = () => {
-		uni.navigateTo({
-			url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
-		})
+		if (Login.value) {
+			uni.navigateTo({
+				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
+			})
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
 	}
 
 	// 我的车辆
 	const carList = () => {
-		uni.navigateTo({
-			url: '/pages/userCenter/carList/carList'
-		})
+		if (Login.value) {
+			uni.navigateTo({
+				url: '/pages/userCenter/carList/carList'
+			})
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
 	}
+		// 去登录
+		const gotoLogin = () => {
+			uni.navigateTo({
+				url: '/pages/login/login'
+			})
+		}
 
 	// 平台续费
 	const platformRenewal = () => {
-		uni.showToast({
-			title: '设备仍在服务期',
-			icon: 'none',
-		})
-		// uni.navigateTo({
-		// 	url: '/pages/userCenter/payDeviceList/payDeviceList'
-		// })
+		if (Login.value) {
+			uni.showToast({
+				title: '设备仍在服务期',
+				icon: 'none',
+			})
+			// uni.navigateTo({
+			// 	url: '/pages/userCenter/payDeviceList/payDeviceList'
+			// })
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
 	}
 </script>
 
