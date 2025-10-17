@@ -78,16 +78,3 @@
   color: #333;
   font-weight: 500;
 }
-.container .info-panel {
-  width: 100%;
-  background-color: #fff;
-  padding: 20rpx;
-  display: flex;
-  flex-direction: column;
-  font-size: 26rpx;
-  color: #666;
-  border-top: 1rpx solid #eee;
-}
-.container .info-panel text {
-  padding: 5rpx 0;
-}

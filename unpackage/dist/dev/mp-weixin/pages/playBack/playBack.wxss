@@ -87,6 +87,15 @@
   flex: 1;
   padding: 0 50rpx;
 }
+.container .tools-panel .tool-tag-item .play-btn {
+  font-size: 25rpx;
+  color: #fff;
+  display: block;
+  padding: 10rpx 25rpx;
+  border-radius: 10rpx;
+  margin-left: 20rpx;
+  background-color: #1890FF;
+}
 .container .tools-panel .play-back-info {
   display: flex;
   flex-direction: row;

@@ -5,10 +5,8 @@
     "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
     "uv-form-item": "../../uni_modules/uv-form/components/uv-form-item/uv-form-item",
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
-    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
-    "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup",
     "uv-form": "../../uni_modules/uv-form/components/uv-form/uv-form",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "car-icons": "../../components/car-icons/car-icons"
   }
 }

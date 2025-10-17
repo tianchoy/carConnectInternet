@@ -4,9 +4,6 @@
     "custom-nav-bar": "../../../components/custom-navBar/custom-navBar",
     "car-number-input": "../../../uni_modules/car-number-input/components/car-number-input/car-number-input",
     "uv-input": "../../../uni_modules/uv-input/components/uv-input/uv-input",
-    "uv-icon": "../../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-grid-item": "../../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
-    "uv-grid": "../../../uni_modules/uv-grid/components/uv-grid/uv-grid",
-    "uv-popup": "../../../uni_modules/uv-popup/components/uv-popup/uv-popup"
+    "car-icons": "../../../components/car-icons/car-icons"
   }
 }

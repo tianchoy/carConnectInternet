@@ -4,7 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:polyline="polylines" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true"
 				@regionchange="handleRegionChange">
 				<sub-navBar :currentTime="currentTime" :currentCar="currentCar" :times="times" :showCar="true"
 					@update:current-time="(val) => (currentTime = val)" :carStatus='connectionStatus'></sub-navBar>
@@ -23,13 +23,9 @@
 					<text>{{currentSpeed}}Km/h</text>
 				</view>
 				<view class="address">
-					<text>地址：</text>
+					<text>定位时间：</text>
 					<text>{{currentAddress}}</text>
 				</view>
-			</view>
-			<view class="info-panel" v-if="routeInfo.distance">
-				<text>路线距离: {{formatDistance(routeInfo.distance)}}</text>
-				<text>预计时间: {{formatDuration(routeInfo.duration)}}</text>
 			</view>
 		</view>
 
@@ -38,7 +34,6 @@
 
 <script setup lang="uts">
 	import { ref, reactive, onMounted, watch } from 'vue'
-	import { getRoutePlan } from '@/utils/tiandituRoute'
 	import { getDevicePos } from '../../api/request.uts'
 	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
@@ -75,22 +70,14 @@
 	const animationQueue = ref<Array<any>>([])
 	const isProcessingQueue = ref(false)
 
-	// 标记点集合
+	// 标记点集合 - 使用固定结构
 	const markers = ref<Array<any>>([])
-
-	// 路线集合
-	const polylines = ref<Array<any>>([])
-
-	// 路线信息
-	const routeInfo = reactive({
-		distance: 0,
-		duration: 0
-	})
+	const markerInitialized = ref(false)
+	let lastIconPath = ''
 
 	// 跟踪状态
 	const isTracking = ref(false)
 	const trackingInterval = ref<number | null>(null)
-	const trackPoints = ref<Array<{ latitude : number, longitude : number }>>([])
 	const lastDirection = ref(0) // 保存上一次的方向值
 
 	// 当前车辆信息
@@ -101,7 +88,6 @@
 
 	const times = ref([
 		[
-
 			{ label: '1s', value: '1' },
 			{ label: '5s', value: '5' },
 			{ label: '10s', value: '10' },
@@ -162,11 +148,11 @@
 					
 					// 立即更新速度信息
 					currentSpeed.value = deviceData.speed || 0
-					currentAddress.value = deviceData.positionUpdateTime || '未知位置'
+					currentAddress.value = deviceData.positionUpdateTime || '定位时间未知'
 					connectionStatus.value = deviceData.connectionStatus || 'unknown'
 					
-					// 设置初始标记点
-					updateMarkers()
+					// 设置初始标记点 - 只设置一次
+					initMarker()
 				}
 			})
 
@@ -177,6 +163,33 @@
 				icon: 'none'
 			})
 		}
+	}
+
+	// 初始化标记点 - 只执行一次
+	const initMarker = () => {
+		if (markerInitialized.value) {
+			return
+		}
+		
+		const iconPath = connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value)
+		lastIconPath = iconPath
+		
+		const marker = {
+			id: 1, // 固定ID为1
+			latitude: currentPosition.latitude,
+			longitude: currentPosition.longitude,
+			iconPath: iconPath,
+			width: 25,
+			height: 25,
+			rotate: currentRotation.value,
+			anchor: { x: 0.5, y: 0.5 },
+			alpha: 1,
+			fixed: false
+		}
+		
+		markers.value = [marker]
+		markerInitialized.value = true
+		console.log('初始化标记点完成')
 	}
 
 	// 计算地图上的旋转角度（修正方向）
@@ -225,9 +238,9 @@
 
 				// 处理方向数据
 				let newDirection = newPosition.direction
-				if (newPosition.direction === lastDirection.value && trackPoints.value.length >= 2) {
-					// 如果没有方向数据，根据轨迹计算方向
-					newDirection = calculateDirectionFromTrack()
+				if (newPosition.direction === lastDirection.value) {
+					// 如果没有新的方向数据，保持原有方向
+					newDirection = lastDirection.value
 				}
 
 				// 添加到动画队列
@@ -244,15 +257,6 @@
 
 				// 更新最后方向
 				lastDirection.value = newDirection
-
-				// 追踪状态下记录轨迹点
-				if (isTracking.value) {
-					trackPoints.value.push({
-						latitude: newPosition.latitude,
-						longitude: newPosition.longitude
-					})
-					drawTempRoute()
-				}
 			}
 		} catch (err) {
 			console.error('获取位置失败:', err)
@@ -361,6 +365,7 @@
 		const lngDiff = targetPosition.longitude - startLng
 		const rotDiff = calculateShortestRotation(startRot, targetRotation.value)
 
+		// 降低更新频率，每50ms更新一次而不是16ms
 		animationTimer.value = setInterval(() => {
 			const now = Date.now()
 			const elapsed = now - startTime
@@ -378,8 +383,10 @@
 			center.latitude = currentPosition.latitude
 			center.longitude = currentPosition.longitude
 			
-			// 更新标记点
-			updateMarkers()
+			// 只在进度为整数百分比或结束时更新标记点，减少闪烁
+			if (progress >= 1 || elapsed % 100 < 50) {
+				updateMarkerPositionOnly()
+			}
 			
 			// 动画结束
 			if (progress >= 1) {
@@ -393,14 +400,14 @@
 				currentPosition.latitude = targetPosition.latitude
 				currentPosition.longitude = targetPosition.longitude
 				currentRotation.value = normalizeRotation(targetRotation.value)
-				updateMarkers()
+				updateMarkerPositionOnly()
 				
 				console.log('动画完成')
 				
 				// 执行完成回调
 				onComplete()
 			}
-		}, 16) as unknown as number
+		}, 50) as unknown as number // 从16ms改为50ms，降低更新频率
 	}
 
 	// 计算最短旋转路径
@@ -414,57 +421,40 @@
 		return diff
 	}
 
-	// 根据轨迹计算方向
-	const calculateDirectionFromTrack = () : number => {
-		if (trackPoints.value.length < 2) return lastDirection.value
-		
-		const lastIndex = trackPoints.value.length - 1
-		const prevIndex = trackPoints.value.length - 2
-		
-		const lastPoint = trackPoints.value[lastIndex]
-		const prevPoint = trackPoints.value[prevIndex]
-		
-		// 计算两点之间的角度
-		const dx = lastPoint.longitude - prevPoint.longitude
-		const dy = lastPoint.latitude - prevPoint.latitude
-		
-		// 计算角度（弧度）
-		let angle = Math.atan2(dy, dx) * 180 / Math.PI
-		
-		// 转换为0-360度范围
-		if (angle < 0) angle += 360
-		return angle
-	}
-
-	// 更新标记点 
-	const updateMarkers = () => {
-		markers.value = []
-		
-		// 添加新的标记点
-		const marker = {
-			id: 0,
-			latitude: currentPosition.latitude,
-			longitude: currentPosition.longitude,
-			iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
-			width: 25,
-			height: 25,
-			rotate: currentRotation.value,
-			anchor: { x: 0.5, y: 0.5 }, // 设置锚点为中心
-			callout: {
-				content: connectionStatus.value == 'online' 
-					? `速度: ${currentSpeed.value}km/h` 
-					: '爱车已离线',
-				color: '#ffffff',
-				bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
-				padding: 8,
-				borderRadius: 6,
-				display: 'ALWAYS',
-				textAlign: 'center'
-			}
+	// 只更新标记点位置，不重新创建数组
+	const updateMarkerPositionOnly = () => {
+		if (markers.value.length === 0) {
+			initMarker()
+			return
 		}
 		
-		// 使用 push 方法添加，确保只有一个标记点
-		markers.value.push(marker)
+		// 检查是否需要更新图标
+		const newIconPath = connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value)
+		const needUpdateIcon = newIconPath !== lastIconPath
+		
+		if (needUpdateIcon) {
+			// 只有在图标真正改变时才更新整个标记点
+			const updatedMarkers = markers.value.map(marker => {
+				return {
+					...marker,
+					latitude: currentPosition.latitude,
+					longitude: currentPosition.longitude,
+					rotate: currentRotation.value,
+					iconPath: newIconPath
+				}
+			})
+			markers.value = updatedMarkers
+			lastIconPath = newIconPath
+		} else {
+			// 只更新位置和旋转，不改变数组引用
+			const marker = markers.value[0]
+			marker.latitude = currentPosition.latitude
+			marker.longitude = currentPosition.longitude
+			marker.rotate = currentRotation.value
+			
+			// 使用Object.assign触发响应式更新，但不创建新数组
+			Object.assign(markers.value[0], marker)
+		}
 	}
 
 	// 开始/停止跟踪
@@ -478,18 +468,14 @@
 
 	// 开始跟踪 
 	const startTracking = () => {
+		// 确保标记点已初始化
+		if (!markerInitialized.value) {
+			initMarker()
+		}
+		
+		// 清空之前的动画状态
 		animationQueue.value = []
 		isProcessingQueue.value = false
-		
-		// 保留最后一个点作为起点
-		if (trackPoints.value.length > 0) {
-			const lastPoint = trackPoints.value[trackPoints.value.length - 1]
-			trackPoints.value = [lastPoint]
-		} else {
-			trackPoints.value = []
-			// 如果没有点，先获取当前位置
-			getCurrentPosition()
-		}
 
 		const interval = 10000
 		isTracking.value = true
@@ -505,7 +491,7 @@
 		}, interval) as unknown as number
 		
 		uni.showToast({
-			title: '开始跟踪（10秒刷新）',
+			title: '开始跟踪',
 			icon: 'success'
 		})
 	}
@@ -521,11 +507,14 @@
 		// 清空动画队列
 		animationQueue.value = []
 		isProcessingQueue.value = false
-
-		if (trackPoints.value.length >= 2) {
-			getRealRoute()
-		}
 		
+		// 停止动画
+		if (animationTimer.value) {
+			clearInterval(animationTimer.value)
+			animationTimer.value = null
+		}
+		isAnimating.value = false
+
 		uni.showToast({
 			title: '停止跟踪',
 			icon: 'success'
@@ -535,159 +524,6 @@
 	// 获取当前位置
 	const getCurrentPosition = () => {
 		loadTrackData()
-	}
-
-	// 绘制临时路线
-	const drawTempRoute = () => {
-		if (trackPoints.value.length < 2) return
-		const validPoints = trackPoints.value.map(point => ({
-			latitude: Number(point.latitude),
-			longitude: Number(point.longitude)
-		}))
-
-		polylines.value = [{
-			points: validPoints,
-			color: '#1296db',
-			width: 6,
-			arrowLine: true,
-			arrowIconPath: '/static/arrow.png',
-			borderColor: '#ffffff',
-			borderWidth: 2
-		}]
-	}
-
-	// 获取真实道路路线
-	const getRealRoute = () => {
-		if (trackPoints.value.length < 2) {
-			uni.showToast({
-				title: '至少需要2个坐标点',
-				icon: 'none'
-			})
-			return
-		}
-
-		uni.showLoading({
-			title: '路线规划中...'
-		})
-
-		const waypoints = trackPoints.value
-			.slice(1, -1)
-			.map(point => `${point.longitude},${point.latitude}`)
-
-		getRoutePlan({
-			origin: `${trackPoints.value[0].longitude},${trackPoints.value[0].latitude}`,
-			destination: `${trackPoints.value[trackPoints.value.length - 1].longitude},${trackPoints.value[trackPoints.value.length - 1].latitude}`,
-			waypoints: waypoints,
-			style: "0" 
-		}).then((res : any) => {
-			uni.hideLoading()
-			if (res && res.data) {
-				drawRoadRoute(res.data)
-			}
-		}).catch((err : any) => {
-			uni.hideLoading()
-			uni.showToast({
-				title: '路线获取失败',
-				icon: 'none'
-			})
-			console.error('路线规划失败:', err)
-		})
-	}
-
-	// 绘制道路路线
-	const drawRoadRoute = (path : any) => {
-		const roadPoints = path.points || []
-
-		//转换为腾讯地图坐标
-		const convertedPoints = roadPoints.map(point => {
-			const converted = CoordTransform.wgs84ToTencent(point.latitude, point.longitude)
-			return {
-				latitude: converted.lat,
-				longitude: converted.lng
-			}
-		})
-
-		polylines.value = [
-			{
-				points: convertedPoints,
-				color: '#4a90e2',
-				width: 12,
-				level: 'low'
-			},
-			{
-				points: convertedPoints,
-				color: '#1a73e8',
-				width: 8,
-				arrowLine: true,
-				arrowIconPath: '/static/road-arrow.png',
-				level: 'high'
-			},
-			{
-				points: convertedPoints,
-				color: '#ffffff',
-				width: 2,
-				level: 'highest'
-			}
-		]
-		routeInfo.distance = path.distance || 0
-		routeInfo.duration = path.duration || 0
-
-		adjustMapView(convertedPoints)
-	}
-
-	// 调整地图视野
-	const adjustMapView = (points : Array<any>) => {
-		if (points.length === 0) return
-
-		let minLat = points[0].latitude
-		let maxLat = points[0].latitude
-		let minLng = points[0].longitude
-		let maxLng = points[0].longitude
-
-		points.forEach((point : any) => {
-			minLat = Math.min(minLat, point.latitude)
-			maxLat = Math.max(maxLat, point.latitude)
-			minLng = Math.min(minLng, point.longitude)
-			maxLng = Math.max(maxLng, point.longitude)
-		})
-
-		center.latitude = (minLat + maxLat) / 2
-		center.longitude = (minLng + maxLng) / 2
-
-		const latDiff = maxLat - minLat
-		const lngDiff = maxLng - minLng
-		const diff = Math.max(latDiff, lngDiff)
-
-		if (diff < 0.01) {
-			mapScale.value = 16
-		} else if (diff < 0.02) {
-			mapScale.value = 15
-		} else if (diff < 0.05) {
-			mapScale.value = 14
-		} else {
-			mapScale.value = 13
-		}
-	}
-
-	// 格式化距离
-	const formatDistance = (distance : number) : string => {
-		if (distance < 1000) {
-			return `${distance}米`
-		} else {
-			return `${(distance / 1000).toFixed(1)}公里`
-		}
-	}
-
-	// 格式化时间
-	const formatDuration = (seconds : number) : string => {
-		const mins = Math.floor(seconds / 60)
-		if (mins < 60) {
-			return `${mins}分钟`
-		} else {
-			const hours = Math.floor(mins / 60)
-			const remainingMins = mins % 60
-			return `${hours}小时${remainingMins}分钟`
-		}
 	}
 
 	// 地图区域变化事件
@@ -764,21 +600,6 @@
 						font-weight: 500;
 					}
 				}
-			}
-		}
-
-		.info-panel {
-			width: 100%;
-			background-color: #fff;
-			padding: 20rpx;
-			display: flex;
-			flex-direction: column;
-			font-size: 26rpx;
-			color: #666;
-			border-top: 1rpx solid #eee;
-
-			text {
-				padding: 5rpx 0;
 			}
 		}
 	}

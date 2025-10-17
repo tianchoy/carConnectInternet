@@ -33,14 +33,15 @@
 				<!-- <uv-action-sheet ref="deviceTypeSelect" :actions="actions" title="请选择设备类型"
 					@select="deviceTypeSelectsFun" :loading="actions.length === 0">
 				</uv-action-sheet> -->
-				<uv-popup ref="deviceTypeSelect" title="请选择图标" mode="bottom">
+				<!-- <uv-popup ref="deviceTypeSelect" title="请选择图标" mode="bottom">
 					<uv-grid :col="5">
 						<uv-grid-item v-for="(item,index) in IconList" :key="index" @click="selectIcon(item)">
 							<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.img" :size="50"></uv-icon>
 							<text class="grid-text">{{item.title}}</text>
 						</uv-grid-item>
 					</uv-grid>
-				</uv-popup>
+				</uv-popup> -->
+				<carIcons ref="deviceTypeSelect"  @select="selectIcon"></carIcons>
 			</uv-form>
 		</view>
 		<uv-button class="btn" type="primary" @click="submit" :loading="loading">提交</uv-button>
@@ -50,6 +51,7 @@
 <script setup lang="ts">
 	import { ref, onUnmount } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
+	import carIcons from '../../components/car-icons/car-icons.uvue'
 
 
 	interface FormData {
@@ -72,109 +74,6 @@
 		plateNo: '',
 		carType : ''
 	})
-
-	const IconList = [
-		{
-			name: 'car',
-			title: '轿车',
-			img: '/static/cars/online/car.png'
-		},
-		{
-			name: 'bus',
-			title: '公交车',
-			img: '/static/cars/online/bus.png'
-		},
-		{
-			name: 'bike',
-			title: '自行车',
-			img: '/static/cars/online/bike.png'
-		},
-		{
-			name: 'moto',
-			title: '摩托车',
-			img: '/static/cars/online/moto.png'
-		},
-		{
-			name: 'diandong',
-			title: '电动车',
-			img: '/static/cars/online/diandong.png'
-		},
-		{
-			name: 'huoche',
-			title: '货车',
-			img: '/static/cars/online/huoche.png'
-		},
-		{
-			name: 'sanlun',
-			title: '三轮车',
-			img: '/static/cars/online/sanlun.png'
-		},
-		{
-			name: 'tuola',
-			title: '拖拉机',
-			img: '/static/cars/online/tuola.png'
-		},
-		{
-			name: 'suv',
-			title: '越野车',
-			img: '/static/cars/online/suv.png'
-		},
-		{
-			name: 'baby',
-			title: '婴儿车',
-			img: '/static/cars/online/baby.png'
-		},
-		{
-			name: 'tank',
-			title: '坦克',
-			img: '/static/cars/online/tank.png'
-		},
-		{
-			name: 'zhuangjia',
-			title: '装甲车',
-			img: '/static/cars/online/zhuangjia.png'
-		},
-		{
-			name: 'wajue',
-			title: '挖掘机',
-			img: '/static/cars/online/wajue.png'
-		},
-		{
-			name: 'plan',
-			title: '飞机',
-			img: '/static/cars/online/plan.png'
-		},
-		{
-			name: 'walk',
-			title: '步行',
-			img: '/static/cars/online/walk.png'
-		},
-		{
-			name: 'muma',
-			title: '木马',
-			img: '/static/cars/online/muma.png'
-		},
-		{
-			name: 'hangmu',
-			title: '航母',
-			img: '/static/cars/online/hangmu.png'
-		},
-		{
-			name: 'junjian',
-			title: '军舰',
-			img: '/static/cars/online/junjian.png'
-		},
-		{
-			name: 'tuiche',
-			title: '手推车',
-			img: '/static/cars/online/tuiche.png'
-		},
-		{
-			name: 'train',
-			title: '火车',
-			img: '/static/cars/online/train.png'
-		},
-	]
 
 	const actions = ref([])
 

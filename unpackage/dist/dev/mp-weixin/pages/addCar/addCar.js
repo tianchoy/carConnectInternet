@@ -6,25 +6,20 @@ if (!Array) {
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
   const _easycom_uv_form_item_1 = common_vendor.resolveComponent("uv-form-item");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
-  const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
-  const _easycom_uv_popup_1 = common_vendor.resolveComponent("uv-popup");
   const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
   const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1 + _easycom_uv_popup_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
 const _easycom_uv_form_item = () => "../../uni_modules/uv-form/components/uv-form-item/uv-form-item.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
-const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
-const _easycom_uv_popup = () => "../../uni_modules/uv-popup/components/uv-popup/uv-popup.js";
 const _easycom_uv_form = () => "../../uni_modules/uv-form/components/uv-form/uv-form.js";
 const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_popup + _easycom_uv_form + _easycom_uv_button)();
+  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + common_vendor.unref(carIcons) + _easycom_uv_form + _easycom_uv_button)();
 }
+const carIcons = () => "../../components/car-icons/car-icons.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "addCar",
   setup(__props) {
@@ -39,108 +34,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       plateNo: "",
       carType: ""
     });
-    const IconList = [
-      new UTSJSONObject({
-        name: "car",
-        title: "轿车",
-        img: "/static/cars/online/car.png"
-      }),
-      new UTSJSONObject({
-        name: "bus",
-        title: "公交车",
-        img: "/static/cars/online/bus.png"
-      }),
-      new UTSJSONObject({
-        name: "bike",
-        title: "自行车",
-        img: "/static/cars/online/bike.png"
-      }),
-      new UTSJSONObject({
-        name: "moto",
-        title: "摩托车",
-        img: "/static/cars/online/moto.png"
-      }),
-      new UTSJSONObject({
-        name: "diandong",
-        title: "电动车",
-        img: "/static/cars/online/diandong.png"
-      }),
-      new UTSJSONObject({
-        name: "huoche",
-        title: "货车",
-        img: "/static/cars/online/huoche.png"
-      }),
-      new UTSJSONObject({
-        name: "sanlun",
-        title: "三轮车",
-        img: "/static/cars/online/sanlun.png"
-      }),
-      new UTSJSONObject({
-        name: "tuola",
-        title: "拖拉机",
-        img: "/static/cars/online/tuola.png"
-      }),
-      new UTSJSONObject({
-        name: "suv",
-        title: "越野车",
-        img: "/static/cars/online/suv.png"
-      }),
-      new UTSJSONObject({
-        name: "baby",
-        title: "婴儿车",
-        img: "/static/cars/online/baby.png"
-      }),
-      new UTSJSONObject({
-        name: "tank",
-        title: "坦克",
-        img: "/static/cars/online/tank.png"
-      }),
-      new UTSJSONObject({
-        name: "zhuangjia",
-        title: "装甲车",
-        img: "/static/cars/online/zhuangjia.png"
-      }),
-      new UTSJSONObject({
-        name: "wajue",
-        title: "挖掘机",
-        img: "/static/cars/online/wajue.png"
-      }),
-      new UTSJSONObject({
-        name: "plan",
-        title: "飞机",
-        img: "/static/cars/online/plan.png"
-      }),
-      new UTSJSONObject({
-        name: "walk",
-        title: "步行",
-        img: "/static/cars/online/walk.png"
-      }),
-      new UTSJSONObject({
-        name: "muma",
-        title: "木马",
-        img: "/static/cars/online/muma.png"
-      }),
-      new UTSJSONObject({
-        name: "hangmu",
-        title: "航母",
-        img: "/static/cars/online/hangmu.png"
-      }),
-      new UTSJSONObject({
-        name: "junjian",
-        title: "军舰",
-        img: "/static/cars/online/junjian.png"
-      }),
-      new UTSJSONObject({
-        name: "tuiche",
-        title: "手推车",
-        img: "/static/cars/online/tuiche.png"
-      }),
-      new UTSJSONObject({
-        name: "train",
-        title: "火车",
-        img: "/static/cars/online/train.png"
-      })
-    ];
     common_vendor.ref([]);
     const scanCode = () => {
       common_vendor.index.navigateTo({
@@ -148,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:196", "接收到扫码结果:", data.result);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:95", "接收到扫码结果:", data.result);
       if (data.result.length === 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
       } else if (data.result.length === 11) {
@@ -184,7 +77,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const selectIcon = (item = null) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:234", item.name);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:133", item.name);
       carInfo.value.deviceType = item.name;
       carInfo.value.deviceTypeValue = item.title;
       (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.close();
@@ -197,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const refreshDeviceList = () => {
       common_vendor.index.$emit("refreshDeviceList");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:267", "已触发首页设备列表刷新");
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:166", "已触发首页设备列表刷新");
     };
     const submit = () => {
       var _a;
@@ -211,7 +104,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               carType: carInfo.value.deviceType
               // plateNo: carInfo.value.plateNo
             });
-            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:281", submitData);
+            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:180", submitData);
             const res = yield api_request.addDevice(submitData);
             if (res.code == 0) {
               common_vendor.index.showToast({
@@ -231,7 +124,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:307", "添加设备错误:", error);
+            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:206", "添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -241,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:316", "验证错误:", errors);
+        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:215", "验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"
@@ -315,48 +208,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           prop: "deviceType",
           borderBottom: true
         }),
-        n: common_vendor.f(IconList, (item, index, i0) => {
-          return {
-            a: "6409e324-12-" + i0 + "," + ("6409e324-11-" + i0),
-            b: common_vendor.p({
-              customStyle: {
-                paddingTop: "20rpx"
-              },
-              name: item.img,
-              size: 50
-            }),
-            c: common_vendor.t(item.title),
-            d: index,
-            e: common_vendor.o(($event) => {
-              return selectIcon(item);
-            }, index),
-            f: "6409e324-11-" + i0 + ",6409e324-10"
-          };
-        }),
-        o: common_vendor.p({
-          col: 5
-        }),
-        p: common_vendor.sr(deviceTypeSelect, "6409e324-9,6409e324-1", {
+        n: common_vendor.sr(deviceTypeSelect, "6409e324-9,6409e324-1", {
           "k": "deviceTypeSelect"
         }),
-        q: common_vendor.p({
-          title: "请选择图标",
-          mode: "bottom"
-        }),
-        r: common_vendor.sr(formRef, "6409e324-1", {
+        o: common_vendor.o(selectIcon),
+        p: common_vendor.sr(formRef, "6409e324-1", {
           "k": "formRef"
         }),
-        s: common_vendor.p({
+        q: common_vendor.p({
           labelPosition: "left",
           model: carInfo.value,
           rules
         }),
-        t: common_vendor.o(submit),
-        v: common_vendor.p({
+        r: common_vendor.o(submit),
+        s: common_vendor.p({
           type: "primary",
           loading: loading.value
         }),
-        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        t: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       };
       return __returned__;
     };

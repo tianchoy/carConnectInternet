@@ -63,7 +63,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     const isEmpty = common_vendor.computed(() => {
-      return props.columns.length == 0 && pickerItemInstanceArray.every((child = null) => {
+      return props.columns.length == 0 && pickerItemInstanceArray.every((child) => {
         return child.options.length == 0;
       });
     });
@@ -82,7 +82,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const curValueArray = common_vendor.ref([...pickerValue.value]);
     const curItemArray = [];
     const realColumns = common_vendor.computed(() => {
-      const pickerColumns = pickerItemInstanceArray.map((child = null) => {
+      const pickerColumns = pickerItemInstanceArray.map((child) => {
         return child.options;
       });
       if (pickerColumns.length > 0) {
@@ -90,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return props.columns;
     });
-    const manageChildInList = (child = null, shouldAdd) => {
+    const manageChildInList = (child, shouldAdd) => {
       const index = pickerItemInstanceArray.indexOf(child);
       if (shouldAdd) {
         if (index != -1)
@@ -110,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const updatePickerItems = () => {
       const _indexs = [];
       const _values = [];
-      pickerItemInstanceArray.forEach((child = null, column) => {
+      pickerItemInstanceArray.forEach((child, column) => {
         if (child.options.length == 0)
           return null;
         const value = curValueArray.value.length > column ? curValueArray.value[column] : null;

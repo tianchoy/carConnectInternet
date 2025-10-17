@@ -66,6 +66,11 @@
     },
     "scope.camera": {
       "desc": "需要摄像头权限进行扫码"
+    },
+    "scope.user": {
+      "required": [
+        "subscribeMessage"
+      ]
     }
   },
   "usingComponents": {}
