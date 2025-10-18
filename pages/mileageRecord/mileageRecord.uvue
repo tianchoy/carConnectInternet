@@ -96,7 +96,7 @@
 
 	// 日期时间选择器相关
 	const showDateTimePicker = ref(false)
-	const currentPickerType = ref('start') // 'start' or 'end'
+	const currentPickerType = ref('start')
 	const pickerTitle = ref('选择开始时间')
 
 	const startTime = ref('')

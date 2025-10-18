@@ -1,0 +1,128 @@
+// 距离计算服务 - 使用稳定的直线距离计算
+export class DistanceService {
+    // 配置常量
+    private static readonly CONFIG = {
+        MIN_DISTANCE_THRESHOLD: 1, // 最小距离阈值（米），低于此值返回0
+        EARTH_RADIUS: 6371000 // 地球半径，单位米
+    }
+
+    /**
+     * 计算两点之间的直线距离（Haversine公式）
+     */
+    static calculateDistance(
+        startLng: number, 
+        startLat: number, 
+        endLng: number, 
+        endLat: number
+    ): number {
+        // 参数验证
+        if (!this.isValidCoordinate(startLng, startLat) || !this.isValidCoordinate(endLng, endLat)) {
+            console.error('无效的坐标参数，无法计算距离')
+            return 0
+        }
+
+        // 如果是同一个点，返回0
+        if (startLng === endLng && startLat === endLat) {
+            return 0
+        }
+
+        const dLat = this.toRad(endLat - startLat)
+        const dLng = this.toRad(endLng - startLng)
+        
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                 Math.cos(this.toRad(startLat)) * Math.cos(this.toRad(endLat)) *
+                 Math.sin(dLng / 2) * Math.sin(dLng / 2)
+        
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        const distance = this.CONFIG.EARTH_RADIUS * c
+        
+        const roundedDistance = Math.round(distance)
+        
+        // 如果距离太小，返回0
+        return roundedDistance < this.CONFIG.MIN_DISTANCE_THRESHOLD ? 0 : roundedDistance
+    }
+
+    /**
+     * 异步计算距离（为了保持接口一致性）
+     */
+    static async getDistanceAsync(
+        startLng: number, 
+        startLat: number, 
+        endLng: number, 
+        endLat: number
+    ): Promise<number> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.calculateDistance(startLng, startLat, endLng, endLat))
+            }, 0)
+        })
+    }
+
+    /**
+     * 验证坐标是否有效
+     */
+    private static isValidCoordinate(lng: number, lat: number): boolean {
+        return (
+            typeof lng === 'number' && 
+            typeof lat === 'number' &&
+            !isNaN(lng) && 
+            !isNaN(lat) &&
+            lng >= -180 && lng <= 180 &&
+            lat >= -90 && lat <= 90
+        )
+    }
+
+    /**
+     * 角度转弧度
+     */
+    private static toRad(degree: number): number {
+        return degree * Math.PI / 180
+    }
+}
+
+// 兼容旧接口
+export class TianMapService {
+    /**
+     * 获取道路规划路径和距离（实际上使用直线距离）
+     */
+    static async getRouteDistance(
+        startLng: number, 
+        startLat: number, 
+        endLng: number, 
+        endLat: number
+    ): Promise<number> {
+        console.log('使用直线距离计算')
+        return DistanceService.getDistanceAsync(startLng, startLat, endLng, endLat)
+    }
+
+    /**
+     * 计算直线距离
+     */
+    static calculateStraightDistance(
+        lng1: number, 
+        lat1: number, 
+        lng2: number, 
+        lat2: number
+    ): number {
+        return DistanceService.calculateDistance(lng1, lat1, lng2, lat2)
+    }
+
+    /**
+     * 简化版本：直接使用直线距离
+     */
+    static async getSimpleDistance(
+        startLng: number, 
+        startLat: number, 
+        endLng: number, 
+        endLat: number
+    ): Promise<number> {
+        return DistanceService.getDistanceAsync(startLng, startLat, endLng, endLat)
+    }
+
+    /**
+     * 初始化方法（为了兼容性保留）
+     */
+    static initialize(): void {
+        console.log('距离计算服务已初始化（使用直线距离算法）')
+    }
+}

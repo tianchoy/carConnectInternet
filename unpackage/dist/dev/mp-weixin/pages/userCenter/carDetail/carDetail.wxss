@@ -61,6 +61,13 @@
   content: "（无）";
   color: #999;
 }
+.container .content .list .custom-icon.data-v-36223569 {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
 .container .content .list.data-v-36223569 .car-input-container {
   display: flex;
   flex-direction: row;

@@ -16,7 +16,10 @@
 			<view class="list">
 				<text class="title">自定义图标</text>
 				<text class="info" v-if="!isEditing">{{carTitle}}</text>
-				<text style="flex:1" v-else @click="deviceTypeSelectFun">{{editInfo.carTypeValue || '请选择图标'}}</text>
+				<view class="custom-icon" v-else @click="deviceTypeSelectFun">
+					<text>{{editInfo.carTypeValue || '请选择图标'}}</text>
+					<uv-icon name="arrow-down" size="18"></uv-icon>
+				</view>
 			</view>
 			<view class="list">
 				<text class="title">车牌号</text>
@@ -198,6 +201,13 @@
 					}
 
 					flex: 1;
+				}
+				.custom-icon {
+					flex: 1;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
 				}
 
 				// 车牌输入组件样式
