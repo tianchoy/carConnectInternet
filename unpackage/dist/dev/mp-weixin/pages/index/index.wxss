@@ -47,7 +47,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  font-size: 25rpx;
+  font-size: 30rpx;
 }
 .container .tool-nav .btn-map-list {
   padding: 7rpx 10rpx;
@@ -112,7 +112,7 @@
   border-radius: 10rpx;
   background-color: rgba(3, 109, 246, 0.71);
   color: #fff;
-  font-size: 25rpx;
+  font-size: 30rpx;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -122,7 +122,7 @@
   left: 20rpx;
 }
 .container .left-bar-state {
-  left: 180rpx;
+  left: 190rpx;
 }
 .container .login-view-more {
   position: absolute;

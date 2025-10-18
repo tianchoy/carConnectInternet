@@ -6,16 +6,18 @@ const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
+  const _easycom_uv_notice_bar_1 = common_vendor.resolveComponent("uv-notice-bar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_picker_1 = common_vendor.resolveComponent("uv-picker");
-  (_easycom_custom_navBar_1 + _easycom_indexListMode_1 + _easycom_uv_icon_1 + _easycom_uv_picker_1)();
+  (_easycom_custom_navBar_1 + _easycom_indexListMode_1 + _easycom_uv_notice_bar_1 + _easycom_uv_icon_1 + _easycom_uv_picker_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
+const _easycom_uv_notice_bar = () => "../../uni_modules/uv-notice-bar/components/uv-notice-bar/uv-notice-bar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 const _easycom_uv_picker = () => "../../uni_modules/uv-picker/components/uv-picker/uv-picker.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_indexListMode + _easycom_uv_icon + _easycom_uv_picker)();
+  (_easycom_custom_navBar + _easycom_indexListMode + _easycom_uv_notice_bar + _easycom_uv_icon + _easycom_uv_picker)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
@@ -27,6 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let mapCtx = void 0;
     const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
+    const noticeText = common_vendor.ref(["本页面仅供展示车辆", "如使用车辆实时位置功能", "请转至车辆详情页面"]);
     const carState = common_vendor.ref([
       [new UTSJSONObject({
         name: "全部状态",
@@ -151,7 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
         });
       } else {
-        common_vendor.index.__f__("warn", "at pages/index/index.uvue:189", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:193", "未找到对应的设备信息", markerId);
       }
     };
     const updateMarkers = (devices = null) => {
@@ -160,13 +163,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       markers.value = devices.map((device = null, index = null) => {
         if (!device || typeof device !== "object") {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:200", "无效的设备数据", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:204", "无效的设备数据", device);
           return null;
         }
         const lat = Number(device.latitude);
         const lng = Number(device.longitude);
         if (isNaN(lat) || isNaN(lng)) {
-          common_vendor.index.__f__("warn", "at pages/index/index.uvue:208", "设备经纬度无效", device);
+          common_vendor.index.__f__("warn", "at pages/index/index.uvue:212", "设备经纬度无效", device);
           return null;
         }
         return new UTSJSONObject({
@@ -215,7 +218,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pickerGroupTitle.value = "全部分组";
           currentGroupId.value = "all";
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:264", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:268", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
@@ -241,7 +244,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             params = new UTSJSONObject({ groupId });
           }
           const res = yield api_request.getUserDeviceList(params);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:287", "API响应数据:", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:291", "API响应数据:", res);
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -256,10 +259,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:304", "解析后的设备列表:", deviceList);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:308", "解析后的设备列表:", deviceList);
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:310", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:314", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -268,7 +271,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:320", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:324", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList();
     };
     const getUserIn = () => {
@@ -279,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:331", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:335", "获取用户信息失败:", err);
         }
       });
     };
@@ -302,7 +305,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const token = common_vendor.index.getStorageSync("token");
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:357", token);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:361", token);
         if (!token) {
           Login.value = false;
         } else {
@@ -317,7 +320,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:377", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:380", "聚合初始化完成");
               }
             }));
           }
@@ -352,59 +355,68 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           lists: filteredDevices.value
         })
       }, {
-        i: !Login.value
-      }, !Login.value ? {
-        j: common_vendor.o(gotoLogin)
-      } : {}, {
-        k: Login.value
+        i: Login.value
       }, Login.value ? {
-        l: common_vendor.o(refresh)
+        j: common_vendor.p({
+          text: noticeText.value,
+          direction: "column",
+          fontSize: "34rpx",
+          mode: "closable"
+        })
+      } : {}, {
+        k: !Login.value
+      }, !Login.value ? {
+        l: common_vendor.o(gotoLogin)
       } : {}, {
         m: Login.value
       }, Login.value ? {
-        n: common_vendor.o(addCar)
+        n: common_vendor.o(refresh)
       } : {}, {
-        o: common_vendor.t(showMap.value ? "车辆列表" : "地图界面"),
-        p: common_vendor.o(toggleMapMode),
-        q: showMap.value
+        o: Login.value
+      }, Login.value ? {
+        p: common_vendor.o(addCar)
+      } : {}, {
+        q: common_vendor.t(showMap.value ? "车辆列表" : "地图界面"),
+        r: common_vendor.o(toggleMapMode),
+        s: showMap.value
       }, showMap.value ? {
-        r: common_vendor.t(totalCount.value),
-        s: common_vendor.o(($event) => {
+        t: common_vendor.t(totalCount.value),
+        v: common_vendor.o(($event) => {
           return goToList("all");
         }),
-        t: common_vendor.t(onlineCount.value),
-        v: common_vendor.o(($event) => {
+        w: common_vendor.t(onlineCount.value),
+        x: common_vendor.o(($event) => {
           return goToList("online");
         }),
-        w: common_vendor.t(offlineCount.value),
-        x: common_vendor.o(($event) => {
+        y: common_vendor.t(offlineCount.value),
+        z: common_vendor.o(($event) => {
           return goToList("offline");
         })
       } : {}, {
-        y: common_vendor.t(pickerStateTitle.value),
-        z: common_vendor.p({
+        A: common_vendor.t(pickerStateTitle.value),
+        B: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
         }),
-        A: common_vendor.o(handStatePicker),
-        B: Login.value && !showMap.value
+        C: common_vendor.o(handStatePicker),
+        D: Login.value && !showMap.value
       }, Login.value && !showMap.value ? {
-        C: common_vendor.t(pickerGroupTitle.value),
-        D: common_vendor.p({
+        E: common_vendor.t(pickerGroupTitle.value),
+        F: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
         }),
-        E: common_vendor.o(handGroupPicker)
+        G: common_vendor.o(handGroupPicker)
       } : {}, {
-        F: common_vendor.sr(picker, "a4fca7fa-4", {
+        H: common_vendor.sr(picker, "a4fca7fa-5", {
           "k": "picker"
         }),
-        G: common_vendor.o(confirm),
-        H: common_vendor.p({
+        I: common_vendor.o(confirm),
+        J: common_vendor.p({
           columns: columns.value,
           keyName: "name"
         }),
-        I: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        K: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

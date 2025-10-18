@@ -52,9 +52,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
         });
       } else {
-        common_vendor.index.showToast({
-          title: "请先登录",
-          icon: "none"
+        common_vendor.index.navigateTo({
+          url: "/pages/login/login"
         });
       }
     };
@@ -69,11 +68,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "none"
         });
       }
-    };
-    const gotoLogin = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/login/login"
-      });
     };
     const platformRenewal = () => {
       if (Login.value) {
@@ -105,14 +99,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.unref(Login)
       }, common_vendor.unref(Login) ? {
         d: common_vendor.t(common_vendor.unref(userInfo).mobile)
-      } : {
-        e: common_vendor.o(gotoLogin)
-      }, {
-        f: common_vendor.p({
+      } : {}, {
+        e: common_vendor.p({
           name: "arrow-right",
           size: "16"
         }),
-        g: common_vendor.o(userInfoDetail),
+        f: common_vendor.o(userInfoDetail),
+        g: common_vendor.unref(Login)
+      }, common_vendor.unref(Login) ? {
         h: common_vendor.p({
           numberType: "overflow",
           type: "error",
@@ -124,7 +118,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "16"
         }),
         j: common_vendor.o(carList),
-        k: common_vendor.o(platformRenewal),
+        k: common_vendor.o(platformRenewal)
+      } : {}, {
         l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;

@@ -113,7 +113,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             imei: imei.value,
             startTime: startTime.value,
             endTime: endTime.value,
-            minParkTime: 60,
+            minParkTime: 120,
             withStop: true,
             withPos: true,
             withTrip: true
@@ -206,9 +206,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showDateTimePicker.value = false;
     };
     const showTripDetail = (trip = null) => {
-      common_vendor.index.navigateTo({
-        url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(UTS.JSON.stringify(trip))}`
-      });
     };
     return (_ctx, _cache) => {
       "raw js";

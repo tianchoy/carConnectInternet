@@ -16,6 +16,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       type: Boolean,
       default: true
     },
+    showPickerTime: {
+      type: Boolean,
+      default: true
+    },
     showCar: {
       type: Boolean,
       default: false
@@ -84,25 +88,32 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = common_vendor.e({
         a: __props.showTime
-      }, __props.showTime ? {
+      }, __props.showTime ? common_vendor.e({
         b: common_vendor.t(__props.currentTime),
-        c: common_assets._imports_0$5,
-        d: common_vendor.o(handleTime)
+        c: !__props.showPickerTime
+      }, !__props.showPickerTime ? {} : {}, {
+        d: __props.showPickerTime
+      }, __props.showPickerTime ? {
+        e: common_assets._imports_0$5
       } : {}, {
-        e: __props.showCar
+        f: common_vendor.o(($event) => {
+          return __props.showPickerTime ? handleTime : null;
+        })
+      }) : {}, {
+        g: __props.showCar
       }, __props.showCar ? {
-        f: common_vendor.t(__props.currentCar),
-        g: common_vendor.o(($event) => {
+        h: common_vendor.t(__props.currentCar),
+        i: common_vendor.o(($event) => {
           return __props.showPicker ? handleCar : null;
         })
       } : {}, {
-        h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
-        i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
-        j: common_vendor.sr(picker, "f630fc82-0", {
+        j: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
+        k: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
+        l: common_vendor.sr(picker, "f630fc82-0", {
           "k": "picker"
         }),
-        k: common_vendor.o(confirm),
-        l: common_vendor.p({
+        m: common_vendor.o(confirm),
+        n: common_vendor.p({
           showPicker: true,
           columns: common_vendor.unref(columns),
           keyName: "label"

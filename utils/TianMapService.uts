@@ -1,0 +1,271 @@
+// 天地图道路规划服务
+export class TianMapService {
+    // 从环境变量获取API密钥，避免硬编码
+    static readonly API_KEY =  "fcaf46a375259f6bf44c387383a212a1"
+    static readonly BASE_URL = "https://api.tianditu.gov.cn/drive"
+    
+    // 配置常量
+    private static readonly CONFIG = {
+        MIN_DISTANCE_THRESHOLD: 50, // 最小距离阈值（米），低于此值使用直线距离
+        REQUEST_TIMEOUT: 15000, // 请求超时时间（毫秒）
+        MAX_RETRY_ATTEMPTS: 2 // 最大重试次数
+    }
+
+    // 获取道路规划路径和距离
+    static async getRouteDistance(
+        startLng: number, 
+        startLat: number, 
+        endLng: number, 
+        endLat: number,
+        options: { retryCount?: number } = {}
+    ): Promise<number> {
+        const { retryCount = 0 } = options
+        
+        try {
+            // 参数验证
+            if (!this.isValidCoordinate(startLng, startLat) || !this.isValidCoordinate(endLng, endLat)) {
+                throw new Error('无效的坐标参数')
+            }
+
+            // 先检查距离，如果太近直接返回直线距离
+            const straightDistance = this.calculateStraightDistance(startLng, startLat, endLng, endLat)
+            if (straightDistance < this.CONFIG.MIN_DISTANCE_THRESHOLD) {
+                console.log('距离太近，直接使用直线距离:', straightDistance, '米')
+                return straightDistance
+            }
+            
+            // 构建请求URL - 修复JSON格式问题
+            const requestData = {
+                orig: `${startLng},${startLat}`,
+                dest: `${endLng},${endLat}`,
+                style: '0'
+            }
+            const postStr = encodeURIComponent(JSON.stringify(requestData))
+            const url = `${this.BASE_URL}?postStr=${postStr}&type=search&tk=${this.API_KEY}`
+            
+            console.log('请求天地图URL:', url)
+            
+            const result = await uni.request({
+                url: url,
+                method: 'GET',
+                timeout: this.CONFIG.REQUEST_TIMEOUT,
+                dataType: 'text'
+            })
+            
+            if (result.statusCode === 200 && result.data) {
+                const xmlData = result.data as string
+                const distance = this.parseDistanceFromXML(xmlData)
+                
+                if (distance > 0) {
+                    console.log(`道路距离计算成功: ${startLng},${startLat} -> ${endLng},${endLat} = ${distance}米`)
+                    return distance
+                } else {
+                    console.warn('道路距离计算失败，使用直线距离')
+                    return straightDistance
+                }
+            } else {
+                console.warn(`天地图API请求失败，状态码: ${result.statusCode}`)
+                // 重试逻辑
+                if (retryCount < this.CONFIG.MAX_RETRY_ATTEMPTS) {
+                    console.log(`进行第${retryCount + 1}次重试...`)
+                    return await this.getRouteDistance(startLng, startLat, endLng, endLat, { 
+                        retryCount: retryCount + 1 
+                    })
+                }
+                return straightDistance
+            }
+        } catch (error) {
+            console.error('道路规划请求异常:', error)
+            
+            // 重试逻辑
+            if (retryCount < this.CONFIG.MAX_RETRY_ATTEMPTS) {
+                console.log(`进行第${retryCount + 1}次重试...`)
+                return await this.getRouteDistance(startLng, startLat, endLng, endLat, { 
+                    retryCount: retryCount + 1 
+                })
+            }
+            
+            const straightDistance = this.calculateStraightDistance(startLng, startLat, endLng, endLat)
+            console.warn('所有重试失败，使用直线距离:', straightDistance, '米')
+            return straightDistance
+        }
+    }
+    
+    // 从XML响应中解析距离
+    private static parseDistanceFromXML(xmlString: string): number {
+        try {
+            // 方法1：解析distance标签（公里单位）
+            const distanceMatch = xmlString.match(/<distance>([\d.]+)<\/distance>/)
+            if (distanceMatch && distanceMatch[1]) {
+                const distanceValue = parseFloat(distanceMatch[1])
+                
+                // 检查距离是否为0或无效值
+                if (distanceValue <= 0 || !isFinite(distanceValue)) {
+                    return 0
+                }
+                
+                // 天地图返回的距离单位是公里，转换为米
+                const distanceInMeters = Math.round(distanceValue * 1000)
+                return distanceInMeters
+            }
+            
+            // 方法2：尝试从streetDistance中获取（米单位）
+            const streetDistanceMatch = xmlString.match(/<streetDistance>([\d.]+)<\/streetDistance>/)
+            if (streetDistanceMatch && streetDistanceMatch[1]) {
+                const streetDistance = parseFloat(streetDistanceMatch[1])
+                if (streetDistance > 0 && isFinite(streetDistance)) {
+                    return Math.round(streetDistance)
+                }
+            }
+
+            // 方法3：尝试从其他可能的标签中获取距离
+            const pathDistanceMatch = xmlString.match(/<pathDistance>([\d.]+)<\/pathDistance>/)
+            if (pathDistanceMatch && pathDistanceMatch[1]) {
+                const pathDistance = parseFloat(pathDistanceMatch[1])
+                if (pathDistance > 0 && isFinite(pathDistance)) {
+                    return Math.round(pathDistance)
+                }
+            }
+            
+            console.warn('XML中未找到有效的距离信息')
+            return 0
+            
+        } catch (error) {
+            console.error('XML解析错误:', error)
+            return 0
+        }
+    }
+    
+    // 计算直线距离（Haversine公式）
+    static calculateStraightDistance(lng1: number, lat1: number, lng2: number, lat2: number): number {
+        // 参数验证
+        if (!this.isValidCoordinate(lng1, lat1) || !this.isValidCoordinate(lng2, lat2)) {
+            console.error('无效的坐标参数，无法计算距离')
+            return 0
+        }
+
+        const R = 6371000 // 地球半径，单位米
+        const dLat = this.toRad(lat2 - lat1)
+        const dLng = this.toRad(lng2 - lng1)
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                 Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+                 Math.sin(dLng / 2) * Math.sin(dLng / 2)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        const distance = R * c
+        return Math.round(distance)
+    }
+    
+    // 角度转弧度
+    private static toRad(degree: number): number {
+        return degree * Math.PI / 180
+    }
+
+    // 验证坐标是否有效
+    private static isValidCoordinate(lng: number, lat: number): boolean {
+        return (
+            typeof lng === 'number' && 
+            typeof lat === 'number' &&
+            !isNaN(lng) && 
+            !isNaN(lat) &&
+            lng >= -180 && lng <= 180 &&
+            lat >= -90 && lat <= 90
+        )
+    }
+
+    // 批量计算多个路径的距离
+    static async getBatchRouteDistances(
+        routes: Array<{
+            startLng: number;
+            startLat: number;
+            endLng: number;
+            endLat: number;
+            id?: string; // 可选的标识符
+        }>
+    ): Promise<Array<{
+        id?: string;
+        startLng: number;
+        startLat: number;
+        endLng: number;
+        endLat: number;
+        distance: number;
+        type: 'road' | 'straight'; // 距离类型
+    }>> {
+        const results = []
+        
+        for (const route of routes) {
+            try {
+                const roadDistance = await this.getRouteDistance(
+                    route.startLng, 
+                    route.startLat, 
+                    route.endLng, 
+                    route.endLat
+                )
+                
+                const straightDistance = this.calculateStraightDistance(
+                    route.startLng, 
+                    route.startLat, 
+                    route.endLng, 
+                    route.endLat
+                )
+                
+                // 如果道路距离计算成功且与直线距离差异合理，使用道路距离
+                const useRoadDistance = roadDistance > straightDistance * 0.8 && 
+                                      roadDistance < straightDistance * 3
+                
+                results.push({
+                    id: route.id,
+                    startLng: route.startLng,
+                    startLat: route.startLat,
+                    endLng: route.endLng,
+                    endLat: route.endLat,
+                    distance: useRoadDistance ? roadDistance : straightDistance,
+                    type: useRoadDistance ? 'road' : 'straight',
+                    straightDistance, // 保留直线距离供参考
+                    roadDistance // 保留道路距离供参考
+                })
+                
+                // 添加延迟避免频繁请求
+                await this.delay(100)
+                
+            } catch (error) {
+                console.error(`计算路径距离失败: ${route.id || '未知路径'}`, error)
+                const straightDistance = this.calculateStraightDistance(
+                    route.startLng, 
+                    route.startLat, 
+                    route.endLng, 
+                    route.endLat
+                )
+                
+                results.push({
+                    id: route.id,
+                    startLng: route.startLng,
+                    startLat: route.startLat,
+                    endLng: route.endLng,
+                    endLat: route.endLat,
+                    distance: straightDistance,
+                    type: 'straight',
+                    straightDistance,
+                    roadDistance: 0,
+                    error: error.message
+                })
+            }
+        }
+        
+        return results
+    }
+    
+    // 延迟函数
+    private static delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
+
+    // 获取服务状态信息
+    static getServiceInfo() {
+        return {
+            apiKey: this.API_KEY ? '已设置' : '未设置',
+            baseUrl: this.BASE_URL,
+            config: this.CONFIG,
+            service: '天地图道路规划服务'
+        }
+    }
+}

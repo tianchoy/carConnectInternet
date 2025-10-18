@@ -9,12 +9,12 @@
 				</view>
 				<view class="user-info">
 					<text v-if="Login">{{userInfo.mobile}}</text>
-					<text v-else @click="gotoLogin">点击登录</text>
+					<text v-else>点击登录</text>
 				</view>
 			</view>
 			<uv-icon name="arrow-right" size="16"></uv-icon>
 		</view>
-		<view>
+		<view v-if="Login">
 			<view class="list" @click="carList">
 				<view class="left">
 					<text>我的车辆</text>
@@ -67,9 +67,8 @@
 				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + encodeURIComponent(JSON.stringify(userInfo.value))
 			})
 		} else {
-			uni.showToast({
-				title: '请先登录',
-				icon: 'none',
+			uni.navigateTo({
+				url: '/pages/login/login'
 			})
 		}
 	}
@@ -87,12 +86,6 @@
 			})
 		}
 	}
-		// 去登录
-		const gotoLogin = () => {
-			uni.navigateTo({
-				url: '/pages/login/login'
-			})
-		}
 
 	// 平台续费
 	const platformRenewal = () => {

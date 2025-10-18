@@ -9,6 +9,11 @@
 				<text class="info">{{carInfo.deviceId}}</text>
 			</view>
 			<view class="list">
+				<text class="title">设备名称</text>
+				<text class="info" v-if="!isEditing">{{carInfo.deviceName}}</text>
+				<uv-input v-else v-model="editInfo.deviceName" border="surround" inputAlign="right" class="input" />
+			</view>
+			<view class="list">
 				<text class="title">自定义图标</text>
 				<text class="info" v-if="!isEditing">{{carTitle}}</text>
 				<text style="flex:1" v-else @click="deviceTypeSelectFun">{{editInfo.carTypeValue || '请选择图标'}}</text>
@@ -107,6 +112,7 @@
 	const saveChanges = async () => {
 		const data = {
 			deviceId: editInfo.value.deviceId,
+			deviceName: editInfo.value.deviceName,
 			carType: editInfo.value.carType,
 			plateNo: editInfo.value.plateNo,
 			carVin: editInfo.value.carVin,
@@ -141,7 +147,7 @@
 
 	const loadCarListData = async () => {
 		const res = await getDeviceDetail(deviceId.value)
-		
+		console.log(res.data)
 		if(res.msg=='success'){
 			carInfo.value = res.data
 		}else{

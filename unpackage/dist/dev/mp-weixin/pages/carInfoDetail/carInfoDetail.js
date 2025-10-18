@@ -38,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const mapScale = common_vendor.ref(15);
     const datainfo = common_vendor.ref({});
     const address = common_vendor.ref("");
-    const currentTime = common_vendor.ref("5s");
+    const currentTime = common_vendor.ref("10s");
     const times = common_vendor.ref([
       [
         new UTSJSONObject({ label: "5s", value: "5" }),
@@ -479,6 +479,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.p({
           currentTime: common_vendor.unref(currentTime),
           showTime: true,
+          showPickerTime: false,
           currentCar: common_vendor.unref(currentCarInfo).plateNo,
           times: common_vendor.unref(times),
           carStatus: common_vendor.unref(datainfo).connectionStatus,

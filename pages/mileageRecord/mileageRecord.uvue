@@ -162,7 +162,7 @@
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
-				minParkTime: 60,
+				minParkTime: 120,
 				withStop: true,
 				withPos: true,
 				withTrip: true,
@@ -287,9 +287,10 @@
 
 	// 显示行程详情
 	const showTripDetail = (trip : any) => {
-		uni.navigateTo({
-			url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(JSON.stringify(trip))}`
-		})
+
+		// uni.navigateTo({
+		// 	url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(JSON.stringify(trip))}`
+		// })
 	}
 </script>
 

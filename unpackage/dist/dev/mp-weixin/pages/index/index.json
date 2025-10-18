@@ -3,6 +3,7 @@
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "index-list-mode": "../../components/indexListMode/indexListMode",
+    "uv-notice-bar": "../../uni_modules/uv-notice-bar/components/uv-notice-bar/uv-notice-bar",
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
     "uv-picker": "../../uni_modules/uv-picker/components/uv-picker/uv-picker"
   }

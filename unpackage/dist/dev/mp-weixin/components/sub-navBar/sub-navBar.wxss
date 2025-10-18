@@ -46,7 +46,7 @@
   border-radius: 10rpx;
 }
 .tools-box .car-box .selectCar .plateNo.data-v-f630fc82 {
-  font-size: 25rpx;
+  font-size: 30rpx;
 }
 .tools-box .car-box .car-state.data-v-f630fc82 {
   border-radius: 10rpx;
@@ -70,8 +70,11 @@
   color: #fff;
 }
 .tools-box .second .times.data-v-f630fc82 {
-  width: 40rpx;
-  font-size: 25rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 30rpx;
 }
 .tools-box .down_icon.data-v-f630fc82 {
   width: 30rpx;

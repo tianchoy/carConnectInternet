@@ -10,6 +10,9 @@
 		<view v-else>
 			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice"/>
 		</view>
+		<view v-if="Login">
+			<uv-notice-bar :text="noticeText" direction="column" fontSize="34rpx" mode="closable" ></uv-notice-bar>
+		</view>
 		<view class="login-view-more" v-if="!Login" @click="gotoLogin">登录查看更多</view>
 		<view class="tool-nav">
 			<view class="refresh" @click="refresh" v-if="Login">刷新</view>
@@ -49,6 +52,7 @@
 	let mapCtx = undefined
 	const currentPickerType = ref('')
 	const picker = ref(null)
+	const noticeText = ref(['本页面仅供展示车辆','如使用车辆实时位置功能','请转至车辆详情页面'])
 
 	// 状态选项
 	const carState = ref([
@@ -356,7 +360,6 @@
 		const token = uni.getStorageSync('token')
 		console.log(token)
 		if (!token) {
-			// uni.redirectTo({ url: '/pages/login/login' })
 			Login.value = false
 		} else {
 			Login.value = true
@@ -416,7 +419,7 @@
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
-			font-size: 25rpx;
+			font-size: 30rpx;
 
 			.btn-map-list {
 				padding: 7rpx 10rpx;
@@ -490,7 +493,7 @@
 			border-radius: 10rpx;
 			background-color: rgba(3, 109, 246, 0.71);
 			color: #fff;
-			font-size: 25rpx;
+			font-size: 30rpx;
 			display: flex;
 			flex-direction: row;
 			justify-content: space-between;
@@ -502,7 +505,7 @@
 		}
 
 		.left-bar-state {
-			left: 180rpx;
+			left: 190rpx;
 		}
 		.login-view-more {
 			position: absolute;

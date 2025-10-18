@@ -393,7 +393,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           imei: imei.value,
           startTime: startTime.value.replace(/\//g, "-"),
           endTime: endTime.value.replace(/\//g, "-"),
-          minParkTime: 60,
+          minParkTime: 2,
           withStop: true,
           withPos: true,
           withTrip: false

@@ -6,7 +6,7 @@
 
 		<view class="content">
 			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
-				<text class="title">{{item.plateNo}}</text>
+				<text class="title">{{item.deviceName}}</text>
 				<view class="device-info">
 					<text>{{item.companyId}}</text>
 					<text class="tel">{{item.imei}}</text>

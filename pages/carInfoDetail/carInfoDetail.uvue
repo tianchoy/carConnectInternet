@@ -5,7 +5,7 @@
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
-				<sub-navBar :currentTime="currentTime" :showTime="true"
+				<sub-navBar :currentTime="currentTime" :showTime="true" :showPickerTime="false"
 					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo"
 					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
 					:showCar="true"></sub-navBar>
@@ -99,7 +99,7 @@
 	const mapScale = ref(15)
 	const datainfo = ref<object>({})
 	const address = ref('')
-	const currentTime = ref('5s')
+	const currentTime = ref('10s')
 	const times = ref([
 		[
 			{ label: '5s', value: '5' },
