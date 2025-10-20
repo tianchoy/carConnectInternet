@@ -99,7 +99,7 @@
 	const mapScale = ref(15)
 	const datainfo = ref<object>({})
 	const address = ref('')
-	const currentTime = ref('10s')
+	const currentTime = ref('5s')
 	const times = ref([
 		[
 			{ label: '5s', value: '5' },
@@ -156,7 +156,6 @@
 
 	// 信号强度处理方法
 	function getSignalDetail(rssi) {
-		// 处理 null、undefined 或空字符串的情况
 		if (rssi === null || rssi === undefined || rssi === '') {
 			return {
 				experience: "无信号",
@@ -235,8 +234,6 @@
 		const signalDetail = getSignalDetail(signalValue);
 		const level = signalDetail.level;
 
-		// 根据信号等级决定哪些信号条亮起
-		// 5格信号条对应5个等级
 		return barIndex < level ? 'bar-active' : 'bar-off';
 	}
 
@@ -301,6 +298,16 @@
 		}
 	}
 
+	// 停止自动刷新
+	const stopAutoRefresh = () => {
+		if (refreshTimer.value !== null) {
+			clearInterval(refreshTimer.value)
+			refreshTimer.value = null
+			isRefreshing.value = false
+			console.log('自动刷新已停止')
+		}
+	}
+
 	const baseList = ref([{
 		name: '/static/gjhf.png',
 		title: '轨迹回放'
@@ -335,21 +342,25 @@
 	const click = (name) => {
 		const itemTo = name.title
 		if (itemTo == '轨迹回放') {
+			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (itemTo == '车辆跟踪') {
+			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (itemTo == '里程记录') {
+			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value
 			})
 		}
 		if (itemTo == '停车记录') {
+			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/stopRecord/stopRecord?imei=' + imei.value + '&deptId=' + deptId.value
 			})
@@ -381,6 +392,7 @@
 			}
 		}
 		if (itemTo == '电子围栏') {
+			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
 				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
 			})
@@ -472,6 +484,7 @@
 	}
 
 	const carDetail = () => {
+		stopAutoRefresh() // 停止刷新
 		uni.navigateTo({
 			url: '/pages/userCenter/carDetail/carDetail?deviceId=' + deviceId.value
 		})
@@ -539,9 +552,7 @@
 
 					// 检查设备状态，如果变为离线状态则停止定时器
 					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
-						clearInterval(refreshTimer.value)
-						refreshTimer.value = null
-						isRefreshing.value = false
+						stopAutoRefresh()
 						uni.showToast({
 							title: '设备已离线，停止自动刷新',
 							icon: 'none'
@@ -617,16 +628,19 @@
 		return marker
 	}
 
-	// 新增页面隐藏时的处理
+	// 页面隐藏时的处理
 	onHide(() => {
-		clearInterval(refreshTimer.value)
-		refreshTimer.value = null
-		isRefreshing.value = false
+		stopAutoRefresh()
 	})
 
+	// 页面卸载时的处理
 	onUnmounted(() => {
-		clearInterval(refreshTimer.value)
-		refreshTimer.value = null
+		stopAutoRefresh()
+	})
+
+	// 新增：页面跳转时的处理
+	onPageHide(() => {
+		stopAutoRefresh()
 	})
 </script>
 <style lang="scss">

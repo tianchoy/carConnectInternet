@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "uv-overlay": "../../../uv-overlay/components/uv-overlay/uv-overlay",
-    "uv-line": "../../../uv-line/components/uv-line/uv-line",
-    "uv-transition": "../../../uv-transition/components/uv-transition/uv-transition"
-  }
-}

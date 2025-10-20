@@ -7051,9 +7051,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.82",
-    uniCompilerVersion: "4.82",
-    uniRuntimeVersion: "4.82",
+    uniCompileVersion: "4.83",
+    uniCompilerVersion: "4.83",
+    uniRuntimeVersion: "4.83",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -7081,8 +7081,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("4.82");
-      parameters.uniRuntimeVersionCode = parseFloat("4.82");
+      parameters.uniCompilerVersionCode = parseFloat("4.83");
+      parameters.uniRuntimeVersionCode = parseFloat("4.83");
     } catch (error) {
     }
   }
@@ -7209,14 +7209,14 @@ const getAppBaseInfo = {
       appLanguage: getAppLanguage(hostLanguage),
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.82",
-      uniCompilerVersion: "4.82",
-      uniRuntimeVersion: "4.82"
+      uniCompileVersion: "4.83",
+      uniCompilerVersion: "4.83",
+      uniRuntimeVersion: "4.83"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("4.82");
-        parameters.uniRuntimeVersionCode = parseFloat("4.82");
+        parameters.uniCompilerVersionCode = parseFloat("4.83");
+        parameters.uniRuntimeVersionCode = parseFloat("4.83");
       } catch (error) {
       }
     }
@@ -7995,7 +7995,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.67";
   const port = "8090";
-  const id = "mp-weixin_7YLdjh";
+  const id = "mp-weixin_3e40Rl";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9738,6 +9738,7 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onPageHide = onHide;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports._export_sfc = _export_sfc;
@@ -9761,6 +9762,7 @@ exports.onDeactivated = onDeactivated;
 exports.onHide = onHide;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
+exports.onPageHide = onPageHide;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
 exports.onShow = onShow;
