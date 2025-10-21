@@ -79,6 +79,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let lastTimestamp = 0;
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
+    const lat = common_vendor.ref("");
+    const lng = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     function safeParseDate(dateStr) {
       if (!dateStr)
@@ -384,6 +386,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carStatus.value = option.connectionStatus;
       plateNo.value = option.plateNo;
       carType.value = option.carType;
+      lat.value = option.lat;
+      lng.value = option.lng;
       initDateTime();
       loadTrackPos();
     });
@@ -399,11 +403,61 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           withTrip: false
         });
         const res = yield api_request.getTrackPos(data);
-        if (res.data && res.data.positions) {
+        if (res.data.positions && res.data.positions.length > 0) {
           processTrackData(res.data.positions);
+        } else {
+          showCurrentPosition();
         }
       });
     };
+    function showCurrentPosition() {
+      if (!lat.value || !lng.value) {
+        common_vendor.index.showToast({
+          title: "无有效位置数据",
+          icon: "none"
+        });
+        return null;
+      }
+      const originalLat = parseFloat(lat.value);
+      const originalLng = parseFloat(lng.value);
+      const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(originalLat, originalLng);
+      center.latitude = convertedCoord.lat;
+      center.longitude = convertedCoord.lng;
+      mapScale.value = 15;
+      const currentPoint = new UTSJSONObject(
+        {
+          latitude: convertedCoord.lat,
+          longitude: convertedCoord.lng,
+          speed: 0,
+          deviceTime: (/* @__PURE__ */ new Date()).toLocaleString(),
+          timestamp: Date.now(),
+          rotation: 0,
+          originalLatitude: originalLat,
+          originalLongitude: originalLng
+        }
+        // 初始化小车标记
+      );
+      carMarker.value = new UTSJSONObject(
+        {
+          id: 999,
+          latitude: currentPoint.latitude,
+          longitude: currentPoint.longitude,
+          iconPath: carStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+          width: 25,
+          height: 25,
+          rotate: 0,
+          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          callout: new UTSJSONObject({
+            content: plateNo.value,
+            borderRadius: 5,
+            padding: 5,
+            display: "ALWAYS"
+          })
+        }
+        // 设置标记点
+      );
+      markers.value = [carMarker.value];
+    }
     function processTrackData(positions) {
       const processedPoints = [];
       for (let i = 0; i < positions.length; i++) {

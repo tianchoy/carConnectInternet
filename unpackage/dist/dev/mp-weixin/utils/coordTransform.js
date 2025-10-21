@@ -2,13 +2,13 @@
 const common_vendor = require("../common/vendor.js");
 class CoordTransform {
   /**
-   * WGS84转腾讯地图坐标系
+   * WGS84转腾讯地图坐标系（GCJ02）
    * @param wgLat WGS84纬度
    * @param wgLon WGS84经度
    * @returns 腾讯地图坐标系 { lat: number, lng: number }
    */
   static wgs84ToTencent(wgLat, wgLon) {
-    if (wgLon < 72.004 || wgLon > 137.8347 || wgLat < 0.8293 || wgLat > 55.8271) {
+    if (!this.isInChina(wgLon, wgLat)) {
       return { lat: wgLat, lng: wgLon };
     }
     let dLat = this.transformLat(wgLon - 105, wgLat - 35);
@@ -19,26 +19,42 @@ class CoordTransform {
     let sqrtMagic = Math.sqrt(magic);
     dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
     dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+    const mgLat = wgLat + dLat;
+    const mgLng = wgLon + dLng;
     return {
-      lat: wgLat + dLat,
-      lng: wgLon + dLng
+      lat: Number(mgLat.toFixed(6)),
+      lng: Number(mgLng.toFixed(6))
     };
   }
   /**
-   * 腾讯地图坐标系转WGS84
+   * 腾讯地图坐标系转WGS84（使用高精度算法）
    * @param tcLat 腾讯地图纬度
    * @param tcLon 腾讯地图经度
    * @returns WGS84坐标系 { lat: number, lng: number }
    */
   static tencentToWgs84(tcLat, tcLon) {
-    const result = this.wgs84ToTencent(tcLat, tcLon);
+    if (!this.isInChina(tcLon, tcLat)) {
+      return { lat: tcLat, lng: tcLon };
+    }
+    let wgsLat = tcLat;
+    let wgsLng = tcLon;
+    for (let i = 0; i < 5; i++) {
+      const gcj02 = this.wgs84ToTencent(wgsLat, wgsLng);
+      const deltaLat = tcLat - gcj02.lat;
+      const deltaLng = tcLon - gcj02.lng;
+      wgsLat += deltaLat;
+      wgsLng += deltaLng;
+      if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
+        break;
+      }
+    }
     return {
-      lat: 2 * tcLat - result.lat,
-      lng: 2 * tcLon - result.lng
+      lat: Number(wgsLat.toFixed(6)),
+      lng: Number(wgsLng.toFixed(6))
     };
   }
   /**
-   * 批量转换坐标
+   * 批量转换坐标（内部使用高精度转换）
    * @param devices 设备数组
    * @param targetSystem 目标坐标系 'tencent' | 'wgs84'
    * @returns 转换后的设备数组
@@ -52,7 +68,7 @@ class CoordTransform {
       const lat = Number(device.latitude);
       const lng = Number(device.longitude);
       if (isNaN(lat) || isNaN(lng)) {
-        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:74", "设备经纬度无效", device);
+        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:96", "设备经纬度无效", device);
         return device;
       }
       let converted = null;
@@ -65,7 +81,7 @@ class CoordTransform {
     });
   }
   /**
-   * 转换单个坐标点
+   * 转换单个坐标点（内部使用高精度转换）
    * @param lat 纬度
    * @param lng 经度
    * @param fromSystem 原坐标系 'wgs84' | 'tencent'
@@ -78,7 +94,7 @@ class CoordTransform {
     } else if (fromSystem === "tencent" && toSystem === "wgs84") {
       return this.tencentToWgs84(lat, lng);
     } else {
-      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:111", "不支持的坐标系转换", fromSystem, "->", toSystem);
+      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:133", "不支持的坐标系转换", fromSystem, "->", toSystem);
       return { lat, lng };
     }
   }
@@ -88,7 +104,7 @@ class CoordTransform {
    * @param lng 经度
    * @returns 是否在中国境内
    */
-  static isInChina(lat, lng) {
+  static isInChina(lng, lat) {
     return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271;
   }
   // 私有方法：纬度转换

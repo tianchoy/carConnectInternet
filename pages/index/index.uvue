@@ -1,17 +1,18 @@
 <template>
 	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="true"
+			:isIcon="true" @capsuleClick="subMsg" Icon="bell" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
-			<map id="myMap" :markers="markers"
-				:scale="mapScale" style="width:100%;height:100%" :show-location="true" @markertap="handleTap">
+			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
+				@markertap="handleTap">
 			</map>
 		</view>
 		<view v-else>
-			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice"/>
+			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice" />
 		</view>
 		<view v-if="Login">
-			<uv-notice-bar :text="noticeText" direction="column" fontSize="34rpx" mode="closable" ></uv-notice-bar>
+			<uv-notice-bar :text="noticeText" direction="column" fontSize="34rpx" mode="closable"></uv-notice-bar>
 		</view>
 		<view class="login-view-more" v-if="!Login" @click="gotoLogin">登录查看更多</view>
 		<view class="tool-nav">
@@ -52,7 +53,8 @@
 	let mapCtx = undefined
 	const currentPickerType = ref('')
 	const picker = ref(null)
-	const noticeText = ref(['本页面仅供展示车辆','如使用车辆实时位置功能','请转至车辆详情页面'])
+	const iconColor = ref('#e6813e')
+	const noticeText = ref(['本页面仅供展示车辆', '如使用车辆实时位置功能', '请转至车辆详情页面'])
 
 	// 状态选项
 	const carState = ref([
@@ -108,14 +110,28 @@
 			updateMarkers(devices)
 		}
 	})
-	
+
+	// 订阅消息
+	const subMsg = () => {
+		console.log('订阅消息')
+		uni.requestSubscribeMessage({
+			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
+			success: (res) => {
+				console.log('订阅成功:', res)
+			},
+			fail: (err) => {
+				console.log('订阅失败:', err)
+			}
+		})
+	}
+
 	// 跳转到列表页面
 	const goToList = (status : string) => {
 		// 先切换到列表模式
 		showMap.value = false
-		
+
 		// 根据状态设置筛选条件
-		switch(status) {
+		switch (status) {
 			case 'all':
 				pickerStateTitle.value = '全部状态'
 				break
@@ -128,23 +144,23 @@
 		}
 	}
 
-		// 解绑设备
-		const unbindDevice = async (imei : string) => {
-			const res = await delDevice(imei)
-			if (res.code == 0) {
-				uni.showToast({
-					title: '解绑成功',
-					icon: 'success'
-				})
-			} else {
-				uni.showToast({
-					title: '解绑失败',
-					icon: 'error'
-				})
-			}
-			// 解绑成功后刷新设备列表
-			await loadUserDeviceList(currentGroupId.value)
+	// 解绑设备
+	const unbindDevice = async (imei : string) => {
+		const res = await delDevice(imei)
+		if (res.code == 0) {
+			uni.showToast({
+				title: '解绑成功',
+				icon: 'success'
+			})
+		} else {
+			uni.showToast({
+				title: '解绑失败',
+				icon: 'error'
+			})
 		}
+		// 解绑成功后刷新设备列表
+		await loadUserDeviceList(currentGroupId.value)
+	}
 
 	const handStatePicker = () => {
 		columns.value = carState.value
@@ -182,16 +198,16 @@
 	}
 
 	const handleTap = (e) => {
-	  const markerId = e.detail.markerId
-	  const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
-	  
-	  if (selectedDevice) {
-	    uni.navigateTo({
-	      url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`,
-	    })
-	  } else {
-	    console.warn('未找到对应的设备信息', markerId)
-	  }
+		const markerId = e.detail.markerId
+		const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
+
+		if (selectedDevice) {
+			uni.navigateTo({
+				url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`,
+			})
+		} else {
+			console.warn('未找到对应的设备信息', markerId)
+		}
 	}
 
 	const updateMarkers = (devices) => {
@@ -204,7 +220,7 @@
 				console.warn('无效的设备数据', device)
 				return null
 			}
-			
+
 			const lat = Number(device.latitude)
 			const lng = Number(device.longitude)
 
@@ -230,7 +246,7 @@
 				},
 				joinCluster: true, // 允许聚合
 				clusterId: `${lat.toFixed(2)}_${lng.toFixed(2)}`,
-				
+
 			}
 		}).filter(marker => marker !== null)
 	}
@@ -263,7 +279,7 @@
 			carGroup.value = [formattedData]
 			pickerGroupTitle.value = '全部分组'
 			currentGroupId.value = 'all'
-			
+
 		} catch (err) {
 			console.error('加载分组数据失败:', err)
 			uni.showToast({
@@ -272,7 +288,7 @@
 			})
 		}
 	}
-	
+
 	const refresh = async () => {
 		await loadUserDeviceList()
 	}
@@ -306,10 +322,10 @@
 			}
 
 			console.log('解析后的设备列表:', deviceList)
-			
+
 			// 使用插件转换坐标
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
-			
+
 		} catch (err) {
 			console.error('获取设备列表失败:', err)
 			uni.showToast({
@@ -318,7 +334,7 @@
 			})
 		}
 	}
-	
+
 	// 添加全局事件监听，用于从添加页面返回时刷新
 	const refreshDeviceList = () => {
 		console.log('收到刷新事件，重新加载设备列表')
@@ -338,11 +354,11 @@
 
 	onShow(async () => {
 		const token = uni.getStorageSync('token')
-		if(token){
+		if (token) {
 			// 监听全局刷新事件
 			// refreshDeviceList()
 			uni.$on('refreshDeviceList', refreshDeviceList)
-			
+
 			const needRefresh = uni.getStorageSync('needRefreshHome')
 			if (needRefresh) {
 				await loadUserDeviceList(currentGroupId.value)
@@ -350,7 +366,7 @@
 			}
 		}
 	})
-	
+
 	onHide(() => {
 		// 移除事件监听
 		uni.$off('refreshDeviceList', refreshDeviceList)
@@ -358,7 +374,6 @@
 
 	onLoad(async () => {
 		const token = uni.getStorageSync('token')
-		console.log(token)
 		if (!token) {
 			Login.value = false
 		} else {
@@ -383,16 +398,15 @@
 			}
 		}
 	})
-	
+
 	onUnload(() => {
 		// 清理事件监听
 		uni.$off('refreshDeviceList', refreshDeviceList)
 	})
-		// 跳转登录页面
-		const gotoLogin = () => {
-			uni.redirectTo({ url: '/pages/login/login' })
-		}
-
+	// 跳转登录页面
+	const gotoLogin = () => {
+		uni.redirectTo({ url: '/pages/login/login' })
+	}
 </script>
 
 <style lang="scss">
@@ -435,7 +449,8 @@
 				border-radius: 10rpx;
 				margin-right: 10rpx;
 			}
-			.refresh{
+
+			.refresh {
 				padding: 7rpx 10rpx;
 				background-color: #1296db;
 				color: #fff;
@@ -463,7 +478,7 @@
 				/* 添加点击效果 */
 				transition: all 0.2s;
 			}
-			
+
 			view:active {
 				transform: scale(0.95);
 				opacity: 0.8;
@@ -507,6 +522,7 @@
 		.left-bar-state {
 			left: 190rpx;
 		}
+
 		.login-view-more {
 			position: absolute;
 			bottom: 50rpx;

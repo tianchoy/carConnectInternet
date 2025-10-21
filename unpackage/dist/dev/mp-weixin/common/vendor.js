@@ -7995,7 +7995,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.67";
   const port = "8090";
-  const id = "mp-weixin_3e40Rl";
+  const id = "mp-weixin_uYe-Y1";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9738,7 +9738,6 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
-const onPageHide = onHide;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports._export_sfc = _export_sfc;
@@ -9762,7 +9761,6 @@ exports.onDeactivated = onDeactivated;
 exports.onHide = onHide;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
-exports.onPageHide = onPageHide;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
 exports.onShow = onShow;

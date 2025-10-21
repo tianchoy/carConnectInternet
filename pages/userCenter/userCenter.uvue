@@ -90,13 +90,13 @@
 	// 平台续费
 	const platformRenewal = () => {
 		if (Login.value) {
-			uni.showToast({
-				title: '设备仍在服务期',
-				icon: 'none',
-			})
-			// uni.navigateTo({
-			// 	url: '/pages/userCenter/payDeviceList/payDeviceList'
+			// uni.showToast({
+			// 	title: '设备仍在服务期',
+			// 	icon: 'none',
 			// })
+			uni.navigateTo({
+				url: '/pages/userCenter/payDeviceList/payDeviceList'
+			})
 		} else {
 			uni.showToast({
 				title: '请先登录',

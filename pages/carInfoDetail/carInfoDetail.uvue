@@ -156,6 +156,7 @@
 
 	// 信号强度处理方法
 	function getSignalDetail(rssi) {
+		// 处理 null、undefined 或空字符串的情况
 		if (rssi === null || rssi === undefined || rssi === '') {
 			return {
 				experience: "无信号",
@@ -234,6 +235,8 @@
 		const signalDetail = getSignalDetail(signalValue);
 		const level = signalDetail.level;
 
+		// 根据信号等级决定哪些信号条亮起
+		// 5格信号条对应5个等级
 		return barIndex < level ? 'bar-active' : 'bar-off';
 	}
 
@@ -304,7 +307,6 @@
 			clearInterval(refreshTimer.value)
 			refreshTimer.value = null
 			isRefreshing.value = false
-			console.log('自动刷新已停止')
 		}
 	}
 
@@ -344,7 +346,7 @@
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude 
 			})
 		}
 		if (itemTo == '车辆跟踪') {
@@ -530,13 +532,17 @@
 						return
 					}
 
+					// console.log('1111111',item.latitude, item.longitude)
+
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
+					// console.log('2222222',convertedCoord.lat, convertedCoord.lng)
+
 					// 获取地址信息
-					const addr = await getAddress(convertedCoord.lat, convertedCoord.lng);
+					const addr = await getAddress(item.latitude, item.longitude);
 					address.value = addr.result.formatted_address;
 
 					// 更新设备标记
@@ -552,7 +558,9 @@
 
 					// 检查设备状态，如果变为离线状态则停止定时器
 					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
-						stopAutoRefresh()
+						clearInterval(refreshTimer.value)
+						refreshTimer.value = null
+						isRefreshing.value = false
 						uni.showToast({
 							title: '设备已离线，停止自动刷新',
 							icon: 'none'
@@ -628,18 +636,14 @@
 		return marker
 	}
 
-	// 页面隐藏时的处理
+	// 新增页面隐藏时的处理
 	onHide(() => {
+		console.log('页面隐藏时停止自动刷新')
 		stopAutoRefresh()
 	})
 
-	// 页面卸载时的处理
 	onUnmounted(() => {
-		stopAutoRefresh()
-	})
-
-	// 新增：页面跳转时的处理
-	onPageHide(() => {
+		console.log('页面卸载时停止自动刷新')
 		stopAutoRefresh()
 	})
 </script>

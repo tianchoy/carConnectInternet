@@ -34,7 +34,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadPayDeviceListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:85", "加载数据，当前页码:", currPage.value, "总页数:", totalPage.value);
         if (loading.value || !hasMore.value)
           return Promise.resolve(null);
         loading.value = true;
@@ -55,7 +54,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (hasMore.value) {
               currPage.value++;
             }
-            common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:115", "数据加载成功，当前数据量:", deviceList.value.length, "是否有更多:", hasMore.value);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "加载失败",
@@ -63,7 +61,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:123", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:124", "加载车辆列表失败:", error);
           common_vendor.index.showToast({
             title: "加载失败，请重试",
             icon: "none"
@@ -77,18 +75,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadPayDeviceListData();
     });
     const pay = (iccid, simMerchant) => {
-      iccid = iccid.substring(0, iccid.length - 1);
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:145", iccid);
+      if (simMerchant.toLowerCase() == "zddx") {
+        iccid = iccid.substring(0, iccid.length - 1);
+      }
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:146", iccid);
       needRefresh.value = true;
       common_vendor.wx$1.openEmbeddedMiniProgram(new UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:157", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:160", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:161", "打开小程序失败", res);
           needRefresh.value = false;
           common_vendor.index.showToast({
             title: "打开支付页面失败",
@@ -98,7 +98,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     common_vendor.onPullDownRefresh(() => {
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:173", "下拉刷新");
       resetData();
       loadPayDeviceListData().finally(() => {
         common_vendor.index.stopPullDownRefresh();
@@ -122,20 +121,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(item.plateNo),
-            b: common_vendor.t(item.iccid),
-            c: item.customerTime
+            a: common_vendor.t(item.deviceName),
+            b: common_vendor.t(item.plateNo),
+            c: common_vendor.t(item.iccid),
+            d: item.customerTime
           }, item.customerTime ? {
-            d: common_vendor.t(item.customerTime)
+            e: common_vendor.t(item.customerTime)
           } : {}, {
-            e: item.simEndDate
+            f: item.simEndDate
           }, item.simEndDate ? {
-            f: common_vendor.t(item.simEndDate)
+            g: common_vendor.t(item.simEndDate)
           } : {}, {
-            g: common_vendor.o(($event) => {
+            h: common_vendor.o(($event) => {
               return pay(item.iccid, item.simMerchant);
             }, index),
-            h: index
+            i: index
           });
         }),
         c: common_vendor.unref(loading)

@@ -8,7 +8,7 @@
 			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
 				<text class="title">{{item.deviceName}}</text>
 				<view class="device-info">
-					<text>{{item.companyId}}</text>
+					<text>{{item.plateNo}}</text>
 					<text class="tel">{{item.imei}}</text>
 				</view>
 			</view>
@@ -137,6 +137,7 @@
 
 				.title {
 					font-weight: bold;
+					font-size: 32rpx;
 				}
 
 				.device-info {

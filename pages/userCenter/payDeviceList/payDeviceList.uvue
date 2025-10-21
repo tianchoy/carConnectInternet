@@ -5,7 +5,10 @@
 	<view class="container">
 		<view class="content">
 			<view class="list" v-for="(item,index) in deviceList" :key="index">
-				<text class="title">{{item.plateNo}}</text>
+				<view class="device-info">
+					<view class="label title">{{item.deviceName}}</view>
+					<view class="value">{{item.plateNo}}</view>
+				</view>
 				<view class="device-info">
 					<view class="label">ICCID:</view>
 					<view class="value">{{item.iccid}}</view>
@@ -82,7 +85,6 @@
 
 	// 加载车辆列表数据
 	const loadPayDeviceListData = async () => {
-		console.log('加载数据，当前页码:', currPage.value, '总页数:', totalPage.value)
 		if (loading.value || !hasMore.value) return
 
 		loading.value = true
@@ -112,7 +114,6 @@
 					currPage.value++
 				}
 				
-				console.log('数据加载成功，当前数据量:', deviceList.value.length, '是否有更多:', hasMore.value)
 			} else {
 				uni.showToast({
 					title: res.msg || '加载失败',
@@ -137,10 +138,10 @@
 
 	// 支付
 	const pay = (iccid : string,simMerchant : string) => {
-		// if(simMerchant == 'zddx'){
-		// 	iccid = iccid.substring(0,iccid.length-1) //电信卡
-		// }
-		iccid = iccid.substring(0,iccid.length-1)
+		if(simMerchant.toLowerCase() == 'zddx'){
+			iccid = iccid.substring(0,iccid.length-1) //电信卡
+		}
+		// iccid = iccid.substring(0,iccid.length-1)
 		
 		console.log(iccid)
 		// 设置需要刷新的标志
@@ -170,7 +171,6 @@
 
 	// 添加下拉刷新功能
 	onPullDownRefresh(() => {
-		console.log('下拉刷新')
 		resetData()
 		loadPayDeviceListData().finally(() => {
 			uni.stopPullDownRefresh()
@@ -198,13 +198,6 @@
 				padding: 20rpx;
 				margin-bottom: 30rpx;
 
-				.title {
-					font-weight: bold;
-					margin-bottom: 20rpx;
-					font-size: 32rpx;
-					color: #333;
-				}
-
 				.device-info {
 					display: flex;
 					flex-direction: row;
@@ -215,6 +208,12 @@
 					
 					.label {
 						color: #666;
+					}
+
+					.title {
+						font-weight: bold;
+						font-size: 32rpx;
+						color: #000;
 					}
 					
 					.value {

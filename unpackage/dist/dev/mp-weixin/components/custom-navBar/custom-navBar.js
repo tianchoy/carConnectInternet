@@ -21,7 +21,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     isIcon: { type: Boolean, default: true },
     Icon: { type: String, default: "plus-circle" },
     rightText: { type: String, default: "" },
-    isShowStyle: { type: Boolean, default: false }
+    isShowStyle: { type: Boolean, default: false },
+    iconColor: { type: String, default: "#606266" }
   },
   emits: ["back", "capsuleClick"],
   setup(__props, _a) {
@@ -46,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:74", "胶囊按钮信息获取失败", e);
+        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:75", "胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
@@ -88,7 +89,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, __props.isIcon ? {
         j: common_vendor.p({
           name: __props.Icon,
-          size: "28"
+          size: "26",
+          color: __props.iconColor
         })
       } : {
         k: common_vendor.t(__props.rightText)
