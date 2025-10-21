@@ -97,7 +97,6 @@
 	])
 
 	onLoad((option) => {
-		console.log('页面参数:', option)
 		connectionStatus.value = option.connectionStatus || ''
 		imei.value = option.imei || ''
 		currentCar.value = option.plateNo || '未知车辆'

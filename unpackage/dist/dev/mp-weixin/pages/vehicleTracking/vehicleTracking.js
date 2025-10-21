@@ -60,7 +60,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       ]
     ]);
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:100", "页面参数:", option);
       connectionStatus.value = option.connectionStatus || "";
       imei.value = option.imei || "";
       currentCar.value = option.plateNo || "未知车辆";
@@ -118,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:177", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:176", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "网络请求失败",
             icon: "none"
@@ -146,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:209", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:208", "初始化标记点完成");
     };
     const calculateMapRotation = (direction) => {
       let rotation = direction;
@@ -206,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:283", "获取跟踪位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:282", "获取跟踪位置失败:", err);
         }
       });
     };

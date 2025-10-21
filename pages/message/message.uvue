@@ -11,7 +11,6 @@
 			@scrolltolower="onScrollToLower">
 			
 			<view class="list-box">
-				<!-- <uv-button type="primary" @click="subscribeMessages">订阅消息</uv-button> -->
 				<!-- 显示空状态 -->
 				<view v-if="msgList.length == 0 && !isLoading" class="empty-state">
 					<text>暂无消息</text>
@@ -72,26 +71,11 @@
 	// 定时器相关
 	let checkTimer: number | null = null
 	const isPageActive = ref(false) // 页面是否处于活动状态
-
-		// 订阅消息
-		const subscribeMessages = () => {
-			console.log('订阅消息')
-			uni.requestSubscribeMessage({
-				tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
-				success: (res) => {
-					console.log('订阅成功:', res)
-				},
-				fail: (err) => {
-					console.log('订阅失败:', err)
-				}
-			})
-		}
 		
 	// 页面加载时初始化数据
 	onLoad(() => {
 		// 获取 token
 		const token = uni.getStorageSync('token')
-		console.log('获取到的 token:', token)
 		// 如果有 token，加载消息列表
 		if (token) {
 			Login.value = true

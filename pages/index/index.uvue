@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="true"
+		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false"
 			:isIcon="true" @capsuleClick="subMsg" Icon="bell" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
@@ -304,7 +304,6 @@
 			}
 
 			const res = await getUserDeviceList(params)
-			console.log('API响应数据:', res)
 
 			let deviceList = []
 			if (res?.data) {
@@ -320,8 +319,6 @@
 					deviceList = []
 				}
 			}
-
-			console.log('解析后的设备列表:', deviceList)
 
 			// 使用插件转换坐标
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')

@@ -40,7 +40,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
         const resCars = yield api_request.getUserDeviceList(params);
-        common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:56", "API响应数据:", resCars);
         if ((_a = resCars === null || resCars === void 0 ? null : resCars.data) === null || _a === void 0 ? null : _a.totalCount) {
           carsnumber.value = resCars.data.totalCount;
         }

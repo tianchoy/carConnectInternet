@@ -257,7 +257,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             params = new UTSJSONObject({ groupId });
           }
           const res = yield api_request.getUserDeviceList(params);
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:307", "API响应数据:", res);
           let deviceList = [];
           if (res === null || res === void 0 ? null : res.data) {
             if (Array.isArray(res.data)) {
@@ -272,10 +271,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               deviceList = [];
             }
           }
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:324", "解析后的设备列表:", deviceList);
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:330", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:327", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -284,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:340", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:337", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList();
     };
     const getUserIn = () => {
@@ -295,7 +293,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:351", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:348", "获取用户信息失败:", err);
         }
       });
     };
@@ -332,7 +330,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:395", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:392", "聚合初始化完成");
               }
             }));
           }
@@ -354,7 +352,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: true,
+          showCapsule: false,
           isIcon: true,
           Icon: "bell",
           iconColor: iconColor.value
