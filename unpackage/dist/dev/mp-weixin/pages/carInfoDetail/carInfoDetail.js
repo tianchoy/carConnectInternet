@@ -374,6 +374,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getDevicePos(data);
+          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:522", "111111");
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               var _a;

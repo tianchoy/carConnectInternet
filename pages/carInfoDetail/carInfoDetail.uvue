@@ -519,7 +519,7 @@
 	const loadData = async (data : object) => {
 		try {
 			const res = await getDevicePos(data)
-
+			console.log('111111')
 			res.data.forEach(async item => {
 				if (item.imei == imei.value) {
 					datainfo.value = item
