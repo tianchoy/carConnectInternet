@@ -6,7 +6,7 @@
 			<camera device-position="back" mode="scanCode" flash="off" @scancode="handleScan" @error="error"
 				class="scan-code"></camera>
 		</view>
-		<view class="tip">请将IMEI码放入框内，自动扫描</view>
+		<view class="tip">请将IMEI码放入框内,自动扫描</view>
 	</view>
 </template>
 

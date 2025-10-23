@@ -50,7 +50,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 10rpx;
+  padding: 20rpx 10rpx;
   border-bottom: 1rpx solid #e5e5e5;
 }
 .container .content .list .item .right {

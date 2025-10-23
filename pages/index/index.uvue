@@ -234,8 +234,8 @@
 				latitude: lat,
 				longitude: lng,
 				iconPath: device.connectionStatus == 'online' ? getOnlineDeviceIcon(device.carType) : getOfflineDeviceIcon(device.carType),
-				width: 25,
-				height: 25,
+				width: 30,
+				height: 30,
 				callout: {
 					padding: 5,
 					borderWidth: 1,

@@ -14,7 +14,7 @@
 				<uv-input v-else v-model="editInfo.deviceName" border="surround" inputAlign="right" class="input" />
 			</view>
 			<view class="list">
-				<text class="title">自定义图标</text>
+				<text class="title">车标</text>
 				<text class="info" v-if="!isEditing">{{carTitle}}</text>
 				<view class="custom-icon" v-else @click="deviceTypeSelectFun">
 					<text>{{editInfo.carTypeValue || '请选择图标'}}</text>

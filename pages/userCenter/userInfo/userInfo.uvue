@@ -7,18 +7,29 @@
 				基本信息
 			</view>
 			<view class="list">
-				<!-- <view class="item">
+				<view class="item">
 					<text>账号</text>
 					<view class="right">
 						<text class="info">{{userInfo.id}}</text>
-						<uv-icon name="arrow-right" size="18"></uv-icon>
+						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
 					</view>
-				</view> -->
+				</view>
 				<view class="item">
 					<text>手机号</text>
 					<view class="right">
 						<text class="info">{{userInfo.mobile}}</text>
-						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
+					</view>
+				</view>
+				<view class="item">
+					<text>类型</text>
+					<view class="right">
+						<text class="info">{{userInfo.type == 1 ? '公司用户' : '个人用户'}}</text>
+					</view>
+				</view>
+				<view class="item">
+					<text>创建时间</text>
+					<view class="right">
+						<text class="info">{{userInfo.createTime}}</text>
 					</view>
 				</view>
 			</view>
@@ -44,11 +55,13 @@
 		id : string,
 		mobile : string,
 		type: number,
+		createTime:string,
 	}
 	const userInfo = ref<UserInfo>({
 		id: "",
 		mobile: "",
-		type: 0
+		type: 0,
+		createTime:""
 	})
 
 	onLoad((options) => {
@@ -59,7 +72,8 @@
 				userInfo.value = {
 					id: parsedInfo.getString("userId") || "",
 					mobile: parsedInfo.getString("mobile") || "",
-					type: parsedInfo.getNumber("type") || 0
+					type: parsedInfo.getNumber("type") || 0,
+					createTime: parsedInfo.getString("createTime") || ""
 				}
 				console.log("用户信息:", userInfo.value)
 			} catch (e) {
@@ -117,7 +131,7 @@
 					flex-direction: row;
 					justify-content: space-between;
 					align-items: center;
-					padding: 10rpx;
+					padding: 20rpx 10rpx;
 					border-bottom: 1rpx solid #e5e5e5;
 
 					.right {

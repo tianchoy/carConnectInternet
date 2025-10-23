@@ -234,7 +234,7 @@
 			}
 			
 			const res = await getDevicePos(data)
-
+			console.log('222222')
 			if (res?.code === 0 && res.data && res.data.length > 0) {
 				const deviceData = res.data.find((item : any) => item.imei == imei.value)
 				
@@ -550,6 +550,48 @@
 	const getCurrentPosition = () => {
 		loadTrackData()
 	}
+
+	onHide(() => {
+		console.log('页面隐藏时停止自动刷新')
+		isTracking.value = false
+		
+		// 清除定时器
+		if (trackingInterval.value) {
+			clearInterval(trackingInterval.value)
+			trackingInterval.value = null
+		}
+		
+		// 清理动画状态
+		animationQueue.value = []
+		isProcessingQueue.value = false
+		
+		if (animationTimer.value) {
+			clearInterval(animationTimer.value)
+			animationTimer.value = null
+		}
+		isAnimating.value = false
+	})
+
+	onUnmounted(() => {
+		console.log('页面卸载时停止自动刷新')
+		isTracking.value = false
+		
+		// 清除定时器
+		if (trackingInterval.value) {
+			clearInterval(trackingInterval.value)
+			trackingInterval.value = null
+		}
+		
+		// 清理动画状态
+		animationQueue.value = []
+		isProcessingQueue.value = false
+		
+		if (animationTimer.value) {
+			clearInterval(animationTimer.value)
+			animationTimer.value = null
+		}
+		isAnimating.value = false
+	})
 </script>
 
 <style lang="scss">

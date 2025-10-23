@@ -19,7 +19,8 @@ class UserInfo extends UTS.UTSType {
         return {
           id: { type: String, optional: false },
           mobile: { type: String, optional: false },
-          type: { type: Number, optional: false }
+          type: { type: Number, optional: false },
+          createTime: { type: String, optional: false }
         };
       },
       name: "UserInfo"
@@ -31,6 +32,7 @@ class UserInfo extends UTS.UTSType {
     this.id = this.__props__.id;
     this.mobile = this.__props__.mobile;
     this.type = this.__props__.type;
+    this.createTime = this.__props__.createTime;
     delete this.__props__;
   }
 }
@@ -40,7 +42,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const userInfo = common_vendor.ref(new UserInfo({
       id: "",
       mobile: "",
-      type: 0
+      type: 0,
+      createTime: ""
     }));
     common_vendor.onLoad((options) => {
       if (options.userInfo) {
@@ -49,11 +52,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
             mobile: parsedInfo.getString("mobile") || "",
-            type: parsedInfo.getNumber("type") || 0
+            type: parsedInfo.getNumber("type") || 0,
+            createTime: parsedInfo.getString("createTime") || ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:64", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:78", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:66", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:80", "解析用户信息失败:", e);
         }
       }
     });
@@ -87,19 +91,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.t(common_vendor.unref(userInfo).mobile),
-        c: common_vendor.unref(userInfo).type == 1
+        b: common_vendor.t(common_vendor.unref(userInfo).id),
+        c: common_vendor.t(common_vendor.unref(userInfo).mobile),
+        d: common_vendor.t(common_vendor.unref(userInfo).type == 1 ? "公司用户" : "个人用户"),
+        e: common_vendor.t(common_vendor.unref(userInfo).createTime),
+        f: common_vendor.unref(userInfo).type == 1
       }, common_vendor.unref(userInfo).type == 1 ? {} : {}, {
-        d: common_vendor.unref(userInfo).type == 1
+        g: common_vendor.unref(userInfo).type == 1
       }, common_vendor.unref(userInfo).type == 1 ? {
-        e: common_vendor.p({
+        h: common_vendor.p({
           name: "arrow-right",
           size: "18"
         }),
-        f: common_vendor.o(editPassword)
+        i: common_vendor.o(editPassword)
       } : {}, {
-        g: common_vendor.o(logoutBtn),
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        j: common_vendor.o(logoutBtn),
+        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

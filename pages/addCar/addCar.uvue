@@ -15,7 +15,7 @@
 						</template>
 					</uv-input>
 				</uv-form-item>
-				<uv-form-item label="自定义图标" labelWidth="150rpx" prop="deviceType" borderBottom
+				<uv-form-item label="车标" labelWidth="150rpx" prop="deviceType" borderBottom
 					@click="deviceTypeSelectFun">
 					<uv-input border="none" v-model="carInfo.deviceTypeValue" disabled disabledColor="#fff"
 						placeholder="请选择设备图标(必选)" suffixIcon="arrow-down">

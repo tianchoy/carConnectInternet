@@ -190,8 +190,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           latitude: lat,
           longitude: lng,
           iconPath: device.connectionStatus == "online" ? utils_cars.getOnlineDeviceIcon(device.carType) : utils_cars.getOfflineDeviceIcon(device.carType),
-          width: 25,
-          height: 25,
+          width: 30,
+          height: 30,
           callout: new UTSJSONObject({
             padding: 5,
             borderWidth: 1,

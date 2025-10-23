@@ -170,6 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceids: imei.value
           });
           const res = yield api_request.getDevicePos(data);
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:237", "222222");
           if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
             const deviceData = res.data.find((item = null) => {
               return item.imei == imei.value;
@@ -389,6 +390,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCurrentPosition = () => {
       loadTrackData();
     };
+    common_vendor.onHide(() => {
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:555", "页面隐藏时停止自动刷新");
+      isTracking.value = false;
+      if (trackingInterval.value) {
+        clearInterval(trackingInterval.value);
+        trackingInterval.value = null;
+      }
+      animationQueue.value = [];
+      isProcessingQueue.value = false;
+      if (animationTimer.value) {
+        clearInterval(animationTimer.value);
+        animationTimer.value = null;
+      }
+      isAnimating.value = false;
+    });
+    common_vendor.onUnmounted(() => {
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:576", "页面卸载时停止自动刷新");
+      isTracking.value = false;
+      if (trackingInterval.value) {
+        clearInterval(trackingInterval.value);
+        trackingInterval.value = null;
+      }
+      animationQueue.value = [];
+      isProcessingQueue.value = false;
+      if (animationTimer.value) {
+        clearInterval(animationTimer.value);
+        animationTimer.value = null;
+      }
+      isAnimating.value = false;
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {

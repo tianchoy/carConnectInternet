@@ -203,7 +203,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         l: common_vendor.o(deviceTypeSelectFun),
         m: common_vendor.p({
-          label: "自定义图标",
+          label: "车标",
           labelWidth: "150rpx",
           prop: "deviceType",
           borderBottom: true
