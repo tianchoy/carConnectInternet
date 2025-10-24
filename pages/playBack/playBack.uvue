@@ -60,7 +60,7 @@
 <script setup lang="uts">
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
+	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -229,7 +229,8 @@
 				latitude: trackPoints.value[0].latitude,
 				longitude: trackPoints.value[0].longitude,
 				// iconPath: '/static/car.png',
-				iconPath: carStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+				// iconPath: carStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+				iconPath: getDeviceIcon(carStatus.value, carType.value),	
 				width: 25,
 				height: 25,
 				rotate: trackPoints.value[0].rotation || 0,

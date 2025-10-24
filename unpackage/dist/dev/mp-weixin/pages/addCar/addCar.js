@@ -151,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: common_vendor.p({
-          title: "添加车辆",
+          title: "添加设备",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",

@@ -454,7 +454,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         longitude: lng,
         width: 25,
         height: 25,
-        iconPath: datainfo.value.connectionStatus == "online" ? utils_cars.getOnlineDeviceIcon(currentCarInfo.value.carType) : utils_cars.getOfflineDeviceIcon(currentCarInfo.value.carType),
+        // iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
+        iconPath: utils_cars.getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
         callout: new UTSJSONObject({
           content: title || "爱车位置",
           color: datainfo.value.connectionStatus == "online" ? "#fff" : "#666",
@@ -468,11 +469,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return marker;
     };
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:641", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:642", "页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:646", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:647", "页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {

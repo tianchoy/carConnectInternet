@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<custom-navBar title="添加车辆" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		<custom-navBar title="添加设备" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="content">
 			<uv-form labelPosition="left" :model="carInfo" :rules="rules" ref="formRef">

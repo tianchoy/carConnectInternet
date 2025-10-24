@@ -129,7 +129,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (markerInitialized.value) {
         return null;
       }
-      const iconPath = connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value);
+      const iconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
       lastIconPath = iconPath;
       const marker = new UTSJSONObject({
         id: 1,
@@ -321,7 +321,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         initMarker();
         return null;
       }
-      const newIconPath = connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value);
+      const newIconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
       const needUpdateIcon = newIconPath !== lastIconPath;
       const updatedMarker = new UTSJSONObject({
         id: 1,

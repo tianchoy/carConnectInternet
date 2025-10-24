@@ -7,22 +7,22 @@ if (!Array) {
   const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
   const _easycom_uv_form_item_1 = common_vendor.resolveComponent("uv-form-item");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
-  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
   const _easycom_uv_checkbox_1 = common_vendor.resolveComponent("uv-checkbox");
   const _easycom_uv_checkbox_group_1 = common_vendor.resolveComponent("uv-checkbox-group");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_form_1 + _easycom_uv_button_1 + _easycom_uv_checkbox_1 + _easycom_uv_checkbox_group_1)();
+  const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
+  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
+  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_icon_1 + _easycom_uv_checkbox_1 + _easycom_uv_checkbox_group_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
 const _easycom_uv_form_item = () => "../../uni_modules/uv-form/components/uv-form-item/uv-form-item.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_form = () => "../../uni_modules/uv-form/components/uv-form/uv-form.js";
-const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 const _easycom_uv_checkbox = () => "../../uni_modules/uv-checkbox/components/uv-checkbox/uv-checkbox.js";
 const _easycom_uv_checkbox_group = () => "../../uni_modules/uv-checkbox/components/uv-checkbox-group/uv-checkbox-group.js";
+const _easycom_uv_form = () => "../../uni_modules/uv-form/components/uv-form/uv-form.js";
+const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_form + _easycom_uv_button + _easycom_uv_checkbox + _easycom_uv_checkbox_group)();
+  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_checkbox + _easycom_uv_checkbox_group + _easycom_uv_form + _easycom_uv_button)();
 }
 class FormData extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -96,6 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref("");
     common_vendor.ref(null);
     const pswLogin = common_vendor.ref(false);
+    const rememberPassword = common_vendor.ref(false);
     const form = common_vendor.ref(new FormData({
       username: "",
       password: ""
@@ -107,8 +108,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const formRef = common_vendor.ref(null);
     const smsformRef = common_vendor.ref(null);
     const deviceModel = common_vendor.ref("");
+    const saveAccountPassword = () => {
+      if (rememberPassword.value && form.value.username && form.value.password) {
+        const accountInfo = new UTSJSONObject({
+          username: form.value.username,
+          password: form.value.password,
+          timestamp: (/* @__PURE__ */ new Date()).getTime()
+        });
+        common_vendor.index.setStorageSync("savedEnterpriseAccount", accountInfo);
+        common_vendor.index.__f__("log", "at pages/login/login.uvue:109", "账号密码已保存");
+      } else if (!rememberPassword.value) {
+        common_vendor.index.removeStorageSync("savedEnterpriseAccount");
+        common_vendor.index.__f__("log", "at pages/login/login.uvue:112", "账号密码已清除");
+      }
+    };
+    const loadSavedAccount = () => {
+      try {
+        const savedAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount");
+        if (savedAccount) {
+          const currentTime = (/* @__PURE__ */ new Date()).getTime();
+          const saveTime = savedAccount.timestamp || 0;
+          const thirtyDays = 90 * 24 * 60 * 60 * 1e3;
+          if (currentTime - saveTime < thirtyDays) {
+            form.value.username = savedAccount.username || "";
+            form.value.password = savedAccount.password || "";
+            rememberPassword.value = true;
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:129", "已加载保存的账号密码");
+          } else {
+            common_vendor.index.removeStorageSync("savedEnterpriseAccount");
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:132", "保存的账号密码已过期，已清除");
+          }
+        }
+      } catch (error) {
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:136", "加载保存的账号密码失败:", error);
+      }
+    };
+    const toggleRememberPassword = () => {
+      rememberPassword.value = !rememberPassword.value;
+      if (!rememberPassword.value) {
+        common_vendor.index.removeStorageSync("savedEnterpriseAccount");
+      }
+    };
     const isPswLogin = () => {
       pswLogin.value = !pswLogin.value;
+      if (pswLogin.value) {
+        setTimeout(() => {
+          loadSavedAccount();
+        }, 100);
+      }
     };
     const filterNonLatin = (e = null) => {
       form.value.password = e.replace(/[^\x00-\x7F]/g, "");
@@ -165,7 +212,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:230", "docState.value:", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:267", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -180,6 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (smsformRef.value) {
         smsformRef.value.setRules(smsrules);
       }
+      loadSavedAccount();
     });
     const loginBt = () => {
       if (!docState.value) {
@@ -232,7 +280,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:315", "res", res);
           if (!res) {
             throw new Error("接口返回数据为空");
           }
@@ -247,7 +294,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:337", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:374", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -259,7 +306,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:348", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:385", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -271,6 +318,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then((res) => {
           const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
           api_request.login(newFormData).then((res2 = null) => {
+            saveAccountPassword();
             common_vendor.index.setStorageSync("token", res2.data.token);
             common_vendor.index.reLaunch({
               url: "/pages/index/index"
@@ -329,7 +377,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_assets._imports_0,
         c: pswLogin.value
-      }, pswLogin.value ? {
+      }, pswLogin.value ? common_vendor.e({
         d: common_vendor.o(($event) => {
           return form.value.username = $event;
         }),
@@ -366,38 +414,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           prop: "password",
           labelWidth: "0"
         }),
-        m: common_vendor.sr(formRef, "27a30816-1", {
+        m: pswLogin.value
+      }, pswLogin.value ? {
+        n: common_vendor.o(toggleRememberPassword),
+        o: common_vendor.p({
+          checked: rememberPassword.value
+        })
+      } : {}, {
+        p: common_vendor.sr(formRef, "27a30816-1", {
           "k": "formRef"
         }),
-        n: common_vendor.p({
+        q: common_vendor.p({
           model: form.value,
           rules: pswrules
         })
-      } : {}, {
-        o: pswLogin.value
+      }) : {}, {
+        r: pswLogin.value
       }, pswLogin.value ? {
-        p: common_vendor.o(submit),
-        q: common_vendor.p({
+        s: common_vendor.o(submit),
+        t: common_vendor.p({
           type: "primary"
         })
       } : common_vendor.e({
-        r: !docState.value
+        v: !docState.value
       }, !docState.value ? {
-        s: common_vendor.o(loginBt)
+        w: common_vendor.o(loginBt)
       } : {}, {
-        t: docState.value
+        x: docState.value
       }, docState.value ? {
-        v: common_vendor.o(handleGetPhoneNumber)
+        y: common_vendor.o(handleGetPhoneNumber)
       } : {}), {
-        w: common_vendor.o(isDocState),
-        x: common_vendor.p({
+        z: common_vendor.o(isDocState),
+        A: common_vendor.p({
           checked: docState.value
         }),
-        y: common_vendor.o(isDocState),
-        z: common_vendor.o(gotoIndex),
-        A: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        B: common_vendor.o(isPswLogin),
-        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        B: common_vendor.o(isDocState),
+        C: common_vendor.o(gotoIndex),
+        D: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
+        E: common_vendor.o(isPswLogin),
+        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

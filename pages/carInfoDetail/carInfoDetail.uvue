@@ -84,7 +84,7 @@
 <script setup lang="uts">
 	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
-	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
+	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -621,7 +621,8 @@
 			longitude: lng,
 			width: 25,
 			height: 25,
-			iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
+			// iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
+			iconPath: getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
 			callout: {
 				content: title || '爱车位置',
 				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',

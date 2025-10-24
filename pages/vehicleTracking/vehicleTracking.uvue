@@ -34,7 +34,7 @@
 <script setup lang="uts">
 	import { ref, reactive, onMounted, onUnmounted } from 'vue'
 	import { getDevicePos } from '../../api/request.uts'
-	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
+	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
@@ -187,7 +187,7 @@
 			return
 		}
 		
-		const iconPath = connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value)
+		const iconPath = getDeviceIcon(connectionStatus.value, carType.value)
 		lastIconPath = iconPath
 		
 		const marker = {
@@ -453,7 +453,7 @@
 			return
 		}
 		
-		const newIconPath = connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value)
+		const newIconPath = getDeviceIcon(connectionStatus.value, carType.value)
 		const needUpdateIcon = newIconPath !== lastIconPath
 		
 		// 创建新的标记点对象

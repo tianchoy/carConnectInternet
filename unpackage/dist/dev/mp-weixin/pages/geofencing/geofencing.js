@@ -164,7 +164,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     id: 0,
                     latitude: position.latitude,
                     longitude: position.longitude,
-                    iconPath: connectionStatus.value == "online" ? utils_cars.getOnlineDeviceIcon(carType.value) : utils_cars.getOfflineDeviceIcon(carType.value),
+                    iconPath: utils_cars.getDeviceIcon(connectionStatus.value, carType.value),
                     width: 25,
                     height: 25,
                     rotate: calculateMapRotation(lastDirection.value),

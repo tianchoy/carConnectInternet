@@ -44,7 +44,7 @@
 	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList, delDevice } from '../../api/request.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
-	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
+	import { getDeviceIcon } from '../../utils/cars'
 
 	const Login = ref<boolean>(false)
 	const mapScale = ref(4)
@@ -211,9 +211,6 @@
 	}
 
 	const updateMarkers = (devices) => {
-		if (!Array.isArray(devices)) {
-			devices = []
-		}
 
 		markers.value = devices.map((device, index) => {
 			if (!device || typeof device !== 'object') {
@@ -229,24 +226,32 @@
 				return null
 			}
 
+			const iconPath = getDeviceIcon(device.connectionStatus, device.carType)
+
+			let markerId : number
+			if (device.deviceId && !isNaN(Number(device.deviceId))) {
+				markerId = Number(device.deviceId)
+			} else {
+				// 如果 deviceId 不是有效数字，使用索引作为 fallback
+				markerId = index + 1
+			}
+
 			return {
-				id: Number(device.deviceId),
+				id: markerId,  // 使用数字类型的 ID
 				latitude: lat,
 				longitude: lng,
-				iconPath: device.connectionStatus == 'online' ? getOnlineDeviceIcon(device.carType) : getOfflineDeviceIcon(device.carType),
+				iconPath: iconPath,
 				width: 30,
 				height: 30,
 				callout: {
-					padding: 5,
-					borderWidth: 1,
-					borderRadius: 10,
-					bgColor: '#ffffff',
-					content: device.deviceName || device.plateNo || '未命名设备',
-					display: 'ALWAYS'
+					content: device.deviceName || device.plateNo || '设备',
+					display: 'ALWAYS',
+					padding: 8,
+					borderRadius: 8,
+					bgColor: '#ffffff'
 				},
-				joinCluster: true, // 允许聚合
-				clusterId: `${lat.toFixed(2)}_${lng.toFixed(2)}`,
-
+				joinCluster: true,  // 可以重新开启聚合
+				anchor: { x: 0.5, y: 0.5 }
 			}
 		}).filter(marker => marker !== null)
 	}
@@ -296,7 +301,7 @@
 	const loadUserDeviceList = async (groupId : string = '') => {
 		try {
 			let params = {
-				pageSize: 1000
+				limit: 1000,
 			}
 			// 如果不是全部分组，添加分组ID参数
 			if (groupId && groupId !== 'all') {
@@ -322,7 +327,6 @@
 
 			// 使用插件转换坐标
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
-
 		} catch (err) {
 			console.error('获取设备列表失败:', err)
 			uni.showToast({

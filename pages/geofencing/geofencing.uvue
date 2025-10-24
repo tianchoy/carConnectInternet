@@ -174,7 +174,7 @@
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
-	import { getOnlineDeviceIcon, getOfflineDeviceIcon } from '../../utils/cars'
+	import { getDeviceIcon } from '../../utils/cars'
 
 	const imei = ref<string | null>('')
 	const connectionStatus = ref<string | null>('')
@@ -312,7 +312,7 @@
 						id: 0,
 						latitude: position.latitude,
 						longitude: position.longitude,
-						iconPath: connectionStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+						iconPath: getDeviceIcon(connectionStatus.value, carType.value),
 						width: 25,
 						height: 25,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
