@@ -143,7 +143,7 @@
 .container .map-plus-min {
   position: absolute;
   bottom: 300rpx;
-  right: 30rpx;
+  right: 50rpx;
   z-index: 100;
   display: flex;
   flex-direction: column;

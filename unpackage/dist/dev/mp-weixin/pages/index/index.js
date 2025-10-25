@@ -89,11 +89,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getLocation(new UTSJSONObject({
         type: "wgs84",
         success: (res) => {
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:130", "获取位置成功:", res);
           userLocation.value.latitude = res.latitude;
           userLocation.value.longitude = res.longitude;
         },
         fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:134", "获取位置失败:", err);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:135", "获取位置失败:", err);
         }
       }));
     };
@@ -108,14 +109,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const subMsg = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:152", "订阅消息");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:153", "订阅消息");
       common_vendor.index.requestSubscribeMessage(new UTSJSONObject({
         tmplIds: ["VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc"],
         success: (res = null) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:156", "订阅成功:", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:157", "订阅成功:", res);
         },
         fail: (err = null) => {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:159", "订阅失败:", err);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:160", "订阅失败:", err);
         }
       }));
     };
@@ -193,7 +194,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
         });
       } else {
-        common_vendor.index.__f__("warn", "at pages/index/index.uvue:245", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:246", "未找到对应的设备信息", markerId);
       }
     };
     const updateMarkers = (devices = null) => {
@@ -261,7 +262,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pickerGroupTitle.value = "全部分组";
           currentGroupId.value = "all";
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:325", "加载分组数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:326", "加载分组数据失败:", err);
           common_vendor.index.showToast({
             title: "加载分组失败",
             icon: "none"
@@ -303,7 +304,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:367", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:368", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -312,7 +313,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const refreshDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:377", "收到刷新事件，重新加载设备列表");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:378", "收到刷新事件，重新加载设备列表");
       loadUserDeviceList();
     };
     const getUserIn = () => {
@@ -323,7 +324,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.setStorageSync("userType", res.data.type);
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:388", "获取用户信息失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:389", "获取用户信息失败:", err);
         }
       });
     };
@@ -361,7 +362,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               zoomOnClick: true,
               gridSize: 60,
               complete: () => {
-                common_vendor.index.__f__("log", "at pages/index/index.uvue:433", "聚合初始化完成");
+                common_vendor.index.__f__("log", "at pages/index/index.uvue:434", "聚合初始化完成");
               }
             }));
           }
