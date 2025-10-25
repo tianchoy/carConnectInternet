@@ -21,7 +21,6 @@
 						</template>
 					</uv-input>
 				</uv-form-item>
-				<!-- 新增：记住密码选项 -->
 				<view class="remember-password" v-if="pswLogin">
 					<uv-checkbox-group>
 						<uv-checkbox :checked="rememberPassword" @change="toggleRememberPassword"></uv-checkbox>
@@ -36,7 +35,8 @@
 				<button v-if="!docState" type="primary" plain="true" @click="loginBt">
 					个人用户登录
 				</button>
-				<button open-type="getPhoneNumber" v-if="docState" type="primary" plain="true" @getphonenumber="handleGetPhoneNumber">
+				<button open-type="getPhoneNumber" v-if="docState" type="primary" plain="true"
+					@getphonenumber="handleGetPhoneNumber">
 					个人用户登录
 				</button>
 			</view>
@@ -54,14 +54,14 @@
 			<view class="noLogin" @click="gotoIndex">暂不登录</view>
 			<view class="BLogin" @click="isPswLogin">{{pswLogin?'个人用户登录':'企业用户登录'}}</view>
 		</view>
-		
+
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, onMounted } from 'vue'
 	import { login, PostWechatlogin } from '../../api/request.uts'
-	
+
 	const showpw = ref(true)
 	const docState = ref(false)
 	const loginType = ref(true)
@@ -103,13 +103,10 @@
 			const accountInfo = {
 				username: form.value.username,
 				password: form.value.password,
-				timestamp: new Date().getTime()
 			}
 			uni.setStorageSync('savedEnterpriseAccount', accountInfo)
-			console.log('账号密码已保存')
 		} else if (!rememberPassword.value) {
 			uni.removeStorageSync('savedEnterpriseAccount')
-			console.log('账号密码已清除')
 		}
 	}
 
@@ -118,19 +115,11 @@
 		try {
 			const savedAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (savedAccount) {
-				const currentTime = new Date().getTime()
-				const saveTime = savedAccount.timestamp || 0
-				const thirtyDays = 90 * 24 * 60 * 60 * 1000 // 30天的毫秒数
-				
-				if (currentTime - saveTime < thirtyDays) {
-					form.value.username = savedAccount.username || ''
-					form.value.password = savedAccount.password || ''
-					rememberPassword.value = true
-					console.log('已加载保存的账号密码')
-				} else {
-					uni.removeStorageSync('savedEnterpriseAccount')
-					console.log('保存的账号密码已过期，已清除')
-				}
+
+				form.value.username = savedAccount.username || ''
+				form.value.password = savedAccount.password || ''
+				rememberPassword.value = true
+
 			}
 		} catch (error) {
 			console.error('加载保存的账号密码失败:', error)
@@ -352,19 +341,19 @@
 			})
 
 			// 3. 检查返回数据是否有效
-		if (!res) {
-			throw new Error('接口返回数据为空')
-		}
+			if (!res) {
+				throw new Error('接口返回数据为空')
+			}
 
-		if (!res.data) {
-			throw new Error('接口返回数据: data为null')
-		}
+			if (!res.data) {
+				throw new Error('接口返回数据: data为null')
+			}
 
-		if (!res.data.token) {
-			throw new Error('登录失败: 未获取到token')
-		}
+			if (!res.data.token) {
+				throw new Error('登录失败: 未获取到token')
+			}
 
-		// 4. 登录成功处理
+			// 4. 登录成功处理
 			uni.setStorageSync('token', res.data.token)
 			uni.reLaunch({
 				url: '/pages/index/index'
@@ -403,7 +392,7 @@
 				login(newFormData).then(res => {
 					// 登录成功后保存账号密码（如果勾选了记住密码）
 					saveAccountPassword()
-					
+
 					uni.setStorageSync('token', res.data.token)
 					uni.reLaunch({
 						url: '/pages/index/index'
@@ -500,7 +489,7 @@
 				font-size: 25rpx;
 				margin-top: 40rpx;
 			}
-			
+
 			// 新增：记住密码样式
 			.remember-password {
 				display: flex;
@@ -508,14 +497,15 @@
 				align-items: center;
 				margin: 20rpx 0;
 				font-size: 25rpx;
-				
+
 				.remember-text {
 					margin-left: 10rpx;
 					color: #666;
 				}
 			}
 		}
-		.other-way{
+
+		.other-way {
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
@@ -523,14 +513,17 @@
 			font-size: 25rpx;
 			margin-top: 40rpx;
 			color: #999;
-			.noLogin{
+
+			.noLogin {
 				border-right: 1rpx solid #999;
 				padding-right: 50rpx;
 			}
-			.BLogin{
+
+			.BLogin {
 				padding-left: 50rpx;
 			}
 		}
+
 		.wechat-login-btn {
 			color: #fff !important;
 		}

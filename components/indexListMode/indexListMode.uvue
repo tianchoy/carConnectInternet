@@ -59,8 +59,8 @@
 		padding: 0 20rpx;
 
 		.content {
-			margin-top: 120rpx;
-			max-height: calc(100vh - 290rpx); 
+			margin-top: 180rpx;
+			max-height: calc(100vh - 370rpx); 
 			overflow-y: auto;
 
 			.list-item {

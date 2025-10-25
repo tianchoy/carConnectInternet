@@ -47,23 +47,23 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  font-size: 30rpx;
+  font-size: 35rpx;
 }
 .container .tool-nav .btn-map-list {
-  padding: 7rpx 10rpx;
+  padding: 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
 }
 .container .tool-nav .addCar {
-  padding: 7rpx 10rpx;
+  padding: 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
   margin-right: 10rpx;
 }
 .container .tool-nav .refresh {
-  padding: 7rpx 10rpx;
+  padding: 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
@@ -122,7 +122,8 @@
   left: 20rpx;
 }
 .container .left-bar-state {
-  left: 190rpx;
+  left: 20rpx;
+  top: 270rpx;
 }
 .container .login-view-more {
   position: absolute;
@@ -138,4 +139,49 @@
   color: #fff;
   background-color: #999;
   padding: 20rpx 0;
+}
+.container .map-plus-min {
+  position: absolute;
+  bottom: 300rpx;
+  right: 30rpx;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+  gap: 80rpx;
+}
+.container .map-plus-min .map-plus {
+  width: 60rpx;
+  height: 60rpx;
+  border-width: 1rpx;
+  border-color: #E6E6E6;
+  background-color: #fff;
+  border-style: solid;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .map-plus-min .map-min {
+  width: 60rpx;
+  height: 60rpx;
+  border-width: 1rpx;
+  border-color: #E6E6E6;
+  background-color: #fff;
+  border-style: solid;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.uv-notice-bar {
+  padding: 25rpx 30rpx !important;
+}
+.uv-notice__swiper {
+  height: 40rpx !important;
+}
+.uvicon-volume {
+  font-size: 40rpx !important;
 }

@@ -12,14 +12,22 @@
 			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice" />
 		</view>
 		<view v-if="Login">
-			<uv-notice-bar :text="noticeText" direction="column" fontSize="34rpx" mode="closable"></uv-notice-bar>
+			<uv-notice-bar :text="noticeText" direction="column" fontSize="40rpx" mode="closable"></uv-notice-bar>
+		</view>
+		<view class="map-plus-min" v-if="showMap">
+			<view class="map-plus" @click="mapPlus">
+				<uv-icon name="plus" size="19"></uv-icon>
+			</view>
+			<view class="map-min" @click="mapMin">
+				<uv-icon name="minus" size="19"></uv-icon>
+			</view>
 		</view>
 		<view class="login-view-more" v-if="!Login" @click="gotoLogin">登录查看更多</view>
 		<view class="tool-nav">
-			<view class="refresh" @click="refresh" v-if="Login">刷新</view>
-			<view class="addCar" @click="addCar" v-if="Login">添加车辆</view>
+			<view class="refresh" @click="refresh" v-if="Login">手动刷新</view>
+			<view class="addCar" @click="addCar" v-if="Login">设备绑定</view>
 			<view class="btn-map-list" @click="toggleMapMode">
-				{{showMap ? '车辆列表' : '地图界面'}}
+				{{showMap ? '查看车辆' : '返回总览'}}
 			</view>
 		</view>
 		<view class="right-bar" v-if="showMap">
@@ -110,7 +118,18 @@
 			updateMarkers(devices)
 		}
 	})
-
+	//地图放大
+	const mapPlus = () => {
+		if (mapScale.value < 20) { // 最大缩放级别
+			mapScale.value += 1
+		}
+	}
+	// 地图缩小
+	const mapMin = () => {
+		if (mapScale.value > 3) { // 最小缩放级别
+			mapScale.value -= 1
+		}
+	}
 	// 订阅消息
 	const subMsg = () => {
 		console.log('订阅消息')
@@ -211,10 +230,11 @@
 	}
 
 	const updateMarkers = (devices) => {
-
+		if (!Array.isArray(devices)) {
+			devices = []
+		}
 		markers.value = devices.map((device, index) => {
 			if (!device || typeof device !== 'object') {
-				console.warn('无效的设备数据', device)
 				return null
 			}
 
@@ -222,7 +242,6 @@
 			const lng = Number(device.longitude)
 
 			if (isNaN(lat) || isNaN(lng)) {
-				console.warn('设备经纬度无效', device)
 				return null
 			}
 
@@ -301,7 +320,7 @@
 	const loadUserDeviceList = async (groupId : string = '') => {
 		try {
 			let params = {
-				limit: 1000,
+				pageSize: 1000,
 			}
 			// 如果不是全部分组，添加分组ID参数
 			if (groupId && groupId !== 'all') {
@@ -434,17 +453,17 @@
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
-			font-size: 30rpx;
+			font-size: 35rpx;
 
 			.btn-map-list {
-				padding: 7rpx 10rpx;
+				padding: 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
 			}
 
 			.addCar {
-				padding: 7rpx 10rpx;
+				padding: 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
@@ -452,7 +471,7 @@
 			}
 
 			.refresh {
-				padding: 7rpx 10rpx;
+				padding: 10rpx;
 				background-color: #1296db;
 				color: #fff;
 				border-radius: 10rpx;
@@ -521,7 +540,8 @@
 		}
 
 		.left-bar-state {
-			left: 190rpx;
+			left: 20rpx;
+			top:270rpx;
 		}
 
 		.login-view-more {
@@ -539,5 +559,50 @@
 			background-color: #999;
 			padding: 20rpx 0;
 		}
+		.map-plus-min{
+			position: absolute;
+			bottom: 300rpx;
+			right: 30rpx;
+			z-index: 100;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			font-size: 28rpx;
+			gap:80rpx;
+			.map-plus{
+				width: 60rpx;
+				height: 60rpx;
+				border-width: 1rpx;
+				border-color: #E6E6E6;
+				background-color: #fff;
+				border-style: solid;
+				border-radius: 50%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.map-min{
+				width: 60rpx;
+				height: 60rpx;
+				border-width: 1rpx;
+				border-color: #E6E6E6;
+				background-color: #fff;
+				border-style: solid;
+				border-radius: 50%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+		}
+	}
+	.uv-notice-bar{
+		padding: 25rpx 30rpx !important;
+	}
+	.uv-notice__swiper{
+		height: 40rpx !important;
+	}
+	.uvicon-volume{
+		font-size: 40rpx !important;
 	}
 </style>

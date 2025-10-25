@@ -112,35 +112,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (rememberPassword.value && form.value.username && form.value.password) {
         const accountInfo = new UTSJSONObject({
           username: form.value.username,
-          password: form.value.password,
-          timestamp: (/* @__PURE__ */ new Date()).getTime()
+          password: form.value.password
         });
         common_vendor.index.setStorageSync("savedEnterpriseAccount", accountInfo);
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:109", "账号密码已保存");
       } else if (!rememberPassword.value) {
         common_vendor.index.removeStorageSync("savedEnterpriseAccount");
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:112", "账号密码已清除");
       }
     };
     const loadSavedAccount = () => {
       try {
         const savedAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount");
         if (savedAccount) {
-          const currentTime = (/* @__PURE__ */ new Date()).getTime();
-          const saveTime = savedAccount.timestamp || 0;
-          const thirtyDays = 90 * 24 * 60 * 60 * 1e3;
-          if (currentTime - saveTime < thirtyDays) {
-            form.value.username = savedAccount.username || "";
-            form.value.password = savedAccount.password || "";
-            rememberPassword.value = true;
-            common_vendor.index.__f__("log", "at pages/login/login.uvue:129", "已加载保存的账号密码");
-          } else {
-            common_vendor.index.removeStorageSync("savedEnterpriseAccount");
-            common_vendor.index.__f__("log", "at pages/login/login.uvue:132", "保存的账号密码已过期，已清除");
-          }
+          form.value.username = savedAccount.username || "";
+          form.value.password = savedAccount.password || "";
+          rememberPassword.value = true;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:136", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:125", "加载保存的账号密码失败:", error);
       }
     };
     const toggleRememberPassword = () => {
@@ -212,7 +200,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:267", "docState.value:", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:256", "docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -294,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:374", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:363", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -306,7 +294,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:385", docState.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:374", docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
