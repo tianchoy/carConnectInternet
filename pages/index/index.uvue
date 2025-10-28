@@ -64,7 +64,7 @@
 	const iconColor = ref('#e6813e')
 	const noticeText = ref(['本页面仅供展示车辆', '如使用车辆实时位置功能', '请转至车辆详情页面'])
 	const userLocation = ref({
-		latitude: 0, // 默认北京位置
+		latitude: 0, 
 		longitude: 0
 	})
 

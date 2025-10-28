@@ -160,4 +160,3 @@ const icons = {
   "uvicon-twitter-circle-fill": "e6cf"
 };
 exports.icons = icons;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-icon/components/uv-icon/icons.js.map

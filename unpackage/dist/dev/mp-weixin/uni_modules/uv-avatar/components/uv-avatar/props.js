@@ -82,4 +82,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-avatar/components/uv-avatar/props.js.map

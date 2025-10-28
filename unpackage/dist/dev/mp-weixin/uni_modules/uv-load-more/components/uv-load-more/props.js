@@ -97,4 +97,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-load-more/components/uv-load-more/props.js.map

@@ -52,4 +52,3 @@ const en = {
   }
 };
 exports.en = en;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/uni_modules/lime-dayuts/common/locale/en/index.js.map

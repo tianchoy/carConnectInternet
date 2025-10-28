@@ -9,7 +9,7 @@ function pathToDataUrl(path) {
         resolve(`data:image/svg+xml;base64,${res.data}`);
       },
       fail: (error) => {
-        common_vendor.index.__f__("error", "at uni_modules/lime-svg/components/l-svg/utils.ts:23", { error, path });
+        console.error({ error, path });
         reject(error);
       }
     });
@@ -21,4 +21,3 @@ function svgToDataUrl(svgString) {
 }
 exports.pathToDataUrl = pathToDataUrl;
 exports.svgToDataUrl = svgToDataUrl;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-svg/components/l-svg/utils.js.map

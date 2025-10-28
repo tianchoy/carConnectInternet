@@ -2,7 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const BASE_URL = "https://car.zdiot.cn:18443/api";
 function handleTokenExpired() {
-  common_vendor.index.__f__("log", "at api/http.uts:27", "检测到token过期，执行跳转登录页逻辑");
+  console.log("检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
   common_vendor.index.showToast({
     title: "登录已过期，请重新登录",
@@ -10,14 +10,14 @@ function handleTokenExpired() {
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:41", "正在跳转到登录页...");
+    console.log("正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:45", "跳转登录页成功");
+        console.log("跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:48", "跳转登录页失败:", err);
+        console.log("跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -50,7 +50,7 @@ function errorHandler(error, config) {
   if (config.showLoading !== false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:107", "请求错误详情:", error);
+  console.log("请求错误详情:", error);
   if (error.statusCode) {
     switch (error.statusCode) {
       case 401:
@@ -200,4 +200,3 @@ const http = new UTSJSONObject({
   }
 });
 exports.http = http;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

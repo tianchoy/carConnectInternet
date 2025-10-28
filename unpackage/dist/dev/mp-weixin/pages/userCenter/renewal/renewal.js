@@ -22,11 +22,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const price = common_vendor.ref("5");
     const year = common_vendor.ref(1);
     const valChange = (val = null) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/renewal/renewal.uvue:66", val.value);
+      console.log(val.value);
       year.value = val.value;
     };
     common_vendor.onLoad((option) => {
-      common_vendor.index.__f__("log", "at pages/userCenter/renewal/renewal.uvue:71", option);
+      console.log(option);
       iccid.value = option.iccid;
     });
     const pay = () => {
@@ -35,10 +35,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         path: "pages/index/index?iccid=" + iccid.value + "&year=" + year.value,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/renewal/renewal.uvue:84", res);
+          console.log(res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/renewal/renewal.uvue:88", res);
+          console.log(res);
         }
       }));
     };
@@ -93,4 +93,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-90dc4ee7"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/renewal/renewal.js.map

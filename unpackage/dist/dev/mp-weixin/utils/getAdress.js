@@ -24,4 +24,3 @@ const getAddress = (latitude, longitude, tk = "fcaf46a375259f6bf44c387383a212a1"
   });
 };
 exports.getAddress = getAddress;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/getAdress.js.map

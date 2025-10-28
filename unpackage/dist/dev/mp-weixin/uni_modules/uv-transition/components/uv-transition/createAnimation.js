@@ -113,4 +113,3 @@ function createAnimation(option, _this) {
   return new MPAnimation(option, _this);
 }
 exports.createAnimation = createAnimation;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-transition/components/uv-transition/createAnimation.js.map

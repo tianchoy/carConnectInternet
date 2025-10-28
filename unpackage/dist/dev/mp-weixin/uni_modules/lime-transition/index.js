@@ -144,4 +144,3 @@ function useTransition(options) {
   };
 }
 exports.useTransition = useTransition;
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/uni_modules/lime-transition/index.js.map

@@ -8,4 +8,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-status-bar/components/uv-status-bar/props.js.map

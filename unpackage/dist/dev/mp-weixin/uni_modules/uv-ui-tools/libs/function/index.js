@@ -152,7 +152,7 @@ function deepMerge(target = {}, source = {}) {
 }
 function error(err) {
   {
-    common_vendor.index.__f__("error", "at uni_modules/uv-ui-tools/libs/function/index.js:250", `uvui提示：${err}`);
+    console.error(`uvui提示：${err}`);
   }
 }
 function randomArray(array = []) {
@@ -503,4 +503,3 @@ exports.page = page;
 exports.priceFormat = priceFormat;
 exports.queryParams = queryParams;
 exports.timeFormat = timeFormat;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/function/index.js.map

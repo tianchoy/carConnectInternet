@@ -69,4 +69,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   };
 } }));
 wx.createComponent(_sfc_main);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-overlay/components/l-overlay/l-overlay.js.map

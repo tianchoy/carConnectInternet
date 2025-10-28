@@ -24,4 +24,3 @@ function convertRadius(radius) {
   return [value, value, value, value];
 }
 exports.convertRadius = convertRadius;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-popup/components/l-popup/utils.js.map

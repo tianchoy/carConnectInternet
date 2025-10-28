@@ -174,4 +174,3 @@ class DayutsObject extends UTS.UTSType {
     delete this.__props__;
   }
 }
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/uni_modules/lime-dayuts/utssdk/interface.js.map

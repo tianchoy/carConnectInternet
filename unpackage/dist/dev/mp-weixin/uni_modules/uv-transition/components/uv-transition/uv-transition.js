@@ -113,7 +113,7 @@ const _sfc_main = common_vendor.defineComponent({
             this.animation[i](obj[i]);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at uni_modules/uv-transition/components/uv-transition/uv-transition.vue:166", `方法 ${i} 不存在`);
+          console.error(`方法 ${i} 不存在`);
         }
       }
       this.animation.step(config);
@@ -260,4 +260,3 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-transition/components/uv-transition/uv-transition.js.map

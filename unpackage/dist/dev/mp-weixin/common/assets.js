@@ -23,4 +23,3 @@ exports._imports_1$2 = _imports_1;
 exports._imports_2 = _imports_2$1;
 exports._imports_2$1 = _imports_2;
 exports._imports_3 = _imports_3;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/common/assets.js.map

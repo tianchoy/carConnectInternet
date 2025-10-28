@@ -123,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             yield processTripData(res.data);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:176", "获取里程数据失败:", e);
+          console.error("获取里程数据失败:", e);
           common_vendor.index.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -327,4 +327,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/mileageRecord/mileageRecord.js.map

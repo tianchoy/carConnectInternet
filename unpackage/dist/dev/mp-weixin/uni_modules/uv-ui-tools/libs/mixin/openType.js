@@ -47,4 +47,3 @@ const openType = {
   }
 };
 exports.openType = openType;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/mixin/openType.js.map

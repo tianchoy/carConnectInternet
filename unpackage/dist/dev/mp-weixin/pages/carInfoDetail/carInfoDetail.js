@@ -322,7 +322,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:467", "操作失败:", error);
+          console.error("操作失败:", error);
           common_vendor.index.showToast({
             title: "操作失败，请重试",
             icon: "none"
@@ -349,7 +349,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:496", address.value);
+      console.log(address.value);
       common_vendor.index.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -366,7 +366,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:514", "调起地图失败:", err);
+          console.error("调起地图失败:", err);
         }
       });
     };
@@ -374,7 +374,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:522", "111111");
+          console.log("111111");
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
               var _a;
@@ -406,14 +406,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 if ((_a = item.attribute) === null || _a === void 0 ? null : _a.rssi) {
                   const signalExp = getSignalDetail(item.attribute.rssi).experience;
                   if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                    common_vendor.index.__f__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:574", `设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
+                    console.warn(`设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
                   }
                 }
               }
             });
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:580", "加载设备数据失败:", error);
+          console.error("加载设备数据失败:", error);
           common_vendor.index.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -443,7 +443,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getDeviceDetail(deviceId.value);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:612", "设备id获取失败");
+          console.error("设备id获取失败");
         }
       });
     };
@@ -468,12 +468,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
       return marker;
     };
+    common_vendor.onShow(() => {
+      console.log("页面显示，检查自动刷新状态");
+      if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
+        setupAutoRefresh(currentTime.value);
+      }
+    });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:642", "页面隐藏时停止自动刷新");
+      console.log("页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:647", "页面卸载时停止自动刷新");
+      console.log("页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {
@@ -594,4 +600,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/carInfoDetail/carInfoDetail.js.map

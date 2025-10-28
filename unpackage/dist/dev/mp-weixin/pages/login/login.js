@@ -128,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rememberPassword.value = true;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:125", "加载保存的账号密码失败:", error);
+        console.error("加载保存的账号密码失败:", error);
       }
     };
     const toggleRememberPassword = () => {
@@ -200,7 +200,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showpw.value = !showpw.value;
     };
     const isDocState = () => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:256", "docState.value:", docState.value);
+      console.log("docState.value:", docState.value);
       docState.value = !docState.value;
     };
     const getSystemInfo = () => {
@@ -282,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             url: "/pages/index/index"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:363", "微信登录失败:", error);
+          console.error("微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -294,7 +294,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:374", docState.value);
+      console.log(docState.value);
       if (!docState.value) {
         common_vendor.index.showToast({
           title: "请先阅读并同意用户协议",
@@ -448,4 +448,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-27a30816"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/login/login.js.map

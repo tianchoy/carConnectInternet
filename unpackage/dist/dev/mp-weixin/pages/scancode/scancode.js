@@ -17,13 +17,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.vibrateLong();
         scanFunctionIsUseable.value = false;
         const scanResult = e.detail.result;
-        common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:23", "扫码结果:", scanResult);
+        console.log("扫码结果:", scanResult);
         const pages = getCurrentPages();
         if (pages.length >= 2) {
           const prevPage = pages[pages.length - 2];
           if (prevPage && prevPage.carInfo) {
             prevPage.carInfo.imei = scanResult;
-            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:33", "已设置上一页面IMEI:", scanResult);
+            console.log("已设置上一页面IMEI:", scanResult);
           } else {
             common_vendor.index.$emit("scanCodeResult", new UTSJSONObject({ result: scanResult }));
           }
@@ -41,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const error = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:56", "摄像头错误:", e);
+      console.log("摄像头错误:", e);
       common_vendor.index.showToast({
         title: "摄像头初始化失败",
         icon: "none"
@@ -51,13 +51,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getSetting(new UTSJSONObject({
         success: (res = null) => {
           if (res.authSetting["scope.camera"]) {
-            common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:67", "已有摄像头权限");
+            console.log("已有摄像头权限");
             return null;
           }
           common_vendor.index.authorize(new UTSJSONObject({
             scope: "scope.camera",
             success: () => {
-              common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:74", "摄像头权限授权成功");
+              console.log("摄像头权限授权成功");
             },
             fail: () => {
               common_vendor.index.showModal(new UTSJSONObject({
@@ -98,4 +98,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/scancode/scancode.js.map

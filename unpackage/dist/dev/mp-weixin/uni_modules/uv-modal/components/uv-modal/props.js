@@ -92,4 +92,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-modal/components/uv-modal/props.js.map

@@ -75,4 +75,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-badge/components/uv-badge/props.js.map

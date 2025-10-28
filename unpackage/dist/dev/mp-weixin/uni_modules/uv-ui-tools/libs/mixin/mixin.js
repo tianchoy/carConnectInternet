@@ -149,4 +149,3 @@ const mixin = {
   }
 };
 exports.mixin = mixin;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/mixin/mixin.js.map

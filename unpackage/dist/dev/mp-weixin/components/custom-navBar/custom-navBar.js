@@ -47,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
       } catch (e) {
-        common_vendor.index.__f__("warn", "at components/custom-navBar/custom-navBar.uvue:75", "胶囊按钮信息获取失败", e);
+        console.warn("胶囊按钮信息获取失败", e);
       }
     };
     const handleBack = () => {
@@ -119,4 +119,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-11b89787"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/custom-navBar/custom-navBar.js.map

@@ -114,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     );
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
-      common_vendor.index.__f__("log", "at pages/signUp/signUp.uvue:92", res);
+      console.log(res);
       deviceModel.value = res.deviceModel;
     };
     const toLogin = () => {
@@ -136,13 +136,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "校验通过"
         });
         const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { deviceModel: deviceModel.value }));
-        common_vendor.index.__f__("log", "at pages/signUp/signUp.uvue:120", "表单数据:", newFormData);
+        console.log("表单数据:", newFormData);
       }).catch((errors = null) => {
         common_vendor.index.showToast({
           icon: "error",
           title: "校验失败"
         });
-        common_vendor.index.__f__("error", "at pages/signUp/signUp.uvue:126", "验证错误:", errors);
+        console.error("验证错误:", errors);
       });
     };
     return (_ctx, _cache) => {
@@ -196,4 +196,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-43462111"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/signUp/signUp.js.map

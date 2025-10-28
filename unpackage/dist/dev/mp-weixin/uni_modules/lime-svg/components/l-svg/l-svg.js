@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           path.value = res;
         }).catch((err = null) => {
           emit("error", errorEvent);
-          common_vendor.index.__f__("warn", "at uni_modules/lime-svg/components/l-svg/l-svg.uvue:264", "[lime-svg]" + props.src + UTS.JSON.stringify(err));
+          console.warn("[lime-svg]" + props.src + UTS.JSON.stringify(err));
         });
       } else {
         path.value = props.src;
@@ -87,4 +87,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-svg/components/l-svg/l-svg.js.map

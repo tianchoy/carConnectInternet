@@ -179,4 +179,3 @@ exports.number = number;
 exports.range = range;
 exports.test = test;
 exports.url = url;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/function/test.js.map

@@ -2507,4 +2507,3 @@ const iconList = new UTSJSONObject({
 });
 const icons = common_vendor.ref(iconList.toMap());
 exports.icons = icons;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-icon/components/l-icon/icons.js.map

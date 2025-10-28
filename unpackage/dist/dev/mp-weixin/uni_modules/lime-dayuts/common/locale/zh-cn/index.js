@@ -84,4 +84,3 @@ const locale = {
   }
 };
 exports.locale = locale;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/uni_modules/lime-dayuts/common/locale/zh-cn/index.js.map

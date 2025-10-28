@@ -27,4 +27,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-overlay/components/uv-overlay/props.js.map

@@ -44,7 +44,9 @@
 									:style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">
 									{{getSignalDetail(currentCarInfo.attribute?.rssi).experience}}
 								</text>
-								<text class="signal-value" :style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">{{currentCarInfo.attribute?.rssi}} CSQ</text>
+								<text class="signal-value"
+									:style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">{{currentCarInfo.attribute?.rssi}}
+									CSQ</text>
 							</view>
 						</view>
 					</view>
@@ -64,7 +66,7 @@
 				</view>
 			</view>
 			<uv-grid :col="5">
-				<uv-grid-item v-for="(item,index) in baseList" :key="index"  @click="click(item)">
+				<uv-grid-item v-for="(item,index) in baseList" :key="index" @click="click(item)">
 					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="45"></uv-icon>
 					<text class="grid-text">{{item.title}}</text>
 				</uv-grid-item>
@@ -346,7 +348,7 @@
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude 
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
 			})
 		}
 		if (itemTo == '车辆跟踪') {
@@ -402,7 +404,7 @@
 		if (itemTo == '一键寻车') {
 			navTo()
 		}
-	
+
 	}
 
 	// 执行操作的统一方法
@@ -524,7 +526,7 @@
 				if (item.imei == imei.value) {
 					datainfo.value = item
 
-					if( !item.latitude || !item.longitude){
+					if (!item.latitude || !item.longitude) {
 						uni.showToast({
 							title: '位置信息缺失',
 							icon: 'none'
@@ -636,6 +638,16 @@
 
 		return marker
 	}
+
+	onShow(() => {
+		console.log('页面显示，检查自动刷新状态')
+
+		// 如果设备在线且没有在刷新，重新启动自动刷新
+		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
+			setupAutoRefresh(currentTime.value)
+		}
+	})
+
 
 	// 新增页面隐藏时的处理
 	onHide(() => {
@@ -810,7 +822,7 @@
 					margin-left: 30rpx;
 				}
 
-				.addree-box{
+				.addree-box {
 					font-size: 22rpx;
 					margin: 20rpx 0 0;
 					color: #999;

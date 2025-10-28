@@ -180,4 +180,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-icon/components/l-icon/l-icon.js.map

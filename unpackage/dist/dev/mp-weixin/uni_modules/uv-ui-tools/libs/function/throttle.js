@@ -18,4 +18,3 @@ function throttle(func, wait = 500, immediate = true) {
   }
 }
 exports.throttle = throttle;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/function/throttle.js.map

@@ -76,4 +76,3 @@ const value = {
   }
 };
 exports.value = value;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-text/components/uv-text/value.js.map

@@ -55,9 +55,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             type: parsedInfo.getNumber("type") || 0,
             createTime: parsedInfo.getString("createTime") || ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:78", "用户信息:", userInfo.value);
+          console.log("用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:80", "解析用户信息失败:", e);
+          console.error("解析用户信息失败:", e);
         }
       }
     });
@@ -113,4 +113,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/userInfo/userInfo.js.map

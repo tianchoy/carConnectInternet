@@ -1,5 +1,4 @@
 "use strict";
-const common_vendor = require("../../../../common/vendor.js");
 const formatRegExp = /%[sdj%]/g;
 let warning = function warning2() {
 };
@@ -7,7 +6,7 @@ if (typeof process !== "undefined" && process.env && true && typeof window !== "
   warning = function warning3(type2, errors) {
     if (typeof console !== "undefined" && console.warn) {
       if (errors.every((e) => typeof e === "string")) {
-        common_vendor.index.__f__("warn", "at uni_modules/uv-form/components/uv-form/valid.js:28", type2, errors);
+        console.warn(type2, errors);
       }
     }
   };
@@ -892,4 +891,3 @@ Schema.register = function register(type2, validator) {
 Schema.warning = warning;
 Schema.messages = messages;
 exports.Schema = Schema;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-form/components/uv-form/valid.js.map

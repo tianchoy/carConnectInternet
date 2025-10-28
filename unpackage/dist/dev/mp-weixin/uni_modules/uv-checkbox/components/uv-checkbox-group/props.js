@@ -86,4 +86,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-checkbox/components/uv-checkbox-group/props.js.map

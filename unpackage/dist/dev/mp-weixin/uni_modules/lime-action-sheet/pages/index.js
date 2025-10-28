@@ -96,7 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.closeDialogPage(new UTSJSONObject({
         dialogPage: instance.proxy.$page,
         fail(err) {
-          common_vendor.index.__f__("log", "at uni_modules/lime-action-sheet/pages/index.uvue:172", "err", err);
+          console.log("err", err);
         }
       }));
       common_vendor.index.$emit(parentKey.value, selected.value);
@@ -194,4 +194,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/uni_modules/lime-action-sheet/pages/index.js.map

@@ -27,4 +27,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-steps/components/uv-steps-item/props.js.map

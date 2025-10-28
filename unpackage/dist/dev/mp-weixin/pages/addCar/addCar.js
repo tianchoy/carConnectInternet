@@ -41,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:95", "接收到扫码结果:", data.result);
+      console.log("接收到扫码结果:", data.result);
       if (data.result.length === 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
       } else if (data.result.length === 11) {
@@ -77,7 +77,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const selectIcon = (item = null) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:133", item.name);
+      console.log(item.name);
       carInfo.value.deviceType = item.name;
       carInfo.value.deviceTypeValue = item.title;
       (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.close();
@@ -90,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const refreshDeviceList = () => {
       common_vendor.index.$emit("refreshDeviceList");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:166", "已触发首页设备列表刷新");
+      console.log("已触发首页设备列表刷新");
     };
     const submit = () => {
       var _a;
@@ -104,7 +104,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               carType: carInfo.value.deviceType
               // plateNo: carInfo.value.plateNo
             });
-            common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:180", submitData);
+            console.log(submitData);
             const res = yield api_request.addDevice(submitData);
             if (res.code == 0) {
               common_vendor.index.showToast({
@@ -124,7 +124,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:206", "添加设备错误:", error);
+            console.error("添加设备错误:", error);
             common_vendor.index.showToast({
               title: "请求失败，请稍后重试",
               icon: "none"
@@ -134,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         });
       }).catch((errors = null) => {
-        common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:215", "验证错误:", errors);
+        console.error("验证错误:", errors);
         common_vendor.index.showToast({
           title: "请检查表单",
           icon: "none"
@@ -233,4 +233,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6409e324"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/addCar/addCar.js.map

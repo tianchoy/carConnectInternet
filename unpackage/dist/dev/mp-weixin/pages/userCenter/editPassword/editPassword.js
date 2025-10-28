@@ -121,14 +121,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo) {
         try {
           const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", parsedInfo);
+          console.log(parsedInfo);
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
             mobile: parsedInfo.getString("mobile") || ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:132", "用户信息:", userInfo.value);
+          console.log("用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:134", "解析用户信息失败:", e);
+          console.error("解析用户信息失败:", e);
         }
       }
     });
@@ -212,4 +212,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/editPassword/editPassword.js.map

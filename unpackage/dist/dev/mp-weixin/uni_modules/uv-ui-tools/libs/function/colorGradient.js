@@ -84,4 +84,3 @@ function rgbToHex(rgb) {
   }
 }
 exports.colorGradient = colorGradient;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-ui-tools/libs/function/colorGradient.js.map

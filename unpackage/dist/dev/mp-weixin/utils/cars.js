@@ -9,4 +9,3 @@ const getDeviceIcon = (connectionStatus = null, carType = null) => {
   return iconPath;
 };
 exports.getDeviceIcon = getDeviceIcon;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/cars.js.map

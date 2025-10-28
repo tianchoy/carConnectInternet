@@ -704,4 +704,3 @@ function dayuts(date = null, format = null, locale = null) {
   });
 }
 exports.dayuts = dayuts;
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/uni_modules/lime-dayuts/common/index.js.map

@@ -118,4 +118,3 @@ exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
 exports.updateGeofence = updateGeofence;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

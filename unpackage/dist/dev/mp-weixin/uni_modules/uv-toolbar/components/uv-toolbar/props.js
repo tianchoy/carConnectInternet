@@ -42,4 +42,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-toolbar/components/uv-toolbar/props.js.map

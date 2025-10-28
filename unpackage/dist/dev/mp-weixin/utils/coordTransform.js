@@ -1,5 +1,4 @@
 "use strict";
-const common_vendor = require("../common/vendor.js");
 class CoordTransform {
   /**
    * WGS84转腾讯地图坐标系（GCJ02）
@@ -68,7 +67,7 @@ class CoordTransform {
       const lat = Number(device.latitude);
       const lng = Number(device.longitude);
       if (isNaN(lat) || isNaN(lng)) {
-        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:96", "设备经纬度无效", device);
+        console.warn("设备经纬度无效", device);
         return device;
       }
       let converted = null;
@@ -94,7 +93,7 @@ class CoordTransform {
     } else if (fromSystem === "tencent" && toSystem === "wgs84") {
       return this.tencentToWgs84(lat, lng);
     } else {
-      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:133", "不支持的坐标系转换", fromSystem, "->", toSystem);
+      console.warn("不支持的坐标系转换", fromSystem, "->", toSystem);
       return { lat, lng };
     }
   }
@@ -128,4 +127,3 @@ CoordTransform.a = 6378245;
 CoordTransform.ee = 0.006693421622965943;
 CoordTransform.pi = 3.141592653589793;
 exports.CoordTransform = CoordTransform;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/coordTransform.js.map

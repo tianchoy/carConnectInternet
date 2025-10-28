@@ -115,4 +115,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-number-box/components/uv-number-box/props.js.map

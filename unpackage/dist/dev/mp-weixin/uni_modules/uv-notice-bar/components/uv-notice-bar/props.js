@@ -78,4 +78,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-notice-bar/components/uv-notice-bar/props.js.map

@@ -17,4 +17,3 @@ const props = {
   }
 };
 exports.props = props;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uv-grid/components/uv-grid-item/props.js.map
