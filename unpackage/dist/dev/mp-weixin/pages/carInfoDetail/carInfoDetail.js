@@ -392,7 +392,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 center.longitude = convertedCoord.lng;
                 const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
                 address.value = addr.result.formatted_address;
-                const deviceMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarInfo.value.deviceName);
+                const deviceMarker = createMarker(Number(data.deviceids), convertedCoord.lat, convertedCoord.lng, "device", currentCarInfo.value.deviceName);
                 markers.value = [deviceMarker];
                 if (item.connectionStatus != "online" && refreshTimer.value !== null) {
                   clearInterval(refreshTimer.value);

@@ -4,7 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:scale="mapScale" style="width:100%;height:100%" :show-location="true">
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true">
 				<sub-navBar :currentTime="currentTime" :showTime="true" :showPickerTime="false"
 					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo"
 					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
@@ -534,14 +534,10 @@
 						return
 					}
 
-					// console.log('1111111',item.latitude, item.longitude)
-
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
-
-					// console.log('2222222',convertedCoord.lat, convertedCoord.lng)
 
 					// 获取地址信息
 					const addr = await getAddress(item.latitude, item.longitude);
@@ -549,7 +545,7 @@
 
 					// 更新设备标记
 					const deviceMarker = createMarker(
-						1,
+						Number(data.deviceids),
 						convertedCoord.lat,
 						convertedCoord.lng,
 						'device',
@@ -557,6 +553,10 @@
 					)
 
 					markers.value = [deviceMarker]
+					// markers.value = []
+					// setTimeout(() => {
+					// 	markers.value = [deviceMarker]
+					// }, 50)
 
 					// 检查设备状态，如果变为离线状态则停止定时器
 					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
