@@ -1,8 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
-const utils_getAdress = require("../../utils/getAdress.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
@@ -75,7 +73,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (!tripsByDate[date]) {
           tripsByDate[date] = [];
         }
-        tripsByDate[date].push(trip);
+        const startTimeStr = trip.startTime || "";
+        const endTimeStr = trip.endTime || "";
+        const startHour = startTimeStr.split(" ")[1] || "";
+        const endHour = endTimeStr.split(" ")[1] || "";
+        tripsByDate[date].push(new UTSJSONObject(Object.assign(Object.assign({}, trip), {
+          startHour,
+          endHour
+        })));
       });
       for (const date in tripsByDate) {
         const trips = tripsByDate[date];
@@ -103,6 +108,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad((option) => {
       imei.value = option.imei;
     });
+    const gotoTripDetail = (startTime2, endTime2) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/playBack/playBack?startTime=" + startTime2 + "&endTime=" + endTime2 + "&imei=" + imei.value
+      });
+    };
     const loadMileageData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!imei.value)
@@ -138,10 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (data.trips && data.trips.length > 0) {
           const processedTrips = yield Promise.all(data.trips.map((trip = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
-              var _a, _b;
-              const startAddress = yield utils_getAdress.getAddress(trip.startLat, trip.startLon);
-              const endAddress = yield utils_getAdress.getAddress(trip.endLat, trip.endLon);
-              return new UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: ((_a = startAddress === null || startAddress === void 0 ? null : startAddress.result) === null || _a === void 0 ? null : _a.formatted_address) || "未知地点", endAddress: ((_b = endAddress === null || endAddress === void 0 ? null : endAddress.result) === null || _b === void 0 ? null : _b.formatted_address) || "未知地点" }));
+              return new UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: "查看位置", endAddress: "查看位置" }));
             });
           }));
           tripData.value = processedTrips;
@@ -204,8 +211,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const onCancel = () => {
       showDateTimePicker.value = false;
-    };
-    const showTripDetail = (trip = null) => {
     };
     return (_ctx, _cache) => {
       "raw js";
@@ -287,40 +292,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }),
             d: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
             e: common_vendor.f(group.trips, (item, index, i1) => {
-              return {
+              return common_vendor.e({
                 a: common_vendor.t(index + 1),
-                b: common_vendor.t((item.distance / 1e3).toFixed(2)),
-                c: common_vendor.t(formatDuration(item.duration)),
-                d: "5f5c5231-10-" + i0 + "-" + i1 + "," + ("5f5c5231-9-" + i0 + "-" + i1),
-                e: common_vendor.p({
-                  title: item.startAddress || "未知地点",
-                  desc: item.startTime
-                }),
-                f: "5f5c5231-11-" + i0 + "-" + i1 + "," + ("5f5c5231-9-" + i0 + "-" + i1),
-                g: common_vendor.p({
-                  title: item.endAddress || "未知地点",
-                  desc: item.endTime
-                }),
-                h: "5f5c5231-9-" + i0 + "-" + i1,
-                i: index,
-                j: common_vendor.o(($event) => {
-                  return showTripDetail(item);
+                b: common_vendor.t(item.startHour),
+                c: common_vendor.t(item.endHour),
+                d: common_vendor.t((item.distance / 1e3).toFixed(2)),
+                e: common_vendor.t(formatDuration(item.duration))
+              }, {}, {
+                p: index,
+                q: common_vendor.o(($event) => {
+                  return gotoTripDetail(item.startTime, item.endTime);
                 }, index)
-              };
+              });
             }),
             f: groupIndex
           };
-        }),
-        y: common_assets._imports_0$2,
-        z: common_assets._imports_1$1,
-        A: common_vendor.p({
-          current: "1",
-          direction: "column",
-          ["active-color"]: "#3c9cff",
-          ["inactive-color"]: "#999"
         })
       }, {
-        B: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        y: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

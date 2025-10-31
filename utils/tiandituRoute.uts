@@ -2,7 +2,7 @@
 
 // 配置常量（建议将密钥放在配置文件中）
 const TD_MAP_CONFIG = {
-  API_KEY: 'fcaf46a375259f6bf44c387383a212a1',
+  API_KEY: '1e3374be3d63de65d44dbfdc7b311afb',
   BASE_URL: 'https://api.tianditu.gov.cn/drive'
 };
 

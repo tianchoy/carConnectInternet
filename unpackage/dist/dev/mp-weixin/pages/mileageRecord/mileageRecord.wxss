@@ -81,7 +81,7 @@
 }
 .container .content {
   margin: 0 20rpx;
-  height: calc(80vh - 200rpx);
+  max-height: calc(80vh - 200rpx);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background-color: #fff;
@@ -91,7 +91,6 @@
   width: 100%;
 }
 .container .content .trip-list .trip-group {
-  margin-bottom: 30rpx;
   padding: 20rpx;
   background-color: #fff;
   border-radius: 15rpx;
@@ -130,7 +129,6 @@
   justify-content: start;
   align-items: center;
   padding-top: 5rpx;
-  margin-bottom: 20rpx;
 }
 .container .content .trip-list .trip-group .trip-item .trip-index .icon {
   width: 40rpx;
@@ -149,6 +147,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  flex: 1;
 }
 .container .content .trip-list .trip-group .trip-item .trip-index .trip-distance-time text {
   font-size: 28rpx;

@@ -13,15 +13,27 @@
 		</view>
 
 		<view class="tools-panel">
-			<view class="Imei-box" @click="carDetail">
-				<view class="imei-info">
+			<view class="Imei-box">
+				<view class="imei-info" @click="carDetail">
 					<view class="imeis">
-						<text>IMEI {{imei}}</text>
-						<text class="pos-time">定位时间 {{datainfo.positionUpdateTime}}</text>
+						<text>ID: {{imei}}</text>
+						<text class="pos-time"></text>
 					</view>
 					<uv-icon name="arrow-right" :bold="true" :size="16"></uv-icon>
 				</view>
-				<view class="addree-box" v-if="address">当前地址：{{address}}</view>
+				<view class="pos-date">
+					<view class="addree-box">定位时间: {{datainfo.positionUpdateTime}}</view>
+					<view class="addree-box">通信时间: {{datainfo.signalUpdateTime}}</view>
+				</view>
+				<view class="pos-adress">
+					<view class="addree-box">
+						<text style="margin-right:10rpx">当前地址:</text>
+						<text v-if="address" class="address-text">{{address}}</text>
+						<text v-else>{{center.latitude}} , {{center.longitude}}</text>
+						<text style="color: #007AFF; margin-left: 20rpx;font-weight: bold;"
+							@click="refreshAdress">中文地址</text>
+					</view>
+				</view>
 				<!-- 信号强度显示区域 -->
 				<view class="signal-container" v-if="currentCarInfo.attribute?.rssi || currentCarInfo.attribute?.sat">
 					<view v-if="currentCarInfo.attribute?.rssi" class="signal-item">
@@ -45,8 +57,9 @@
 									{{getSignalDetail(currentCarInfo.attribute?.rssi).experience}}
 								</text>
 								<text class="signal-value"
-									:style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">{{currentCarInfo.attribute?.rssi}}
-									CSQ</text>
+									:style="{ color: getSignalDetail(currentCarInfo.attribute?.rssi).color }">CSQ
+									{{currentCarInfo.attribute?.rssi}}
+								</text>
 							</view>
 						</view>
 					</view>
@@ -494,8 +507,12 @@
 		})
 	}
 
-	const navTo = () => {
+	const navTo = async () => {
+
 		console.log(address.value)
+		if (!address.value) {
+			await refreshAdress()
+		}
 		//导航去此位置
 		uni.openLocation({
 			latitude: center.latitude,
@@ -539,13 +556,9 @@
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
-					// 获取地址信息
-					const addr = await getAddress(item.latitude, item.longitude);
-					address.value = addr.result.formatted_address;
-
 					// 更新设备标记
 					const deviceMarker = createMarker(
-						Number(data.deviceids),
+						1,
 						convertedCoord.lat,
 						convertedCoord.lng,
 						'device',
@@ -553,10 +566,7 @@
 					)
 
 					markers.value = [deviceMarker]
-					// markers.value = []
-					// setTimeout(() => {
-					// 	markers.value = [deviceMarker]
-					// }, 50)
+
 
 					// 检查设备状态，如果变为离线状态则停止定时器
 					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
@@ -585,6 +595,12 @@
 				icon: 'none'
 			})
 		}
+	}
+
+	const refreshAdress = async () => {
+		// 获取地址信息
+		const addr = await getAddress(center.latitude, center.longitude);
+		address.value = addr.result.formatted_address;
 	}
 
 	onLoad((option) => {
@@ -623,7 +639,6 @@
 			longitude: lng,
 			width: 25,
 			height: 25,
-			// iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
 			iconPath: getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
 			callout: {
 				content: title || '爱车位置',
@@ -822,10 +837,38 @@
 					margin-left: 30rpx;
 				}
 
-				.addree-box {
-					font-size: 22rpx;
-					margin: 20rpx 0 0;
-					color: #999;
+				.pos-date,
+				.pos-adress {
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-start;
+					align-items: center;
+					gap: 50rpx;
+
+					.addree-box {
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-start;
+						align-items: center;
+						font-size: 22rpx;
+						margin: 20rpx 0 0;
+						color: #999;
+
+						.address-text {
+							word-break: break-all;
+							word-wrap: break-word;
+							display: inline-block;
+							max-width: 400rpx;
+							vertical-align: top;
+							line-height: 1.4;
+						}
+
+						.pos-icon {
+							width: 30rpx;
+							height: 30rpx;
+							margin-right: 10rpx;
+						}
+					}
 				}
 
 				// 手机信号样式

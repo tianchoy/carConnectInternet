@@ -4,7 +4,7 @@
 			:isIcon="true" @capsuleClick="subMsg" Icon="bell" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
-			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%" :show-location="true"
+			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%"
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
 		</view>

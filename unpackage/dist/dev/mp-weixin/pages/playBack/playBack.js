@@ -81,6 +81,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const endTime = common_vendor.ref("");
     const lat = common_vendor.ref("");
     const lng = common_vendor.ref("");
+    const sTime = common_vendor.ref("");
+    const eTime = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     function safeParseDate(dateStr) {
       if (!dateStr)
@@ -153,13 +155,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const lngDiff = bounds.maxLng - bounds.minLng;
       const maxDiff = Math.max(latDiff, lngDiff);
       if (maxDiff > 0.1)
-        mapScale.value = 9;
-      else if (maxDiff > 0.05)
         mapScale.value = 10;
-      else if (maxDiff > 0.02)
-        mapScale.value = 11;
-      else
+      else if (maxDiff > 0.05)
         mapScale.value = 12;
+      else if (maxDiff > 0.02)
+        mapScale.value = 15;
+      else
+        mapScale.value = 16;
     }
     function calculateTrackDistance() {
       totalDistance.value = 0;
@@ -183,8 +185,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             id: 999,
             latitude: trackPoints.value[0].latitude,
             longitude: trackPoints.value[0].longitude,
-            // iconPath: '/static/car.png',
-            // iconPath: carStatus.value == 'online' ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
             iconPath: utils_cars.getDeviceIcon(carStatus.value, carType.value),
             width: 25,
             height: 25,
@@ -389,8 +389,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carType.value = option.carType;
       lat.value = option.lat;
       lng.value = option.lng;
-      initDateTime();
-      loadTrackPos();
+      sTime.value = option.startTime;
+      eTime.value = option.endTime;
+      console.log(sTime.value, eTime.value);
+      if (sTime.value && eTime.value) {
+        startTime.value = sTime.value;
+        endTime.value = eTime.value;
+        loadTrackPos();
+      } else {
+        initDateTime();
+        loadTrackPos();
+      }
     });
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -443,7 +452,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           id: 999,
           latitude: currentPoint.latitude,
           longitude: currentPoint.longitude,
-          iconPath: carStatus.value == "online" ? getOnlineDeviceIcon(carType.value) : getOfflineDeviceIcon(carType.value),
+          iconPath: utils_cars.getDeviceIcon(carStatus.value, carType.value),
           width: 25,
           height: 25,
           rotate: 0,

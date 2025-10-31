@@ -49,28 +49,36 @@
 					</view>
 					<view class="group-separator"></view>
 					<view v-for="(item, index) in group.trips" :key="index" class="trip-item"
-						@click="showTripDetail(item)">
+						@click="gotoTripDetail(item.startTime, item.endTime)">
 						<view class="trip-index">
 							<text class="icon">{{index + 1}}</text>
 							<view class="trip-distance-time">
+								<text>{{item.startHour}}-{{item.endHour}}</text>
 								<text>{{(item.distance /1000).toFixed(2)}} km</text>
 								<text>{{formatDuration(item.duration)}}</text>
 							</view>
 						</view>
-						<view class="trip-content">
-
+						<view class="trip-content" v-if="false">
 							<view class="trip-locations">
 								<uv-steps current="1" direction="column" active-color="#3c9cff" inactive-color="#999">
-									<uv-steps-item :title="item.startAddress || '未知地点'" :desc="item.startTime">
-										<template v-slot:icon>
-											<image class="icons" src="/static/start.png" mode="aspectFit" />
-										</template>
-									</uv-steps-item>
-									<uv-steps-item :title="item.endAddress || '未知地点'" :desc="item.endTime">
-										<template v-slot:icon>
-											<image class="icons" src="/static/end.png" mode="aspectFit" />
-										</template>
-									</uv-steps-item>
+									<view @click="showMap(item.startLat, item.startLon)">
+										<uv-steps-item
+											:title="'位置坐标：'+item.startLat + ', ' + item.startLon+' '+'点击查看地图位置'"
+											:desc="item.startTime">
+											<template v-slot:icon>
+												<image class="icons" src="/static/start.png" mode="aspectFit" />
+											</template>
+										</uv-steps-item>
+									</view>
+									<view @click="showMap(item.endLat, item.endLon)">
+										<uv-steps-item
+											:title="'位置坐标：'+item.endLat + ', ' + item.endLon +' '+ '点击查看地图位置'"
+											:desc="item.endTime">
+											<template v-slot:icon>
+												<image class="icons" src="/static/end.png" mode="aspectFit" />
+											</template>
+										</uv-steps-item>
+									</view>
 								</uv-steps>
 							</view>
 						</view>
@@ -84,7 +92,7 @@
 <script setup lang="uts">
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
-	import { getAddress } from '../../utils/getAdress.uts'
+	// import { getAddress } from '../../utils/getAdress.uts'
 
 	type GroupType = { date : string; trips : any; totalDistance : number; }
 
@@ -114,7 +122,18 @@
 			if (!tripsByDate[date]) {
 				tripsByDate[date] = []
 			}
-			tripsByDate[date].push(trip)
+
+			// 为每个行程添加格式化后的时间
+			const startTimeStr = trip.startTime || ''
+			const endTimeStr = trip.endTime || ''
+			const startHour = startTimeStr.split(' ')[1] || ''
+			const endHour = endTimeStr.split(' ')[1] || ''
+
+			tripsByDate[date].push({
+				...trip,
+				startHour,
+				endHour
+			})
 		})
 
 		// 转换为数组并计算每组的统计信息
@@ -150,8 +169,14 @@
 
 	onLoad((option) => {
 		imei.value = option.imei
-		
+
 	})
+
+	const gotoTripDetail = (startTime : string, endTime : string) => {
+		uni.navigateTo({
+			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value
+		})
+	}
 
 	const loadMileageData = async () => {
 		if (!imei.value) return;
@@ -183,19 +208,43 @@
 		}
 	};
 
+	// 显示地图
+	const showMap = (lat : number, lon : number) => {
+		console.log('11111', lat, lon)
+		uni.openLocation({
+			latitude: lat,
+			longitude: lon,
+			name: '位置',
+			scale: 18,
+			success: () => {
+				uni.showToast({
+					title: '成功调起地图',
+					icon: 'none'
+				});
+			},
+			fail: (err) => {
+				uni.showToast({
+					title: '调起地图失败',
+					icon: 'none'
+				});
+				console.error('调起地图失败:', err);
+			}
+		});
+	}
+
 	// 处理行程数据
 	const processTripData = async (data : any) => {
 		if (data.trips && data.trips.length > 0) {
 			// 遍历所有行程，获取地址
 			const processedTrips = await Promise.all(
 				data.trips.map(async (trip : any) => {
-					const startAddress = await getAddress(trip.startLat, trip.startLon);
-					const endAddress = await getAddress(trip.endLat, trip.endLon);
+					// const startAddress = await getAddress(trip.startLat, trip.startLon);
+					// const endAddress = await getAddress(trip.endLat, trip.endLon);
 
 					return {
 						...trip,
-						startAddress: startAddress?.result?.formatted_address || '未知地点',
-						endAddress: endAddress?.result?.formatted_address || '未知地点',
+						startAddress: '查看位置',
+						endAddress: '查看位置',
 					};
 				})
 			);
@@ -258,7 +307,7 @@
 
 		endTime.value = formatTime(now)
 		// 开始时间默认为当前时间前1天
-		const startDate = new Date(now.getTime() -  3600000*24)
+		const startDate = new Date(now.getTime() - 3600000 * 24)
 		startTime.value = formatTime(startDate)
 	}
 
@@ -283,14 +332,6 @@
 
 	const onCancel = () => {
 		showDateTimePicker.value = false
-	}
-
-	// 显示行程详情
-	const showTripDetail = (trip : any) => {
-
-		// uni.navigateTo({
-		// 	url: `/pages/tripDetail/tripDetail?tripData=${encodeURIComponent(JSON.stringify(trip))}`
-		// })
 	}
 </script>
 
@@ -359,7 +400,7 @@
 
 		.content {
 			margin: 0 20rpx;
-			height: calc(80vh - 200rpx);
+			max-height: calc(80vh - 200rpx);
 			overflow-y: auto;
 			-webkit-overflow-scrolling: touch;
 			background-color: #fff;
@@ -369,7 +410,6 @@
 				width: 100%;
 
 				.trip-group {
-					margin-bottom: 30rpx;
 					padding: 20rpx;
 					background-color: #fff;
 					border-radius: 15rpx;
@@ -412,7 +452,6 @@
 							justify-content: start;
 							align-items: center;
 							padding-top: 5rpx;
-							margin-bottom: 20rpx;
 
 							.icon {
 								width: 40rpx;
@@ -432,6 +471,7 @@
 								flex-direction: row;
 								justify-content: space-between;
 								align-items: center;
+								flex: 1;
 
 								text {
 									font-size: 28rpx;

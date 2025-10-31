@@ -39,7 +39,8 @@
 				</view>
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/user_location.png" />
-					<text class="address">{{item.address || '加载中...'}}</text>
+					<text class="address" v-if="item.address">{{item.address || '加载中...'}}</text>
+					<text v-else @click="showAddress(item.latitude, item.longitude)">点击查看停车位置</text>
 				</view>
 			</view>
 		</view>
@@ -62,6 +63,7 @@
 	const endTime = ref('')
 	const imei = ref<string | null>('')
 	const carStopDetail = ref<UTSJSONObject>({})
+	const address = ref('')
 
 
 	// 初始化加载
@@ -86,10 +88,12 @@
 		}
 		const res = await getTrackPos(data)
 		const stopsWithAddress = await Promise.all(res.data.stops.map(async (stop) => {
-			const address = await getAddress(stop.latitude, stop.longitude)
+			// const address = await getAddress(stop.latitude, stop.longitude)
 			return {
 				...stop,
-				address: address.result.formatted_address
+				latitude: stop.latitude,
+				longitude: stop.longitude,
+				// address: address.value
 			}
 		}))
 
@@ -141,6 +145,29 @@
 		const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
 		return `${hours}小时${minutes}分${seconds}秒`
+	}
+
+	const showAddress = async (latitude : string, longitude : string) => {
+		console.log(latitude, longitude)
+			uni.openLocation({
+			latitude: latitude,
+			longitude: longitude,
+			name: '当前位置',
+			scale: 18,
+			success: () => {
+				uni.showToast({
+					title: '成功调起地图',
+					icon: 'none'
+				});
+			},
+			fail: (err) => {
+				uni.showToast({
+					title: '调起地图失败',
+					icon: 'none'
+				});
+				console.error('调起地图失败:', err);
+			}
+		});
 	}
 </script>
 
@@ -213,10 +240,15 @@
 				}
 
 				text {
-					flex: 1;
 					font-size: 25rpx;
 					word-break: break-all;
 					flex-wrap: wrap;
+				}
+				.location-view {
+					display: flex;
+					flex-direction: row;
+					justify-content: center;
+					align-items: center;
 				}
 			}
 		}

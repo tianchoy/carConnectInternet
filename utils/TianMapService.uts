@@ -1,7 +1,7 @@
 // 天地图道路规划服务
 export class TianMapService {
     // 从环境变量获取API密钥，避免硬编码
-    static readonly API_KEY =  "fcaf46a375259f6bf44c387383a212a1"
+    static readonly API_KEY =  "1e3374be3d63de65d44dbfdc7b311afb"
     static readonly BASE_URL = "https://api.tianditu.gov.cn/drive"
     
     // 配置常量

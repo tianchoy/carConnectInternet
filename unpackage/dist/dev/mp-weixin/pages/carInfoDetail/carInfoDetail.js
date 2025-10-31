@@ -349,25 +349,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const navTo = () => {
-      console.log(address.value);
-      common_vendor.index.openLocation({
-        latitude: center.latitude,
-        longitude: center.longitude,
-        name: address.value,
-        scale: 18,
-        success: () => {
-          common_vendor.index.showToast({
-            title: "成功调起地图",
-            icon: "none"
-          });
-        },
-        fail: (err) => {
-          common_vendor.index.showToast({
-            title: "调起地图失败",
-            icon: "none"
-          });
-          console.error("调起地图失败:", err);
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        console.log(address.value);
+        if (!address.value) {
+          yield refreshAdress();
         }
+        common_vendor.index.openLocation({
+          latitude: center.latitude,
+          longitude: center.longitude,
+          name: address.value,
+          scale: 18,
+          success: () => {
+            common_vendor.index.showToast({
+              title: "成功调起地图",
+              icon: "none"
+            });
+          },
+          fail: (err) => {
+            common_vendor.index.showToast({
+              title: "调起地图失败",
+              icon: "none"
+            });
+            console.error("调起地图失败:", err);
+          }
+        });
       });
     };
     const loadData = (data) => {
@@ -390,9 +395,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(item.latitude, item.longitude);
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
-                const addr = yield utils_getAdress.getAddress(item.latitude, item.longitude);
-                address.value = addr.result.formatted_address;
-                const deviceMarker = createMarker(Number(data.deviceids), convertedCoord.lat, convertedCoord.lng, "device", currentCarInfo.value.deviceName);
+                const deviceMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarInfo.value.deviceName);
                 markers.value = [deviceMarker];
                 if (item.connectionStatus != "online" && refreshTimer.value !== null) {
                   clearInterval(refreshTimer.value);
@@ -419,6 +422,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             icon: "none"
           });
         }
+      });
+    };
+    const refreshAdress = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const addr = yield utils_getAdress.getAddress(center.latitude, center.longitude);
+        address.value = addr.result.formatted_address;
       });
     };
     common_vendor.onLoad((option) => {
@@ -454,7 +463,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         longitude: lng,
         width: 25,
         height: 25,
-        // iconPath: datainfo.value.connectionStatus == 'online' ? getOnlineDeviceIcon(currentCarInfo.value.carType) : getOfflineDeviceIcon(currentCarInfo.value.carType),
         iconPath: utils_cars.getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
         callout: new UTSJSONObject({
           content: title || "爱车位置",
@@ -512,49 +520,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.unref(markers),
         h: common_vendor.unref(mapScale),
         i: common_vendor.t(common_vendor.unref(imei)),
-        j: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
-        k: common_vendor.p({
+        j: common_vendor.p({
           name: "arrow-right",
           bold: true,
           size: 16
         }),
-        l: common_vendor.unref(address)
+        k: common_vendor.o(carDetail),
+        l: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
+        m: common_vendor.t(common_vendor.unref(datainfo).signalUpdateTime),
+        n: common_vendor.unref(address)
       }, common_vendor.unref(address) ? {
-        m: common_vendor.t(common_vendor.unref(address))
-      } : {}, {
-        n: ((_a = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _a.rssi) || ((_b = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _b.sat)
+        o: common_vendor.t(common_vendor.unref(address))
+      } : {
+        p: common_vendor.t(common_vendor.unref(center).latitude),
+        q: common_vendor.t(common_vendor.unref(center).longitude)
+      }, {
+        r: common_vendor.o(refreshAdress),
+        s: ((_a = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _a.rssi) || ((_b = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _b.sat)
       }, ((_c = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _c.rssi) || ((_d = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _d.sat) ? common_vendor.e({
-        o: (_e = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _e.rssi
+        t: (_e = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _e.rssi
       }, ((_f = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _f.rssi) ? {
-        p: common_vendor.n(getMobileSignalBarClass(0, (_g = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _g.rssi)),
-        q: common_vendor.n(getMobileSignalBarClass(1, (_h = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _h.rssi)),
-        r: common_vendor.n(getMobileSignalBarClass(2, (_i = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _i.rssi)),
-        s: common_vendor.n(getMobileSignalBarClass(3, (_j = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _j.rssi)),
-        t: common_vendor.n(getMobileSignalBarClass(4, (_k = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _k.rssi)),
-        v: getSignalDetail((_l = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _l.rssi).color,
-        w: common_vendor.t(getSignalDetail((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi).experience),
-        x: getSignalDetail((_n = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _n.rssi).color,
-        y: common_vendor.t((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi),
-        z: getSignalDetail((_p = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _p.rssi).color
+        v: common_vendor.n(getMobileSignalBarClass(0, (_g = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _g.rssi)),
+        w: common_vendor.n(getMobileSignalBarClass(1, (_h = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _h.rssi)),
+        x: common_vendor.n(getMobileSignalBarClass(2, (_i = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _i.rssi)),
+        y: common_vendor.n(getMobileSignalBarClass(3, (_j = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _j.rssi)),
+        z: common_vendor.n(getMobileSignalBarClass(4, (_k = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _k.rssi)),
+        A: getSignalDetail((_l = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _l.rssi).color,
+        B: common_vendor.t(getSignalDetail((_m = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _m.rssi).experience),
+        C: getSignalDetail((_n = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _n.rssi).color,
+        D: common_vendor.t((_o = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _o.rssi),
+        E: getSignalDetail((_p = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _p.rssi).color
       } : {}, {
-        A: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
+        F: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
       }, ((_r = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _r.sat) ? {
-        B: common_assets._imports_0$1,
-        C: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
+        G: common_assets._imports_0$1,
+        H: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
       } : {}, {
-        D: common_vendor.unref(currentCarInfo).voltage
+        I: common_vendor.unref(currentCarInfo).voltage
       }, common_vendor.unref(currentCarInfo).voltage ? {
-        E: common_assets._imports_1,
-        F: common_vendor.t(common_vendor.unref(currentCarInfo).voltage)
+        J: common_assets._imports_1,
+        K: common_vendor.t(common_vendor.unref(currentCarInfo).voltage)
       } : {}, {
-        G: common_vendor.unref(datainfo).batteryPercent
+        L: common_vendor.unref(datainfo).batteryPercent
       }, common_vendor.unref(datainfo).batteryPercent ? {
-        H: common_assets._imports_2,
-        I: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
-        J: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
+        M: common_assets._imports_2,
+        N: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
+        O: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
       } : {}) : {}, {
-        K: common_vendor.o(carDetail),
-        L: common_vendor.f(common_vendor.unref(baseList), (item, index, i0) => {
+        P: common_vendor.f(common_vendor.unref(baseList), (item, index, i0) => {
           return {
             a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
             b: common_vendor.p({
@@ -572,13 +585,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: "6cb34a81-4-" + i0 + ",6cb34a81-3"
           };
         }),
-        M: common_vendor.p({
+        Q: common_vendor.p({
           col: 5
         }),
-        N: common_vendor.o(($event) => {
+        R: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
         }),
-        O: common_vendor.p({
+        S: common_vendor.p({
           placeholder: "请输入账户密码",
           prefixIcon: "lock",
           border: "surround",
@@ -586,14 +599,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        P: common_vendor.sr(popupRef, "6cb34a81-6", {
+        T: common_vendor.sr(popupRef, "6cb34a81-6", {
           "k": "popupRef"
         }),
-        Q: common_vendor.o(confirm),
-        R: common_vendor.p({
+        U: common_vendor.o(confirm),
+        V: common_vendor.p({
           title: common_vendor.unref(modalTitle)
         }),
-        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        W: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

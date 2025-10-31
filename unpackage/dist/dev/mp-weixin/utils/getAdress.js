@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const getAddress = (latitude, longitude, tk = "fcaf46a375259f6bf44c387383a212a1") => {
+const getAddress = (latitude, longitude, tk = "1e3374be3d63de65d44dbfdc7b311afb") => {
   return new Promise((resolve, reject) => {
     const postStr = UTS.JSON.stringify(new UTSJSONObject({
       lon: longitude,

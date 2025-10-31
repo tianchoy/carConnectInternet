@@ -163,10 +163,38 @@
   color: #999;
   margin-left: 30rpx;
 }
-.container .tools-panel .Imei-box .addree-box {
+.container .tools-panel .Imei-box .pos-date,
+.container .tools-panel .Imei-box .pos-adress {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 50rpx;
+}
+.container .tools-panel .Imei-box .pos-date .addree-box,
+.container .tools-panel .Imei-box .pos-adress .addree-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
   font-size: 22rpx;
   margin: 20rpx 0 0;
   color: #999;
+}
+.container .tools-panel .Imei-box .pos-date .addree-box .address-text,
+.container .tools-panel .Imei-box .pos-adress .addree-box .address-text {
+  word-break: break-all;
+  word-wrap: break-word;
+  display: inline-block;
+  max-width: 400rpx;
+  vertical-align: top;
+  line-height: 1.4;
+}
+.container .tools-panel .Imei-box .pos-date .addree-box .pos-icon,
+.container .tools-panel .Imei-box .pos-adress .addree-box .pos-icon {
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container {
   display: flex;

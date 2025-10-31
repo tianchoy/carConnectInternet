@@ -2,7 +2,6 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
-const utils_getAdress = require("../../utils/getAdress.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
@@ -30,6 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const endTime = common_vendor.ref("");
     const imei = common_vendor.ref("");
     const carStopDetail = common_vendor.ref(new UTSJSONObject({}));
+    common_vendor.ref("");
     common_vendor.onMounted(() => {
       initDateTime();
       loadStopData();
@@ -51,8 +51,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.getTrackPos(data);
         const stopsWithAddress = yield Promise.all(res.data.stops.map((stop = null) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
-            const address = yield utils_getAdress.getAddress(stop.latitude, stop.longitude);
-            return new UTSJSONObject(Object.assign(Object.assign({}, stop), { address: address.result.formatted_address }));
+            return new UTSJSONObject(Object.assign(Object.assign({}, stop), { latitude: stop.latitude, longitude: stop.longitude }));
           });
         }));
         carStopDetail.value = stopsWithAddress;
@@ -92,6 +91,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const minutes = Math.floor(diff % (1e3 * 60 * 60) / (1e3 * 60));
       const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
       return `${hours}小时${minutes}分${seconds}秒`;
+    };
+    const showAddress = (latitude, longitude) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        console.log(latitude, longitude);
+        common_vendor.index.openLocation({
+          latitude,
+          longitude,
+          name: "当前位置",
+          scale: 18,
+          success: () => {
+            common_vendor.index.showToast({
+              title: "成功调起地图",
+              icon: "none"
+            });
+          },
+          fail: (err) => {
+            common_vendor.index.showToast({
+              title: "调起地图失败",
+              icon: "none"
+            });
+            console.error("调起地图失败:", err);
+          }
+        });
+      });
     };
     return (_ctx, _cache) => {
       "raw js";
@@ -153,16 +176,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       } : {
         r: common_vendor.f(carStopDetail.value, (item, index, i0) => {
-          return {
+          return common_vendor.e({
             a: common_vendor.t(item.startTime),
             b: common_vendor.t(item.endTime),
             c: common_vendor.t(calculateDuration(item.startTime, item.endTime)),
-            d: common_vendor.t(item.address || "加载中..."),
-            e: index
-          };
+            d: item.address
+          }, item.address ? {
+            e: common_vendor.t(item.address || "加载中...")
+          } : {
+            f: common_vendor.o(($event) => {
+              return showAddress(item.latitude, item.longitude);
+            }, index)
+          }, {
+            g: index
+          });
         }),
-        s: common_assets._imports_0$3,
-        t: common_assets._imports_1$2,
+        s: common_assets._imports_0$2,
+        t: common_assets._imports_1$1,
         v: common_assets._imports_2$1,
         w: common_assets._imports_3
       }, {

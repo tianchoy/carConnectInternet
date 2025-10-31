@@ -85,8 +85,13 @@
   margin-right: 15rpx;
 }
 .container .content .item text {
-  flex: 1;
   font-size: 25rpx;
   word-break: break-all;
   flex-wrap: wrap;
+}
+.container .content .item .location-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
