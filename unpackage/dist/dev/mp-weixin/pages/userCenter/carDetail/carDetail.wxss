@@ -45,6 +45,7 @@
 }
 .container .content .list .title.data-v-36223569 {
   width: 30vw;
+  color: #999;
 }
 .container .content .list .input.data-v-36223569 {
   text-align: right;

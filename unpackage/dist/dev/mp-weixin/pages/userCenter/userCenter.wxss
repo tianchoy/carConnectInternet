@@ -71,3 +71,13 @@
 .container .list .left .badge {
   margin-left: 20rpx;
 }
+.container .version {
+  position: fixed;
+  bottom: 50rpx;
+  left: 20rpx;
+  right: 20rpx;
+  text-align: center;
+  font-size: 20rpx;
+  color: #c3c2c2ff;
+  margin: 20rpx 40rpx 0;
+}

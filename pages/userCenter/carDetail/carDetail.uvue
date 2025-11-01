@@ -182,6 +182,7 @@
 
 				.title {
 					width: 30vw;
+					color: #999;
 				}
 
 				.input {

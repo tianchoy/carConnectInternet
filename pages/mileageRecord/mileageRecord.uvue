@@ -477,10 +477,6 @@
 									font-size: 28rpx;
 									color: #333;
 									margin: 0 10rpx;
-
-									&:first-child {
-										font-weight: bold;
-									}
 								}
 							}
 						}

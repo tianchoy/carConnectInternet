@@ -154,9 +154,6 @@
   color: #333;
   margin: 0 10rpx;
 }
-.container .content .trip-list .trip-group .trip-item .trip-index .trip-distance-time text:first-child {
-  font-weight: bold;
-}
 .container .content .trip-list .trip-group .trip-item .trip-content {
   flex: 1;
 }

@@ -24,6 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const carsnumber = common_vendor.ref(0);
     const Login = common_vendor.ref(false);
+    const version = common_vendor.ref("");
     common_vendor.onShow(() => {
       const token = common_vendor.index.getStorageSync("token");
       if (token) {
@@ -31,6 +32,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadData();
       } else {
         Login.value = false;
+      }
+      try {
+        const accountInfo = common_vendor.wx$1.getAccountInfoSync();
+        const appVersion = accountInfo.miniProgram.version;
+        version.value = appVersion;
+      } catch (error) {
+        console.error("获取版本号失败:", error);
       }
     });
     const loadData = () => {
@@ -118,7 +126,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.o(carList),
         k: common_vendor.o(platformRenewal)
       } : {}, {
-        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        l: common_vendor.unref(version)
+      }, common_vendor.unref(version) ? {
+        m: common_vendor.t(common_vendor.unref(version))
+      } : {}, {
+        n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };
