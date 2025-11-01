@@ -15,7 +15,9 @@
 					<text>IMEI {{item.imei}}</text>
 				</view>
 			</view>
+			<uv-modal ref="modal" title="提示" content="是否要解绑设备？" :buttonReverse="true" align="center" confirmText="确定" cancelText="取消" :showCancelButton="true" @confirm="confirm" @cancel="cancel"></uv-modal>
 		</view>
+		
 		<view class="empty" v-else>
 			暂无数据
 		</view>
@@ -39,10 +41,25 @@
 	const emit = defineEmits<{
 		(e: 'unbindDevice', imei: string): void
 	}>()
-	
+	const modal = ref<UVModal>()
+	const imeis = ref('')
 	// 解绑设备
 	const unbindDevice = (imei : string) => {
-		emit('unbindDevice', imei)
+		imeis.value = imei
+		// 显示确认弹窗
+		modal.value?.open()
+	}
+	const confirm = () => {
+		// 确认解绑设备
+		// console.log(imeis.value)
+		emit('unbindDevice', imeis.value)
+		// 隐藏确认弹窗
+		modal.value?.close()
+	}
+	const cancel = () => {
+		// 取消解绑设备
+		// 隐藏确认弹窗
+		modal.value?.close()
 	}
 	const todetail = (companyId:string,imei:string,deviceId:string) => {
 		uni.navigateTo({

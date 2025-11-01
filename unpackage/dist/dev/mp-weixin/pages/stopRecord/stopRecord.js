@@ -36,8 +36,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return [];
       }
       return [...carStopDetail.value].sort((a = null, b = null) => {
-        const timeA = new Date(a.startTime).getTime();
-        const timeB = new Date(b.startTime).getTime();
+        const timeA = new Date(a.endTime).getTime();
+        const timeB = new Date(b.endTime).getTime();
         return timeB - timeA;
       });
     });

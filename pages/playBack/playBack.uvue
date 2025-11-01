@@ -234,7 +234,7 @@
 				width: 25,
 				height: 25,
 				rotate: trackPoints.value[0].rotation || 0,
-				anchor: { x: 0.5, y: 0.5 },
+				// anchor: { x: 0.5, y: 0.5 },
 				callout: {
 					content: plateNo,
 					borderRadius: 5,
@@ -251,7 +251,7 @@
 				iconPath: '/static/start.png',
 				width: 24,
 				height: 24,
-				anchor: { x: 0.5, y: 0.5 },
+				// anchor: { x: 0.5, y: 0.5 },
 				callout: {
 					content: '起点',
 					borderRadius: 5,
@@ -267,7 +267,7 @@
 				iconPath: '/static/end.png',
 				width: 24,
 				height: 24,
-				anchor: { x: 0.5, y: 0.5 },
+				// anchor: { x: 0.5, y: 0.5 },
 				callout: {
 					content: '终点',
 					borderRadius: 5,
@@ -548,7 +548,7 @@
 			width: 25,
 			height: 25,
 			rotate: 0,
-			anchor: { x: 0.5, y: 0.5 },
+			// anchor: { x: 0.5, y: 0.5 },
 			callout: {
 				content: plateNo.value,
 				borderRadius: 5,

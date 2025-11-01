@@ -189,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             width: 25,
             height: 25,
             rotate: trackPoints.value[0].rotation || 0,
-            anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+            // anchor: { x: 0.5, y: 0.5 },
             callout: new UTSJSONObject({
               content: plateNo,
               borderRadius: 5,
@@ -206,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           iconPath: "/static/start.png",
           width: 24,
           height: 24,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          // anchor: { x: 0.5, y: 0.5 },
           callout: new UTSJSONObject({
             content: "起点",
             borderRadius: 5,
@@ -221,7 +221,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           iconPath: "/static/end.png",
           width: 24,
           height: 24,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          // anchor: { x: 0.5, y: 0.5 },
           callout: new UTSJSONObject({
             content: "终点",
             borderRadius: 5,
@@ -456,7 +456,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: 25,
           height: 25,
           rotate: 0,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+          // anchor: { x: 0.5, y: 0.5 },
           callout: new UTSJSONObject({
             content: plateNo.value,
             borderRadius: 5,

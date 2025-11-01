@@ -3,11 +3,13 @@ const common_vendor = require("../../common/vendor.js");
 require("../../api/http.js");
 if (!Array) {
   const _easycom_uv_tags_1 = common_vendor.resolveComponent("uv-tags");
-  _easycom_uv_tags_1();
+  const _easycom_uv_modal_1 = common_vendor.resolveComponent("uv-modal");
+  (_easycom_uv_tags_1 + _easycom_uv_modal_1)();
 }
 const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-tags.js";
+const _easycom_uv_modal = () => "../../uni_modules/uv-modal/components/uv-modal/uv-modal.js";
 if (!Math) {
-  _easycom_uv_tags();
+  (_easycom_uv_tags + _easycom_uv_modal)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "indexListMode",
@@ -19,8 +21,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     var __emit = _a.emit;
     const props = __props;
     const emit = __emit;
+    const modal = common_vendor.ref();
+    const imeis = common_vendor.ref("");
     const unbindDevice = (imei) => {
-      emit("unbindDevice", imei);
+      var _a2;
+      imeis.value = imei;
+      (_a2 = modal.value) === null || _a2 === void 0 ? null : _a2.open();
+    };
+    const confirm = () => {
+      var _a2;
+      emit("unbindDevice", imeis.value);
+      (_a2 = modal.value) === null || _a2 === void 0 ? null : _a2.close();
+    };
+    const cancel = () => {
+      var _a2;
+      (_a2 = modal.value) === null || _a2 === void 0 ? null : _a2.close();
     };
     const todetail = (companyId, imei, deviceId) => {
       common_vendor.index.navigateTo({
@@ -56,9 +71,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.p({
           text: "解绑",
           type: "warning"
+        }),
+        d: common_vendor.sr(modal, "245c735a-2", {
+          "k": "modal"
+        }),
+        e: common_vendor.o(confirm),
+        f: common_vendor.o(cancel),
+        g: common_vendor.p({
+          title: "提示",
+          content: "是否要解绑设备？",
+          buttonReverse: true,
+          align: "center",
+          confirmText: "确定",
+          cancelText: "取消",
+          showCancelButton: true
         })
       } : {}, {
-        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };
