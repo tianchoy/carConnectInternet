@@ -23,8 +23,8 @@
 			<text>设备名称</text>
 		</view> -->
 		<view class="content-box">
-			<uv-empty v-if="carStopDetail.length == 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
-			<view class="content" v-else v-for="(item,index) in carStopDetail" :key="index">
+			<uv-empty v-if="sortedCarStopDetail.length == 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
+			<view class="content" v-else v-for="(item,index) in sortedCarStopDetail" :key="index">
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/startTime.png" />
 					<text>{{item.startTime}}</text>
@@ -48,9 +48,11 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted } from 'vue'
+	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
 
 	const carStatus = ref('在线')
 
@@ -65,6 +67,19 @@
 	const carStopDetail = ref<UTSJSONObject>({})
 	const address = ref('')
 
+	// 计算属性：按照时间倒序排列的停车记录
+	const sortedCarStopDetail = computed(() => {
+		if (!carStopDetail.value || !Array.isArray(carStopDetail.value)) {
+			return []
+		}
+		
+		// 按照开始时间倒序排列
+		return [...carStopDetail.value].sort((a, b) => {
+			const timeA = new Date(a.startTime).getTime()
+			const timeB = new Date(b.startTime).getTime()
+			return timeB - timeA // 倒序排列
+		})
+	})
 
 	// 初始化加载
 	onMounted(() => {
@@ -89,10 +104,12 @@
 		const res = await getTrackPos(data)
 		const stopsWithAddress = await Promise.all(res.data.stops.map(async (stop) => {
 			// const address = await getAddress(stop.latitude, stop.longitude)
+			// 转换坐标到腾讯地图坐标系
+			const convertedCoord = CoordTransform.wgs84ToTencent(stop.latitude, stop.longitude)
 			return {
 				...stop,
-				latitude: stop.latitude,
-				longitude: stop.longitude,
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
 				// address: address.value
 			}
 		}))
@@ -155,10 +172,7 @@
 			name: '当前位置',
 			scale: 18,
 			success: () => {
-				uni.showToast({
-					title: '成功调起地图',
-					icon: 'none'
-				});
+				console.log('成功调起地图')
 			},
 			fail: (err) => {
 				uni.showToast({

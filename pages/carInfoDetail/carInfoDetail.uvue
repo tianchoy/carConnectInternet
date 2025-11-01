@@ -4,7 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true">
+				:scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				<sub-navBar :currentTime="currentTime" :showTime="true" :showPickerTime="false"
 					@update:current-time="(val) => (currentTime = val)" :currentCar="currentCarInfo.plateNo"
 					:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
@@ -411,7 +411,7 @@
 		if (itemTo == '电子围栏') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType+ '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
 			})
 		}
 		if (itemTo == '一键寻车') {
@@ -556,6 +556,8 @@
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
+					await new Promise(resolve => setTimeout(resolve, 100))
+
 					// 更新设备标记
 					const deviceMarker = createMarker(
 						1,
@@ -566,7 +568,6 @@
 					)
 
 					markers.value = [deviceMarker]
-
 
 					// 检查设备状态，如果变为离线状态则停止定时器
 					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
@@ -643,7 +644,6 @@
 			callout: {
 				content: title || '爱车位置',
 				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',
-				fontSize: 14,
 				borderRadius: 10,
 				bgColor: datainfo.value.connectionStatus == 'online' ? '#07C160' : '#ccc',
 				padding: 5,

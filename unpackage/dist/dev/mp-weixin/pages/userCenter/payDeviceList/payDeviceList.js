@@ -120,23 +120,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isShowStyle: true
         }),
         b: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
-          return common_vendor.e({
+          return {
             a: common_vendor.t(item.deviceName),
             b: common_vendor.t(item.plateNo),
             c: common_vendor.t(item.iccid),
-            d: item.customerTime
-          }, item.customerTime ? {
-            e: common_vendor.t(item.customerTime)
-          } : {}, {
-            f: item.simEndDate
-          }, item.simEndDate ? {
-            g: common_vendor.t(item.simEndDate)
-          } : {}, {
-            h: common_vendor.o(($event) => {
+            d: common_vendor.o(($event) => {
               return pay(item.iccid, item.simMerchant);
             }, index),
-            i: index
-          });
+            e: index
+          };
         }),
         c: common_vendor.unref(loading)
       }, common_vendor.unref(loading) ? {} : {}, {

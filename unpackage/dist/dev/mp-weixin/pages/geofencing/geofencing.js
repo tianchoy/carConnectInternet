@@ -59,6 +59,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const connectionStatus = common_vendor.ref("");
     const deptId = common_vendor.ref("");
     const carType = common_vendor.ref("");
+    const deviceName = common_vendor.ref("");
     const center = common_vendor.reactive(new UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
@@ -133,6 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentCar.value = option.plateNo;
       deptId.value = option.deptId;
       carType.value = option.carType;
+      deviceName.value = option.deviceName;
       loadInitialPosition();
       loadGeofenceList();
     });
@@ -169,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     height: 25,
                     rotate: calculateMapRotation(lastDirection.value),
                     callout: new UTSJSONObject({
-                      content: connectionStatus.value == "online" ? `${deviceData.deviceName != null ? deviceData.deviceName : "爱车位置"} | 速度: ${deviceData.speed || 0}km/h` : "车辆已离线",
+                      content: deviceName.value || "爱车位置",
                       color: connectionStatus.value == "online" ? "#fff" : "#666",
                       bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
                       padding: 5,

@@ -13,14 +13,14 @@
 					<view class="label">ICCID:</view>
 					<view class="value">{{item.iccid}}</view>
 				</view>
-				<view class="device-info" v-if="item.customerTime">
+				<!-- <view class="device-info" v-if="item.customerTime">
 					<view class="label">平台到期时间:</view>
 					<view class="value">{{item.customerTime}}</view>
 				</view>
 				<view class="device-info" v-if="item.simEndDate">
 					<view class="label">流量到期时间:</view>
 					<view class="value">{{item.simEndDate}}</view>
-				</view>
+				</view> -->
 				<view class="device-info">
 					<view></view>
 					<text class="pay-btn" @click="pay(item.iccid,item.simMerchant)">去续费</text>

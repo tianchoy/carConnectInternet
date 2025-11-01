@@ -504,12 +504,12 @@
 							}
 						}
 					}
-
-					.trip-item:last-child {
-						border-bottom: none;
-					}
 				}
 			}
 		}
+	}
+
+	.uv-empty {
+		margin-bottom: 20rpx;
 	}
 </style>

@@ -5,7 +5,7 @@
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
 				style="width:100%;height:100%" :show-location="true" :polygons="polygons" :markers="markers"
-				:circles="circles" @click="handleMapTap":enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
+				:circles="circles" @click="handleMapTap" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				<sub-navBar :showTime="false" :currentCar="currentCar" :showCar="true"
 					:carStatus='connectionStatus'></sub-navBar>
 			</map>
@@ -180,6 +180,7 @@
 	const connectionStatus = ref<string | null>('')
 	const deptId = ref<string | null>('')
 	const carType = ref<string | null>('')
+	const deviceName = ref<string | null>('')
 	type Coordinate = {
 		latitude : number;
 		longitude : number;
@@ -275,6 +276,8 @@
 		currentCar.value = option.plateNo
 		deptId.value = option.deptId
 		carType.value = option.carType
+		deviceName.value = option.deviceName
+
 		loadInitialPosition()
 		loadGeofenceList() // 页面加载时获取围栏列表
 	})
@@ -317,7 +320,7 @@
 						height: 25,
 						rotate: calculateMapRotation(lastDirection.value), // 修正方向
 						callout: {
-							content: connectionStatus.value == 'online' ? `${deviceData.deviceName != null ? deviceData.deviceName : '爱车位置'} | 速度: ${deviceData.speed || 0}km/h` : '车辆已离线',
+							content: deviceName.value || '爱车位置',
 							color: connectionStatus.value == 'online' ? '#fff' : '#666',
 							bgColor: connectionStatus.value == 'online' ? '#1296db' : '#ccc',
 							padding: 5,

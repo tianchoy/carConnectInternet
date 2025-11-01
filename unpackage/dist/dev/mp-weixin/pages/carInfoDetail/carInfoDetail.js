@@ -271,7 +271,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (itemTo == "电子围栏") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType
+          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value.deviceName
         });
       }
       if (itemTo == "一键寻车") {
@@ -395,6 +395,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(item.latitude, item.longitude);
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
+                yield new Promise((resolve) => {
+                  return setTimeout(resolve, 100);
+                });
                 const deviceMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarInfo.value.deviceName);
                 markers.value = [deviceMarker];
                 if (item.connectionStatus != "online" && refreshTimer.value !== null) {
@@ -467,7 +470,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         callout: new UTSJSONObject({
           content: title || "爱车位置",
           color: datainfo.value.connectionStatus == "online" ? "#fff" : "#666",
-          fontSize: 14,
           borderRadius: 10,
           bgColor: datainfo.value.connectionStatus == "online" ? "#07C160" : "#ccc",
           padding: 5,

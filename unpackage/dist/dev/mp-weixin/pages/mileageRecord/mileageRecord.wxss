@@ -171,6 +171,6 @@
   font-size: 24rpx !important;
   line-height: unset !important;
 }
-.container .content .trip-list .trip-group .trip-item:last-child {
-  border-bottom: none;
+.uv-empty {
+  margin-bottom: 20rpx;
 }
