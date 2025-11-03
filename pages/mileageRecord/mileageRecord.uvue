@@ -141,13 +141,18 @@
 			const trips = tripsByDate[date]
 			let totalDistance = 0
 
-			trips.forEach(trip => {
+			// 对每个日期组内的行程按开始时间倒序排列
+			const sortedTrips = trips.sort((a, b) => {
+				return new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+			})
+
+			sortedTrips.forEach(trip => {
 				totalDistance += trip.distance || 0
 			})
 
 			groups.push({
 				date,
-				trips,
+				trips: sortedTrips, // 使用排序后的行程数组
 				totalDistance
 			})
 		}

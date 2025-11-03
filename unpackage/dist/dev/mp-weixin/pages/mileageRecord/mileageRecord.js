@@ -84,12 +84,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       for (const date in tripsByDate) {
         const trips = tripsByDate[date];
         let totalDistance = 0;
-        trips.forEach((trip = null) => {
+        const sortedTrips = trips.sort((a = null, b = null) => {
+          return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+        });
+        sortedTrips.forEach((trip = null) => {
           totalDistance += trip.distance || 0;
         });
         groups.push(new GroupType({
           date,
-          trips,
+          trips: sortedTrips,
           totalDistance
         }));
       }

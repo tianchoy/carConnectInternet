@@ -4,7 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
+				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				<marker v-if="carMarker" :id="carMarker.id" :latitude="carMarker.latitude"
 					:longitude="carMarker.longitude" :iconPath="carMarker.iconPath" :width="carMarker.width"
 					:height="carMarker.height" :rotate="carMarker.rotate" :anchor="carMarker.anchor"
@@ -235,12 +235,12 @@
 				height: 25,
 				rotate: trackPoints.value[0].rotation || 0,
 				// anchor: { x: 0.5, y: 0.5 },
-				callout: {
-					content: plateNo,
-					borderRadius: 5,
-					padding: 5,
-					display: 'ALWAYS'
-				}
+				// callout: {
+				// 	content: plateNo,
+				// 	borderRadius: 5,
+				// 	padding: 5,
+				// 	display: 'ALWAYS'
+				// }
 			}
 
 			// 添加起点和终点标记
@@ -486,9 +486,7 @@
 	})
 
 	const loadTrackPos = async () => {
-		uni.showLoading({
-			title: '加载中...',
-		})
+		uni.showLoading({ title: '加载中...' })
 		const data = {
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
@@ -554,14 +552,12 @@
 			height: 25,
 			rotate: 0,
 			// anchor: { x: 0.5, y: 0.5 },
-			callout: {
-				content: plateNo.value,
-				color: carStatus.value == 'online' ? '#fff' : '#666',
-				borderRadius: 10,
-				bgColor: carStatus.value == 'online' ? '#07C160' : '#ccc',
-				padding: 5,
-				display: 'ALWAYS'
-			}
+			// callout: {
+			// 	content: plateNo.value,
+			// 	borderRadius: 5,
+			// 	padding: 5,
+			// 	display: 'ALWAYS'
+			// }
 		}
 
 		// 设置标记点

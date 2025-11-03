@@ -188,14 +188,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             iconPath: utils_cars.getDeviceIcon(carStatus.value, carType.value),
             width: 25,
             height: 25,
-            rotate: trackPoints.value[0].rotation || 0,
+            rotate: trackPoints.value[0].rotation || 0
             // anchor: { x: 0.5, y: 0.5 },
-            callout: new UTSJSONObject({
-              content: plateNo,
-              borderRadius: 5,
-              padding: 5,
-              display: "ALWAYS"
-            })
+            // callout: {
+            // 	content: plateNo,
+            // 	borderRadius: 5,
+            // 	padding: 5,
+            // 	display: 'ALWAYS'
+            // }
           }
           // 添加起点和终点标记
         );
@@ -403,9 +403,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showLoading({
-          title: "加载中..."
-        });
+        common_vendor.index.showLoading({ title: "加载中..." });
         const data = new UTSJSONObject({
           imei: imei.value,
           startTime: startTime.value.replace(/\//g, "-"),
@@ -460,16 +458,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           iconPath: utils_cars.getDeviceIcon(carStatus.value, carType.value),
           width: 25,
           height: 25,
-          rotate: 0,
+          rotate: 0
           // anchor: { x: 0.5, y: 0.5 },
-          callout: new UTSJSONObject({
-            content: plateNo.value,
-            color: carStatus.value == "online" ? "#fff" : "#666",
-            borderRadius: 10,
-            bgColor: carStatus.value == "online" ? "#07C160" : "#ccc",
-            padding: 5,
-            display: "ALWAYS"
-          })
+          // callout: {
+          // 	content: plateNo.value,
+          // 	borderRadius: 5,
+          // 	padding: 5,
+          // 	display: 'ALWAYS'
+          // }
         }
         // 设置标记点
       );
