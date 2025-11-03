@@ -36,8 +36,7 @@
 		</view>
 
 		<view class="content">
-			<uv-loading-icon v-if="loading" mode="circle" size="40"></uv-loading-icon>
-			<uv-empty v-if="!loading && groupedTrips.length == 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
+			<uv-empty v-if="groupedTrips.length == 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
 			<view v-else class="trip-list">
 				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
 					<view class="group-header">
@@ -97,7 +96,8 @@
 	type GroupType = { date : string; trips : any; totalDistance : number; }
 
 	const carStatus = ref('在线')
-	const loading = ref(false)
+	const plateNo = ref('')
+	const carType = ref('')
 	const totalMileage = ref(0)
 	const averageSpeed = ref(0)
 	const tripData = ref<Array<any>>([])
@@ -169,19 +169,22 @@
 
 	onLoad((option) => {
 		imei.value = option.imei
-
+		carStatus.value = option.connectionStatus
+		plateNo.value = option.plateNo
+		carType.value = option.carType
 	})
 
 	const gotoTripDetail = (startTime : string, endTime : string) => {
 		uni.navigateTo({
-			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value
+			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value + '&connectionStatus=' + carStatus.value + '&plateNo=' + plateNo.value + '&carType=' + carType.value
 		})
 	}
 
 	const loadMileageData = async () => {
+		uni.showLoading({
+			title: '加载中...',
+		})
 		if (!imei.value) return;
-
-		loading.value = true;
 		try {
 			const data = {
 				imei: imei.value,
@@ -193,7 +196,7 @@
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-
+			console.log('获取里程数据成功:', res);
 			if (res && res.data) {
 				await processTripData(res.data); // 等待地址获取完成
 			}
@@ -204,7 +207,7 @@
 				icon: 'none',
 			});
 		} finally {
-			loading.value = false;
+			uni.hideLoading()
 		}
 	};
 

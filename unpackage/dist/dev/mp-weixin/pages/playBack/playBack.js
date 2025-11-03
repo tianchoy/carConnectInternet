@@ -403,6 +403,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.showLoading({
+          title: "加载中..."
+        });
         const data = new UTSJSONObject({
           imei: imei.value,
           startTime: startTime.value.replace(/\//g, "-"),
@@ -415,8 +418,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.getTrackPos(data);
         if (res.data.positions && res.data.positions.length > 0) {
           processTrackData(res.data.positions);
+          common_vendor.index.hideLoading();
         } else {
           showCurrentPosition();
+          common_vendor.index.hideLoading();
         }
       });
     };
@@ -459,7 +464,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           // anchor: { x: 0.5, y: 0.5 },
           callout: new UTSJSONObject({
             content: plateNo.value,
-            borderRadius: 5,
+            color: carStatus.value == "online" ? "#fff" : "#666",
+            borderRadius: 10,
+            bgColor: carStatus.value == "online" ? "#07C160" : "#ccc",
             padding: 5,
             display: "ALWAYS"
           })

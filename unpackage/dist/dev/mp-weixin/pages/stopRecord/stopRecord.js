@@ -50,6 +50,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadStopData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.showLoading({
+          title: "加载中..."
+        });
         const data = new UTSJSONObject({
           imei: imei.value,
           startTime: startTime.value,
@@ -67,6 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }));
         carStopDetail.value = stopsWithAddress;
+        common_vendor.index.hideLoading();
       });
     };
     const initDateTime = () => {

@@ -361,19 +361,19 @@
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
 			})
 		}
 		if (itemTo == '车辆跟踪') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (itemTo == '里程记录') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value
+				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType 
 			})
 		}
 		if (itemTo == '停车记录') {
@@ -411,7 +411,7 @@
 		if (itemTo == '电子围栏') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.plateNo + '&carType=' + currentCarInfo.value.carType+ '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType+ '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
 			})
 		}
 		if (itemTo == '一键寻车') {
@@ -508,8 +508,6 @@
 	}
 
 	const navTo = async () => {
-
-		console.log(address.value)
 		if (!address.value) {
 			await refreshAdress()
 		}
@@ -536,6 +534,7 @@
 	}
 
 	const loadData = async (data : object) => {
+		
 		try {
 			const res = await getDevicePos(data)
 			console.log('111111')
@@ -614,7 +613,11 @@
 			deptId: deptId.value,
 			deviceids: imei.value
 		}
+		uni.showLoading({
+			title: '加载中...',
+		})
 		loadData(data).then(() => {
+			uni.hideLoading()
 			// 数据加载完成后，根据设备状态启动定时器
 			if (datainfo.value.connectionStatus == 'online') {
 				setupAutoRefresh(currentTime.value)

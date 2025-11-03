@@ -6,24 +6,22 @@ if (!Array) {
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  const _easycom_uv_loading_icon_1 = common_vendor.resolveComponent("uv-loading-icon");
   const _easycom_uv_empty_1 = common_vendor.resolveComponent("uv-empty");
   const _easycom_uv_tags_1 = common_vendor.resolveComponent("uv-tags");
   const _easycom_uv_steps_item_1 = common_vendor.resolveComponent("uv-steps-item");
   const _easycom_uv_steps_1 = common_vendor.resolveComponent("uv-steps");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_uv_loading_icon_1 + _easycom_uv_empty_1 + _easycom_uv_tags_1 + _easycom_uv_steps_item_1 + _easycom_uv_steps_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_uv_empty_1 + _easycom_uv_tags_1 + _easycom_uv_steps_item_1 + _easycom_uv_steps_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
-const _easycom_uv_loading_icon = () => "../../uni_modules/uv-loading-icon/components/uv-loading-icon/uv-loading-icon.js";
 const _easycom_uv_empty = () => "../../uni_modules/uv-empty/components/uv-empty/uv-empty.js";
 const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-tags.js";
 const _easycom_uv_steps_item = () => "../../uni_modules/uv-steps/components/uv-steps-item/uv-steps-item.js";
 const _easycom_uv_steps = () => "../../uni_modules/uv-steps/components/uv-steps/uv-steps.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_uv_loading_icon + _easycom_uv_empty + _easycom_uv_tags + _easycom_uv_steps_item + _easycom_uv_steps)();
+  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_uv_empty + _easycom_uv_tags + _easycom_uv_steps_item + _easycom_uv_steps)();
 }
 class GroupType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -51,8 +49,9 @@ class GroupType extends UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "mileageRecord",
   setup(__props) {
-    common_vendor.ref("在线");
-    const loading = common_vendor.ref(false);
+    const carStatus = common_vendor.ref("在线");
+    const plateNo = common_vendor.ref("");
+    const carType = common_vendor.ref("");
     const totalMileage = common_vendor.ref(0);
     const averageSpeed = common_vendor.ref(0);
     const tripData = common_vendor.ref([]);
@@ -107,17 +106,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     common_vendor.onLoad((option) => {
       imei.value = option.imei;
+      carStatus.value = option.connectionStatus;
+      plateNo.value = option.plateNo;
+      carType.value = option.carType;
     });
     const gotoTripDetail = (startTime2, endTime2) => {
       common_vendor.index.navigateTo({
-        url: "/pages/playBack/playBack?startTime=" + startTime2 + "&endTime=" + endTime2 + "&imei=" + imei.value
+        url: "/pages/playBack/playBack?startTime=" + startTime2 + "&endTime=" + endTime2 + "&imei=" + imei.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value
       });
     };
     const loadMileageData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.showLoading({
+          title: "加载中..."
+        });
         if (!imei.value)
           return Promise.resolve(null);
-        loading.value = true;
         try {
           const data = new UTSJSONObject({
             imei: imei.value,
@@ -129,6 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
+          console.log("获取里程数据成功:", res);
           if (res && res.data) {
             yield processTripData(res.data);
           }
@@ -139,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             icon: "none"
           });
         } finally {
-          loading.value = false;
+          common_vendor.index.hideLoading();
         }
       });
     };
@@ -267,24 +272,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         q: common_vendor.t(totalTrips.value),
         r: common_vendor.t(averageSpeed.value.toFixed(1)),
-        s: loading.value
-      }, loading.value ? {
+        s: groupedTrips.value.length == 0
+      }, groupedTrips.value.length == 0 ? {
         t: common_vendor.p({
-          mode: "circle",
-          size: "40"
-        })
-      } : {}, {
-        v: !loading.value && groupedTrips.value.length == 0
-      }, !loading.value && groupedTrips.value.length == 0 ? {
-        w: common_vendor.p({
           mode: "data",
           text: "当前时间点暂无行程数据"
         })
       } : {
-        x: common_vendor.f(groupedTrips.value, (group, groupIndex, i0) => {
+        v: common_vendor.f(groupedTrips.value, (group, groupIndex, i0) => {
           return {
             a: common_vendor.t(group.date),
-            b: "5f5c5231-8-" + i0,
+            b: "5f5c5231-7-" + i0,
             c: common_vendor.p({
               text: group.trips.length + "段",
               type: "success",
@@ -309,7 +307,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }, {
-        y: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

@@ -173,7 +173,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     callout: new UTSJSONObject({
                       content: deviceName.value || "爱车位置",
                       color: connectionStatus.value == "online" ? "#fff" : "#666",
-                      bgColor: connectionStatus.value == "online" ? "#1296db" : "#ccc",
+                      bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
                       padding: 5,
                       borderRadius: 4,
                       display: "ALWAYS"

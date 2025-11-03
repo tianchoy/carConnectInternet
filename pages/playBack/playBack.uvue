@@ -4,7 +4,7 @@
 		</custom-navBar>
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
-				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
+				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="false" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				<marker v-if="carMarker" :id="carMarker.id" :latitude="carMarker.latitude"
 					:longitude="carMarker.longitude" :iconPath="carMarker.iconPath" :width="carMarker.width"
 					:height="carMarker.height" :rotate="carMarker.rotate" :anchor="carMarker.anchor"
@@ -486,6 +486,9 @@
 	})
 
 	const loadTrackPos = async () => {
+		uni.showLoading({
+			title: '加载中...',
+		})
 		const data = {
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
@@ -500,10 +503,12 @@
 		//当轨迹数据不为空时，处理轨迹数据
 		if (res.data.positions && res.data.positions.length > 0) {
 			processTrackData(res.data.positions)
+			uni.hideLoading()
 		}
 		else {
 			// 当轨迹数据为空时，使用传过来的经纬度 来标记当前位置
 			showCurrentPosition()
+			uni.hideLoading()
 		}
 	}
 
@@ -551,7 +556,9 @@
 			// anchor: { x: 0.5, y: 0.5 },
 			callout: {
 				content: plateNo.value,
-				borderRadius: 5,
+				color: carStatus.value == 'online' ? '#fff' : '#666',
+				borderRadius: 10,
+				bgColor: carStatus.value == 'online' ? '#07C160' : '#ccc',
 				padding: 5,
 				display: 'ALWAYS'
 			}

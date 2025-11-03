@@ -92,6 +92,9 @@
 	})
 
 	const loadStopData = async () => {
+		uni.showLoading({
+			title: '加载中...',
+		})
 		const data = {
 			imei: imei.value,
 			startTime: startTime.value,
@@ -115,6 +118,7 @@
 		}))
 
 		carStopDetail.value = stopsWithAddress
+		uni.hideLoading()
 	}
 
 	// 初始化时间

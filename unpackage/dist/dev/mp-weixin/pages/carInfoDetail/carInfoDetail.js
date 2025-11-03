@@ -227,19 +227,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (itemTo == "轨迹回放") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType + "&lat=" + datainfo.value.latitude + "&lng=" + datainfo.value.longitude
+          url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&lat=" + datainfo.value.latitude + "&lng=" + datainfo.value.longitude
         });
       }
       if (itemTo == "车辆跟踪") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType
+          url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
         });
       }
       if (itemTo == "里程记录") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value
+          url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
         });
       }
       if (itemTo == "停车记录") {
@@ -271,7 +271,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (itemTo == "电子围栏") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
-          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.plateNo + "&carType=" + currentCarInfo.value.carType + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value.deviceName
+          url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value.deviceName
         });
       }
       if (itemTo == "一键寻车") {
@@ -350,7 +350,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const navTo = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        console.log(address.value);
         if (!address.value) {
           yield refreshAdress();
         }
@@ -442,7 +441,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deptId: deptId.value,
         deviceids: imei.value
       });
+      common_vendor.index.showLoading({
+        title: "加载中..."
+      });
       loadData(data).then(() => {
+        common_vendor.index.hideLoading();
         if (datainfo.value.connectionStatus == "online") {
           setupAutoRefresh(currentTime.value);
         }
