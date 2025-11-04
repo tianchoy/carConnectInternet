@@ -512,14 +512,11 @@
 
 	// 显示当前位置
 	function showCurrentPosition() {
-		if (!lat.value || !lng.value) {
-			uni.showToast({
-				title: '无有效位置数据',
-				icon: 'none'
-			})
-			return
-		}
-
+		uni.showToast({
+			title: '无有效位置数据',
+			icon: 'none',
+			duration: 1500
+		})
 		// 转换坐标到腾讯地图坐标系
 		const originalLat = parseFloat(lat.value)
 		const originalLng = parseFloat(lng.value)

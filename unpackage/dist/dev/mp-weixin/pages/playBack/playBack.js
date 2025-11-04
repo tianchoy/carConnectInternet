@@ -424,13 +424,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     function showCurrentPosition() {
-      if (!lat.value || !lng.value) {
-        common_vendor.index.showToast({
-          title: "无有效位置数据",
-          icon: "none"
-        });
-        return null;
-      }
+      common_vendor.index.showToast({
+        title: "无有效位置数据",
+        icon: "none",
+        duration: 1500
+      });
       const originalLat = parseFloat(lat.value);
       const originalLng = parseFloat(lng.value);
       const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(originalLat, originalLng);
