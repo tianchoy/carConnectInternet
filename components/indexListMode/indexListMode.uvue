@@ -12,7 +12,7 @@
 					</view>
 				</view>
 				<view class="imei">
-					<text>IMEI {{item.imei}}</text>
+					<text>ID: {{item.imei}}</text>
 				</view>
 			</view>
 			<uv-modal ref="modal" title="提示" content="是否要解绑设备？" :buttonReverse="true" align="center" confirmText="确定" cancelText="取消" :showCancelButton="true" @confirm="confirm" @cancel="cancel"></uv-modal>

@@ -23,4 +23,3 @@ export const  getAddress = (latitude:number,longitude:number,  tk = '1e3374be3d6
     });
   });
 }
-

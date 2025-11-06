@@ -5,7 +5,7 @@
 		<view class="user-info-box" @click="userInfoDetail">
 			<view class="userinfo">
 				<view>
-					<uv-avatar :src="userInfo.avatar" shape="circle"></uv-avatar>
+					<uv-avatar src="/static/avatar.png" shape="circle"></uv-avatar>
 				</view>
 				<view class="user-info">
 					<text v-if="Login">{{userInfo.mobile}}</text>
