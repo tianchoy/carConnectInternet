@@ -99,10 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onCancel = () => {
       showDateTimePicker.value = false;
     };
-    const calculateDuration = (start, end) => {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      const diff = endDate.getTime() - startDate.getTime();
+    const calculateDuration = (diff) => {
       const hours = Math.floor(diff / (1e3 * 60 * 60));
       const minutes = Math.floor(diff % (1e3 * 60 * 60) / (1e3 * 60));
       const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
@@ -192,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return common_vendor.e({
             a: common_vendor.t(item.startTime),
             b: common_vendor.t(item.endTime),
-            c: common_vendor.t(calculateDuration(item.startTime, item.endTime)),
+            c: common_vendor.t(calculateDuration(item.duration)),
             d: item.address
           }, item.address ? {
             e: common_vendor.t(item.address || "加载中...")

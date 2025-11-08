@@ -57,30 +57,6 @@
 								<text>{{formatDuration(item.duration)}}</text>
 							</view>
 						</view>
-						<view class="trip-content" v-if="false">
-							<view class="trip-locations">
-								<uv-steps current="1" direction="column" active-color="#3c9cff" inactive-color="#999">
-									<view @click="showMap(item.startLat, item.startLon)">
-										<uv-steps-item
-											:title="'位置坐标：'+item.startLat + ', ' + item.startLon+' '+'点击查看地图位置'"
-											:desc="item.startTime">
-											<template v-slot:icon>
-												<image class="icons" src="/static/start.png" mode="aspectFit" />
-											</template>
-										</uv-steps-item>
-									</view>
-									<view @click="showMap(item.endLat, item.endLon)">
-										<uv-steps-item
-											:title="'位置坐标：'+item.endLat + ', ' + item.endLon +' '+ '点击查看地图位置'"
-											:desc="item.endTime">
-											<template v-slot:icon>
-												<image class="icons" src="/static/end.png" mode="aspectFit" />
-											</template>
-										</uv-steps-item>
-									</view>
-								</uv-steps>
-							</view>
-						</view>
 					</view>
 				</view>
 			</view>
@@ -196,8 +172,8 @@
 				startTime: startTime.value,
 				endTime: endTime.value,
 				minParkTime: 120,
-				withStop: true,
-				withPos: true,
+				withStop: false,
+				withPos: false,
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
@@ -215,30 +191,6 @@
 			uni.hideLoading()
 		}
 	};
-
-	// 显示地图
-	const showMap = (lat : number, lon : number) => {
-		console.log('11111', lat, lon)
-		uni.openLocation({
-			latitude: lat,
-			longitude: lon,
-			name: '位置',
-			scale: 18,
-			success: () => {
-				uni.showToast({
-					title: '成功调起地图',
-					icon: 'none'
-				});
-			},
-			fail: (err) => {
-				uni.showToast({
-					title: '调起地图失败',
-					icon: 'none'
-				});
-				console.error('调起地图失败:', err);
-			}
-		});
-	}
 
 	// 处理行程数据
 	const processTripData = async (data : any) => {

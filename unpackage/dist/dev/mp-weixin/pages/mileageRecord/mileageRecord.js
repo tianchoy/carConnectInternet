@@ -8,9 +8,7 @@ if (!Array) {
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
   const _easycom_uv_empty_1 = common_vendor.resolveComponent("uv-empty");
   const _easycom_uv_tags_1 = common_vendor.resolveComponent("uv-tags");
-  const _easycom_uv_steps_item_1 = common_vendor.resolveComponent("uv-steps-item");
-  const _easycom_uv_steps_1 = common_vendor.resolveComponent("uv-steps");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_uv_empty_1 + _easycom_uv_tags_1 + _easycom_uv_steps_item_1 + _easycom_uv_steps_1)();
+  (_easycom_custom_navBar_1 + _easycom_uv_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_uv_empty_1 + _easycom_uv_tags_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
@@ -18,10 +16,8 @@ const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-pick
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 const _easycom_uv_empty = () => "../../uni_modules/uv-empty/components/uv-empty/uv-empty.js";
 const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-tags.js";
-const _easycom_uv_steps_item = () => "../../uni_modules/uv-steps/components/uv-steps-item/uv-steps-item.js";
-const _easycom_uv_steps = () => "../../uni_modules/uv-steps/components/uv-steps/uv-steps.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_uv_empty + _easycom_uv_tags + _easycom_uv_steps_item + _easycom_uv_steps)();
+  (_easycom_custom_navBar + _easycom_uv_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_uv_empty + _easycom_uv_tags)();
 }
 class GroupType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -131,8 +127,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             startTime: startTime.value,
             endTime: endTime.value,
             minParkTime: 120,
-            withStop: true,
-            withPos: true,
+            withStop: false,
+            withPos: false,
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
@@ -293,18 +289,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }),
             d: common_vendor.t((group.totalDistance / 1e3).toFixed(2)),
             e: common_vendor.f(group.trips, (item, index, i1) => {
-              return common_vendor.e({
+              return {
                 a: common_vendor.t(index + 1),
                 b: common_vendor.t(item.startHour),
                 c: common_vendor.t(item.endHour),
                 d: common_vendor.t((item.distance / 1e3).toFixed(2)),
-                e: common_vendor.t(formatDuration(item.duration))
-              }, {}, {
-                p: index,
-                q: common_vendor.o(($event) => {
+                e: common_vendor.t(formatDuration(item.duration)),
+                f: index,
+                g: common_vendor.o(($event) => {
                   return gotoTripDetail(item.startTime, item.endTime);
                 }, index)
-              });
+              };
             }),
             f: groupIndex
           };

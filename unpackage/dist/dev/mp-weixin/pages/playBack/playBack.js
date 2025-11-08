@@ -409,7 +409,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           startTime: startTime.value.replace(/\//g, "-"),
           endTime: endTime.value.replace(/\//g, "-"),
           minParkTime: 2,
-          withStop: true,
+          withStop: false,
           withPos: true,
           withTrip: false
         });
@@ -425,9 +425,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     function showCurrentPosition() {
       common_vendor.index.showToast({
-        title: "无有效位置数据",
+        title: "这段时间没有数据",
         icon: "none",
-        duration: 1500
+        duration: 2e3
       });
       const originalLat = parseFloat(lat.value);
       const originalLng = parseFloat(lng.value);

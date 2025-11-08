@@ -35,7 +35,7 @@
 				</view>
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/stopTime.png" />
-					<text>停留 {{calculateDuration(item.startTime, item.endTime)}}</text>
+					<text>停留 {{calculateDuration(item.duration)}}</text>
 				</view>
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/user_location.png" />
@@ -129,7 +129,7 @@
 		}
 
 		endTime.value = formatTime(now)
-		// 开始时间默认为当前时间前2小时
+		// 开始时间默认为当前时间前24小时
 		const startDate = new Date(now.getTime() - 3600000*24)
 		startTime.value = formatTime(startDate)
 	}
@@ -156,11 +156,7 @@
 		showDateTimePicker.value = false
 	}
 
-	const calculateDuration = (start : string, end : string) : string => {
-		const startDate = new Date(start)
-		const endDate = new Date(end)
-		const diff = endDate.getTime() - startDate.getTime()
-
+	const calculateDuration = (diff:number) : string => {
 		const hours = Math.floor(diff / (1000 * 60 * 60))
 		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 		const seconds = Math.floor((diff % (1000 * 60)) / 1000)
