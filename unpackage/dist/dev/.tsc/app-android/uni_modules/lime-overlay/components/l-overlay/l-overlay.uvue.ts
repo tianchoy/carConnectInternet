@@ -1,0 +1,103 @@
+import { useTransition, UseTransitionOptions, TransitionEmitStatus } from '@/uni_modules/lime-transition';
+	import { OverlayProps } from './type';
+	
+const __sfc__ = defineComponent({
+  __name: 'l-overlay',
+
+		name:'l-overlay'	
+	,
+  __props: OverlayProps,
+  props: {
+    ariaLabel: { type: String, required: true, default: '关闭' },
+    ariaRole: { type: String, required: true, default: 'button' },
+    lClass: { type: String, required: false },
+    bgColor: { type: String, required: false },
+    lStyle: { type: String, required: false },
+    duration: { type: Number, required: true, default: 300 },
+    preventScrollThrough: { type: Boolean, required: true, default: true },
+    visible: { type: Boolean, required: true, default: false },
+    zIndex: { type: Number, required: true, default: 998 }
+  },
+  emits: ['click', 'before-enter', 'enter', 'after-enter', 'before-leave', 'leave', 'after-leave'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+	
+	const props = __props
+	
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+	
+	const {inited, display, classes, finished} = useTransition({
+		defaultName: 'fade',
+		appear: props.visible,
+		emits: (name:TransitionEmitStatus) => { emit(name) },
+		visible: (): boolean => props.visible,
+		duration: props.duration,
+	} as UseTransitionOptions)
+	
+	const styles = computed<Map<string,any>>(():Map<string,any> => {
+		const style = new Map<string,any>();
+		if (props.bgColor != null) {
+			style.set("background", props.bgColor!)
+		}
+		if (props.zIndex > 0) {
+			style.set("z-index", props.zIndex)
+		}
+
+
+
+
+
+
+		return style
+	})
+	
+	const noop = () => {}
+	const onClick = (event: UniPointerEvent) =>{
+		// event.stopPropagation()
+		emit('click', !props.visible)
+	}
+
+	const overlayRef = ref<UniElement|null>(null)
+	
+	watchEffect(()=>{
+		overlayRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if(!display.value){
+			overlayRef.value?.style.setProperty('display', "none")
+		} else {
+			overlayRef.value?.style.setProperty('display', "flex")
+		}
+	})
+
+	
+
+return (): any | null => {
+
+  return isTrue(unref(inited))
+    ? _cE("view", _uM({
+        key: 0,
+        class: _nC(["l-overlay", [_ctx.lClass, unref(classes)]]),
+        ref_key: "overlayRef",
+        ref: overlayRef,
+        style: _nS([unref(styles), _ctx.lStyle]),
+        onClick: withModifiers(onClick, ["stop"]),
+        onTouchmove: withModifiers(noop, ["stop"]),
+        onTransitionend: unref(finished),
+        "aria-role": _ctx.ariaRole,
+        "aria-label": _ctx.ariaLabel
+      }), [
+        renderSlot(_ctx.$slots, "default")
+      ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onTransitionend", "aria-role", "aria-label"])
+    : _cC("v-if", true)
+}
+}
+
+})
+export default __sfc__
+export type LOverlayComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesLimeOverlayComponentsLOverlayLOverlayStyles = [_uM([["l-overlay", _pS(_uM([["position", "fixed"], ["top", 0], ["left", 0], ["width", "100%"], ["bottom", 0], ["backgroundColor", "rgba(0,0,0,0.6)"], ["transitionDuration", "300ms"], ["transitionProperty", "opacity"], ["transitionTimingFunction", "ease"], ["zIndex", 998], ["opacity", 1]]))], ["l-fade-enter", _pS(_uM([["opacity", 0]]))], ["l-fade-leave-to", _pS(_uM([["opacity", 0]]))], ["@TRANSITION", _uM([["l-overlay", _uM([["duration", "300ms"], ["property", "opacity"], ["timingFunction", "ease"]])]])]])]

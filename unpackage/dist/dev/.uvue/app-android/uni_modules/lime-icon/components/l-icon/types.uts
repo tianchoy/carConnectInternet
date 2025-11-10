@@ -1,0 +1,5 @@
+export type IconCollection = {
+    has: boolean;
+    icons: Map<string, any | null>;
+};
+//# sourceMappingURL=types.uts.map

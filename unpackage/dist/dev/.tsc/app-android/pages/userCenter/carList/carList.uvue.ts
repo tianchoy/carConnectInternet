@@ -1,0 +1,156 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import { getUserDeviceList } from '../../../api/request.uts'
+
+	
+const __sfc__ = defineComponent({
+  __name: 'carList',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const carList = ref<Array<UTSJSONObject>>([])
+	// 当前页码
+	const currPage = ref(1)
+	// 每页条数
+	const pageSize = ref(10)
+	// 总页数
+	const totalPage = ref(0)
+	// 是否正在加载
+	const loading = ref(false)
+	// 是否还有更多数据
+	const hasMore = ref(true)
+
+	const addCar = () => {
+		uni.navigateTo({
+			url: '/pages/addCar/addCar'
+		})
+	}
+
+	onShow(() => {
+		resetData()
+		loadCarListData()
+	})
+
+	// 重置数据
+	const resetData = () => {
+		carList.value = []
+		currPage.value = 1
+		totalPage.value = 0
+		hasMore.value = true
+	}
+
+	// 加载车辆列表数据
+	const loadCarListData = async () => {
+		console.log(currPage.value,totalPage.value, " at pages/userCenter/carList/carList.uvue:63")
+		if (loading.value || !hasMore.value) return
+
+		loading.value = true
+		try {
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 68, 10),
+				page: currPage.value,
+				pageSize: pageSize.value
+			}
+			const res = await getUserDeviceList(data)
+
+			if (res.code == 0) {
+				// 保存总页数
+				totalPage.value = res.data.totalPage
+
+				// 如果是第一页，直接赋值
+				if (currPage.value == 1) {
+					carList.value = res.data.list
+				} else {
+					carList.value = [...carList.value, ...res.data.list]
+				}
+
+				// 判断是否还有更多数据
+				hasMore.value = currPage.value < totalPage.value
+
+				// 还有更多数据时增加页码
+				if (hasMore.value) {
+					currPage.value++
+				}
+			} else {
+				uni.showToast({
+					title: res.msg || '加载失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:99")
+			uni.showToast({
+				title: '加载失败，请重试',
+				icon: 'none'
+			})
+		} finally {
+			loading.value = false
+		}
+	}
+
+	// 监听页面滚动到底部，触发加载更多
+	onReachBottom(() => {
+		loadCarListData()
+	})
+
+	const carDetail = (deviceId : string) => {
+		uni.navigateTo({
+			url: `/pages/userCenter/carDetail/carDetail?deviceId=${deviceId}`
+		})
+	}
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+
+  return _cE(Fragment, null, [
+    _cV(_component_custom_navBar, _uM({
+      title: "车辆管理",
+      "show-back": true,
+      backgroundColor: "#fff",
+      textColor: "#333",
+      showCapsule: true,
+      isIcon: true,
+      onCapsuleClick: addCar,
+      isShowStyle: true
+    })),
+    _cE("view", _uM({ class: "container" }), [
+      _cE("view", _uM({ class: "content" }), [
+        _cE(Fragment, null, RenderHelpers.renderList(unref(carList), (item, index, __index, _cached): any => {
+          return _cE("view", _uM({
+            class: "list",
+            key: index,
+            onClick: () => {carDetail(item.deviceId)}
+          }), [
+            _cE("text", _uM({ class: "title" }), _tD(item.deviceName), 1 /* TEXT */),
+            _cE("view", _uM({ class: "device-info" }), [
+              _cE("text", null, _tD(item.plateNo), 1 /* TEXT */),
+              _cE("text", _uM({ class: "tel" }), _tD(item.imei), 1 /* TEXT */)
+            ])
+          ], 8 /* PROPS */, ["onClick"])
+        }), 128 /* KEYED_FRAGMENT */),
+        isTrue(unref(loading))
+          ? _cE("view", _uM({
+              key: 0,
+              class: "loading"
+            }), [
+              _cE("text", null, "加载中...")
+            ])
+          : _cC("v-if", true),
+        isTrue(!unref(hasMore) && !unref(loading))
+          ? _cE("view", _uM({
+              key: 1,
+              class: "no-more"
+            }), [
+              _cE("text", null, "没有更多数据了")
+            ])
+          : _cC("v-if", true)
+      ])
+    ])
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesUserCenterCarListCarListStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["backgroundColor", "#f5f5f5"], ["marginTop", "170rpx"]]))], ["content", _uM([[".container ", _uM([["marginTop", "30rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]])]])], ["list", _uM([[".container .content ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "30rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "40rpx"], ["marginBottom", "30rpx"], ["fontSize", "25rpx"]])]])], ["title", _uM([[".container .content .list ", _uM([["fontWeight", "bold"], ["fontSize", "32rpx"]])]])], ["device-info", _uM([[".container .content .list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"]])]])], ["tel", _uM([[".container .content .list .device-info ", _uM([["color", "#999999"], ["fontSize", "22rpx"]])]])], ["loading", _uM([[".container .content ", _uM([["textAlign", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "24rpx"]])]])], ["no-more", _uM([[".container .content ", _uM([["textAlign", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "24rpx"]])]])]])]

@@ -1,0 +1,175 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_uv_avatar from '@/uni_modules/uv-avatar/components/uv-avatar/uv-avatar.vue'
+import _easycom_uv_icon from '@/uni_modules/uv-icon/components/uv-icon/uv-icon.vue'
+import _easycom_uv_badge from '@/uni_modules/uv-badge/components/uv-badge/uv-badge.vue'
+import { getUserInfo, getUserDeviceList } from '../../api/request';
+	
+const __sfc__ = defineComponent({
+  __name: 'userCenter',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const userInfo = ref({
+		avatar: '/static/avatar.png',
+		nickname: '',
+	})
+	const carsnumber = ref(0)
+	const Login = ref(false)
+	const version = ref('')
+	onShow(() => {
+		// 如果有 token，加载用户信息
+		const token = uni.getStorageSync('token')
+		if (token) {
+			Login.value = true
+			loadData()
+		} else {
+			Login.value = false
+		}
+		// 获取小程序版本号
+		try {
+			const accountInfo = wx.getAccountInfoSync();
+			const appVersion = accountInfo.miniProgram.version; 
+			version.value = appVersion 
+		} catch (error) {
+			console.error('获取版本号失败:', error, " at pages/userCenter/userCenter.uvue:55")
+		}
+	})
+
+	// 加载数据
+	const loadData = async () => {
+		let params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 61, 7),}
+		const res = await getUserInfo()
+		userInfo.value = res.data
+
+		const resCars = await getUserDeviceList(params)
+			
+			if (resCars?.data?.totalCount) {
+				 carsnumber.value = resCars.data.totalCount
+			}
+	}
+
+	// 用户信息详情
+	const userInfoDetail = () => {
+		if (Login.value) {
+			uni.navigateTo({
+				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:76")
+			})
+		} else {
+			uni.navigateTo({
+				url: '/pages/login/login'
+			})
+		}
+	}
+
+	// 我的车辆
+	const carList = () => {
+		if (Login.value) {
+			uni.navigateTo({
+				url: '/pages/userCenter/carList/carList'
+			})
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
+	}
+
+	// 平台续费
+	const platformRenewal = () => {
+		if (Login.value) {
+			// uni.showToast({
+			// 	title: '设备仍在服务期',
+			// 	icon: 'none',
+			// })
+			uni.navigateTo({
+				url: '/pages/userCenter/payDeviceList/payDeviceList'
+			})
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
+	}
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_uv_avatar = resolveEasyComponent("uv-avatar",_easycom_uv_avatar)
+const _component_uv_icon = resolveEasyComponent("uv-icon",_easycom_uv_icon)
+const _component_uv_badge = resolveEasyComponent("uv-badge",_easycom_uv_badge)
+
+  return _cE("view", _uM({ class: "container" }), [
+    _cV(_component_custom_navBar, _uM({
+      title: "个人中心",
+      "show-back": false,
+      backgroundColor: "#fff",
+      textColor: "#333",
+      showCapsule: false
+    })),
+    _cE("view", _uM({
+      class: "user-info-box",
+      onClick: userInfoDetail
+    }), [
+      _cE("view", _uM({ class: "userinfo" }), [
+        _cE("view", null, [
+          _cV(_component_uv_avatar, _uM({
+            src: "/static/avatar.png",
+            shape: "circle"
+          }))
+        ]),
+        _cE("view", _uM({ class: "user-info" }), [
+          isTrue(unref(Login))
+            ? _cE("text", _uM({ key: 0 }), _tD(unref(userInfo).mobile), 1 /* TEXT */)
+            : _cE("text", _uM({ key: 1 }), "点击登录")
+        ])
+      ]),
+      _cV(_component_uv_icon, _uM({
+        name: "arrow-right",
+        size: "16"
+      }))
+    ]),
+    isTrue(unref(Login))
+      ? _cE("view", _uM({ key: 0 }), [
+          _cE("view", _uM({
+            class: "list",
+            onClick: carList
+          }), [
+            _cE("view", _uM({ class: "left" }), [
+              _cE("text", null, "我的车辆"),
+              _cE("text", _uM({ class: "badge" }), [
+                _cV(_component_uv_badge, _uM({
+                  numberType: "overflow",
+                  type: "error",
+                  max: "99",
+                  value: unref(carsnumber)
+                }), null, 8 /* PROPS */, ["value"])
+              ])
+            ]),
+            _cV(_component_uv_icon, _uM({
+              name: "arrow-right",
+              size: "16"
+            }))
+          ]),
+          _cE("view", _uM({
+            class: "list",
+            onClick: platformRenewal
+          }), "平台续费")
+        ])
+      : _cC("v-if", true),
+    isTrue(unref(version))
+      ? _cE("view", _uM({
+          key: 1,
+          class: "version"
+        }), "当前版本：" + _tD(unref(version)), 1 /* TEXT */)
+      : _cC("v-if", true)
+  ])
+}
+}
+
+})
+export default __sfc__
+const GenPagesUserCenterUserCenterStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["user-info-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "40rpx"], ["paddingRight", "60rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "60rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["userinfo", _uM([[".container .user-info-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["user-info", _uM([[".container .user-info-box ", _uM([["marginLeft", "20rpx"], ["textAlign", "center"], ["fontSize", "30rpx"], ["color", "#333333"]])]])], ["list", _uM([[".container ", _uM([["backgroundColor", "#f5f5f5"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["marginTop", "15rpx"], ["marginRight", "15rpx"], ["marginBottom", "15rpx"], ["marginLeft", "15rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["fontSize", "25rpx"]])]])], ["left", _uM([[".container .list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["badge", _uM([[".container .list .left ", _uM([["marginLeft", "20rpx"]])]])], ["version", _uM([[".container ", _uM([["position", "fixed"], ["bottom", "50rpx"], ["left", "20rpx"], ["right", "20rpx"], ["textAlign", "center"], ["fontSize", "20rpx"], ["color", "#c3c2c2ff"], ["marginTop", "20rpx"], ["marginRight", "40rpx"], ["marginBottom", 0], ["marginLeft", "40rpx"]])]])]])]

@@ -401,6 +401,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadTrackPos();
       }
     });
+    common_vendor.onUnload(() => {
+      pausePlayback();
+    });
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         common_vendor.index.showLoading({ title: "加载中..." });

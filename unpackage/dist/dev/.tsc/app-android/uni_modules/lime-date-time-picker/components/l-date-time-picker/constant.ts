@@ -1,0 +1,56 @@
+// @ts-nocheck
+import { TimeModeValues } from './type';
+// 使用位运算定义模式
+// const MODES = {
+// 	YEAR: 1 << 0, // 1
+// 	MONTH: 1 << 1, // 2
+// 	DATE: 1 << 2, // 4
+// 	HOUR: 1 << 3, // 8
+// 	MINUTE: 1 << 4 // 16
+// 	SECOND : 1 << 4 // 32
+// };
+
+export const MODE_YEAR = 1; // 0001
+export const MODE_MONTH = 2; // 0010
+export const MODE_DATE = 4; // 0100
+export const MODE_HOUR = 8; // 1000
+export const MODE_MINUTE = 16; // 10000
+export const MODE_SECOND = 32; // 100000
+
+export const MODE_MAP = new Map<string, number>([
+	['年', MODE_YEAR],
+	['月', MODE_MONTH],
+	['日', MODE_DATE],
+	['时', MODE_HOUR],
+	['分', MODE_MINUTE],
+	['秒', MODE_SECOND],
+	['year', MODE_YEAR],
+	['month', MODE_MONTH],
+	['date', MODE_DATE],
+	['hour', MODE_HOUR],
+	['minute', MODE_MINUTE],
+	['second', MODE_SECOND],
+])
+
+export const FORMAT_MAP = new Map<string, string>([
+	['year', 'YYYY'],
+	['month', 'MM'],
+	['date', 'DD'],
+	['hour', 'HH'],
+	['minute', 'mm'],
+	['second', 'ss'],
+])
+
+export const UNIT_MAP = new Map<string, string>([
+	['year', '年'],
+	['month', '月'],
+	['date', '日'],
+	['hour', '时'],
+	['minute', '分'],
+	['second', '秒'],
+])
+
+
+// 定义时间列名称数组
+export const MODE_NAMES : TimeModeValues[] = ['year', 'month', 'date', 'hour', 'minute', 'second'];
+export const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss'
