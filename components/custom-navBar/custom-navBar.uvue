@@ -105,6 +105,7 @@
 		width: 70rpx;
 		height: 40rpx;
 		z-index: 10;
+		justify-content: center;
 	}
 
 	.title {

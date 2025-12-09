@@ -1584,9 +1584,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.84",
-    uniCompilerVersion: "4.84",
-    uniRuntimeVersion: "4.84",
+    uniCompileVersion: "4.87",
+    uniCompilerVersion: "4.87",
+    uniRuntimeVersion: "4.87",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -1614,8 +1614,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("4.84");
-      parameters.uniRuntimeVersionCode = parseFloat("4.84");
+      parameters.uniCompilerVersionCode = parseFloat("4.87");
+      parameters.uniRuntimeVersionCode = parseFloat("4.87");
     } catch (error) {
     }
   }
@@ -1742,14 +1742,14 @@ const getAppBaseInfo = {
       appLanguage: getAppLanguage(hostLanguage),
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.84",
-      uniCompilerVersion: "4.84",
-      uniRuntimeVersion: "4.84"
+      uniCompileVersion: "4.87",
+      uniCompilerVersion: "4.87",
+      uniRuntimeVersion: "4.87"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("4.84");
-        parameters.uniRuntimeVersionCode = parseFloat("4.84");
+        parameters.uniCompilerVersionCode = parseFloat("4.87");
+        parameters.uniRuntimeVersionCode = parseFloat("4.87");
       } catch (error) {
       }
     }
@@ -9098,6 +9098,20 @@ function __awaiter(thisArg, _arguments, P, generator) {
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 }
+function __values(o2) {
+  var s2 = typeof Symbol === "function" && Symbol.iterator, m = s2 && o2[s2], i = 0;
+  if (m)
+    return m.call(o2);
+  if (o2 && typeof o2.length === "number")
+    return {
+      next: function() {
+        if (o2 && i >= o2.length)
+          o2 = void 0;
+        return { value: o2 && o2[i++], done: !o2 };
+      }
+    };
+  throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
 function __read(o2, n2) {
   var m = typeof Symbol === "function" && o2[Symbol.iterator];
   if (!m)
@@ -9158,6 +9172,7 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
 );
 exports.__awaiter = __awaiter;
 exports.__read = __read;
+exports.__values = __values;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;

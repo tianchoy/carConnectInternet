@@ -19,7 +19,8 @@
     "pages/geofencing/geofencing",
     "pages/scancode/scancode",
     "pages/userCenter/payDeviceList/payDeviceList",
-    "pages/userCenter/renewal/renewal"
+    "pages/userCenter/renewal/renewal",
+    "pages/cmd/cmd"
   ],
   "window": {
     "navigationStyle": "custom",

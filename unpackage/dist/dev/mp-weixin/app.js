@@ -22,6 +22,7 @@ if (!Math) {
   "./pages/scancode/scancode.js";
   "./pages/userCenter/payDeviceList/payDeviceList.js";
   "./pages/userCenter/renewal/renewal.js";
+  "./pages/cmd/cmd.js";
 }
 let updateManager = null;
 function checkForUpdates() {

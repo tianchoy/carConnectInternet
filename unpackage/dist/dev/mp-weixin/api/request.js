@@ -22,6 +22,9 @@ const bindDeviceList = "/device/bindGeofenceList";
 const bindGeofence = "/geofence/bind";
 const unbindGeofence = "/geofence/unbind";
 const deleteDevice = "/userDevice/del";
+const cmdActionUrl = "/command/cmdAction";
+const cmdByMidUrl = "/command/cmdByMid";
+const cmdSendUrl = "/command/sendCmd";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
@@ -94,6 +97,15 @@ const bindDevices = (data) => {
 const unbindDevices = (data) => {
   return api_http.http.delete(unbindGeofence, data);
 };
+const getCmdAction = () => {
+  return api_http.http.get(cmdActionUrl);
+};
+const getCmdByMid = (data) => {
+  return api_http.http.get(cmdByMidUrl, data);
+};
+const sendCmd = (data) => {
+  return api_http.http.post(cmdSendUrl, data);
+};
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
@@ -103,6 +115,8 @@ exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
 exports.editDeviceInfo = editDeviceInfo;
 exports.getBoundDevices = getBoundDevices;
+exports.getCmdAction = getCmdAction;
+exports.getCmdByMid = getCmdByMid;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getGeofenceList = getGeofenceList;
@@ -114,6 +128,7 @@ exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
 exports.login = login;
 exports.logout = logout;
+exports.sendCmd = sendCmd;
 exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;

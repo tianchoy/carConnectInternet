@@ -1,0 +1,473 @@
+<template>
+	<view class="container">
+		<custom-navBar title="指令" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+		</custom-navBar>
+		<view class="device-info">
+			<text class="device-label">设备ID: {{ imei}}</text>
+		</view>
+		<view class="section">
+			<text class="section-title">指令类型</text>
+			<view class="type-container">
+				<view class="type-list">
+					<view v-for="(type,index) in commandTypes" :key="type.cmdmId" class="type-item"
+						:class="{ active: selectedTypeId == type.cmdmId }" @click="selectType(type.cmdmId)">
+						<text class="type-name">{{ type.cmdName }}</text>
+					</view>	
+				</view>
+			</view>
+		</view>
+		<view class="section" v-if="commands.length" >
+			<text class="section-title">指令列表</text>
+			<view class="command-list">
+				<view v-for="(cmd,index) in commands" :key="cmd.predictCmdId" class="command-item"
+					:class="{ active: selectedCommandId == cmd.predictCmdId }" @click="selectCommand(cmd)">
+					<text class="command-name">{{ cmd.cmdName }}</text>
+					<text class="command-descr">{{ cmd.remarks }}</text>
+				</view>
+			</view>
+		</view>
+		
+		<view class="section" v-if="selectedCommand && selectedCommand.details">
+			<!-- <text class="section-title">指令参数</text> -->
+			<view class="param-form">
+				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
+					<text class="section-title">{{ param.label }}</text>
+					<uv-input v-if="param.type == 'input'" class="param-input" v-model="paramValues[index]"
+						:placeholder="'请输入' + param.label" placeholder-class="placeholder" />
+					<uv-input v-if="param.type == 'number'" class="param-input" type="number" v-model="paramValues[index]"
+						:placeholder="'请输入' + param.label" placeholder-class="placeholder" :maxlength="param.max" />
+					<view v-if="param.type == 'radio'" class="radio-group">
+						<view v-for="item in param.items" :key="'radio_' + item.value" class="radio-item"
+							@click="selectRadio(index, item.value)">
+							<view class="radio-icon">
+								<view class="radio-inner" :class="{ checked: paramValues[index] == item.value }">
+								</view>
+							</view>
+							<text class="radio-label">{{ item.desc }}</text>
+						</view>
+					</view>
+				</view>
+				<uv-button type="primary" class="submit-btn" :disabled="!isFormValid" @click="sendCommand">
+					发送指令
+				</uv-button>
+			</view>
+		</view>
+		<view class="empty-state" v-if="!selectedTypeId">
+			<text class="empty-text">请先选择指令类型</text>
+		</view>
+		<view class="loading" v-if="loading">
+			<text class="loading-text">加载中...</text>
+		</view>
+		<view class="empty-state" v-else-if="!commands.length && selectedTypeId">
+			<text class="empty-text">暂无指令</text>
+		</view>
+	</view>
+</template>
+<script setup lang="uts">
+	import { ref, reactive, computed, onMounted } from 'vue'
+	import { getCmdAction, getCmdByMid, sendCmd } from '@/api/request'
+	const imei = ref('')
+	const commandTypes = ref([])
+	const selectedTypeId = ref(null)
+	const commands = ref([])
+	const selectedCommandId = ref(null)
+	const selectedCommand = ref(null)
+	const paramValues = ref([])
+	const loading = ref(false)
+
+	const paramConfigs = computed(() => {
+		if (!selectedCommand.value || !selectedCommand.value.details) return []
+
+		try {
+			return JSON.parse(selectedCommand.value.details)
+		} catch (e) {
+			console.error('解析参数配置失败:', e)
+			return []
+		}
+	})
+
+	const isFormValid = computed(() => {
+		return paramValues.value.length > 0 &&
+			paramValues.value.every(val => val !== null && val !== undefined && val !== '')
+	})
+
+	onLoad((options) => {
+		imei.value = options.imei || ''
+		loadCommandTypes()
+	})
+	
+	// 加载指令类型
+	const loadCommandTypes = async () => {
+		try {
+			loading.value = true
+			const response = await getCmdAction()
+
+			console.log('加载指令类型响应:', response)
+
+			if (response.code == 0) {
+				commandTypes.value = response.data
+			} else {
+				uni.showToast({
+					title: '加载指令类型失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('加载指令类型出错:', error)
+			uni.showToast({
+				title: '网络错误',
+				icon: 'none'
+			})
+		} finally {
+			loading.value = false
+		}
+	}
+	const selectType = async (typeId:any) => {
+		selectedTypeId.value = typeId
+		selectedCommandId.value = null
+		selectedCommand.value = null
+		paramValues.value = []
+
+		try {
+			loading.value = true
+			const response = await getCmdByMid({
+				imei: imei.value,
+				cmdmId: typeId
+			})
+
+			if (response.code == 0) {
+				commands.value = response.data
+			} else {
+				uni.showToast({
+					title: '加载指令列表失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('加载指令列表出错:', error)
+			uni.showToast({
+				title: '网络错误',
+				icon: 'none'
+			})
+		} finally {
+			loading.value = false
+		}
+	}
+
+	const selectCommand = (command) => {
+		selectedCommandId.value = command.predictCmdId
+		selectedCommand.value = command
+		paramValues.value = []
+
+		// 初始化参数值
+		if (command.details) {
+			try {
+				const configs = JSON.parse(command.details)
+				paramValues.value = configs.map(config => {
+					// 处理不同类型的默认值
+					if (config.default !== undefined) {
+						return config.default.toString()
+					}
+					if (config.type == 'radio' && config.items && config.items.length > 0) {
+						return config.items[0].value
+					}
+					return ''
+				})
+			} catch (e) {
+				console.error('初始化参数值失败:', e)
+				paramValues.value = []
+			}
+		}
+	}
+
+	const selectRadio = (index, value) => {
+		// 确保数组长度足够
+		if (paramValues.value.length <= index) {
+			// 扩展数组到指定长度
+			const newLength = index + 1
+			const newArray = new Array(newLength)
+			for (let i = 0; i < newLength; i++) {
+				newArray[i] = paramValues.value[i] || ''
+			}
+			paramValues.value = newArray
+		}
+		paramValues.value[index] = value
+	}
+
+	const sendCommand = async () => {
+		if (!isFormValid.value) {
+			uni.showToast({
+				title: '请填写所有参数',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			loading.value = true
+
+			// 改进参数替换逻辑
+			let cmdData = selectedCommand.value.params
+			
+			// 根据参数配置进行智能替换
+			paramConfigs.value.forEach((config, index) => {
+				const value = paramValues.value[index]
+				if (config.placeholder) {
+					// 使用配置中的占位符
+					cmdData = cmdData.replace(config.placeholder, value)
+				} else {
+					const placeholder = `\${param${index + 1}}` // 假设占位符格式为 ${param1}, ${param2}...
+					cmdData = cmdData.replace(placeholder, value)
+				}
+			})
+
+			// 发送请求
+			const response = await sendCmd({
+				imei: imei.value,
+				type: selectedCommand.value.cmdCode,
+				password: null,
+				cmdData: encodeURIComponent(cmdData),
+				predictCmdId: selectedCommand.value.predictCmdId
+			})
+
+			if (response.code == 0) {
+				uni.showToast({
+					title: '指令发送成功',
+					icon: 'success'
+				})
+				// 返回上一页
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 1500)
+			} else {
+				uni.showToast({
+					title: '指令发送失败: ' + (response.msg || '未知错误'),
+					icon: 'none',
+					duration: 3000
+				})
+			}
+		} catch (error) {
+			console.error('发送指令出错:', error)
+			uni.showToast({
+				title: '网络错误',
+				icon: 'none'
+			})
+		} finally {
+			loading.value = false
+		}
+	}
+</script>
+<style scoped lang="scss">
+	.container {
+		background-color: #f5f5f5;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.device-info {
+		display: flex;
+		align-items: center;
+		background: white;
+		padding: 20rpx;
+		border-radius: 10rpx;
+		margin: 30rpx 0;
+	}
+
+	.device-label {
+		font-size: 28rpx;
+		color: #666;
+		white-space: nowrap;
+	}
+
+	.device-input {
+		flex: 1;
+		font-size: 28rpx;
+		color: #333;
+	}
+
+	.section {
+		background: white;
+		border-radius: 10rpx;
+		padding: 20rpx;
+		margin-bottom: 30rpx;
+	}
+
+	.section-title {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #333;
+		margin-bottom: 20rpx;
+		display: block;
+	}
+
+	.type-container {
+		width: 100%;
+	}
+	
+	.type-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: 20rpx;
+	}
+	
+	.type-item {
+		padding: 15rpx 30rpx;
+		background: #f0f0f0;
+		border-radius: 50rpx;
+	}
+	
+	.type-item:nth-child(2n) {
+		margin-right: 0;
+	}
+
+	.type-item.active {
+		background: #007AFF;
+	}
+
+	.type-item.active .type-name {
+		color: white;
+	}
+
+	.type-name {
+		font-size: 26rpx;
+		color: #666;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.command-list {
+		display: flex;
+		flex-direction: row;
+		gap: 20rpx;
+	}
+
+	.command-item {
+		flex: 1;
+		padding: 25rpx;
+		border: 1rpx solid #e0e0e0;
+		border-radius: 10rpx;
+	}
+
+	.command-item.active {
+		border-color: #007AFF;
+		background-color: #f0f8ff;
+	}
+
+	.command-name {
+		font-size: 30rpx;
+		color: #333;
+		display: block;
+		margin-bottom: 10rpx;
+	}
+
+	.command-descr {
+		font-size: 24rpx;
+		color: #999;
+		display: block;
+	}
+
+	.param-form {
+		display: flex;
+		flex-direction: column;
+		gap: 30rpx;
+	}
+
+	.param-item {
+		display: flex;
+		flex-direction: column;
+		gap: 15rpx;
+	}
+
+	.param-label {
+		font-size: 28rpx;
+		color: #333;
+	}
+
+	.param-input {
+		border: 1rpx solid #e0e0e0;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		font-size: 26rpx;
+	}
+
+	.radio-group {
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
+	}
+
+	.radio-item {
+		display: flex;
+		align-items: center;
+		gap: 20rpx;
+	}
+
+	.radio-icon {
+		width: 36rpx;
+		height: 36rpx;
+		border-radius: 50%;
+		border: 1rpx solid #ccc;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.radio-inner {
+		width: 20rpx;
+		height: 20rpx;
+		border-radius: 50%;
+		background: transparent;
+	}
+
+	.radio-inner.checked {
+		background: #007AFF;
+	}
+
+	.radio-label {
+		font-size: 26rpx;
+		color: #333;
+	}
+
+	.submit-btn {
+		color: white;
+		border: none;
+		border-radius: 10rpx;
+		padding: 25rpx;
+		font-size: 30rpx;
+		margin-top: 20rpx;
+	}
+
+	.submit-btn:disabled {
+		background: #ccc;
+		color: #999;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 100rpx 0;
+	}
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #999;
+	}
+
+	.loading {
+		text-align: center;
+		padding: 50rpx 0;
+	}
+
+	.loading-text {
+		font-size: 28rpx;
+		color: #999;
+	}
+
+	.placeholder {
+		color: #ccc;
+	}
+</style>
