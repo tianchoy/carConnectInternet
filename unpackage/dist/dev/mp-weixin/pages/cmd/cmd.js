@@ -24,6 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectedCommand = common_vendor.ref(null);
     const paramValues = common_vendor.ref([]);
     const loading = common_vendor.ref(false);
+    const commandRecords = common_vendor.ref(null);
     const paramConfigs = common_vendor.computed(() => {
       if (!selectedCommand.value || !selectedCommand.value.details)
         return [];
@@ -43,6 +44,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imei.value = options.imei || "";
       loadCommandTypes();
     });
+    const sortByCmdNameLengthAndAlphabet = (data = null) => {
+      if (!Array.isArray(data)) {
+        console.error("参数必须是一个数组");
+        return [];
+      }
+      const sortedData = [...data];
+      sortedData.sort((a = null, b = null) => {
+        const aName = a.cmdName ? a.cmdName.toString() : "";
+        const bName = b.cmdName ? b.cmdName.toString() : "";
+        if (aName.length !== bName.length) {
+          return aName.length - bName.length;
+        }
+        return aName.localeCompare(bName, "zh-CN");
+      });
+      return sortedData;
+    };
     const loadCommandTypes = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,7 +67,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const response = yield api_request.getCmdAction();
           console.log("加载指令类型响应:", response);
           if (response.code == 0) {
-            commandTypes.value = response.data;
+            commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
           } else {
             common_vendor.index.showToast({
               title: "加载指令类型失败",
@@ -74,6 +91,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         selectedCommandId.value = null;
         selectedCommand.value = null;
         paramValues.value = [];
+        commandRecords.value = null;
+        console.log("选择指令类型:", typeId, typeof commandRecords.value);
         try {
           loading.value = true;
           const response = yield api_request.getCmdByMid({
@@ -166,8 +185,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "success"
             });
             setTimeout(() => {
-              common_vendor.index.navigateBack();
-            }, 1500);
+              api_request.getCmdRecordById(response.data).then((recordResponse = null) => {
+                console.log("获取指令记录详情响应:", recordResponse);
+                if (recordResponse.code == 0) {
+                  commandRecords.value = recordResponse.data;
+                } else {
+                  common_vendor.index.showToast({
+                    title: "获取指令记录详情失败",
+                    icon: "none"
+                  });
+                }
+              });
+            }, 2e3);
           } else {
             common_vendor.index.showToast({
               title: "指令发送失败: " + (response.msg || "未知错误"),
@@ -274,12 +303,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           disabled: !isFormValid.value
         })
       } : {}, {
-        j: !selectedTypeId.value
+        j: commandRecords.value
+      }, commandRecords.value ? {
+        k: common_vendor.t(commandRecords.value.reason || "暂无指令返回记录")
+      } : {}, {
+        l: !selectedTypeId.value
       }, !selectedTypeId.value ? {} : {}, {
-        k: loading.value
+        m: loading.value
       }, loading.value ? {} : !commands.value.length && selectedTypeId.value ? {} : {}, {
-        l: !commands.value.length && selectedTypeId.value,
-        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        n: !commands.value.length && selectedTypeId.value,
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

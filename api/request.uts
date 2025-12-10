@@ -27,10 +27,11 @@ const bindGeofence = '/geofence/bind'
 const unbindGeofence = '/geofence/unbind'
 const deleteDevice = '/userDevice/del'
 
-// 指令相关的URL常量 - 修正命名避免冲突
+// 指令相关的URL常量
 const cmdActionUrl = '/command/cmdAction'
 const cmdByMidUrl = '/command/cmdByMid'
 const cmdSendUrl = '/command/sendCmd'
+const cmdRecordByIdUrl = '/command/recordById?id='
 
 // 登陆接口
 export const login = (data: UTSJSONObject) => {
@@ -180,4 +181,9 @@ export const getCmdByMid = (data: object) => {
 // 发送命令
 export const sendCmd = (data: object) => {
     return http.post(cmdSendUrl, data)
+}
+
+// 根据指令ID获取指令记录详情
+export const getCmdRecordById = (id: string) => {
+    return http.get(`${cmdRecordByIdUrl}${id}`)
 }

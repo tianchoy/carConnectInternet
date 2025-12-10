@@ -25,6 +25,7 @@ const deleteDevice = "/userDevice/del";
 const cmdActionUrl = "/command/cmdAction";
 const cmdByMidUrl = "/command/cmdByMid";
 const cmdSendUrl = "/command/sendCmd";
+const cmdRecordByIdUrl = "/command/recordById?id=";
 const login = (data) => {
   return api_http.http.post(loginUrl, data);
 };
@@ -106,6 +107,9 @@ const getCmdByMid = (data) => {
 const sendCmd = (data) => {
   return api_http.http.post(cmdSendUrl, data);
 };
+const getCmdRecordById = (id) => {
+  return api_http.http.get(`${cmdRecordByIdUrl}${id}`);
+};
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
 exports.addGeofence = addGeofence;
@@ -117,6 +121,7 @@ exports.editDeviceInfo = editDeviceInfo;
 exports.getBoundDevices = getBoundDevices;
 exports.getCmdAction = getCmdAction;
 exports.getCmdByMid = getCmdByMid;
+exports.getCmdRecordById = getCmdRecordById;
 exports.getDeviceDetail = getDeviceDetail;
 exports.getDevicePos = getDevicePos;
 exports.getGeofenceList = getGeofenceList;

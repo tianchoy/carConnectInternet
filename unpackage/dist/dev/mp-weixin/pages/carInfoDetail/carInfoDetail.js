@@ -35,7 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(14);
+    const mapScale = common_vendor.ref(15);
     const datainfo = common_vendor.ref({});
     const address = common_vendor.ref("");
     const currentTime = common_vendor.ref("5s");
@@ -197,44 +197,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isRefreshing.value = false;
       }
     };
-    const baseList = common_vendor.ref([
-      new UTSJSONObject({
-        name: "/static/gjhf.png",
-        title: "轨迹回放"
-      }),
-      new UTSJSONObject({
-        name: "/static/clgz.png",
-        title: "车辆跟踪"
-      }),
-      new UTSJSONObject({
-        name: "/static/lcjl.png",
-        title: "里程记录"
-      }),
-      new UTSJSONObject({
-        name: "/static/tcjl.png",
-        title: "停车记录"
-      }),
-      new UTSJSONObject({
-        name: "/static/dzwl.png",
-        title: "电子围栏"
-      }),
-      new UTSJSONObject({
-        name: "/static/navto.png",
-        title: "一键寻车"
-      }),
-      new UTSJSONObject({
-        name: "/static/power.png",
-        title: "恢复油电"
-      }),
-      new UTSJSONObject({
-        name: "/static/offpower.png",
-        title: "断开油电"
-      })
-      // {
-      // 	name: '/static/cmd.png',
-      // 	title: '发送指令'
-      // },
-    ]);
+    const baseList = common_vendor.ref([new UTSJSONObject({
+      name: "/static/gjhf.png",
+      title: "轨迹回放"
+    }), new UTSJSONObject({
+      name: "/static/clgz.png",
+      title: "车辆跟踪"
+    }), new UTSJSONObject({
+      name: "/static/lcjl.png",
+      title: "里程记录"
+    }), new UTSJSONObject({
+      name: "/static/tcjl.png",
+      title: "停车记录"
+    }), new UTSJSONObject({
+      name: "/static/dzwl.png",
+      title: "电子围栏"
+    }), new UTSJSONObject({
+      name: "/static/navto.png",
+      title: "一键寻车"
+    }), new UTSJSONObject({
+      name: "/static/power.png",
+      title: "恢复油电"
+    }), new UTSJSONObject({
+      name: "/static/offpower.png",
+      title: "断开油电"
+    }), new UTSJSONObject({
+      name: "/static/cmd.png",
+      title: "发送指令"
+    })]);
     const click = (name = null) => {
       const itemTo = name.title;
       if (itemTo == "轨迹回放") {
@@ -613,11 +603,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
         setupAutoRefresh(currentTime.value);
       }
-    });
-    common_vendor.onShow(() => {
-      common_vendor.onHide(() => {
-        clearInterval(statusTimer);
-      });
     });
     common_vendor.onHide(() => {
       console.log("页面隐藏时停止自动刷新");

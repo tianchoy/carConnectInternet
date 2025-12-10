@@ -28,7 +28,6 @@
 		</view>
 		
 		<view class="section" v-if="selectedCommand && selectedCommand.details">
-			<!-- <text class="section-title">指令参数</text> -->
 			<view class="param-form">
 				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
 					<text class="section-title">{{ param.label }}</text>
@@ -52,6 +51,12 @@
 				</uv-button>
 			</view>
 		</view>
+		<view class="section" v-if="commandRecords">
+			<text class="section-title">指令记录</text>
+			<view class="record-list">
+				{{ commandRecords.reason || '暂无指令返回记录' }}
+			</view>
+		</view>
 		<view class="empty-state" v-if="!selectedTypeId">
 			<text class="empty-text">请先选择指令类型</text>
 		</view>
@@ -65,7 +70,7 @@
 </template>
 <script setup lang="uts">
 	import { ref, reactive, computed, onMounted } from 'vue'
-	import { getCmdAction, getCmdByMid, sendCmd } from '@/api/request'
+	import { getCmdAction, getCmdByMid, sendCmd,getCmdRecordById } from '@/api/request'
 	const imei = ref('')
 	const commandTypes = ref([])
 	const selectedTypeId = ref(null)
@@ -74,6 +79,7 @@
 	const selectedCommand = ref(null)
 	const paramValues = ref([])
 	const loading = ref(false)
+	const commandRecords = ref(null)
 
 	const paramConfigs = computed(() => {
 		if (!selectedCommand.value || !selectedCommand.value.details) return []
@@ -95,6 +101,30 @@
 		imei.value = options.imei || ''
 		loadCommandTypes()
 	})
+
+	const sortByCmdNameLengthAndAlphabet = (data) => {
+    if (!Array.isArray(data)) {
+        console.error('参数必须是一个数组');
+        return [];
+    }
+    
+    const sortedData = [...data];
+    
+    sortedData.sort((a, b) => {
+        const aName = a.cmdName ? a.cmdName.toString() : '';
+        const bName = b.cmdName ? b.cmdName.toString() : '';
+        
+        // 首先按长度排序
+        if (aName.length !== bName.length) {
+            return aName.length - bName.length;
+        }
+        
+        // 长度相同则按字母顺序排序
+        return aName.localeCompare(bName, 'zh-CN');
+    });
+    
+    return sortedData;
+}
 	
 	// 加载指令类型
 	const loadCommandTypes = async () => {
@@ -105,7 +135,7 @@
 			console.log('加载指令类型响应:', response)
 
 			if (response.code == 0) {
-				commandTypes.value = response.data
+				commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
 			} else {
 				uni.showToast({
 					title: '加载指令类型失败',
@@ -127,6 +157,9 @@
 		selectedCommandId.value = null
 		selectedCommand.value = null
 		paramValues.value = []
+		commandRecords.value = null
+
+		console.log('选择指令类型:', typeId,typeof commandRecords.value)
 
 		try {
 			loading.value = true
@@ -235,10 +268,21 @@
 					title: '指令发送成功',
 					icon: 'success'
 				})
-				// 返回上一页
+				//等待两秒之后再请求
 				setTimeout(() => {
-					uni.navigateBack()
-				}, 1500)
+					getCmdRecordById(response.data).then(recordResponse => {
+						console.log('获取指令记录详情响应:', recordResponse)
+						if (recordResponse.code == 0) {
+							// 处理指令记录详情
+							commandRecords.value = recordResponse.data
+						} else {
+							uni.showToast({
+								title: '获取指令记录详情失败',
+								icon: 'none'
+							})
+						}
+					})
+				}, 2000)
 			} else {
 				uni.showToast({
 					title: '指令发送失败: ' + (response.msg || '未知错误'),
@@ -256,6 +300,7 @@
 			loading.value = false
 		}
 	}
+
 </script>
 <style scoped lang="scss">
 	.container {
@@ -301,6 +346,11 @@
 		display: block;
 	}
 
+	.record-list {
+		font-size: 26rpx;
+		color: #666;
+	}
+
 	.type-container {
 		width: 100%;
 	}
@@ -309,7 +359,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		justify-content: space-between;
+		justify-content: flex-start;
 		align-items: center;
 		gap: 20rpx;
 	}

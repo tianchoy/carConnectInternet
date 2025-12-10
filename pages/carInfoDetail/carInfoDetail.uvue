@@ -112,7 +112,7 @@
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(14)
+	const mapScale = ref(15)
 	const datainfo = ref<object>({})
 	const address = ref('')
 	const currentTime = ref('5s')
@@ -383,10 +383,10 @@
 		name: '/static/offpower.png',
 		title: '断开油电'
 	},
-	// {
-	// 	name: '/static/cmd.png',
-	// 	title: '发送指令'
-	// },
+	{
+		name: '/static/cmd.png',
+		title: '发送指令'
+	},
 	])
 
 	const click = (name) => {
@@ -845,16 +845,6 @@
 			setupAutoRefresh(currentTime.value)
 		}
 	})
-
-
-
-	// 页面显示时开始检查
-	onShow(() => {
-		// 页面隐藏时清除
-		onHide(() => {
-			clearInterval(statusTimer);
-		});
-	});
 
 	// 新增页面隐藏时的处理
 	onHide(() => {
