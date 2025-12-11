@@ -164,8 +164,8 @@
   justify-content: center;
 }
 .radio-inner.data-v-c4271740 {
-  width: 20rpx;
-  height: 20rpx;
+  width: 25rpx;
+  height: 25rpx;
   border-radius: 50%;
   background: transparent;
 }

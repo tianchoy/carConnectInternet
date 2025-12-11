@@ -12,11 +12,11 @@
 					<view v-for="(type,index) in commandTypes" :key="type.cmdmId" class="type-item"
 						:class="{ active: selectedTypeId == type.cmdmId }" @click="selectType(type.cmdmId)">
 						<text class="type-name">{{ type.cmdName }}</text>
-					</view>	
+					</view>
 				</view>
 			</view>
 		</view>
-		<view class="section" v-if="commands.length" >
+		<view class="section" v-if="commands.length">
 			<text class="section-title">指令列表</text>
 			<view class="command-list">
 				<view v-for="(cmd,index) in commands" :key="cmd.predictCmdId" class="command-item"
@@ -26,15 +26,16 @@
 				</view>
 			</view>
 		</view>
-		
+
 		<view class="section" v-if="selectedCommand && selectedCommand.details">
 			<view class="param-form">
 				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
 					<text class="section-title">{{ param.label }}</text>
 					<uv-input v-if="param.type == 'input'" class="param-input" v-model="paramValues[index]"
 						:placeholder="'请输入' + param.label" placeholder-class="placeholder" />
-					<uv-input v-if="param.type == 'number'" class="param-input" type="number" v-model="paramValues[index]"
-						:placeholder="'请输入' + param.label" placeholder-class="placeholder" :maxlength="param.max" />
+					<uv-input v-if="param.type == 'number'" class="param-input" type="number"
+						v-model="paramValues[index]" :placeholder="'请输入' + param.label" placeholder-class="placeholder"
+						:maxlength="param.max" />
 					<view v-if="param.type == 'radio'" class="radio-group">
 						<view v-for="item in param.items" :key="'radio_' + item.value" class="radio-item"
 							@click="selectRadio(index, item.value)">
@@ -70,7 +71,7 @@
 </template>
 <script setup lang="uts">
 	import { ref, reactive, computed, onMounted } from 'vue'
-	import { getCmdAction, getCmdByMid, sendCmd,getCmdRecordById } from '@/api/request'
+	import { getCmdAction, getCmdByMid, sendCmd, getCmdRecordById } from '@/api/request'
 	const imei = ref('')
 	const commandTypes = ref([])
 	const selectedTypeId = ref(null)
@@ -103,29 +104,29 @@
 	})
 
 	const sortByCmdNameLengthAndAlphabet = (data) => {
-    if (!Array.isArray(data)) {
-        console.error('参数必须是一个数组');
-        return [];
-    }
-    
-    const sortedData = [...data];
-    
-    sortedData.sort((a, b) => {
-        const aName = a.cmdName ? a.cmdName.toString() : '';
-        const bName = b.cmdName ? b.cmdName.toString() : '';
-        
-        // 首先按长度排序
-        if (aName.length !== bName.length) {
-            return aName.length - bName.length;
-        }
-        
-        // 长度相同则按字母顺序排序
-        return aName.localeCompare(bName, 'zh-CN');
-    });
-    
-    return sortedData;
-}
-	
+		if (!Array.isArray(data)) {
+			console.error('参数必须是一个数组');
+			return [];
+		}
+
+		const sortedData = [...data];
+
+		sortedData.sort((a, b) => {
+			const aName = a.cmdName ? a.cmdName.toString() : '';
+			const bName = b.cmdName ? b.cmdName.toString() : '';
+
+			// 首先按长度排序
+			if (aName.length !== bName.length) {
+				return aName.length - bName.length;
+			}
+
+			// 再次，长度相同则按字母顺序排序
+			return aName.localeCompare(bName, 'zh-CN');
+		});
+
+		return sortedData;
+	}
+
 	// 加载指令类型
 	const loadCommandTypes = async () => {
 		try {
@@ -152,14 +153,14 @@
 			loading.value = false
 		}
 	}
-	const selectType = async (typeId:any) => {
+	const selectType = async (typeId : any) => {
 		selectedTypeId.value = typeId
 		selectedCommandId.value = null
 		selectedCommand.value = null
 		paramValues.value = []
 		commandRecords.value = null
 
-		console.log('选择指令类型:', typeId,typeof commandRecords.value)
+		console.log('选择指令类型:', typeId, typeof commandRecords.value)
 
 		try {
 			loading.value = true
@@ -241,7 +242,7 @@
 
 			// 改进参数替换逻辑
 			let cmdData = selectedCommand.value.params
-			
+
 			// 根据参数配置进行智能替换
 			paramConfigs.value.forEach((config, index) => {
 				const value = paramValues.value[index]
@@ -249,7 +250,7 @@
 					// 使用配置中的占位符
 					cmdData = cmdData.replace(config.placeholder, value)
 				} else {
-					const placeholder = `\${param${index + 1}}` // 假设占位符格式为 ${param1}, ${param2}...
+					const placeholder = `\${param${index + 1}}` 
 					cmdData = cmdData.replace(placeholder, value)
 				}
 			})
@@ -300,7 +301,6 @@
 			loading.value = false
 		}
 	}
-
 </script>
 <style scoped lang="scss">
 	.container {
@@ -354,7 +354,7 @@
 	.type-container {
 		width: 100%;
 	}
-	
+
 	.type-list {
 		display: flex;
 		flex-direction: row;
@@ -363,13 +363,13 @@
 		align-items: center;
 		gap: 20rpx;
 	}
-	
+
 	.type-item {
 		padding: 15rpx 30rpx;
 		background: #f0f0f0;
 		border-radius: 50rpx;
 	}
-	
+
 	.type-item:nth-child(2n) {
 		margin-right: 0;
 	}
@@ -468,8 +468,8 @@
 	}
 
 	.radio-inner {
-		width: 20rpx;
-		height: 20rpx;
+		width: 25rpx;
+		height: 25rpx;
 		border-radius: 50%;
 		background: transparent;
 	}
