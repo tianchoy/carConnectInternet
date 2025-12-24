@@ -700,7 +700,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 paddingTop: "20rpx"
               },
               name: item.name,
-              size: 42
+              size: 35
             }),
             c: common_vendor.t(item.title),
             d: index,

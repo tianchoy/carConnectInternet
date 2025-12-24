@@ -81,7 +81,7 @@
 			</view>
 			<uv-grid :col="5">
 				<uv-grid-item v-for="(item,index) in baseList" :key="index" @click="click(item)">
-					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="42"></uv-icon>
+					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="35"></uv-icon>
 					<text class="grid-text">{{item.title}}</text>
 				</uv-grid-item>
 			</uv-grid>
@@ -1203,7 +1203,7 @@
 			}
 
 			.grid-text {
-				padding: 20rpx 0 0;
+				padding: 10rpx 0 0;
 				/* #ifndef APP-PLUS */
 				box-sizing: border-box;
 				/* #endif */
