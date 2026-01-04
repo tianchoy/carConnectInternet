@@ -297,7 +297,7 @@
 					const newData = data.list || []
 					console.log('即将添加的新数据长度:', newData.length)
 					
-					// 去重处理：基于 messageId
+					// 去重
 					const existingIds = new Set(msgList.value.map(item => item.messageId))
 					const uniqueNewData = newData.filter((item: UTSJSONObject) => !existingIds.has(item.messageId))
 					

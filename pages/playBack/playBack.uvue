@@ -689,7 +689,11 @@
 
 				.slider {
 					flex: 1;
-					padding: 0 50rpx;
+					padding: 0 20rpx 0 30rpx;
+					overflow: unset;
+				}
+				.uv-slider{
+					overflow: unset;
 				}
 
 				.play-btn {

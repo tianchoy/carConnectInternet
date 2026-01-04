@@ -85,7 +85,11 @@
 }
 .container .tools-panel .tool-tag-item .slider {
   flex: 1;
-  padding: 0 50rpx;
+  padding: 0 20rpx 0 30rpx;
+  overflow: unset;
+}
+.container .tools-panel .tool-tag-item .uv-slider {
+  overflow: unset;
 }
 .container .tools-panel .tool-tag-item .play-btn {
   font-size: 25rpx;
