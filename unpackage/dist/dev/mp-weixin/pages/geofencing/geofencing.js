@@ -129,14 +129,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return currentPagination.value.hasMore;
     });
     common_vendor.onLoad((option) => {
-      connectionStatus.value = option.connectionStatus;
-      imei.value = option.imei;
-      currentCar.value = option.plateNo;
-      deptId.value = option.deptId;
-      carType.value = option.carType;
-      deviceName.value = option.deviceName;
-      loadInitialPosition();
-      loadGeofenceList();
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        connectionStatus.value = option.connectionStatus;
+        imei.value = option.imei;
+        currentCar.value = option.plateNo;
+        deptId.value = option.deptId;
+        carType.value = option.carType;
+        deviceName.value = option.deviceName;
+        yield loadInitialPosition();
+        yield loadGeofenceList();
+      });
     });
     const loadInitialPosition = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {

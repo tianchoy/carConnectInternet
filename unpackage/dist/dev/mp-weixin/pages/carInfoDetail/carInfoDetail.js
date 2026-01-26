@@ -197,34 +197,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isRefreshing.value = false;
       }
     };
-    const baseList = common_vendor.ref([new UTSJSONObject({
-      name: "/static/gjhf.png",
-      title: "轨迹回放"
-    }), new UTSJSONObject({
-      name: "/static/clgz.png",
-      title: "车辆跟踪"
-    }), new UTSJSONObject({
-      name: "/static/lcjl.png",
-      title: "里程记录"
-    }), new UTSJSONObject({
-      name: "/static/tcjl.png",
-      title: "停车记录"
-    }), new UTSJSONObject({
-      name: "/static/dzwl.png",
-      title: "电子围栏"
-    }), new UTSJSONObject({
-      name: "/static/navto.png",
-      title: "一键寻车"
-    }), new UTSJSONObject({
-      name: "/static/power.png",
-      title: "恢复油电"
-    }), new UTSJSONObject({
-      name: "/static/offpower.png",
-      title: "断开油电"
-    }), new UTSJSONObject({
-      name: "/static/cmd.png",
-      title: "发送指令"
-    })]);
+    const baseList = common_vendor.computed(() => {
+      const list = [new UTSJSONObject({
+        name: "/static/gjhf.png",
+        title: "轨迹回放"
+      }), new UTSJSONObject({
+        name: "/static/clgz.png",
+        title: "车辆跟踪"
+      }), new UTSJSONObject({
+        name: "/static/lcjl.png",
+        title: "里程记录"
+      }), new UTSJSONObject({
+        name: "/static/tcjl.png",
+        title: "停车记录"
+      }), new UTSJSONObject({
+        name: "/static/dzwl.png",
+        title: "电子围栏"
+      }), new UTSJSONObject({
+        name: "/static/navto.png",
+        title: "一键寻车"
+      }), new UTSJSONObject({
+        name: "/static/power.png",
+        title: "恢复油电"
+      }), new UTSJSONObject({
+        name: "/static/offpower.png",
+        title: "断开油电"
+      })];
+      const productId = currentCarInfo.value.productId;
+      if (productId === "product-1141811865601576960" || productId === "product-1183161303028600832") {
+        list.push(new UTSJSONObject({
+          name: "/static/cmd.png",
+          title: "发送指令"
+        }));
+      }
+      return list;
+    });
     const click = (name = null) => {
       const itemTo = name.title;
       if (itemTo == "轨迹回放") {
@@ -394,7 +401,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             console.log("地图中心点移动成功，缩放级别：15");
           },
           fail: (err) => {
-            console.error("地图中心点移动失败:", err);
+            console.error("地图中心点移动失败:", err.errMsg);
           }
         }));
       } catch (error) {
@@ -573,6 +580,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (deviceId.value !== null) {
           const res = yield api_request.getDeviceDetail(deviceId.value);
+          console.log("设备详情：", res.data);
           currentCarInfo.value = res.data;
         } else {
           console.error("设备id获取失败");

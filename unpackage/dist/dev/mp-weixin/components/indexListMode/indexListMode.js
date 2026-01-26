@@ -23,6 +23,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const emit = __emit;
     const modal = common_vendor.ref();
     const imeis = common_vendor.ref("");
+    const needRefresh = common_vendor.ref(false);
+    const pay = (iccid, simMerchant) => {
+      if (simMerchant.toLowerCase() == "zddx") {
+        iccid = iccid.substring(0, iccid.length - 1);
+      }
+      console.log(iccid);
+      needRefresh.value = true;
+      common_vendor.wx$1.openEmbeddedMiniProgram(new UTSJSONObject({
+        appId: "wx1d647f2cfdc089e6",
+        path: "/pages/home/userSimRecharge?iccid=" + iccid,
+        envVersion: "release",
+        success(res = null) {
+          console.log("打开小程序成功", res);
+        },
+        fail(res = null) {
+          console.log("打开小程序失败", res);
+          needRefresh.value = false;
+          common_vendor.index.showToast({
+            title: "打开支付页面失败",
+            icon: "none"
+          });
+        }
+      }));
+    };
     const unbindDevice = (imei) => {
       var _a2;
       imeis.value = imei;
@@ -58,26 +82,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               type: item.connectionStatus == "online" ? "success" : "error"
             }),
             d: common_vendor.o(($event) => {
-              return unbindDevice(item.imei);
+              return pay(item.iccid, item.simMerchant);
             }, index),
             e: "245c735a-1-" + i0,
-            f: common_vendor.t(item.imei),
-            g: index,
-            h: common_vendor.o(($event) => {
+            f: common_vendor.o(($event) => {
+              return unbindDevice(item.imei);
+            }, index),
+            g: "245c735a-2-" + i0,
+            h: common_vendor.t(item.imei),
+            i: index,
+            j: common_vendor.o(($event) => {
               return todetail(item.companyId, item.imei, item.deviceId);
             }, index)
           };
         }),
         c: common_vendor.p({
+          text: "充值",
+          type: "success"
+        }),
+        d: common_vendor.p({
           text: "解绑",
           type: "warning"
         }),
-        d: common_vendor.sr(modal, "245c735a-2", {
+        e: common_vendor.sr(modal, "245c735a-3", {
           "k": "modal"
         }),
-        e: common_vendor.o(confirm),
-        f: common_vendor.o(cancel),
-        g: common_vendor.p({
+        f: common_vendor.o(confirm),
+        g: common_vendor.o(cancel),
+        h: common_vendor.p({
           title: "提示",
           content: "是否要解绑设备？",
           buttonReverse: true,
@@ -87,7 +119,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCancelButton: true
         })
       } : {}, {
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
       });
       return __returned__;
     };

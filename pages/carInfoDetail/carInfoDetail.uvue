@@ -354,7 +354,8 @@
 		}
 	}
 
-	const baseList = ref([{
+	const baseList = computed(() => {
+	const list = [{
 		name: '/static/gjhf.png',
 		title: '轨迹回放'
 	}, {
@@ -382,12 +383,20 @@
 	{
 		name: '/static/offpower.png',
 		title: '断开油电'
-	},
-	{
-		name: '/static/cmd.png',
-		title: '发送指令'
-	},
-	])
+	}]
+	
+	// 根据 productId 决定是否添加发送指令选项
+	const productId = currentCarInfo.value.productId
+	if (productId === 'product-1141811865601576960' || 
+		productId === 'product-1183161303028600832') {
+		list.push({
+			name: '/static/cmd.png',
+			title: '发送指令'
+		})
+	}
+	
+	return list
+})
 
 	const click = (name) => {
 		const itemTo = name.title
@@ -586,7 +595,7 @@
 					console.log('地图中心点移动成功，缩放级别：15');
 				},
 				fail: (err) => {
-					console.error('地图中心点移动失败:', err);
+					console.error('地图中心点移动失败:', err.errMsg);
 				}
 			});
 
@@ -810,6 +819,7 @@
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
+			console.log('设备详情：',res.data)
 			currentCarInfo.value = res.data
 		} else {
 			console.error("设备id获取失败")

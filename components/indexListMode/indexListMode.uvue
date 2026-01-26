@@ -8,6 +8,7 @@
 						<uv-tags size="mini" shape="circle" :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></uv-tags>
 					</view>
 					<view class="device-tools">
+						<uv-tags text="充值" type="success" @click="pay(item.iccid,item.simMerchant)"></uv-tags>
 						<uv-tags text="解绑" type="warning" @click="unbindDevice(item.imei)"></uv-tags>
 					</view>
 				</view>
@@ -43,6 +44,39 @@
 	}>()
 	const modal = ref<UVModal>()
 	const imeis = ref('')
+	// 是否需要刷新数据
+	const needRefresh = ref(false)
+	// 支付
+	const pay = (iccid : string,simMerchant : string) => {
+		if(simMerchant.toLowerCase() == 'zddx'){
+			iccid = iccid.substring(0,iccid.length-1) //电信卡
+		}
+		
+		console.log(iccid)
+		// 设置需要刷新的标志
+		needRefresh.value = true
+		
+		//拉起半屏小程序
+		wx.openEmbeddedMiniProgram({
+			appId: 'wx1d647f2cfdc089e6',
+			path: '/pages/home/userSimRecharge?iccid=' + iccid,
+			envVersion: 'release',
+			success(res) {
+				// 打开成功
+				console.log('打开小程序成功', res)
+			},
+			fail(res) {
+				// 打开失败
+				console.log('打开小程序失败', res)
+				// 如果打开失败，取消刷新标志
+				needRefresh.value = false
+				uni.showToast({
+					title: '打开支付页面失败',
+					icon: 'none'
+				})
+			}
+		})
+	}
 	// 解绑设备
 	const unbindDevice = (imei : string) => {
 		imeis.value = imei

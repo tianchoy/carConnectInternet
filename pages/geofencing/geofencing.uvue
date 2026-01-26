@@ -270,7 +270,7 @@
 		return currentPagination.value.hasMore
 	})
 
-	onLoad((option) => {
+	onLoad(async (option) => {
 		connectionStatus.value = option.connectionStatus
 		imei.value = option.imei
 		currentCar.value = option.plateNo
@@ -278,8 +278,8 @@
 		carType.value = option.carType
 		deviceName.value = option.deviceName
 
-		loadInitialPosition()
-		loadGeofenceList() // 页面加载时获取围栏列表
+		await loadInitialPosition()
+		await loadGeofenceList() // 页面加载时获取围栏列表
 	})
 
 	const loadInitialPosition = async () => {

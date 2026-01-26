@@ -7,11 +7,15 @@
 			<view class="list" v-for="(item,index) in deviceList" :key="index">
 				<view class="device-info">
 					<view class="label title">{{item.deviceName}}</view>
-					<view class="value">{{item.plateNo}}</view>
+					<view class="value"></view>
 				</view>
-				<view class="device-info">
+				<view class="device-info" v-if="item.iccid">
 					<view class="label">ICCID:</view>
 					<view class="value">{{item.iccid}}</view>
+				</view>
+				<view class="device-info" v-if="item.imei && item.imei != ''">
+					<view class="label">ID:</view>
+					<view class="value">{{item.imei}}</view>
 				</view>
 				<!-- <view class="device-info" v-if="item.customerTime">
 					<view class="label">平台到期时间:</view>
