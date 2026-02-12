@@ -8,7 +8,7 @@ const _sfc_main = common_vendor.defineComponent({
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvEmpty_components_uvEmpty_props.props],
   data() {
     return {
-      icons: new UTSJSONObject({
+      icons: new common_vendor.UTSJSONObject({
         car: "购物车为空",
         page: "页面不存在",
         search: "没有搜索结果",
@@ -30,13 +30,13 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 组件样式
     emptyStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       style.marginTop = this.$uv.addUnit(this.marginTop);
       return this.$uv.deepMerge(style, this.$uv.addStyle(this.customStyle));
     },
     // 文本样式
     textStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       style.color = this.textColor;
       style.fontSize = this.$uv.addUnit(this.textSize);
       return style;
@@ -67,7 +67,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       name: _ctx.mode === "message" ? "chat" : `empty-${_ctx.mode}`,
       size: _ctx.iconSize,
       color: _ctx.iconColor,
-      ["margin-top"]: "14"
+      ["margin-top"]: "14",
+      class: "data-v-6efcec67"
     })
   } : {
     d: _ctx.$uv.addUnit(_ctx.width),
@@ -77,7 +78,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     g: common_vendor.t(_ctx.text ? _ctx.text : $data.icons[_ctx.mode]),
     h: common_vendor.s($options.textStyle),
     i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    j: common_vendor.s($options.emptyStyle)
+    j: common_vendor.s($options.emptyStyle),
+    k: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6efcec67"]]);

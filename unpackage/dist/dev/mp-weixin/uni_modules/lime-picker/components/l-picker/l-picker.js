@@ -199,7 +199,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(_ctx.cancelBtn),
         d: common_vendor.unref(ohosShow),
         e: common_vendor.s(_ctx.cancelStyle ?? ""),
-        f: common_vendor.o(onCancel)
+        f: common_vendor.o(onCancel, "c1")
       } : {}, {
         g: common_vendor.t(_ctx.title),
         h: common_vendor.unref(ohosShow),
@@ -209,7 +209,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         k: common_vendor.t(_ctx.confirmBtn),
         l: common_vendor.unref(ohosShow),
         m: common_vendor.s(_ctx.confirmStyle ?? ""),
-        n: common_vendor.o(onConfirm)
+        n: common_vendor.o(onConfirm, "c1")
       } : {}, {
         o: common_vendor.unref(ohosShow)
       }) : {}, {
@@ -241,7 +241,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } : {})
       } : {}, {
         x: common_vendor.sei(common_vendor.gei(_ctx, "", "r1-070619bb"), "view", "pickerRef"),
-        y: common_vendor.s(common_vendor.unref(styles))
+        y: common_vendor.s(common_vendor.unref(styles)),
+        z: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

@@ -53,14 +53,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
-    const rules = new UTSJSONObject({
+    const rules = new common_vendor.UTSJSONObject({
       imei: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请输入设备ID",
           trigger: ["blur", "change"]
         }),
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           min: 8,
           max: 18,
           message: "ID长度应在8-18位之间",
@@ -68,7 +68,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       ],
       deviceType: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请选择设备图标",
           trigger: ["blur", "change"]
@@ -98,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return common_vendor.__awaiter(this, void 0, void 0, function* () {
           loading.value = true;
           try {
-            const submitData = new UTSJSONObject({
+            const submitData = new common_vendor.UTSJSONObject({
               deviceName: carInfo.value.deviceName,
               imei: carInfo.value.imei,
               carType: carInfo.value.deviceType
@@ -155,77 +155,92 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          class: "data-v-6409e324"
         }),
         b: common_vendor.o(($event) => {
           return carInfo.value.deviceName = $event;
-        }),
+        }, "0b"),
         c: common_vendor.p({
           border: "none",
           placeholder: "请输入设备名称",
-          modelValue: carInfo.value.deviceName
+          modelValue: carInfo.value.deviceName,
+          class: "data-v-6409e324"
         }),
         d: common_vendor.p({
           label: "设备名称",
           labelWidth: "150rpx",
           prop: "deviceName",
-          borderBottom: true
+          borderBottom: true,
+          class: "data-v-6409e324"
         }),
-        e: common_vendor.o(scanCode),
+        e: common_vendor.o(scanCode, "7f"),
         f: common_vendor.p({
           name: "scan",
-          size: "25"
+          size: "25",
+          class: "data-v-6409e324"
         }),
         g: common_vendor.o(($event) => {
           return carInfo.value.imei = $event;
-        }),
+        }, "4d"),
         h: common_vendor.p({
           border: "none",
           placeholder: "请输入设备ID(必填)",
-          modelValue: carInfo.value.imei
+          modelValue: carInfo.value.imei,
+          class: "data-v-6409e324"
         }),
         i: common_vendor.p({
           label: "*设备ID",
           labelWidth: "150rpx",
           prop: "imei",
-          borderBottom: true
+          borderBottom: true,
+          class: "data-v-6409e324"
         }),
         j: common_vendor.o(($event) => {
           return carInfo.value.deviceTypeValue = $event;
-        }),
+        }, "ba"),
         k: common_vendor.p({
           border: "none",
           disabled: true,
           disabledColor: "#fff",
           placeholder: "请选择设备图标(必选)",
           suffixIcon: "arrow-down",
-          modelValue: carInfo.value.deviceTypeValue
+          modelValue: carInfo.value.deviceTypeValue,
+          class: "data-v-6409e324"
         }),
-        l: common_vendor.o(deviceTypeSelectFun),
+        l: common_vendor.o(deviceTypeSelectFun, "37"),
         m: common_vendor.p({
           label: "车标",
           labelWidth: "150rpx",
           prop: "deviceType",
-          borderBottom: true
+          borderBottom: true,
+          class: "data-v-6409e324"
         }),
         n: common_vendor.sr(deviceTypeSelect, "6409e324-9,6409e324-1", {
           "k": "deviceTypeSelect"
         }),
-        o: common_vendor.o(selectIcon),
-        p: common_vendor.sr(formRef, "6409e324-1", {
+        o: common_vendor.o(selectIcon, "ca"),
+        p: common_vendor.p({
+          class: "r data-v-6409e324"
+        }),
+        q: common_vendor.sr(formRef, "6409e324-1", {
           "k": "formRef"
         }),
-        q: common_vendor.p({
+        r: common_vendor.p({
           labelPosition: "left",
           model: carInfo.value,
-          rules
+          rules,
+          class: "r data-v-6409e324"
         }),
-        r: common_vendor.o(submit),
-        s: common_vendor.p({
+        s: common_vendor.o(submit, "05"),
+        t: common_vendor.p({
           type: "primary",
-          loading: loading.value
+          loading: loading.value,
+          class: "btn data-v-6409e324"
         }),
-        t: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        w: `${_ctx.u_s_b_h}px`,
+        x: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

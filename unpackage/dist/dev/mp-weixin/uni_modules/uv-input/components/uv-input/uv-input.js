@@ -50,7 +50,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 组件的样式
     wrapperStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.disabled) {
         style.backgroundColor = this.disabledColor;
       }
@@ -66,7 +66,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 输入框的样式
     inputStyle() {
-      const style = new UTSJSONObject({
+      const style = new common_vendor.UTSJSONObject({
         color: this.color,
         fontSize: this.$uv.addUnit(this.fontSize),
         textAlign: this.inputAlign
@@ -84,7 +84,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 当键盘输入时，触发input事件
     onInput(e = null) {
-      let _a = (e.detail || new UTSJSONObject({})).value, value = _a == void 0 ? "" : _a;
+      let _a = (e.detail || new common_vendor.UTSJSONObject({})).value, value = _a == void 0 ? "" : _a;
       const formatter = this.formatter || this.innerFormatter;
       const formatValue = formatter(value);
       this.innerValue = value;
@@ -164,7 +164,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.p({
       name: _ctx.prefixIcon,
       size: "18",
-      customStyle: _ctx.prefixIconStyle
+      customStyle: _ctx.prefixIconStyle,
+      class: "data-v-651602aa"
     })
   } : {}, {
     c: common_vendor.s($options.inputStyle),
@@ -187,33 +188,39 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     t: _ctx.selectionStart,
     v: _ctx.password || _ctx.type === "password" || void 0,
     w: _ctx.ignoreCompositionEvent,
-    x: common_vendor.o((...args) => $options.onInput && $options.onInput(...args)),
-    y: common_vendor.o((...args) => $options.onBlur && $options.onBlur(...args)),
-    z: common_vendor.o((...args) => $options.onFocus && $options.onFocus(...args)),
-    A: common_vendor.o((...args) => $options.onConfirm && $options.onConfirm(...args)),
-    B: common_vendor.o((...args) => $options.onkeyboardheightchange && $options.onkeyboardheightchange(...args)),
-    C: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    x: common_vendor.o((...args) => $options.onInput && $options.onInput(...args), "38"),
+    y: common_vendor.o((...args) => $options.onBlur && $options.onBlur(...args), "79"),
+    z: common_vendor.o((...args) => $options.onFocus && $options.onFocus(...args), "fa"),
+    A: common_vendor.o((...args) => $options.onConfirm && $options.onConfirm(...args), "a5"),
+    B: common_vendor.o((...args) => $options.onkeyboardheightchange && $options.onkeyboardheightchange(...args), "86"),
+    C: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "b7"),
     D: $options.isShowClear
   }, $options.isShowClear ? {
     E: common_vendor.p({
       name: "close",
       size: "11",
       color: "#ffffff",
-      customStyle: "line-height: 12px"
+      customStyle: "line-height: 12px",
+      class: "data-v-651602aa"
     }),
-    F: common_vendor.o((...args) => $options.onClear && $options.onClear(...args))
+    F: common_vendor.o((...args) => $options.onClear && $options.onClear(...args), "5c")
   } : {}, {
     G: _ctx.suffixIcon
   }, _ctx.suffixIcon ? {
     H: common_vendor.p({
       name: _ctx.suffixIcon,
       size: "18",
-      customStyle: _ctx.suffixIconStyle
+      customStyle: _ctx.suffixIconStyle,
+      class: "data-v-651602aa"
     })
   } : {}, {
     I: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     J: common_vendor.n($options.inputClass),
-    K: common_vendor.s($options.wrapperStyle)
+    K: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    L: common_vendor.s($options.wrapperStyle),
+    M: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    })
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-651602aa"]]);

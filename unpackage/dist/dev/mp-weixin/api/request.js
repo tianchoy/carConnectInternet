@@ -1,4 +1,5 @@
 "use strict";
+const common_vendor = require("../common/vendor.js");
 const api_http = require("./http.js");
 const loginUrl = "/sys/login";
 const devicePos = "/gps/lastPosition?deptId=";
@@ -51,7 +52,7 @@ const addDevice = (data) => {
   return api_http.http.post(addDeviceUrl, data);
 };
 const delDevice = (imei) => {
-  return api_http.http.post(deleteDevice, new UTSJSONObject({ imei }));
+  return api_http.http.post(deleteDevice, new common_vendor.UTSJSONObject({ imei }));
 };
 const getUserDeviceList = (data) => {
   return api_http.http.post(userDeviceList, data);

@@ -30,7 +30,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       console.log(iccid);
       needRefresh.value = true;
-      common_vendor.wx$1.openEmbeddedMiniProgram(new UTSJSONObject({
+      common_vendor.wx$1.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
@@ -107,8 +107,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.sr(modal, "245c735a-3", {
           "k": "modal"
         }),
-        f: common_vendor.o(confirm),
-        g: common_vendor.o(cancel),
+        f: common_vendor.o(confirm, "31"),
+        g: common_vendor.o(cancel, "ac"),
         h: common_vendor.p({
           title: "提示",
           content: "是否要解绑设备？",
@@ -116,10 +116,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           align: "center",
           confirmText: "确定",
           cancelText: "取消",
-          showCancelButton: true
+          showCancelButton: true,
+          class: "r"
         })
       } : {}, {
-        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        j: `${_ctx.u_s_b_h}px`,
+        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

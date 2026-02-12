@@ -16,9 +16,9 @@ const _sfc_main = common_vendor.defineComponent({
   },
   data() {
     return {
-      formRules: new UTSJSONObject({}),
+      formRules: new common_vendor.UTSJSONObject({}),
       // 规则校验器
-      validator: new UTSJSONObject({}),
+      validator: new common_vendor.UTSJSONObject({}),
       // 原始的model快照，用于resetFields方法重置表单时使用
       originalModel: null
     };
@@ -119,10 +119,10 @@ const _sfc_main = common_vendor.defineComponent({
                 const trigger = [].concat(ruleItem === null || ruleItem === void 0 ? null : ruleItem.trigger);
                 if (event && !trigger.includes(event))
                   continue;
-                const validator = new uni_modules_uvForm_components_uvForm_valid.Schema(new UTSJSONObject({
+                const validator = new uni_modules_uvForm_components_uvForm_valid.Schema(new common_vendor.UTSJSONObject({
                   [propertyName]: ruleItem
                 }));
-                validator.validate(new UTSJSONObject({
+                validator.validate(new common_vendor.UTSJSONObject({
                   [propertyName]: propertyVal
                 }), (errors = null, fields = null) => {
                   if (this.$uv.test.array(errors)) {
@@ -164,7 +164,9 @@ const _sfc_main = common_vendor.defineComponent({
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return {
-    a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+    a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    b: `${_ctx.u_s_b_h}px`,
+    c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);

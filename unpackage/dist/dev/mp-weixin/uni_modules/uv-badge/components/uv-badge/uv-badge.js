@@ -9,12 +9,12 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 是否将badge中心与父组件右上角重合
     boxStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       return style;
     },
     // 整个组件的样式
     badgeStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.color) {
         style.color = this.color;
       }
@@ -60,8 +60,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.n(_ctx.inverted && "uv-badge--inverted"),
     f: common_vendor.n(_ctx.shape === "horn" && "uv-badge--horn"),
     g: common_vendor.n(`uv-badge--${$options.propsType}${_ctx.inverted ? "--inverted" : ""}`),
-    h: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
-    i: common_vendor.s($options.badgeStyle)
+    h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    i: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    j: common_vendor.s($options.badgeStyle),
+    k: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    })
   } : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-91e4945b"]]);

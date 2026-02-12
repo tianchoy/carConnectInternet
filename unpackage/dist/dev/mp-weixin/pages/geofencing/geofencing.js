@@ -31,7 +31,7 @@ const _easycom_uv_switch = () => "../../uni_modules/uv-switch/components/uv-swit
 if (!Math) {
   (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_button + _easycom_uv_popup + _easycom_uv_input + _easycom_uv_radio + _easycom_uv_grid_item + _easycom_uv_radio_group + _easycom_uv_grid + _easycom_uv_switch)();
 }
-class Coordinate extends UTS.UTSType {
+class Coordinate extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -46,7 +46,7 @@ class Coordinate extends UTS.UTSType {
   }
   constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.latitude = this.__props__.latitude;
     this.longitude = this.__props__.longitude;
     delete this.__props__;
@@ -60,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const deptId = common_vendor.ref("");
     const carType = common_vendor.ref("");
     const deviceName = common_vendor.ref("");
-    const center = common_vendor.reactive(new UTSJSONObject({
+    const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
@@ -85,7 +85,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const fencesPopup = common_vendor.ref(null);
     const editDialogPopup = common_vendor.ref(null);
     const editingFence = common_vendor.ref(null);
-    const fenceForm = common_vendor.reactive(new UTSJSONObject({
+    const fenceForm = common_vendor.reactive(new common_vendor.UTSJSONObject({
       name: "",
       alarmType: "1"
     }));
@@ -96,15 +96,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentFenceName = common_vendor.ref("");
     const currentFenceId = common_vendor.ref("");
     const loading = common_vendor.ref(false);
-    const pagination = common_vendor.reactive(new UTSJSONObject({
-      bind: new UTSJSONObject({
+    const pagination = common_vendor.reactive(new common_vendor.UTSJSONObject({
+      bind: new common_vendor.UTSJSONObject({
         pageNum: 1,
         pageSize: 10,
         hasMore: true,
         loadingMore: false
         // 加载更多中状态
       }),
-      unbind: new UTSJSONObject({
+      unbind: new common_vendor.UTSJSONObject({
         pageNum: 1,
         pageSize: 10,
         hasMore: true,
@@ -142,11 +142,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadInitialPosition = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showLoading({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "获取车辆位置中..."
-        });
+        }));
         try {
-          const data = new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
+          const data = new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
           res.data.forEach((item = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -155,7 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
-                const position = new UTSJSONObject(
+                const position = new common_vendor.UTSJSONObject(
                   {
                     latitude: convertedCoord.lat,
                     longitude: convertedCoord.lng
@@ -163,7 +163,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   // 记录初始方向
                 );
                 lastDirection.value = deviceData.direction || 0;
-                carMarker.value = new UTSJSONObject(
+                carMarker.value = new common_vendor.UTSJSONObject(
                   {
                     id: 0,
                     latitude: position.latitude,
@@ -172,7 +172,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     width: 25,
                     height: 25,
                     rotate: calculateMapRotation(lastDirection.value),
-                    callout: new UTSJSONObject({
+                    callout: new common_vendor.UTSJSONObject({
                       content: deviceName.value || "爱车位置",
                       color: connectionStatus.value == "online" ? "#fff" : "#666",
                       bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
@@ -297,7 +297,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return coordPoints.map((point) => {
         const _a = common_vendor.__read(point.trim().split(" ").map(Number), 2), lat = _a[0], lng = _a[1];
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           latitude: convertedCoord.lat,
           longitude: convertedCoord.lng
         });
@@ -319,7 +319,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           latitude: convertedCoord.lat,
           longitude: convertedCoord.lng,
           radius
@@ -406,7 +406,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         minLng = Math.min(minLng, point.longitude);
         maxLng = Math.max(maxLng, point.longitude);
       });
-      return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
+      return new common_vendor.UTSJSONObject({ minLat, maxLat, minLng, maxLng });
     };
     const showFenceList = () => {
       var _a;
@@ -444,7 +444,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const deleteFence = (id) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showModal(new UTSJSONObject({
+        common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "确认删除",
           content: "确定要删除这个围栏吗？",
           success: (res) => {
@@ -498,7 +498,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } else if (drawingMode.value === "circle" && circleCenter.value) {
           area = generateCircleString(circleCenter.value, circleRadius.value);
         }
-        const fenceData = new UTSJSONObject({
+        const fenceData = new common_vendor.UTSJSONObject({
           name: fenceForm.name,
           area,
           alarmType: parseInt(fenceForm.alarmType),
@@ -620,7 +620,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         loading.value = true;
         try {
-          const params = new UTSJSONObject({
+          const params = new common_vendor.UTSJSONObject({
             geofenceId: currentFenceId.value,
             imeis: [deviceImei]
           });
@@ -794,7 +794,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const updateFencePolygon = () => {
       if (drawingMode.value === "polygon") {
-        polygons.value = points.value.length >= 3 ? [new UTSJSONObject({
+        polygons.value = points.value.length >= 3 ? [new common_vendor.UTSJSONObject({
           points: points.value,
           strokeWidth: 2,
           strokeColor: "#FF0000",
@@ -807,7 +807,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const updateFenceCircle = () => {
       if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
-        circles.value = [new UTSJSONObject({
+        circles.value = [new common_vendor.UTSJSONObject({
           latitude: circleCenter.value.latitude,
           longitude: circleCenter.value.longitude,
           radius: circleRadius.value,
@@ -868,7 +868,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: polygons.value,
         h: markers.value,
         i: circles.value,
-        j: common_vendor.o(handleMapTap),
+        j: common_vendor.o(handleMapTap, "1b"),
         k: isDrawing.value
       }, isDrawing.value ? common_vendor.e({
         l: drawingMode.value === "polygon"
@@ -882,26 +882,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           var _a;
           selectedFence.value = null;
           (_a = showFenceModal.value) == null ? void 0 : _a.close();
-        }),
+        }, "b2"),
         q: common_vendor.p({
           name: "close"
         }),
         r: common_vendor.o(($event) => {
           return editFence(selectedFence.value);
-        }),
+        }, "27"),
         s: common_vendor.p({
           size: "small"
         }),
         t: common_vendor.o(($event) => {
           return deleteFence(selectedFence.value.id);
-        }),
+        }, "e7"),
         v: common_vendor.p({
           size: "small",
           type: "error"
         }),
         w: common_vendor.o(($event) => {
           return showBindDevices(selectedFence.value.id);
-        }),
+        }, "a9"),
         x: common_vendor.p({
           size: "small",
           type: "primary"
@@ -912,13 +912,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         z: common_vendor.p({
           mode: "center",
-          round: "10"
+          round: "10",
+          class: "r"
         }),
         A: !isDrawing.value && !selectedFence.value
       }, !isDrawing.value && !selectedFence.value ? {
         B: common_vendor.o(($event) => {
           return setDrawingMode("polygon");
-        }),
+        }, "7c"),
         C: common_vendor.p({
           type: drawingMode.value == "polygon" ? "success" : "default",
           size: "small",
@@ -926,23 +927,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         D: common_vendor.o(($event) => {
           return setDrawingMode("circle");
-        }),
+        }, "ff"),
         E: common_vendor.p({
           type: drawingMode.value == "circle" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0"
         })
       } : {}, {
-        F: common_vendor.o(startDrawing),
+        F: common_vendor.o(startDrawing, "bf"),
         G: common_vendor.p({
           disabled: isDrawing.value || selectedFence.value
         }),
-        H: common_vendor.o(finishDrawing),
+        H: common_vendor.o(finishDrawing, "58"),
         I: common_vendor.p({
           disabled: !isDrawing.value || !canFinishDrawing.value
         }),
-        J: common_vendor.o(clearDrawing),
-        K: common_vendor.o(showFenceList),
+        J: common_vendor.o(clearDrawing, "37"),
+        K: common_vendor.o(showFenceList, "69"),
         L: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
         M: drawingMode.value === "polygon"
       }, drawingMode.value === "polygon" ? {
@@ -954,7 +955,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         Q: common_vendor.o(($event) => {
           return fencesPopup.value.close();
-        }),
+        }, "13"),
         R: common_vendor.p({
           name: "close"
         }),
@@ -980,12 +981,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         W: common_vendor.p({
           mode: "bottom",
-          round: "10"
+          round: "10",
+          class: "r"
         }),
         X: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
         Y: common_vendor.o(($event) => {
           return fenceForm.name = $event;
-        }),
+        }, "de"),
         Z: common_vendor.p({
           placeholder: "请输入围栏名称",
           border: "surround",
@@ -1005,7 +1007,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ae: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }),
+        }, "c0"),
         af: common_vendor.p({
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
@@ -1015,8 +1017,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ah: common_vendor.o(($event) => {
           return editDialogPopup.value.close();
-        }),
-        ai: common_vendor.o(saveFence),
+        }, "7a"),
+        ai: common_vendor.o(saveFence, "d2"),
         aj: common_vendor.p({
           type: "primary"
         }),
@@ -1025,23 +1027,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         al: common_vendor.p({
           mode: "center",
-          round: "10"
+          round: "10",
+          class: "r"
         }),
         am: common_vendor.t(currentFenceName.value),
         an: common_vendor.o(($event) => {
           return deviceDialogPopup.value.close();
-        }),
+        }, "12"),
         ao: common_vendor.p({
           name: "close"
         }),
         ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
         aq: common_vendor.o(($event) => {
           return activeTab.value = "bind";
-        }),
+        }, "c8"),
         ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
         as: common_vendor.o(($event) => {
           return activeTab.value = "unbind";
-        }),
+        }, "33"),
         at: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(device.plateNo || device.imei),
@@ -1069,18 +1072,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, loadingMore.value ? {} : {}, {
         ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
       }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
-        az: common_vendor.o(handleLoadMore),
+        az: common_vendor.o(handleLoadMore, "05"),
         aA: common_vendor.o(($event) => {
           return deviceDialogPopup.value.close();
-        }),
+        }, "a7"),
         aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
           "k": "deviceDialogPopup"
         }),
         aC: common_vendor.p({
           mode: "bottom",
-          round: "10"
+          round: "10",
+          class: "r"
         }),
-        aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        aE: `${_ctx.u_s_b_h}px`,
+        aF: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

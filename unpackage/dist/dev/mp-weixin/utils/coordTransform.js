@@ -1,4 +1,5 @@
 "use strict";
+const common_vendor = require("../common/vendor.js");
 class CoordTransform {
   /**
    * WGS84转腾讯地图坐标系（GCJ02）
@@ -76,7 +77,7 @@ class CoordTransform {
       } else {
         converted = this.tencentToWgs84(lat, lng);
       }
-      return new UTSJSONObject(Object.assign(Object.assign({}, device), { latitude: converted.lat, longitude: converted.lng, originalLatitude: lat, originalLongitude: lng }));
+      return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, device), { latitude: converted.lat, longitude: converted.lng, originalLatitude: lat, originalLongitude: lng }));
     });
   }
   /**

@@ -99,7 +99,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     t: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     v: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
-    w: common_vendor.n(_ctx.vertical && "uv-loading-icon--vertical")
+    w: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    x: common_vendor.n(_ctx.vertical && "uv-loading-icon--vertical"),
+    y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-29b619ea"]]);

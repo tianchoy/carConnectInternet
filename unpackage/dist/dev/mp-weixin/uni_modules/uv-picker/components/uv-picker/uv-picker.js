@@ -11,7 +11,7 @@ const _sfc_main = common_vendor.defineComponent({
     // 为了解决支付宝不生效
     textStyle() {
       return (index = null, index1 = null) => {
-        const style = new UTSJSONObject({});
+        const style = new common_vendor.UTSJSONObject({});
         style.display = "block";
         if (this.color) {
           style.color = this.color;
@@ -78,7 +78,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 点击工具栏的确定按钮
     confirm() {
-      this.$emit("confirm", this.$uv.deepClone(new UTSJSONObject({
+      this.$emit("confirm", this.$uv.deepClone(new common_vendor.UTSJSONObject({
         indexs: this.innerIndex,
         value: this.innerColumns.map((item, index) => {
           return item[this.innerIndex[index]];
@@ -105,7 +105,7 @@ const _sfc_main = common_vendor.defineComponent({
       const values = this.innerColumns;
       this.setLastIndex(value);
       this.setIndexs(value);
-      this.$emit("change", new UTSJSONObject({
+      this.$emit("change", new common_vendor.UTSJSONObject({
         value: this.innerColumns.map((item, index2) => {
           return item[value[index2]];
         }),
@@ -188,14 +188,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: _ctx.showToolbar
   }, _ctx.showToolbar ? {
-    b: common_vendor.o($options.cancel),
-    c: common_vendor.o($options.confirm),
+    b: common_vendor.o($options.cancel, "17"),
+    c: common_vendor.o($options.confirm, "d3"),
     d: common_vendor.p({
       cancelColor: _ctx.cancelColor,
       confirmColor: _ctx.confirmColor,
       cancelText: _ctx.cancelText,
       confirmText: _ctx.confirmText,
-      title: _ctx.title
+      title: _ctx.title,
+      class: "data-v-f74a1703"
     })
   } : {}, {
     e: common_vendor.f($data.innerColumns, (item, index, i0) => {
@@ -222,22 +223,29 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     g: $data.innerIndex,
     h: _ctx.immediateChange,
     i: `${_ctx.$uv.addUnit(_ctx.visibleItemCount * _ctx.itemHeight)}`,
-    j: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args)),
+    j: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args), "5b"),
     k: _ctx.loading
   }, _ctx.loading ? {
     l: common_vendor.p({
-      mode: "circle"
+      mode: "circle",
+      class: "data-v-f74a1703"
     })
   } : {}, {
     m: common_vendor.sr("pickerPopup", "f74a1703-0"),
     n: common_vendor.gei(_ctx, ""),
-    o: common_vendor.o($options.popupChange),
-    p: common_vendor.p({
+    o: common_vendor.o($options.popupChange, "24"),
+    p: `${_ctx.u_s_b_h}px`,
+    q: common_vendor.p({
       mode: "bottom",
       round: _ctx.round,
       ["close-on-click-overlay"]: _ctx.closeOnClickOverlay,
-      id: common_vendor.gei(_ctx, "")
-    })
+      id: common_vendor.gei(_ctx, ""),
+      class: "r data-v-f74a1703",
+      style: common_vendor.normalizeStyle({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
+      })
+    }),
+    r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f74a1703"]]);

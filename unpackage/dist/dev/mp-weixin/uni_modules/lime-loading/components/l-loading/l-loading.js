@@ -71,7 +71,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.s(common_vendor.unref(textStyle))
       } : {}, {
         k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        l: common_vendor.n(common_vendor.unref(classes))
+        l: common_vendor.n(common_vendor.unref(classes)),
+        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+        n: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

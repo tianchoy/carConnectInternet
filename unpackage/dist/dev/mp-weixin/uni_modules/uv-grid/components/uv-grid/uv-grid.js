@@ -33,7 +33,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 宫格对齐方式
     gridStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       switch (this.align) {
         case "left":
           style.justifyContent = "flex-start";
@@ -61,7 +61,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-fb64a415"), "view", "uv-grid"),
-    b: common_vendor.s($options.gridStyle)
+    b: common_vendor.s($options.gridStyle),
+    c: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-fb64a415"]]);

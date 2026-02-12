@@ -9,7 +9,7 @@ const _sfc_main = common_vendor.defineComponent({
   emits: ["$uvGridItem", "click"],
   data() {
     return {
-      parentData: new UTSJSONObject({
+      parentData: new common_vendor.UTSJSONObject({
         col: 3,
         border: true
         // 是否显示边框，根据父组件决定
@@ -30,7 +30,7 @@ const _sfc_main = common_vendor.defineComponent({
       return 100 / Number(this.parentData.col) + "%";
     },
     itemStyle() {
-      const style = new UTSJSONObject({
+      const style = new common_vendor.UTSJSONObject({
         background: this.bgColor,
         width: this.width
       });
@@ -101,9 +101,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    b: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    b: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "cd"),
     c: common_vendor.n($data.classes),
-    d: common_vendor.s($options.itemStyle)
+    d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    e: common_vendor.s($options.itemStyle),
+    f: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    })
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0657340f"]]);

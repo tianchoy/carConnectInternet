@@ -11,7 +11,7 @@ const _sfc_main = common_vendor.defineComponent({
   },
   computed: {
     style() {
-      const style = new UTSJSONObject(
+      const style = new common_vendor.UTSJSONObject(
         {}
         // 状态栏高度，由于某些安卓和微信开发工具无法识别css的顶部状态栏变量，所以使用js获取的方式
       );
@@ -31,7 +31,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    b: common_vendor.s($options.style)
+    b: common_vendor.s($options.style),
+    c: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f5bd6f5a"]]);

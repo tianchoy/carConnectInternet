@@ -29,7 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!selectedCommand.value || !selectedCommand.value.details)
         return [];
       try {
-        return UTS.JSON.parse(selectedCommand.value.details);
+        return common_vendor.UTS.JSON.parse(selectedCommand.value.details);
       } catch (e) {
         console.error("解析参数配置失败:", e);
         return [];
@@ -124,7 +124,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       paramValues.value = [];
       if (command.details) {
         try {
-          const configs = UTS.JSON.parse(command.details);
+          const configs = common_vendor.UTS.JSON.parse(command.details);
           paramValues.value = configs.map((config = null) => {
             if (config.default !== void 0) {
               return config.default.toString();
@@ -223,7 +223,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          class: "data-v-c4271740"
         }),
         b: common_vendor.t(imei.value),
         c: common_vendor.f(commandTypes.value, (type, index, i0) => {
@@ -264,7 +265,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: common_vendor.p({
               placeholder: "请输入" + param.label,
               ["placeholder-class"]: "placeholder",
-              modelValue: paramValues.value[index]
+              modelValue: paramValues.value[index],
+              class: "param-input data-v-c4271740"
             })
           } : {}, {
             f: param.type == "number"
@@ -278,7 +280,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               placeholder: "请输入" + param.label,
               ["placeholder-class"]: "placeholder",
               maxlength: param.max,
-              modelValue: paramValues.value[index]
+              modelValue: paramValues.value[index],
+              class: "param-input data-v-c4271740"
             })
           } : {}, {
             j: param.type == "radio"
@@ -297,10 +300,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             l: "param_" + index
           });
         }),
-        h: common_vendor.o(sendCommand),
+        h: common_vendor.o(sendCommand, "8b"),
         i: common_vendor.p({
           type: "primary",
-          disabled: !isFormValid.value
+          disabled: !isFormValid.value,
+          class: "submit-btn data-v-c4271740"
         })
       } : {}, {
         j: commandRecords.value
@@ -312,7 +316,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: loading.value
       }, loading.value ? {} : !commands.value.length && selectedTypeId.value ? {} : {}, {
         n: !commands.value.length && selectedTypeId.value,
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        p: `${_ctx.u_s_b_h}px`,
+        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

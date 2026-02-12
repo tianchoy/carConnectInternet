@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         loading.value = true;
         try {
-          const data = new UTSJSONObject({
+          const data = new common_vendor.UTSJSONObject({
             page: currPage.value,
             pageSize: pageSize.value
           });
@@ -84,17 +84,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(addCar),
-        b: common_vendor.p({
+        a: common_vendor.o(addCar, "a5"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: common_vendor.p({
           title: "车辆管理",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: true,
           isIcon: true,
-          isShowStyle: true
+          isShowStyle: true,
+          class: "data-v-4d1d23ef",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: common_vendor.f(common_vendor.unref(carList), (item, index, i0) => {
+        d: common_vendor.f(common_vendor.unref(carList), (item, index, i0) => {
           return {
             a: common_vendor.t(item.deviceName),
             b: common_vendor.t(item.plateNo),
@@ -105,10 +110,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           };
         }),
-        d: common_vendor.unref(loading)
+        e: common_vendor.unref(loading)
       }, common_vendor.unref(loading) ? {} : {}, {
-        e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
-      }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? {} : {});
+        f: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
+      }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? {} : {}, {
+        g: `${_ctx.u_s_b_h}px`
+      });
       return __returned__;
     };
   }

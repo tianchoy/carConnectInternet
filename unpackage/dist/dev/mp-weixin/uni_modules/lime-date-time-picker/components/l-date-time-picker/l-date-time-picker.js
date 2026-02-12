@@ -133,14 +133,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const generateColumn = (type, lowerBound, upperBound) => {
         const cacheKey = `${type}-${lowerBound}-${upperBound}`;
         if (columnCache.has(cacheKey)) {
-          ret.push(UTS.mapGet(columnCache, cacheKey));
+          ret.push(common_vendor.UTS.mapGet(columnCache, cacheKey));
           return null;
         }
         const arr = [];
         for (let i = lowerBound; i <= upperBound; i++) {
           const value = i;
           arr.push({
-            label: props.renderLabel != null ? props.renderLabel(type, i.toString()) : `${value}${props.showUnit ? UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.UNIT_MAP, type) : ""}`,
+            label: props.renderLabel != null ? props.renderLabel(type, i.toString()) : `${value}${props.showUnit ? common_vendor.UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.UNIT_MAP, type) : ""}`,
             value: type == "month" ? `${value - 1}` : value.toString()
           });
         }
@@ -186,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const innterFormat = common_vendor.computed(() => {
       const first = meaningColumn.length > 0 ? meaningColumn[0] : "year";
       const last = meaningColumn.length > 0 ? meaningColumn[meaningColumn.length - 1] : "date";
-      const format = uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.substring(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.indexOf(UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, first)), uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.lastIndexOf(UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, last)) + UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, last).length);
+      const format = uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.substring(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.indexOf(common_vendor.UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, first)), uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.DEFAULT_FORMAT.lastIndexOf(common_vendor.UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, last)) + common_vendor.UTS.mapGet(uni_modules_limeDateTimePicker_components_lDateTimePicker_constant.FORMAT_MAP, last).length);
       return format;
     });
     const onConfirm = (_a2) => {
@@ -231,11 +231,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.o(onConfirm),
-        c: common_vendor.o(onCancel),
-        d: common_vendor.o(onChange),
-        e: common_vendor.o(onPick),
-        f: common_vendor.p({
+        b: common_vendor.o(onConfirm, "c2"),
+        c: common_vendor.o(onCancel, "1c"),
+        d: common_vendor.o(onChange, "7d"),
+        e: common_vendor.o(onPick, "c6"),
+        f: `${_ctx.u_s_b_h}px`,
+        g: common_vendor.p({
           title: _ctx.title,
           titleStyle: _ctx.titleStyle,
           ["confirm-btn"]: _ctx.confirmBtn,
@@ -252,8 +253,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius: _ctx.radius,
           value: common_vendor.unref(valueOfPicker),
           columns: common_vendor.unref(columns),
-          id: common_vendor.gei(_ctx, "")
-        })
+          id: common_vendor.gei(_ctx, ""),
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
+        }),
+        h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

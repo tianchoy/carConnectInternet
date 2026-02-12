@@ -88,7 +88,7 @@ function errorHandler(error, config) {
   }
 }
 function request(options) {
-  const config = Object.assign({ url: options.url, method: options.method || "GET", data: options.data || new UTSJSONObject({}), header: options.header || {}, showLoading: options.showLoading !== false }, options);
+  const config = Object.assign({ url: options.url, method: options.method || "GET", data: options.data || new common_vendor.UTSJSONObject({}), header: options.header || {}, showLoading: options.showLoading !== false }, options);
   if (!config.url.startsWith("http")) {
     config.url = BASE_URL + config.url;
   }
@@ -113,36 +113,36 @@ function request(options) {
     } }));
   });
 }
-const http = new UTSJSONObject({
-  get(url, data = new UTSJSONObject({}), options = {}) {
+const http = new common_vendor.UTSJSONObject({
+  get(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
       data,
       method: "GET"
     }, options));
   },
-  post(url, data = new UTSJSONObject({}), options = {}) {
+  post(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
       data,
       method: "POST"
     }, options));
   },
-  put(url, data = new UTSJSONObject({}), options = {}) {
+  put(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
       data,
       method: "PUT"
     }, options));
   },
-  delete(url, data = new UTSJSONObject({}), options = {}) {
+  delete(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
     return request(Object.assign({
       url,
       data,
       method: "DELETE"
     }, options));
   },
-  upload(url, filePath, name = "file", formData = new UTSJSONObject({}), options = {}) {
+  upload(url, filePath, name = "file", formData = new common_vendor.UTSJSONObject({}), options = {}) {
     return new Promise((resolve, reject) => {
       const fullUrl = url.startsWith("http") ? url : BASE_URL + url;
       const token = common_vendor.index.getStorageSync("token");
@@ -151,10 +151,10 @@ const http = new UTSJSONObject({
         header["token"] = `${token}`;
       }
       if (options.showLoading !== false) {
-        common_vendor.index.showLoading({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "上传中...",
           mask: true
-        });
+        }));
       }
       common_vendor.index.uploadFile({
         url: fullUrl,
@@ -168,7 +168,7 @@ const http = new UTSJSONObject({
           }
           if (res.statusCode === 200) {
             try {
-              const data = UTS.JSON.parse(res.data);
+              const data = common_vendor.UTS.JSON.parse(res.data);
               resolve(data);
             } catch (e) {
               resolve(res.data);

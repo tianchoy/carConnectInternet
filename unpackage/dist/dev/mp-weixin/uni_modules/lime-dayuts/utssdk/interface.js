@@ -1,5 +1,6 @@
 "use strict";
-class DayutsConfig extends UTS.UTSType {
+const common_vendor = require("../../../common/vendor.js");
+class DayutsConfig extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -15,14 +16,14 @@ class DayutsConfig extends UTS.UTSType {
   }
   constructor(options, metadata = DayutsConfig.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.date = this.__props__.date;
     this.format = this.__props__.format;
     this.locale = this.__props__.locale;
     delete this.__props__;
   }
 }
-class DayutsFormats extends UTS.UTSType {
+class DayutsFormats extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -45,7 +46,7 @@ class DayutsFormats extends UTS.UTSType {
   }
   constructor(options, metadata = DayutsFormats.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.LT = this.__props__.LT;
     this.LTS = this.__props__.LTS;
     this.L = this.__props__.L;
@@ -59,7 +60,7 @@ class DayutsFormats extends UTS.UTSType {
     delete this.__props__;
   }
 }
-class DayutsRelativeTime extends UTS.UTSType {
+class DayutsRelativeTime extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -85,7 +86,7 @@ class DayutsRelativeTime extends UTS.UTSType {
   }
   constructor(options, metadata = DayutsRelativeTime.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.future = this.__props__.future;
     this.past = this.__props__.past;
     this.s = this.__props__.s;
@@ -102,18 +103,18 @@ class DayutsRelativeTime extends UTS.UTSType {
     delete this.__props__;
   }
 }
-class DayutsLocale extends UTS.UTSType {
+class DayutsLocale extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
       get fields() {
         return {
           name: { type: String, optional: false },
-          weekdays: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-          weekdaysShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-          weekdaysMin: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-          months: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-          monthsShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          weekdays: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: false },
+          weekdaysShort: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          weekdaysMin: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          months: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: false },
+          monthsShort: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true },
           ordinal: { type: "Unknown", optional: false },
           weekStart: { type: Number, optional: true },
           yearStart: { type: Number, optional: true },
@@ -127,7 +128,7 @@ class DayutsLocale extends UTS.UTSType {
   }
   constructor(options, metadata = DayutsLocale.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.name = this.__props__.name;
     this.weekdays = this.__props__.weekdays;
     this.weekdaysShort = this.__props__.weekdaysShort;
@@ -143,7 +144,7 @@ class DayutsLocale extends UTS.UTSType {
     delete this.__props__;
   }
 }
-class DayutsObject extends UTS.UTSType {
+class DayutsObject extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -163,7 +164,7 @@ class DayutsObject extends UTS.UTSType {
   }
   constructor(options, metadata = DayutsObject.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.years = this.__props__.years;
     this.months = this.__props__.months;
     this.date = this.__props__.date;

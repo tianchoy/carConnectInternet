@@ -19,7 +19,7 @@ const _easycom_uv_tags = () => "../../uni_modules/uv-tags/components/uv-tags/uv-
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_uv_empty + _easycom_uv_tags)();
 }
-class GroupType extends UTS.UTSType {
+class GroupType extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -35,7 +35,7 @@ class GroupType extends UTS.UTSType {
   }
   constructor(options, metadata = GroupType.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.date = this.__props__.date;
     this.trips = this.__props__.trips;
     this.totalDistance = this.__props__.totalDistance;
@@ -59,7 +59,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const imei = common_vendor.ref("");
     const groupedTrips = common_vendor.computed(() => {
       const groups = [];
-      const tripsByDate = new UTSJSONObject(
+      const tripsByDate = new common_vendor.UTSJSONObject(
         {}
         // 按日期分组
       );
@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const endTimeStr = trip.endTime || "";
         const startHour = startTimeStr.split(" ")[1] || "";
         const endHour = endTimeStr.split(" ")[1] || "";
-        tripsByDate[date].push(new UTSJSONObject(Object.assign(Object.assign({}, trip), {
+        tripsByDate[date].push(new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, trip), {
           startHour,
           endHour
         })));
@@ -116,13 +116,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadMileageData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showLoading({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载中..."
-        });
+        }));
         if (!imei.value)
           return Promise.resolve(null);
         try {
-          const data = new UTSJSONObject({
+          const data = new common_vendor.UTSJSONObject({
             imei: imei.value,
             startTime: startTime.value,
             endTime: endTime.value,
@@ -152,7 +152,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (data.trips && data.trips.length > 0) {
           const processedTrips = yield Promise.all(data.trips.map((trip = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
-              return new UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: "查看位置", endAddress: "查看位置" }));
+              return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: "查看位置", endAddress: "查看位置" }));
             });
           }));
           tripData.value = processedTrips;
@@ -233,10 +233,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(formatDisplayTime(startTime.value)),
         d: common_vendor.o(($event) => {
           return showPicker("start");
-        }),
+        }, "47"),
         e: common_vendor.o(($event) => {
           return showPicker("start");
-        }),
+        }, "f3"),
         f: common_vendor.p({
           name: "arrow-down",
           size: "13"
@@ -244,16 +244,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.t(formatDisplayTime(endTime.value)),
         h: common_vendor.o(($event) => {
           return showPicker("end");
-        }),
+        }, "7e"),
         i: common_vendor.o(($event) => {
           return showPicker("end");
-        }),
+        }, "b7"),
         j: common_vendor.p({
           name: "arrow-down",
           size: "13"
         }),
-        k: common_vendor.o(onConfirm),
-        l: common_vendor.o(onCancel),
+        k: common_vendor.o(onConfirm, "25"),
+        l: common_vendor.o(onCancel, "d3"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -262,7 +262,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }),
+        }, "a1"),
         o: common_vendor.p({
           position: "bottom",
           closeable: false,
@@ -305,7 +305,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }, {
-        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        x: `${_ctx.u_s_b_h}px`,
+        y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

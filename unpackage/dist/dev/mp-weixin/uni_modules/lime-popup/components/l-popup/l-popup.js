@@ -14,7 +14,7 @@ if (!Math) {
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "l-popup",
-  props: /* @__PURE__ */ common_vendor.mergeModels(new UTSJSONObject({
+  props: /* @__PURE__ */ common_vendor.mergeModels(new common_vendor.UTSJSONObject({
     closeable: { type: Boolean, default: false },
     closeOnClickOverlay: { type: Boolean, default: true },
     destroyOnClose: { type: Boolean, default: false },
@@ -33,7 +33,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     safeAreaInsetBottom: { type: Boolean, default: true },
     safeAreaInsetTop: { type: Boolean, default: false },
     radius: {}
-  }), new UTSJSONObject({
+  }), new common_vendor.UTSJSONObject({
     "modelValue": { type: Boolean },
     "modelModifiers": {}
   })),
@@ -119,33 +119,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: _ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay
       }, (_ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay) ? {
-        b: common_vendor.o(handleOverlayClick),
-        c: common_vendor.p({
+        b: common_vendor.o(handleOverlayClick, "81"),
+        c: `${_ctx.u_s_b_h}px`,
+        d: common_vendor.p({
           visible: common_vendor.unref(innerValue),
           zIndex: common_vendor.unref(overlayZIndex),
           appear: true,
           preventScrollThrough: _ctx.preventScrollThrough,
-          ["l-style"]: _ctx.overlayStyle
+          ["l-style"]: _ctx.overlayStyle,
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         })
       } : {}, {
-        d: _ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)
+        e: _ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)
       }, (_ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)) ? common_vendor.e({
-        e: _ctx.closeable
+        f: _ctx.closeable
       }, _ctx.closeable ? {
-        f: common_vendor.p({
+        g: common_vendor.p({
           name: _ctx.closeIcon,
           size: "27px",
-          color: _ctx.iconColor
+          color: _ctx.iconColor,
+          class: "l-popup__close-icon"
         }),
-        g: common_vendor.o(handleClose)
+        h: common_vendor.o(handleClose, "e0")
       } : {}, {
-        h: common_vendor.sei("r0-7cb52a4a", "view", "popupRef"),
-        i: common_vendor.n(common_vendor.unref(rootClass)),
-        j: common_vendor.s(common_vendor.unref(styles)),
-        k: common_vendor.s(_ctx.lStyle),
-        l: common_vendor.o((...args) => {
+        i: common_vendor.sei("r0-7cb52a4a", "view", "popupRef"),
+        j: common_vendor.n(common_vendor.unref(rootClass)),
+        k: common_vendor.s(common_vendor.unref(styles)),
+        l: common_vendor.s(_ctx.lStyle),
+        m: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        n: common_vendor.o((...args) => {
           return common_vendor.unref(finished) && common_vendor.unref(finished)(...args);
-        })
+        }, "eb")
       }) : {});
       return __returned__;
     };

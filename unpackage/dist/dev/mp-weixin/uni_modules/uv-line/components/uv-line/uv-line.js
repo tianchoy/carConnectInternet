@@ -8,7 +8,7 @@ const _sfc_main = common_vendor.defineComponent({
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvLine_components_uvLine_props.props],
   computed: {
     lineStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       style.margin = this.margin;
       if (this.direction === "row") {
         style.borderBottomWidth = "1px";
@@ -32,7 +32,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    b: common_vendor.s($options.lineStyle)
+    b: common_vendor.s($options.lineStyle),
+    c: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dcf8cb8f"]]);

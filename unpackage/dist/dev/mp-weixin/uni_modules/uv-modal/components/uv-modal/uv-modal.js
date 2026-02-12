@@ -13,7 +13,7 @@ const _sfc_main = common_vendor.defineComponent({
   },
   computed: {
     nvueStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       return style;
     }
   },
@@ -79,38 +79,47 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.s($options.nvueStyle),
     f: common_vendor.s(_ctx.$uv.addStyle(_ctx.textStyle)),
     g: `${_ctx.title ? 12 : 25}px`,
-    h: _ctx.showConfirmButton || _ctx.showCancelButton
+    h: common_vendor.p({
+      class: "data-v-4b4aa5ec"
+    }),
+    i: _ctx.showConfirmButton || _ctx.showCancelButton
   }, _ctx.showConfirmButton || _ctx.showCancelButton ? common_vendor.e({
-    i: _ctx.showCancelButton
+    j: _ctx.showCancelButton
   }, _ctx.showCancelButton ? {
-    j: common_vendor.t(_ctx.cancelText),
-    k: _ctx.cancelColor,
-    l: common_vendor.n(_ctx.showCancelButton && !_ctx.showConfirmButton && "uv-modal__button-group__wrapper--only-cancel"),
-    m: common_vendor.o((...args) => $options.cancelHandler && $options.cancelHandler(...args))
+    k: common_vendor.t(_ctx.cancelText),
+    l: _ctx.cancelColor,
+    m: common_vendor.n(_ctx.showCancelButton && !_ctx.showConfirmButton && "uv-modal__button-group__wrapper--only-cancel"),
+    n: common_vendor.o((...args) => $options.cancelHandler && $options.cancelHandler(...args), "b7")
   } : {}, {
-    n: _ctx.showConfirmButton && _ctx.showCancelButton
+    o: _ctx.showConfirmButton && _ctx.showCancelButton
   }, _ctx.showConfirmButton && _ctx.showCancelButton ? {
-    o: common_vendor.p({
-      direction: "column"
+    p: common_vendor.p({
+      direction: "column",
+      class: "data-v-4b4aa5ec"
     })
   } : {}, {
-    p: _ctx.showConfirmButton
+    q: _ctx.showConfirmButton
   }, _ctx.showConfirmButton ? common_vendor.e({
-    q: $data.loading
-  }, $data.loading ? {} : {
-    r: common_vendor.t(_ctx.confirmText),
-    s: _ctx.confirmColor
+    r: $data.loading
+  }, $data.loading ? {
+    s: common_vendor.p({
+      class: "data-v-4b4aa5ec"
+    })
+  } : {
+    t: common_vendor.t(_ctx.confirmText),
+    v: _ctx.confirmColor
   }, {
-    t: common_vendor.n(!_ctx.showCancelButton && _ctx.showConfirmButton && "uv-modal__button-group__wrapper--only-confirm"),
-    v: common_vendor.o((...args) => $options.confirmHandler && $options.confirmHandler(...args))
+    w: common_vendor.n(!_ctx.showCancelButton && _ctx.showConfirmButton && "uv-modal__button-group__wrapper--only-confirm"),
+    x: common_vendor.o((...args) => $options.confirmHandler && $options.confirmHandler(...args), "04")
   }) : {}, {
-    w: _ctx.buttonReverse ? "row-reverse" : "row"
+    y: _ctx.buttonReverse ? "row-reverse" : "row"
   }) : {}, {
-    x: _ctx.$uv.addUnit(_ctx.width),
-    y: common_vendor.sr("modalPopup", "4b4aa5ec-0"),
-    z: common_vendor.gei(_ctx, ""),
-    A: common_vendor.o($options.popupChange),
-    B: common_vendor.p({
+    z: _ctx.$uv.addUnit(_ctx.width),
+    A: common_vendor.sr("modalPopup", "4b4aa5ec-0"),
+    B: common_vendor.gei(_ctx, ""),
+    C: common_vendor.o($options.popupChange, "5a"),
+    D: `${_ctx.u_s_b_h}px`,
+    E: common_vendor.p({
       mode: "center",
       zoom: _ctx.zoom,
       zIndex: _ctx.zIndex,
@@ -122,8 +131,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       closeOnClickOverlay: _ctx.closeOnClickOverlay,
       safeAreaInsetBottom: false,
       duration: 400,
-      id: common_vendor.gei(_ctx, "")
-    })
+      id: common_vendor.gei(_ctx, ""),
+      class: "r data-v-4b4aa5ec",
+      style: common_vendor.normalizeStyle({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
+      })
+    }),
+    F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-4b4aa5ec"]]);

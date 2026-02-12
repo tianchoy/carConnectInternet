@@ -1,1 +1,1 @@
-:host{display:flex;flex-direction:column}
+:host,page{display:flex;flex-direction:column}

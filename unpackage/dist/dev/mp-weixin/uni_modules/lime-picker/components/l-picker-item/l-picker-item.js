@@ -142,10 +142,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.s(common_vendor.unref(itemStyles)),
         c: common_vendor.sei(common_vendor.gei(_ctx, ""), "picker-view"),
-        d: _ctx.options.length > 0 ? 1 : 0,
-        e: common_vendor.unref(indicatorStyles),
-        f: common_vendor.unref(innerIndex),
-        g: common_vendor.o(handlePick)
+        d: common_vendor.s({
+          opacity: _ctx.options.length > 0 ? 1 : 0
+        }),
+        e: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        f: common_vendor.unref(indicatorStyles),
+        g: common_vendor.unref(innerIndex),
+        h: common_vendor.o(handlePick, "44"),
+        i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

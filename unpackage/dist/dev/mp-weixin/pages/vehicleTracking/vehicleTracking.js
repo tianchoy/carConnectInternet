@@ -22,18 +22,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref("");
     const deptId = common_vendor.ref("");
     const carType = common_vendor.ref("");
-    const center = common_vendor.reactive(new UTSJSONObject({
+    const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(15);
     const isAnimating = common_vendor.ref(false);
     const animationTimer = common_vendor.ref(null);
-    const currentPosition = common_vendor.reactive(new UTSJSONObject({
+    const currentPosition = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const targetPosition = common_vendor.reactive(new UTSJSONObject({
+    const targetPosition = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
@@ -53,10 +53,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentCar = common_vendor.ref("京A12345");
     const times = common_vendor.ref([
       [
-        new UTSJSONObject({ label: "1s", value: "1" }),
-        new UTSJSONObject({ label: "5s", value: "5" }),
-        new UTSJSONObject({ label: "10s", value: "10" }),
-        new UTSJSONObject({ label: "20s", value: "20" })
+        new common_vendor.UTSJSONObject({ label: "1s", value: "1" }),
+        new common_vendor.UTSJSONObject({ label: "5s", value: "5" }),
+        new common_vendor.UTSJSONObject({ label: "10s", value: "10" }),
+        new common_vendor.UTSJSONObject({ label: "20s", value: "20" })
       ]
     ]);
     common_vendor.onLoad((option) => {
@@ -70,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadInitialPosition = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const data = new UTSJSONObject({
+          const data = new common_vendor.UTSJSONObject({
             deptId: deptId.value,
             deviceids: imei.value
           });
@@ -131,7 +131,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const iconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
       lastIconPath = iconPath;
-      const marker = new UTSJSONObject({
+      const marker = new common_vendor.UTSJSONObject({
         id: 1,
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
@@ -139,7 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         width: 25,
         height: 25,
         rotate: currentRotation.value,
-        anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+        anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 }),
         alpha: 1,
         fixed: false
       });
@@ -165,7 +165,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadTrackData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const data = new UTSJSONObject({
+          const data = new common_vendor.UTSJSONObject({
             deptId: deptId.value,
             deviceids: imei.value
           });
@@ -177,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
             if (deviceData) {
               const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
-              const newPosition = new UTSJSONObject(
+              const newPosition = new common_vendor.UTSJSONObject(
                 {
                   latitude: convertedCoord.lat,
                   longitude: convertedCoord.lng,
@@ -192,8 +192,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               if (newPosition.direction === lastDirection.value) {
                 newDirection = lastDirection.value;
               }
-              addToAnimationQueue(new UTSJSONObject({
-                position: new UTSJSONObject({
+              addToAnimationQueue(new common_vendor.UTSJSONObject({
+                position: new common_vendor.UTSJSONObject({
                   latitude: newPosition.latitude,
                   longitude: newPosition.longitude
                 }),
@@ -225,7 +225,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
       isProcessingQueue.value = true;
-      const nextAnimation = UTS.arrayShift(animationQueue.value);
+      const nextAnimation = common_vendor.UTS.arrayShift(animationQueue.value);
       targetPosition.latitude = nextAnimation.position.latitude;
       targetPosition.longitude = nextAnimation.position.longitude;
       targetRotation.value = nextAnimation.rotation;
@@ -323,7 +323,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const newIconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
       const needUpdateIcon = newIconPath !== lastIconPath;
-      const updatedMarker = new UTSJSONObject({
+      const updatedMarker = new common_vendor.UTSJSONObject({
         id: 1,
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
@@ -331,7 +331,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         width: 25,
         height: 25,
         rotate: currentRotation.value,
-        anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
+        anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 }),
         alpha: 1,
         fixed: false
       });
@@ -432,7 +432,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o((val) => {
           return currentTime.value = val;
-        }),
+        }, "e2"),
         c: common_vendor.p({
           currentTime: currentTime.value,
           currentCar: currentCar.value,
@@ -446,11 +446,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: markers.value,
         h: mapScale.value,
         i: common_vendor.t(isTracking.value ? "停止跟踪" : "开始跟踪"),
-        j: common_vendor.o(toggleTracking),
+        j: common_vendor.o(toggleTracking, "2e"),
         k: isTracking.value ? "#e64340" : "#1296db",
         l: common_vendor.t(currentSpeed.value),
         m: common_vendor.t(currentAddress.value),
-        n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        o: `${_ctx.u_s_b_h}px`,
+        p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

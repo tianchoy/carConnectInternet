@@ -37,13 +37,13 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 文字内容的样式
     textStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       style.color = this.color;
       style.fontSize = this.$uv.addUnit(this.fontSize);
       return style;
     },
     animationStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       style.animationDuration = this.animationDuration;
       style.animationPlayState = this.animationPlayState;
       return style;
@@ -118,7 +118,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.p({
       name: _ctx.icon,
       color: _ctx.color,
-      size: "19"
+      size: "19",
+      class: "data-v-8e15132c"
     })
   } : {}, {
     c: common_vendor.f($options.innerText, (item, index, i0) => {
@@ -138,20 +139,24 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     j: common_vendor.p({
       name: "arrow-right",
       size: 17,
-      color: _ctx.color
+      color: _ctx.color,
+      class: "data-v-8e15132c"
     })
   } : {}, {
     k: _ctx.mode === "closable"
   }, _ctx.mode === "closable" ? {
-    l: common_vendor.o($options.close),
+    l: common_vendor.o($options.close, "f1"),
     m: common_vendor.p({
       name: "close",
       size: 16,
-      color: _ctx.color
+      color: _ctx.color,
+      class: "data-v-8e15132c"
     })
   } : {}) : {}, {
     n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    o: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    o: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "bf"),
+    p: `${_ctx.u_s_b_h}px`,
+    q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-8e15132c"]]);

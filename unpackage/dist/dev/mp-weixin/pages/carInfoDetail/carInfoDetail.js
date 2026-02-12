@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const deptId = common_vendor.ref("");
     const imei = common_vendor.ref("");
     const deviceId = common_vendor.ref("");
-    const center = common_vendor.reactive(new UTSJSONObject({
+    const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
@@ -41,11 +41,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentTime = common_vendor.ref("5s");
     const times = common_vendor.ref([
       [
-        new UTSJSONObject({ label: "5s", value: "5" }),
-        new UTSJSONObject({ label: "10s", value: "10" }),
-        new UTSJSONObject({ label: "20s", value: "20" }),
-        new UTSJSONObject({ label: "30s", value: "30" }),
-        new UTSJSONObject({ label: "停止刷新", value: "0" })
+        new common_vendor.UTSJSONObject({ label: "5s", value: "5" }),
+        new common_vendor.UTSJSONObject({ label: "10s", value: "10" }),
+        new common_vendor.UTSJSONObject({ label: "20s", value: "20" }),
+        new common_vendor.UTSJSONObject({ label: "30s", value: "30" }),
+        new common_vendor.UTSJSONObject({ label: "停止刷新", value: "0" })
       ]
     ]);
     const refreshTimer = common_vendor.ref(null);
@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const userType = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     common_vendor.ref(false);
-    common_vendor.ref(new UTSJSONObject({
+    common_vendor.ref(new common_vendor.UTSJSONObject({
       deviceName: "",
       carNumber: "",
       deviceSerial: "",
@@ -69,7 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       totalMileage: "",
       address: ""
     }));
-    const currentCarInfo = common_vendor.ref(new UTSJSONObject({}));
+    const currentCarInfo = common_vendor.ref(new common_vendor.UTSJSONObject({}));
     const getBatteryColor = (batteryPercent = null) => {
       if (!batteryPercent)
         return "#c9c9c9";
@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     function getSignalDetail(rssi = null) {
       if (rssi === null || rssi === void 0 || rssi === "") {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "无信号",
           quality: "无服务",
           color: "#999",
@@ -95,7 +95,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const signalValue = Number(rssi);
       if (isNaN(signalValue)) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "信号数据无效",
           quality: "无服务",
           color: "#999",
@@ -103,42 +103,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
       if (signalValue >= 26) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "极好",
           quality: "极强",
           color: "#07C160",
           level: 5
         });
       } else if (signalValue >= 20) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "良好",
           quality: "强",
           color: "#52c41a",
           level: 4
         });
       } else if (signalValue >= 15) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "一般",
           quality: "中等",
           color: "#faad14",
           level: 3
         });
       } else if (signalValue >= 10) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "差",
           quality: "较弱",
           color: "#fa8c16",
           level: 2
         });
       } else if (signalValue >= 1) {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "非常差",
           quality: "微弱",
           color: "#f5222d",
           level: 1
         });
       } else {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           experience: "无信号",
           quality: "无服务",
           color: "#999",
@@ -198,34 +198,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const baseList = common_vendor.computed(() => {
-      const list = [new UTSJSONObject({
+      const list = [new common_vendor.UTSJSONObject({
         name: "/static/gjhf.png",
         title: "轨迹回放"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/clgz.png",
         title: "车辆跟踪"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/lcjl.png",
         title: "里程记录"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/tcjl.png",
         title: "停车记录"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/dzwl.png",
         title: "电子围栏"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/navto.png",
         title: "一键寻车"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/power.png",
         title: "恢复油电"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "/static/offpower.png",
         title: "断开油电"
       })];
       const productId = currentCarInfo.value.productId;
       if (productId === "product-1141811865601576960" || productId === "product-1183161303028600832") {
-        list.push(new UTSJSONObject({
+        list.push(new common_vendor.UTSJSONObject({
           name: "/static/cmd.png",
           title: "发送指令"
         }));
@@ -312,10 +312,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.showLoading({
+          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "执行中...",
             mask: true
-          });
+          }));
           const res = yield api_request.sendCommand({
             imei: imei.value,
             password: userType.value == "1" ? psw.value : "",
@@ -393,7 +393,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const refreshMapView = () => {
       try {
         const mapContext = common_vendor.index.createMapContext("myMap");
-        mapContext.moveToLocation(new UTSJSONObject({
+        mapContext.moveToLocation(new common_vendor.UTSJSONObject({
           latitude: center.latitude,
           longitude: center.longitude,
           scale: mapScale.value,
@@ -432,7 +432,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   var item = _d.value;
                   if (item.imei == imei.value) {
                     foundDevice = true;
-                    datainfo.value = UTS.JSON.parse(UTS.JSON.stringify(item));
+                    datainfo.value = common_vendor.UTS.JSON.parse(common_vendor.UTS.JSON.stringify(item));
                     if (!item.latitude || !item.longitude) {
                       console.error("位置信息缺失", item);
                       common_vendor.index.showToast({
@@ -453,11 +453,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                       console.log("坐标转换结果:", convertedCoord);
                     } catch (transformError) {
                       console.error("坐标转换失败:", transformError);
-                      convertedCoord = new UTSJSONObject({ lat, lng });
+                      convertedCoord = new common_vendor.UTSJSONObject({ lat, lng });
                     }
                     center.latitude = convertedCoord.lat;
                     center.longitude = convertedCoord.lng;
-                    console.log("地图中心点更新:", new UTSJSONObject({
+                    console.log("地图中心点更新:", new common_vendor.UTSJSONObject({
                       latitude: center.latitude,
                       longitude: center.longitude
                     }));
@@ -546,20 +546,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       deviceId.value = option.deviceId;
       userType.value = common_vendor.index.getStorageSync("userType");
       common_vendor.watch(center, (newVal, oldVal) => {
-        console.log("center 变化:", new UTSJSONObject({
+        console.log("center 变化:", new common_vendor.UTSJSONObject({
           old: oldVal,
           new: newVal,
           time: (/* @__PURE__ */ new Date()).toISOString()
         }));
       }, { deep: true });
       loadDeviceDetail().then(() => {
-        const data = new UTSJSONObject({
+        const data = new common_vendor.UTSJSONObject({
           deptId: deptId.value,
           deviceids: imei.value
         });
-        common_vendor.index.showLoading({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载中..."
-        });
+        }));
         loadData(data, 3).then((success = null) => {
           common_vendor.index.hideLoading();
           if (success) {
@@ -588,14 +588,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const createMarker = (id, lat, lng, type, title = null) => {
-      const marker = new UTSJSONObject({
+      const marker = new common_vendor.UTSJSONObject({
         id,
         latitude: lat,
         longitude: lng,
         width: 25,
         height: 25,
         iconPath: utils_cars.getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
-        callout: new UTSJSONObject({
+        callout: new common_vendor.UTSJSONObject({
           content: title || "爱车位置",
           color: datainfo.value.connectionStatus == "online" ? "#fff" : "#666",
           borderRadius: 10,
@@ -633,7 +633,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o((val) => {
           return currentTime.value = val;
-        }),
+        }, "33"),
         c: common_vendor.p({
           currentTime: common_vendor.unref(currentTime),
           showTime: true,
@@ -655,7 +655,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           size: 16
         }),
-        k: common_vendor.o(carDetail),
+        k: common_vendor.o(carDetail, "4a"),
         l: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
         m: common_vendor.t(common_vendor.unref(datainfo).signalUpdateTime),
         n: common_vendor.unref(address)
@@ -667,7 +667,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         r: !common_vendor.unref(address)
       }, !common_vendor.unref(address) ? {
-        s: common_vendor.o(refreshAdress)
+        s: common_vendor.o(refreshAdress, "d5")
       } : {}, {
         t: ((_a = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _a.rssi) || ((_b = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _b.sat)
       }, ((_c = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _c.rssi) || ((_d = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _d.sat) ? common_vendor.e({
@@ -723,7 +723,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         S: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }),
+        }, "7e"),
         T: common_vendor.p({
           placeholder: "请输入账户密码",
           prefixIcon: "lock",
@@ -735,11 +735,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         U: common_vendor.sr(popupRef, "6cb34a81-6", {
           "k": "popupRef"
         }),
-        V: common_vendor.o(confirm),
+        V: common_vendor.o(confirm, "7a"),
         W: common_vendor.p({
-          title: common_vendor.unref(modalTitle)
+          title: common_vendor.unref(modalTitle),
+          class: "r"
         }),
-        X: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        X: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        Y: `${_ctx.u_s_b_h}px`,
+        Z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

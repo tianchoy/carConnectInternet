@@ -31,7 +31,7 @@ const _sfc_main = common_vendor.defineComponent({
       return this.innerValue === this.activeValue;
     },
     switchStyle() {
-      let style = new UTSJSONObject(
+      let style = new common_vendor.UTSJSONObject(
         {}
         // 这里需要加2，是为了腾出边框的距离，否则圆点node会和外边框紧贴在一起
       );
@@ -44,7 +44,7 @@ const _sfc_main = common_vendor.defineComponent({
       return style;
     },
     nodeStyle() {
-      let style = new UTSJSONObject(
+      let style = new common_vendor.UTSJSONObject(
         {}
         // 如果自定义非激活颜色，将node圆点的尺寸减少两个像素，让其与外边框距离更大一点
       );
@@ -55,7 +55,7 @@ const _sfc_main = common_vendor.defineComponent({
       return style;
     },
     bgStyle() {
-      let style = new UTSJSONObject(
+      let style = new common_vendor.UTSJSONObject(
         {}
         // 这里配置一个多余的元素在HTML中，是为了让switch切换时，有更良好的背景色扩充体验(见实际效果)
       );
@@ -101,16 +101,21 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       mode: "circle",
       timingFunction: "linear",
       color: $data.innerValue ? _ctx.activeColor : "#AAABAD",
-      size: _ctx.size * 0.6
+      size: _ctx.size * 0.6,
+      class: "data-v-c713e4c9"
     }),
     c: common_vendor.sei("r0-c713e4c9", "view", "uv-switch__node"),
     d: common_vendor.n($data.innerValue && "uv-switch__node--on"),
     e: common_vendor.s($options.nodeStyle),
     f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     g: common_vendor.n(_ctx.disabled && "uv-switch--disabled"),
-    h: common_vendor.s($options.switchStyle),
-    i: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
-    j: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    i: common_vendor.s($options.switchStyle),
+    j: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    k: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    l: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "b7")
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c713e4c9"]]);

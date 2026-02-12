@@ -48,9 +48,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.show ? common_vendor.e({
     b: _ctx.direction === "column" || _ctx.direction === "row" && _ctx.step
   }, _ctx.direction === "column" || _ctx.direction === "row" && _ctx.step ? {
-    c: common_vendor.o($options.close),
-    d: common_vendor.o($options.click),
-    e: common_vendor.o($options.change),
+    c: common_vendor.o($options.close, "9f"),
+    d: common_vendor.o($options.click, "9b"),
+    e: common_vendor.o($options.change, "5d"),
     f: common_vendor.p({
       color: _ctx.color,
       bgColor: _ctx.bgColor,
@@ -61,11 +61,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       ["disable-touch"]: _ctx.disableTouch,
       ["disable-scroll"]: _ctx.disableScroll,
       fontSize: _ctx.fontSize,
-      duration: _ctx.duration
+      duration: _ctx.duration,
+      class: "data-v-ecf69ee0"
     })
   } : {
-    g: common_vendor.o($options.close),
-    h: common_vendor.o($options.click),
+    g: common_vendor.o($options.close, "45"),
+    h: common_vendor.o($options.click, "f4"),
     i: common_vendor.p({
       color: _ctx.color,
       bgColor: _ctx.bgColor,
@@ -75,14 +76,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       speed: _ctx.speed,
       url: _ctx.url,
       linkType: _ctx.linkType,
-      icon: _ctx.icon
+      icon: _ctx.icon,
+      class: "data-v-ecf69ee0"
     })
   }, {
     j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     k: common_vendor.s({
       backgroundColor: _ctx.bgColor
     }),
-    l: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle))
+    l: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    m: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ecf69ee0"]]);

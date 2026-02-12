@@ -58,7 +58,7 @@ const _sfc_main = common_vendor.defineComponent({
     badge: {
       type: Object,
       default() {
-        return new UTSJSONObject({});
+        return new common_vendor.UTSJSONObject({});
       }
     },
     rightText: {
@@ -80,7 +80,7 @@ const _sfc_main = common_vendor.defineComponent({
     extraIcon: {
       type: Object,
       default() {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           name: "",
           color: "#000000",
           size: 20,
@@ -95,7 +95,7 @@ const _sfc_main = common_vendor.defineComponent({
     customStyle: {
       type: Object,
       default() {
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           padding: "",
           backgroundColor: "#FFFFFF"
         });
@@ -123,13 +123,13 @@ const _sfc_main = common_vendor.defineComponent({
   data() {
     return {
       isFirstChild: false,
-      padding: new UTSJSONObject({
+      padding: new common_vendor.UTSJSONObject({
         top: "",
         right: "",
         bottom: "",
         left: ""
       }),
-      parentData: new UTSJSONObject({
+      parentData: new common_vendor.UTSJSONObject({
         direction: "row",
         padding: 0
       })
@@ -213,8 +213,8 @@ const _sfc_main = common_vendor.defineComponent({
         return null;
       }
       if (this.clickable || this.link) {
-        this.$emit("click", new UTSJSONObject({
-          data: new UTSJSONObject({})
+        this.$emit("click", new common_vendor.UTSJSONObject({
+          data: new common_vendor.UTSJSONObject({})
         }));
       }
     },
@@ -229,15 +229,15 @@ const _sfc_main = common_vendor.defineComponent({
       }
     },
     pageApi(api = null) {
-      let callback = new UTSJSONObject({
+      let callback = new common_vendor.UTSJSONObject({
         url: this.to,
         success: (res = null) => {
-          this.$emit("click", new UTSJSONObject({
+          this.$emit("click", new common_vendor.UTSJSONObject({
             data: res
           }));
         },
         fail: (err = null) => {
-          this.$emit("click", new UTSJSONObject({
+          this.$emit("click", new common_vendor.UTSJSONObject({
             data: err
           }));
         }
@@ -289,7 +289,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       name: $props.extraIcon.icon,
       customPrefix: $props.extraIcon.customPrefix,
       color: $props.extraIcon.color,
-      size: $props.extraIcon.size
+      size: $props.extraIcon.size,
+      class: "data-v-d568ce32"
     })
   } : {}, {
     f: $props.showExtraIcon,
@@ -323,15 +324,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       shape: $props.badge.shape,
       numberType: $props.badge.numberType,
       inverted: $props.badge.inverted,
-      customStyle: "margin-left: 4px;"
+      customStyle: "margin-left: 4px;",
+      class: "data-v-d568ce32"
     })
   } : {}, {
     s: $props.showSwitch
   }, $props.showSwitch ? {
-    t: common_vendor.o($options.onSwitchChange),
+    t: common_vendor.o($options.onSwitchChange, "7d"),
     v: common_vendor.p({
       value: $props.switchChecked,
-      disabled: $props.disabled
+      disabled: $props.disabled,
+      class: "data-v-d568ce32"
     })
   } : {}, {
     w: $options.directionData === "column" ? 1 : ""
@@ -347,17 +350,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     E: common_vendor.p({
       size: "34rpx",
       color: "#bbb",
-      name: "arrow-right"
+      name: "arrow-right",
+      class: "uv-icon-wrapper data-v-d568ce32"
     })
   } : {}, {
     F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     G: $props.disabled ? 1 : "",
-    H: common_vendor.s(_ctx.$uv.addStyle($props.customStyle)),
-    I: common_vendor.s({
+    H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    I: common_vendor.s(_ctx.$uv.addStyle($props.customStyle)),
+    J: common_vendor.s({
       "background-color": $props.customStyle.backgroundColor ? $props.customStyle.backgroundColor : "#fff"
     }),
-    J: !$props.clickable && !$props.link || $props.disabled || $props.showSwitch ? "" : "uv-list-item--hover",
-    K: common_vendor.o((...args) => $options.onClick && $options.onClick(...args))
+    K: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    L: !$props.clickable && !$props.link || $props.disabled || $props.showSwitch ? "" : "uv-list-item--hover",
+    M: common_vendor.o((...args) => $options.onClick && $options.onClick(...args), "60")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d568ce32"]]);

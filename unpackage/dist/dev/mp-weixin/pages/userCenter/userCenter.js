@@ -18,7 +18,7 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "userCenter",
   setup(__props) {
-    const userInfo = common_vendor.ref(new UTSJSONObject({
+    const userInfo = common_vendor.ref(new common_vendor.UTSJSONObject({
       avatar: "/static/avatar.png",
       nickname: ""
     }));
@@ -44,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
-        let params = new UTSJSONObject({});
+        let params = new common_vendor.UTSJSONObject({});
         const res = yield api_request.getUserInfo();
         userInfo.value = res.data;
         const resCars = yield api_request.getUserDeviceList(params);
@@ -56,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const userInfoDetail = () => {
       if (Login.value) {
         common_vendor.index.navigateTo({
-          url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
+          url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(common_vendor.UTS.JSON.stringify(userInfo.value))
         });
       } else {
         common_vendor.index.navigateTo({
@@ -110,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           size: "16"
         }),
-        f: common_vendor.o(userInfoDetail),
+        f: common_vendor.o(userInfoDetail, "0c"),
         g: common_vendor.unref(Login)
       }, common_vendor.unref(Login) ? {
         h: common_vendor.p({
@@ -123,14 +123,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           size: "16"
         }),
-        j: common_vendor.o(carList),
-        k: common_vendor.o(platformRenewal)
+        j: common_vendor.o(carList, "0b"),
+        k: common_vendor.o(platformRenewal, "3e")
       } : {}, {
         l: common_vendor.unref(version)
       }, common_vendor.unref(version) ? {
         m: common_vendor.t(common_vendor.unref(version))
       } : {}, {
-        n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        n: common_vendor.p({
+          name: "server-man",
+          size: "35",
+          color: "primary"
+        }),
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        p: `${_ctx.u_s_b_h}px`,
+        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

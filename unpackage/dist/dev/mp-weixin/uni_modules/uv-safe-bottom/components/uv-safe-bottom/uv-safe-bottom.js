@@ -13,7 +13,7 @@ const _sfc_main = common_vendor.defineComponent({
   },
   computed: {
     style() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       return this.$uv.deepMerge(style, this.$uv.addStyle(this.customStyle));
     }
   },
@@ -25,7 +25,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     b: common_vendor.s($options.style),
-    c: common_vendor.n(!$data.isNvue && "uv-safe-area-inset-bottom")
+    c: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    d: common_vendor.n(!$data.isNvue && "uv-safe-area-inset-bottom"),
+    e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-560f16b2"]]);

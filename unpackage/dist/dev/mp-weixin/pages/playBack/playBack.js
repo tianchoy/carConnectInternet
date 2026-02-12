@@ -22,7 +22,7 @@ const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/
 if (!Math) {
   (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
 }
-class polyData extends UTS.UTSType {
+class polyData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -41,7 +41,7 @@ class polyData extends UTS.UTSType {
   }
   constructor(options, metadata = polyData.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.points = this.__props__.points;
     this.color = this.__props__.color;
     this.width = this.__props__.width;
@@ -54,7 +54,7 @@ class polyData extends UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "playBack",
   setup(__props) {
-    const center = common_vendor.reactive(new UTSJSONObject({
+    const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
     }));
@@ -143,7 +143,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         minLng = Math.min(minLng, point.longitude);
         maxLng = Math.max(maxLng, point.longitude);
       });
-      return new UTSJSONObject({ minLat, maxLat, minLng, maxLng });
+      return new common_vendor.UTSJSONObject({ minLat, maxLat, minLng, maxLng });
     }
     function adjustMapToFitTrack() {
       const bounds = calculateTrackBounds();
@@ -180,7 +180,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function initCarMarker() {
       if (trackPoints.value.length > 0) {
-        carMarker.value = new UTSJSONObject(
+        carMarker.value = new common_vendor.UTSJSONObject(
           {
             id: 999,
             latitude: trackPoints.value[0].latitude,
@@ -199,7 +199,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           // 添加起点和终点标记
         );
-        const startMarker = new UTSJSONObject({
+        const startMarker = new common_vendor.UTSJSONObject({
           id: 1e3,
           latitude: trackPoints.value[0].latitude,
           longitude: trackPoints.value[0].longitude,
@@ -207,14 +207,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: 24,
           height: 24,
           // anchor: { x: 0.5, y: 0.5 },
-          callout: new UTSJSONObject({
+          callout: new common_vendor.UTSJSONObject({
             content: "起点",
             borderRadius: 5,
             padding: 5,
             display: "BYCLICK"
           })
         });
-        const endMarker = new UTSJSONObject({
+        const endMarker = new common_vendor.UTSJSONObject({
           id: 1001,
           latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
           longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
@@ -222,7 +222,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: 24,
           height: 24,
           // anchor: { x: 0.5, y: 0.5 },
-          callout: new UTSJSONObject({
+          callout: new common_vendor.UTSJSONObject({
             content: "终点",
             borderRadius: 5,
             padding: 5,
@@ -241,9 +241,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (currentIndex.value > 0) {
         const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
         if (playedPoints.length >= 2) {
-          newPolyline.push(new UTSJSONObject({
+          newPolyline.push(new common_vendor.UTSJSONObject({
             points: playedPoints.map((p = null) => {
-              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
+              return new common_vendor.UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
             }),
             color: "#1890FF",
             width: 6,
@@ -256,9 +256,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (currentIndex.value < trackPoints.value.length - 1) {
         const unplayedPoints = trackPoints.value.slice(currentIndex.value);
         if (unplayedPoints.length >= 2) {
-          newPolyline.push(new UTSJSONObject({
+          newPolyline.push(new common_vendor.UTSJSONObject({
             points: unplayedPoints.map((p = null) => {
-              return new UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
+              return new common_vendor.UTSJSONObject({ latitude: p.latitude, longitude: p.longitude });
             }),
             color: "#999",
             width: 3,
@@ -406,8 +406,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showLoading({ title: "加载中..." });
-        const data = new UTSJSONObject({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中..." }));
+        const data = new common_vendor.UTSJSONObject({
           imei: imei.value,
           startTime: startTime.value.replace(/\//g, "-"),
           endTime: endTime.value.replace(/\//g, "-"),
@@ -438,7 +438,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       center.latitude = convertedCoord.lat;
       center.longitude = convertedCoord.lng;
       mapScale.value = 15;
-      const currentPoint = new UTSJSONObject(
+      const currentPoint = new common_vendor.UTSJSONObject(
         {
           latitude: convertedCoord.lat,
           longitude: convertedCoord.lng,
@@ -451,7 +451,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         // 初始化小车标记
       );
-      carMarker.value = new UTSJSONObject(
+      carMarker.value = new common_vendor.UTSJSONObject(
         {
           id: 999,
           latitude: currentPoint.latitude,
@@ -480,7 +480,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const originalLat = point.getNumber("latitude", 0);
         const originalLng = point.getNumber("longitude", 0);
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(originalLat, originalLng);
-        const processedPoint = new UTSJSONObject({
+        const processedPoint = new common_vendor.UTSJSONObject({
           latitude: convertedCoord.lat,
           longitude: convertedCoord.lng,
           speed: point.getNumber("speed", 0),
@@ -555,17 +555,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: common_vendor.t(startTime.value),
         n: common_vendor.o(($event) => {
           return showPicker("start");
-        }),
+        }, "6b"),
         o: common_vendor.t(endTime.value),
         p: common_vendor.o(($event) => {
           return showPicker("end");
-        }),
+        }, "50"),
         q: common_vendor.t(isPlaying.value ? "暂停" : "播放"),
-        r: common_vendor.o(togglePlayback),
-        s: common_vendor.o(setPlaybackSpeed),
+        r: common_vendor.o(togglePlayback, "00"),
+        s: common_vendor.o(setPlaybackSpeed, "27"),
         t: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }),
+        }, "b4"),
         v: common_vendor.p({
           backgroundColor: "#f5f5f5",
           activeColor: "#1890FF",
@@ -578,8 +578,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         x: common_vendor.t(currentTime.value),
         y: common_vendor.t(currentSpeed.value),
         z: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        A: common_vendor.o(onConfirm),
-        B: common_vendor.o(onCancel),
+        A: common_vendor.o(onConfirm, "ec"),
+        B: common_vendor.o(onCancel, "02"),
         C: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -588,13 +588,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         D: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }),
+        }, "c1"),
         E: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
         }),
-        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        G: `${_ctx.u_s_b_h}px`,
+        H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

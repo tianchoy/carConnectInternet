@@ -33,15 +33,15 @@ function checkForUpdates() {
         console.log("检查更新结果:", res);
         if (res.hasUpdate) {
           console.log("发现新版本，正在后台下载...");
-          common_vendor.index.showLoading({
+          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
-          });
+          }));
         }
       });
       updateManager.onUpdateReady(() => {
         console.log("新版本下载完成");
         common_vendor.index.hideLoading();
-        common_vendor.index.showModal(new UTSJSONObject({
+        common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
           content: "新版本已经准备好，是否重启应用？",
           confirmText: "立即重启",
@@ -56,7 +56,7 @@ function checkForUpdates() {
       updateManager.onUpdateFailed(() => {
         console.error("新版本下载失败");
         common_vendor.index.hideLoading();
-        common_vendor.index.showModal(new UTSJSONObject({
+        common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
           content: "新版本下载失败，请检查网络设置或稍后再试",
           showCancel: false,
@@ -65,7 +65,7 @@ function checkForUpdates() {
       });
     }
   } else {
-    common_vendor.index.showModal(new UTSJSONObject({
+    common_vendor.index.showModal(new common_vendor.UTSJSONObject({
       title: "提示",
       content: "当前微信版本过低，无法使用自动更新功能，请升级到最新微信版本后重试。",
       showCancel: false

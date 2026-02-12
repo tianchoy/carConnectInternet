@@ -29,7 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const startTime = common_vendor.ref("");
     const endTime = common_vendor.ref("");
     const imei = common_vendor.ref("");
-    const carStopDetail = common_vendor.ref(new UTSJSONObject({}));
+    const carStopDetail = common_vendor.ref(new common_vendor.UTSJSONObject({}));
     common_vendor.ref("");
     const sortedCarStopDetail = common_vendor.computed(() => {
       if (!carStopDetail.value || !Array.isArray(carStopDetail.value)) {
@@ -50,10 +50,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const loadStopData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.showLoading({
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载中..."
-        });
-        const data = new UTSJSONObject({
+        }));
+        const data = new common_vendor.UTSJSONObject({
           imei: imei.value,
           startTime: startTime.value,
           endTime: endTime.value,
@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const stopsWithAddress = yield Promise.all(res.data.stops.map((stop = null) => {
           return common_vendor.__awaiter(this, void 0, void 0, function* () {
             const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(stop.latitude, stop.longitude);
-            return new UTSJSONObject(Object.assign(Object.assign({}, stop), { latitude: convertedCoord.lat, longitude: convertedCoord.lng }));
+            return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, stop), { latitude: convertedCoord.lat, longitude: convertedCoord.lng }));
           });
         }));
         carStopDetail.value = stopsWithAddress;
@@ -143,10 +143,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(startTime.value),
         d: common_vendor.o(($event) => {
           return showPicker("start");
-        }),
+        }, "47"),
         e: common_vendor.o(($event) => {
           return showPicker("start");
-        }),
+        }, "c8"),
         f: common_vendor.p({
           name: "arrow-down",
           size: "13"
@@ -154,16 +154,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.t(endTime.value),
         h: common_vendor.o(($event) => {
           return showPicker("end");
-        }),
+        }, "4f"),
         i: common_vendor.o(($event) => {
           return showPicker("end");
-        }),
+        }, "6a"),
         j: common_vendor.p({
           name: "arrow-down",
           size: "13"
         }),
-        k: common_vendor.o(onConfirm),
-        l: common_vendor.o(onCancel),
+        k: common_vendor.o(onConfirm, "b1"),
+        l: common_vendor.o(onCancel, "66"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -172,7 +172,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }),
+        }, "97"),
         o: common_vendor.p({
           position: "bottom",
           closeable: false,
@@ -206,7 +206,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         v: common_assets._imports_2$1,
         w: common_assets._imports_3
       }, {
-        x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        y: `${_ctx.u_s_b_h}px`,
+        z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

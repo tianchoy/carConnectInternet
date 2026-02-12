@@ -12,7 +12,7 @@ const _sfc_main = common_vendor.defineComponent({
       // 当你看到这段代码的时候，
       // 父组件的默认值，因为头条小程序不支持在computed中使用this.parent.shape的形式
       // 故只能使用如此方法
-      parentData: new UTSJSONObject({
+      parentData: new common_vendor.UTSJSONObject({
         iconSize: 12,
         labelSize: 14,
         labelColor: "#303133",
@@ -88,7 +88,7 @@ const _sfc_main = common_vendor.defineComponent({
       return classes;
     },
     iconWrapStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       style.backgroundColor = this.checked && !this.elDisabled ? this.elActiveColor : "#ffffff";
       style.borderColor = this.checked && !this.elDisabled ? this.elActiveColor : this.elInactiveColor;
       style.width = this.$uv.addUnit(this.elSize);
@@ -99,7 +99,7 @@ const _sfc_main = common_vendor.defineComponent({
       return style;
     },
     radioStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.parentData.borderBottom && this.parentData.placement === "row") {
         this.$uv.error("检测到您将borderBottom设置为true，需要同时将uv-radio-group的placement设置为column才有效");
       }
@@ -177,21 +177,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: common_vendor.p({
       name: "checkbox-mark",
       size: $options.elIconSize,
-      color: $options.elIconColor
+      color: $options.elIconColor,
+      class: "uv-radio__icon-wrap__icon data-v-2da5b323"
     }),
-    b: common_vendor.o((...args) => $options.iconClickHandler && $options.iconClickHandler(...args)),
+    b: common_vendor.o((...args) => $options.iconClickHandler && $options.iconClickHandler(...args), "ff"),
     c: common_vendor.n($options.iconClasses),
     d: common_vendor.s($options.iconWrapStyle),
     e: common_vendor.t(_ctx.label),
     f: $options.elDisabled ? $options.elInactiveColor : $options.elLabelColor,
     g: $options.elLabelSize,
     h: $options.elLabelSize,
-    i: common_vendor.o((...args) => $options.labelClickHandler && $options.labelClickHandler(...args)),
+    i: common_vendor.o((...args) => $options.labelClickHandler && $options.labelClickHandler(...args), "7e"),
     j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    k: common_vendor.o((...args) => $options.wrapperClickHandler && $options.wrapperClickHandler(...args)),
+    k: common_vendor.o((...args) => $options.wrapperClickHandler && $options.wrapperClickHandler(...args), "52"),
     l: common_vendor.s($options.radioStyle),
-    m: common_vendor.n(`uv-radio-label--${$data.parentData.iconPlacement}`),
-    n: common_vendor.n($data.parentData.borderBottom && $data.parentData.placement === "column" && "uv-border-bottom")
+    m: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    n: common_vendor.n(`uv-radio-label--${$data.parentData.iconPlacement}`),
+    o: common_vendor.n($data.parentData.borderBottom && $data.parentData.placement === "column" && "uv-border-bottom"),
+    p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-2da5b323"]]);

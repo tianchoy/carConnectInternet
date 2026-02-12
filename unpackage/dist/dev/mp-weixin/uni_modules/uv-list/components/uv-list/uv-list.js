@@ -6,7 +6,7 @@ const _sfc_main = common_vendor.defineComponent({
   name: "uv-list",
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin],
   "mp-weixin": {
-    options: new UTSJSONObject({
+    options: new common_vendor.UTSJSONObject({
       multipleSlots: false
     })
   },
@@ -63,7 +63,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   } : {}, {
     e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    f: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle))
+    f: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    g: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-53ea9bef"]]);

@@ -11,13 +11,13 @@ const _sfc_main = common_vendor.defineComponent({
     return {
       // 错误提示语
       message: "",
-      parentData: new UTSJSONObject({
+      parentData: new common_vendor.UTSJSONObject({
         // 提示文本的位置
         labelPosition: "left",
         // 提示文本对齐方式
         labelAlign: "left",
         // 提示文本的样式
-        labelStyle: new UTSJSONObject({}),
+        labelStyle: new common_vendor.UTSJSONObject({}),
         // 提示文本的宽度
         labelWidth: 45,
         // 错误提示方式
@@ -78,7 +78,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, _ctx.leftIcon ? {
     d: common_vendor.p({
       name: _ctx.leftIcon,
-      ["custom-style"]: _ctx.leftIconStyle
+      ["custom-style"]: _ctx.leftIconStyle,
+      class: "data-v-d1e73275"
     })
   } : {}, {
     e: common_vendor.t(_ctx.label),
@@ -89,7 +90,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: _ctx.$uv.addUnit(_ctx.labelWidth || $data.parentData.labelWidth),
     i: $data.parentData.labelPosition === "left" ? 0 : "5px"
   }) : {}, {
-    j: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    j: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "51"),
     k: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
     l: common_vendor.s({
       flexDirection: (_ctx.labelPosition || $data.parentData.labelPosition) === "left" ? "row" : "column"
@@ -101,16 +102,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     p: common_vendor.p({
       show: true,
       duration: 100,
-      mode: "fade"
+      mode: "fade",
+      class: "data-v-d1e73275"
     })
   } : {}, {
     q: _ctx.borderBottom
   }, _ctx.borderBottom ? {
     r: common_vendor.p({
-      color: $data.message && $data.parentData.errorType === "border-bottom" ? "#f56c6c" : "#d6d7d9"
+      color: $data.message && $data.parentData.errorType === "border-bottom" ? "#f56c6c" : "#d6d7d9",
+      class: "data-v-d1e73275"
     })
   } : {}, {
-    s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+    s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    t: `${_ctx.u_s_b_h}px`,
+    v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d1e73275"]]);

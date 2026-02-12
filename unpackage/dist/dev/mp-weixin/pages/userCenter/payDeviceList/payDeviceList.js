@@ -38,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         loading.value = true;
         try {
-          const data = new UTSJSONObject({
+          const data = new common_vendor.UTSJSONObject({
             page: currPage.value,
             pageSize: pageSize.value
           });
@@ -80,7 +80,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       console.log(iccid);
       needRefresh.value = true;
-      common_vendor.wx$1.openEmbeddedMiniProgram(new UTSJSONObject({
+      common_vendor.wx$1.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
@@ -110,16 +110,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "续费管理",
           ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false,
           isIcon: true,
-          isShowStyle: true
+          isShowStyle: true,
+          class: "data-v-21a71356",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
+        c: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.deviceName),
             b: item.iccid
@@ -136,12 +141,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           });
         }),
-        c: common_vendor.unref(loading)
+        d: common_vendor.unref(loading)
       }, common_vendor.unref(loading) ? {} : {}, {
-        d: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
+        e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
       }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0 ? {} : {}, {
-        e: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
-      }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0 ? {} : {});
+        f: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
+      }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0 ? {} : {}, {
+        g: `${_ctx.u_s_b_h}px`
+      });
       return __returned__;
     };
   }

@@ -389,7 +389,7 @@ const window = "";
 const windy = "";
 const wink = "";
 const work = "";
-const iconList = new UTSJSONObject({
+const iconList = new common_vendor.UTSJSONObject({
   "accessibility-filled": "",
   accessibility,
   "activity-filled": "",

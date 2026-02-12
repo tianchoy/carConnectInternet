@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return (_a2 = props.name) !== null && _a2 !== void 0 ? _a2 : "";
     });
     const collectionIcon = common_vendor.computed(() => {
-      return UTS.mapGet($iconCollection.icons, innerName.value);
+      return common_vendor.UTS.mapGet($iconCollection.icons, innerName.value);
     });
     common_vendor.ref(null);
     const hasHost = common_vendor.computed(() => {
@@ -117,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return hasHost.value ? innerName.value : ($iconsHost !== null && $iconsHost !== void 0 ? $iconsHost : "") + innerName.value;
       } else if (isIconify.value) {
         if (cacheMap.has(innerName.value) && !isError.value) {
-          return UTS.mapGet(cacheMap, innerName.value);
+          return common_vendor.UTS.mapGet(cacheMap, innerName.value);
         }
         const _host = `${hasIconsHost ? $iconsHost : IconifyURL}`;
         const _icon = (_a2 = collectionIcon.value) !== null && _a2 !== void 0 ? _a2 : _host + `${innerName.value}.svg`.replace(/:/g, "/");
@@ -145,35 +145,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.n(__props.lClass),
         e: common_vendor.s(common_vendor.unref(styles)),
         f: common_vendor.s(__props.lStyle),
-        g: common_vendor.o(($event) => {
-          return _ctx.$emit("click");
-        })
-      } : !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage) ? {
-        i: common_vendor.n(common_vendor.unref(classes)),
-        j: common_vendor.n(__props.lClass),
-        k: common_vendor.s(common_vendor.unref(styles)),
-        l: common_vendor.s(__props.lStyle),
-        m: common_vendor.unref(iconUrl),
-        n: common_vendor.o(($event) => {
-          return _ctx.$emit("click");
-        })
-      } : {
-        o: common_vendor.n(common_vendor.unref(classes)),
-        p: common_vendor.n(__props.lClass),
-        q: common_vendor.s(common_vendor.unref(styles)),
-        r: common_vendor.s(__props.lStyle),
-        s: common_vendor.o(imageError),
-        t: common_vendor.o(imageload),
-        v: common_vendor.o(($event) => {
-          return _ctx.$emit("click");
+        g: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         }),
-        w: common_vendor.p({
+        h: common_vendor.o(($event) => {
+          return _ctx.$emit("click");
+        }, "13")
+      } : !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage) ? {
+        j: common_vendor.n(common_vendor.unref(classes)),
+        k: common_vendor.n(__props.lClass),
+        l: common_vendor.s(common_vendor.unref(styles)),
+        m: common_vendor.s(__props.lStyle),
+        n: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        o: common_vendor.unref(iconUrl),
+        p: common_vendor.o(($event) => {
+          return _ctx.$emit("click");
+        }, "2a")
+      } : {
+        q: common_vendor.n(common_vendor.unref(classes)),
+        r: common_vendor.n(__props.lClass),
+        s: common_vendor.s(common_vendor.unref(styles)),
+        t: common_vendor.s(__props.lStyle),
+        v: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        w: common_vendor.o(imageError, "8c"),
+        x: common_vendor.o(imageload, "cd"),
+        y: common_vendor.o(($event) => {
+          return _ctx.$emit("click");
+        }, "8a"),
+        z: common_vendor.p({
           color: __props.color,
           src: common_vendor.unref(iconUrl),
-          web: __props.web
+          web: __props.web,
+          class: common_vendor.normalizeClass(["l-icon", [common_vendor.unref(classes), __props.lClass]]),
+          style: common_vendor.normalizeStyle([common_vendor.unref(styles), __props.lStyle, {
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          }])
         })
       }, {
-        h: !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage)
+        i: !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage)
       });
       return __returned__;
     };

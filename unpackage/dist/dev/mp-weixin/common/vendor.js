@@ -184,12 +184,16 @@ const ON_ERROR = "onError";
 const ON_THEME_CHANGE = "onThemeChange";
 const ON_PAGE_NOT_FOUND = "onPageNotFound";
 const ON_UNHANDLE_REJECTION = "onUnhandledRejection";
+const ON_LAST_PAGE_BACK_PRESS = "onLastPageBackPress";
 const ON_EXIT = "onExit";
 const ON_LOAD = "onLoad";
 const ON_READY = "onReady";
 const ON_UNLOAD = "onUnload";
 const ON_INIT = "onInit";
 const ON_SAVE_EXIT_STATE = "onSaveExitState";
+const ON_UPLOAD_DOUYIN_VIDEO = "onUploadDouyinVideo";
+const ON_LIVE_MOUNT = "onLiveMount";
+const ON_TITLE_CLICK = "onTitleClick";
 const ON_RESIZE = "onResize";
 const ON_BACK_PRESS = "onBackPress";
 const ON_PAGE_SCROLL = "onPageScroll";
@@ -198,6 +202,7 @@ const ON_REACH_BOTTOM = "onReachBottom";
 const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
 const ON_SHARE_TIMELINE = "onShareTimeline";
 const ON_SHARE_CHAT = "onShareChat";
+const ON_COPY_URL = "onCopyUrl";
 const ON_ADD_TO_FAVORITES = "onAddToFavorites";
 const ON_SHARE_APP_MESSAGE = "onShareAppMessage";
 const ON_NAVIGATION_BAR_BUTTON_TAP = "onNavigationBarButtonTap";
@@ -209,6 +214,665 @@ const VIRTUAL_HOST_STYLE = "virtualHostStyle";
 const VIRTUAL_HOST_CLASS = "virtualHostClass";
 const VIRTUAL_HOST_HIDDEN = "virtualHostHidden";
 const VIRTUAL_HOST_ID = "virtualHostId";
+const UNI_STATUS_BAR_HEIGHT = "u_s_b_h";
+function arrayPop(array) {
+  if (array.length === 0) {
+    return null;
+  }
+  return array.pop();
+}
+function arrayShift(array) {
+  if (array.length === 0) {
+    return null;
+  }
+  return array.shift();
+}
+function arrayFind(array, predicate) {
+  const index2 = array.findIndex(predicate);
+  if (index2 < 0) {
+    return null;
+  }
+  return array[index2];
+}
+function arrayFindLast(array, predicate) {
+  const index2 = array.findLastIndex(predicate);
+  if (index2 < 0) {
+    return null;
+  }
+  return array[index2];
+}
+function arrayAt(array, index2) {
+  if (index2 < -array.length || index2 >= array.length) {
+    return null;
+  }
+  return array.at(index2);
+}
+const UTS_CLASS_METADATA_KIND_LIST = [0, 1, 2];
+function getType$2(val) {
+  return Object.prototype.toString.call(val).slice(8, -1).toLowerCase();
+}
+function isPlainObject(val) {
+  if (val == null || typeof val !== "object") {
+    return false;
+  }
+  const proto = Object.getPrototypeOf(val);
+  return proto === Object.prototype || proto === null;
+}
+class UTSError extends Error {
+  constructor(message) {
+    super(message);
+  }
+}
+function isUTSMetadata(metadata) {
+  return !!(metadata && UTS_CLASS_METADATA_KIND_LIST.includes(metadata.kind) && metadata.interfaces);
+}
+function isNativeType(proto) {
+  return !proto || proto === Object.prototype;
+}
+const utsMetadataKey = "$UTSMetadata$";
+function getParentTypeList(type) {
+  const metadata = utsMetadataKey in type ? type[utsMetadataKey] : {};
+  let interfaces = [];
+  if (!isUTSMetadata(metadata)) {
+    interfaces = [];
+  } else {
+    interfaces = metadata.interfaces || [];
+  }
+  const proto = Object.getPrototypeOf(type);
+  if (!isNativeType(proto)) {
+    interfaces.push(proto.constructor);
+  }
+  return interfaces;
+}
+function isImplementationOf(leftType, rightType, visited = []) {
+  if (isNativeType(leftType)) {
+    return false;
+  }
+  if (leftType === rightType) {
+    return true;
+  }
+  visited.push(leftType);
+  const parentTypeList = getParentTypeList(leftType);
+  return parentTypeList.some((parentType) => {
+    if (visited.includes(parentType)) {
+      return false;
+    }
+    return isImplementationOf(parentType, rightType, visited);
+  });
+}
+function isInstanceOf(value, type) {
+  if (type === UTSValueIterable) {
+    return value && value[Symbol.iterator];
+  }
+  const isNativeInstanceofType = value instanceof type;
+  if (isNativeInstanceofType || typeof value !== "object" || value === null) {
+    return isNativeInstanceofType;
+  }
+  const proto = Object.getPrototypeOf(value).constructor;
+  return isImplementationOf(proto, type);
+}
+function isBaseType(type) {
+  return type === Number || type === String || type === Boolean;
+}
+function isUnknownType(type) {
+  return type === "Unknown";
+}
+function isAnyType(type) {
+  return type === "Any";
+}
+function isUTSType(type) {
+  return type && type.prototype && type.prototype instanceof UTSType;
+}
+function normalizeGenericValue(value, genericType, isJSONParse = false) {
+  return value == null ? null : isBaseType(genericType) || isUnknownType(genericType) || isAnyType(genericType) ? value : genericType === Array ? new Array(...value) : new genericType(value, void 0, isJSONParse);
+}
+class UTSType {
+  static get$UTSMetadata$(...args) {
+    return {
+      name: "",
+      kind: 2,
+      interfaces: [],
+      fields: {}
+    };
+  }
+  get $UTSMetadata$() {
+    return UTSType.get$UTSMetadata$();
+  }
+  // TODO 缓存withGenerics结果
+  static withGenerics(parent, generics, isJSONParse = false) {
+    if (isJSONParse) {
+      const illegalGeneric = generics.find((item) => !(item === Array || isBaseType(item) || isUnknownType(item) || isAnyType(item) || item === UTSJSONObject || item.prototype && item.prototype instanceof UTSType));
+      if (illegalGeneric) {
+        throw new Error("Generic is not UTSType or Array or UTSJSONObject or base type, generic: " + illegalGeneric);
+      }
+    }
+    if (parent === Array) {
+      return class UTSArray extends UTSType {
+        constructor(options, isJSONParse2 = false) {
+          if (!Array.isArray(options)) {
+            throw new UTSError(`Failed to contruct type, ${options} is not an array`);
+          }
+          super();
+          return options.map((item) => {
+            return normalizeGenericValue(item, generics[0], isJSONParse2);
+          });
+        }
+      };
+    } else if (parent === Map || parent === WeakMap) {
+      return class UTSMap extends UTSType {
+        constructor(options, isJSONParse2 = false) {
+          if (options == null || typeof options !== "object") {
+            throw new UTSError(`Failed to contruct type, ${options} is not an object`);
+          }
+          super();
+          const obj = new parent();
+          for (const key in options) {
+            obj.set(normalizeGenericValue(key, generics[0], isJSONParse2), normalizeGenericValue(options[key], generics[1], isJSONParse2));
+          }
+          return obj;
+        }
+      };
+    } else if (isUTSType(parent)) {
+      return class VirtualClassWithGenerics extends parent {
+        static get$UTSMetadata$() {
+          return parent.get$UTSMetadata$(...generics);
+        }
+        constructor(options, metadata = VirtualClassWithGenerics.get$UTSMetadata$(), isJSONParse2 = false) {
+          super(options, metadata, isJSONParse2);
+        }
+      };
+    } else {
+      return parent;
+    }
+  }
+  constructor() {
+  }
+  static initProps(options, metadata, isJSONParse = false) {
+    if (!isJSONParse) {
+      return options;
+    }
+    const obj = {};
+    if (!metadata.fields) {
+      return obj;
+    }
+    for (const key in metadata.fields) {
+      const { type, optional, jsonField } = metadata.fields[key];
+      const realKey = isJSONParse ? jsonField || key : key;
+      if (options[realKey] == null) {
+        if (optional) {
+          obj[key] = null;
+          continue;
+        } else {
+          throw new UTSError(`Failed to contruct type, missing required property: ${key}`);
+        }
+      }
+      if (isUTSType(type)) {
+        obj[key] = isJSONParse ? (
+          // @ts-expect-error
+          new type(options[realKey], void 0, isJSONParse)
+        ) : options[realKey];
+      } else if (type === Array) {
+        if (!Array.isArray(options[realKey])) {
+          throw new UTSError(`Failed to contruct type, property ${key} is not an array`);
+        }
+        obj[key] = options[realKey];
+      } else {
+        obj[key] = options[realKey];
+      }
+    }
+    return obj;
+  }
+}
+function initUTSJSONObjectProperties(obj) {
+  const propertyList = [
+    "_resolveKeyPath",
+    "_getValue",
+    "toJSON",
+    "get",
+    "set",
+    "getAny",
+    "getString",
+    "getNumber",
+    "getBoolean",
+    "getJSON",
+    "getArray",
+    "toMap",
+    "forEach"
+  ];
+  const propertyDescriptorMap = {};
+  for (let i = 0; i < propertyList.length; i++) {
+    const property = propertyList[i];
+    propertyDescriptorMap[property] = {
+      enumerable: false,
+      value: obj[property]
+    };
+  }
+  Object.defineProperties(obj, propertyDescriptorMap);
+}
+function getRealDefaultValue(defaultValue) {
+  return defaultValue === void 0 ? null : defaultValue;
+}
+class UTSJSONObject {
+  static keys(obj) {
+    return Object.keys(obj);
+  }
+  static assign(target, ...sources) {
+    for (let i = 0; i < sources.length; i++) {
+      const source = sources[i];
+      for (let key in source) {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+  constructor(content = {}) {
+    if (content instanceof Map) {
+      content.forEach((value, key) => {
+        this[key] = value;
+      });
+    } else {
+      for (const key in content) {
+        if (Object.prototype.hasOwnProperty.call(content, key)) {
+          this[key] = content[key];
+        }
+      }
+    }
+    initUTSJSONObjectProperties(this);
+  }
+  _resolveKeyPath(keyPath) {
+    let token = "";
+    const keyPathArr = [];
+    let inOpenParentheses = false;
+    for (let i = 0; i < keyPath.length; i++) {
+      const word = keyPath[i];
+      switch (word) {
+        case ".":
+          if (token.length > 0) {
+            keyPathArr.push(token);
+            token = "";
+          }
+          break;
+        case "[": {
+          inOpenParentheses = true;
+          if (token.length > 0) {
+            keyPathArr.push(token);
+            token = "";
+          }
+          break;
+        }
+        case "]":
+          if (inOpenParentheses) {
+            if (token.length > 0) {
+              const tokenFirstChar = token[0];
+              const tokenLastChar = token[token.length - 1];
+              if (tokenFirstChar === '"' && tokenLastChar === '"' || tokenFirstChar === "'" && tokenLastChar === "'" || tokenFirstChar === "`" && tokenLastChar === "`") {
+                if (token.length > 2) {
+                  token = token.slice(1, -1);
+                } else {
+                  return [];
+                }
+              } else if (!/^\d+$/.test(token)) {
+                return [];
+              }
+              keyPathArr.push(token);
+              token = "";
+            } else {
+              return [];
+            }
+            inOpenParentheses = false;
+          } else {
+            return [];
+          }
+          break;
+        default:
+          token += word;
+          break;
+      }
+      if (i === keyPath.length - 1) {
+        if (token.length > 0) {
+          keyPathArr.push(token);
+          token = "";
+        }
+      }
+    }
+    return keyPathArr;
+  }
+  _getValue(keyPath, defaultValue) {
+    const keyPathArr = this._resolveKeyPath(keyPath);
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    if (keyPathArr.length === 0) {
+      return realDefaultValue;
+    }
+    let value = this;
+    for (let i = 0; i < keyPathArr.length; i++) {
+      const key = keyPathArr[i];
+      if (value instanceof Object) {
+        if (key in value) {
+          value = value[key];
+        } else {
+          return realDefaultValue;
+        }
+      } else {
+        return realDefaultValue;
+      }
+    }
+    return value;
+  }
+  get(key) {
+    return this._getValue(key);
+  }
+  set(key, value) {
+    this[key] = value;
+  }
+  getAny(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    return this._getValue(key, realDefaultValue);
+  }
+  getString(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    const value = this._getValue(key, realDefaultValue);
+    if (typeof value === "string") {
+      return value;
+    } else {
+      return realDefaultValue;
+    }
+  }
+  getNumber(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    const value = this._getValue(key, realDefaultValue);
+    if (typeof value === "number") {
+      return value;
+    } else {
+      return realDefaultValue;
+    }
+  }
+  getBoolean(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    const boolean = this._getValue(key, realDefaultValue);
+    if (typeof boolean === "boolean") {
+      return boolean;
+    } else {
+      return realDefaultValue;
+    }
+  }
+  getJSON(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    let value = this._getValue(key, realDefaultValue);
+    if (value instanceof Object) {
+      return value;
+    } else {
+      return realDefaultValue;
+    }
+  }
+  getArray(key, defaultValue) {
+    const realDefaultValue = getRealDefaultValue(defaultValue);
+    let value = this._getValue(key, realDefaultValue);
+    if (value instanceof Array) {
+      return value;
+    } else {
+      return realDefaultValue;
+    }
+  }
+  toMap() {
+    let map = /* @__PURE__ */ new Map();
+    for (let key in this) {
+      map.set(key, this[key]);
+    }
+    return map;
+  }
+  forEach(callback) {
+    for (let key in this) {
+      callback(this[key], key);
+    }
+  }
+}
+const OriginalJSON = JSON;
+function createUTSJSONObjectOrArray(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => {
+      return createUTSJSONObjectOrArray(item);
+    });
+  } else if (isPlainObject(obj)) {
+    const result = new UTSJSONObject({});
+    for (const key in obj) {
+      const value = obj[key];
+      result[key] = createUTSJSONObjectOrArray(value);
+    }
+    return result;
+  }
+  return obj;
+}
+function parseObjectOrArray(object, utsType) {
+  const objectType = getType$2(object);
+  if (object === null || objectType !== "object" && objectType !== "array") {
+    return object;
+  }
+  if (utsType && utsType !== UTSJSONObject) {
+    try {
+      return new utsType(object, void 0, true);
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+  if (objectType === "array" || objectType === "object") {
+    return createUTSJSONObjectOrArray(object);
+  }
+  return object;
+}
+const UTSJSON = {
+  parse: (text, reviver, utsType) => {
+    if (reviver && (isUTSType(reviver) || reviver === UTSJSONObject)) {
+      utsType = reviver;
+      reviver = void 0;
+    }
+    try {
+      const parseResult = OriginalJSON.parse(text, reviver);
+      return parseObjectOrArray(parseResult, utsType);
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+  parseArray(text, utsType) {
+    try {
+      const parseResult = OriginalJSON.parse(text);
+      if (Array.isArray(parseResult)) {
+        return parseObjectOrArray(parseResult, utsType ? UTSType.withGenerics(Array, [utsType], true) : void 0);
+      }
+      return null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+  parseObject(text, utsType) {
+    try {
+      const parseResult = OriginalJSON.parse(text);
+      if (Array.isArray(parseResult)) {
+        return null;
+      }
+      return parseObjectOrArray(parseResult, utsType);
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+  stringify: (value, replacer2, space) => {
+    try {
+      if (!replacer2) {
+        const visited = /* @__PURE__ */ new Set();
+        replacer2 = function(_, v) {
+          if (typeof v === "object") {
+            if (visited.has(v)) {
+              return null;
+            }
+            visited.add(v);
+          }
+          return v;
+        };
+      }
+      return OriginalJSON.stringify(value, replacer2, space);
+    } catch (error) {
+      console.error(error);
+      return "";
+    }
+  }
+};
+function mapGet(map, key) {
+  if (!map.has(key)) {
+    return null;
+  }
+  return map.get(key);
+}
+function stringCodePointAt(str, pos) {
+  if (pos < 0 || pos >= str.length) {
+    return null;
+  }
+  return str.codePointAt(pos);
+}
+function stringAt(str, pos) {
+  if (pos < -str.length || pos >= str.length) {
+    return null;
+  }
+  return str.at(pos);
+}
+function weakMapGet(map, key) {
+  if (!map.has(key)) {
+    return null;
+  }
+  return map.get(key);
+}
+const UTS = {
+  arrayAt,
+  arrayFind,
+  arrayFindLast,
+  arrayPop,
+  arrayShift,
+  isInstanceOf,
+  UTSType,
+  mapGet,
+  stringAt,
+  stringCodePointAt,
+  weakMapGet,
+  JSON: UTSJSON
+};
+let UniError$1 = class UniError2 extends Error {
+  constructor(errSubject, errCode, errMsg) {
+    let options = {};
+    const argsLength = Array.from(arguments).length;
+    switch (argsLength) {
+      case 0:
+        errSubject = "";
+        errMsg = "";
+        errCode = 0;
+        break;
+      case 1:
+        errMsg = errSubject;
+        errSubject = "";
+        errCode = 0;
+        break;
+      case 2:
+        errMsg = errSubject;
+        options = errCode;
+        errCode = options.errCode || 0;
+        errSubject = options.errSubject || "";
+        break;
+    }
+    super(errMsg);
+    this.name = "UniError";
+    this.errSubject = errSubject;
+    this.errCode = errCode;
+    this.errMsg = errMsg;
+    if (options.data) {
+      this.data = options.data;
+    }
+    if (options.cause) {
+      this.cause = options.cause;
+    }
+  }
+  set errMsg(msg) {
+    this.message = msg;
+  }
+  get errMsg() {
+    return this.message;
+  }
+  toString() {
+    return this.errMsg;
+  }
+  toJSON() {
+    return {
+      errSubject: this.errSubject,
+      errCode: this.errCode,
+      errMsg: this.errMsg,
+      data: this.data,
+      cause: this.cause && typeof this.cause.toJSON === "function" ? this.cause.toJSON() : this.cause
+    };
+  }
+};
+class UTSValueIterable {
+}
+const customizeRE = /:/g;
+function customizeEvent(str) {
+  return camelize(str.replace(customizeRE, "-"));
+}
+function normalizeStyle(value) {
+  if (value instanceof UTSJSONObject) {
+    const styleObject = {};
+    UTSJSONObject.keys(value).forEach((key) => {
+      styleObject[key] = value[key];
+    });
+    return normalizeStyle$1(styleObject);
+  } else if (value instanceof Map) {
+    const styleObject = {};
+    value.forEach((value2, key) => {
+      styleObject[key] = value2;
+    });
+    return normalizeStyle$1(styleObject);
+  } else if (isString(value)) {
+    return parseStringStyle(value);
+  } else if (isArray(value)) {
+    const res = {};
+    for (let i = 0; i < value.length; i++) {
+      const item = value[i];
+      const normalized = isString(item) ? parseStringStyle(item) : normalizeStyle(item);
+      if (normalized) {
+        for (const key in normalized) {
+          res[key] = normalized[key];
+        }
+      }
+    }
+    return res;
+  } else {
+    return normalizeStyle$1(value);
+  }
+}
+function normalizeClass(value) {
+  let res = "";
+  if (value instanceof UTSJSONObject) {
+    UTSJSONObject.keys(value).forEach((key) => {
+      if (value[key]) {
+        res += key + " ";
+      }
+    });
+  } else if (value instanceof Map) {
+    value.forEach((value2, key) => {
+      if (value2) {
+        res += key + " ";
+      }
+    });
+  } else if (isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const normalized = normalizeClass(value[i]);
+      if (normalized) {
+        res += normalized + " ";
+      }
+    }
+  } else {
+    res = normalizeClass$1(value);
+  }
+  return res.trim();
+}
 function hasLeadingSlash(str) {
   return str.indexOf("/") === 0;
 }
@@ -247,16 +911,6 @@ function getValueByDataPath(obj, path) {
   }
   return getValueByDataPath(obj[key], parts.slice(1).join("."));
 }
-function sortObject(obj) {
-  let sortObj = {};
-  if (isPlainObject$1(obj)) {
-    Object.keys(obj).sort().forEach((key) => {
-      const _key = key;
-      sortObj[_key] = obj[_key];
-    });
-  }
-  return !Object.keys(sortObj) ? obj : sortObj;
-}
 function getGlobalOnce() {
   if (typeof globalThis !== "undefined") {
     return globalThis;
@@ -278,75 +932,12 @@ function getGlobalOnce() {
   }();
 }
 let g = void 0;
-function getGlobal$1() {
+function getGlobal() {
   if (g) {
     return g;
   }
   g = getGlobalOnce();
   return g;
-}
-const customizeRE = /:/g;
-function customizeEvent(str) {
-  return camelize(str.replace(customizeRE, "-"));
-}
-function normalizeStyle(value) {
-  const g2 = getGlobal$1();
-  if (g2 && g2.UTSJSONObject && value instanceof g2.UTSJSONObject) {
-    const styleObject = {};
-    g2.UTSJSONObject.keys(value).forEach((key) => {
-      styleObject[key] = value[key];
-    });
-    return normalizeStyle$1(styleObject);
-  } else if (value instanceof Map) {
-    const styleObject = {};
-    value.forEach((value2, key) => {
-      styleObject[key] = value2;
-    });
-    return normalizeStyle$1(styleObject);
-  } else if (isString(value)) {
-    return parseStringStyle(value);
-  } else if (isArray(value)) {
-    const res = {};
-    for (let i = 0; i < value.length; i++) {
-      const item = value[i];
-      const normalized = isString(item) ? parseStringStyle(item) : normalizeStyle(item);
-      if (normalized) {
-        for (const key in normalized) {
-          res[key] = normalized[key];
-        }
-      }
-    }
-    return res;
-  } else {
-    return normalizeStyle$1(value);
-  }
-}
-function normalizeClass(value) {
-  let res = "";
-  const g2 = getGlobal$1();
-  if (g2 && g2.UTSJSONObject && value instanceof g2.UTSJSONObject) {
-    g2.UTSJSONObject.keys(value).forEach((key) => {
-      if (value[key]) {
-        res += key + " ";
-      }
-    });
-  } else if (value instanceof Map) {
-    value.forEach((value2, key) => {
-      if (value2) {
-        res += key + " ";
-      }
-    });
-  } else if (isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      const normalized = normalizeClass(value[i]);
-      if (normalized) {
-        res += normalized + " ";
-      }
-    }
-  } else {
-    res = normalizeClass$1(value);
-  }
-  return res.trim();
 }
 const encode = encodeURIComponent;
 function stringifyQuery(obj, encodeStr = encode) {
@@ -367,6 +958,7 @@ const PAGE_HOOKS = [
   ON_SHOW,
   ON_HIDE,
   ON_UNLOAD,
+  ON_RESIZE,
   ON_BACK_PRESS,
   ON_PAGE_SCROLL,
   ON_TAB_ITEM_TAP,
@@ -375,6 +967,10 @@ const PAGE_HOOKS = [
   ON_SHARE_TIMELINE,
   ON_SHARE_APP_MESSAGE,
   ON_SHARE_CHAT,
+  ON_COPY_URL,
+  ON_UPLOAD_DOUYIN_VIDEO,
+  ON_LIVE_MOUNT,
+  ON_TITLE_CLICK,
   ON_ADD_TO_FAVORITES,
   ON_SAVE_EXIT_STATE,
   ON_NAVIGATION_BAR_BUTTON_TAP,
@@ -409,19 +1005,28 @@ const UniLifecycleHooks = [
   ON_ADD_TO_FAVORITES,
   ON_SHARE_APP_MESSAGE,
   ON_SHARE_CHAT,
+  ON_COPY_URL,
+  ON_UPLOAD_DOUYIN_VIDEO,
+  ON_LIVE_MOUNT,
+  ON_TITLE_CLICK,
   ON_SAVE_EXIT_STATE,
   ON_NAVIGATION_BAR_BUTTON_TAP,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
+  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED,
+  ON_LAST_PAGE_BACK_PRESS
 ];
 const MINI_PROGRAM_PAGE_RUNTIME_HOOKS = /* @__PURE__ */ (() => {
   return {
     onPageScroll: 1,
     onShareAppMessage: 1 << 1,
     onShareTimeline: 1 << 2,
-    onShareChat: 1 << 3
+    onShareChat: 1 << 3,
+    onCopyUrl: 1 << 4,
+    onUploadDouyinVideo: 1 << 5,
+    onLiveMount: 1 << 6,
+    onTitleClick: 1 << 7
   };
 })();
 function isUniLifecycleHook(name, value, checkType = true) {
@@ -617,7 +1222,7 @@ function validateProp$1(name, value, prop, isAbsent) {
 const isSimpleType$1 = /* @__PURE__ */ makeMap("String,Number,Boolean,Function,Symbol");
 function assertType$1(value, type) {
   let valid;
-  const expectedType = getType$2(type);
+  const expectedType = getType$1(type);
   if (isSimpleType$1(expectedType)) {
     const t2 = typeof value;
     valid = t2 === expectedType.toLowerCase();
@@ -653,7 +1258,7 @@ function getInvalidTypeMessage$1(name, value, expectedTypes) {
   }
   return message;
 }
-function getType$2(ctor) {
+function getType$1(ctor) {
   const match = ctor && ctor.toString().match(/^\s*function (\w+)/);
   return match ? match[1] : "";
 }
@@ -1009,8 +1614,9 @@ const createCanvasContextAsync = defineAsyncApi(API_CREATE_CANVAS_CONTEXT_ASYNC,
   if (!page || !page.$vm) {
     reject("current page invalid.");
   } else {
-    const query = options.component ? wx.createSelectorQuery().in(options.component) : wx.createSelectorQuery();
-    query.select("#" + options.id).fields({ node: true, size: true }, () => {
+    const query = wx.createSelectorQuery();
+    const baseQuery = options.component ? query.in(options.component) : query;
+    baseQuery.select("#" + options.id).fields({ node: true, size: true }, () => {
     }).exec((res) => {
       if (res.length > 0 && res[0].node) {
         const result = res[0];
@@ -1356,7 +1962,7 @@ function createUTSJSONObjectIfNeed(obj) {
   if (!isPlainObject$1(obj) && !Array.isArray(obj)) {
     return obj;
   }
-  return globalThis.UTS.JSON.parse(JSON.stringify(obj));
+  return UTS.JSON.parse(JSON.stringify(obj));
 }
 const request = {
   returnValue: (res) => {
@@ -1584,9 +2190,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.87",
-    uniCompilerVersion: "4.87",
-    uniRuntimeVersion: "4.87",
+    uniCompileVersion: "5.01",
+    uniCompilerVersion: "5.01",
+    uniRuntimeVersion: "5.01",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -1614,8 +2220,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("4.87");
-      parameters.uniRuntimeVersionCode = parseFloat("4.87");
+      parameters.uniCompilerVersionCode = parseFloat("5.01");
+      parameters.uniRuntimeVersionCode = parseFloat("5.01");
     } catch (error) {
     }
   }
@@ -1715,13 +2321,13 @@ const getDeviceInfo = {
     let deviceBrand = getDeviceBrand(brand);
     useDeviceId()(fromRes, toRes);
     const { osName, osVersion } = getOSInfo(system, platform);
-    toRes = sortObject(extend(toRes, {
+    toRes = extend(toRes, {
       deviceType,
       deviceBrand,
       deviceModel: model,
       osName,
       osVersion
-    }));
+    });
   }
 };
 const getAppBaseInfo = {
@@ -1730,26 +2336,26 @@ const getAppBaseInfo = {
     let _hostName = getHostName(fromRes);
     let hostLanguage = (language || "").replace(/_/g, "-");
     const parameters = {
-      hostVersion: version2,
-      hostLanguage,
-      hostName: _hostName,
-      hostSDKVersion: SDKVersion,
-      hostTheme: theme,
       appId: "__UNI__662B0B4",
       appName: "carConnectInternet",
       appVersion: "1.0.0",
       appVersionCode: "100",
       appLanguage: getAppLanguage(hostLanguage),
+      hostVersion: version2,
+      hostLanguage,
+      hostName: _hostName,
+      hostSDKVersion: SDKVersion,
+      hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.87",
-      uniCompilerVersion: "4.87",
-      uniRuntimeVersion: "4.87"
+      uniCompileVersion: "5.01",
+      uniCompilerVersion: "5.01",
+      uniRuntimeVersion: "5.01"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("4.87");
-        parameters.uniRuntimeVersionCode = parseFloat("4.87");
+        parameters.uniCompilerVersionCode = parseFloat("5.01");
+        parameters.uniRuntimeVersionCode = parseFloat("5.01");
       } catch (error) {
       }
     }
@@ -1759,10 +2365,10 @@ const getAppBaseInfo = {
 const getWindowInfo = {
   returnValue: (fromRes, toRes) => {
     addSafeAreaInsets(fromRes, toRes);
-    toRes = sortObject(extend(toRes, {
+    toRes = extend(toRes, {
       windowTop: 0,
       windowBottom: 0
-    }));
+    });
   }
 };
 const getAppAuthorizeSetting = {
@@ -1942,13 +2548,13 @@ function createSelectorQuery() {
   return query;
 }
 const wx$2 = initWx();
-if (!wx$2.canIUse("getAppBaseInfo")) {
+if (!wx$2.getAppBaseInfo || !wx$2.getAppBaseInfo()) {
   wx$2.getAppBaseInfo = wx$2.getSystemInfoSync;
 }
-if (!wx$2.canIUse("getWindowInfo")) {
+if (!wx$2.getWindowInfo || !wx$2.getWindowInfo()) {
   wx$2.getWindowInfo = wx$2.getSystemInfoSync;
 }
-if (!wx$2.canIUse("getDeviceInfo")) {
+if (!wx$2.getDeviceInfo || !wx$2.getDeviceInfo()) {
   wx$2.getDeviceInfo = wx$2.getSystemInfoSync;
 }
 let baseInfo = wx$2.getAppBaseInfo && wx$2.getAppBaseInfo();
@@ -1957,22 +2563,36 @@ if (!baseInfo) {
 }
 const host = baseInfo ? baseInfo.host : null;
 const shareVideoMessage = host && host.env === "SAAASDK" ? wx$2.miniapp.shareVideoMessage : wx$2.shareVideoMessage;
-const THEME_CALLBACK = [];
+const THEME_CALLBACK_MAP = /* @__PURE__ */ new Map();
+let CALLBACK_ID = 0;
 const onHostThemeChange = (callback) => {
   const onHostThemeChangeCallback = (res) => {
     callback({ hostTheme: res.theme });
   };
-  const index2 = THEME_CALLBACK.push([callback, onHostThemeChangeCallback]) - 1;
-  wx$2.onThemeChange && wx$2.onThemeChange(onHostThemeChangeCallback);
-  return index2;
+  const id = ++CALLBACK_ID;
+  THEME_CALLBACK_MAP.set(id, [callback, onHostThemeChangeCallback]);
+  if (wx$2.onThemeChange) {
+    wx$2.onThemeChange(onHostThemeChangeCallback);
+  }
+  return id;
 };
 const offHostThemeChange = (callbackId) => {
+  let id;
   if (isFunction(callbackId)) {
-    callbackId = THEME_CALLBACK.findIndex(([callback]) => callback === callbackId);
+    THEME_CALLBACK_MAP.forEach(([cb], key) => {
+      if (cb === callbackId && id === void 0) {
+        id = key;
+      }
+    });
+  } else {
+    id = callbackId;
   }
-  if (callbackId > -1) {
-    const arr = THEME_CALLBACK.splice(callbackId, 1)[0];
-    isArray(arr) && wx$2.offThemeChange && wx$2.offThemeChange(arr[1]);
+  if (id !== void 0 && THEME_CALLBACK_MAP.has(id)) {
+    const [, onHostThemeChangeCallback] = THEME_CALLBACK_MAP.get(id);
+    THEME_CALLBACK_MAP.delete(id);
+    if (wx$2.offThemeChange) {
+      wx$2.offThemeChange(onHostThemeChangeCallback);
+    }
   }
 };
 var shims = /* @__PURE__ */ Object.freeze({
@@ -4373,6 +4993,8 @@ const PublicInstanceProxyHandlers = {
     } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
       accessCache[key] = 4;
       return ctx[key];
+    } else if (instance.exposed && hasOwn(instance.exposed, key)) {
+      return instance.exposed[key];
     } else if (
       // global properties
       globalProperties = appContext.config.globalProperties, hasOwn(globalProperties, key)
@@ -4999,7 +5621,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
         if (options) {
           if (hasOwn(attrs, key)) {
             if (value !== attrs[key]) {
-              attrs[key] = value;
+              attrs[key] = normalizeInheritAttrsValue(instance, key, value);
               hasAttrsChanged = true;
             }
           } else {
@@ -5015,7 +5637,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
           }
         } else {
           if (value !== attrs[key]) {
-            attrs[key] = value;
+            attrs[key] = normalizeInheritAttrsValue(instance, key, value);
             hasAttrsChanged = true;
           }
         }
@@ -5078,13 +5700,15 @@ function setFullProps(instance, rawProps, props, attrs) {
       let camelKey;
       if (options && hasOwn(options, camelKey = camelize(key))) {
         if (!needCastKeys || !needCastKeys.includes(camelKey)) {
-          props[camelKey] = value;
+          {
+            props[camelKey] = value;
+          }
         } else {
           (rawCastValues || (rawCastValues = {}))[camelKey] = value;
         }
       } else if (!isEmitListener(instance.emitsOptions, key)) {
         if (!(key in attrs) || value !== attrs[key]) {
-          attrs[key] = value;
+          attrs[key] = normalizeInheritAttrsValue(instance, key, value);
           hasAttrsChanged = true;
         }
       }
@@ -5107,7 +5731,21 @@ function setFullProps(instance, rawProps, props, attrs) {
   }
   return hasAttrsChanged;
 }
+function normalizeInheritAttrsValue(instance, key, value) {
+  return value;
+}
 function resolvePropValue$1(options, props, key, value, instance, isAbsent) {
+  const result = _resolvePropValue(
+    options,
+    props,
+    key,
+    value,
+    instance,
+    isAbsent
+  );
+  return result;
+}
+function _resolvePropValue(options, props, key, value, instance, isAbsent) {
   const opt = options[key];
   if (opt != null) {
     const hasDefault = hasOwn(opt, "default");
@@ -5230,7 +5868,7 @@ function validatePropName(key) {
   }
   return false;
 }
-function getType$1(ctor) {
+function getType(ctor) {
   if (ctor === null) {
     return "null";
   }
@@ -5243,7 +5881,7 @@ function getType$1(ctor) {
   return "";
 }
 function isSameType(a, b) {
-  return getType$1(a) === getType$1(b);
+  return getType(a) === getType(b);
 }
 function getTypeIndex(type, expectedTypes) {
   if (isArray(expectedTypes)) {
@@ -5301,7 +5939,7 @@ const isSimpleType = /* @__PURE__ */ makeMap(
 );
 function assertType(value, type) {
   let valid;
-  const expectedType = getType$1(type);
+  const expectedType = getType(type);
   if (isSimpleType(expectedType)) {
     const t2 = typeof value;
     valid = t2 === expectedType.toLowerCase();
@@ -6095,16 +6733,15 @@ function setRef$1(instance, isUnmount = false) {
     $templateUniElementRefs,
     ctx: { $scope, $mpPlatform }
   } = instance;
-  if ($mpPlatform === "mp-alipay") {
-    return;
-  }
   if (!$scope || !$templateRefs && !$templateUniElementRefs) {
     return;
   }
   if (isUnmount) {
-    $templateRefs && $templateRefs.forEach(
-      (templateRef) => setTemplateRef(templateRef, null, setupState)
-    );
+    if ($mpPlatform !== "mp-alipay") {
+      $templateRefs && $templateRefs.forEach(
+        (templateRef) => setTemplateRef(templateRef, null, setupState)
+      );
+    }
     $templateUniElementRefs && $templateUniElementRefs.forEach(
       (templateRef) => setTemplateRef(templateRef, null, setupState)
     );
@@ -6141,6 +6778,13 @@ function setRef$1(instance, isUnmount = false) {
       }
     }
   };
+  if ($mpPlatform !== "mp-alipay") {
+    if ($scope._$setRef) {
+      $scope._$setRef(doSet);
+    } else {
+      nextTick(instance, doSet);
+    }
+  }
   if ($templateUniElementRefs && $templateUniElementRefs.length) {
     nextTick(instance, () => {
       $templateUniElementRefs.forEach((templateRef) => {
@@ -6153,11 +6797,6 @@ function setRef$1(instance, isUnmount = false) {
         }
       });
     });
-  }
-  if ($scope._$setRef) {
-    $scope._$setRef(doSet);
-  } else {
-    nextTick(instance, doSet);
   }
 }
 function toSkip(value) {
@@ -6266,6 +6905,18 @@ const getFunctionalFallthrough = (attrs) => {
   }
   return res;
 };
+function clearTemplateRefs(templateRefs) {
+  if (!templateRefs) {
+    return [];
+  }
+  return templateRefs.filter((templateRef) => {
+    const v = templateRef.v;
+    if (v && typeof v === "object" && ["UNI-LOADING-ELEMENT", "UNI-CLOUD-DB-ELEMENT"].includes(v.nodeName)) {
+      return true;
+    }
+    return false;
+  });
+}
 function renderComponentRoot(instance) {
   const {
     type: Component2,
@@ -6293,8 +6944,12 @@ function renderComponentRoot(instance) {
     inheritAttrs
   } = instance;
   instance.$uniElementIds = /* @__PURE__ */ new Map();
-  instance.$templateRefs = [];
-  instance.$templateUniElementRefs = [];
+  instance.$templateRefs = clearTemplateRefs(
+    instance.$templateRefs || []
+  );
+  instance.$templateUniElementRefs = clearTemplateRefs(
+    instance.$templateUniElementRefs || []
+  );
   instance.$templateUniElementStyles = {};
   instance.$ei = 0;
   pruneComponentPropsCache2(uid2);
@@ -6719,10 +7374,18 @@ function findComponentPropsData(up) {
   }
   return propsCaches[uid2][parseInt(propsId)];
 }
+function getStatusBarHeight() {
+  if (typeof wx$1 !== "undefined") {
+    return wx$1.getWindowInfo().statusBarHeight;
+  } else if (typeof my !== "undefined") {
+    return my.getWindowInfo().statusBarHeight;
+  }
+}
 var plugin = {
   install(app) {
     initApp(app);
     app.config.globalProperties.pruneComponentPropsCache = pruneComponentPropsCache;
+    app.config.globalProperties[UNI_STATUS_BAR_HEIGHT] = getStatusBarHeight();
     const oldMount = app.mount;
     app.mount = function mount(rootContainer) {
       const instance = oldMount.call(app, rootContainer);
@@ -6967,6 +7630,10 @@ class UniElement {
     this.nodeName = this.tagName;
   }
   scrollTo(options) {
+    if (this.$vm.$mpPlatform !== "mp-weixin") {
+      console.warn("scrollTo is only supported on weixin miniProgram");
+      return;
+    }
     if (!this.id) {
       console.warn(`scrollTo is only supported on elements with id`);
       return;
@@ -7015,12 +7682,12 @@ class UniElement {
       console.warn(`getBoundingClientRectAsync is not supported on elements without id`);
       return Promise.reject();
     }
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve2) => {
       this._getBoundingClientRectAsync(resolve2);
     });
   }
   _getBoundingClientRectAsync(callback) {
-    const query = index.createSelectorQuery().in(this.$vm);
+    const query = this.$vm.$mpPlatform === "mp-alipay" ? index.createSelectorQuery() : index.createSelectorQuery().in(this.$vm);
     query.select("#" + this.id).boundingClientRect();
     query.exec((res) => {
       this._fixDomRectXY(res[0]);
@@ -7129,7 +7796,9 @@ function createUniElement(id, tagName, ins) {
   }
   const uniElement = new (customElements.get(tagName) || UniElement)(id, tagName);
   uniElement.$vm = ins.proxy;
-  initMiniProgramNode(uniElement, ins);
+  if (ins.proxy.$mpPlatform === "mp-weixin") {
+    initMiniProgramNode(uniElement, ins);
+  }
   uniElement.$onStyleChange((styles) => {
     var _a;
     let cssText = "";
@@ -7278,18 +7947,31 @@ const bubbles = [
 function isMPTapEvent(event) {
   return event.type === "tap";
 }
+function normalizeAlipayTapEventPosition(event) {
+  event.x = event.detail.clientX;
+  event.y = event.detail.clientY;
+  event.clientX = event.detail.clientX;
+  event.clientY = event.detail.clientY;
+  event.pageX = event.detail.pageX;
+  event.pageY = event.detail.pageY;
+}
 function normalizeXEvent(event, instance) {
   if (isMPTapEvent(event)) {
-    event.x = event.detail.x;
-    event.y = event.detail.y;
-    event.clientX = event.detail.x;
-    event.clientY = event.detail.y;
-    const touch0 = event.touches && event.touches[0];
-    if (touch0) {
-      event.pageX = touch0.pageX;
-      event.pageY = touch0.pageY;
-      event.screenX = touch0.screenX;
-      event.screenY = touch0.screenY;
+    const ctx = instance === null || instance === void 0 ? void 0 : instance.ctx;
+    if ((ctx === null || ctx === void 0 ? void 0 : ctx.$mpPlatform) === "mp-alipay") {
+      normalizeAlipayTapEventPosition(event);
+    } else {
+      event.x = event.detail.x;
+      event.y = event.detail.y;
+      event.clientX = event.detail.x;
+      event.clientY = event.detail.y;
+      const touch0 = event.touches && event.touches[0];
+      if (touch0) {
+        event.pageX = touch0.pageX;
+        event.pageY = touch0.pageY;
+        event.screenX = touch0.screenX;
+        event.screenY = touch0.screenY;
+      }
     }
   }
   if (event.target) {
@@ -7479,6 +8161,24 @@ function genIdWithVirtualHost(_ctx, idBinding) {
 function genUniElementId(_ctx, idBinding, genId) {
   return genIdWithVirtualHost(_ctx, idBinding) || genId || "";
 }
+function patchClassList(classList) {
+  const patchedClassList = [];
+  classList.forEach((className) => {
+    className = className.trim();
+    if (!className) {
+      return;
+    }
+    const patchedClassName = "^" + className;
+    if (!patchedClassList.includes(patchedClassName)) {
+      patchedClassList.push(patchedClassName);
+    }
+  });
+  return patchedClassList;
+}
+function parseVirtualHostClass(className) {
+  className = normalizeClass(className);
+  return patchClassList(className.split(/\s+/)).join(" ");
+}
 const o = (value, key) => vOn(value, key);
 const f = (source, renderItem) => vFor(source, renderItem);
 const s = (value) => stringifyStyle(value);
@@ -7489,650 +8189,17 @@ const p = (props) => renderProps(props);
 const sr = (ref2, id, opts) => setRef(ref2, id, opts);
 const sei = setUniElementId;
 const gei = genUniElementId;
+const pvhc = parseVirtualHostClass;
 function createApp$1(rootComponent, rootProps = null) {
   rootComponent && (rootComponent.mpType = "app");
   return createVueApp(rootComponent, rootProps).use(plugin);
 }
 const createSSRApp = createApp$1;
-function arrayPop(array) {
-  if (array.length === 0) {
-    return null;
-  }
-  return array.pop();
-}
-function arrayShift(array) {
-  if (array.length === 0) {
-    return null;
-  }
-  return array.shift();
-}
-function arrayFind(array, predicate) {
-  const index2 = array.findIndex(predicate);
-  if (index2 < 0) {
-    return null;
-  }
-  return array[index2];
-}
-function arrayFindLast(array, predicate) {
-  const index2 = array.findLastIndex(predicate);
-  if (index2 < 0) {
-    return null;
-  }
-  return array[index2];
-}
-function arrayAt(array, index2) {
-  if (index2 < -array.length || index2 >= array.length) {
-    return null;
-  }
-  return array.at(index2);
-}
-var IDENTIFIER;
-(function(IDENTIFIER2) {
-  IDENTIFIER2["UTSJSONObject"] = "UTSJSONObject";
-  IDENTIFIER2["JSON"] = "JSON";
-  IDENTIFIER2["UTS"] = "UTS";
-  IDENTIFIER2["VUE"] = "vue";
-  IDENTIFIER2["GLOBAL_THIS"] = "globalThis";
-  IDENTIFIER2["UTS_TYPE"] = "UTSType";
-  IDENTIFIER2["UTS_METADATA"] = "$UTSMetadata$";
-  IDENTIFIER2["TEMP_UTS_METADATA"] = "$TempUTSMetadata$";
-  IDENTIFIER2["JSON_FIELD"] = "JSON_FIELD";
-})(IDENTIFIER || (IDENTIFIER = {}));
-var UTS_CLASS_METADATA_KIND;
-(function(UTS_CLASS_METADATA_KIND2) {
-  UTS_CLASS_METADATA_KIND2[UTS_CLASS_METADATA_KIND2["CLASS"] = 0] = "CLASS";
-  UTS_CLASS_METADATA_KIND2[UTS_CLASS_METADATA_KIND2["INTERFACE"] = 1] = "INTERFACE";
-  UTS_CLASS_METADATA_KIND2[UTS_CLASS_METADATA_KIND2["TYPE"] = 2] = "TYPE";
-})(UTS_CLASS_METADATA_KIND || (UTS_CLASS_METADATA_KIND = {}));
-function getType(val) {
-  return Object.prototype.toString.call(val).slice(8, -1).toLowerCase();
-}
-function isPlainObject(val) {
-  if (val == null || typeof val !== "object") {
-    return false;
-  }
-  const proto = Object.getPrototypeOf(val);
-  return proto === Object.prototype || proto === null;
-}
-class UTSError extends Error {
-  constructor(message) {
-    super(message);
-  }
-}
-function isUTSMetadata(metadata) {
-  return !!(metadata && metadata.kind in UTS_CLASS_METADATA_KIND && metadata.interfaces);
-}
-function isNativeType(proto) {
-  return !proto || proto === Object.prototype;
-}
-const utsMetadataKey = IDENTIFIER.UTS_METADATA;
-function getParentTypeList(type) {
-  const metadata = utsMetadataKey in type ? type[utsMetadataKey] : {};
-  let interfaces = [];
-  if (!isUTSMetadata(metadata)) {
-    interfaces = [];
-  } else {
-    interfaces = metadata.interfaces || [];
-  }
-  const proto = Object.getPrototypeOf(type);
-  if (!isNativeType(proto)) {
-    interfaces.push(proto.constructor);
-  }
-  return interfaces;
-}
-function isImplementationOf(leftType, rightType, visited = []) {
-  if (isNativeType(leftType)) {
-    return false;
-  }
-  if (leftType === rightType) {
-    return true;
-  }
-  visited.push(leftType);
-  const parentTypeList = getParentTypeList(leftType);
-  return parentTypeList.some((parentType) => {
-    if (visited.includes(parentType)) {
-      return false;
-    }
-    return isImplementationOf(parentType, rightType, visited);
-  });
-}
-function isInstanceOf(value, type) {
-  if (type === UTSValueIterable) {
-    return value && value[Symbol.iterator];
-  }
-  const isNativeInstanceofType = value instanceof type;
-  if (isNativeInstanceofType || typeof value !== "object" || value === null) {
-    return isNativeInstanceofType;
-  }
-  const proto = Object.getPrototypeOf(value).constructor;
-  return isImplementationOf(proto, type);
-}
-function isBaseType(type) {
-  return type === Number || type === String || type === Boolean;
-}
-function isUnknownType(type) {
-  return type === "Unknown";
-}
-function isAnyType(type) {
-  return type === "Any";
-}
-function isUTSType(type) {
-  return type && type.prototype && type.prototype instanceof UTSType;
-}
-function normalizeGenericValue(value, genericType, isJSONParse = false) {
-  return value == null ? null : isBaseType(genericType) || isUnknownType(genericType) || isAnyType(genericType) ? value : genericType === Array ? new Array(...value) : new genericType(value, void 0, isJSONParse);
-}
-class UTSType {
-  static get$UTSMetadata$(...args) {
-    return {
-      name: "",
-      kind: UTS_CLASS_METADATA_KIND.TYPE,
-      interfaces: [],
-      fields: {}
-    };
-  }
-  get $UTSMetadata$() {
-    return UTSType.get$UTSMetadata$();
-  }
-  // TODO 缓存withGenerics结果
-  static withGenerics(parent, generics, isJSONParse = false) {
-    if (isJSONParse) {
-      const illegalGeneric = generics.find((item) => !(item === Array || isBaseType(item) || isUnknownType(item) || isAnyType(item) || item === UTSJSONObject || item.prototype && item.prototype instanceof UTSType));
-      if (illegalGeneric) {
-        throw new Error("Generic is not UTSType or Array or UTSJSONObject or base type, generic: " + illegalGeneric);
-      }
-    }
-    if (parent === Array) {
-      return class UTSArray extends UTSType {
-        constructor(options, isJSONParse2 = false) {
-          if (!Array.isArray(options)) {
-            throw new UTSError(`Failed to contruct type, ${options} is not an array`);
-          }
-          super();
-          return options.map((item) => {
-            return normalizeGenericValue(item, generics[0], isJSONParse2);
-          });
-        }
-      };
-    } else if (parent === Map || parent === WeakMap) {
-      return class UTSMap extends UTSType {
-        constructor(options, isJSONParse2 = false) {
-          if (options == null || typeof options !== "object") {
-            throw new UTSError(`Failed to contruct type, ${options} is not an object`);
-          }
-          super();
-          const obj = new parent();
-          for (const key in options) {
-            obj.set(normalizeGenericValue(key, generics[0], isJSONParse2), normalizeGenericValue(options[key], generics[1], isJSONParse2));
-          }
-          return obj;
-        }
-      };
-    } else if (isUTSType(parent)) {
-      return class VirtualClassWithGenerics extends parent {
-        static get$UTSMetadata$() {
-          return parent.get$UTSMetadata$(...generics);
-        }
-        constructor(options, metadata = VirtualClassWithGenerics.get$UTSMetadata$(), isJSONParse2 = false) {
-          super(options, metadata, isJSONParse2);
-        }
-      };
-    } else {
-      return parent;
-    }
-  }
-  constructor() {
-  }
-  static initProps(options, metadata, isJSONParse = false) {
-    const obj = {};
-    if (!metadata.fields) {
-      return obj;
-    }
-    for (const key in metadata.fields) {
-      const { type, optional, jsonField } = metadata.fields[key];
-      const realKey = isJSONParse ? jsonField || key : key;
-      if (options[realKey] == null) {
-        if (optional) {
-          obj[key] = null;
-          continue;
-        } else {
-          throw new UTSError(`Failed to contruct type, missing required property: ${key}`);
-        }
-      }
-      if (isUTSType(type)) {
-        obj[key] = isJSONParse ? (
-          // @ts-ignore
-          new type(options[realKey], void 0, isJSONParse)
-        ) : options[realKey];
-      } else if (type === Array) {
-        if (!Array.isArray(options[realKey])) {
-          throw new UTSError(`Failed to contruct type, property ${key} is not an array`);
-        }
-        obj[key] = options[realKey];
-      } else {
-        obj[key] = options[realKey];
-      }
-    }
-    return obj;
-  }
-}
-function initUTSJSONObjectProperties(obj) {
-  const propertyList = [
-    "_resolveKeyPath",
-    "_getValue",
-    "toJSON",
-    "get",
-    "set",
-    "getAny",
-    "getString",
-    "getNumber",
-    "getBoolean",
-    "getJSON",
-    "getArray",
-    "toMap",
-    "forEach"
-  ];
-  const propertyDescriptorMap = {};
-  for (let i = 0; i < propertyList.length; i++) {
-    const property = propertyList[i];
-    propertyDescriptorMap[property] = {
-      enumerable: false,
-      value: obj[property]
-    };
-  }
-  Object.defineProperties(obj, propertyDescriptorMap);
-}
-function getRealDefaultValue(defaultValue) {
-  return defaultValue === void 0 ? null : defaultValue;
-}
-let UTSJSONObject$1 = class UTSJSONObject2 {
-  static keys(obj) {
-    return Object.keys(obj);
-  }
-  static assign(target, ...sources) {
-    for (let i = 0; i < sources.length; i++) {
-      const source = sources[i];
-      for (let key in source) {
-        target[key] = source[key];
-      }
-    }
-    return target;
-  }
-  constructor(content = {}) {
-    if (content instanceof Map) {
-      content.forEach((value, key) => {
-        this[key] = value;
-      });
-    } else {
-      for (const key in content) {
-        if (Object.prototype.hasOwnProperty.call(content, key)) {
-          this[key] = content[key];
-        }
-      }
-    }
-    initUTSJSONObjectProperties(this);
-  }
-  _resolveKeyPath(keyPath) {
-    let token = "";
-    const keyPathArr = [];
-    let inOpenParentheses = false;
-    for (let i = 0; i < keyPath.length; i++) {
-      const word = keyPath[i];
-      switch (word) {
-        case ".":
-          if (token.length > 0) {
-            keyPathArr.push(token);
-            token = "";
-          }
-          break;
-        case "[": {
-          inOpenParentheses = true;
-          if (token.length > 0) {
-            keyPathArr.push(token);
-            token = "";
-          }
-          break;
-        }
-        case "]":
-          if (inOpenParentheses) {
-            if (token.length > 0) {
-              const tokenFirstChar = token[0];
-              const tokenLastChar = token[token.length - 1];
-              if (tokenFirstChar === '"' && tokenLastChar === '"' || tokenFirstChar === "'" && tokenLastChar === "'" || tokenFirstChar === "`" && tokenLastChar === "`") {
-                if (token.length > 2) {
-                  token = token.slice(1, -1);
-                } else {
-                  return [];
-                }
-              } else if (!/^\d+$/.test(token)) {
-                return [];
-              }
-              keyPathArr.push(token);
-              token = "";
-            } else {
-              return [];
-            }
-            inOpenParentheses = false;
-          } else {
-            return [];
-          }
-          break;
-        default:
-          token += word;
-          break;
-      }
-      if (i === keyPath.length - 1) {
-        if (token.length > 0) {
-          keyPathArr.push(token);
-          token = "";
-        }
-      }
-    }
-    return keyPathArr;
-  }
-  _getValue(keyPath, defaultValue) {
-    const keyPathArr = this._resolveKeyPath(keyPath);
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    if (keyPathArr.length === 0) {
-      return realDefaultValue;
-    }
-    let value = this;
-    for (let i = 0; i < keyPathArr.length; i++) {
-      const key = keyPathArr[i];
-      if (value instanceof Object) {
-        if (key in value) {
-          value = value[key];
-        } else {
-          return realDefaultValue;
-        }
-      } else {
-        return realDefaultValue;
-      }
-    }
-    return value;
-  }
-  get(key) {
-    return this._getValue(key);
-  }
-  set(key, value) {
-    this[key] = value;
-  }
-  getAny(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    return this._getValue(key, realDefaultValue);
-  }
-  getString(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    const value = this._getValue(key, realDefaultValue);
-    if (typeof value === "string") {
-      return value;
-    } else {
-      return realDefaultValue;
-    }
-  }
-  getNumber(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    const value = this._getValue(key, realDefaultValue);
-    if (typeof value === "number") {
-      return value;
-    } else {
-      return realDefaultValue;
-    }
-  }
-  getBoolean(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    const boolean = this._getValue(key, realDefaultValue);
-    if (typeof boolean === "boolean") {
-      return boolean;
-    } else {
-      return realDefaultValue;
-    }
-  }
-  getJSON(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    let value = this._getValue(key, realDefaultValue);
-    if (value instanceof Object) {
-      return value;
-    } else {
-      return realDefaultValue;
-    }
-  }
-  getArray(key, defaultValue) {
-    const realDefaultValue = getRealDefaultValue(defaultValue);
-    let value = this._getValue(key, realDefaultValue);
-    if (value instanceof Array) {
-      return value;
-    } else {
-      return realDefaultValue;
-    }
-  }
-  toMap() {
-    let map = /* @__PURE__ */ new Map();
-    for (let key in this) {
-      map.set(key, this[key]);
-    }
-    return map;
-  }
-  forEach(callback) {
-    for (let key in this) {
-      callback(this[key], key);
-    }
-  }
-};
-const OriginalJSON = JSON;
-function createUTSJSONObjectOrArray(obj) {
-  if (Array.isArray(obj)) {
-    return obj.map((item) => {
-      return createUTSJSONObjectOrArray(item);
-    });
-  } else if (isPlainObject(obj)) {
-    const result = new UTSJSONObject$1({});
-    for (const key in obj) {
-      const value = obj[key];
-      result[key] = createUTSJSONObjectOrArray(value);
-    }
-    return result;
-  }
-  return obj;
-}
-function parseObjectOrArray(object, utsType) {
-  const objectType = getType(object);
-  if (object === null || objectType !== "object" && objectType !== "array") {
-    return object;
-  }
-  if (utsType && utsType !== UTSJSONObject$1) {
-    try {
-      return new utsType(object, void 0, true);
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
-  if (objectType === "array" || objectType === "object") {
-    return createUTSJSONObjectOrArray(object);
-  }
-  return object;
-}
-const UTSJSON = {
-  parse: (text, reviver, utsType) => {
-    if (reviver && (isUTSType(reviver) || reviver === UTSJSONObject$1)) {
-      utsType = reviver;
-      reviver = void 0;
-    }
-    try {
-      const parseResult = OriginalJSON.parse(text, reviver);
-      return parseObjectOrArray(parseResult, utsType);
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  },
-  parseArray(text, utsType) {
-    try {
-      const parseResult = OriginalJSON.parse(text);
-      if (Array.isArray(parseResult)) {
-        return parseObjectOrArray(parseResult, utsType ? UTSType.withGenerics(Array, [utsType], true) : void 0);
-      }
-      return null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  },
-  parseObject(text, utsType) {
-    try {
-      const parseResult = OriginalJSON.parse(text);
-      if (Array.isArray(parseResult)) {
-        return null;
-      }
-      return parseObjectOrArray(parseResult, utsType);
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  },
-  stringify: (value, replacer2, space) => {
-    try {
-      if (!replacer2) {
-        const visited = /* @__PURE__ */ new Set();
-        replacer2 = function(_, v) {
-          if (typeof v === "object") {
-            if (visited.has(v)) {
-              return null;
-            }
-            visited.add(v);
-          }
-          return v;
-        };
-      }
-      return OriginalJSON.stringify(value, replacer2, space);
-    } catch (error) {
-      console.error(error);
-      return "";
-    }
-  }
-};
-function mapGet(map, key) {
-  if (!map.has(key)) {
-    return null;
-  }
-  return map.get(key);
-}
-function stringCodePointAt(str, pos) {
-  if (pos < 0 || pos >= str.length) {
-    return null;
-  }
-  return str.codePointAt(pos);
-}
-function stringAt(str, pos) {
-  if (pos < -str.length || pos >= str.length) {
-    return null;
-  }
-  return str.at(pos);
-}
-function weakMapGet(map, key) {
-  if (!map.has(key)) {
-    return null;
-  }
-  return map.get(key);
-}
-const UTS = {
-  arrayAt,
-  arrayFind,
-  arrayFindLast,
-  arrayPop,
-  arrayShift,
-  isInstanceOf,
-  UTSType,
-  mapGet,
-  stringAt,
-  stringCodePointAt,
-  weakMapGet,
-  JSON: UTSJSON
-};
-let UniError$1 = class UniError2 extends Error {
-  constructor(errSubject, errCode, errMsg) {
-    let options = {};
-    const argsLength = Array.from(arguments).length;
-    switch (argsLength) {
-      case 0:
-        errSubject = "";
-        errMsg = "";
-        errCode = 0;
-        break;
-      case 1:
-        errMsg = errSubject;
-        errSubject = "";
-        errCode = 0;
-        break;
-      case 2:
-        errMsg = errSubject;
-        options = errCode;
-        errCode = options.errCode || 0;
-        errSubject = options.errSubject || "";
-        break;
-    }
-    super(errMsg);
-    this.name = "UniError";
-    this.errSubject = errSubject;
-    this.errCode = errCode;
-    this.errMsg = errMsg;
-    if (options.data) {
-      this.data = options.data;
-    }
-    if (options.cause) {
-      this.cause = options.cause;
-    }
-  }
-  set errMsg(msg) {
-    this.message = msg;
-  }
-  get errMsg() {
-    return this.message;
-  }
-  toString() {
-    return this.errMsg;
-  }
-  toJSON() {
-    return {
-      errSubject: this.errSubject,
-      errCode: this.errCode,
-      errMsg: this.errMsg,
-      data: this.data,
-      cause: this.cause && typeof this.cause.toJSON === "function" ? this.cause.toJSON() : this.cause
-    };
-  }
-};
-let UTSValueIterable$1 = class UTSValueIterable2 {
-};
-function getGlobal() {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  function g2() {
-    return this;
-  }
-  if (typeof g2() !== "undefined") {
-    return g2();
-  }
-  return function() {
-    return new Function("return this")();
-  }();
-}
 const realGlobal = getGlobal();
-realGlobal.UTSJSONObject = UTSJSONObject$1;
-realGlobal.UniError = UniError$1;
 realGlobal.UTS = UTS;
-realGlobal.UTSValueIterable = UTSValueIterable$1;
+realGlobal.UTSJSONObject = UTSJSONObject;
+realGlobal.UTSValueIterable = UTSValueIterable;
+realGlobal.UniError = UniError$1;
 function initVueIds(vueIds, mpInstance) {
   if (!vueIds) {
     return;
@@ -8264,6 +8331,16 @@ function initBaseInstance(instance, options) {
   ctx.$mpType = options.mpType;
   ctx.$mpPlatform = "mp-weixin";
   ctx.$scope = options.mpInstance;
+  {
+    Object.defineProperties(ctx, {
+      $page: {
+        get() {
+          var _a;
+          return (_a = instance.root.proxy) === null || _a === void 0 ? void 0 : _a.$scope;
+        }
+      }
+    });
+  }
   {
     Object.defineProperties(ctx, {
       // only id
@@ -9170,6 +9247,8 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+exports.UTS = UTS;
+exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports.__values = __values;
@@ -9187,6 +9266,8 @@ exports.isRef = isRef;
 exports.mergeModels = mergeModels;
 exports.n = n;
 exports.nextTick$1 = nextTick$1;
+exports.normalizeClass = normalizeClass$1;
+exports.normalizeStyle = normalizeStyle$1;
 exports.o = o;
 exports.onActivated = onActivated;
 exports.onBeforeUnmount = onBeforeUnmount;
@@ -9201,6 +9282,7 @@ exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.provide = provide;
+exports.pvhc = pvhc;
 exports.reactive = reactive;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;

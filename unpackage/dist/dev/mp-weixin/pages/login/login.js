@@ -24,7 +24,7 @@ const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-butt
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_icon + _easycom_uv_checkbox + _easycom_uv_checkbox_group + _easycom_uv_form + _easycom_uv_button)();
 }
-class FormData extends UTS.UTSType {
+class FormData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -39,13 +39,13 @@ class FormData extends UTS.UTSType {
   }
   constructor(options, metadata = FormData.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.username = this.__props__.username;
     this.password = this.__props__.password;
     delete this.__props__;
   }
 }
-class smsFormData extends UTS.UTSType {
+class smsFormData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -60,13 +60,13 @@ class smsFormData extends UTS.UTSType {
   }
   constructor(options, metadata = smsFormData.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.phone = this.__props__.phone;
     this.code = this.__props__.code;
     delete this.__props__;
   }
 }
-class UvFormInstance extends UTS.UTSType {
+class UvFormInstance extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -81,7 +81,7 @@ class UvFormInstance extends UTS.UTSType {
   }
   constructor(options, metadata = UvFormInstance.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.setRules = this.__props__.setRules;
     this.validate = this.__props__.validate;
     delete this.__props__;
@@ -110,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const deviceModel = common_vendor.ref("");
     const saveAccountPassword = () => {
       if (rememberPassword.value && form.value.username && form.value.password) {
-        const accountInfo = new UTSJSONObject({
+        const accountInfo = new common_vendor.UTSJSONObject({
           username: form.value.username,
           password: form.value.password
         });
@@ -148,30 +148,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const filterNonLatin = (e = null) => {
       form.value.password = e.replace(/[^\x00-\x7F]/g, "");
     };
-    const pswrules = new UTSJSONObject({
+    const pswrules = new common_vendor.UTSJSONObject({
       username: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请输入账号",
           trigger: ["blur", "change"]
         })
       ],
       password: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请输入密码",
           trigger: ["blur", "change"]
         })
       ]
     });
-    const smsrules = new UTSJSONObject({
+    const smsrules = new common_vendor.UTSJSONObject({
       phone: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请输入手机号",
           trigger: ["blur", "change"]
         }),
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           validator: (rule = null, value = null, callback = null) => {
             const phoneReg = /^1[3-9]\d{9}$/;
             if (!phoneReg.test(value)) {
@@ -184,12 +184,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       ],
       code: [
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           required: true,
           message: "请输入验证码",
           trigger: ["blur", "change"]
         }),
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({
           len: 6,
           message: "验证码长度为6位",
           trigger: ["blur", "change"]
@@ -255,9 +255,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.showLoading({ title: "登录中..." });
+          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "登录中..." }));
           const loginRes = yield new Promise((resolve, reject) => {
-            common_vendor.index.login(new UTSJSONObject({
+            common_vendor.index.login(new common_vendor.UTSJSONObject({
               provider: "weixin",
               success: resolve,
               fail: reject
@@ -304,7 +304,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (loginType.value) {
         (_a = formRef.value) === null || _a === void 0 ? null : _a.validate().then((res) => {
-          const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
+          const newFormData = new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, form.value), { from: deviceModel.value, type: "USER" }));
           api_request.login(newFormData).then((res2 = null) => {
             saveAccountPassword();
             common_vendor.index.setStorageSync("token", res2.data.token);
@@ -325,7 +325,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       } else {
         (_b = smsformRef.value) === null || _b === void 0 ? null : _b.validate().then((res) => {
-          new UTSJSONObject(
+          new common_vendor.UTSJSONObject(
             {
               phone: smsform.value.phone,
               code: smsform.value.code,
@@ -361,86 +361,104 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          class: "data-v-27a30816"
         }),
         b: common_assets._imports_0,
         c: pswLogin.value
       }, pswLogin.value ? common_vendor.e({
         d: common_vendor.o(($event) => {
           return form.value.username = $event;
-        }),
+        }, "6f"),
         e: common_vendor.p({
           prefixIcon: "account-fill",
           type: _ctx.text,
           placeholder: "请输入账号",
-          modelValue: form.value.username
+          modelValue: form.value.username,
+          class: "data-v-27a30816"
         }),
         f: common_vendor.p({
           label: "",
           prop: "username",
-          labelWidth: "0"
+          labelWidth: "0",
+          class: "data-v-27a30816"
         }),
-        g: common_vendor.o(showpwfun),
+        g: common_vendor.o(showpwfun, "a9"),
         h: common_vendor.p({
           name: showpw.value ? "eye-off-outline" : "eye",
-          size: "20"
+          size: "20",
+          class: "data-v-27a30816"
         }),
-        i: common_vendor.o(filterNonLatin),
+        i: common_vendor.o(filterNonLatin, "4c"),
         j: common_vendor.o(($event) => {
           return form.value.password = $event;
-        }),
+        }, "17"),
         k: common_vendor.p({
           prefixIcon: "lock-fill",
           type: showpw.value ? "password" : "text",
           placeholder: "请输入密码",
           password: showpw.value,
           customStyle: "border:1rpx solid red;height:80rpx",
-          modelValue: form.value.password
+          modelValue: form.value.password,
+          class: "data-v-27a30816"
         }),
         l: common_vendor.p({
           label: "",
           prop: "password",
-          labelWidth: "0"
+          labelWidth: "0",
+          class: "data-v-27a30816"
         }),
         m: pswLogin.value
       }, pswLogin.value ? {
-        n: common_vendor.o(toggleRememberPassword),
+        n: common_vendor.o(toggleRememberPassword, "74"),
         o: common_vendor.p({
-          checked: rememberPassword.value
+          checked: rememberPassword.value,
+          class: "data-v-27a30816"
+        }),
+        p: common_vendor.p({
+          class: "data-v-27a30816"
         })
       } : {}, {
-        p: common_vendor.sr(formRef, "27a30816-1", {
+        q: common_vendor.sr(formRef, "27a30816-1", {
           "k": "formRef"
         }),
-        q: common_vendor.p({
+        r: common_vendor.p({
           model: form.value,
-          rules: pswrules
+          rules: pswrules,
+          class: "r data-v-27a30816"
         })
       }) : {}, {
-        r: pswLogin.value
+        s: pswLogin.value
       }, pswLogin.value ? {
-        s: common_vendor.o(submit),
-        t: common_vendor.p({
-          type: "primary"
+        t: common_vendor.o(submit, "68"),
+        v: common_vendor.p({
+          type: "primary",
+          class: "data-v-27a30816"
         })
       } : common_vendor.e({
-        v: !docState.value
+        w: !docState.value
       }, !docState.value ? {
-        w: common_vendor.o(loginBt)
+        x: common_vendor.o(loginBt, "31")
       } : {}, {
-        x: docState.value
+        y: docState.value
       }, docState.value ? {
-        y: common_vendor.o(handleGetPhoneNumber)
+        z: common_vendor.o(handleGetPhoneNumber, "3e")
       } : {}), {
-        z: common_vendor.o(isDocState),
-        A: common_vendor.p({
-          checked: docState.value
+        A: common_vendor.o(isDocState, "e6"),
+        B: common_vendor.p({
+          checked: docState.value,
+          class: "data-v-27a30816"
         }),
-        B: common_vendor.o(isDocState),
-        C: common_vendor.o(gotoIndex),
-        D: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        E: common_vendor.o(isPswLogin),
-        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        C: common_vendor.p({
+          class: "data-v-27a30816"
+        }),
+        D: common_vendor.o(isDocState, "20"),
+        E: common_vendor.o(gotoIndex, "8a"),
+        F: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
+        G: common_vendor.o(isPswLogin, "81"),
+        H: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        I: `${_ctx.u_s_b_h}px`,
+        J: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

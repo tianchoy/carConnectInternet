@@ -41,7 +41,7 @@ const _sfc_main = common_vendor.defineComponent({
       }
     },
     baseColor() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       if (this.color) {
         style.color = this.plain ? this.color : "white";
         if (!this.plain) {
@@ -65,7 +65,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // nvue版本按钮的字体不会继承父组件的颜色，需要对每一个text组件进行单独的设置
     nvueTextStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       if (this.type === "info") {
         style.color = "#323233";
       }
@@ -95,7 +95,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 设置外层盒子的宽度，其他样式不需要
     btnWrapperStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       const customStyle = this.$uv.addStyle(this.customStyle);
       if (customStyle.width)
         style.width = customStyle.width;
@@ -132,7 +132,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: common_vendor.p({
       mode: _ctx.loadingMode,
       size: _ctx.loadingSize * 1.15,
-      color: $options.loadingColor
+      color: $options.loadingColor,
+      class: "data-v-ae8e42c7"
     }),
     d: common_vendor.t(_ctx.loadingText || _ctx.text),
     e: common_vendor.s({
@@ -148,7 +149,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: $options.getIconSize,
       customStyle: {
         marginRight: "2px"
-      }
+      },
+      class: "data-v-ae8e42c7"
     })
   } : {}, {
     i: common_vendor.t(_ctx.text),
@@ -170,25 +172,29 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     w: _ctx.sessionFrom,
     x: _ctx.sendMessageImg,
     y: _ctx.showMessageCard,
-    z: common_vendor.o((...args) => _ctx.onGetPhoneNumber && _ctx.onGetPhoneNumber(...args)),
-    A: common_vendor.o((...args) => _ctx.onGetUserInfo && _ctx.onGetUserInfo(...args)),
-    B: common_vendor.o((...args) => _ctx.onError && _ctx.onError(...args)),
-    C: common_vendor.o((...args) => _ctx.onOpenSetting && _ctx.onOpenSetting(...args)),
-    D: common_vendor.o((...args) => _ctx.onLaunchApp && _ctx.onLaunchApp(...args)),
-    E: common_vendor.o((...args) => _ctx.onContact && _ctx.onContact(...args)),
-    F: common_vendor.o((...args) => _ctx.onChooseavatar && _ctx.onChooseavatar(...args)),
-    G: common_vendor.o((...args) => _ctx.onAgreeprivacyauthorization && _ctx.onAgreeprivacyauthorization(...args)),
-    H: common_vendor.o((...args) => _ctx.onAddgroupapp && _ctx.onAddgroupapp(...args)),
-    I: common_vendor.o((...args) => _ctx.onChooseaddress && _ctx.onChooseaddress(...args)),
-    J: common_vendor.o((...args) => _ctx.onSubscribe && _ctx.onSubscribe(...args)),
-    K: common_vendor.o((...args) => _ctx.onLogin && _ctx.onLogin(...args)),
-    L: common_vendor.o((...args) => _ctx.onIm && _ctx.onIm(...args)),
+    z: common_vendor.o((...args) => _ctx.onGetPhoneNumber && _ctx.onGetPhoneNumber(...args), "df"),
+    A: common_vendor.o((...args) => _ctx.onGetUserInfo && _ctx.onGetUserInfo(...args), "7c"),
+    B: common_vendor.o((...args) => _ctx.onError && _ctx.onError(...args), "22"),
+    C: common_vendor.o((...args) => _ctx.onOpenSetting && _ctx.onOpenSetting(...args), "fb"),
+    D: common_vendor.o((...args) => _ctx.onLaunchApp && _ctx.onLaunchApp(...args), "1c"),
+    E: common_vendor.o((...args) => _ctx.onContact && _ctx.onContact(...args), "1f"),
+    F: common_vendor.o((...args) => _ctx.onChooseavatar && _ctx.onChooseavatar(...args), "8e"),
+    G: common_vendor.o((...args) => _ctx.onAgreeprivacyauthorization && _ctx.onAgreeprivacyauthorization(...args), "26"),
+    H: common_vendor.o((...args) => _ctx.onAddgroupapp && _ctx.onAddgroupapp(...args), "20"),
+    I: common_vendor.o((...args) => _ctx.onChooseaddress && _ctx.onChooseaddress(...args), "d3"),
+    J: common_vendor.o((...args) => _ctx.onSubscribe && _ctx.onSubscribe(...args), "2c"),
+    K: common_vendor.o((...args) => _ctx.onLogin && _ctx.onLogin(...args), "7d"),
+    L: common_vendor.o((...args) => _ctx.onIm && _ctx.onIm(...args), "1c"),
     M: common_vendor.s($options.baseColor),
     N: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
-    O: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    O: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "02"),
     P: common_vendor.n($options.bemClass),
     Q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    R: common_vendor.s($options.btnWrapperStyle)
+    R: common_vendor.s($options.btnWrapperStyle),
+    S: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    T: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ae8e42c7"]]);

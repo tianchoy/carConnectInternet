@@ -30,7 +30,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const emit = __emit;
     const statusBarHeight = common_vendor.ref(20);
     const navBarHeight = common_vendor.ref(44);
-    const menuButtonInfo = common_vendor.ref(new UTSJSONObject({
+    const menuButtonInfo = common_vendor.ref(new common_vendor.UTSJSONObject({
       top: 4,
       right: 10,
       width: 87,
@@ -75,32 +75,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: common_vendor.unref(statusBarHeight) + "px",
           "background-color": "#fff"
         }),
-        b: __props.showBack
+        b: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        }),
+        c: __props.showBack
       }, __props.showBack ? {
-        c: common_assets._imports_0$3,
-        d: common_vendor.o(handleBack)
+        d: common_assets._imports_0$3,
+        e: common_vendor.o(handleBack, "62")
       } : {}, {
-        e: common_vendor.t(__props.title),
-        f: __props.textColor,
-        g: common_vendor.unref(navBarHeight) + "px",
-        h: __props.showCapsule
+        f: common_vendor.t(__props.title),
+        g: __props.textColor,
+        h: common_vendor.unref(navBarHeight) + "px",
+        i: __props.showCapsule
       }, __props.showCapsule ? common_vendor.e({
-        i: __props.isIcon
+        j: __props.isIcon
       }, __props.isIcon ? {
-        j: common_vendor.p({
+        k: common_vendor.p({
           name: __props.Icon,
           size: "26",
-          color: __props.iconColor
+          color: __props.iconColor,
+          class: "data-v-11b89787"
         })
       } : {
-        k: common_vendor.t(__props.rightText)
+        l: common_vendor.t(__props.rightText)
       }, {
-        l: common_vendor.o(($event) => {
+        m: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        })
+        }, "4f")
       }) : {}, {
-        m: "200rpx",
-        n: common_vendor.s(__props.isShowStyle ? {
+        n: "200rpx",
+        o: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor,
           position: "fixed",
@@ -111,6 +115,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } : {
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor
+        }),
+        p: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       });
       return __returned__;

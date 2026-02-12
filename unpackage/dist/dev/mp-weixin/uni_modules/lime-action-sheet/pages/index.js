@@ -26,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let parentKey = common_vendor.ref(`action-sheet-1`);
     common_vendor.onLoad((options) => {
       var _a, _b, _c, _d, _g, _h, _j;
-      const param = UTS.JSON.parseObject(`${(_a = options["param"]) !== null && _a !== void 0 ? _a : "{}"}`);
+      const param = common_vendor.UTS.JSON.parseObject(`${(_a = options["param"]) !== null && _a !== void 0 ? _a : "{}"}`);
       parentKey.value = (_b = param.getString("key")) !== null && _b !== void 0 ? _b : `action-sheet-1`;
       description.value = (_c = param.getString("description")) !== null && _c !== void 0 ? _c : "";
       cancelText.value = (_d = param.getString("cancelText")) !== null && _d !== void 0 ? _d : "";
@@ -69,7 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         let cols = _rowCol[i];
         const row = [];
         while (cols > 0 && list.length > 0) {
-          const item = UTS.arrayShift(list);
+          const item = common_vendor.UTS.arrayShift(list);
           cols--;
           row.push(item);
         }
@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       selected.value = -1;
     };
     const onClose = () => {
-      common_vendor.index.closeDialogPage(new UTSJSONObject({
+      common_vendor.index.closeDialogPage(new common_vendor.UTSJSONObject({
         dialogPage: instance.proxy.$page,
         fail(err) {
           console.log("err", err);
@@ -119,7 +119,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             c: common_vendor.p({
               color: item.iconColor ?? item.color,
               size: item.fontSize,
-              name: item.icon
+              name: item.icon,
+              class: "l-action-sheet__item-icon"
             })
           } : {}, {
             d: common_vendor.t(item.label),
@@ -149,7 +150,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 f: common_vendor.p({
                   color: item.iconColor ?? item.color,
                   size: item.fontSize ?? "48rpx",
-                  name: item.icon
+                  name: item.icon,
+                  class: "l-action-sheet__col-icon"
                 }),
                 g: common_vendor.s(item.bgColor != null ? "background:" + item.bgColor : ""),
                 h: common_vendor.s(item.radius != null ? "border-radius:" + item.radius : "")
@@ -176,18 +178,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.unref(cancelText).length > 0
       }, common_vendor.unref(cancelText).length > 0 ? {
         j: common_vendor.t(common_vendor.unref(cancelText)),
-        k: common_vendor.o(handleCancel)
+        k: common_vendor.o(handleCancel, "ad")
       } : {}, {
         l: common_vendor.gei(_ctx, ""),
-        m: common_vendor.o(onClose),
-        n: common_vendor.o(($event) => {
+        m: common_vendor.o(onClose, "5d"),
+        n: `${_ctx.u_s_b_h}px`,
+        o: common_vendor.o(($event) => {
           return common_vendor.isRef(innerValue) ? innerValue.value = $event : null;
-        }),
-        o: common_vendor.p({
+        }, "a2"),
+        p: common_vendor.p({
           position: "bottom",
           modelValue: common_vendor.unref(innerValue),
-          id: common_vendor.gei(_ctx, "")
-        })
+          id: common_vendor.gei(_ctx, ""),
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
+        }),
+        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

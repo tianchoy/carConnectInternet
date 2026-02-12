@@ -52,7 +52,7 @@ const _sfc_main = common_vendor.defineComponent({
   },
   computed: {
     imageStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       return style;
     }
   },
@@ -101,7 +101,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.p({
       name: _ctx.icon,
       size: _ctx.fontSize,
-      color: _ctx.color
+      color: _ctx.color,
+      class: "data-v-fa9b0ca7"
     })
   } : _ctx.text ? {
     g: common_vendor.p({
@@ -109,13 +110,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: _ctx.fontSize,
       color: _ctx.color,
       align: "center",
-      customStyle: "justify-content: center"
+      customStyle: "justify-content: center",
+      class: "data-v-fa9b0ca7"
     })
   } : {
     h: common_vendor.n(`uv-avatar__image--${_ctx.shape}`),
     i: $data.avatarUrl || _ctx.defaultUrl,
     j: _ctx.mode,
-    k: common_vendor.o((...args) => $options.errorHandler && $options.errorHandler(...args)),
+    k: common_vendor.o((...args) => $options.errorHandler && $options.errorHandler(...args), "e0"),
     l: common_vendor.s({
       width: _ctx.$uv.addUnit(_ctx.size),
       height: _ctx.$uv.addUnit(_ctx.size)
@@ -125,13 +127,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     f: _ctx.text,
     m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     n: common_vendor.n(`uv-avatar--${_ctx.shape}`),
-    o: common_vendor.s({
+    o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    p: common_vendor.s({
       backgroundColor: _ctx.text || _ctx.icon ? _ctx.randomBgColor ? $data.colors[_ctx.colorIndex !== "" ? _ctx.colorIndex : _ctx.$uv.random(0, 19)] : _ctx.bgColor : "transparent",
       width: _ctx.$uv.addUnit(_ctx.size),
       height: _ctx.$uv.addUnit(_ctx.size)
     }),
-    p: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
-    q: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    q: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    r: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    s: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "29")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-fa9b0ca7"]]);

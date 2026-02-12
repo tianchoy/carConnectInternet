@@ -1,1 +1,1 @@
-<view id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" class="{{['uv-form', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}"><slot/></view><wxs src="/common/uniView.wxs" module="uV"/>
+<view style="{{'--status-bar-height:' + b + ';' + (virtualHostStyle || '')}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" class="{{['uv-form', c]}}" hidden="{{virtualHostHidden || false}}"><slot/></view><wxs src="/common/uniView.wxs" module="uV"/>

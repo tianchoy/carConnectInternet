@@ -11,7 +11,7 @@ const _easycom_uv_icon = () => "../../../uni_modules/uv-icon/components/uv-icon/
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_icon)();
 }
-class UserInfo extends UTS.UTSType {
+class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -28,7 +28,7 @@ class UserInfo extends UTS.UTSType {
   }
   constructor(options, metadata = UserInfo.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.id = this.__props__.id;
     this.mobile = this.__props__.mobile;
     this.type = this.__props__.type;
@@ -48,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad((options) => {
       if (options.userInfo) {
         try {
-          const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
+          const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
             mobile: parsedInfo.getString("mobile") || "",
@@ -103,10 +103,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           size: "18"
         }),
-        i: common_vendor.o(editPassword)
+        i: common_vendor.o(editPassword, "cc")
       } : {}, {
-        j: common_vendor.o(logoutBtn),
-        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        j: common_vendor.o(logoutBtn, "cd"),
+        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        l: `${_ctx.u_s_b_h}px`,
+        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

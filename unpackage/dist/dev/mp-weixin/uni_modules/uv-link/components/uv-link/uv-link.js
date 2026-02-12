@@ -9,7 +9,7 @@ const _sfc_main = common_vendor.defineComponent({
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvLink_components_uvLink_props.props],
   computed: {
     linkStyle() {
-      const style = new UTSJSONObject({
+      const style = new common_vendor.UTSJSONObject({
         color: this.color,
         fontSize: this.$uv.addUnit(this.fontSize),
         // line-height设置为比字体大小多2px
@@ -39,9 +39,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.t(_ctx.text),
     b: common_vendor.sei(common_vendor.gei(_ctx, ""), "text"),
-    c: common_vendor.o((...args) => $options.openLink && $options.openLink(...args)),
+    c: common_vendor.o((...args) => $options.openLink && $options.openLink(...args), "fc"),
     d: common_vendor.s($options.linkStyle),
-    e: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle))
+    e: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    f: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-86e87617"]]);

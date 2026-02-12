@@ -9,7 +9,7 @@ const _sfc_main = common_vendor.defineComponent({
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvTags_components_uvTags_props.props],
   computed: {
     style() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.bgColor) {
         style.backgroundColor = this.bgColor;
       }
@@ -23,7 +23,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // nvue下，文本颜色无法继承父元素
     textColor() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.color) {
         style.color = this.color;
       }
@@ -31,7 +31,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     imgStyle() {
       const width = this.size === "large" ? "17px" : this.size === "medium" ? "15px" : "13px";
-      return new UTSJSONObject({
+      return new common_vendor.UTSJSONObject({
         width,
         height: width
       });
@@ -85,7 +85,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.p({
       color: $options.elIconColor,
       name: _ctx.icon,
-      size: $options.iconSize
+      size: $options.iconSize,
+      class: "data-v-b10c8d02"
     })
   }) : {}, {
     f: common_vendor.t(_ctx.text),
@@ -98,11 +99,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     l: common_vendor.p({
       name: "close",
       size: $options.closeSize,
-      color: "#ffffff"
+      color: "#ffffff",
+      class: "data-v-b10c8d02"
     }),
     m: common_vendor.n(`uv-tags__close--${_ctx.size}`),
     n: common_vendor.n(`uv-tags__close--${_ctx.closePlace}`),
-    o: common_vendor.o((...args) => $options.closeHandler && $options.closeHandler(...args)),
+    o: common_vendor.o((...args) => $options.closeHandler && $options.closeHandler(...args), "b1"),
     p: _ctx.closeColor
   } : {}, {
     q: common_vendor.n(`uv-tags--${_ctx.shape}`),
@@ -111,7 +113,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     t: common_vendor.n(`uv-tags--${_ctx.size}`),
     v: common_vendor.n(`uv-tags--${_ctx.size}--${_ctx.closePlace}`),
     w: common_vendor.n(_ctx.plain && _ctx.plainFill && `uv-tags--${_ctx.type}--plain--fill`),
-    x: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    x: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "7d"),
     y: common_vendor.s({
       marginRight: _ctx.closable && _ctx.closePlace == "right-top" ? "10px" : 0,
       marginTop: _ctx.closable && _ctx.closePlace == "right-top" ? "10px" : 0
@@ -123,20 +125,27 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     C: common_vendor.p({
       name: "close",
       size: $options.closeSize,
-      color: "#ffffff"
+      color: "#ffffff",
+      class: "data-v-b10c8d02"
     }),
     D: common_vendor.n(`uv-tags__close--${_ctx.size}`),
     E: common_vendor.n(`uv-tags__close--${_ctx.closePlace}`),
-    F: common_vendor.o((...args) => $options.closeHandler && $options.closeHandler(...args)),
+    F: common_vendor.o((...args) => $options.closeHandler && $options.closeHandler(...args), "b0"),
     G: _ctx.closeColor
   } : {}, {
     H: common_vendor.gei(_ctx, ""),
-    I: common_vendor.p({
+    I: `${_ctx.u_s_b_h}px`,
+    J: common_vendor.p({
       mode: "fade",
       show: _ctx.show,
       ["cell-child"]: _ctx.cellChild,
-      id: common_vendor.gei(_ctx, "")
-    })
+      id: common_vendor.gei(_ctx, ""),
+      class: "data-v-b10c8d02",
+      style: common_vendor.normalizeStyle({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
+      })
+    }),
+    K: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b10c8d02"]]);

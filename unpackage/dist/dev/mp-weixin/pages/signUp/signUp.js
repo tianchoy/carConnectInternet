@@ -16,7 +16,7 @@ const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-butt
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_form + _easycom_uv_button)();
 }
-class FormData extends UTS.UTSType {
+class FormData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -31,13 +31,13 @@ class FormData extends UTS.UTSType {
   }
   constructor(options, metadata = FormData.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.mobile = this.__props__.mobile;
     this.password = this.__props__.password;
     delete this.__props__;
   }
 }
-class UvFormInstance extends UTS.UTSType {
+class UvFormInstance extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -52,7 +52,7 @@ class UvFormInstance extends UTS.UTSType {
   }
   constructor(options, metadata = UvFormInstance.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.setRules = this.__props__.setRules;
     this.validate = this.__props__.validate;
     delete this.__props__;
@@ -67,15 +67,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const formRef = common_vendor.ref(null);
     const deviceModel = common_vendor.ref("");
-    const rules = new UTSJSONObject(
+    const rules = new common_vendor.UTSJSONObject(
       {
         mobile: [
-          new UTSJSONObject({
+          new common_vendor.UTSJSONObject({
             required: true,
             message: "请输入手机号码",
             trigger: ["blur", "change"]
           }),
-          new UTSJSONObject({
+          new common_vendor.UTSJSONObject({
             validator: (rule = null, value, callback) => {
               if (!/^1[3-9]\d{9}$/.test(value)) {
                 callback(new Error("手机号码格式不正确"));
@@ -87,18 +87,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           })
         ],
         password: [
-          new UTSJSONObject({
+          new common_vendor.UTSJSONObject({
             required: true,
             message: "请输入密码",
             trigger: ["blur", "change"]
           }),
-          new UTSJSONObject({
+          new common_vendor.UTSJSONObject({
             min: 8,
             max: 20,
             message: "密码长度在8-20个字符之间",
             trigger: ["blur"]
           }),
-          new UTSJSONObject({
+          new common_vendor.UTSJSONObject({
             validator: (rule = null, value, callback) => {
               if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
                 callback(new Error("密码需包含大小写字母和数字"));
@@ -135,7 +135,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "success",
           title: "校验通过"
         });
-        const newFormData = new UTSJSONObject(Object.assign(Object.assign({}, form.value), { deviceModel: deviceModel.value }));
+        const newFormData = new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, form.value), { deviceModel: deviceModel.value }));
         console.log("表单数据:", newFormData);
       }).catch((errors = null) => {
         common_vendor.index.showToast({
@@ -153,42 +153,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          class: "data-v-43462111"
         }),
         b: common_vendor.o(($event) => {
           return form.value.mobile = $event;
-        }),
+        }, "cd"),
         c: common_vendor.p({
           placeholder: "请输入账号",
-          modelValue: form.value.mobile
+          modelValue: form.value.mobile,
+          class: "data-v-43462111"
         }),
         d: common_vendor.p({
           label: "账号",
-          prop: "mobile"
+          prop: "mobile",
+          class: "data-v-43462111"
         }),
         e: common_vendor.o(($event) => {
           return form.value.password = $event;
-        }),
+        }, "06"),
         f: common_vendor.p({
           type: "password",
           placeholder: "请输入密码",
           password: true,
-          modelValue: form.value.password
+          modelValue: form.value.password,
+          class: "data-v-43462111"
         }),
         g: common_vendor.p({
           label: "密码",
-          prop: "password"
+          prop: "password",
+          class: "data-v-43462111"
         }),
         h: common_vendor.sr(formRef, "43462111-1", {
           "k": "formRef"
         }),
         i: common_vendor.p({
           model: form.value,
-          rules
+          rules,
+          class: "r data-v-43462111"
         }),
-        j: common_vendor.o(toLogin),
-        k: common_vendor.o(submit),
-        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        j: common_vendor.o(toLogin, "b9"),
+        k: common_vendor.o(submit, "11"),
+        l: common_vendor.p({
+          class: "data-v-43462111"
+        }),
+        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        n: `${_ctx.u_s_b_h}px`,
+        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

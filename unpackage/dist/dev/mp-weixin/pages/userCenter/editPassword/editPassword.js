@@ -17,7 +17,7 @@ const _easycom_uv_button = () => "../../../uni_modules/uv-button/components/uv-b
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_form + _easycom_uv_button)();
 }
-class UserInfo extends UTS.UTSType {
+class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -32,7 +32,7 @@ class UserInfo extends UTS.UTSType {
   }
   constructor(options, metadata = UserInfo.get$UTSMetadata$(), isJSONParse = false) {
     super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.id = this.__props__.id;
     this.mobile = this.__props__.mobile;
     delete this.__props__;
@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       id: "",
       mobile: ""
     }));
-    const formData = common_vendor.ref(new UTSJSONObject({
+    const formData = common_vendor.ref(new common_vendor.UTSJSONObject({
       password: "",
       newPassword: "",
       confirmPassword: ""
@@ -58,31 +58,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         callback();
       }
     };
-    const rules = new UTSJSONObject({
+    const rules = new common_vendor.UTSJSONObject({
       password: [
-        new UTSJSONObject({ required: true, message: "请输入原密码", trigger: "blur" }),
-        new UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" })
+        new common_vendor.UTSJSONObject({ required: true, message: "请输入原密码", trigger: "blur" }),
+        new common_vendor.UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" })
       ],
       newPassword: [
-        new UTSJSONObject({ required: true, message: "请输入新密码", trigger: "blur" }),
-        new UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" }),
-        new UTSJSONObject({
+        new common_vendor.UTSJSONObject({ required: true, message: "请输入新密码", trigger: "blur" }),
+        new common_vendor.UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" }),
+        new common_vendor.UTSJSONObject({
           pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,20}$/,
           message: "密码需包含大小写字母和数字",
           trigger: "blur"
         })
       ],
       confirmPassword: [
-        new UTSJSONObject({ required: true, message: "请确认新密码", trigger: "blur" }),
-        new UTSJSONObject({ validator: validateConfirmPassword, trigger: "blur" })
+        new common_vendor.UTSJSONObject({ required: true, message: "请确认新密码", trigger: "blur" }),
+        new common_vendor.UTSJSONObject({ validator: validateConfirmPassword, trigger: "blur" })
       ]
     });
     const handleSubmit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           yield formRef.value.validate();
-          common_vendor.index.showLoading({ title: "提交中...", mask: true });
-          const submitData = new UTSJSONObject({
+          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "提交中...", mask: true }));
+          const submitData = new common_vendor.UTSJSONObject({
             password: formData.value.password,
             newPassword: formData.value.newPassword
           });
@@ -120,7 +120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad((options) => {
       if (options.userInfo) {
         try {
-          const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
+          const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
           console.log(parsedInfo);
           userInfo.value = {
             id: parsedInfo.getString("userId") || "",
@@ -144,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return common_vendor.unref(formData).password = $event;
-        }),
+        }, "41"),
         c: common_vendor.p({
           placeholder: "请输入原密码",
           border: "none",
@@ -161,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.o(($event) => {
           return common_vendor.unref(formData).newPassword = $event;
-        }),
+        }, "0f"),
         f: common_vendor.p({
           placeholder: "请输入新密码",
           border: "none",
@@ -178,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return common_vendor.unref(formData).confirmPassword = $event;
-        }),
+        }, "b4"),
         i: common_vendor.p({
           placeholder: "请再次输入新密码",
           border: "none",
@@ -198,14 +198,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.p({
           labelPosition: "left",
           model: common_vendor.unref(formData),
-          rules
+          rules,
+          class: "r"
         }),
-        m: common_vendor.o(handleSubmit),
+        m: common_vendor.o(handleSubmit, "d6"),
         n: common_vendor.p({
           type: "primary",
           text: "提交修改"
         }),
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        p: `${_ctx.u_s_b_h}px`,
+        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

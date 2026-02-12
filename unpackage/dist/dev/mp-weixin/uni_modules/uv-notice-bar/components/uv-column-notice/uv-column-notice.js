@@ -19,7 +19,7 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 文字内容的样式
     textStyle() {
-      let style = new UTSJSONObject({});
+      let style = new common_vendor.UTSJSONObject({});
       style.color = this.color;
       style.fontSize = this.$uv.addUnit(this.fontSize);
       return style;
@@ -33,7 +33,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // NVUE中的swiper在css中样式不生效
     swiperStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       return style;
     }
   },
@@ -73,7 +73,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.p({
       name: _ctx.icon,
       color: _ctx.color,
-      size: "19"
+      size: "19",
+      class: "data-v-243b8fd9"
     })
   } : {}, {
     c: common_vendor.f(_ctx.text, (item, index, i0) => {
@@ -88,7 +89,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     g: _ctx.duration,
     h: !_ctx.disableScroll,
     i: common_vendor.s($options.swiperStyle),
-    j: common_vendor.o((...args) => $options.noticeChange && $options.noticeChange(...args)),
+    j: common_vendor.o((...args) => $options.noticeChange && $options.noticeChange(...args), "41"),
     k: ["link", "closable"].includes(_ctx.mode)
   }, ["link", "closable"].includes(_ctx.mode) ? common_vendor.e({
     l: _ctx.mode === "link"
@@ -96,20 +97,24 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: common_vendor.p({
       name: "arrow-right",
       size: 17,
-      color: _ctx.color
+      color: _ctx.color,
+      class: "data-v-243b8fd9"
     })
   } : {}, {
     n: _ctx.mode === "closable"
   }, _ctx.mode === "closable" ? {
-    o: common_vendor.o($options.close),
+    o: common_vendor.o($options.close, "8b"),
     p: common_vendor.p({
       name: "close",
       size: 16,
-      color: _ctx.color
+      color: _ctx.color,
+      class: "data-v-243b8fd9"
     })
   } : {}) : {}, {
     q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    r: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    r: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "bf"),
+    s: `${_ctx.u_s_b_h}px`,
+    t: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-243b8fd9"]]);

@@ -15,7 +15,7 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 加载的文字显示的样式
     loadTextStyle() {
-      return new UTSJSONObject({
+      return new common_vendor.UTSJSONObject({
         color: this.color,
         fontSize: this.$uv.addUnit(this.fontSize),
         lineHeight: this.$uv.addUnit(this.fontSize),
@@ -62,7 +62,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       length: "140rpx",
       color: _ctx.lineColor,
       hairline: false,
-      dashed: _ctx.dashed
+      dashed: _ctx.dashed,
+      class: "data-v-1078b33c"
     })
   } : {}, {
     c: _ctx.status === "loading" && _ctx.icon
@@ -70,13 +71,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: common_vendor.p({
       color: _ctx.iconColor,
       size: _ctx.iconSize,
-      mode: _ctx.loadingIcon
+      mode: _ctx.loadingIcon,
+      class: "data-v-1078b33c"
     })
   } : {}, {
     e: common_vendor.t($options.showText),
     f: common_vendor.s($options.loadTextStyle),
     g: common_vendor.n(_ctx.status == "nomore" && _ctx.isDot == true ? "uv-loadmore__content__dot-text" : "uv-loadmore__content__text"),
-    h: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
+    h: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args), "41"),
     i: common_vendor.n(_ctx.status == "loadmore" || _ctx.status == "nomore" ? "uv-more" : ""),
     j: _ctx.line
   }, _ctx.line ? {
@@ -84,7 +86,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       length: "140rpx",
       color: _ctx.lineColor,
       hairline: false,
-      dashed: _ctx.dashed
+      dashed: _ctx.dashed,
+      class: "data-v-1078b33c"
     })
   } : {}, {
     l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
@@ -94,7 +97,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       marginTop: _ctx.$uv.addUnit(_ctx.marginTop),
       height: _ctx.$uv.addUnit(_ctx.height)
     }),
-    n: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle))
+    n: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    o: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1078b33c"]]);

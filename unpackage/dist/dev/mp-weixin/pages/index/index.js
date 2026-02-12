@@ -31,18 +31,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const picker = common_vendor.ref(null);
     const iconColor = common_vendor.ref("#e6813e");
     const noticeText = common_vendor.ref(["本页面仅供展示车辆", "如使用车辆实时位置功能", "请转至车辆详情页面"]);
-    const userLocation = common_vendor.ref(new UTSJSONObject({
+    const userLocation = common_vendor.ref(new common_vendor.UTSJSONObject({
       latitude: 0,
       longitude: 0
     }));
     const carState = common_vendor.ref([
-      [new UTSJSONObject({
+      [new common_vendor.UTSJSONObject({
         name: "全部状态",
         value: "0"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "在线",
         value: "1"
-      }), new UTSJSONObject({
+      }), new common_vendor.UTSJSONObject({
         name: "离线",
         value: "2"
       })]
@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     const getLocation = () => {
-      common_vendor.index.getLocation(new UTSJSONObject({
+      common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
         type: "wgs84",
         success: (res) => {
           console.log("获取位置成功:", res);
@@ -110,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const subMsg = () => {
       console.log("订阅消息");
-      common_vendor.index.requestSubscribeMessage(new UTSJSONObject({
+      common_vendor.index.requestSubscribeMessage(new common_vendor.UTSJSONObject({
         tmplIds: ["VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc"],
         success: (res = null) => {
           console.log("订阅成功:", res);
@@ -186,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleTap = (e = null) => {
       const markerId = e.detail.markerId;
-      const selectedDevice = UTS.arrayFind(originalDeviceList.value, (device = null) => {
+      const selectedDevice = common_vendor.UTS.arrayFind(originalDeviceList.value, (device = null) => {
         return device.deviceId == markerId;
       });
       if (selectedDevice) {
@@ -217,14 +217,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } else {
           markerId = index + 1;
         }
-        return new UTSJSONObject({
+        return new common_vendor.UTSJSONObject({
           id: markerId,
           latitude: lat,
           longitude: lng,
           iconPath,
           width: 30,
           height: 30,
-          callout: new UTSJSONObject({
+          callout: new common_vendor.UTSJSONObject({
             content: device.deviceName || device.plateNo || "设备",
             display: "ALWAYS",
             padding: 8,
@@ -232,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             bgColor: "#ffffff"
           }),
           joinCluster: true,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
+          anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 })
         });
       }).filter((marker = null) => {
         return marker !== null;
@@ -245,13 +245,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if ((groupRes === null || groupRes === void 0 ? null : groupRes.code) !== 0 || !Array.isArray(groupRes.data)) {
             throw new Error("获取分组数据失败");
           }
-          const allGroupOption = new UTSJSONObject({
+          const allGroupOption = new common_vendor.UTSJSONObject({
             name: "全部分组",
             value: "all",
             id: "all"
           });
           const formattedData = groupRes.data.map((item = null) => {
-            return new UTSJSONObject({
+            return new common_vendor.UTSJSONObject({
               name: item.name || "未命名分组",
               value: item.id || "",
               id: item.id || ""
@@ -278,14 +278,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadUserDeviceList = (groupId = "") => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          let params = new UTSJSONObject(
+          let params = new common_vendor.UTSJSONObject(
             {
               pageSize: 1e3
             }
             // 如果不是全部分组，添加分组ID参数
           );
           if (groupId && groupId !== "all") {
-            params = new UTSJSONObject({ groupId });
+            params = new common_vendor.UTSJSONObject({ groupId });
           }
           const res = yield api_request.getUserDeviceList(params);
           let deviceList = [];
@@ -357,7 +357,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           yield getUserIn();
           mapCtx = common_vendor.index.createMapContext("myMap", this);
           if (mapCtx && mapCtx.initMarkerCluster) {
-            mapCtx.initMarkerCluster(new UTSJSONObject({
+            mapCtx.initMarkerCluster(new common_vendor.UTSJSONObject({
               enableDefaultStyle: true,
               zoomOnClick: true,
               gridSize: 60,
@@ -378,7 +378,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(subMsg),
+        a: common_vendor.o(subMsg, "18"),
         b: common_vendor.p({
           title: "首页",
           ["show-back"]: false,
@@ -394,11 +394,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.sei("myMap", "map"),
         e: markers.value,
         f: mapScale.value,
-        g: common_vendor.o(handleTap),
+        g: common_vendor.o(handleTap, "54"),
         h: userLocation.value.latitude,
         i: userLocation.value.longitude
       } : {
-        j: common_vendor.o(unbindDevice),
+        j: common_vendor.o(unbindDevice, "70"),
         k: common_vendor.p({
           lists: filteredDevices.value
         })
@@ -418,48 +418,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "plus",
           size: "19"
         }),
-        p: common_vendor.o(mapPlus),
+        p: common_vendor.o(mapPlus, "b6"),
         q: common_vendor.p({
           name: "minus",
           size: "19"
         }),
-        r: common_vendor.o(mapMin)
+        r: common_vendor.o(mapMin, "6b")
       } : {}, {
         s: !Login.value
       }, !Login.value ? {
-        t: common_vendor.o(gotoLogin)
+        t: common_vendor.o(gotoLogin, "28")
       } : {}, {
         v: Login.value
       }, Login.value ? {
-        w: common_vendor.o(refresh)
+        w: common_vendor.o(refresh, "00")
       } : {}, {
         x: Login.value
       }, Login.value ? {
-        y: common_vendor.o(addCar)
+        y: common_vendor.o(addCar, "7e")
       } : {}, {
         z: common_vendor.t(showMap.value ? "查看车辆" : "返回总览"),
-        A: common_vendor.o(toggleMapMode),
+        A: common_vendor.o(toggleMapMode, "f1"),
         B: showMap.value
       }, showMap.value ? {
         C: common_vendor.t(totalCount.value),
         D: common_vendor.o(($event) => {
           return goToList("all");
-        }),
+        }, "4d"),
         E: common_vendor.t(onlineCount.value),
         F: common_vendor.o(($event) => {
           return goToList("online");
-        }),
+        }, "d9"),
         G: common_vendor.t(offlineCount.value),
         H: common_vendor.o(($event) => {
           return goToList("offline");
-        })
+        }, "ed")
       } : {}, {
         I: common_vendor.t(pickerStateTitle.value),
         J: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
         }),
-        K: common_vendor.o(handStatePicker),
+        K: common_vendor.o(handStatePicker, "c2"),
         L: Login.value && !showMap.value
       }, Login.value && !showMap.value ? {
         M: common_vendor.t(pickerGroupTitle.value),
@@ -467,17 +467,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-down",
           color: "#fff"
         }),
-        O: common_vendor.o(handGroupPicker)
+        O: common_vendor.o(handGroupPicker, "d7")
       } : {}, {
         P: common_vendor.sr(picker, "a4fca7fa-7", {
           "k": "picker"
         }),
-        Q: common_vendor.o(confirm),
+        Q: common_vendor.o(confirm, "cc"),
         R: common_vendor.p({
           columns: columns.value,
-          keyName: "name"
+          keyName: "name",
+          class: "r"
         }),
-        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        T: `${_ctx.u_s_b_h}px`,
+        U: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

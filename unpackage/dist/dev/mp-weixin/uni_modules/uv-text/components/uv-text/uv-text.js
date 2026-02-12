@@ -12,7 +12,7 @@ const _sfc_main = common_vendor.defineComponent({
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvText_components_uvText_value.value, uni_modules_uvUiTools_libs_mixin_button.button, uni_modules_uvUiTools_libs_mixin_openType.openType, uni_modules_uvText_components_uvText_props.props],
   computed: {
     valueStyle() {
-      const style = new UTSJSONObject({
+      const style = new common_vendor.UTSJSONObject({
         textDecoration: this.decoration,
         fontWeight: this.bold ? "bold" : "normal",
         wordWrap: this.wordWrap,
@@ -76,7 +76,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, _ctx.prefixIcon ? {
     f: common_vendor.p({
       name: _ctx.prefixIcon,
-      customStyle: _ctx.$uv.addStyle(_ctx.iconStyle)
+      customStyle: _ctx.$uv.addStyle(_ctx.iconStyle),
+      class: "data-v-8da47eb3"
     })
   } : {}, {
     g: _ctx.mode === "link"
@@ -84,18 +85,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: common_vendor.p({
       text: _ctx.value,
       href: _ctx.href,
-      underLine: true
+      underLine: true,
+      class: "data-v-8da47eb3"
     })
   } : _ctx.openType && $options.isMp ? {
     j: common_vendor.t(_ctx.value),
     k: common_vendor.s($options.valueStyle),
     l: _ctx.openType,
-    m: common_vendor.o((...args) => _ctx.onGetUserInfo && _ctx.onGetUserInfo(...args)),
-    n: common_vendor.o((...args) => _ctx.onContact && _ctx.onContact(...args)),
-    o: common_vendor.o((...args) => _ctx.onGetPhoneNumber && _ctx.onGetPhoneNumber(...args)),
-    p: common_vendor.o((...args) => _ctx.onError && _ctx.onError(...args)),
-    q: common_vendor.o((...args) => _ctx.onLaunchApp && _ctx.onLaunchApp(...args)),
-    r: common_vendor.o((...args) => _ctx.onOpenSetting && _ctx.onOpenSetting(...args)),
+    m: common_vendor.o((...args) => _ctx.onGetUserInfo && _ctx.onGetUserInfo(...args), "7c"),
+    n: common_vendor.o((...args) => _ctx.onContact && _ctx.onContact(...args), "b1"),
+    o: common_vendor.o((...args) => _ctx.onGetPhoneNumber && _ctx.onGetPhoneNumber(...args), "3f"),
+    p: common_vendor.o((...args) => _ctx.onError && _ctx.onError(...args), "8f"),
+    q: common_vendor.o((...args) => _ctx.onLaunchApp && _ctx.onLaunchApp(...args), "a0"),
+    r: common_vendor.o((...args) => _ctx.onOpenSetting && _ctx.onOpenSetting(...args), "bf"),
     s: _ctx.lang,
     t: _ctx.sessionFrom,
     v: _ctx.sendMessageTitle,
@@ -114,13 +116,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, _ctx.suffixIcon ? {
     F: common_vendor.p({
       name: _ctx.suffixIcon,
-      customStyle: _ctx.$uv.addStyle(_ctx.iconStyle)
+      customStyle: _ctx.$uv.addStyle(_ctx.iconStyle),
+      class: "data-v-8da47eb3"
     })
   } : {}, {
     G: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    H: _ctx.margin,
-    I: _ctx.align === "left" ? "flex-start" : _ctx.align === "center" ? "center" : "flex-end",
-    J: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    I: common_vendor.s({
+      margin: _ctx.margin,
+      justifyContent: _ctx.align === "left" ? "flex-start" : _ctx.align === "center" ? "center" : "flex-end"
+    }),
+    J: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    K: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "a5")
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-8da47eb3"]]);

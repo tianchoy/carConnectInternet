@@ -55,15 +55,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       b: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-85e95612"), "view", "overlayRef"),
       c: common_vendor.n(_ctx.lClass),
       d: common_vendor.n(common_vendor.unref(classes)),
-      e: common_vendor.s(common_vendor.unref(styles)),
-      f: common_vendor.s(_ctx.lStyle),
-      g: common_vendor.o(onClick),
-      h: common_vendor.o(noop),
-      i: common_vendor.o((...args) => {
-        return common_vendor.unref(finished) && common_vendor.unref(finished)(...args);
+      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      f: common_vendor.s(common_vendor.unref(styles)),
+      g: common_vendor.s(_ctx.lStyle),
+      h: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       }),
-      j: _ctx.ariaRole,
-      k: _ctx.ariaLabel
+      i: common_vendor.o(onClick, "7b"),
+      j: common_vendor.o(noop, "f8"),
+      k: common_vendor.o((...args) => {
+        return common_vendor.unref(finished) && common_vendor.unref(finished)(...args);
+      }, "e6"),
+      l: _ctx.ariaRole,
+      m: _ctx.ariaLabel
     } : {});
     return __returned__;
   };

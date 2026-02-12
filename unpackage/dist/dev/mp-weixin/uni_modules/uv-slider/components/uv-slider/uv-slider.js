@@ -41,10 +41,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: _ctx.blockColor,
     i: _ctx.showValue,
     j: _ctx.disabled,
-    k: common_vendor.o((...args) => $options.changingHandler && $options.changingHandler(...args)),
-    l: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args)),
+    k: common_vendor.o((...args) => $options.changingHandler && $options.changingHandler(...args), "b9"),
+    l: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args), "4b"),
     m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    n: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle))
+    n: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
+    o: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);

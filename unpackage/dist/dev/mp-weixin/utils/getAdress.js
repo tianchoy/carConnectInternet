@@ -2,7 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const getAddress = (latitude, longitude, tk = "1e3374be3d63de65d44dbfdc7b311afb") => {
   return new Promise((resolve, reject) => {
-    const postStr = UTS.JSON.stringify(new UTSJSONObject({
+    const postStr = common_vendor.UTS.JSON.stringify(new common_vendor.UTSJSONObject({
       lon: longitude,
       lat: latitude,
       ver: 1

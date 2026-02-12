@@ -114,7 +114,7 @@ const _sfc_main = common_vendor.defineComponent({
       showTrans: false,
       popupWidth: 0,
       popupHeight: 0,
-      config: new UTSJSONObject({
+      config: new common_vendor.UTSJSONObject({
         top: "top",
         bottom: "bottom",
         center: "center",
@@ -124,7 +124,7 @@ const _sfc_main = common_vendor.defineComponent({
         dialog: "center",
         share: "bottom"
       }),
-      transitionStyle: new UTSJSONObject({
+      transitionStyle: new common_vendor.UTSJSONObject({
         position: "fixed",
         left: 0,
         right: 0
@@ -146,7 +146,7 @@ const _sfc_main = common_vendor.defineComponent({
       return this.bgColor;
     },
     contentStyle() {
-      const style = new UTSJSONObject({});
+      const style = new common_vendor.UTSJSONObject({});
       if (this.bgColor) {
         style.backgroundColor = this.bg;
       }
@@ -203,14 +203,14 @@ const _sfc_main = common_vendor.defineComponent({
         return this.$uv.error(`缺少类型：${direction}`);
       }
       this[this.config[direction]]();
-      this.$emit("change", new UTSJSONObject({
+      this.$emit("change", new common_vendor.UTSJSONObject({
         show: true,
         type: direction
       }));
     },
     close(type = null) {
       this.showTrans = false;
-      this.$emit("change", new UTSJSONObject({
+      this.$emit("change", new common_vendor.UTSJSONObject({
         show: false,
         type: this.mode
       }));
@@ -359,47 +359,62 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.showPopup ? common_vendor.e({
     b: $data.maskShow && $props.overlay
   }, $data.maskShow && $props.overlay ? {
-    c: common_vendor.o($options.onTap),
+    c: common_vendor.o($options.onTap, "0f"),
     d: common_vendor.p({
       show: $data.showTrans,
       duration: $props.duration,
       ["custom-style"]: $props.overlayStyle,
       opacity: $props.overlayOpacity,
-      zIndex: $props.zIndex
+      zIndex: $props.zIndex,
+      class: "data-v-01a3ad6e"
     })
   } : {}, {
     e: $props.safeAreaInsetTop
-  }, $props.safeAreaInsetTop ? {} : {}, {
-    f: $props.safeAreaInsetBottom
-  }, $props.safeAreaInsetBottom ? {} : {}, {
-    g: $props.closeable
-  }, $props.closeable ? {
+  }, $props.safeAreaInsetTop ? {
+    f: common_vendor.p({
+      class: "data-v-01a3ad6e"
+    })
+  } : {}, {
+    g: $props.safeAreaInsetBottom
+  }, $props.safeAreaInsetBottom ? {
     h: common_vendor.p({
+      class: "data-v-01a3ad6e"
+    })
+  } : {}, {
+    i: $props.closeable
+  }, $props.closeable ? {
+    j: common_vendor.p({
       name: "close",
       color: "#909399",
       size: "18",
-      bold: true
+      bold: true,
+      class: "data-v-01a3ad6e"
     }),
-    i: common_vendor.o((...args) => $options.close && $options.close(...args)),
-    j: common_vendor.n("uv-popup__content__close--" + $props.closeIconPos)
+    k: common_vendor.o((...args) => $options.close && $options.close(...args), "b8"),
+    l: common_vendor.n("uv-popup__content__close--" + $props.closeIconPos)
   } : {}, {
-    k: common_vendor.s($options.contentStyle),
-    l: common_vendor.n($data.popupClass),
-    m: common_vendor.o((...args) => $options.clear && $options.clear(...args)),
-    n: common_vendor.o($options.onTap),
-    o: common_vendor.p({
+    m: common_vendor.s($options.contentStyle),
+    n: common_vendor.n($data.popupClass),
+    o: common_vendor.o((...args) => $options.clear && $options.clear(...args), "21"),
+    p: common_vendor.o($options.onTap, "23"),
+    q: common_vendor.p({
       mode: $data.ani,
       name: "content",
       ["custom-style"]: $data.transitionStyle,
       duration: $props.duration,
-      show: $data.showTrans
+      show: $data.showTrans,
+      class: "data-v-01a3ad6e"
     }),
-    p: common_vendor.o((...args) => $options.touchstart && $options.touchstart(...args)),
-    q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    r: common_vendor.n($data.popupClass),
-    s: common_vendor.n($options.isDesktop ? "fixforpc-z-index" : ""),
-    t: common_vendor.s({
+    r: common_vendor.o((...args) => $options.touchstart && $options.touchstart(...args), "31"),
+    s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    t: common_vendor.n($data.popupClass),
+    v: common_vendor.n($options.isDesktop ? "fixforpc-z-index" : ""),
+    w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    x: common_vendor.s({
       zIndex: $props.zIndex
+    }),
+    y: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
     })
   }) : {});
 }

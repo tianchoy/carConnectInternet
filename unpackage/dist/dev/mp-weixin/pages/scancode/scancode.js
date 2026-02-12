@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             prevPage.carInfo.imei = scanResult;
             console.log("已设置上一页面IMEI:", scanResult);
           } else {
-            common_vendor.index.$emit("scanCodeResult", new UTSJSONObject({ result: scanResult }));
+            common_vendor.index.$emit("scanCodeResult", new common_vendor.UTSJSONObject({ result: scanResult }));
           }
         }
         common_vendor.index.showToast({
@@ -34,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           duration: 1e3
         });
         setTimeout(() => {
-          common_vendor.index.navigateBack(new UTSJSONObject({
+          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
             delta: 1
           }));
         }, 1e3);
@@ -48,19 +48,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const requestCameraPermission = () => {
-      common_vendor.index.getSetting(new UTSJSONObject({
+      common_vendor.index.getSetting(new common_vendor.UTSJSONObject({
         success: (res = null) => {
           if (res.authSetting["scope.camera"]) {
             console.log("已有摄像头权限");
             return null;
           }
-          common_vendor.index.authorize(new UTSJSONObject({
+          common_vendor.index.authorize(new common_vendor.UTSJSONObject({
             scope: "scope.camera",
             success: () => {
               console.log("摄像头权限授权成功");
             },
             fail: () => {
-              common_vendor.index.showModal(new UTSJSONObject({
+              common_vendor.index.showModal(new common_vendor.UTSJSONObject({
                 title: "权限提示",
                 content: "需要摄像头权限才能扫码，是否去设置开启？",
                 success: (modalRes) => {
@@ -89,9 +89,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.o(handleScan),
-        c: common_vendor.o(error),
-        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view")
+        b: common_vendor.o(handleScan, "1e"),
+        c: common_vendor.o(error, "5e"),
+        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        e: `${_ctx.u_s_b_h}px`,
+        f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

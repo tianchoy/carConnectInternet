@@ -45,13 +45,13 @@ const _sfc_main = common_vendor.defineComponent({
       isShow: false,
       transform: "",
       opacity: 1,
-      animationData: new UTSJSONObject({}),
+      animationData: new common_vendor.UTSJSONObject({}),
       durationTime: 300,
-      config: new UTSJSONObject({})
+      config: new common_vendor.UTSJSONObject({})
     };
   },
   watch: {
-    show: new UTSJSONObject({
+    show: new common_vendor.UTSJSONObject({
       handler(newVal = null) {
         if (newVal) {
           this.open();
@@ -67,7 +67,7 @@ const _sfc_main = common_vendor.defineComponent({
   computed: {
     // 初始化动画条件
     transformStyles() {
-      const style = new UTSJSONObject(Object.assign(Object.assign({ transform: this.transform, opacity: this.opacity }, this.$uv.addStyle(this.customStyle)), { "transition-duration": `${this.duration / 1e3}s` }));
+      const style = new common_vendor.UTSJSONObject(Object.assign(Object.assign({ transform: this.transform, opacity: this.opacity }, this.$uv.addStyle(this.customStyle)), { "transition-duration": `${this.duration / 1e3}s` }));
       return this.$uv.addStyle(style, "string");
     }
   },
@@ -84,7 +84,7 @@ const _sfc_main = common_vendor.defineComponent({
     /**
      *  ref 触发 初始化动画
      */
-    init(obj = new UTSJSONObject({})) {
+    init(obj = new common_vendor.UTSJSONObject({})) {
       if (obj.duration) {
         this.durationTime = obj.duration;
       }
@@ -94,7 +94,7 @@ const _sfc_main = common_vendor.defineComponent({
      * 点击组件触发回调
      */
     onClick() {
-      this.$emit("click", new UTSJSONObject({
+      this.$emit("click", new common_vendor.UTSJSONObject({
         detail: this.isShow
       }));
     },
@@ -102,7 +102,7 @@ const _sfc_main = common_vendor.defineComponent({
      * ref 触发 动画分组
      * @param {Object} obj
      */
-    step(obj = null, config = new UTSJSONObject({})) {
+    step(obj = null, config = new common_vendor.UTSJSONObject({})) {
       if (!this.animation)
         return null;
       for (let i in obj) {
@@ -142,7 +142,7 @@ const _sfc_main = common_vendor.defineComponent({
           this.animation = uni_modules_uvTransition_components_uvTransition_createAnimation.createAnimation(this.config, this);
           this.tranfromInit(false).step();
           this.animation.run();
-          this.$emit("change", new UTSJSONObject({
+          this.$emit("change", new common_vendor.UTSJSONObject({
             detail: this.isShow
           }));
         }, 20);
@@ -159,14 +159,14 @@ const _sfc_main = common_vendor.defineComponent({
         let _a = this.styleInit(false), opacity = _a.opacity, transform = _a.transform;
         this.opacity = opacity || 1;
         this.transform = transform;
-        this.$emit("change", new UTSJSONObject({
+        this.$emit("change", new common_vendor.UTSJSONObject({
           detail: this.isShow
         }));
       });
     },
     // 处理动画开始前的默认样式
     styleInit(type = null) {
-      let styles = new UTSJSONObject({
+      let styles = new common_vendor.UTSJSONObject({
         transform: ""
       });
       let buildStyle = (type2 = null, mode = null) => {
@@ -218,7 +218,7 @@ const _sfc_main = common_vendor.defineComponent({
       return this.animation;
     },
     animationType(type = null) {
-      return new UTSJSONObject({
+      return new common_vendor.UTSJSONObject({
         fade: type ? 1 : 0,
         "slide-top": `translateY(${type ? "0" : "-100%"})`,
         "slide-right": `translateX(${type ? "0" : "100%"})`,
@@ -230,7 +230,7 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 内置动画类型与实际动画对应字典
     animationMode() {
-      return new UTSJSONObject({
+      return new common_vendor.UTSJSONObject({
         fade: "opacity",
         "slide-top": "translateY",
         "slide-right": "translateX",
@@ -254,8 +254,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-42493d05"), "view", "ani"),
     c: $data.animationData,
     d: common_vendor.n($props.customClass),
-    e: common_vendor.s($options.transformStyles),
-    f: common_vendor.o((...args) => $options.onClick && $options.onClick(...args))
+    e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    f: common_vendor.s($options.transformStyles),
+    g: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`
+    }),
+    h: common_vendor.o((...args) => $options.onClick && $options.onClick(...args), "2c")
   } : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);

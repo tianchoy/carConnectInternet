@@ -21,7 +21,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "message",
   setup(__props) {
     const modal = common_vendor.ref(null);
-    const modalContent = common_vendor.ref(new UTSJSONObject({}));
+    const modalContent = common_vendor.ref(new common_vendor.UTSJSONObject({}));
     const refresherTriggered = common_vendor.ref(false);
     const msgList = common_vendor.ref([]);
     const currPage = common_vendor.ref(1);
@@ -132,19 +132,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         try {
           console.log("开始检查新消息...");
-          const res = yield api_request.getUserMsgList(new UTSJSONObject({
+          const res = yield api_request.getUserMsgList(new common_vendor.UTSJSONObject({
             page: 1,
             pageSize: 1
           }));
           if (res.code == 0 && res.msg == "success") {
-            const data = res.data || new UTSJSONObject({ list: [], total: 0 });
+            const data = res.data || new common_vendor.UTSJSONObject({ list: [], total: 0 });
             const latestMessage = (_a = data.list) === null || _a === void 0 ? null : _a[0];
             if (latestMessage && latestMessage.createTime) {
               const messageTime = new Date(latestMessage.createTime).getTime();
               if (messageTime > lastUpdateTime.value) {
                 hasNewMessages.value = true;
                 vibrateAlert();
-                const countRes = yield api_request.getUserMsgList(new UTSJSONObject({
+                const countRes = yield api_request.getUserMsgList(new common_vendor.UTSJSONObject({
                   page: 1,
                   pageSize: 50
                 }));
@@ -195,12 +195,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             loadStatus.value = "loading";
           }
           console.log("请求数据 - 页码:", currPage.value);
-          const res = yield api_request.getUserMsgList(new UTSJSONObject({
+          const res = yield api_request.getUserMsgList(new common_vendor.UTSJSONObject({
             page: currPage.value,
             pageSize: pageSize.value
           }));
           if (res.code == 0 && res.msg == "success") {
-            const data = res.data || new UTSJSONObject({ list: [], totalPage: 0 });
+            const data = res.data || new common_vendor.UTSJSONObject({ list: [], totalPage: 0 });
             totalPage.value = data.totalPage || 1;
             console.log("第", currPage.value, "页接口返回:", data);
             console.log("第", currPage.value, "页列表长度:", (_a = data.list) === null || _a === void 0 ? null : _a.length);
@@ -315,22 +315,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "消息中心",
           ["show-back"]: false,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false,
-          isShowStyle: true
+          isShowStyle: true,
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: msgList.value.length == 0 && !isLoading.value
+        c: msgList.value.length == 0 && !isLoading.value
       }, msgList.value.length == 0 && !isLoading.value ? {} : {}, {
-        c: hasNewMessages.value
+        d: hasNewMessages.value
       }, hasNewMessages.value ? {
-        d: common_vendor.t(newMessageCount.value),
-        e: common_vendor.o(loadNewMessages)
+        e: common_vendor.t(newMessageCount.value),
+        f: common_vendor.o(loadNewMessages, "d4")
       } : {}, {
-        f: common_vendor.f(msgList.value, (item, index, i0) => {
+        g: common_vendor.f(msgList.value, (item, index, i0) => {
           return {
             a: common_vendor.t(formatTime(item.createTime)),
             b: common_vendor.o(($event) => {
@@ -350,23 +354,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: "1993bd19-1-" + i0
           };
         }),
-        g: Login.value
+        h: Login.value
       }, Login.value ? {
-        h: common_vendor.p({
+        i: common_vendor.p({
           status: loadStatus.value
         })
       } : {}, {
-        i: refresherTriggered.value,
-        j: common_vendor.o(onRefresherRefresh),
-        k: common_vendor.o(onScrollToLower),
-        l: common_vendor.sr(modal, "1993bd19-4", {
+        j: refresherTriggered.value,
+        k: common_vendor.o(onRefresherRefresh, "86"),
+        l: common_vendor.o(onScrollToLower, "f9"),
+        m: common_vendor.sr(modal, "1993bd19-4", {
           "k": "modal"
         }),
-        m: common_vendor.o(ReadIt),
-        n: common_vendor.p({
+        n: common_vendor.o(ReadIt, "82"),
+        o: common_vendor.p({
           title: getMessageTypeText(modalContent.value.messageType),
-          content: modalContent.value.content
-        })
+          content: modalContent.value.content,
+          class: "r"
+        }),
+        p: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

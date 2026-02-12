@@ -29,8 +29,8 @@ const _sfc_main = common_vendor.defineComponent({
       return classes;
     },
     iconStyle() {
-      let style = new UTSJSONObject({});
-      style = new UTSJSONObject(
+      let style = new common_vendor.UTSJSONObject({});
+      style = new common_vendor.UTSJSONObject(
         {
           fontSize: this.$uv.addUnit(this.size),
           lineHeight: this.$uv.addUnit(this.size),
@@ -50,7 +50,7 @@ const _sfc_main = common_vendor.defineComponent({
       return this.name.indexOf("/") !== -1 || isBase64;
     },
     imgStyle() {
-      let style = new UTSJSONObject(
+      let style = new common_vendor.UTSJSONObject(
         {}
         // 如果设置width和height属性，则优先使用，否则使用size属性
       );
@@ -98,8 +98,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     r: _ctx.labelPos == "top" ? _ctx.$uv.addUnit(_ctx.space) : 0
   } : {}, {
     s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    t: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
-    v: common_vendor.n("uv-icon--" + _ctx.labelPos)
+    t: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "64"),
+    v: common_vendor.n("uv-icon--" + _ctx.labelPos),
+    w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    x: `${_ctx.u_s_b_h}px`
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b7a6dd5d"]]);
