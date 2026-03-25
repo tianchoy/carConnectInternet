@@ -15,6 +15,8 @@ const _easycom_uv_badge = () => "../../uni_modules/uv-badge/components/uv-badge/
 if (!Math) {
   (_easycom_custom_navBar + _easycom_uv_avatar + _easycom_uv_icon + _easycom_uv_badge)();
 }
+const buttonWidth = 120;
+const buttonHeight = 200;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "userCenter",
   setup(__props) {
@@ -25,7 +27,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const carsnumber = common_vendor.ref(0);
     const Login = common_vendor.ref(false);
     const version = common_vendor.ref("");
+    const moveX = common_vendor.ref(0);
+    const moveY = common_vendor.ref(0);
+    const windowWidth = common_vendor.ref(0);
+    const windowHeight = common_vendor.ref(0);
     common_vendor.onShow(() => {
+      const systemInfo = common_vendor.index.getSystemInfoSync();
+      windowWidth.value = systemInfo.windowWidth;
+      windowHeight.value = systemInfo.windowHeight;
+      moveX.value = windowWidth.value - buttonWidth - 20;
+      moveY.value = windowHeight.value - buttonHeight - 20;
       const token = common_vendor.index.getStorageSync("token");
       if (token) {
         Login.value = true;
@@ -52,6 +63,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           carsnumber.value = resCars.data.totalCount;
         }
       });
+    };
+    const onMoveChange = (e = null) => {
+      const _a = e.detail, x = _a.x, y = _a.y;
+      const maxX = windowWidth.value - buttonWidth;
+      const maxY = windowHeight.value - buttonHeight;
+      if (x < 0 || x > maxX || y < 0 || y > maxY) {
+        moveX.value = Math.max(0, Math.min(maxX, x));
+        moveY.value = Math.max(0, Math.min(maxY, y));
+      }
     };
     const userInfoDetail = () => {
       if (Login.value) {
@@ -124,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "16"
         }),
         j: common_vendor.o(carList, "0b"),
-        k: common_vendor.o(platformRenewal, "3e")
+        k: common_vendor.o(platformRenewal, "7f")
       } : {}, {
         l: common_vendor.unref(version)
       }, common_vendor.unref(version) ? {
@@ -135,9 +155,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "50",
           color: "primary"
         }),
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        p: `${_ctx.u_s_b_h}px`,
-        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: common_vendor.unref(moveX),
+        p: common_vendor.unref(moveY),
+        q: common_vendor.o(onMoveChange, "ba"),
+        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        s: `${_ctx.u_s_b_h}px`,
+        t: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
