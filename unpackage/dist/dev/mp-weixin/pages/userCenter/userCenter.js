@@ -132,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         n: common_vendor.p({
           name: "server-man",
-          size: "35",
+          size: "50",
           color: "primary"
         }),
         o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),

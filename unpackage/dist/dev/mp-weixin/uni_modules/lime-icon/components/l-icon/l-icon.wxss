@@ -1,4 +1,4 @@
-:host,page{display:flex;flex-direction:column}
+:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *

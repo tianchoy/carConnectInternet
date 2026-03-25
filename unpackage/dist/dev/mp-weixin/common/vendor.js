@@ -2190,9 +2190,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.01",
-    uniCompilerVersion: "5.01",
-    uniRuntimeVersion: "5.01",
+    uniCompileVersion: "5.04",
+    uniCompilerVersion: "5.04",
+    uniRuntimeVersion: "5.04",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -2220,8 +2220,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.01");
-      parameters.uniRuntimeVersionCode = parseFloat("5.01");
+      parameters.uniCompilerVersionCode = parseFloat("5.04");
+      parameters.uniRuntimeVersionCode = parseFloat("5.04");
     } catch (error) {
     }
   }
@@ -2348,14 +2348,14 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.01",
-      uniCompilerVersion: "5.01",
-      uniRuntimeVersion: "5.01"
+      uniCompileVersion: "5.04",
+      uniCompilerVersion: "5.04",
+      uniRuntimeVersion: "5.04"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.01");
-        parameters.uniRuntimeVersionCode = parseFloat("5.01");
+        parameters.uniCompilerVersionCode = parseFloat("5.04");
+        parameters.uniRuntimeVersionCode = parseFloat("5.04");
       } catch (error) {
       }
     }
@@ -8167,6 +8167,10 @@ function patchClassList(classList) {
     className = className.trim();
     if (!className) {
       return;
+    }
+    const originalClassName = className.replace(/^\^/g, "");
+    if (!patchedClassList.includes(originalClassName)) {
+      patchedClassList.push(originalClassName);
     }
     const patchedClassName = "^" + className;
     if (!patchedClassList.includes(patchedClassName)) {
