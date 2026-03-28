@@ -20,7 +20,8 @@
     "pages/scancode/scancode",
     "pages/userCenter/payDeviceList/payDeviceList",
     "pages/userCenter/renewal/renewal",
-    "pages/cmd/cmd"
+    "pages/cmd/cmd",
+    "pages/webview/webview"
   ],
   "window": {
     "navigationStyle": "custom",

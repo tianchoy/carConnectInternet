@@ -157,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: common_vendor.unref(moveX),
         p: common_vendor.unref(moveY),
-        q: common_vendor.o(onMoveChange, "ba"),
+        q: common_vendor.o(onMoveChange, "49"),
         r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         s: `${_ctx.u_s_b_h}px`,
         t: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)

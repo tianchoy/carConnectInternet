@@ -23,6 +23,7 @@
 				<uv-icon name="arrow-right" size="16"></uv-icon>
 			</view>
 			<view class="list" @click="platformRenewal">平台续费</view>
+			<!-- <view class="list" @click="productMall">产品商城</view> -->
 		</view>
 		<view class="version" v-if="version">当前版本：{{version}}</view>
 		<movable-area class="movable-area">
@@ -148,6 +149,21 @@
 		if (Login.value) {
 			uni.navigateTo({
 				url: '/pages/userCenter/payDeviceList/payDeviceList'
+			})
+		} else {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none',
+			})
+		}
+	}
+
+	// 产品商城
+	const productMall = () => {
+		if (Login.value) {
+			// 跳转到网页容器页面
+			uni.navigateTo({
+				url: '/pages/webview/webview?url=' + encodeURIComponent('https://shop.zdiot.cn/')
 			})
 		} else {
 			uni.showToast({

@@ -9251,6 +9251,11 @@ const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onShareAppMessage = /* @__PURE__ */ createLifeCycleHook(
+  ON_SHARE_APP_MESSAGE,
+  2
+  /* HookFlags.PAGE */
+);
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
@@ -9281,6 +9286,7 @@ exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
+exports.onShareAppMessage = onShareAppMessage;
 exports.onShow = onShow;
 exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;

@@ -12,7 +12,7 @@
 			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice" />
 		</view>
 		<view v-if="Login">
-			<uv-notice-bar :text="noticeText" direction="column" fontSize="40rpx" mode="closable"></uv-notice-bar>
+			<uv-notice-bar :text="noticeText" direction="column" fontSize="32rpx" mode="closable"></uv-notice-bar>
 		</view>
 		<view class="map-plus-min" v-if="showMap">
 			<view class="map-plus" @click="mapPlus">
@@ -62,7 +62,7 @@
 	const currentPickerType = ref('')
 	const picker = ref(null)
 	const iconColor = ref('#e6813e')
-	const noticeText = ref(['本页面仅供展示车辆', '如使用车辆实时位置功能', '请转至车辆详情页面'])
+	const noticeText = ref(['人工客服已上线,工作时间早8点至晚12点'])
 	const userLocation = ref({
 		latitude: 0, 
 		longitude: 0
@@ -416,10 +416,25 @@
 			Login.value = false
 		} else {
 			Login.value = true
+			const isFirst = uni.getStorageSync('isFirst')
+			if (!isFirst) {
+				uni.showModal({
+					title: '提示',
+					content: '售后，购买可通过“我的-人工客服”咨询',
+					showCancel: false,
+					success: (res) => {
+						if (res.confirm) {
+							uni.setStorageSync('isFirst', true)
+						}
+					}
+				})
+			}
 			getLocation()
 			await loadGroupData()
 			await loadUserDeviceList()
 			await getUserIn()
+
+			
 
 			// 初始化地图上下文
 			mapCtx = uni.createMapContext('myMap', this)

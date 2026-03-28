@@ -30,7 +30,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
     const iconColor = common_vendor.ref("#e6813e");
-    const noticeText = common_vendor.ref(["本页面仅供展示车辆", "如使用车辆实时位置功能", "请转至车辆详情页面"]);
+    const noticeText = common_vendor.ref(["人工客服已上线,工作时间早8点至晚12点"]);
     const userLocation = common_vendor.ref(new common_vendor.UTSJSONObject({
       latitude: 0,
       longitude: 0
@@ -351,6 +351,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           Login.value = false;
         } else {
           Login.value = true;
+          const isFirst = common_vendor.index.getStorageSync("isFirst");
+          if (!isFirst) {
+            common_vendor.index.showModal(new common_vendor.UTSJSONObject({
+              title: "提示",
+              content: "售后，购买可通过“我的-人工客服”咨询",
+              showCancel: false,
+              success: (res) => {
+                if (res.confirm) {
+                  common_vendor.index.setStorageSync("isFirst", true);
+                }
+              }
+            }));
+          }
           getLocation();
           yield loadGroupData();
           yield loadUserDeviceList();
@@ -408,7 +421,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: common_vendor.p({
           text: noticeText.value,
           direction: "column",
-          fontSize: "40rpx",
+          fontSize: "32rpx",
           mode: "closable"
         })
       } : {}, {
