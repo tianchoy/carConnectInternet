@@ -34,11 +34,16 @@
 				:y="moveY"
 				@change="onMoveChange"
 			>
-				<button open-type="contact" class="contact-button-movable">
+				<!-- <button open-type="contact" class="contact-button-movable">
 					<uv-icon name="server-man" size="50" color="primary"></uv-icon>
 					<text class="contact-text">人工客服</text>
 					<text class="contact-text">08:00-24:00</text>
-				</button>
+				</button> -->
+				<view class="contact-button-movable" @click="contactCustomerService">
+					<uv-icon name="server-man" size="50" color="primary"></uv-icon>
+					<text class="contact-text">人工客服</text>
+					<text class="contact-text">08:00-24:00</text>
+				</view>
 			</movable-view>
 		</movable-area>
 	</view>
@@ -91,6 +96,16 @@
 			console.error('获取版本号失败:', error)
 		}
 	})
+
+	const contactCustomerService = () => {
+		uni.openCustomerServiceChat({
+			extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
+			corpId: 'ww686122ec6a4db85a',
+			success(res) {
+				console.log(res)
+			}
+		})
+	}
 	
 	// 加载数据
 	const loadData = async () => {

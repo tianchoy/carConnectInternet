@@ -52,6 +52,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         console.error("获取版本号失败:", error);
       }
     });
+    const contactCustomerService = () => {
+      common_vendor.index.openCustomerServiceChat(new common_vendor.UTSJSONObject({
+        extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
+        corpId: "ww686122ec6a4db85a",
+        success(res = null) {
+          console.log(res);
+        }
+      }));
+    };
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -155,12 +164,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "50",
           color: "primary"
         }),
-        o: common_vendor.unref(moveX),
-        p: common_vendor.unref(moveY),
-        q: common_vendor.o(onMoveChange, "49"),
-        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        s: `${_ctx.u_s_b_h}px`,
-        t: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: common_vendor.o(contactCustomerService, "45"),
+        p: common_vendor.unref(moveX),
+        q: common_vendor.unref(moveY),
+        r: common_vendor.o(onMoveChange, "49"),
+        s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        t: `${_ctx.u_s_b_h}px`,
+        v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
