@@ -2190,9 +2190,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.04",
-    uniCompilerVersion: "5.04",
-    uniRuntimeVersion: "5.04",
+    uniCompileVersion: "5.07",
+    uniCompilerVersion: "5.07",
+    uniRuntimeVersion: "5.07",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -2220,8 +2220,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.04");
-      parameters.uniRuntimeVersionCode = parseFloat("5.04");
+      parameters.uniCompilerVersionCode = parseFloat("5.07");
+      parameters.uniRuntimeVersionCode = parseFloat("5.07");
     } catch (error) {
     }
   }
@@ -2348,14 +2348,14 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.04",
-      uniCompilerVersion: "5.04",
-      uniRuntimeVersion: "5.04"
+      uniCompileVersion: "5.07",
+      uniCompilerVersion: "5.07",
+      uniRuntimeVersion: "5.07"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.04");
-        parameters.uniRuntimeVersionCode = parseFloat("5.04");
+        parameters.uniCompilerVersionCode = parseFloat("5.07");
+        parameters.uniRuntimeVersionCode = parseFloat("5.07");
       } catch (error) {
       }
     }

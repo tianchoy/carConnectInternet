@@ -62,7 +62,7 @@
 	const currentPickerType = ref('')
 	const picker = ref(null)
 	const iconColor = ref('#e6813e')
-	const noticeText = ref(['人工客服已上线,工作时间早8点至晚12点'])
+	const noticeText = ref(['新平台即将上线敬请期待!'])
 	const userLocation = ref({
 		latitude: 0, 
 		longitude: 0
@@ -416,15 +416,15 @@
 			Login.value = false
 		} else {
 			Login.value = true
-			const isFirst = uni.getStorageSync('isFirst')
+			const isFirst = uni.getStorageSync('upgradeTip')
 			if (!isFirst) {
 				uni.showModal({
-					title: '提示',
-					content: '售后，购买可通过“我的-人工客服”咨询',
+					title: '惊喜预告',
+					content: '5月平台全新升级,敬请期待!',
 					showCancel: false,
 					success: (res) => {
 						if (res.confirm) {
-							uni.setStorageSync('isFirst', true)
+							uni.setStorageSync('upgradeTip', true)
 						}
 					}
 				})
