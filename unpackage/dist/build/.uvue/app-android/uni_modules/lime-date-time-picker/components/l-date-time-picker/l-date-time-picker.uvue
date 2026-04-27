@@ -1,0 +1,249 @@
+import _easycom_l_picker from '@/uni_modules/lime-picker/components/l-picker/l-picker.uvue';
+import { DateTimePickerProps, DateValue, DateTimePickerColumn, TimeModeValues, DateTimePickerColumnItem } from './type';
+import { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent, PickerValue } from '@/uni_modules/lime-picker';
+import { getMeaningColumn } from './utils';
+import { DEFAULT_FORMAT, MODE_NAMES, FORMAT_MAP, UNIT_MAP } from './constant';
+import { dayuts, Dayuts } from '@/uni_modules/lime-dayuts/common';
+import { DayutsUnit } from '@/uni_modules/lime-dayuts';
+import { clamp } from '@/uni_modules/lime-shared/clamp';
+const __sfc__ = defineComponent({
+    __name: 'l-date-time-picker',
+    __props: DateTimePickerProps,
+    props: {
+        cancelBtn: { type: String, required: false },
+        cancelStyle: { type: String, required: false },
+        confirmBtn: { type: String, required: false },
+        confirmStyle: { type: String, required: false },
+        customLocale: { type: String, required: false },
+        end: { type: Object, required: false },
+        start: { type: Object, required: false },
+        steps: { type: UTSJSONObject, required: false },
+        title: { type: String, required: false },
+        titleStyle: { type: String, required: false },
+        value: { type: Object, required: false },
+        defaultValue: { type: Object, required: false },
+        modelValue: { type: Object, required: false },
+        format: { type: String, required: true, default: DEFAULT_FORMAT },
+        mode: { type: Object, required: true, default: 1 | 2 | 4 },
+        customFilter: { type: Function as PropType<(type: TimeModeValues, columns: DateTimePickerColumn) => DateTimePickerColumn>, required: false },
+        renderLabel: { type: Function as PropType<(type: string, value: string) => string>, required: false },
+        showUnit: { type: Boolean, required: true, default: true },
+        itemHeight: { type: String, required: false },
+        itemColor: { type: String, required: false },
+        itemFontSize: { type: String, required: false },
+        itemActiveColor: { type: String, required: false },
+        indicatorStyle: { type: String, required: false },
+        bgColor: { type: String, required: false },
+        groupHeight: { type: String, required: false },
+        radius: { type: String, required: false },
+        resetIndex: { type: Boolean, required: true, default: false },
+        minHour: { type: Number, required: true, default: 0 },
+        maxHour: { type: Number, required: true, default: 23 },
+        minMinute: { type: Number, required: true, default: 0 },
+        maxMinute: { type: Number, required: true, default: 59 }
+    },
+    emits: ['change', 'cancel', 'confirm', 'pick', 'update:modelValue', 'update:value'],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        const props = __props;
+        // 默认值
+        let defaultValue: DateValue = props.value ?? props.defaultValue ?? props.defaultValue ?? Date.now();
+        const innerValue = computed({
+            set(value: DateValue) {
+                if (defaultValue == value)
+                    return;
+                defaultValue = value;
+                emit('change', value);
+                emit('update:modelValue', value);
+                emit('update:value', value);
+            },
+            get(): DateValue {
+                const value = props.value ?? props.modelValue ?? defaultValue;
+                return typeof value == 'string' && (value as string).length == 0 ? Date.now() : value;
+            }
+        } as WritableComputedOptions<DateValue>);
+        const meaningColumn = getMeaningColumn(props.mode);
+        const isTimeMode = ['hour', 'minute', 'second'].includes(meaningColumn[0]);
+        const normalize = (val: DateValue | null, defaultDay: Dayuts): Dayuts => val != null && dayuts(val).isValid() ? dayuts(val) : defaultDay;
+        const start = computed((): Dayuts => normalize(props.start as DateValue | null, dayuts().subtract(10, 'year')));
+        const end = computed((): Dayuts => normalize(props.end as DateValue | null, dayuts().add(10, 'year')));
+        const rationalize = (val: Dayuts): Dayuts => {
+            if (isTimeMode)
+                return val;
+            if (val.isBefore(start.value))
+                return start.value;
+            if (val.isAfter(end.value))
+                return end.value;
+            return val;
+        };
+        const calcDate = (currentValue: DateValue | null): Dayuts => {
+            if (isTimeMode) {
+                const dateStr = dayuts(start.value).format('YYYY-MM-DD');
+                currentValue = `${dateStr} ${currentValue}`;
+            }
+            return currentValue != null && dayuts(currentValue).isValid() ? rationalize(dayuts(currentValue)) : start.value;
+        };
+        const curDate = ref(calcDate(innerValue.value));
+        const valueOfPicker = computed((): string[] => meaningColumn.map((item): string => curDate.value.get(item).toString(10)));
+        const columnCache = new Map<string, DateTimePickerColumnItem[]>();
+        const columns = computed((): DateTimePickerColumn[] => {
+            const ret: DateTimePickerColumn[] = [];
+            const getDate = (date: Dayuts): number[] => [
+                date.year(),
+                date.month() + 1,
+                date.date(),
+                date.hour(),
+                date.minute(),
+                date.second(),
+            ];
+            //@ts-ignore
+            const [curYear, curMonth, curDay, curHour, curMinute] = getDate(curDate.value);
+            const [minYear, minMonth, minDay, minHour, minMinute, minSecond] = getDate(start.value);
+            const [maxYear, maxMonth, maxDay, maxHour, maxMinute, maxSecond] = getDate(end.value);
+            const isInMinYear = curYear == minYear;
+            const isInMaxYear = curYear == maxYear;
+            const isInMinMonth = isInMinYear && curMonth == minMonth;
+            const isInMaxMonth = isInMaxYear && curMonth === maxMonth;
+            const isInMinDay = isInMinMonth && curDay == minDay;
+            const isInMaxDay = isInMaxMonth && curDay == maxDay;
+            const isInMinHour = isInMinDay && curHour == minHour;
+            const isInMaxHour = isInMaxDay && curHour == maxHour;
+            const isInMinMinute = isInMinHour && curMinute == minMinute;
+            const isInMaxMinute = isInMaxHour && curMinute == maxMinute;
+            const generateColumn = (type: string, lowerBound: number, upperBound: number) => {
+                const cacheKey = `${type}-${lowerBound}-${upperBound}`;
+                if (columnCache.has(cacheKey)) {
+                    ret.push(columnCache.get(cacheKey)!);
+                    return;
+                }
+                const arr: DateTimePickerColumnItem[] = [];
+                for (let i = lowerBound; i <= upperBound; i++) {
+                    const value = i;
+                    arr.push({
+                        label: props.renderLabel != null ? props.renderLabel!(type, i.toString(10)) : `${value}${props.showUnit ? UNIT_MAP.get(type) : ''}`,
+                        value: type == 'month' ? `${value - 1}` : value.toString(10),
+                    } as DateTimePickerColumnItem);
+                }
+                if (props.customFilter != null) {
+                    const _arr = props.customFilter!(type, arr);
+                    ret.push(_arr);
+                    columnCache.set(cacheKey, _arr);
+                }
+                else {
+                    ret.push(arr);
+                    columnCache.set(cacheKey, arr);
+                }
+            };
+            if (meaningColumn.includes('year')) {
+                generateColumn('year', minYear, maxYear);
+            }
+            if (meaningColumn.includes('month')) {
+                const lower = isInMinYear ? minMonth : 1;
+                const upper = isInMaxYear ? maxMonth : 12;
+                generateColumn('month', lower, upper);
+            }
+            if (meaningColumn.includes('date')) {
+                const lower = isInMinMonth ? minDay : 1;
+                const upper = isInMaxMonth ? maxDay : dayuts(`${curYear}-${curMonth}`).daysInMonth();
+                generateColumn('date', lower, upper);
+            }
+            if (meaningColumn.includes('hour')) {
+                const lower = isInMinDay && !isTimeMode ? minHour : clamp(props.minHour, 0, 23); // 0;
+                const upper = isInMaxDay && !isTimeMode ? maxHour : clamp(props.maxHour, lower, 23); //23;
+                generateColumn('hour', lower, upper);
+            }
+            if (meaningColumn.includes('minute')) {
+                const lower = isInMinHour && !isTimeMode ? minMinute : clamp(props.minMinute, 0, 59); //0;
+                const upper = isInMaxHour && !isTimeMode ? maxMinute : clamp(props.maxMinute, lower, 59); //59;
+                generateColumn('minute', lower, upper);
+            }
+            if (meaningColumn.includes('second')) {
+                const lower = isInMinMinute && !isTimeMode ? minSecond : 0;
+                const upper = isInMaxMinute && !isTimeMode ? maxSecond : 59;
+                generateColumn('second', lower, upper);
+            }
+            return ret;
+        });
+        const innterFormat = computed((): string => {
+            const first = meaningColumn.length > 0 ? meaningColumn[0] : 'year';
+            const last = meaningColumn.length > 0 ? meaningColumn[meaningColumn.length - 1] : 'date';
+            const format = DEFAULT_FORMAT.substring(DEFAULT_FORMAT.indexOf(FORMAT_MAP.get(first)!), DEFAULT_FORMAT.lastIndexOf(FORMAT_MAP.get(last)!) + FORMAT_MAP.get(last)!.length);
+            return format;
+        });
+        const onConfirm = ({ values }: PickerConfirmEvent) => {
+            // const first = meaningColumn.length > 0 ? meaningColumn[0]: 'year';
+            // const last =  meaningColumn.length > 0 ? meaningColumn[meaningColumn.length - 1]: 'date';
+            // const format = DEFAULT_FORMAT.substring(
+            // 	DEFAULT_FORMAT.indexOf(FORMAT_MAP.get(first)!),
+            // 	DEFAULT_FORMAT.lastIndexOf(FORMAT_MAP.get(last)!) + FORMAT_MAP.get(last)!.length
+            // )
+            let cur = curDate.value;
+            // MODE_NAMES
+            values.forEach((item, index) => {
+                const type = meaningColumn[index];
+                cur = cur.set(type, parseInt(`${item}`, 10));
+            });
+            const curValue = cur.format(props.format);
+            innerValue.value = cur.format(innterFormat.value);
+            emit('confirm', curValue);
+        };
+        const onCancel = () => {
+            emit('cancel');
+        };
+        const onPick = ({ values, column, index }: PickerPickEvent) => {
+            const type = meaningColumn[column];
+            const val = curDate.value.set(type as DayutsUnit, parseInt(columns.value[column][index].value, 10));
+            curDate.value = rationalize(val);
+            emit('pick', rationalize(val).format(props.format));
+        };
+        const onChange = (values: PickerValue[]) => {
+            let cur = curDate.value;
+            values.forEach((item, index) => {
+                const type = meaningColumn[index];
+                cur = cur.set(type, parseInt(`${item}`, 10));
+            });
+            curDate.value = rationalize(cur as Dayuts);
+            const curValue = curDate.value.format(innterFormat.value);
+            innerValue.value = curValue;
+        };
+        const stop = watch(innerValue, (val: DateValue) => {
+            curDate.value = calcDate(val);
+        });
+        onBeforeUnmount(() => {
+            stop();
+        });
+        return (): any | null => {
+            const _component_l_picker = resolveEasyComponent("l-picker", _easycom_l_picker);
+            return _cV(_component_l_picker, _uM({
+                title: _ctx.title,
+                titleStyle: _ctx.titleStyle,
+                "confirm-btn": _ctx.confirmBtn,
+                "confirm-style": _ctx.confirmStyle,
+                "cancel-btn": _ctx.cancelBtn,
+                "cancel-style": _ctx.cancelStyle,
+                itemHeight: _ctx.itemHeight,
+                itemColor: _ctx.itemColor,
+                itemFontSize: _ctx.itemFontSize,
+                itemActiveColor: _ctx.itemActiveColor,
+                indicatorStyle: _ctx.indicatorStyle,
+                bgColor: _ctx.bgColor,
+                groupHeight: _ctx.groupHeight,
+                radius: _ctx.radius,
+                value: unref(valueOfPicker),
+                columns: unref(columns),
+                onConfirm: onConfirm,
+                onCancel: onCancel,
+                onChange: onChange,
+                onPick: onPick
+            }), null, 8 /* PROPS */, ["title", "titleStyle", "confirm-btn", "confirm-style", "cancel-btn", "cancel-style", "itemHeight", "itemColor", "itemFontSize", "itemActiveColor", "indicatorStyle", "bgColor", "groupHeight", "radius", "value", "columns"]);
+        };
+    }
+});
+export default __sfc__;
+export type LDateTimePickerComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerStyles = [];

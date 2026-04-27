@@ -340,19 +340,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               fail: reject
             }));
           });
+          console.log("微信登录code:", loginRes.code);
           const res = yield api_request.PostWechatlogin({
             code: loginRes.code,
             encryptedData: e.detail.encryptedData,
             iv: e.detail.iv
           });
-          if (!res) {
-            throw new Error("接口返回数据为空");
-          }
-          if (!res.data) {
-            throw new Error("接口返回数据: data为null");
+          if (!res && !res.data) {
+            common_vendor.index.showToast({
+              title: res.msg,
+              icon: "none"
+            });
           }
           if (!res.data.token) {
-            throw new Error("登录失败: 未获取到token");
+            common_vendor.index.showToast({
+              title: "登录失败: 未获取到token",
+              icon: "none"
+            });
           }
           common_vendor.index.setStorageSync("token", res.data.token);
           common_vendor.index.reLaunch({

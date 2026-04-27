@@ -333,6 +333,8 @@
 				})
 			})
 
+			console.log('微信登录code:', loginRes.code)
+
 			// 2. 发送到后端解密处理
 			const res = await PostWechatlogin({
 				code: loginRes.code,
@@ -341,16 +343,18 @@
 			})
 
 			// 3. 检查返回数据是否有效
-			if (!res) {
-				throw new Error('接口返回数据为空')
-			}
-
-			if (!res.data) {
-				throw new Error('接口返回数据: data为null')
+			if (!res && !res.data) {
+				uni.showToast({
+					title: res.msg,
+					icon: 'none'
+				})
 			}
 
 			if (!res.data.token) {
-				throw new Error('登录失败: 未获取到token')
+				uni.showToast({
+					title: '登录失败: 未获取到token',
+					icon: 'none'
+				})
 			}
 
 			// 4. 登录成功处理

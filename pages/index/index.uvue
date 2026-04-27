@@ -12,7 +12,7 @@
 			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice" />
 		</view>
 		<view v-if="Login">
-			<uv-notice-bar :text="noticeText" direction="column" fontSize="32rpx" mode="closable"></uv-notice-bar>
+			<uv-notice-bar :text="noticeText" direction="row" fontSize="32rpx" mode="closable"></uv-notice-bar>
 		</view>
 		<view class="map-plus-min" v-if="showMap">
 			<view class="map-plus" @click="mapPlus">
@@ -62,7 +62,7 @@
 	const currentPickerType = ref('')
 	const picker = ref(null)
 	const iconColor = ref('#e6813e')
-	const noticeText = ref(['新平台即将上线敬请期待!'])
+	const noticeText = ref('近期平台,升级偶尔会有短暂登录不上的情况，敬请谅解！')
 	const userLocation = ref({
 		latitude: 0, 
 		longitude: 0

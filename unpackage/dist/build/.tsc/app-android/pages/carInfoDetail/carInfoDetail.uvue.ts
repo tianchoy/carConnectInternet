@@ -1,0 +1,1006 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue'
+import _easycom_uv_icon from '@/uni_modules/uv-icon/components/uv-icon/uv-icon.vue'
+import _easycom_uv_grid_item from '@/uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.vue'
+import _easycom_uv_grid from '@/uni_modules/uv-grid/components/uv-grid/uv-grid.vue'
+import _easycom_uv_input from '@/uni_modules/uv-input/components/uv-input/uv-input.vue'
+import _easycom_uv_modal from '@/uni_modules/uv-modal/components/uv-modal/uv-modal.vue'
+import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
+	import { getAddress } from '../../utils/getAdress.uts'
+	import { getDeviceIcon } from '../../utils/cars'
+	// 导入坐标转换插件
+	import CoordTransform from '../../utils/coordTransform.uts'
+
+	
+const __sfc__ = defineComponent({
+  __name: 'carInfoDetail',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const deptId = ref<string | null>('')
+	const imei = ref<string | null>('')
+	const deviceId = ref<string | null>('')
+	// 地图状态
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(15)
+	const datainfo = ref<object>({})
+	const address = ref('')
+	const currentTime = ref('5s')
+	const times = ref([
+		[
+			{ label: '5s', value: '5' },
+			{ label: '10s', value: '10' },
+			{ label: '20s', value: '20' },
+			{ label: '30s', value: '30' },
+			{ label: '停止刷新', value: '0' }
+		]
+	])
+	const refreshTimer = ref<number | null>(null)
+	const isRefreshing = ref(false)
+
+	const popupRef = ref(null);
+	const psw = ref('')
+	const currentOperation = ref(0) // 0:无操作 1:恢复油电 2:断开油电
+	const modalTitle = ref('验证密码')
+	const userType = ref('')
+
+	// 标记点集合
+	const markers = ref<Array<any>>([])
+
+	// 控制弹窗显示
+	const showDevicePopup = ref(false)
+	const currentDeviceInfo = ref({
+		deviceName: '',
+		carNumber: '',
+		deviceSerial: '',
+		locationType: '',
+		lngLat: '',
+		updateTime: '',
+		locationTime: '',
+		speed: '',
+		totalMileage: '',
+		address: ''
+	})
+	const currentCarInfo = ref<UTSJSONObject>({})
+
+	// 获取电池颜色
+	const getBatteryColor = (batteryPercent) => {
+		if (!batteryPercent) return '#c9c9c9'
+
+		const batteryValue = parseInt(batteryPercent)
+
+		if (batteryValue >= 70) {
+			return '#07C160' // 绿色，电量充足
+		} else if (batteryValue >= 30) {
+			return '#FF9C19' // 橙色，电量中等
+		} else if (batteryValue >= 10) {
+			return '#FF6B00' // 深橙色，电量低
+		} else {
+			return '#FF0000' // 红色，电量严重不足
+		}
+	}
+
+	// 信号强度处理方法
+	function getSignalDetail(rssi) {
+		// 处理 null、undefined 或空字符串的情况
+		if (rssi === null || rssi === undefined || rssi === '') {
+			return {
+				experience: "无信号",
+				quality: "无服务",
+				color: "#999",
+				level: 0
+			};
+		}
+
+		const signalValue = Number(rssi);
+
+		if (isNaN(signalValue)) {
+			return {
+				experience: "信号数据无效",
+				quality: "无服务",
+				color: "#999",
+				level: 0
+			};
+		}
+
+		// 根据图片规则判断信号等级
+		if (signalValue >= 26) {
+			return {
+				experience: "极好",
+				quality: "极强",
+				color: "#07C160",
+				level: 5
+			};
+		} else if (signalValue >= 20) {
+			return {
+				experience: "良好",
+				quality: "强",
+				color: "#52c41a",
+				level: 4
+			};
+		} else if (signalValue >= 15) {
+			return {
+				experience: "一般",
+				quality: "中等",
+				color: "#faad14",
+				level: 3
+			};
+		} else if (signalValue >= 10) {
+			return {
+				experience: "差",
+				quality: "较弱",
+				color: "#fa8c16",
+				level: 2
+			};
+		} else if (signalValue >= 1) {
+			return {
+				experience: "非常差",
+				quality: "微弱",
+				color: "#f5222d",
+				level: 1
+			};
+		} else {
+			return {
+				experience: "无信号",
+				quality: "无服务",
+				color: "#999",
+				level: 0
+			};
+		}
+	}
+
+	// 样式计算方法
+	const getMobileSignalBarClass = (barIndex, rssi) => {
+		if (rssi === null || rssi === undefined || rssi === '') {
+			return 'bar-off';
+		}
+
+		const signalValue = Number(rssi);
+		if (isNaN(signalValue)) return 'bar-off';
+
+		const signalDetail = getSignalDetail(signalValue);
+		const level = signalDetail.level;
+
+		// 根据信号等级决定哪些信号条亮起
+		// 5格信号条对应5个等级
+		return barIndex < level ? 'bar-active' : 'bar-off';
+	}
+
+	// 手动刷新方法
+	const manualRefresh = async () => {
+		uni.showLoading({
+			title: '刷新中...',
+			mask: true
+		});
+
+		try {
+			const success = await loadData({
+				deptId: deptId.value,
+				deviceids: imei.value
+			});
+
+			if (success) {
+				// 手动刷新后强制更新地图
+				setTimeout(() => {
+					refreshMapView();
+				}, 300);
+
+				uni.showToast({
+					title: '刷新成功',
+					icon: 'success'
+				});
+			} else {
+				uni.showToast({
+					title: '刷新失败',
+					icon: 'none'
+				});
+			}
+		} catch (error) {
+			console.error('手动刷新失败:', error);
+			uni.showToast({
+				title: '刷新失败',
+				icon: 'none'
+			});
+		} finally {
+			uni.hideLoading();
+		}
+	}
+
+	watch(currentTime, (newVal) => {
+		setupAutoRefresh(newVal); // 当时间间隔变化时，重新设置自动刷新
+	});
+
+	const setupAutoRefresh = (intervalValue : string) => {
+		// 清除现有的定时器
+		if (refreshTimer.value !== null) {
+			clearInterval(refreshTimer.value)
+			refreshTimer.value = null
+			isRefreshing.value = false
+		}
+
+		// 如果选择"停止刷新"(值为'0')，则直接返回
+		if (intervalValue == '0') {
+			isRefreshing.value = false
+			return
+		}
+
+		// 只有当设备在线时才启动定时器
+		if (datainfo.value.connectionStatus != 'online') {
+			isRefreshing.value = false
+			return
+		}
+
+		// 将字符串值转换为数字(秒)
+		const intervalSeconds = parseInt(intervalValue)
+
+		if (intervalSeconds > 0) {
+
+			isRefreshing.value = true
+			// 将秒转换为毫秒
+			const intervalMs = intervalSeconds * 1000
+
+			// 立即加载一次数据
+			loadData({
+				deptId: deptId.value,
+				deviceids: imei.value
+			})
+
+			// 设置定时器
+			refreshTimer.value = setInterval(() => {
+				loadData({
+					deptId: deptId.value,
+					deviceids: imei.value
+				})
+			}, intervalMs) as unknown as number
+		}
+	}
+
+	// 停止自动刷新
+	const stopAutoRefresh = () => {
+		if (refreshTimer.value !== null) {
+			clearInterval(refreshTimer.value)
+			refreshTimer.value = null
+			isRefreshing.value = false
+		}
+	}
+
+	const baseList = computed(() => {
+	const list = [{
+		name: '/static/gjhf.png',
+		title: '轨迹回放'
+	}, {
+		name: '/static/clgz.png',
+		title: '车辆跟踪'
+	}, {
+		name: '/static/lcjl.png',
+		title: '里程记录'
+	}, {
+		name: '/static/tcjl.png',
+		title: '停车记录'
+	},
+	{
+		name: '/static/dzwl.png',
+		title: '电子围栏'
+	},
+	{
+		name: '/static/navto.png',
+		title: '一键寻车'
+	},
+	{
+		name: '/static/power.png',
+		title: '恢复油电'
+	},
+	{
+		name: '/static/offpower.png',
+		title: '断开油电'
+	}]
+	
+	// 根据 productId 决定是否添加发送指令选项
+	const productId = currentCarInfo.value.productId
+	if (productId === 'product-1141811865601576960' || 
+		productId === 'product-1183161303028600832') {
+		list.push({
+			name: '/static/cmd.png',
+			title: '发送指令'
+		})
+	}
+	
+	return list
+})
+
+	const click = (name) => {
+		const itemTo = name.title
+		if (itemTo == '轨迹回放') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/playBack/playBack?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&lat=' + datainfo.value.latitude + '&lng=' + datainfo.value.longitude
+			})
+		}
+		if (itemTo == '车辆跟踪') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/vehicleTracking/vehicleTracking?imei=' + imei.value + '&deptId=' + deptId.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
+			})
+		}
+		if (itemTo == '里程记录') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
+			})
+		}
+		if (itemTo == '停车记录') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/stopRecord/stopRecord?imei=' + imei.value + '&deptId=' + deptId.value
+			})
+		}
+		if (itemTo == '恢复油电') {
+			// 恢复油电
+			if (userType.value == '1') {
+				// 需要密码验证
+				psw.value = ''
+				currentOperation.value = 1
+				modalTitle.value = '验证密码'
+				popupRef.value.open();
+			} else {
+				// 不需要密码验证，直接执行操作
+				executeOperation(1);
+			}
+		}
+		if (itemTo == '断开油电') {
+			// 断开油电
+			if (userType.value == '1') {
+				// 需要密码验证
+				psw.value = ''
+				currentOperation.value = 2
+				modalTitle.value = '验证密码'
+				popupRef.value.open();
+			} else {
+				// 不需要密码验证，直接执行操作
+				executeOperation(2);
+			}
+		}
+		if (itemTo == '电子围栏') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
+			})
+		}
+		if (itemTo == '一键寻车') {
+			navTo()
+		}
+		if (itemTo == '发送指令') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/cmd/cmd?imei=' + imei.value
+			})
+		}
+
+	}
+
+	// 执行操作的统一方法
+	const executeOperation = async (operationType) => {
+		let predictCmdId = 0
+		let type = 0
+
+		if (operationType == 1) {
+			// 恢复油电
+			predictCmdId = 2
+			type = 2
+		} else if (operationType == 2) {
+			// 断开油电
+			predictCmdId = 1
+			type = 1
+		} else {
+			uni.showToast({
+				title: '操作类型错误',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			// 显示加载中
+			uni.showLoading({
+				title: '执行中...',
+				mask: true
+			})
+
+			// 调用接口
+			const res = await sendCommand({
+				imei: imei.value,
+				password: userType.value == '1' ? psw.value : '', // 根据用户类型决定是否传密码
+				params: ['1111'],
+				predictCmdId: predictCmdId,
+				type: type
+			})
+
+			// 隐藏加载中
+			uni.hideLoading()
+
+			// 根据响应处理结果
+			if (res.code == 0) {
+				uni.showToast({
+					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
+					icon: 'success'
+				})
+
+				// 清空密码
+				psw.value = ''
+			} else {
+				uni.showToast({
+					title: res.msg || '操作失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			// 隐藏加载中
+			uni.hideLoading()
+
+			console.error('操作失败:', error)
+			uni.showToast({
+				title: '操作失败，请重试',
+				icon: 'none'
+			})
+		}
+	}
+
+	const confirm = async () => {
+		if (userType.value == '1' && psw.value == '') {
+			uni.showToast({
+				title: '请输入密码',
+				icon: 'none'
+			})
+			return
+		}
+
+		// 执行当前操作
+		executeOperation(currentOperation.value);
+	}
+
+	const carDetail = () => {
+		stopAutoRefresh() // 停止刷新
+		uni.navigateTo({
+			url: '/pages/userCenter/carDetail/carDetail?deviceId=' + deviceId.value
+		})
+	}
+
+	const navTo = async () => {
+		if (!address.value) {
+			await refreshAdress()
+		}
+		//导航去此位置
+		uni.openLocation({
+			latitude: center.latitude,
+			longitude: center.longitude,
+			name: address.value,
+			scale: 18,
+			success: () => {
+				uni.showToast({
+					title: '成功调起地图',
+					icon: 'none'
+				});
+			},
+			fail: (err) => {
+				uni.showToast({
+					title: '调起地图失败',
+					icon: 'none'
+				});
+				console.error('调起地图失败:', err);
+			}
+		});
+	}
+
+	// 刷新地图视图
+	const refreshMapView = () => {
+		try {
+			// 强制更新地图
+			const mapContext = uni.createMapContext('myMap');
+
+			mapContext.moveToLocation({
+				latitude: center.latitude,
+				longitude: center.longitude,
+				scale: mapScale.value,  // 直接设置缩放级别为15
+				success: () => {
+					console.log('地图中心点移动成功，缩放级别：15');
+				},
+				fail: (err) => {
+					console.error('地图中心点移动失败:', err.errMsg);
+				}
+			});
+
+			
+		} catch (error) {
+			console.error('刷新地图视图失败:', error);
+		}
+	}
+
+	const delay = (ms : number) => new Promise(resolve => setTimeout(resolve, ms));
+
+	const loadData = async (data : object, retryCount = 3) => {
+		let retry = retryCount;
+
+		const tryLoad = async (attempt : number) => {
+			try {
+				const res = await getDevicePos(data);
+
+				// 检查返回结果是否有效
+				if (!res || !res.data || res.data.length === 0) {
+					throw new Error('返回数据为空');
+				}
+
+				console.log('接口请求成功', attempt);
+
+				let foundDevice = false;
+
+				// 使用 for...of 替代 forEach，确保 await 生效
+				for (const item of res.data) {
+					if (item.imei == imei.value) {
+						foundDevice = true;
+
+						// 深拷贝数据，确保响应式更新
+						datainfo.value = JSON.parse(JSON.stringify(item));
+
+						if (!item.latitude || !item.longitude) {
+							console.error('位置信息缺失', item);
+							uni.showToast({
+								title: '位置信息缺失',
+								icon: 'none'
+							})
+							return false;
+						}
+
+						// 确保经纬度是数字类型
+						const lat = Number(item.latitude);
+						const lng = Number(item.longitude);
+
+						if (isNaN(lat) || isNaN(lng)) {
+							console.error('经纬度格式错误', item.latitude, item.longitude);
+							return false;
+						}
+
+						// 同步进行坐标转换
+						let convertedCoord;
+						try {
+							convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
+							console.log('坐标转换结果:', convertedCoord);
+						} catch (transformError) {
+							console.error('坐标转换失败:', transformError);
+							// 如果转换失败，使用原始坐标
+							convertedCoord = { lat: lat, lng: lng };
+						}
+
+						// 强制更新中心点 - 使用同步赋值
+						center.latitude = convertedCoord.lat;
+						center.longitude = convertedCoord.lng;
+
+						console.log('地图中心点更新:', {
+							latitude: center.latitude,
+							longitude: center.longitude
+						});
+
+						// 在 UTS 环境中，使用 setTimeout 替代 $nextTick
+						await delay(50);
+
+						// 更新设备标记
+						const deviceMarker = createMarker(
+							1,
+							convertedCoord.lat,
+							convertedCoord.lng,
+							'device',
+							currentCarInfo.value.deviceName
+						);
+
+						// 使用强制响应式更新
+						markers.value = [];
+						await delay(50);
+						markers.value = [deviceMarker];
+
+						console.log('标记点更新完成');
+
+						// 检查设备状态，如果变为离线状态则停止定时器
+						if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
+							clearInterval(refreshTimer.value);
+							refreshTimer.value = null;
+							isRefreshing.value = false;
+							uni.showToast({
+								title: '设备已离线，停止自动刷新',
+								icon: 'none'
+							});
+						}
+
+						// 信号强度监控提醒
+						if (item.attribute?.rssi) {
+							const signalExp = getSignalDetail(item.attribute.rssi).experience;
+							if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
+								console.warn(`设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`);
+							}
+						}
+
+						// 手动刷新地图
+						setTimeout(() => {
+							refreshMapView();
+						}, 100);
+					}
+				}
+
+				// 如果没有找到对应设备
+				if (!foundDevice) {
+					throw new Error('未找到对应的设备数据');
+				}
+
+				return true; // 成功标志
+
+			} catch (error) {
+				console.error(`第${attempt}次加载设备数据失败:`, error);
+
+				// 如果不是最后一次重试，则继续重试
+				if (attempt < retry) {
+					// 等待一段时间后重试（指数退避）
+					const delayMs = Math.pow(2, attempt) * 1000; // 2^attempt 秒
+					console.log(`等待${delayMs / 1000}秒后重试...`);
+
+					await new Promise(resolve => setTimeout(resolve, delayMs));
+
+					// 递归调用重试
+					return tryLoad(attempt + 1);
+				} else {
+					// 所有重试都失败了
+					uni.showToast({
+						title: '数据加载失败，请稍后重试',
+						icon: 'none',
+						duration: 2000
+					});
+
+					// 如果设备在线状态，停止自动刷新
+					if (datainfo.value.connectionStatus == 'online' && refreshTimer.value !== null) {
+						clearInterval(refreshTimer.value);
+						refreshTimer.value = null;
+						isRefreshing.value = false;
+						uni.showToast({
+							title: '数据加载失败，停止自动刷新',
+							icon: 'none'
+						});
+					}
+
+					return false; // 失败标志
+				}
+			}
+		}
+
+		// 开始重试逻辑
+		return tryLoad(1);
+	}
+
+	const refreshAdress = async () => {
+		// 获取地址信息
+		const addr = await getAddress(center.latitude, center.longitude);
+		address.value = addr.result.formatted_address;
+	}
+
+	onLoad((option) => {
+		deptId.value = option.deptId;
+		imei.value = option.imei;
+		deviceId.value = option.deviceId;
+		userType.value = uni.getStorageSync('userType');
+
+		// 添加调试监听器
+		watch(center, (newVal, oldVal) => {
+			console.log('center 变化:', {
+				old: oldVal,
+				new: newVal,
+				time: new Date().toISOString()
+			});
+		}, { deep: true });
+
+		// 先加载设备详情
+		loadDeviceDetail().then(() => {
+			const data = {
+				deptId: deptId.value,
+				deviceids: imei.value
+			};
+
+			uni.showLoading({
+				title: '加载中...',
+			});
+
+			loadData(data, 3).then((success) => {
+				uni.hideLoading();
+
+				if (success) {
+					// 数据加载成功后，延时设置自动刷新
+					setTimeout(() => {
+						// 手动刷新一次地图视图
+						refreshMapView();
+
+						// 根据设备状态启动定时器
+						if (datainfo.value.connectionStatus == 'online') {
+							setupAutoRefresh(currentTime.value);
+						}
+					}, 500);
+				}
+			}).catch(error => {
+				uni.hideLoading();
+				console.error('初始化加载失败:', error);
+			});
+		});
+	})
+
+	const loadDeviceDetail = async () => {
+		if (deviceId.value !== null) {
+			const res = await getDeviceDetail(deviceId.value)
+			console.log('设备详情：',res.data)
+			currentCarInfo.value = res.data
+		} else {
+			console.error("设备id获取失败")
+		}
+	}
+
+	//封装markers
+	const createMarker = (id : number, lat : number, lng : number, type : string, title ?: string) => {
+		const marker = {
+			id,
+			latitude: lat,
+			longitude: lng,
+			width: 25,
+			height: 25,
+			iconPath: getDeviceIcon(datainfo.value.connectionStatus, currentCarInfo.value.carType),
+			callout: {
+				content: title || '爱车位置',
+				color: datainfo.value.connectionStatus == 'online' ? '#fff' : '#666',
+				borderRadius: 10,
+				bgColor: datainfo.value.connectionStatus == 'online' ? '#07C160' : '#ccc',
+				padding: 5,
+				display: 'ALWAYS'
+			}
+		}
+
+		return marker
+	}
+
+	onShow(() => {
+		console.log('页面显示，检查自动刷新状态')
+		// 如果设备在线且没有在刷新，重新启动自动刷新
+		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
+			setupAutoRefresh(currentTime.value)
+		}
+	})
+
+	// 新增页面隐藏时的处理
+	onHide(() => {
+		console.log('页面隐藏时停止自动刷新')
+		stopAutoRefresh()
+	})
+
+	onUnmounted(() => {
+		console.log('页面卸载时停止自动刷新')
+		stopAutoRefresh()
+	})
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
+const _component_map = resolveComponent("map")
+const _component_uv_icon = resolveEasyComponent("uv-icon",_easycom_uv_icon)
+const _component_uv_grid_item = resolveEasyComponent("uv-grid-item",_easycom_uv_grid_item)
+const _component_uv_grid = resolveEasyComponent("uv-grid",_easycom_uv_grid)
+const _component_uv_input = resolveEasyComponent("uv-input",_easycom_uv_input)
+const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
+
+  return _cE("view", _uM({ class: "container" }), [
+    _cV(_component_custom_navBar, _uM({
+      title: "详情",
+      "show-back": true,
+      backgroundColor: "#fff",
+      textColor: "#333",
+      showCapsule: false
+    })),
+    _cE("view", _uM({ class: "map-container" }), [
+      _cV(_component_map, _uM({
+        id: "myMap",
+        latitude: unref(center).latitude,
+        longitude: unref(center).longitude,
+        markers: unref(markers),
+        scale: unref(mapScale),
+        style: _nS(_uM({"width":"100%","height":"100%"})),
+        "show-location": false,
+        "enable-traffic": true,
+        "enable-overlooking": true,
+        "enable-building": true,
+        "enable-3D": true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cV(_component_sub_navBar, _uM({
+            currentTime: unref(currentTime),
+            showTime: true,
+            showPickerTime: false,
+            "onUpdate:currentTime": (val) => (currentTime.value = val),
+            currentCar: unref(currentCarInfo).plateNo,
+            times: unref(times),
+            carStatus: unref(datainfo).connectionStatus,
+            showPicker: false,
+            showCar: true
+          }), null, 8 /* PROPS */, ["currentTime", "onUpdate:currentTime", "currentCar", "times", "carStatus"])
+        ]),
+        _: 1 /* STABLE */
+      }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
+    ]),
+    _cE("view", _uM({ class: "tools-panel" }), [
+      _cE("view", _uM({ class: "Imei-box" }), [
+        _cE("view", _uM({
+          class: "imei-info",
+          onClick: carDetail
+        }), [
+          _cE("view", _uM({ class: "imeis" }), [
+            _cE("text", null, "ID: " + _tD(unref(imei)), 1 /* TEXT */),
+            _cE("text", _uM({ class: "pos-time" }))
+          ]),
+          _cV(_component_uv_icon, _uM({
+            name: "arrow-right",
+            bold: true,
+            size: 16
+          }))
+        ]),
+        _cE("view", _uM({ class: "pos-date" }), [
+          _cE("view", _uM({ class: "addree-box" }), "定位时间: " + _tD(unref(datainfo).positionUpdateTime), 1 /* TEXT */),
+          _cE("view", _uM({ class: "addree-box" }), "通信时间: " + _tD(unref(datainfo).signalUpdateTime), 1 /* TEXT */)
+        ]),
+        _cE("view", _uM({ class: "pos-adress" }), [
+          _cE("view", _uM({ class: "addree-box" }), [
+            _cE("text", _uM({
+              style: _nS(_uM({"margin-right":"10rpx"}))
+            }), "当前地址:", 4 /* STYLE */),
+            isTrue(unref(address))
+              ? _cE("text", _uM({
+                  key: 0,
+                  class: "address-text"
+                }), _tD(unref(address)), 1 /* TEXT */)
+              : _cE("text", _uM({ key: 1 }), _tD(unref(center).latitude) + " , " + _tD(unref(center).longitude), 1 /* TEXT */),
+            isTrue(!unref(address))
+              ? _cE("text", _uM({
+                  key: 2,
+                  style: _nS(_uM({"color":"#007AFF","margin-left":"20rpx","font-weight":"bold"})),
+                  onClick: refreshAdress
+                }), "中文地址", 4 /* STYLE */)
+              : _cC("v-if", true)
+          ])
+        ]),
+        isTrue(unref(currentCarInfo).attribute?.rssi || unref(currentCarInfo).attribute?.sat)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "signal-container"
+            }), [
+              isTrue(unref(currentCarInfo).attribute?.rssi)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "signal-item"
+                  }), [
+                    _cE("view", _uM({ class: "mobile-signal" }), [
+                      _cE("view", _uM({
+                        class: "signal-bars-horizontal",
+                        style: _nS(_uM({ '--signal-color': getSignalDetail(unref(currentCarInfo).attribute?.rssi).color }))
+                      }), [
+                        _cE("view", _uM({
+                          class: _nC(["signal-bar-h", getMobileSignalBarClass(0, unref(currentCarInfo).attribute?.rssi)])
+                        }), null, 2 /* CLASS */),
+                        _cE("view", _uM({
+                          class: _nC(["signal-bar-h", getMobileSignalBarClass(1, unref(currentCarInfo).attribute?.rssi)])
+                        }), null, 2 /* CLASS */),
+                        _cE("view", _uM({
+                          class: _nC(["signal-bar-h", getMobileSignalBarClass(2, unref(currentCarInfo).attribute?.rssi)])
+                        }), null, 2 /* CLASS */),
+                        _cE("view", _uM({
+                          class: _nC(["signal-bar-h", getMobileSignalBarClass(3, unref(currentCarInfo).attribute?.rssi)])
+                        }), null, 2 /* CLASS */),
+                        _cE("view", _uM({
+                          class: _nC(["signal-bar-h", getMobileSignalBarClass(4, unref(currentCarInfo).attribute?.rssi)])
+                        }), null, 2 /* CLASS */)
+                      ], 4 /* STYLE */),
+                      _cE("view", _uM({ class: "signal-info-h" }), [
+                        _cE("text", _uM({
+                          class: "experience",
+                          style: _nS(_uM({ color: getSignalDetail(unref(currentCarInfo).attribute?.rssi).color }))
+                        }), _tD(getSignalDetail(unref(currentCarInfo).attribute?.rssi).experience), 5 /* TEXT, STYLE */),
+                        _cE("text", _uM({
+                          class: "signal-value",
+                          style: _nS(_uM({ color: getSignalDetail(unref(currentCarInfo).attribute?.rssi).color }))
+                        }), "CSQ " + _tD(unref(currentCarInfo).attribute?.rssi), 5 /* TEXT, STYLE */)
+                      ])
+                    ])
+                  ])
+                : _cC("v-if", true),
+              isTrue(unref(currentCarInfo).attribute?.sat)
+                ? _cE("view", _uM({
+                    key: 1,
+                    class: "satellite-item-h"
+                  }), [
+                    _cE("image", _uM({
+                      class: "satellite-icon",
+                      src: "/static/sate.png"
+                    })),
+                    _cE("text", _uM({ class: "satellite-text" }), _tD(unref(currentCarInfo).attribute?.sat), 1 /* TEXT */)
+                  ])
+                : _cC("v-if", true),
+              isTrue(unref(currentCarInfo).voltage)
+                ? _cE("view", _uM({
+                    key: 2,
+                    class: "power"
+                  }), [
+                    _cE("image", _uM({ src: "/static/v.png" })),
+                    _cE("text", null, _tD(unref(currentCarInfo).voltage) + "V", 1 /* TEXT */)
+                  ])
+                : _cC("v-if", true),
+              isTrue(unref(datainfo).batteryPercent)
+                ? _cE("view", _uM({
+                    key: 3,
+                    class: "battery",
+                    style: _nS(_uM({ color: getBatteryColor(unref(datainfo).batteryPercent) }))
+                  }), [
+                    _cE("image", _uM({
+                      src: "/static/pow.png",
+                      alt: ""
+                    })),
+                    _cE("text", null, _tD(unref(datainfo).batteryPercent) + "%", 1 /* TEXT */)
+                  ], 4 /* STYLE */)
+                : _cC("v-if", true)
+            ])
+          : _cC("v-if", true)
+      ]),
+      _cV(_component_uv_grid, _uM({ col: 5 }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE(Fragment, null, RenderHelpers.renderList(unref(baseList), (item, index, __index, _cached): any => {
+            return _cV(_component_uv_grid_item, _uM({
+              key: index,
+              onClick: () => {click(item)}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cV(_component_uv_icon, _uM({
+                  customStyle: {paddingTop:20+'rpx'},
+                  name: item.name,
+                  size: 35
+                }), null, 8 /* PROPS */, ["name"]),
+                _cE("text", _uM({ class: "grid-text" }), _tD(item.title), 1 /* TEXT */)
+              ]),
+              _: 2 /* DYNAMIC */
+            }), 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"])
+          }), 128 /* KEYED_FRAGMENT */)
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _cE("view", null, [
+      _cV(_component_uv_modal, _uM({
+        ref_key: "popupRef",
+        ref: popupRef,
+        title: unref(modalTitle),
+        onConfirm: confirm
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", null, [
+            _cV(_component_uv_input, _uM({
+              placeholder: "请输入账户密码",
+              prefixIcon: "lock",
+              border: "surround",
+              clearable: "",
+              password: true,
+              modelValue: unref(psw),
+              "onUpdate:modelValue": $event => {trySetRefValue(psw, $event)}
+            }), null, 8 /* PROPS */, ["modelValue"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 8 /* PROPS */, ["title"])
+    ])
+  ])
+}
+}
+
+})
+export default __sfc__
+const GenPagesCarInfoDetailCarInfoDetailStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "20rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"], ["animation", "pulse 1.5s infinite"]])]])], ["navTo", _uM([[".container .map-container ", _uM([["width", "60rpx"], ["height", "60rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["position", "absolute"], ["zIndex", 100], ["bottom", "10%"], ["right", "30rpx"], ["paddingTop", "5rpx"], ["paddingRight", "5rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "5rpx"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-map-list-icon", _uM([[".container .tool-nav ", _uM([["width", "100%"], ["height", "100%"], ["paddingTop", "8rpx"], ["paddingRight", "8rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "8rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["backgroundColor", "#69c2f1"]])]])], ["tool-more", _uM([[".container ", _uM([["position", "absolute"], ["top", "30%"], ["right", "20rpx"], ["zIndex", 100], ["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-tool-more-icon", _uM([[".container .tool-more ", _uM([["width", "100%"], ["height", "100%"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingBottom", "70rpx"]])]])], ["refresh-status", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8f9fa"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e8e8e8"]])]])], ["refresh-text", _uM([[".container .tools-panel .refresh-status ", _uM([["fontSize", "26rpx"], ["color", "#666666"]])], [".container .tools-panel .refresh-status .refreshing", _uM([["color", "#1890ff"], ["animation", "rotating 2s linear infinite"]])]])], ["refresh-btn", _uM([[".container .tools-panel .refresh-status ", _uM([["marginLeft", "auto"], ["color", "#1890ff"], ["fontSize", "26rpx"]])]])], ["Imei-box", _uM([[".container .tools-panel ", _uM([["marginTop", "30rpx"], ["marginRight", "30rpx"], ["marginBottom", 0], ["marginLeft", "30rpx"], ["fontSize", "28rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#dcdfe6"]])]])], ["imei-info", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["imeis", _uM([[".container .tools-panel .Imei-box .imei-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["pos-time", _uM([[".container .tools-panel .Imei-box ", _uM([["fontSize", "20rpx"], ["color", "#999999"], ["marginLeft", "30rpx"]])]])], ["pos-date", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["pos-adress", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["addree-box", _uM([[".container .tools-panel .Imei-box .pos-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])], [".container .tools-panel .Imei-box .pos-adress ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])]])], ["address-text", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])]])], ["pos-icon", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])]])], ["signal-container", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["gap", "10rpx"]])]])], ["signal-item", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["mobile-signal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["signal-bars-horizontal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"], ["height", "40rpx"], ["gap", "3rpx"], ["marginRight", "10rpx"]])]])], ["signal-bar-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ", _uM([["width", "8rpx"], ["borderTopLeftRadius", "2rpx"], ["borderTopRightRadius", "2rpx"], ["borderBottomRightRadius", 0], ["borderBottomLeftRadius", 0], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-active", _uM([["!background", "var(--signal-color, #52c41a)"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-off", _uM([["backgroundImage", "none"], ["backgroundColor", "#e8e8e8"]])]])], ["signal-info-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["signal-value", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["color", "#333333"]])]])], ["experience", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["fontWeight", "normal"]])]])], ["satellite-item-h", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["satellite-icon", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["width", "47rpx"], ["height", "47rpx"], ["marginRight", "10rpx"]])]])], ["satellite-text", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["fontSize", "24rpx"], ["color", "#1890ff"], ["fontWeight", "bold"]])]])], ["power", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["battery", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["h-line", _uM([[".container .tools-panel ", _uM([["width", "90%"], ["height", "2rpx"], ["backgroundColor", "#f1f1f1"], ["marginTop", "50rpx"], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"]])]])], ["speed-control", _uM([[".container .tools-panel ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .speed-control ", _uM([["width", "90%"], ["marginTop", 0], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["grid-text", _uM([[".container .tools-panel ", _uM([["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0], ["boxSizing", "border-box"], ["fontSize", "24rpx"]])]])], ["@TRANSITION", _uM([["signal-bar-h", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]

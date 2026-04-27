@@ -1,0 +1,25 @@
+// @ts-nocheck
+import { fileToDataURL } from '@/uni_modules/lime-file-utils';
+/**
+ * 小程序把路径转成base64
+ * @param {string} path
+ * @return 表示 SVG 的 Data URL。
+ */
+export function pathToDataUrl(path: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const url = fileToDataURL(path);
+        if (url == null) {
+            reject('路径错误');
+        }
+        resolve(url!.replace(/\s+/g, ''));
+    });
+}
+/**
+ * 将 SVG 字符串转换为 Data URL。
+ * @param {string} svg - 要转换的 SVG 字符串。
+ * @returns {string} 表示 SVG 的 Data URL。
+ */
+export function svgToDataUrl(svgString: string): string {
+    const encodedSvg = encodeURIComponent(svgString)!.replace(/\+/g, '%20');
+    return `data:image/svg+xml,${encodedSvg}`;
+}

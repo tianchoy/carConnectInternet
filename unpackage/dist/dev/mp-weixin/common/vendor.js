@@ -2496,7 +2496,7 @@ const objectKeys = [
   "version",
   "lanDebug",
   "cloud",
-  "serviceMarket",
+  "serviceMarket", "miniapp",
   "router",
   "worklet",
   "__webpack_require_UNI_MP_PLUGIN__"

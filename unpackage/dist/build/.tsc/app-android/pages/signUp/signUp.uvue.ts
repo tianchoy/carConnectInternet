@@ -1,0 +1,189 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_uv_input from '@/uni_modules/uv-input/components/uv-input/uv-input.vue'
+import _easycom_uv_form_item from '@/uni_modules/uv-form/components/uv-form-item/uv-form-item.vue'
+import _easycom_uv_form from '@/uni_modules/uv-form/components/uv-form/uv-form.vue'
+import _easycom_uv_button from '@/uni_modules/uv-button/components/uv-button/uv-button.vue'
+import { ref, onMounted } from 'vue'
+
+	// 定义表单类型
+	type FormData = {
+		mobile : string
+		password : string
+	}
+
+	type UvFormInstance = {
+		setRules : (rules : Record<string, any>) => void
+		validate : () => Promise<boolean>
+	}
+
+	
+const __sfc__ = defineComponent({
+  __name: 'signUp',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const form = ref<FormData>({
+		mobile: '',
+		password: ''
+	})
+
+	const formRef = ref<UvFormInstance | null>(null)
+	
+	const deviceModel= ref('')
+
+	const rules = {
+		mobile: [
+			{
+				required: true,
+				message: '请输入手机号码',
+				trigger: ['blur', 'change']
+			},
+			{
+				validator: (rule : any, value : string, callback : (error ?: Error) => void) => {
+					if (!/^1[3-9]\d{9}$/.test(value)) {
+						callback(new Error('手机号码格式不正确'))
+					} else {
+						callback()
+					}
+				},
+				trigger: ['blur']
+			}
+		],
+		password: [
+			{
+				required: true,
+				message: '请输入密码',
+				trigger: ['blur', 'change']
+			},
+			{
+				min: 8,
+				max: 20,
+				message: '密码长度在8-20个字符之间',
+				trigger: ['blur']
+			},
+			{
+				validator: (rule : any, value : string, callback : (error ?: Error) => void) => {
+					if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+						callback(new Error('密码需包含大小写字母和数字'))
+					} else {
+						callback()
+					}
+				},
+				trigger: ['blur']
+			}
+		]
+	}
+
+	//获取系统信息
+	const getSystemInfo = () => {
+		const res = uni.getSystemInfoSync()
+		console.log(res)
+		deviceModel.value = res.deviceModel
+	}
+
+	//注册
+	const toLogin = () => {
+		uni.reLaunch({
+			url:'/pages/login/login'
+		})
+	}
+
+	onMounted(() => {
+		getSystemInfo()
+		if (formRef.value) {
+			formRef.value.setRules(rules)
+		}
+	})
+
+	const submit = () => {
+		formRef.value?.validate().then(res => {
+			uni.showToast({
+				icon: 'success',
+				title: '校验通过'
+			})
+		const newFormData = {
+			...form.value,
+			deviceModel:deviceModel.value
+		}
+			console.log('表单数据:', newFormData)
+		}).catch(errors => {
+			uni.showToast({
+				icon: 'error',
+				title: '校验失败'
+			})
+			console.error('验证错误:', errors)
+		})
+	}
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_uv_input = resolveEasyComponent("uv-input",_easycom_uv_input)
+const _component_uv_form_item = resolveEasyComponent("uv-form-item",_easycom_uv_form_item)
+const _component_uv_form = resolveEasyComponent("uv-form",_easycom_uv_form)
+const _component_uv_button = resolveEasyComponent("uv-button",_easycom_uv_button)
+
+  return _cE("view", _uM({ class: "container" }), [
+    _cV(_component_custom_navBar, _uM({
+      title: "注册",
+      "show-back": false,
+      backgroundColor: "#fff",
+      textColor: "#333",
+      showCapsule: false
+    })),
+    _cE("view", _uM({ class: "content" }), [
+      _cV(_component_uv_form, _uM({
+        model: form.value,
+        rules: rules,
+        ref_key: "formRef",
+        ref: formRef
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cV(_component_uv_form_item, _uM({
+            label: "账号",
+            prop: "mobile"
+          }), _uM({
+            default: withSlotCtx((): any[] => [
+              _cV(_component_uv_input, _uM({
+                modelValue: form.value.mobile,
+                "onUpdate:modelValue": $event => {(form.value.mobile) = $event},
+                placeholder: "请输入账号"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+            ]),
+            _: 1 /* STABLE */
+          })),
+          _cV(_component_uv_form_item, _uM({
+            label: "密码",
+            prop: "password"
+          }), _uM({
+            default: withSlotCtx((): any[] => [
+              _cV(_component_uv_input, _uM({
+                modelValue: form.value.password,
+                "onUpdate:modelValue": $event => {(form.value.password) = $event},
+                type: "password",
+                placeholder: "请输入密码",
+                password: ""
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+            ]),
+            _: 1 /* STABLE */
+          }))
+        ]),
+        _: 1 /* STABLE */
+      }), 8 /* PROPS */, ["model"]),
+      _cE("view", _uM({ class: "regisiter_box" }), [
+        _cE("text", _uM({ onClick: toLogin }), "立即登陆")
+      ]),
+      _cV(_component_uv_button, _uM({ onClick: submit }), _uM({
+        default: withSlotCtx((): any[] => ["注册"]),
+        _: 1 /* STABLE */
+      }))
+    ])
+  ])
+}
+}
+
+})
+export default __sfc__
+const GenPagesSignUpSignUpStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f5f5f5"]]))], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["regisiter_box", _uM([[".container .content ", _uM([["fontSize", "25rpx"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0]])]])]])]

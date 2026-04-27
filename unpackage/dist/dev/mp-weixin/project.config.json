@@ -9,7 +9,10 @@
     "postcss": true,
     "minified": true,
     "newFeature": true,
-    "bigPackageSizeSupport": true
+    "bigPackageSizeSupport": true,
+    "useMiniAppAuthorizePage": true,
+    "copyMiniAppJsonPath": "../../../src/project.miniapp.json",
+    "condition": true
   },
   "compileType": "miniprogram",
   "libVersion": "",
@@ -32,5 +35,10 @@
       "current": -1,
       "list": []
     }
-  }
+  },
+  "simulatorPluginLibVersion": {
+    "wxext14566970e7e9f62": "2.27.3",
+    "wxext94b1b46f6603361": "3.6.0"
+  },
+  "projectArchitecture": "multiPlatform"
 }

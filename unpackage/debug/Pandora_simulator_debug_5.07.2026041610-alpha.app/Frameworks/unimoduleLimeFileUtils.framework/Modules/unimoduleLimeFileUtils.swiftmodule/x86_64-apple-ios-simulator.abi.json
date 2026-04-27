@@ -1,0 +1,3157 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "unimoduleLimeFileUtils",
+    "printedName": "unimoduleLimeFileUtils",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "DCloudUTSFoundation",
+        "printedName": "DCloudUTSFoundation",
+        "declKind": "Import",
+        "moduleName": "unimoduleLimeFileUtils"
+      },
+      {
+        "kind": "Import",
+        "name": "DCloudUniappRuntime",
+        "printedName": "DCloudUniappRuntime",
+        "declKind": "Import",
+        "moduleName": "unimoduleLimeFileUtils"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "unimoduleLimeFileUtils"
+      },
+      {
+        "kind": "Import",
+        "name": "MobileCoreServices",
+        "printedName": "MobileCoreServices",
+        "declKind": "Import",
+        "moduleName": "unimoduleLimeFileUtils"
+      },
+      {
+        "kind": "Import",
+        "name": "Swift",
+        "printedName": "Swift",
+        "declKind": "Import",
+        "moduleName": "unimoduleLimeFileUtils"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ProcessFileOptions",
+        "printedName": "ProcessFileOptions",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "__$getOriginalPosition",
+            "printedName": "__$getOriginalPosition()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSSourceMapPosition?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSSourceMapPosition",
+                    "printedName": "DCloudUTSFoundation.UTSSourceMapPosition",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSSourceMapPosition"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)__$getOriginalPosition",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC22__$getOriginalPosition19DCloudUTSFoundation012UTSSourceMapI0CSgyF",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "type",
+            "printedName": "type",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)type",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4typeSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)type",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4typeSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setType:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4typeSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC4typeSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4typeSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "path",
+            "printedName": "path",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)path",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4pathSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)path",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4pathSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setPath:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4pathSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC4pathSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4pathSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "filename",
+            "printedName": "filename",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)filename",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8filenameSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)filename",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8filenameSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setFilename:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8filenameSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC8filenameSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8filenameSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "success",
+            "printedName": "success",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "((Swift.String) -> ())?",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> ()",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Void",
+                        "printedName": "()"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)success",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC7successySScSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Swift.String) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Swift.String) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "String",
+                            "printedName": "Swift.String",
+                            "usr": "s:SS"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)success",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC7successySScSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Swift.String) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Swift.String) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "String",
+                            "printedName": "Swift.String",
+                            "usr": "s:SS"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setSuccess:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC7successySScSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC7successySScSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC7successySScSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "fail",
+            "printedName": "fail",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "((Any) -> ())?",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Any) -> ()",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Void",
+                        "printedName": "()"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ]
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)fail",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4failyypcSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Any) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Any) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "ProtocolComposition",
+                            "printedName": "Any"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)fail",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4failyypcSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Any) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Any) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "ProtocolComposition",
+                            "printedName": "Any"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setFail:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4failyypcSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC4failyypcSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC4failyypcSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "complete",
+            "printedName": "complete",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "((Any) -> ())?",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Any) -> ()",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Void",
+                        "printedName": "()"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ]
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(py)complete",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8completeyypcSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Any) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Any) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "ProtocolComposition",
+                            "printedName": "Any"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)complete",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8completeyypcSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "((Any) -> ())?",
+                    "children": [
+                      {
+                        "kind": "TypeFunc",
+                        "name": "Function",
+                        "printedName": "(Any) -> ()",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "ProtocolComposition",
+                            "printedName": "Any"
+                          }
+                        ]
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setComplete:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8completeyypcSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsC8completeyypcSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC8completeyypcSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Subscript",
+            "name": "subscript",
+            "printedName": "subscript(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Subscript",
+            "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSScip",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSScip",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)objectForKeyedSubscript:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSScig",
+                "moduleName": "unimoduleLimeFileUtils",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)setObject:forKeyedSubscript:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSScis",
+                "moduleName": "unimoduleLimeFileUtils",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSSciM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCyypSgSSciM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ProcessFileOptions",
+                "printedName": "unimoduleLimeFileUtils.ProcessFileOptions",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)init",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCACycfc",
+            "moduleName": "unimoduleLimeFileUtils",
+            "overriding": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override",
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ProcessFileOptions",
+                "printedName": "unimoduleLimeFileUtils.ProcessFileOptions",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UTSJSONObject",
+                "printedName": "DCloudUTSFoundation.UTSJSONObject",
+                "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSJSONObject"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions(im)init:",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsCyAC19DCloudUTSFoundation13UTSJSONObjectCcfc",
+            "moduleName": "unimoduleLimeFileUtils",
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions",
+        "mangledName": "$s22unimoduleLimeFileUtils07ProcessC7OptionsC",
+        "moduleName": "unimoduleLimeFileUtils",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesLimeFileUtilsProcessFileOptions",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "UTSObject",
+            "printedName": "UTSObject",
+            "usr": "s:19DCloudUTSFoundation9UTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation9UTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSSourceMap",
+            "printedName": "IUTSSourceMap",
+            "usr": "s:19DCloudUTSFoundation13IUTSSourceMapP",
+            "mangledName": "$s19DCloudUTSFoundation13IUTSSourceMapP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "DCUTSSequence",
+            "printedName": "DCUTSSequence",
+            "usr": "s:19DCloudUTSFoundation13DCUTSSequenceP",
+            "mangledName": "$s19DCloudUTSFoundation13DCUTSSequenceP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSObject",
+            "printedName": "IUTSObject",
+            "usr": "s:19DCloudUTSFoundation10IUTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation10IUTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DCUniIterator",
+                    "printedName": "DCloudUTSFoundation.DCUniIterator",
+                    "usr": "s:19DCloudUTSFoundation13DCUniIteratorV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          }
+        ]
+      },
+      {
+        "kind": "Function",
+        "name": "getResourcePath",
+        "printedName": "getResourcePath(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils15getResourcePathyS2SF",
+        "mangledName": "$s22unimoduleLimeFileUtils15getResourcePathyS2SF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "checkExistence",
+        "printedName": "checkExistence(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Array",
+            "printedName": "[Swift.Bool]",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "usr": "s:Sa"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils14checkExistenceySaySbGSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils14checkExistenceySaySbGSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isFile",
+        "printedName": "isFile(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils02isC0ySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils02isC0ySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isExists",
+        "printedName": "isExists(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils8isExistsySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils8isExistsySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isDirectory",
+        "printedName": "isDirectory(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils11isDirectoryySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils11isDirectoryySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "getMimeType",
+        "printedName": "getMimeType(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils11getMimeTypeySSSgSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils11getMimeTypeySSSgSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "fileToBase64",
+        "printedName": "fileToBase64(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils12fileToBase64ySSSgSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils12fileToBase64ySSSgSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "fileToDataURL",
+        "printedName": "fileToDataURL(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils13fileToDataURLySSSgSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils13fileToDataURLySSSgSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "getFileExtensionFromDataURL",
+        "printedName": "getFileExtensionFromDataURL(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils03getC20ExtensionFromDataURLyS2SF",
+        "mangledName": "$s22unimoduleLimeFileUtils03getC20ExtensionFromDataURLyS2SF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "dataURLToFile",
+        "printedName": "dataURLToFile(_:_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "hasDefaultArg": true,
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils09dataURLToC0ySSSgSS_ACtF",
+        "mangledName": "$s22unimoduleLimeFileUtils09dataURLToC0ySSSgSS_ACtF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "processFile",
+        "printedName": "processFile(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "ProcessFileOptions",
+            "printedName": "unimoduleLimeFileUtils.ProcessFileOptions",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptions"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils07processC0yyAA07ProcessC7OptionsCF",
+        "mangledName": "$s22unimoduleLimeFileUtils07processC0yyAA07ProcessC7OptionsCF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ProcessFileOptionsJSONObject",
+        "printedName": "ProcessFileOptionsJSONObject",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "type",
+            "printedName": "type",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)type",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4typeSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)type",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4typeSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setType:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4typeSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4typeSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4typeSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "path",
+            "printedName": "path",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)path",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4pathSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)path",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4pathSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setPath:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4pathSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4pathSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4pathSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "filename",
+            "printedName": "filename",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)filename",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8filenameSSSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)filename",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8filenameSSSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setFilename:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8filenameSSSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8filenameSSSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8filenameSSSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "success",
+            "printedName": "success",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSCallback?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSCallback",
+                    "printedName": "DCloudUTSFoundation.UTSCallback",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)success",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC7success19DCloudUTSFoundation11UTSCallbackCSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)success",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC7success19DCloudUTSFoundation11UTSCallbackCSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setSuccess:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC7success19DCloudUTSFoundation11UTSCallbackCSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC7success19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC7success19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "fail",
+            "printedName": "fail",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSCallback?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSCallback",
+                    "printedName": "DCloudUTSFoundation.UTSCallback",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)fail",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4fail19DCloudUTSFoundation11UTSCallbackCSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)fail",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4fail19DCloudUTSFoundation11UTSCallbackCSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setFail:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4fail19DCloudUTSFoundation11UTSCallbackCSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4fail19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC4fail19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "complete",
+            "printedName": "complete",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSCallback?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSCallback",
+                    "printedName": "DCloudUTSFoundation.UTSCallback",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(py)complete",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8complete19DCloudUTSFoundation11UTSCallbackCSgvp",
+            "moduleName": "unimoduleLimeFileUtils",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)complete",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8complete19DCloudUTSFoundation11UTSCallbackCSgvg",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "DCloudUTSFoundation.UTSCallback?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UTSCallback",
+                        "printedName": "DCloudUTSFoundation.UTSCallback",
+                        "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSCallback"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)setComplete:",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8complete19DCloudUTSFoundation11UTSCallbackCSgvs",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8complete19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC8complete19DCloudUTSFoundation11UTSCallbackCSgvM",
+                "moduleName": "unimoduleLimeFileUtils",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ProcessFileOptionsJSONObject",
+                "printedName": "unimoduleLimeFileUtils.ProcessFileOptionsJSONObject",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject(im)init",
+            "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectCACycfc",
+            "moduleName": "unimoduleLimeFileUtils",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject",
+        "mangledName": "$s22unimoduleLimeFileUtils07ProcessC17OptionsJSONObjectC",
+        "moduleName": "unimoduleLimeFileUtils",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "Function",
+        "name": "getResourcePathByJs",
+        "printedName": "getResourcePathByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils19getResourcePathByJsyS2SF",
+        "mangledName": "$s22unimoduleLimeFileUtils19getResourcePathByJsyS2SF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "checkExistenceByJs",
+        "printedName": "checkExistenceByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Array",
+            "printedName": "[Swift.Bool]",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "usr": "s:Sa"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils18checkExistenceByJsySaySbGSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils18checkExistenceByJsySaySbGSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isFileByJs",
+        "printedName": "isFileByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils02isC4ByJsySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils02isC4ByJsySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isExistsByJs",
+        "printedName": "isExistsByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils12isExistsByJsySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils12isExistsByJsySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "isDirectoryByJs",
+        "printedName": "isDirectoryByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Bool",
+            "printedName": "Swift.Bool",
+            "usr": "s:Sb"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils15isDirectoryByJsySbSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils15isDirectoryByJsySbSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "fileToBase64ByJs",
+        "printedName": "fileToBase64ByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils16fileToBase64ByJsySSSgSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils16fileToBase64ByJsySSSgSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "fileToDataURLByJs",
+        "printedName": "fileToDataURLByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils17fileToDataURLByJsySSSgSSF",
+        "mangledName": "$s22unimoduleLimeFileUtils17fileToDataURLByJsySSSgSSF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "dataURLToFileByJs",
+        "printedName": "dataURLToFileByJs(_:_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.String?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "hasDefaultArg": true,
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils09dataURLToC4ByJsySSSgSS_ACtF",
+        "mangledName": "$s22unimoduleLimeFileUtils09dataURLToC4ByJsySSSgSS_ACtF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "processFileByJs",
+        "printedName": "processFileByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "ProcessFileOptionsJSONObject",
+            "printedName": "unimoduleLimeFileUtils.ProcessFileOptionsJSONObject",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:22unimoduleLimeFileUtils07processC4ByJsyyAA07ProcessC17OptionsJSONObjectCF",
+        "mangledName": "$s22unimoduleLimeFileUtils07processC4ByJsyyAA07ProcessC17OptionsJSONObjectCF",
+        "moduleName": "unimoduleLimeFileUtils",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "UTSSDKModulesLimeFileUtilsIndexSwift",
+        "printedName": "UTSSDKModulesLimeFileUtilsIndexSwift",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "s_getResourcePathByJs",
+            "printedName": "s_getResourcePathByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_getResourcePathByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC21s_getResourcePathByJsyS2SFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_checkExistenceByJs",
+            "printedName": "s_checkExistenceByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.Bool]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_checkExistenceByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC20s_checkExistenceByJsySaySbGSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_isFileByJs",
+            "printedName": "s_isFileByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_isFileByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC04s_isC4ByJsySbSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_isExistsByJs",
+            "printedName": "s_isExistsByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_isExistsByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC14s_isExistsByJsySbSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_isDirectoryByJs",
+            "printedName": "s_isDirectoryByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_isDirectoryByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC17s_isDirectoryByJsySbSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_fileToBase64ByJs",
+            "printedName": "s_fileToBase64ByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_fileToBase64ByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC18s_fileToBase64ByJsySSSgSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_fileToDataURLByJs",
+            "printedName": "s_fileToDataURLByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_fileToDataURLByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC19s_fileToDataURLByJsySSSgSSFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_dataURLToFileByJs",
+            "printedName": "s_dataURLToFileByJs(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_dataURLToFileByJs::",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC011s_dataURLToC4ByJsySSSgSS_AEtFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "s_processFileByJs",
+            "printedName": "s_processFileByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ProcessFileOptionsJSONObject",
+                "printedName": "unimoduleLimeFileUtils.ProcessFileOptionsJSONObject",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsProcessFileOptionsJSONObject"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(cm)s_processFileByJs:",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC09s_processC4ByJsyyAA07ProcessC17OptionsJSONObjectCFZ",
+            "moduleName": "unimoduleLimeFileUtils",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UTSSDKModulesLimeFileUtilsIndexSwift",
+                "printedName": "unimoduleLimeFileUtils.UTSSDKModulesLimeFileUtilsIndexSwift",
+                "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift(im)init",
+            "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftCACycfc",
+            "moduleName": "unimoduleLimeFileUtils",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleLimeFileUtils@objc(cs)UTSSDKModulesLimeFileUtilsIndexSwift",
+        "mangledName": "$s22unimoduleLimeFileUtils013UTSSDKModulesbcD10IndexSwiftC",
+        "moduleName": "unimoduleLimeFileUtils",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesLimeFileUtilsIndexSwift",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}

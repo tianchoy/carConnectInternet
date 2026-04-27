@@ -1,0 +1,10 @@
+framework module unimoduleLimeFileUtils {
+  umbrella header "unimoduleLimeFileUtils.h"
+  export *
+
+  module * { export * }
+}
+
+module unimoduleLimeFileUtils.Swift {
+  header "unimoduleLimeFileUtils-Swift.h"
+}

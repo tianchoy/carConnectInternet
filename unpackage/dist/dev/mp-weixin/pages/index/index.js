@@ -30,7 +30,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentPickerType = common_vendor.ref("");
     const picker = common_vendor.ref(null);
     const iconColor = common_vendor.ref("#e6813e");
-    const noticeText = common_vendor.ref(["新平台即将上线敬请期待!"]);
+    const noticeText = common_vendor.ref("近期平台,升级偶尔会有短暂登录不上的情况，敬请谅解！");
     const userLocation = common_vendor.ref(new common_vendor.UTSJSONObject({
       latitude: 0,
       longitude: 0
@@ -420,7 +420,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, Login.value ? {
         m: common_vendor.p({
           text: noticeText.value,
-          direction: "column",
+          direction: "row",
           fontSize: "32rpx",
           mode: "closable"
         })
@@ -431,48 +431,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "plus",
           size: "19"
         }),
-        p: common_vendor.o(mapPlus, "b6"),
+        p: common_vendor.o(mapPlus, "85"),
         q: common_vendor.p({
           name: "minus",
           size: "19"
         }),
-        r: common_vendor.o(mapMin, "6b")
+        r: common_vendor.o(mapMin, "0c")
       } : {}, {
         s: !Login.value
       }, !Login.value ? {
-        t: common_vendor.o(gotoLogin, "28")
+        t: common_vendor.o(gotoLogin, "57")
       } : {}, {
         v: Login.value
       }, Login.value ? {
-        w: common_vendor.o(refresh, "00")
+        w: common_vendor.o(refresh, "7a")
       } : {}, {
         x: Login.value
       }, Login.value ? {
-        y: common_vendor.o(addCar, "7e")
+        y: common_vendor.o(addCar, "96")
       } : {}, {
         z: common_vendor.t(showMap.value ? "查看车辆" : "返回总览"),
-        A: common_vendor.o(toggleMapMode, "f1"),
+        A: common_vendor.o(toggleMapMode, "4c"),
         B: showMap.value
       }, showMap.value ? {
         C: common_vendor.t(totalCount.value),
         D: common_vendor.o(($event) => {
           return goToList("all");
-        }, "4d"),
+        }, "a9"),
         E: common_vendor.t(onlineCount.value),
         F: common_vendor.o(($event) => {
           return goToList("online");
-        }, "d9"),
+        }, "b7"),
         G: common_vendor.t(offlineCount.value),
         H: common_vendor.o(($event) => {
           return goToList("offline");
-        }, "ed")
+        }, "ae")
       } : {}, {
         I: common_vendor.t(pickerStateTitle.value),
         J: common_vendor.p({
           name: "arrow-down",
           color: "#fff"
         }),
-        K: common_vendor.o(handStatePicker, "c2"),
+        K: common_vendor.o(handStatePicker, "1b"),
         L: Login.value && !showMap.value
       }, Login.value && !showMap.value ? {
         M: common_vendor.t(pickerGroupTitle.value),
@@ -480,12 +480,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-down",
           color: "#fff"
         }),
-        O: common_vendor.o(handGroupPicker, "d7")
+        O: common_vendor.o(handGroupPicker, "b4")
       } : {}, {
         P: common_vendor.sr(picker, "a4fca7fa-7", {
           "k": "picker"
         }),
-        Q: common_vendor.o(confirm, "cc"),
+        Q: common_vendor.o(confirm, "c0"),
         R: common_vendor.p({
           columns: columns.value,
           keyName: "name",

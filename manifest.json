@@ -15,7 +15,9 @@
 			"urlCheck": false,
 			"es6": true,
 			"postcss": true,
-			"minified": true
+			"minified": true,
+			"useMiniAppAuthorizePage": true,
+			"copyMiniAppJsonPath": "../../../src/project.miniapp.json"
 		},
 		"permission": {
 			"scope.userLocation": {

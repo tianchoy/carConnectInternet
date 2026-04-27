@@ -1,0 +1,16 @@
+export const getDeviceIcon = (connectionStatus, carType) => {
+    const basePath = connectionStatus === 'online' 
+        ? '/static/cars/online/' 
+        : '/static/cars/offline/'
+    
+    const validTypes = ['car', 'bus', 'bike', 'moto', 'diandong', 'huoche', 'sanlun', 'tuola', 'suv', 'baby', 'tank', 'zhuangjia', 'wajue', 'plan', 'walk', 'muma', 'hangmu', 'junjian', 'tuiche', 'train']
+    
+    let iconPath = basePath + 'default.png'
+    
+    if (validTypes.includes(carType)) {
+        iconPath = basePath + carType + '.png'
+    }
+    
+    // 返回绝对路径
+    return iconPath
+}

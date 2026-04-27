@@ -1,0 +1,66 @@
+// @ts-nocheck
+import { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '@/uni_modules/lime-picker';
+export type TimeModeValues = 'year' | 'month' | 'date' | 'hour' | 'minute' | 'second';
+export type DateValue = any;//string | number;
+export type DateTimePickerColumn = PickerColumn//DateTimePickerColumnItem[];
+
+export type DateTimePickerColumnItem  = PickerColumnItem;
+
+export interface DateTimePickerProps {
+	 /** 取消按钮文字 */
+	cancelBtn?: string;
+	cancelStyle ?: string;
+	/** 确定按钮文字 */
+	confirmBtn?: string;
+	confirmStyle ?: string;
+	/**  组件国际化语言，目前支持: 简体中文(zh)、(tc)、英文(en)、日语(ja)、朝鲜语(ko)、俄语(ru)等六种语言 */
+	customLocale?: 'zh' | 'tc' | 'en' | 'ja' | 'ko' | 'ru';
+	/** 选择器的最大可选时间，默认为当前时间+10年 */
+	end?: DateValue;//string;
+	/** 选择器的最小可选时间，默认为当前时间-10年 */
+	start?: DateValue; //string;
+	/** 时间间隔步数，示例：`{ minute: 5 }` */
+	steps?: UTSJSONObject
+	/** 标题 */
+	title?: string;
+	titleStyle ?: string;
+	/** 选中值 */
+	value?: DateValue;
+	defaultValue?: DateValue;
+	modelValue?: DateValue;
+	/* 用于格式化 pick、change、confirm 事件返回的值，[详细文档](https://day.js.org/docs/en/display/format)
+	 */
+	format: string;
+	/**
+	 * 时间选择器的显示模式，可以是单个模式或多个模式的组合。
+	 * 使用位运算符来组合多个模式。
+	 * 
+	 * 例如：
+	 * - 单个模式：1
+	 * - 多个模式组合：4 | 8
+	 * - 1 -> 年 | 2 ->  月 | 4 ->  日 | 8 ->  时 | 16 ->  分 | 32 ->  秒
+	 */
+	mode: any//number
+	customFilter?: ((type: TimeModeValues, columns: DateTimePickerColumn) => DateTimePickerColumn);
+	/**
+	 * 自定义label
+	 */
+	renderLabel?: ((type: string, value: string) => string);
+	showUnit: boolean;
+	
+	itemHeight?: string;
+	itemColor?: string;
+	itemFontSize?: string;
+	itemActiveColor?: string;
+	
+	indicatorStyle?: string;
+	bgColor?:string;
+	groupHeight?:string;
+	radius?:string;
+	resetIndex: boolean
+	
+	minHour:number;
+	maxHour:number;
+	minMinute:number;
+	maxMinute:number;
+} 
