@@ -203,7 +203,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     k: common_vendor.s($options.checkboxStyle),
     l: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     }),
     m: common_vendor.o((...args) => $options.wrapperClickHandler && $options.wrapperClickHandler(...args), "5e"),
     n: common_vendor.n(`uv-checkbox-label--${$data.parentData.iconPlacement}`),

@@ -100,7 +100,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     t: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     v: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
     w: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     }),
     x: common_vendor.n(_ctx.vertical && "uv-loading-icon--vertical"),
     y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)

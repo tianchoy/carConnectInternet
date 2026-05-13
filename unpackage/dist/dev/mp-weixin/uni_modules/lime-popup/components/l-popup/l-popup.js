@@ -120,38 +120,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: _ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay
       }, (_ctx.destroyOnClose ? common_vendor.unref(display) && _ctx.overlay : _ctx.overlay) ? {
         b: common_vendor.o(handleOverlayClick, "81"),
-        c: `${_ctx.u_s_b_h}px`,
-        d: common_vendor.p({
+        c: common_vendor.p({
           visible: common_vendor.unref(innerValue),
           zIndex: common_vendor.unref(overlayZIndex),
           appear: true,
           preventScrollThrough: _ctx.preventScrollThrough,
-          ["l-style"]: _ctx.overlayStyle,
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          ["l-style"]: _ctx.overlayStyle
         })
       } : {}, {
-        e: _ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)
+        d: _ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)
       }, (_ctx.destroyOnClose ? common_vendor.unref(display) : common_vendor.unref(inited)) ? common_vendor.e({
-        f: _ctx.closeable
+        e: _ctx.closeable
       }, _ctx.closeable ? {
-        g: common_vendor.p({
+        f: common_vendor.p({
           name: _ctx.closeIcon,
           size: "27px",
           color: _ctx.iconColor,
           class: "l-popup__close-icon"
         }),
-        h: common_vendor.o(handleClose, "e0")
+        g: common_vendor.o(handleClose, "e0")
       } : {}, {
-        i: common_vendor.sei("r0-7cb52a4a", "view", "popupRef"),
-        j: common_vendor.n(common_vendor.unref(rootClass)),
-        k: common_vendor.s(common_vendor.unref(styles)),
-        l: common_vendor.s(_ctx.lStyle),
-        m: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        h: common_vendor.sei("r0-7cb52a4a", "view", "popupRef"),
+        i: common_vendor.n(common_vendor.unref(rootClass)),
+        j: common_vendor.s(common_vendor.unref(styles)),
+        k: common_vendor.s(_ctx.lStyle),
+        l: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        n: common_vendor.o((...args) => {
+        m: common_vendor.o((...args) => {
           return common_vendor.unref(finished) && common_vendor.unref(finished)(...args);
         }, "eb")
       }) : {});

@@ -182,19 +182,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         l: common_vendor.gei(_ctx, ""),
         m: common_vendor.o(onClose, "5d"),
-        n: `${_ctx.u_s_b_h}px`,
-        o: common_vendor.o(($event) => {
+        n: common_vendor.o(($event) => {
           return common_vendor.isRef(innerValue) ? innerValue.value = $event : null;
         }, "a2"),
-        p: common_vendor.p({
+        o: common_vendor.p({
           position: "bottom",
           modelValue: common_vendor.unref(innerValue),
-          id: common_vendor.gei(_ctx, ""),
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          id: common_vendor.gei(_ctx, "")
         }),
-        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

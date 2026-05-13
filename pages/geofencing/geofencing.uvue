@@ -1181,7 +1181,7 @@
 			background-color: #fff;
 			padding: 20rpx 20rpx 50rpx 20rpx;
 			width: 500rpx;
-			height: 170rpx;
+			height: 200rpx;
 
 			.fence-header {
 				display: flex;

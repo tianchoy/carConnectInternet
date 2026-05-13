@@ -215,6 +215,7 @@ const VIRTUAL_HOST_CLASS = "virtualHostClass";
 const VIRTUAL_HOST_HIDDEN = "virtualHostHidden";
 const VIRTUAL_HOST_ID = "virtualHostId";
 const UNI_STATUS_BAR_HEIGHT = "u_s_b_h";
+const UNI_SAFE_AREA_INSET_BOTTOM = "u_s_a_i_b";
 function arrayPop(array) {
   if (array.length === 0) {
     return null;
@@ -1627,6 +1628,25 @@ const createCanvasContextAsync = defineAsyncApi(API_CREATE_CANVAS_CONTEXT_ASYNC,
     });
   }
 });
+const API_CREATE_EDITOR_CONTEXT_ASYNC = "createEditorContextAsync";
+const createEditorContextAsync = defineAsyncApi(API_CREATE_EDITOR_CONTEXT_ASYNC, (options, { resolve: resolve2, reject }) => {
+  const { id, component } = options;
+  const pages = getCurrentPages();
+  const page = pages[pages.length - 1];
+  if (!page || !page.$vm) {
+    reject("current page invalid.");
+  } else {
+    const query = wx.createSelectorQuery();
+    const baseQuery = component ? query.in(component) : query;
+    baseQuery.select("#" + id).context((res) => {
+      if (res && res.context) {
+        resolve2(res.context);
+      } else {
+        reject("editor id or component invalid.");
+      }
+    }).exec();
+  }
+});
 const API_UPX2PX = "upx2px";
 const Upx2pxProtocol = [
   {
@@ -2190,9 +2210,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.07",
-    uniCompilerVersion: "5.07",
-    uniRuntimeVersion: "5.07",
+    uniCompileVersion: "5.08",
+    uniCompilerVersion: "5.08",
+    uniRuntimeVersion: "5.08",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -2220,8 +2240,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.07");
-      parameters.uniRuntimeVersionCode = parseFloat("5.07");
+      parameters.uniCompilerVersionCode = parseFloat("5.08");
+      parameters.uniRuntimeVersionCode = parseFloat("5.08");
     } catch (error) {
     }
   }
@@ -2348,14 +2368,14 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.07",
-      uniCompilerVersion: "5.07",
-      uniRuntimeVersion: "5.07"
+      uniCompileVersion: "5.08",
+      uniCompilerVersion: "5.08",
+      uniRuntimeVersion: "5.08"
     };
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.07");
-        parameters.uniRuntimeVersionCode = parseFloat("5.07");
+        parameters.uniCompilerVersionCode = parseFloat("5.08");
+        parameters.uniRuntimeVersionCode = parseFloat("5.08");
       } catch (error) {
       }
     }
@@ -2450,7 +2470,8 @@ const baseApis = {
   invokePushCallback,
   __f__,
   getElementById,
-  createCanvasContextAsync
+  createCanvasContextAsync,
+  createEditorContextAsync
 };
 function initUni(api, protocols2, platform = wx) {
   const wrapper = initWrapper(protocols2);
@@ -2496,7 +2517,7 @@ const objectKeys = [
   "version",
   "lanDebug",
   "cloud",
-  "serviceMarket", "miniapp",
+  "serviceMarket",
   "router",
   "worklet",
   "__webpack_require_UNI_MP_PLUGIN__"
@@ -7374,18 +7395,10 @@ function findComponentPropsData(up) {
   }
   return propsCaches[uid2][parseInt(propsId)];
 }
-function getStatusBarHeight() {
-  if (typeof wx$1 !== "undefined") {
-    return wx$1.getWindowInfo().statusBarHeight;
-  } else if (typeof my !== "undefined") {
-    return my.getWindowInfo().statusBarHeight;
-  }
-}
 var plugin = {
   install(app) {
     initApp(app);
     app.config.globalProperties.pruneComponentPropsCache = pruneComponentPropsCache;
-    app.config.globalProperties[UNI_STATUS_BAR_HEIGHT] = getStatusBarHeight();
     const oldMount = app.mount;
     app.mount = function mount(rootContainer) {
       const instance = oldMount.call(app, rootContainer);
@@ -8783,13 +8796,28 @@ function initPropsObserver(componentOptions) {
       updateComponentProps(resolvePropValue(up), this.$vm.$);
     } else if (resolvePropValue(this.properties.uT) === "m") {
       updateMiniProgramComponentProperties(resolvePropValue(up), this);
-    }
+    } else
+      ;
   };
   {
     if (!componentOptions.observers) {
       componentOptions.observers = {};
     }
     componentOptions.observers.uP = observe;
+    if (componentOptions.options && componentOptions.options.virtualHost && componentOptions.properties && componentOptions.properties[VIRTUAL_HOST_CLASS]) {
+      const observeVirtualHostClass = function observeVirtualHostClass2() {
+        if (!this.$vm) {
+          return;
+        }
+        const instance = this.$vm.$;
+        instance.effect.dirty = true;
+        if (hasQueueJob(instance.update)) {
+          invalidateJob(instance.update);
+        }
+        instance.update();
+      };
+      componentOptions.observers[VIRTUAL_HOST_CLASS] = observeVirtualHostClass;
+    }
   }
 }
 function updateMiniProgramComponentProperties(up, mpInstance) {
@@ -9015,6 +9043,18 @@ function initPageInstance(mpPageInstance) {
     });
   }
 }
+function updateCssVariables() {
+  var _a, _b, _c;
+  const globalProperties = (_c = (_b = (_a = getAppVm()) === null || _a === void 0 ? void 0 : _a.$) === null || _b === void 0 ? void 0 : _b.appContext) === null || _c === void 0 ? void 0 : _c.config.globalProperties;
+  if (!globalProperties) {
+    return;
+  }
+  const windowInfo = wx.getWindowInfo();
+  const screenBottom = windowInfo.screenHeight - windowInfo.screenTop - windowInfo.windowHeight;
+  const safeAreaBottom = windowInfo.screenHeight - windowInfo.safeArea.bottom;
+  globalProperties[UNI_STATUS_BAR_HEIGHT] = windowInfo.statusBarHeight;
+  globalProperties[UNI_SAFE_AREA_INSET_BOTTOM] = Math.max(0, safeAreaBottom - screenBottom);
+}
 function initCreatePluginApp(parseAppOptions) {
   return function createApp2(vm) {
     initAppLifecycle(parseApp(vm), vm);
@@ -9073,6 +9113,9 @@ function initLifetimes({ mocks: mocks2, isPage: isPage2, initRelation: initRelat
       initRelation2(this, relationOptions);
       const mpInstance = this;
       const isMiniProgramPage = isPage2(mpInstance);
+      if (isMiniProgramPage) {
+        updateCssVariables();
+      }
       let propsData = properties;
       this.$vm = $createComponent({
         type: vueOptions,

@@ -198,8 +198,6 @@
 			// 遍历所有行程，获取地址
 			const processedTrips = await Promise.all(
 				data.trips.map(async (trip : any) => {
-					// const startAddress = await getAddress(trip.startLat, trip.startLon);
-					// const endAddress = await getAddress(trip.endLat, trip.endLon);
 
 					return {
 						...trip,

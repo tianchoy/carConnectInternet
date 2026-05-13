@@ -47,20 +47,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: common_vendor.gei(_ctx, ""),
     b: common_vendor.o($options.clickHandler, "88"),
     c: common_vendor.o($options.clear, "64"),
-    d: `${_ctx.u_s_b_h}px`,
-    e: common_vendor.p({
+    d: common_vendor.p({
       show: _ctx.show,
       mode: "fade",
       ["custom-class"]: "uv-overlay",
       duration: _ctx.duration,
       ["custom-style"]: $options.overlayStyle,
       id: common_vendor.gei(_ctx, ""),
-      class: "data-v-7303e1aa",
-      style: common_vendor.normalizeStyle({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
-      })
+      class: "data-v-7303e1aa"
     }),
-    f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-7303e1aa"]]);

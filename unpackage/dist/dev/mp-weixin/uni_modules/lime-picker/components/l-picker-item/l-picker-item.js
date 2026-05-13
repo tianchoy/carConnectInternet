@@ -146,7 +146,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           opacity: _ctx.options.length > 0 ? 1 : 0
         }),
         e: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
         f: common_vendor.unref(indicatorStyles),
         g: common_vendor.unref(innerIndex),

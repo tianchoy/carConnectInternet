@@ -1,331 +1,525 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
-const utils_cars = require("../../utils/cars.js");
+const utils_gettime = require("../../utils/gettime.js");
+const utils_formateTime = require("../../utils/formateTime.js");
 if (!Array) {
-  const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_indexListMode_1 = common_vendor.resolveComponent("indexListMode");
-  const _easycom_uv_notice_bar_1 = common_vendor.resolveComponent("uv-notice-bar");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
+  const _easycom_uv_line_progress_1 = common_vendor.resolveComponent("uv-line-progress");
+  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
   const _easycom_uv_picker_1 = common_vendor.resolveComponent("uv-picker");
-  (_easycom_custom_navBar_1 + _easycom_indexListMode_1 + _easycom_uv_notice_bar_1 + _easycom_uv_icon_1 + _easycom_uv_picker_1)();
+  (_easycom_uv_icon_1 + _easycom_uv_line_progress_1 + _easycom_uv_button_1 + _easycom_uv_picker_1)();
 }
-const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
-const _easycom_indexListMode = () => "../../components/indexListMode/indexListMode.js";
-const _easycom_uv_notice_bar = () => "../../uni_modules/uv-notice-bar/components/uv-notice-bar/uv-notice-bar.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_uv_line_progress = () => "../../uni_modules/uv-line-progress/components/uv-line-progress/uv-line-progress.js";
+const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 const _easycom_uv_picker = () => "../../uni_modules/uv-picker/components/uv-picker/uv-picker.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_indexListMode + _easycom_uv_notice_bar + _easycom_uv_icon + _easycom_uv_picker)();
+  (_easycom_uv_icon + _easycom_uv_line_progress + _easycom_uv_button + _easycom_uv_picker)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    const Login = common_vendor.ref(false);
-    const mapScale = common_vendor.ref(4);
-    const showMap = common_vendor.ref(true);
-    const markers = common_vendor.ref([]);
-    let mapCtx = void 0;
-    const currentPickerType = common_vendor.ref("");
-    const picker = common_vendor.ref(null);
-    const iconColor = common_vendor.ref("#e6813e");
-    const noticeText = common_vendor.ref("近期平台,升级偶尔会有短暂登录不上的情况，敬请谅解！");
-    const userLocation = common_vendor.ref(new common_vendor.UTSJSONObject({
-      latitude: 0,
-      longitude: 0
+    const _a = utils_gettime.getTodayZeroTime(), nowTime = _a.nowTime, todayZero = _a.todayZero;
+    const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
+      latitude: 39.90469,
+      longitude: 116.40717
     }));
-    const carState = common_vendor.ref([
-      [new common_vendor.UTSJSONObject({
-        name: "全部状态",
-        value: "0"
-      }), new common_vendor.UTSJSONObject({
-        name: "在线",
-        value: "1"
-      }), new common_vendor.UTSJSONObject({
-        name: "离线",
-        value: "2"
-      })]
-    ]);
-    const carGroup = common_vendor.ref([]);
-    const columns = common_vendor.ref([[]]);
-    const pickerStateTitle = common_vendor.ref("全部状态");
-    const pickerGroupTitle = common_vendor.ref("全部分组");
-    const originalDeviceList = common_vendor.ref([]);
-    const currentGroupId = common_vendor.ref("");
-    const filteredDevices = common_vendor.computed(() => {
-      if (!Array.isArray(originalDeviceList.value))
-        return [];
-      let result = [...originalDeviceList.value];
-      if (pickerStateTitle.value == "在线") {
-        result = result.filter((device = null) => {
-          return (device === null || device === void 0 ? null : device.connectionStatus) == "online";
-        });
-      } else if (pickerStateTitle.value === "离线") {
-        result = result.filter((device = null) => {
-          return (device === null || device === void 0 ? null : device.connectionStatus) == "offline";
-        });
-      }
-      return result;
+    const isLogin = common_vendor.ref(false);
+    const isMapReady = common_vendor.ref(false);
+    const mapScale = common_vendor.ref(17);
+    const statusBarHeight = common_vendor.ref(20);
+    const menuButtonInfo = common_vendor.ref(null);
+    const navBarHeight = common_vendor.ref(44);
+    common_vendor.ref(true);
+    const deviceList = common_vendor.ref([]);
+    const picker = common_vendor.ref(null);
+    const currentCarImei = common_vendor.ref("");
+    const currentCarDeptId = common_vendor.ref("");
+    const currentCarDeviceId = common_vendor.ref("");
+    const currentCarIccId = common_vendor.ref("");
+    const currentCarName = common_vendor.ref("");
+    const currentCarSimMerchant = common_vendor.ref("");
+    const currentCarConnectionStatus = common_vendor.ref("");
+    const currentCarCarType = common_vendor.ref("");
+    const currentCarPlateNo = common_vendor.ref("");
+    const deviceDetail = common_vendor.ref(new common_vendor.UTSJSONObject({
+      deviceStatus: new common_vendor.UTSJSONObject({
+        batteryPercent: 0,
+        voltage: 0,
+        signalStrength: 0
+      }),
+      connectionStatus: "offline",
+      lastUpdateTime: null
+    }));
+    const markers = common_vendor.ref([]);
+    const lastUpdateTime = common_vendor.ref("--:--:--");
+    const safeDeviceDetail = common_vendor.computed(() => {
+      var _a2, _b, _c, _d, _f, _g, _h, _j, _k, _l, _m, _q, _r;
+      return new common_vendor.UTSJSONObject({
+        deviceStatus: new common_vendor.UTSJSONObject({
+          batteryPercent: (_c = (_b = (_a2 = deviceDetail.value) === null || _a2 === void 0 ? null : _a2.deviceStatus) === null || _b === void 0 ? null : _b.batteryPercent) !== null && _c !== void 0 ? _c : 0,
+          voltage: (_g = (_f = (_d = deviceDetail.value) === null || _d === void 0 ? null : _d.deviceStatus) === null || _f === void 0 ? null : _f.voltage) !== null && _g !== void 0 ? _g : "--",
+          signalStrength: (_k = (_j = (_h = deviceDetail.value) === null || _h === void 0 ? null : _h.deviceStatus) === null || _j === void 0 ? null : _j.signalStrength) !== null && _k !== void 0 ? _k : 0
+        }),
+        connectionStatus: (_m = (_l = deviceDetail.value) === null || _l === void 0 ? null : _l.connectionStatus) !== null && _m !== void 0 ? _m : "offline",
+        lastUpdateTime: (_r = (_q = deviceDetail.value) === null || _q === void 0 ? null : _q.lastUpdateTime) !== null && _r !== void 0 ? _r : null
+      });
     });
-    const totalCount = common_vendor.computed(() => {
-      return originalDeviceList.value.length;
+    const pickerColumns = common_vendor.computed(() => {
+      return [deviceList.value];
     });
-    const onlineCount = common_vendor.computed(() => {
-      return originalDeviceList.value.filter((d = null) => {
-        return (d === null || d === void 0 ? null : d.connectionStatus) == "online";
-      }).length;
-    });
-    const offlineCount = common_vendor.computed(() => {
-      return totalCount.value - onlineCount.value;
-    });
-    common_vendor.watch([filteredDevices, showMap], (_a) => {
-      var _b = common_vendor.__read(_a, 2), devices = _b[0], isMapVisible = _b[1];
-      if (isMapVisible) {
-        updateMarkers(devices);
-      }
-    });
-    const getLocation = () => {
-      common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
-        type: "wgs84",
-        success: (res) => {
-          console.log("获取位置成功:", res);
-          userLocation.value.latitude = res.latitude;
-          userLocation.value.longitude = res.longitude;
-        },
-        fail: (err) => {
-          console.log("获取位置失败:", err);
+    const initDimensions = () => {
+      const systemInfo = common_vendor.index.getSystemInfoSync();
+      statusBarHeight.value = systemInfo.statusBarHeight || 20;
+      try {
+        const menuRect = common_vendor.index.getMenuButtonBoundingClientRect();
+        if (menuRect) {
+          menuButtonInfo.value = menuRect;
+          const gap = menuRect.top - statusBarHeight.value;
+          navBarHeight.value = gap * 2 + menuRect.height + 4;
         }
-      }));
-    };
-    const mapPlus = () => {
-      if (mapScale.value < 20) {
-        mapScale.value += 1;
+      } catch (e) {
+        console.warn("胶囊按钮信息获取失败", e);
       }
     };
-    const mapMin = () => {
-      if (mapScale.value > 3) {
-        mapScale.value -= 1;
+    const delay = (ms) => {
+      return new Promise((resolve) => {
+        return setTimeout(resolve, ms);
+      });
+    };
+    const handlePicker = () => {
+      var _a2;
+      if (deviceList.value.length === 0) {
+        common_vendor.index.showToast({
+          title: "暂无车辆数据",
+          icon: "none"
+        });
+        return null;
       }
+      (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.open();
     };
-    const subMsg = () => {
-      console.log("订阅消息");
-      common_vendor.index.requestSubscribeMessage(new common_vendor.UTSJSONObject({
-        tmplIds: ["VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc"],
-        success: (res = null) => {
-          console.log("订阅成功:", res);
-        },
-        fail: (err = null) => {
-          console.log("订阅失败:", err);
-        }
-      }));
-    };
-    const goToList = (status) => {
-      showMap.value = false;
-      switch (status) {
-        case "all":
-          pickerStateTitle.value = "全部状态";
-          break;
-        case "online":
-          pickerStateTitle.value = "在线";
-          break;
-        case "offline":
-          pickerStateTitle.value = "离线";
-          break;
-      }
-    };
-    const unbindDevice = (imei) => {
+    const confirm = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_request.delDevice(imei);
-        if (res.code == 0) {
+        if (!isLogin.value || !e.value || !e.value[0])
+          return Promise.resolve(null);
+        currentCarName.value = e.value[0].name;
+        currentCarImei.value = e.value[0].value;
+        currentCarDeptId.value = e.value[0].deptId;
+        currentCarDeviceId.value = e.value[0].deviceId;
+        currentCarIccId.value = e.value[0].iccid;
+        currentCarSimMerchant.value = e.value[0].simMerchant;
+        currentCarConnectionStatus.value = e.value[0].connectionStatus;
+        currentCarCarType.value = e.value[0].carType;
+        currentCarPlateNo.value = e.value[0].plateNo;
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
+          title: "加载车辆数据...",
+          mask: true
+        }));
+        try {
+          yield loadDeviceDetail(e.value[0].deviceId);
+          yield loadDevicePos(new common_vendor.UTSJSONObject({
+            deviceId: e.value[0].deviceId,
+            deviceids: e.value[0].value
+          }));
+          yield loadTrackPos(new common_vendor.UTSJSONObject({
+            imei: e.value[0].value,
+            startTime: utils_formateTime.formatTimes(todayZero),
+            endTime: utils_formateTime.formatTimes(nowTime),
+            minParkTime: 120,
+            withStop: false,
+            withPos: false,
+            withTrip: true
+          }));
+        } catch (error) {
+          console.error("切换车辆失败", error);
           common_vendor.index.showToast({
-            title: "解绑成功",
-            icon: "success"
+            title: "切换失败，请重试",
+            icon: "none"
           });
+        } finally {
+          common_vendor.index.hideLoading();
+        }
+      });
+    };
+    const loadDeviceList = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (!checkToken())
+          return Promise.resolve(null);
+        isLogin.value = true;
+        try {
+          const res = yield api_request.getUserDeviceList({
+            pageSize: 1e3
+          });
+          if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
+            deviceList.value = res.data.list.map((item = null) => {
+              return new common_vendor.UTSJSONObject({
+                name: item.deviceName,
+                value: item.imei,
+                deptId: item.companyId,
+                deviceId: item.deviceId,
+                iccid: item.iccid,
+                simMerchant: item.simMerchant,
+                connectionStatus: item.connectionStatus,
+                carType: item.carType,
+                plateNo: item.plateNo
+              });
+            });
+            currentCarName.value = deviceList.value[0].name;
+            currentCarImei.value = deviceList.value[0].value;
+            currentCarDeptId.value = deviceList.value[0].deptId;
+            currentCarDeviceId.value = deviceList.value[0].deviceId;
+            currentCarIccId.value = deviceList.value[0].iccid;
+            currentCarSimMerchant.value = deviceList.value[0].simMerchant;
+            currentCarConnectionStatus.value = deviceList.value[0].connectionStatus;
+            currentCarCarType.value = deviceList.value[0].carType;
+            currentCarPlateNo.value = deviceList.value[0].plateNo;
+            yield loadDeviceDetail(deviceList.value[0].deviceId);
+            yield loadDevicePos(new common_vendor.UTSJSONObject({
+              deviceId: deviceList.value[0].deviceId,
+              deviceids: deviceList.value[0].value
+            }));
+            yield loadTrackPos(new common_vendor.UTSJSONObject({
+              imei: deviceList.value[0].value,
+              startTime: utils_formateTime.formatTimes(todayZero),
+              endTime: utils_formateTime.formatTimes(nowTime),
+              minParkTime: 120,
+              withStop: false,
+              withPos: false,
+              withTrip: true
+            }));
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "暂无车辆数据",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          console.error("加载车辆列表失败", error);
+          common_vendor.index.showToast({
+            title: "加载失败，请下拉重试",
+            icon: "none"
+          });
+        }
+      });
+    };
+    const loadDeviceDetail = (deviceId) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a2, _b, _c, _d, _f, _g, _h, _j;
+        try {
+          const res = yield api_request.getDeviceDetail(deviceId);
+          if (res.code == 0 && res.data) {
+            deviceDetail.value = {
+              deviceStatus: {
+                batteryPercent: (_b = (_a2 = res.data.deviceStatus) === null || _a2 === void 0 ? null : _a2.batteryPercent) !== null && _b !== void 0 ? _b : 0,
+                voltage: (_d = (_c = res.data.deviceStatus) === null || _c === void 0 ? null : _c.voltage) !== null && _d !== void 0 ? _d : "--",
+                signalStrength: (_g = (_f = res.data.deviceStatus) === null || _f === void 0 ? null : _f.signalStrength) !== null && _g !== void 0 ? _g : 0
+              },
+              connectionStatus: (_h = res.data.connectionStatus) !== null && _h !== void 0 ? _h : "offline",
+              lastUpdateTime: (_j = res.data.lastUpdateTime) !== null && _j !== void 0 ? _j : null
+            };
+            if (res.data.lastUpdateTime) {
+              const date = new Date(res.data.lastUpdateTime);
+              lastUpdateTime.value = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+            }
+          } else {
+            console.warn("获取设备详情失败:", res.msg);
+          }
+        } catch (error) {
+          console.error("加载设备详情失败", error);
+        }
+      });
+    };
+    common_vendor.ref(new common_vendor.UTSJSONObject({}));
+    const tripData = common_vendor.ref([]);
+    const totalMileage = common_vendor.ref(0);
+    const averageSpeed = common_vendor.ref(0);
+    const loadTrackPos = (data = null) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_request.getTrackPos(data);
+          console.log("车辆轨迹:", res);
+          if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
+            yield processTripData(res.data);
+          } else {
+            console.warn("获取轨迹失败:", res.msg);
+          }
+        } catch (error) {
+          console.error("加载轨迹失败", error);
+        }
+      });
+    };
+    const totalTrips = common_vendor.computed(() => {
+      return tripData.value.length;
+    });
+    const processTripData = (data = null) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (data.trips && data.trips.length > 0) {
+          const processedTrips = yield Promise.all(data.trips.map((trip = null) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: "查看位置", endAddress: "查看位置" }));
+            });
+          }));
+          tripData.value = processedTrips;
+          let totalDistance = 0;
+          let totalDuration = 0;
+          let totalAvgSpeed = 0;
+          processedTrips.forEach((trip = null) => {
+            totalDistance += trip.distance || 0;
+            totalDuration += trip.duration || 0;
+            totalAvgSpeed += trip.averageSpeed || 0;
+          });
+          totalMileage.value = totalDistance;
+          averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
         } else {
-          common_vendor.index.showToast({
-            title: "解绑失败",
-            icon: "error"
-          });
+          tripData.value = [];
+          totalMileage.value = 0;
+          averageSpeed.value = 0;
         }
-        yield loadUserDeviceList(currentGroupId.value);
       });
     };
-    const handStatePicker = () => {
-      var _a;
-      columns.value = carState.value;
-      currentPickerType.value = "state";
-      (_a = picker.value) === null || _a === void 0 ? null : _a.open();
-    };
-    const handGroupPicker = () => {
-      var _a;
-      columns.value = carGroup.value;
-      currentPickerType.value = "group";
-      (_a = picker.value) === null || _a === void 0 ? null : _a.open();
-    };
-    const confirm = (e) => {
+    const devicePosInfo = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+    const loadDevicePos = (data = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const selected = e.value[0];
-        if (currentPickerType.value == "state") {
-          pickerStateTitle.value = selected.name;
-        } else if (currentPickerType.value == "group") {
-          pickerGroupTitle.value = selected.name;
-          currentGroupId.value = selected.id;
-          yield loadUserDeviceList(selected.id);
+        try {
+          const res = yield api_request.getDevicePos(data);
+          if (res.code == 0 && res.data && res.data.length > 0) {
+            devicePosInfo.value = res.data[0];
+            const lat = Number(res.data[0].latitude);
+            const lng = Number(res.data[0].longitude);
+            if (isNaN(lat) || isNaN(lng)) {
+              console.error("经纬度格式错误", res.data[0].latitude, res.data[0].longitude);
+              common_vendor.index.showToast({
+                title: "定位数据异常",
+                icon: "none"
+              });
+              return false;
+            }
+            let convertedCoord = null;
+            try {
+              convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
+            } catch (transformError) {
+              console.error("坐标转换失败:", transformError);
+              convertedCoord = new common_vendor.UTSJSONObject({ lat, lng });
+            }
+            center.latitude = convertedCoord.lat;
+            center.longitude = convertedCoord.lng;
+            isMapReady.value = true;
+            yield delay(100);
+            const deviceMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
+            markers.value = [];
+            yield delay(50);
+            markers.value = [deviceMarker];
+            console.log("标记点更新完成");
+            return true;
+          } else {
+            console.warn("获取设备位置失败:", res.msg);
+            isMapReady.value = false;
+            common_vendor.index.showToast({
+              title: res.msg || "获取位置失败",
+              icon: "none"
+            });
+            return false;
+          }
+        } catch (error) {
+          console.error("加载设备位置失败", error);
+          common_vendor.index.showToast({
+            title: "定位失败，请重试",
+            icon: "none"
+          });
+          return false;
         }
-        currentPickerType.value = "";
       });
     };
-    const addCar = () => {
+    const refreshLocation = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (!currentCarDeviceId.value) {
+          common_vendor.index.showToast({
+            title: "请先选择车辆",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
+          title: "刷新位置中...",
+          mask: true
+        }));
+        try {
+          yield loadDeviceDetail(currentCarDeviceId.value);
+          const success = yield loadDevicePos(new common_vendor.UTSJSONObject({
+            deviceId: currentCarDeviceId.value,
+            deviceids: currentCarImei.value
+          }));
+          if (success) {
+            common_vendor.index.showToast({
+              title: "位置已更新",
+              icon: "success"
+            });
+          }
+        } catch (error) {
+          console.error("刷新位置失败", error);
+          common_vendor.index.showToast({
+            title: "刷新失败",
+            icon: "none"
+          });
+        } finally {
+          common_vendor.index.hideLoading();
+        }
+      });
+    };
+    const createMarker = (id, lat, lng, type, title = null) => {
+      const isOnline = safeDeviceDetail.value.connectionStatus === "online";
+      const marker = new common_vendor.UTSJSONObject({
+        id,
+        latitude: lat,
+        longitude: lng,
+        width: 35,
+        height: 35,
+        iconPath: isOnline ? "../../static/marker.png" : "../../static/offline-marker.png",
+        callout: new common_vendor.UTSJSONObject({
+          content: title || "爱车位置",
+          color: isOnline ? "#ffffff" : "#999999",
+          borderRadius: 10,
+          bgColor: isOnline ? "#07C160" : "#CCCCCC",
+          padding: 8,
+          fontSize: 14,
+          display: "ALWAYS"
+        }),
+        anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 })
+      });
+      return marker;
+    };
+    const toDeviceDetail = (e = null) => {
+      if (!isLogin.value)
+        return null;
+      if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+        common_vendor.index.showToast({
+          title: "请先选择车辆",
+          icon: "none"
+        });
+        return null;
+      }
+      common_vendor.index.navigateTo({
+        url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`
+      });
+    };
+    const toAdd = () => {
+      if (!isLogin.value)
+        return null;
       common_vendor.index.navigateTo({
         url: "/pages/addCar/addCar"
       });
     };
-    const toggleMapMode = () => {
-      showMap.value = !showMap.value;
-    };
-    const handleTap = (e = null) => {
-      const markerId = e.detail.markerId;
-      const selectedDevice = common_vendor.UTS.arrayFind(originalDeviceList.value, (device = null) => {
-        return device.deviceId == markerId;
-      });
-      if (selectedDevice) {
-        common_vendor.index.navigateTo({
-          url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
-        });
-      } else {
-        console.warn("未找到对应的设备信息", markerId);
-      }
-    };
-    const updateMarkers = (devices = null) => {
-      if (!Array.isArray(devices)) {
-        devices = [];
-      }
-      markers.value = devices.map((device = null, index = null) => {
-        if (!device || typeof device !== "object") {
-          return null;
-        }
-        const lat = Number(device.latitude);
-        const lng = Number(device.longitude);
-        if (isNaN(lat) || isNaN(lng)) {
-          return null;
-        }
-        const iconPath = utils_cars.getDeviceIcon(device.connectionStatus, device.carType);
-        let markerId;
-        if (device.deviceId && !isNaN(Number(device.deviceId))) {
-          markerId = Number(device.deviceId);
-        } else {
-          markerId = index + 1;
-        }
-        return new common_vendor.UTSJSONObject({
-          id: markerId,
-          latitude: lat,
-          longitude: lng,
-          iconPath,
-          width: 30,
-          height: 30,
-          callout: new common_vendor.UTSJSONObject({
-            content: device.deviceName || device.plateNo || "设备",
-            display: "ALWAYS",
-            padding: 8,
-            borderRadius: 8,
-            bgColor: "#ffffff"
-          }),
-          joinCluster: true,
-          anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 })
-        });
-      }).filter((marker = null) => {
-        return marker !== null;
+    const toMsgCenter = () => {
+      if (!isLogin.value)
+        return null;
+      common_vendor.index.switchTab({
+        url: "/pages/message/message"
       });
     };
-    const loadGroupData = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          const groupRes = yield api_request.getUserGroupList();
-          if ((groupRes === null || groupRes === void 0 ? null : groupRes.code) !== 0 || !Array.isArray(groupRes.data)) {
-            throw new Error("获取分组数据失败");
-          }
-          const allGroupOption = new common_vendor.UTSJSONObject({
-            name: "全部分组",
-            value: "all",
-            id: "all"
-          });
-          const formattedData = groupRes.data.map((item = null) => {
-            return new common_vendor.UTSJSONObject({
-              name: item.name || "未命名分组",
-              value: item.id || "",
-              id: item.id || ""
-            });
-          });
-          formattedData.unshift(allGroupOption);
-          carGroup.value = [formattedData];
-          pickerGroupTitle.value = "全部分组";
-          currentGroupId.value = "all";
-        } catch (err) {
-          console.error("加载分组数据失败:", err);
+    const toFindCar = () => {
+      if (!isLogin.value)
+        return null;
+      common_vendor.index.openLocation({
+        latitude: center.latitude,
+        longitude: center.longitude,
+        name: currentCarName.value,
+        scale: 18,
+        success: () => {
           common_vendor.index.showToast({
-            title: "加载分组失败",
+            title: "成功调起地图",
+            icon: "none"
+          });
+        },
+        fail: (err) => {
+          common_vendor.index.showToast({
+            title: "调起地图失败",
+            icon: "none"
+          });
+          console.error("调起地图失败:", err);
+        }
+      });
+    };
+    const toFence = () => {
+      if (!isLogin.value)
+        return null;
+      common_vendor.index.navigateTo({
+        url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
+      });
+    };
+    const contactCustomerService = () => {
+      common_vendor.index.openCustomerServiceChat(new common_vendor.UTSJSONObject({
+        extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
+        corpId: "ww686122ec6a4db85a",
+        success(res = null) {
+          console.log(res);
+        }
+      }));
+    };
+    const needRefresh = common_vendor.ref(false);
+    const toPay = (iccid, simMerchant) => {
+      if (!isLogin.value)
+        return null;
+      if (simMerchant.toLowerCase() == "zddx") {
+        iccid = iccid.substring(0, iccid.length - 1);
+      }
+      console.log(iccid);
+      needRefresh.value = true;
+      common_vendor.wx$1.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
+        appId: "wx1d647f2cfdc089e6",
+        path: "/pages/home/userSimRecharge?iccid=" + iccid,
+        envVersion: "release",
+        success(res = null) {
+          console.log("打开小程序成功", res);
+        },
+        fail(res = null) {
+          console.log("打开小程序失败", res);
+          needRefresh.value = false;
+          common_vendor.index.showToast({
+            title: "打开支付页面失败",
             icon: "none"
           });
         }
-      });
-    };
-    const refresh = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        yield loadUserDeviceList();
-      });
-    };
-    const loadUserDeviceList = (groupId = "") => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          let params = new common_vendor.UTSJSONObject(
-            {
-              pageSize: 1e3
-            }
-            // 如果不是全部分组，添加分组ID参数
-          );
-          if (groupId && groupId !== "all") {
-            params = new common_vendor.UTSJSONObject({ groupId });
-          }
-          const res = yield api_request.getUserDeviceList(params);
-          let deviceList = [];
-          if (res === null || res === void 0 ? null : res.data) {
-            if (Array.isArray(res.data)) {
-              deviceList = res.data;
-            } else if (Array.isArray(res.data.list)) {
-              deviceList = res.data.list;
-            } else if (Array.isArray(res.data.devices)) {
-              deviceList = res.data.devices;
-            } else if (Array.isArray(res.data.items)) {
-              deviceList = res.data.items;
-            } else if (res.data.totalCount !== void 0) {
-              deviceList = [];
-            }
-          }
-          originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
-        } catch (err) {
-          console.error("获取设备列表失败:", err);
-          common_vendor.index.showToast({
-            title: "获取设备列表失败",
-            icon: "none"
-          });
-        }
-      });
+      }));
     };
     const refreshDeviceList = () => {
       console.log("收到刷新事件，重新加载设备列表");
-      loadUserDeviceList();
+      loadDeviceList();
     };
-    const getUserIn = () => {
+    const gotoLogin = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/login/login"
+      });
+    };
+    const unbindDevice = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          const res = yield api_request.getUserInfo();
-          if ((res === null || res === void 0 ? null : res.code) === 0) {
-            common_vendor.index.setStorageSync("userType", res.data.type);
+        if (!isLogin.value)
+          return Promise.resolve(null);
+        common_vendor.index.showModal(new common_vendor.UTSJSONObject({
+          title: "解绑车辆",
+          content: "确定解绑当前车辆吗？",
+          success: (res) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              if (res.confirm) {
+                const res_1 = yield api_request.delDevice(currentCarImei.value);
+                if (res_1.code == 0) {
+                  common_vendor.index.showToast({
+                    title: "解绑成功",
+                    icon: "success"
+                  });
+                } else {
+                  common_vendor.index.showToast({
+                    title: "解绑失败",
+                    icon: "error"
+                  });
+                }
+                loadDeviceList();
+              }
+            });
           }
-        } catch (err) {
-          console.error("获取用户信息失败:", err);
-        }
+        }));
       });
     };
     common_vendor.onShow(() => {
@@ -333,51 +527,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const token = common_vendor.index.getStorageSync("token");
         if (token) {
           common_vendor.index.$on("refreshDeviceList", refreshDeviceList);
-          const needRefresh = common_vendor.index.getStorageSync("needRefreshHome");
-          if (needRefresh) {
-            yield loadUserDeviceList(currentGroupId.value);
+          const needRefresh_1 = common_vendor.index.getStorageSync("needRefreshHome");
+          if (needRefresh_1) {
+            yield loadDeviceList();
             common_vendor.index.removeStorageSync("needRefreshHome");
-          }
-        }
-      });
-    });
-    common_vendor.onHide(() => {
-      common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
-    });
-    common_vendor.onLoad(() => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const token = common_vendor.index.getStorageSync("token");
-        if (!token) {
-          Login.value = false;
-        } else {
-          Login.value = true;
-          const isFirst = common_vendor.index.getStorageSync("upgradeTip");
-          if (!isFirst) {
-            common_vendor.index.showModal(new common_vendor.UTSJSONObject({
-              title: "惊喜预告",
-              content: "5月平台全新升级,敬请期待!",
-              showCancel: false,
-              success: (res) => {
-                if (res.confirm) {
-                  common_vendor.index.setStorageSync("upgradeTip", true);
-                }
-              }
-            }));
-          }
-          getLocation();
-          yield loadGroupData();
-          yield loadUserDeviceList();
-          yield getUserIn();
-          mapCtx = common_vendor.index.createMapContext("myMap", this);
-          if (mapCtx && mapCtx.initMarkerCluster) {
-            mapCtx.initMarkerCluster(new common_vendor.UTSJSONObject({
-              enableDefaultStyle: true,
-              zoomOnClick: true,
-              gridSize: 60,
-              complete: () => {
-                console.log("聚合初始化完成");
-              }
-            }));
           }
         }
       });
@@ -385,118 +538,118 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onUnload(() => {
       common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
     });
-    const gotoLogin = () => {
-      common_vendor.index.redirectTo({ url: "/pages/login/login" });
+    const checkToken = () => {
+      const token = common_vendor.index.getStorageSync("token");
+      if (!token) {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+        return false;
+      }
+      return true;
     };
+    common_vendor.onLoad(() => {
+      common_vendor.index.hideTabBar();
+      initDimensions();
+      loadDeviceList();
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(subMsg, "18"),
-        b: common_vendor.p({
-          title: "首页",
-          ["show-back"]: false,
-          backgroundColor: "#fff",
-          textColor: "#333",
-          showCapsule: false,
-          isIcon: true,
-          Icon: "bell",
-          iconColor: iconColor.value
+        a: common_vendor.t(currentCarName.value || "请选择车辆"),
+        b: common_vendor.o(handlePicker, "03"),
+        c: common_vendor.o(toAdd, "34"),
+        d: common_vendor.p({
+          name: "plus-circle",
+          size: "25",
+          class: "data-v-00a60067"
         }),
-        c: showMap.value
-      }, showMap.value ? {
-        d: common_vendor.sei("myMap", "map"),
-        e: markers.value,
-        f: mapScale.value,
-        g: common_vendor.o(handleTap, "54"),
-        h: userLocation.value.latitude,
-        i: userLocation.value.longitude
-      } : {
-        j: common_vendor.o(unbindDevice, "70"),
-        k: common_vendor.p({
-          lists: filteredDevices.value
-        })
-      }, {
-        l: Login.value
-      }, Login.value ? {
-        m: common_vendor.p({
-          text: noticeText.value,
-          direction: "row",
-          fontSize: "32rpx",
-          mode: "closable"
+        e: safeDeviceDetail.value.deviceStatus.batteryPercent
+      }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
+        f: common_vendor.p({
+          percentage: safeDeviceDetail.value.deviceStatus.batteryPercent,
+          height: "20rpx",
+          activeColor: "#19be6b",
+          inactiveColor: "#999",
+          class: "data-v-00a60067"
         })
       } : {}, {
-        n: showMap.value
-      }, showMap.value ? {
-        o: common_vendor.p({
-          name: "plus",
-          size: "19"
+        g: safeDeviceDetail.value.deviceStatus.batteryPercent
+      }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
+        h: common_vendor.t(safeDeviceDetail.value.deviceStatus.batteryPercent)
+      } : {}, {
+        i: safeDeviceDetail.value.deviceStatus.voltage
+      }, safeDeviceDetail.value.deviceStatus.voltage ? {
+        j: common_vendor.t(safeDeviceDetail.value.deviceStatus.voltage)
+      } : {}, {
+        k: common_assets._imports_0,
+        l: common_vendor.t(safeDeviceDetail.value.connectionStatus === "online" ? "在线" : "离线"),
+        m: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
+        n: common_vendor.t(devicePosInfo.value.positionUpdateTime),
+        o: statusBarHeight.value + 50 + "px",
+        p: common_vendor.o(refreshLocation, "ca"),
+        q: isMapReady.value
+      }, isMapReady.value ? {
+        r: common_vendor.sei("myMap", "map"),
+        s: center.latitude,
+        t: center.longitude,
+        v: markers.value,
+        w: mapScale.value
+      } : {}, {
+        x: common_vendor.t(totalTrips.value),
+        y: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
+        z: common_assets._imports_1,
+        A: common_vendor.o(toDeviceDetail, "36"),
+        B: common_vendor.p({
+          name: "arrow-right",
+          class: "data-v-00a60067"
         }),
-        p: common_vendor.o(mapPlus, "85"),
-        q: common_vendor.p({
-          name: "minus",
-          size: "19"
+        C: common_assets._imports_2,
+        D: common_vendor.p({
+          name: "arrow-right",
+          class: "data-v-00a60067"
         }),
-        r: common_vendor.o(mapMin, "0c")
-      } : {}, {
-        s: !Login.value
-      }, !Login.value ? {
-        t: common_vendor.o(gotoLogin, "57")
-      } : {}, {
-        v: Login.value
-      }, Login.value ? {
-        w: common_vendor.o(refresh, "7a")
-      } : {}, {
-        x: Login.value
-      }, Login.value ? {
-        y: common_vendor.o(addCar, "96")
-      } : {}, {
-        z: common_vendor.t(showMap.value ? "查看车辆" : "返回总览"),
-        A: common_vendor.o(toggleMapMode, "4c"),
-        B: showMap.value
-      }, showMap.value ? {
-        C: common_vendor.t(totalCount.value),
-        D: common_vendor.o(($event) => {
-          return goToList("all");
-        }, "a9"),
-        E: common_vendor.t(onlineCount.value),
-        F: common_vendor.o(($event) => {
-          return goToList("online");
-        }, "b7"),
-        G: common_vendor.t(offlineCount.value),
+        E: common_vendor.o(toMsgCenter, "79"),
+        F: common_assets._imports_3,
+        G: common_vendor.t(currentCarIccId.value),
         H: common_vendor.o(($event) => {
-          return goToList("offline");
-        }, "ae")
-      } : {}, {
-        I: common_vendor.t(pickerStateTitle.value),
-        J: common_vendor.p({
-          name: "arrow-down",
-          color: "#fff"
+          return toPay(currentCarIccId.value, currentCarSimMerchant.value);
+        }, "c6"),
+        I: common_vendor.p({
+          type: "primary",
+          size: "small",
+          class: "data-v-00a60067"
         }),
-        K: common_vendor.o(handStatePicker, "1b"),
-        L: Login.value && !showMap.value
-      }, Login.value && !showMap.value ? {
-        M: common_vendor.t(pickerGroupTitle.value),
-        N: common_vendor.p({
-          name: "arrow-down",
-          color: "#fff"
-        }),
-        O: common_vendor.o(handGroupPicker, "b4")
+        J: common_assets._imports_4,
+        K: common_vendor.o(toFindCar, "e2"),
+        L: common_assets._imports_5,
+        M: common_vendor.o(toFence, "10"),
+        N: common_assets._imports_6,
+        O: common_vendor.o(contactCustomerService, "bd"),
+        P: common_assets._imports_7,
+        Q: common_vendor.o(unbindDevice, "45"),
+        R: !isLogin.value
+      }, !isLogin.value ? {
+        S: common_vendor.o(gotoLogin, "a8")
       } : {}, {
-        P: common_vendor.sr(picker, "a4fca7fa-7", {
+        T: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        Q: common_vendor.o(confirm, "c0"),
-        R: common_vendor.p({
-          columns: columns.value,
+        U: common_vendor.o(confirm, "d5"),
+        V: common_vendor.p({
+          columns: pickerColumns.value,
           keyName: "name",
-          class: "r"
+          class: "r data-v-00a60067"
         }),
-        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        T: `${_ctx.u_s_b_h}px`,
-        U: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        W: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        X: `${_ctx.u_s_b_h}px`,
+        Y: `${_ctx.u_s_a_i_b}px`,
+        Z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-00a60067"]]);
+wx.createPage(MiniProgramPage);

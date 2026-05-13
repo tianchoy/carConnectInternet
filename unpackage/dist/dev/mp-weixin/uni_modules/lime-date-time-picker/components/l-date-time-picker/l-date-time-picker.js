@@ -235,8 +235,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.o(onCancel, "1c"),
         d: common_vendor.o(onChange, "7d"),
         e: common_vendor.o(onPick, "c6"),
-        f: `${_ctx.u_s_b_h}px`,
-        g: common_vendor.p({
+        f: common_vendor.p({
           title: _ctx.title,
           titleStyle: _ctx.titleStyle,
           ["confirm-btn"]: _ctx.confirmBtn,
@@ -253,12 +252,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius: _ctx.radius,
           value: common_vendor.unref(valueOfPicker),
           columns: common_vendor.unref(columns),
-          id: common_vendor.gei(_ctx, ""),
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          id: common_vendor.gei(_ctx, "")
         }),
-        h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

@@ -118,8 +118,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     A: common_vendor.sr("modalPopup", "4b4aa5ec-0"),
     B: common_vendor.gei(_ctx, ""),
     C: common_vendor.o($options.popupChange, "5a"),
-    D: `${_ctx.u_s_b_h}px`,
-    E: common_vendor.p({
+    D: common_vendor.p({
       mode: "center",
       zoom: _ctx.zoom,
       zIndex: _ctx.zIndex,
@@ -132,12 +131,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       safeAreaInsetBottom: false,
       duration: 400,
       id: common_vendor.gei(_ctx, ""),
-      class: "r data-v-4b4aa5ec",
-      style: common_vendor.normalizeStyle({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
-      })
+      class: "r data-v-4b4aa5ec"
     }),
-    F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    E: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-4b4aa5ec"]]);

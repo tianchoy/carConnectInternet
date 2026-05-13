@@ -25,109 +25,324 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
+.container.data-v-00a60067 {
+  background: linear-gradient(90deg, #E6F9E6, #E0F0FF);
+  min-height: 100vh;
+  padding: 0 30rpx 30rpx 30rpx;
+}
+.container .loading-container.data-v-00a60067 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  background-color: #f5f7fa;
-}
-.container .map-container {
-  flex: 1;
-  width: 100%;
-  position: relative;
-}
-.container .tool-nav {
-  position: absolute;
-  top: 200rpx;
-  right: 20rpx;
-  z-index: 100;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
   align-items: center;
-  font-size: 35rpx;
+  gap: 20rpx;
+  z-index: 999;
 }
-.container .tool-nav .btn-map-list {
-  padding: 10rpx;
-  background-color: #1296db;
-  color: #fff;
-  border-radius: 10rpx;
+.container .loading-container .loading-text.data-v-00a60067 {
+  font-size: 28rpx;
+  color: #666;
 }
-.container .tool-nav .addCar {
-  padding: 10rpx;
-  background-color: #1296db;
-  color: #fff;
-  border-radius: 10rpx;
-  margin-right: 10rpx;
-}
-.container .tool-nav .refresh {
-  padding: 10rpx;
-  background-color: #1296db;
-  color: #fff;
-  border-radius: 10rpx;
-  margin-right: 10rpx;
-}
-.container .right-bar {
-  position: absolute;
-  top: 300rpx;
-  right: 20rpx;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-.container .right-bar view {
-  padding: 5rpx 15rpx;
-  font-size: 25rpx;
-  margin-bottom: 20rpx;
-  border-radius: 10rpx;
-  color: #fff;
-  /* 添加点击效果 */
-  transition: all 0.2s;
-}
-.container .right-bar view:active {
-  transform: scale(0.95);
-  opacity: 0.8;
-}
-.container .right-bar .allCar {
-  background-color: #1296db;
-}
-.container .right-bar .onlineCar {
-  background-color: #0da117;
-}
-.container .right-bar .offlineCar {
-  background-color: #d81e06;
-}
-.container .left-bar,
-.container .left-bar-state {
-  position: absolute;
-  top: 200rpx;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  padding: 10rpx;
-  border-radius: 10rpx;
-  background-color: rgba(3, 109, 246, 0.71);
-  color: #fff;
-  font-size: 30rpx;
+.container .top .device-car.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20rpx;
 }
-.container .left-bar {
-  left: 20rpx;
+.container .top .device-car .current-car.data-v-00a60067 {
+  position: relative;
 }
-.container .left-bar-state {
-  left: 20rpx;
-  top: 270rpx;
+.container .top .device-car .current-car .car-id.data-v-00a60067 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  padding-right: 30rpx;
+  position: relative;
 }
-.container .login-view-more {
+.container .top .device-car .current-car .car-id.data-v-00a60067::after {
+  content: "";
   position: absolute;
-  bottom: 50rpx;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent transparent #000 transparent;
+  border-width: 0 0 10px 10px;
+}
+.container .top .device-car .nav-tools.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30rpx;
+}
+.container .top .device-info.data-v-00a60067 {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  width: 50%;
+}
+.container .top .device-info > view.data-v-00a60067 {
+  font-size: 26rpx;
+  color: #333;
+}
+.container .top .banner.data-v-00a60067 {
+  margin: 20rpx 0;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+.container .top .banner .banner-image.data-v-00a60067 {
+  width: 100%;
+}
+.container .top .car-state.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-radius: 16rpx;
+}
+.container .top .car-state .state-item.data-v-00a60067 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  background-color: #fff;
+  padding: 20rpx;
+  border-radius: 30rpx;
+}
+.container .top .car-state .state-item .state-label.data-v-00a60067 {
+  font-size: 24rpx;
+  color: #999;
+}
+.container .top .car-state .state-item .state-value.data-v-00a60067 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.container .top .car-state .state-item .state-value.online.data-v-00a60067 {
+  color: #07C160;
+}
+.container .content .map-box.data-v-00a60067 {
+  width: 100%;
+  height: 400rpx;
+  margin: 10rpx 0 40rpx 0;
+  background-color: #fff;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+.container .content .map-box .map-header.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.container .content .map-box .map-header .map-title.data-v-00a60067 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+.container .content .map-box .map-header .map-refresh.data-v-00a60067 {
+  font-size: 26rpx;
+  color: #07C160;
+  padding: 8rpx 16rpx;
+  background: #f0f9f0;
+  border-radius: 8rpx;
+}
+.container .content .map-box .map-container.data-v-00a60067 {
+  height: 300rpx;
+}
+.container .content .mile-record.data-v-00a60067 {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+.container .content .mile-record .record-header.data-v-00a60067 {
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.container .content .mile-record .record-header .record-title.data-v-00a60067 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+.container .content .mile-record .ring-container.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 30rpx 20rpx;
+  background-color: #edf7ff;
+  border-radius: 24rpx;
+  margin: 20rpx;
+}
+.container .content .mile-record .ring-item.data-v-00a60067 {
+  position: relative;
+  width: 250rpx;
+  height: 250rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container .content .mile-record .ring-item.data-v-00a60067::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4rpx solid #D8E2F0;
+  box-sizing: border-box;
+  z-index: 1;
+}
+.container .content .mile-record .ring-bg.data-v-00a60067 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: 2;
+  box-sizing: border-box;
+  border: 16rpx solid transparent;
+}
+.container .content .mile-record .ring-bg.green.data-v-00a60067 {
+  border-top-color: #4cd964;
+  border-right-color: #4cd964;
+  border-left-color: #4cd964;
+  transform: rotate(135deg);
+}
+.container .content .mile-record .ring-bg.orange.data-v-00a60067 {
+  border-top-color: #ff9500;
+  border-right-color: #ff9500;
+  border-left-color: #ff9500;
+  transform: rotate(135deg);
+}
+.container .content .mile-record .ring-text.data-v-00a60067 {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+.container .content .mile-record .num.data-v-00a60067 {
+  font-size: 45rpx;
+  font-weight: bold;
+  color: #333;
+}
+.container .content .mile-record .unit.data-v-00a60067 {
+  font-size: 20rpx;
+  color: #666;
+  margin-left: 8rpx;
+  text-align: right;
+}
+.container .content .mile-record .label.data-v-00a60067 {
+  display: block;
+  font-size: 25rpx;
+  color: #666;
+  margin-top: 12rpx;
+}
+.container .content .device-list.data-v-00a60067 {
+  display: flex;
+  flex-direction: column;
+  margin: 40rpx 0;
+  gap: 30rpx;
+}
+.container .content .device-list .device-item.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+}
+.container .content .device-list .device-item .item-label.data-v-00a60067 {
+  font-size: 30rpx;
+  font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  align-items: center;
+  gap: 30rpx;
+}
+.container .content .device-list .device-item .item-label .icon.data-v-00a60067 {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  padding: 20rpx;
+}
+.container .content .device-list .device-item .item-label .icon image.data-v-00a60067 {
+  width: 100%;
+  height: 100%;
+}
+.container .content .device-list .device-item .item-label .icon.icon-device.data-v-00a60067 {
+  background-color: #f0f9f0;
+}
+.container .content .device-list .device-item .item-label .icon.icon-msg.data-v-00a60067 {
+  background-color: #f7f5f1;
+}
+.container .content .device-list .device-item .item-label .icon.icon-pay.data-v-00a60067 {
+  background-color: #f7f1f5;
+}
+.container .content .device-list .device-item .item-label .item-info.data-v-00a60067 {
+  font-weight: normal;
+}
+.container .content .device-list .device-item .item-label .item-info .item-desc.data-v-00a60067 {
+  color: #ccc;
+  margin-top: 10rpx;
+}
+.container .content .service.data-v-00a60067 {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20rpx;
+  background-color: #fff;
+  margin-bottom: 30rpx;
+}
+.container .content .service .service-header.data-v-00a60067 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  margin-bottom: 30rpx;
+}
+.container .content .service .service-content.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+}
+.container .content .service .service-content .service-item.data-v-00a60067 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+.container .content .service .service-content .service-item .icon-image.data-v-00a60067 {
+  width: 50rpx;
+  height: 50rpx;
+}
+.container .content .service .service-content .service-item .item-title.data-v-00a60067 {
+  font-size: 25rpx;
+  color: #222;
+}
+.container .login-view-more.data-v-00a60067 {
+  position: fixed;
+  bottom: 200rpx;
   width: 100%;
   left: 0rpx;
   z-index: 100;
@@ -139,49 +354,4 @@
   color: #fff;
   background-color: #999;
   padding: 20rpx 0;
-}
-.container .map-plus-min {
-  position: absolute;
-  bottom: 300rpx;
-  right: 50rpx;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 28rpx;
-  gap: 80rpx;
-}
-.container .map-plus-min .map-plus {
-  width: 60rpx;
-  height: 60rpx;
-  border-width: 1rpx;
-  border-color: #E6E6E6;
-  background-color: #fff;
-  border-style: solid;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.container .map-plus-min .map-min {
-  width: 60rpx;
-  height: 60rpx;
-  border-width: 1rpx;
-  border-color: #E6E6E6;
-  background-color: #fff;
-  border-style: solid;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.uv-notice-bar {
-  padding: 25rpx 30rpx !important;
-}
-.uv-notice__swiper {
-  height: 40rpx !important;
-}
-.uvicon-volume {
-  font-size: 40rpx !important;
 }

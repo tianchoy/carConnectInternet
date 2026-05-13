@@ -1,7 +1,7 @@
 <template>
-	<view :style="isShowStyle?{ height: statusBarHeight + 'px','background-color':'#fff',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'}
+	<view :style="isShowStyle?{ height: statusBarHeight + 'px','background-color':'#f1f1f1',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'}
 		:
-		{ height: statusBarHeight + 'px','background-color':'#fff',} ">
+		{ height: statusBarHeight + 'px','background-color':'#f1f1f1',} ">
 	</view>
 	<view class="navbar" :style="isShowStyle?{
     height: navBarHeight +'px',
@@ -38,7 +38,7 @@
 		showBack: { type: Boolean, default: true },
 		backText: { type: String, default: '' },
 		showCapsule: { type: Boolean, default: true },
-		backgroundColor: { type: String, default: '#ffffff' },
+		backgroundColor: { type: String, default: '#f1f1f1' },
 		textColor: { type: String, default: '#000000' },
 		isIcon: { type: Boolean, default: true },
 		Icon: { type: String, default: 'plus-circle' },

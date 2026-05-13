@@ -94,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, !__props.showPickerTime ? {} : {}, {
         d: __props.showPickerTime
       }, __props.showPickerTime ? {
-        e: common_assets._imports_0$4
+        e: common_assets._imports_0$5
       } : {}, {
         f: common_vendor.o(($event) => {
           return __props.showPickerTime ? handleTime : null;
@@ -110,19 +110,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         k: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
         l: `${_ctx.u_s_b_h}px`,
-        m: common_vendor.sr(picker, "f630fc82-0", {
+        m: `${_ctx.u_s_a_i_b}px`,
+        n: common_vendor.sr(picker, "f630fc82-0", {
           "k": "picker"
         }),
-        n: common_vendor.o(confirm, "69"),
-        o: `${_ctx.u_s_b_h}px`,
+        o: common_vendor.o(confirm, "69"),
         p: common_vendor.p({
           showPicker: true,
           columns: common_vendor.unref(columns),
           keyName: "label",
-          class: "r data-v-f630fc82",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "r data-v-f630fc82"
         })
       });
       return __returned__;

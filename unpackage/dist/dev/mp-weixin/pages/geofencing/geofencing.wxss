@@ -68,7 +68,7 @@
   background-color: #fff;
   padding: 20rpx 20rpx 50rpx 20rpx;
   width: 500rpx;
-  height: 170rpx;
+  height: 200rpx;
 }
 .container .fence-operations .fence-header {
   display: flex;

@@ -201,14 +201,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           });
         }),
-        s: common_assets._imports_0$2,
-        t: common_assets._imports_1$1,
-        v: common_assets._imports_2$1,
-        w: common_assets._imports_3
+        s: common_assets._imports_0$3,
+        t: common_assets._imports_1$2,
+        v: common_assets._imports_2$2,
+        w: common_assets._imports_3$1
       }, {
         x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         y: `${_ctx.u_s_b_h}px`,
-        z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        z: `${_ctx.u_s_a_i_b}px`,
+        A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

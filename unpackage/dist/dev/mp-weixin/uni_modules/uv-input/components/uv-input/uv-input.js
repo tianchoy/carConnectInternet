@@ -219,7 +219,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     K: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
     L: common_vendor.s($options.wrapperStyle),
     M: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     })
   });
 }

@@ -1,642 +1,1151 @@
 <template>
-	<view class="container">
-		<custom-navBar title="首页" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false"
-			:isIcon="true" @capsuleClick="subMsg" Icon="bell" :iconColor="iconColor">
-		</custom-navBar>
-		<view class="map-container" v-if="showMap">
-			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%"
-				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
-			</map>
-		</view>
-		<view v-else>
-			<indexListMode :lists="filteredDevices" @unbindDevice="unbindDevice" />
-		</view>
-		<view v-if="Login">
-			<uv-notice-bar :text="noticeText" direction="row" fontSize="32rpx" mode="closable"></uv-notice-bar>
-		</view>
-		<view class="map-plus-min" v-if="showMap">
-			<view class="map-plus" @click="mapPlus">
-				<uv-icon name="plus" size="19"></uv-icon>
-			</view>
-			<view class="map-min" @click="mapMin">
-				<uv-icon name="minus" size="19"></uv-icon>
-			</view>
-		</view>
-		<view class="login-view-more" v-if="!Login" @click="gotoLogin">登录查看更多</view>
-		<view class="tool-nav">
-			<view class="refresh" @click="refresh" v-if="Login">手动刷新</view>
-			<view class="addCar" @click="addCar" v-if="Login">设备绑定</view>
-			<view class="btn-map-list" @click="toggleMapMode">
-				{{showMap ? '查看车辆' : '返回总览'}}
-			</view>
-		</view>
-		<view class="right-bar" v-if="showMap">
-			<view class="allCar" @click="goToList('all')">全部 {{totalCount}}</view>
-			<view class="onlineCar" @click="goToList('online')">在线 {{onlineCount}}</view>
-			<view class="offlineCar" @click="goToList('offline')">离线 {{offlineCount}}</view>
-		</view>
-		<view class="left-bar" @click="handStatePicker">
-			<text>{{pickerStateTitle}}</text>
-			<uv-icon name="arrow-down" color="#fff"></uv-icon>
-		</view>
-		<view class="left-bar-state" @click="handGroupPicker" v-if=" Login && !showMap">
-			<text>{{pickerGroupTitle}}</text>
-			<uv-icon name="arrow-down" color="#fff"></uv-icon>
-		</view>
-		<uv-picker ref="picker" :columns="columns" keyName="name" @confirm="confirm"></uv-picker>
-	</view>
+    <view class="container">
+        <view>
+            <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
+                <view class="device-car">
+                    <view class="current-car">
+                        <text class="car-id" @click="handlePicker">{{currentCarName || '请选择车辆'}}</text>
+                    </view>
+                    <view class="nav-tools">
+                        <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
+                    </view>
+                </view>
+                
+                <!-- 设备信息 - 使用安全访问 -->
+                <view class="device-info">
+                    <uv-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percentage="safeDeviceDetail.deviceStatus.batteryPercent" height="20rpx" activeColor="#19be6b" inactiveColor="#999"></uv-line-progress>
+                    <view v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
+                    <view v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
+                </view>
+                
+                <view class="banner">
+                    <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
+                </view>
+                
+                <view class="car-state">
+                    <view class="state-item">
+                        <text class="state-label">设备状态</text>
+                        <text class="state-value" :class="{'online': safeDeviceDetail.connectionStatus === 'online'}">
+                            {{safeDeviceDetail.connectionStatus === 'online' ? '在线' : '离线'}}
+                        </text>
+                    </view>
+                    <view class="state-item">
+                        <text class="state-label">最后定位</text>
+                        <text class="state-value">{{devicePosInfo.positionUpdateTime}}</text>
+                    </view>
+                </view>
+            </view>
+            <view class="content">
+                <view class="map-box">
+                    <view class="map-header">
+                        <text class="map-title">车辆定位</text>
+                        <text class="map-refresh" @click="refreshLocation">刷新位置</text>
+                    </view>
+                    <view class="map-container">
+                        <map 
+                            v-if="isMapReady"
+                            id="myMap" 
+                            :latitude="center.latitude" 
+                            :longitude="center.longitude" 
+                            :markers="markers"
+                            :scale="mapScale" 
+                            style="width:100%;height:100%"
+                            :show-location="true" 
+                            :enable-traffic="true"
+                            :enable-overlooking="true" 
+                            :enable-building="true" 
+                            :enable-3D="false" 
+                            >
+                        </map>
+                    </view>
+                </view>
+                <view class="mile-record">
+                    <view class="record-header">
+                        <text class="record-title">轨迹记录</text>
+                    </view>
+                    <view class="ring-container">
+                        <view class="ring-item">
+                        <view class="ring-bg green"></view>
+                        <view class="ring-text">
+                            <text class="unit">条</text>
+                            <text class="num">{{totalTrips}}</text>
+                            <text class="label">今日轨迹</text>
+                        </view>
+                        </view>
+                        <view class="ring-item">
+                        <view class="ring-bg orange"></view>
+                        <view class="ring-text">
+                            <text class="unit">km</text>
+                            <text class="num">{{(totalMileage/1000).toFixed(2)}}</text>
+                            <text class="label">今日里程</text>
+                        </view>
+                        </view>
+                    </view>
+                </view>
+                <view class="device-list">
+                    <view class="device-item">
+                        <view class="item-label" @click="toDeviceDetail">
+                            <view class="icon icon-device"><image src="../../static/pos.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="item-info">
+                                <text class="item-title">设备详情</text>
+                                <text class="item-desc">请点击查看设备更多详情</text>
+                            </view>
+                        </view>
+                        <uv-icon name="arrow-right"></uv-icon>
+                    </view>
+                    <view class="device-item" @click="toMsgCenter">
+                        <view class="item-label">
+                            <view class="icon icon-msg"><image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="item-info">
+                                <text class="item-title">消息中心</text>
+                                <text class="item-desc">请点击查看报警消息</text>
+                            </view>
+                        </view>
+                        <uv-icon name="arrow-right"></uv-icon>
+                    </view>
+                    <view class="device-item">
+                        <view class="item-label">
+                            <view class="icon icon-pay"><image src="../../static/pay.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="item-info">
+                                <text class="item-title">ID: {{currentCarIccId}}</text>
+                                <text class="item-desc">请点击去续费</text>
+                            </view>
+                        </view>
+                        <uv-button type="primary" size="small"  @click="toPay(currentCarIccId,currentCarSimMerchant)">续费</uv-button>
+                    </view>
+                </view>
+                <view class="service">
+                    <view class="service-header">服务中心</view>
+                    <view class="service-content">
+                        <view class="service-item" @click="toFindCar">
+                            <image src="../../static/car.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">一键寻车</text>
+                        </view>
+                        <view class="service-item" @click="toFence">
+                            <image src="../../static/dzwl.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">电子围栏</text>
+                        </view>
+                        <view class="service-item" @click="contactCustomerService">
+                            <image src="../../static/online.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">在线客服</text>
+                        </view>
+                        <view class="service-item" @click="unbindDevice">
+                            <image src="../../static/del.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title" style="color: #ff4d4f;">删除设备</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="login-view-more" v-if="!isLogin" @click="gotoLogin">登录查看更多</view>
+        <uv-picker ref="picker" :columns="pickerColumns" keyName="name" @confirm="confirm"></uv-picker>
+    </view>
 </template>
 
-<script setup lang="uts">
-	import { ref, reactive, onMounted, computed, watch } from 'vue'
-	import { getCustomList, getCustomDeviceList, getUserInfo, getUserDeviceList, getUserGroupList, delDevice } from '../../api/request.uts'
-	// 导入坐标转换插件
-	import CoordTransform from '../../utils/coordTransform.uts'
-	import { getDeviceIcon } from '../../utils/cars'
+<script setup lang="ts">
+import { ref, reactive, computed, } from 'vue';
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice } from '../../api/request.uts'
+import CoordTransform from '../../utils/coordTransform.uts'
+import { getTodayZeroTime } from '../../utils/gettime.uts'
+import { formatTimes } from '../../utils/formateTime.uts'
+const { nowTime, todayZero } = getTodayZeroTime()
 
-	const Login = ref<boolean>(false)
-	const mapScale = ref(4)
-	const showMap = ref(true)
-	const markers = ref<Array<any>>([])
-	let mapCtx = undefined
-	const currentPickerType = ref('')
-	const picker = ref(null)
-	const iconColor = ref('#e6813e')
-	const noticeText = ref('近期平台,升级偶尔会有短暂登录不上的情况，敬请谅解！')
-	const userLocation = ref({
-		latitude: 0, 
-		longitude: 0
+interface Device {
+    name: string,
+    value: string,
+    deptId: string,
+    deviceId: string,
+    iccid: string,
+    simMerchant: string,
+    connectionStatus: string,
+    carType: string,
+    plateNo: string
+}
+
+//// 响应式数据
+const center = reactive({
+    latitude: 39.90469,
+    longitude: 116.40717
+})
+const isLogin = ref(false)
+const isMapReady = ref(false)
+const mapScale = ref(17)
+const statusBarHeight = ref(20)
+const menuButtonInfo = ref(null)
+const navBarHeight = ref(44)
+const loading = ref(true)
+const deviceList = ref<Array<Device>>([])
+const picker = ref(null)
+const currentCarImei = ref('')
+const currentCarDeptId = ref('')
+const currentCarDeviceId = ref('')
+const currentCarIccId = ref('')
+const currentCarName = ref('')
+const currentCarSimMerchant = ref('')
+const currentCarConnectionStatus = ref('')
+const currentCarCarType = ref('')
+const currentCarPlateNo = ref('')
+const deviceDetail = ref({
+    deviceStatus: {
+        batteryPercent: 0,
+        voltage: 0,
+        signalStrength: 0
+    },
+    connectionStatus: 'offline',
+    lastUpdateTime: null
+})
+const markers = ref<Array<any>>([])
+const lastUpdateTime = ref('--:--:--')
+
+// 计算属性 - 安全访问设备详情
+const safeDeviceDetail = computed(() => {
+    return {
+        deviceStatus: {
+            batteryPercent: deviceDetail.value?.deviceStatus?.batteryPercent ?? 0,
+            voltage: deviceDetail.value?.deviceStatus?.voltage ?? '--',
+            signalStrength: deviceDetail.value?.deviceStatus?.signalStrength ?? 0
+        },
+        connectionStatus: deviceDetail.value?.connectionStatus ?? 'offline',
+        lastUpdateTime: deviceDetail.value?.lastUpdateTime ?? null
+    }
+})
+
+// 处理车辆列表显示
+const pickerColumns = computed(() => {
+    return [deviceList.value]
+})
+
+// 初始化尺寸数据
+const initDimensions = () => {
+    const systemInfo = uni.getSystemInfoSync();
+    statusBarHeight.value = systemInfo.statusBarHeight || 20;
+    try {
+        const menuRect = uni.getMenuButtonBoundingClientRect();
+        if (menuRect) {
+            menuButtonInfo.value = menuRect;
+            const gap = menuRect.top - statusBarHeight.value;
+            navBarHeight.value = gap * 2 + menuRect.height + 4;
+        }
+    } catch (e) {
+        console.warn('胶囊按钮信息获取失败', e);
+    }
+}
+
+// 延迟函数
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 处理选择车辆
+const handlePicker = () => {
+    if (deviceList.value.length === 0) {
+        uni.showToast({
+            title: '暂无车辆数据',
+            icon: 'none'
+        })
+        return
+    }
+    picker.value?.open()
+}
+
+// 处理选择车辆确认
+const confirm = async (e: any) => {
+    if (!isLogin.value || !e.value || !e.value[0]) return
+    
+    currentCarName.value = e.value[0].name
+    currentCarImei.value = e.value[0].value
+    currentCarDeptId.value = e.value[0].deptId
+    currentCarDeviceId.value = e.value[0].deviceId
+    currentCarIccId.value = e.value[0].iccid
+    currentCarSimMerchant.value = e.value[0].simMerchant
+    currentCarConnectionStatus.value = e.value[0].connectionStatus
+    currentCarCarType.value = e.value[0].carType
+    currentCarPlateNo.value = e.value[0].plateNo
+    
+    uni.showLoading({
+        title: '加载车辆数据...',
+        mask: true
+    })
+    
+    try {
+        await loadDeviceDetail(e.value[0].deviceId);
+        await loadDevicePos({
+            deviceId: e.value[0].deviceId,
+            deviceids: e.value[0].value
+        })
+        await loadTrackPos({
+            imei: e.value[0].value,
+            startTime: formatTimes(todayZero),
+            endTime: formatTimes(nowTime),
+            minParkTime: 120,
+            withStop: false,
+            withPos: false,
+            withTrip: true,
+        })
+    } catch (error) {
+        console.error('切换车辆失败', error)
+        uni.showToast({
+            title: '切换失败，请重试',
+            icon: 'none'
+        })
+    } finally {
+        uni.hideLoading()
+    }
+}
+
+// 加载车辆列表
+const loadDeviceList = async () => {
+    if (!checkToken()) return
+    isLogin.value = true
+    
+    try {
+        const res = await getUserDeviceList({
+            pageSize: 1000
+        })
+        
+        if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
+            deviceList.value = res.data.list.map((item: any) => ({ 
+                name: item.deviceName, 
+                value: item.imei,
+                deptId: item.companyId,
+                deviceId: item.deviceId,
+                iccid: item.iccid,
+                simMerchant: item.simMerchant,
+                connectionStatus: item.connectionStatus,
+                carType: item.carType,
+                plateNo: item.plateNo,
+            }))
+            
+            currentCarName.value = deviceList.value[0].name
+            currentCarImei.value = deviceList.value[0].value
+            currentCarDeptId.value = deviceList.value[0].deptId
+            currentCarDeviceId.value = deviceList.value[0].deviceId
+            currentCarIccId.value = deviceList.value[0].iccid
+            currentCarSimMerchant.value = deviceList.value[0].simMerchant
+            currentCarConnectionStatus.value = deviceList.value[0].connectionStatus
+            currentCarCarType.value = deviceList.value[0].carType
+            currentCarPlateNo.value = deviceList.value[0].plateNo
+
+            await loadDeviceDetail(deviceList.value[0].deviceId);
+            await loadDevicePos({
+                deviceId: deviceList.value[0].deviceId,
+                deviceids: deviceList.value[0].value
+            })
+            await loadTrackPos({
+                imei: deviceList.value[0].value,
+                startTime: formatTimes(todayZero),
+                endTime: formatTimes(nowTime),
+                minParkTime: 120,
+                withStop: false,
+                withPos: false,
+                withTrip: true,
+            })
+
+        } else {
+            uni.showToast({
+                title: res.msg || '暂无车辆数据',
+                icon: 'none'
+            })
+        }
+    } catch (error) {
+        console.error('加载车辆列表失败', error)
+        uni.showToast({
+            title: '加载失败，请下拉重试',
+            icon: 'none'
+        })
+    } 
+}
+
+// 加载车辆详情
+const loadDeviceDetail = async (deviceId: string) => {
+    try {
+        const res = await getDeviceDetail(deviceId)
+        if (res.code == 0 && res.data) {
+            deviceDetail.value = {
+                deviceStatus: {
+                    batteryPercent: res.data.deviceStatus?.batteryPercent ?? 0,
+                    voltage: res.data.deviceStatus?.voltage ?? '--',
+                    signalStrength: res.data.deviceStatus?.signalStrength ?? 0
+                },
+                connectionStatus: res.data.connectionStatus ?? 'offline',
+                lastUpdateTime: res.data.lastUpdateTime ?? null
+            }
+            
+            // 更新最后定位时间
+            if (res.data.lastUpdateTime) {
+                const date = new Date(res.data.lastUpdateTime)
+                lastUpdateTime.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+            }
+        } else {
+            console.warn('获取设备详情失败:', res.msg)
+        }
+    } catch (error) {
+        console.error('加载设备详情失败', error)
+    }
+}
+
+// 加载轨迹轨迹
+const trackPosInfo = ref<any>({})
+const tripData = ref<Array<any>>([])
+const totalMileage = ref(0)
+const averageSpeed = ref(0)
+
+const loadTrackPos = async (data: any) => {
+    try {
+        const res = await getTrackPos(data)
+            console.log('车辆轨迹:', res)
+        if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
+            await processTripData(res.data)
+            // trackPosInfo.value = res.data.trips
+        } else {
+            console.warn('获取轨迹失败:', res.msg)
+        }
+    } catch (error) {
+        console.error('加载轨迹失败', error)
+    }
+}
+
+// 计算属性：总行程数
+	const totalTrips = computed(() => {
+		return tripData.value.length
 	})
 
-	// 状态选项
-	const carState = ref([
-		[{
-			name: '全部状态',
-			value: '0'
-		},
-		{
-			name: '在线',
-			value: '1'
-		},
-		{
-			name: '离线',
-			value: '2'
-		}]
-	])
+// 处理行程数据
+	const processTripData = async (data : any) => {
+		if (data.trips && data.trips.length > 0) {
+			// 遍历所有行程，获取地址
+			const processedTrips = await Promise.all(
+				data.trips.map(async (trip : any) => {
 
-	// 分组选项
-	const carGroup = ref<any>([])
-	const columns = ref<Array<{ name : string, value : string }>>([[]])
-	const pickerStateTitle = ref('全部状态')
-	const pickerGroupTitle = ref('全部分组')
-
-	// 原始设备列表
-	const originalDeviceList = ref<Array<any>>([])
-	// 当前选中的分组ID
-	const currentGroupId = ref<string>('')
-
-	// 计算属性 筛选逻辑
-	const filteredDevices = computed(() => {
-		if (!Array.isArray(originalDeviceList.value)) return []
-
-		let result = [...originalDeviceList.value]
-
-		// 状态筛选
-		if (pickerStateTitle.value == '在线') {
-			result = result.filter(device => device?.connectionStatus == 'online')
-		} else if (pickerStateTitle.value === '离线') {
-			result = result.filter(device => device?.connectionStatus == 'offline')
-		}
-
-		return result
-	})
-
-	// 计算设备数量统计
-	const totalCount = computed(() => originalDeviceList.value.length)
-	const onlineCount = computed(() => originalDeviceList.value.filter(d => d?.connectionStatus == 'online').length)
-	const offlineCount = computed(() => totalCount.value - onlineCount.value)
-
-	// 自动更新地图标记
-	watch([filteredDevices, showMap], ([devices, isMapVisible]) => {
-		if (isMapVisible) {
-			updateMarkers(devices)
-		}
-	})
-
-	const getLocation = () => {
-		uni.getLocation({
-			type: 'wgs84',
-			success: (res) => {
-				console.log('获取位置成功:', res)
-				userLocation.value.latitude = res.latitude
-				userLocation.value.longitude = res.longitude
-			},
-			fail: (err) => {
-				console.log('获取位置失败:', err)
-			}
-		})
-	}
-	//地图放大
-	const mapPlus = () => {
-		if (mapScale.value < 20) { // 最大缩放级别
-			mapScale.value += 1
-		}
-	}
-	// 地图缩小
-	const mapMin = () => {
-		if (mapScale.value > 3) { // 最小缩放级别
-			mapScale.value -= 1
-		}
-	}
-	// 订阅消息
-	const subMsg = () => {
-		console.log('订阅消息')
-		uni.requestSubscribeMessage({
-			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
-			success: (res) => {
-				console.log('订阅成功:', res)
-			},
-			fail: (err) => {
-				console.log('订阅失败:', err)
-			}
-		})
-	}
-
-	// 跳转到列表页面
-	const goToList = (status : string) => {
-		// 先切换到列表模式
-		showMap.value = false
-
-		// 根据状态设置筛选条件
-		switch (status) {
-			case 'all':
-				pickerStateTitle.value = '全部状态'
-				break
-			case 'online':
-				pickerStateTitle.value = '在线'
-				break
-			case 'offline':
-				pickerStateTitle.value = '离线'
-				break
-		}
-	}
-
-	// 解绑设备
-	const unbindDevice = async (imei : string) => {
-		const res = await delDevice(imei)
-		if (res.code == 0) {
-			uni.showToast({
-				title: '解绑成功',
-				icon: 'success'
-			})
-		} else {
-			uni.showToast({
-				title: '解绑失败',
-				icon: 'error'
-			})
-		}
-		// 解绑成功后刷新设备列表
-		await loadUserDeviceList(currentGroupId.value)
-	}
-
-	const handStatePicker = () => {
-		columns.value = carState.value
-		currentPickerType.value = 'state'
-		picker.value?.open()
-	}
-
-	const handGroupPicker = () => {
-		columns.value = carGroup.value
-		currentPickerType.value = 'group'
-		picker.value?.open()
-	}
-
-	const confirm = async (e : { value : Array<{ name : string, value : string, id : string }> }) => {
-		const selected = e.value[0]
-		if (currentPickerType.value == 'state') {
-			pickerStateTitle.value = selected.name
-		} else if (currentPickerType.value == 'group') {
-			pickerGroupTitle.value = selected.name
-			currentGroupId.value = selected.id
-			// 根据选择的分组重新加载设备列表
-			await loadUserDeviceList(selected.id)
-		}
-		currentPickerType.value = ''
-	}
-
-	const addCar = () => {
-		uni.navigateTo({
-			url: '/pages/addCar/addCar'
-		})
-	}
-
-	const toggleMapMode = () => {
-		showMap.value = !showMap.value
-	}
-
-	const handleTap = (e) => {
-		const markerId = e.detail.markerId
-		const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
-
-		if (selectedDevice) {
-			uni.navigateTo({
-				url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`,
-			})
-		} else {
-			console.warn('未找到对应的设备信息', markerId)
-		}
-	}
-
-	const updateMarkers = (devices) => {
-		if (!Array.isArray(devices)) {
-			devices = []
-		}
-		markers.value = devices.map((device, index) => {
-			if (!device || typeof device !== 'object') {
-				return null
-			}
-
-			const lat = Number(device.latitude)
-			const lng = Number(device.longitude)
-
-			if (isNaN(lat) || isNaN(lng)) {
-				return null
-			}
-
-			const iconPath = getDeviceIcon(device.connectionStatus, device.carType)
-
-			let markerId : number
-			if (device.deviceId && !isNaN(Number(device.deviceId))) {
-				markerId = Number(device.deviceId)
-			} else {
-				// 如果 deviceId 不是有效数字，使用索引作为 fallback
-				markerId = index + 1
-			}
-
-			return {
-				id: markerId,  // 使用数字类型的 ID
-				latitude: lat,
-				longitude: lng,
-				iconPath: iconPath,
-				width: 30,
-				height: 30,
-				callout: {
-					content: device.deviceName || device.plateNo || '设备',
-					display: 'ALWAYS',
-					padding: 8,
-					borderRadius: 8,
-					bgColor: '#ffffff'
-				},
-				joinCluster: true,  // 可以重新开启聚合
-				anchor: { x: 0.5, y: 0.5 }
-			}
-		}).filter(marker => marker !== null)
-	}
-
-
-	const loadGroupData = async () => {
-		try {
-			// 使用新的 getUserGroupList 接口
-			const groupRes = await getUserGroupList()
-			if (groupRes?.code !== 0 || !Array.isArray(groupRes.data)) {
-				throw new Error('获取分组数据失败')
-			}
-
-			// 格式化分组数据，添加全部分组选项
-			const allGroupOption = {
-				name: '全部分组',
-				value: 'all',
-				id: 'all'
-			}
-
-			const formattedData = groupRes.data.map(item => ({
-				name: item.name || '未命名分组',
-				value: item.id || '',
-				id: item.id || ''
-			}))
-
-			// 将全部分组选项添加到最前面
-			formattedData.unshift(allGroupOption)
-
-			carGroup.value = [formattedData]
-			pickerGroupTitle.value = '全部分组'
-			currentGroupId.value = 'all'
-
-		} catch (err) {
-			console.error('加载分组数据失败:', err)
-			uni.showToast({
-				title: '加载分组失败',
-				icon: 'none'
-			})
-		}
-	}
-
-	const refresh = async () => {
-		await loadUserDeviceList()
-	}
-
-	const loadUserDeviceList = async (groupId : string = '') => {
-		try {
-			let params = {
-				pageSize: 1000,
-			}
-			// 如果不是全部分组，添加分组ID参数
-			if (groupId && groupId !== 'all') {
-				params = { groupId: groupId }
-			}
-
-			const res = await getUserDeviceList(params)
-
-			let deviceList = []
-			if (res?.data) {
-				if (Array.isArray(res.data)) {
-					deviceList = res.data
-				} else if (Array.isArray(res.data.list)) {
-					deviceList = res.data.list
-				} else if (Array.isArray(res.data.devices)) {
-					deviceList = res.data.devices
-				} else if (Array.isArray(res.data.items)) {
-					deviceList = res.data.items
-				} else if (res.data.totalCount !== undefined) {
-					deviceList = []
-				}
-			}
-
-			// 使用插件转换坐标
-			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
-		} catch (err) {
-			console.error('获取设备列表失败:', err)
-			uni.showToast({
-				title: '获取设备列表失败',
-				icon: 'none'
-			})
-		}
-	}
-
-	// 添加全局事件监听，用于从添加页面返回时刷新
-	const refreshDeviceList = () => {
-		console.log('收到刷新事件，重新加载设备列表')
-		loadUserDeviceList()
-	}
-
-	const getUserIn = async () => {
-		try {
-			const res = await getUserInfo()
-			if (res?.code === 0) {
-				uni.setStorageSync('userType', res.data.type)
-			}
-		} catch (err) {
-			console.error('获取用户信息失败:', err)
-		}
-	}
-
-	onShow(async () => {
-		const token = uni.getStorageSync('token')
-		if (token) {
-			// 监听全局刷新事件
-			// refreshDeviceList()
-			uni.$on('refreshDeviceList', refreshDeviceList)
-
-			const needRefresh = uni.getStorageSync('needRefreshHome')
-			if (needRefresh) {
-				await loadUserDeviceList(currentGroupId.value)
-				uni.removeStorageSync('needRefreshHome')
-			}
-		}
-	})
-
-	onHide(() => {
-		// 移除事件监听
-		uni.$off('refreshDeviceList', refreshDeviceList)
-	})
-
-	onLoad(async () => {
-		const token = uni.getStorageSync('token')
-		if (!token) {
-			Login.value = false
-		} else {
-			Login.value = true
-			const isFirst = uni.getStorageSync('upgradeTip')
-			if (!isFirst) {
-				uni.showModal({
-					title: '惊喜预告',
-					content: '5月平台全新升级,敬请期待!',
-					showCancel: false,
-					success: (res) => {
-						if (res.confirm) {
-							uni.setStorageSync('upgradeTip', true)
-						}
-					}
+					return {
+						...trip,
+						startAddress: '查看位置',
+						endAddress: '查看位置',
+					};
 				})
-			}
-			getLocation()
-			await loadGroupData()
-			await loadUserDeviceList()
-			await getUserIn()
+			);
 
-			
+			tripData.value = processedTrips;
 
-			// 初始化地图上下文
-			mapCtx = uni.createMapContext('myMap', this)
+			// 计算总里程和平均速度
+			let totalDistance = 0;
+			let totalDuration = 0;
+			let totalAvgSpeed = 0;
 
-			// 启用点聚合
-			if (mapCtx && mapCtx.initMarkerCluster) {
-				mapCtx.initMarkerCluster({
-					enableDefaultStyle: true,
-					zoomOnClick: true,
-					gridSize: 60,
-					complete: () => {
-						console.log('聚合初始化完成')
-					}
-				})
-			}
+			processedTrips.forEach((trip : any) => {
+				totalDistance += trip.distance || 0;
+				totalDuration += trip.duration || 0;
+				totalAvgSpeed += trip.averageSpeed || 0;
+			});
+
+			totalMileage.value = totalDistance;
+			averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
+		} else {
+			tripData.value = [];
+			totalMileage.value = 0;
+			averageSpeed.value = 0;
 		}
-	})
+	};
 
-	onUnload(() => {
-		// 清理事件监听
-		uni.$off('refreshDeviceList', refreshDeviceList)
-	})
-	// 跳转登录页面
-	const gotoLogin = () => {
-		uni.redirectTo({ url: '/pages/login/login' })
-	}
+// 加载设备位置
+const devicePosInfo = ref<any>({})
+const loadDevicePos = async (data: any) => {
+    try {
+        const res = await getDevicePos(data)
+        if (res.code == 0 && res.data && res.data.length > 0) {
+            devicePosInfo.value = res.data[0]
+            
+            // 确保经纬度是数字类型
+            const lat = Number(res.data[0].latitude);
+            const lng = Number(res.data[0].longitude);
+
+            if (isNaN(lat) || isNaN(lng)) {
+                console.error('经纬度格式错误', res.data[0].latitude, res.data[0].longitude);
+                uni.showToast({
+                    title: '定位数据异常',
+                    icon: 'none'
+                })
+                return false;
+            }
+
+            // 同步进行坐标转换
+            let convertedCoord;
+            try {
+                convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
+            } catch (transformError) {
+                console.error('坐标转换失败:', transformError);
+                convertedCoord = { lat: lat, lng: lng };
+            }
+
+            // 强制更新中心点
+            center.latitude = convertedCoord.lat;
+            center.longitude = convertedCoord.lng;
+            isMapReady.value = true
+
+            // 等待一小段时间确保地图更新
+            await delay(100);
+
+            // 更新设备标记
+            const deviceMarker = createMarker(
+                1,
+                convertedCoord.lat,
+                convertedCoord.lng,
+                'device',
+                currentCarName.value
+            );
+            
+            // 强制响应式更新标记点
+            markers.value = [];
+            await delay(50);
+            markers.value = [deviceMarker];
+
+            console.log('标记点更新完成');
+            return true;
+        } else {
+            console.warn('获取设备位置失败:', res.msg)
+            isMapReady.value = false
+            uni.showToast({
+                title: res.msg || '获取位置失败',
+                icon: 'none'
+            })
+            return false
+        }
+    } catch (error) {
+        console.error('加载设备位置失败', error)
+        uni.showToast({
+            title: '定位失败，请重试',
+            icon: 'none'
+        })
+        return false
+    }
+}
+
+// 刷新位置
+const refreshLocation = async () => {
+    if (!currentCarDeviceId.value) {
+        uni.showToast({
+            title: '请先选择车辆',
+            icon: 'none'
+        })
+        return
+    }
+    
+    uni.showLoading({
+        title: '刷新位置中...',
+        mask: true
+    })
+    
+    try {
+        await loadDeviceDetail(currentCarDeviceId.value);
+        const success = await loadDevicePos({
+            deviceId: currentCarDeviceId.value,
+            deviceids: currentCarImei.value
+        })
+        
+        if (success) {
+            uni.showToast({
+                title: '位置已更新',
+                icon: 'success'
+            })
+        }
+    } catch (error) {
+        console.error('刷新位置失败', error)
+        uni.showToast({
+            title: '刷新失败',
+            icon: 'none'
+        })
+    } finally {
+        uni.hideLoading()
+    }
+}
+
+// 创建标记点
+const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
+    const isOnline = safeDeviceDetail.value.connectionStatus === 'online'
+    const marker = {
+        id,
+        latitude: lat,
+        longitude: lng,
+        width: 35,
+        height: 35,
+        iconPath: isOnline ? '../../static/marker.png' : '../../static/offline-marker.png',
+        callout: {
+            content: title || '爱车位置',
+            color: isOnline ? '#ffffff' : '#999999',
+            borderRadius: 10,
+            bgColor: isOnline ? '#07C160' : '#CCCCCC',
+            padding: 8,
+            fontSize: 14,
+            display: 'ALWAYS'
+        },
+        anchor: { x: 0.5, y: 0.5 }
+    }
+    return marker
+}
+
+// 跳转设备详情
+const toDeviceDetail = (e: any) => {
+    // 检查是否登录
+    if (!isLogin.value) return
+
+    if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+        uni.showToast({
+            title: '请先选择车辆',
+            icon: 'none'
+        })
+        return
+    }
+    uni.navigateTo({
+        url: `/pages/carInfoDetail/carInfoDetail?imei=${currentCarImei.value}&deptId=${currentCarDeptId.value}&deviceId=${currentCarDeviceId.value}`,
+    })
+}
+
+// 跳转添加车辆
+const toAdd = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.navigateTo({
+        url: '/pages/addCar/addCar',
+    })
+}
+
+// 跳转消息中心
+const toMsgCenter = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.switchTab({
+        url: '/pages/message/message',
+    })
+}
+
+// 跳转查找车辆
+const toFindCar = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.openLocation({
+        latitude: center.latitude,
+        longitude: center.longitude,
+        name: currentCarName.value,
+        scale: 18,
+        success: () => {
+            uni.showToast({
+                title: '成功调起地图',
+                icon: 'none'
+            });
+        },
+        fail: (err) => {
+            uni.showToast({
+                title: '调起地图失败',
+                icon: 'none'
+            });
+            console.error('调起地图失败:', err);
+        }
+    });
+}
+
+// 跳转围栏
+const toFence = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.navigateTo({
+        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+    })
+}
+
+// 联系客服
+const contactCustomerService = () => {
+    uni.openCustomerServiceChat({
+        extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
+        corpId: 'ww686122ec6a4db85a',
+        success(res) {
+            console.log(res)
+        }
+    })
+}
+
+// 支付
+const needRefresh = ref(false)
+const toPay = (iccid : string,simMerchant : string) => {
+        // 检查是否登录
+    if (!isLogin.value) return
+    if(simMerchant.toLowerCase() == 'zddx'){
+        iccid = iccid.substring(0,iccid.length-1) //电信卡
+    }
+    // iccid = iccid.substring(0,iccid.length-1)
+    
+    console.log(iccid)
+    // 设置需要刷新的标志
+    needRefresh.value = true
+    
+    //拉起半屏小程序
+    wx.openEmbeddedMiniProgram({
+        appId: 'wx1d647f2cfdc089e6',
+        path: '/pages/home/userSimRecharge?iccid=' + iccid,
+        envVersion: 'release',
+        success(res) {
+            // 打开成功
+            console.log('打开小程序成功', res)
+        },
+        fail(res) {
+            // 打开失败
+            console.log('打开小程序失败', res)
+            // 如果打开失败，取消刷新标志
+            needRefresh.value = false
+            uni.showToast({
+                title: '打开支付页面失败',
+                icon: 'none'
+            })
+        }
+    })
+}
+
+
+
+const refreshDeviceList = () => {
+    console.log('收到刷新事件，重新加载设备列表')
+    loadDeviceList()
+}
+
+// 跳转登录页
+const gotoLogin = () => {
+    uni.navigateTo({
+        url: '/pages/login/login',
+    })
+}
+
+// 解绑设备
+const unbindDevice = async () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.showModal({
+        title: '解绑车辆',
+        content: '确定解绑当前车辆吗？',
+        success: async (res) => {
+            if (res.confirm) {
+                //判断deviceList的 length，不能解绑最后一个车辆
+                // if(deviceList.value.length == 1){
+                //     uni.showToast({
+                //         title: '不能解绑',
+                //         icon: 'error'
+                //     })
+                //     return
+                // }
+                // 确认解绑
+                const res = await delDevice(currentCarImei.value)
+                if (res.code == 0) {
+                    uni.showToast({
+                        title: '解绑成功',
+                        icon: 'success'
+                    })
+                } else {
+                    uni.showToast({
+                        title: '解绑失败',
+                        icon: 'error'
+                    })
+                }
+                loadDeviceList();
+            }
+        }
+    })
+}
+
+onShow(async () => {
+    const token = uni.getStorageSync('token')
+    if (token) {
+        // 监听全局刷新事件
+        // refreshDeviceList()
+        uni.$on('refreshDeviceList', refreshDeviceList)
+
+        const needRefresh = uni.getStorageSync('needRefreshHome')
+        if (needRefresh) {
+            await loadDeviceList()
+            uni.removeStorageSync('needRefreshHome')
+        }
+    }
+})
+
+onUnload(() => {
+    // 清理事件监听
+    uni.$off('refreshDeviceList', refreshDeviceList)
+})
+
+// 检查登录状态
+const checkToken = () => {
+    const token = uni.getStorageSync('token')
+    if (!token) {
+        uni.showToast({
+            title: '请先登录',
+            icon: 'none'
+        })
+        return false
+    }
+    return true
+}
+
+// 页面加载
+onLoad(() => {
+    uni.hideTabBar()
+    initDimensions();
+    loadDeviceList();
+})
 </script>
 
-<style lang="scss">
-	.container {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-		background-color: #f5f7fa;
+<style scoped lang="scss">
+.container {
+    background: linear-gradient(90deg, #E6F9E6, #E0F0FF);
+    min-height: 100vh;
+    padding: 0 30rpx 30rpx 30rpx;
+    
+    .loading-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20rpx;
+        z-index: 999;
+        
+        .loading-text {
+            font-size: 28rpx;
+            color: #666;
+        }
+    }
+    
+    .top {
+        .device-car {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20rpx;
+            
+            .current-car {
+                position: relative;
+                
+                .car-id {
+                    font-size: 36rpx;
+                    font-weight: bold;
+                    color: #000;
+                    text-align: center;
+                    padding-right: 30rpx;
+                    position: relative;
+                    
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                        width: 0;
+                        height: 0;
+                        border-style: solid;
+                        border-color: transparent transparent #000 transparent;
+                        border-width: 0 0 10px 10px;
+                    }
+                }
+            }
+            
+            .nav-tools {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 30rpx;
+            }
+        }
+        
+        .device-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16rpx;
+            padding: 20rpx;
+            border-radius: 16rpx;
+            width: 50%;
+            
+            > view {
+                font-size: 26rpx;
+                color: #333;
+            }
+        }
+        
+        .banner {
+            margin: 20rpx 0;
+            border-radius: 20rpx;
+            overflow: hidden;
+            
+            .banner-image {
+                width: 100%;
+            }
+        }
+        
+        .car-state {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20rpx;
+            padding: 20rpx 0;
+            border-radius: 16rpx;
+            
+            .state-item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 12rpx;
+                background-color: #fff;
+                padding: 20rpx;
+                border-radius: 30rpx;
+                
+                .state-label {
+                    font-size: 24rpx;
+                    color: #999;
+                }
+                
+                .state-value {
+                    font-size: 28rpx;
+                    font-weight: bold;
+                    color: #333;
+                    
+                    &.online {
+                        color: #07C160;
+                    }
+                }
+            }
+        }
+    }
+    
+    .content {
+        .map-box {
+            width: 100%;
+            height: 400rpx;
+            margin: 10rpx 0 40rpx 0;
+            background-color: #fff;
+            border-radius: 20rpx;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+            
+            .map-header {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding:20rpx 30rpx;
+                border-bottom: 1rpx solid #f0f0f0;
+                
+                .map-title {
+                    font-size: 32rpx;
+                    font-weight: bold;
+                    color: #333;
+                }
+                
+                .map-refresh {
+                    font-size: 26rpx;
+                    color: #07C160;
+                    padding: 8rpx 16rpx;
+                    background: #f0f9f0;
+                    border-radius: 8rpx;
+                }
+            }
+            
+            .map-container {
+                height: 300rpx;
+            }
+        }
+        .mile-record{
+            width: 100%;
+            background-color: #fff;
+            border-radius: 20rpx;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+            .record-header {
+                padding:20rpx 30rpx;
+                border-bottom: 1rpx solid #f0f0f0;
+                
+                .record-title {
+                    font-size: 32rpx;
+                    font-weight: bold;
+                    color: #333;
+                }
+            }
+            .ring-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 30rpx 20rpx;
+                background-color: #edf7ff;
+                border-radius: 24rpx;
+                margin: 20rpx;
+            }
+            .ring-item {
+                position: relative;
+                width: 250rpx;
+                height: 250rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .ring-item::before {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                border: 4rpx solid #D8E2F0;
+                box-sizing: border-box;
+                z-index: 1;
+            }
+            .ring-bg {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                z-index: 2;
+                box-sizing: border-box;
+                border: 16rpx solid transparent; 
+            }
+            .ring-bg.green {
+                border-top-color: #4cd964;
+                border-right-color: #4cd964;
+                border-left-color: #4cd964;
+                transform: rotate(135deg);
+            }
+            .ring-bg.orange {
+                border-top-color: #ff9500;
+                border-right-color: #ff9500;
+                border-left-color: #ff9500;
+                transform: rotate(135deg);
+            }
 
-		.map-container {
-			flex: 1;
-			width: 100%;
-			position: relative;
-		}
+            .ring-text {
+                position: relative;
+                z-index: 10;
+                text-align: center;
+            }
+            .num {
+                font-size: 45rpx;
+                font-weight: bold;
+                color: #333;
+            }
+            .unit {
+                font-size: 20rpx;
+                color: #666;
+                margin-left: 8rpx;
+                text-align: right;
+            }
+            .label {
+                display: block;
+                font-size: 25rpx;
+                color: #666;
+                margin-top: 12rpx;
+            }
+        }
+        .device-list{
+            display: flex;
+            flex-direction: column;
+            margin: 40rpx 0;
+            gap: 30rpx;
+            .device-item{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 24rpx;
+                background-color: #fff;
+                border-radius: 20rpx;
+                .item-label{
+                    font-size: 30rpx;
+                    font-weight: 500;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: flex-start;
+                    align-items: center;
+                    gap: 30rpx;
+                    .icon{
+                        width: 100rpx;
+                        height: 100rpx;
+                        
+                        border-radius: 50%;
+                        padding: 20rpx;
+                        image{
+                            width: 100%;
+                            height: 100%;
+                        }
+                        &.icon-device{
+                            background-color: #f0f9f0;
+                        }
+                        &.icon-msg{
+                            background-color: #f7f5f1;
+                        }
+                        &.icon-pay{
+                            background-color: #f7f1f5;
+                        }
+                    }
+                    .item-info{
+                        font-weight: normal;
+                        .item-desc{
+                            color: #ccc;
+                            margin-top: 10rpx;
+                        }
+                    }
+                }
+            }
+        }
+        .service{
+            display: flex;
+            flex-direction: column;
+            border-radius: 20rpx;
+            background-color: #fff;
+            margin-bottom: 30rpx;
+            .service-header{
+                font-size: 32rpx;
+                font-weight: bold;
+                color: #333;
+                padding:20rpx 30rpx;
+                border-bottom: 1rpx solid #f0f0f0;
+                margin-bottom: 30rpx;
+            }
+            .service-content{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20rpx 30rpx;
+                .service-item{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 20rpx;
+                    .icon-image{
+                        width: 50rpx;
+                        height: 50rpx;
+                    }
+                    .item-title{
+                        font-size: 25rpx;
+                        color: #222;
+                    }
+                }
+            }
+        }
+    }
 
-		.tool-nav {
-			position: absolute;
-			top: 200rpx;
-			right: 20rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			font-size: 35rpx;
-
-			.btn-map-list {
-				padding: 10rpx;
-				background-color: #1296db;
-				color: #fff;
-				border-radius: 10rpx;
-			}
-
-			.addCar {
-				padding: 10rpx;
-				background-color: #1296db;
-				color: #fff;
-				border-radius: 10rpx;
-				margin-right: 10rpx;
-			}
-
-			.refresh {
-				padding: 10rpx;
-				background-color: #1296db;
-				color: #fff;
-				border-radius: 10rpx;
-				margin-right: 10rpx;
-			}
-		}
-
-		.right-bar {
-			position: absolute;
-			top: 300rpx;
-			right: 20rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-
-			view {
-				padding: 5rpx 15rpx;
-				font-size: 25rpx;
-				margin-bottom: 20rpx;
-				border-radius: 10rpx;
-				color: #fff;
-				/* 添加点击效果 */
-				transition: all 0.2s;
-			}
-
-			view:active {
-				transform: scale(0.95);
-				opacity: 0.8;
-			}
-
-			.allCar {
-				background-color: #1296db;
-			}
-
-			.onlineCar {
-				background-color: #0da117;
-			}
-
-			.offlineCar {
-				background-color: #d81e06;
-			}
-		}
-
-		.left-bar,
-		.left-bar-state {
-			position: absolute;
-			top: 200rpx;
-			z-index: 100;
-			display: flex;
-			align-items: center;
-			padding: 10rpx;
-			border-radius: 10rpx;
-			background-color: rgba(3, 109, 246, 0.71);
-			color: #fff;
-			font-size: 30rpx;
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-		}
-
-		.left-bar {
-			left: 20rpx;
-		}
-
-		.left-bar-state {
-			left: 20rpx;
-			top:270rpx;
-		}
-
-		.login-view-more {
-			position: absolute;
-			bottom: 50rpx;
-			width: 100%;
-			left: 0rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			font-size: 28rpx;
-			color: #fff;
-			background-color: #999;
-			padding: 20rpx 0;
-		}
-		.map-plus-min{
-			position: absolute;
-			bottom: 300rpx;
-			right: 50rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			font-size: 28rpx;
-			gap:80rpx;
-			.map-plus{
-				width: 60rpx;
-				height: 60rpx;
-				border-width: 1rpx;
-				border-color: #E6E6E6;
-				background-color: #fff;
-				border-style: solid;
-				border-radius: 50%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-			.map-min{
-				width: 60rpx;
-				height: 60rpx;
-				border-width: 1rpx;
-				border-color: #E6E6E6;
-				background-color: #fff;
-				border-style: solid;
-				border-radius: 50%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-		}
-	}
-	.uv-notice-bar{
-		padding: 25rpx 30rpx !important;
-	}
-	.uv-notice__swiper{
-		height: 40rpx !important;
-	}
-	.uvicon-volume{
-		font-size: 40rpx !important;
-	}
+    .login-view-more {
+        position: fixed;
+        bottom: 200rpx;
+        width: 100%;
+        left: 0rpx;
+        z-index: 100;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        font-size: 28rpx;
+        color: #fff;
+        background-color: #999;
+        padding: 20rpx 0;
+    }
+}
 </style>

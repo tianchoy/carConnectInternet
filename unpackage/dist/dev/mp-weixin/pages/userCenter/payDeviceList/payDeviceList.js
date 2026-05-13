@@ -110,8 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: `${_ctx.u_s_b_h}px`,
-        b: common_vendor.p({
+        a: common_vendor.p({
           title: "续费管理",
           ["show-back"]: true,
           backgroundColor: "#fff",
@@ -119,12 +118,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           isIcon: true,
           isShowStyle: true,
-          class: "data-v-21a71356",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "data-v-21a71356"
         }),
-        c: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
+        b: common_vendor.f(common_vendor.unref(deviceList), (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.deviceName),
             b: item.iccid
@@ -141,13 +137,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           });
         }),
-        d: common_vendor.unref(loading)
+        c: common_vendor.unref(loading)
       }, common_vendor.unref(loading) ? {} : {}, {
-        e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
+        d: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
       }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0 ? {} : {}, {
-        f: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
+        e: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
       }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0 ? {} : {}, {
-        g: `${_ctx.u_s_b_h}px`
+        f: `${_ctx.u_s_b_h}px`,
+        g: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

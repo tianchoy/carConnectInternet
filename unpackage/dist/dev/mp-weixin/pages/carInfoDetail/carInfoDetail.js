@@ -686,17 +686,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         G: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
       }, ((_r = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _r.sat) ? {
-        H: common_assets._imports_0$1,
+        H: common_assets._imports_0$2,
         I: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
       } : {}, {
         J: common_vendor.unref(currentCarInfo).voltage
       }, common_vendor.unref(currentCarInfo).voltage ? {
-        K: common_assets._imports_1,
+        K: common_assets._imports_1$1,
         L: common_vendor.t(common_vendor.unref(currentCarInfo).voltage)
       } : {}, {
         M: common_vendor.unref(datainfo).batteryPercent
       }, common_vendor.unref(datainfo).batteryPercent ? {
-        N: common_assets._imports_2,
+        N: common_assets._imports_2$1,
         O: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
         P: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
       } : {}) : {}, {
@@ -742,7 +742,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         X: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         Y: `${_ctx.u_s_b_h}px`,
-        Z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        Z: `${_ctx.u_s_a_i_b}px`,
+        aa: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

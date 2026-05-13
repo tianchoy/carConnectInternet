@@ -14,7 +14,6 @@ const msgState = "/usermessage/detail/";
 const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const logoutUrl = "/sys/logout";
-const groupList = "/group/userGroupList";
 const sendcmd = "/command/sendCmd";
 const getGeofence = "/geofence";
 const deleteGeo = "/geofence/";
@@ -32,9 +31,6 @@ const login = (data) => {
 };
 const logout = () => {
   return api_http.http.post(logoutUrl);
-};
-const getUserGroupList = () => {
-  return api_http.http.get(groupList);
 };
 const sendCommand = (data) => {
   return api_http.http.post(sendcmd, data);
@@ -129,7 +125,6 @@ exports.getGeofenceList = getGeofenceList;
 exports.getTrackPos = getTrackPos;
 exports.getUnboundDevices = getUnboundDevices;
 exports.getUserDeviceList = getUserDeviceList;
-exports.getUserGroupList = getUserGroupList;
 exports.getUserInfo = getUserInfo;
 exports.getUserMsgList = getUserMsgList;
 exports.login = login;

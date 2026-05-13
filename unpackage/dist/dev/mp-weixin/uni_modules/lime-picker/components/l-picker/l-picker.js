@@ -243,7 +243,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         x: common_vendor.sei(common_vendor.gei(_ctx, "", "r1-070619bb"), "view", "pickerRef"),
         y: common_vendor.s(common_vendor.unref(styles)),
         z: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
         A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });

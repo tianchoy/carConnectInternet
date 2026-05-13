@@ -16,7 +16,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     showBack: { type: Boolean, default: true },
     backText: { type: String, default: "" },
     showCapsule: { type: Boolean, default: true },
-    backgroundColor: { type: String, default: "#ffffff" },
+    backgroundColor: { type: String, default: "#f1f1f1" },
     textColor: { type: String, default: "#000000" },
     isIcon: { type: Boolean, default: true },
     Icon: { type: String, default: "plus-circle" },
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": "#fff",
+          "background-color": "#f1f1f1",
           position: "fixed",
           width: "100%",
           letf: 0,
@@ -73,15 +73,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "z-index": "100"
         } : {
           height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": "#fff"
+          "background-color": "#f1f1f1"
         }),
         b: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
         c: __props.showBack
       }, __props.showBack ? {
-        d: common_assets._imports_0$3,
-        e: common_vendor.o(handleBack, "62")
+        d: common_assets._imports_0$4,
+        e: common_vendor.o(handleBack, "67")
       } : {}, {
         f: common_vendor.t(__props.title),
         g: __props.textColor,
@@ -101,7 +102,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         m: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "4f")
+        }, "c4")
       }) : {}, {
         n: "200rpx",
         o: common_vendor.s(__props.isShowStyle ? {
@@ -117,7 +118,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           background: __props.backgroundColor
         }),
         p: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         })
       });
       return __returned__;

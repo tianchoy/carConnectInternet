@@ -146,7 +146,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.s(common_vendor.unref(styles)),
         f: common_vendor.s(__props.lStyle),
         g: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
         h: common_vendor.o(($event) => {
           return _ctx.$emit("click");
@@ -157,7 +158,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.s(common_vendor.unref(styles)),
         m: common_vendor.s(__props.lStyle),
         n: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
         o: common_vendor.unref(iconUrl),
         p: common_vendor.o(($event) => {
@@ -168,22 +170,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         r: common_vendor.n(__props.lClass),
         s: common_vendor.s(common_vendor.unref(styles)),
         t: common_vendor.s(__props.lStyle),
-        v: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        }),
-        w: common_vendor.o(imageError, "8c"),
-        x: common_vendor.o(imageload, "cd"),
-        y: common_vendor.o(($event) => {
+        v: common_vendor.o(imageError, "8c"),
+        w: common_vendor.o(imageload, "cd"),
+        x: common_vendor.o(($event) => {
           return _ctx.$emit("click");
         }, "8a"),
-        z: common_vendor.p({
+        y: common_vendor.p({
           color: __props.color,
           src: common_vendor.unref(iconUrl),
           web: __props.web,
           class: common_vendor.normalizeClass(["l-icon", [common_vendor.unref(classes), __props.lClass]]),
-          style: common_vendor.normalizeStyle([common_vendor.unref(styles), __props.lStyle, {
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          }])
+          style: common_vendor.normalizeStyle([common_vendor.unref(styles), __props.lStyle])
         })
       }, {
         i: !common_vendor.unref(isSVG) && !common_vendor.unref(isIconify) && common_vendor.unref(isImage)

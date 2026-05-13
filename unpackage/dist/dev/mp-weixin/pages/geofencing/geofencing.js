@@ -1086,7 +1086,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         aE: `${_ctx.u_s_b_h}px`,
-        aF: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        aF: `${_ctx.u_s_a_i_b}px`,
+        aG: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

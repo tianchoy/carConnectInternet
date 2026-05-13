@@ -192,7 +192,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     k: common_vendor.o((...args) => $options.wrapperClickHandler && $options.wrapperClickHandler(...args), "52"),
     l: common_vendor.s($options.radioStyle),
     m: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     }),
     n: common_vendor.n(`uv-radio-label--${$data.parentData.iconPlacement}`),
     o: common_vendor.n($data.parentData.borderBottom && $data.parentData.placement === "column" && "uv-border-bottom"),

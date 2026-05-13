@@ -1,5 +1,5 @@
 <template>
-	<custom-navBar title="消息中心" :show-back="false" backgroundColor="#fff" textColor="#333" :showCapsule="false" :isShowStyle="true">
+	<custom-navBar title="消息中心" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false" :isShowStyle="true">
 	</custom-navBar>
 	<view class="container">
 		<scroll-view 

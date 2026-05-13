@@ -134,18 +134,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     G: _ctx.closeColor
   } : {}, {
     H: common_vendor.gei(_ctx, ""),
-    I: `${_ctx.u_s_b_h}px`,
-    J: common_vendor.p({
+    I: common_vendor.p({
       mode: "fade",
       show: _ctx.show,
       ["cell-child"]: _ctx.cellChild,
       id: common_vendor.gei(_ctx, ""),
-      class: "data-v-b10c8d02",
-      style: common_vendor.normalizeStyle({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
-      })
+      class: "data-v-b10c8d02"
     }),
-    K: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    J: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b10c8d02"]]);

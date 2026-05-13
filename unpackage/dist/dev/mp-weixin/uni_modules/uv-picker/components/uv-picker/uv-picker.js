@@ -234,18 +234,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: common_vendor.sr("pickerPopup", "f74a1703-0"),
     n: common_vendor.gei(_ctx, ""),
     o: common_vendor.o($options.popupChange, "24"),
-    p: `${_ctx.u_s_b_h}px`,
-    q: common_vendor.p({
+    p: common_vendor.p({
       mode: "bottom",
       round: _ctx.round,
       ["close-on-click-overlay"]: _ctx.closeOnClickOverlay,
       id: common_vendor.gei(_ctx, ""),
-      class: "r data-v-f74a1703",
-      style: common_vendor.normalizeStyle({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
-      })
+      class: "r data-v-f74a1703"
     }),
-    r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f74a1703"]]);

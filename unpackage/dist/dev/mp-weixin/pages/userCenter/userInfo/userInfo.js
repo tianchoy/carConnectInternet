@@ -108,7 +108,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.o(logoutBtn, "cd"),
         k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         l: `${_ctx.u_s_b_h}px`,
-        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        m: `${_ctx.u_s_a_i_b}px`,
+        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

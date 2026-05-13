@@ -105,18 +105,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "k": "popupRef"
         }),
         e: common_vendor.gei(_ctx, ""),
-        f: `${_ctx.u_s_b_h}px`,
-        g: common_vendor.p({
+        f: common_vendor.p({
           title: _ctx.title,
           mode: "bottom",
           safeAreaInsetBottom: _ctx.safeAreaInsetBottom,
           id: common_vendor.gei(_ctx, ""),
-          class: "r data-v-a1ffb157",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "r data-v-a1ffb157"
         }),
-        h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

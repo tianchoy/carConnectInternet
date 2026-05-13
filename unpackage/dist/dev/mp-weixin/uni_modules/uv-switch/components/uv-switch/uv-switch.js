@@ -113,7 +113,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     i: common_vendor.s($options.switchStyle),
     j: common_vendor.s(_ctx.$uv.addStyle(_ctx.customStyle)),
     k: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     }),
     l: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "b7")
   };

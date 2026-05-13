@@ -83,7 +83,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
         g: common_vendor.s(common_vendor.unref(styles)),
         h: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         })
       };
       return __returned__;

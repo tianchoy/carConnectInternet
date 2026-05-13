@@ -39,7 +39,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
     m: common_vendor.o((...args) => _ctx.noop && _ctx.noop(...args), "56"),
-    n: `${_ctx.u_s_b_h}px`
+    n: `${_ctx.u_s_b_h}px`,
+    o: `${_ctx.u_s_a_i_b}px`
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-298cf9e4"]]);

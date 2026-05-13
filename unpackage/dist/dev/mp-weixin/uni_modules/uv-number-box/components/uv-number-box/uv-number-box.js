@@ -257,7 +257,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     y: _ctx.showPlus,
     F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     G: `${_ctx.u_s_b_h}px`,
-    H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    H: `${_ctx.u_s_a_i_b}px`,
+    I: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-4e2a3f1a"]]);

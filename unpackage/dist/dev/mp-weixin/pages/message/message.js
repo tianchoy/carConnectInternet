@@ -315,26 +315,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: `${_ctx.u_s_b_h}px`,
-        b: common_vendor.p({
+        a: common_vendor.p({
           title: "消息中心",
-          ["show-back"]: false,
+          ["show-back"]: true,
           backgroundColor: "#fff",
           textColor: "#333",
           showCapsule: false,
-          isShowStyle: true,
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          isShowStyle: true
         }),
-        c: msgList.value.length == 0 && !isLoading.value
+        b: msgList.value.length == 0 && !isLoading.value
       }, msgList.value.length == 0 && !isLoading.value ? {} : {}, {
-        d: hasNewMessages.value
+        c: hasNewMessages.value
       }, hasNewMessages.value ? {
-        e: common_vendor.t(newMessageCount.value),
-        f: common_vendor.o(loadNewMessages, "d4")
+        d: common_vendor.t(newMessageCount.value),
+        e: common_vendor.o(loadNewMessages, "a5")
       } : {}, {
-        g: common_vendor.f(msgList.value, (item, index, i0) => {
+        f: common_vendor.f(msgList.value, (item, index, i0) => {
           return {
             a: common_vendor.t(formatTime(item.createTime)),
             b: common_vendor.o(($event) => {
@@ -354,25 +350,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: "1993bd19-1-" + i0
           };
         }),
-        h: Login.value
+        g: Login.value
       }, Login.value ? {
-        i: common_vendor.p({
+        h: common_vendor.p({
           status: loadStatus.value
         })
       } : {}, {
-        j: refresherTriggered.value,
-        k: common_vendor.o(onRefresherRefresh, "86"),
-        l: common_vendor.o(onScrollToLower, "f9"),
-        m: common_vendor.sr(modal, "1993bd19-4", {
+        i: refresherTriggered.value,
+        j: common_vendor.o(onRefresherRefresh, "da"),
+        k: common_vendor.o(onScrollToLower, "9e"),
+        l: common_vendor.sr(modal, "1993bd19-4", {
           "k": "modal"
         }),
-        n: common_vendor.o(ReadIt, "82"),
-        o: common_vendor.p({
+        m: common_vendor.o(ReadIt, "ff"),
+        n: common_vendor.p({
           title: getMessageTypeText(modalContent.value.messageType),
           content: modalContent.value.content,
           class: "r"
         }),
-        p: `${_ctx.u_s_b_h}px`
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
