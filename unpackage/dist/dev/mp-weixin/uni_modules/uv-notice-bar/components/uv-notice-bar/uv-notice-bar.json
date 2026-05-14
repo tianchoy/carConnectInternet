@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "uv-column-notice": "../uv-column-notice/uv-column-notice",
-    "uv-row-notice": "../uv-row-notice/uv-row-notice"
-  }
-}

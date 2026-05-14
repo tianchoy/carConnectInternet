@@ -554,20 +554,22 @@ const refreshLocation = async () => {
         })
         return
     }
-    
     uni.showLoading({
         title: '刷新位置中...',
         mask: true
     })
-    
     try {
         await loadDeviceDetail(currentCarDeviceId.value);
         const success = await loadDevicePos({
             deviceId: currentCarDeviceId.value,
             deviceids: currentCarImei.value
         })
-        
         if (success) {
+            const mapContext = uni.createMapContext('myMap', this);
+            mapContext.moveToLocation({
+                latitude: center.latitude,
+                longitude: center.longitude,
+            });
             uni.showToast({
                 title: '位置已更新',
                 icon: 'success'

@@ -361,6 +361,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceids: currentCarImei.value
           }));
           if (success) {
+            const mapContext = common_vendor.index.createMapContext("myMap", this);
+            mapContext.moveToLocation(new common_vendor.UTSJSONObject({
+              latitude: center.latitude,
+              longitude: center.longitude
+            }));
             common_vendor.index.showToast({
               title: "位置已更新",
               icon: "success"
