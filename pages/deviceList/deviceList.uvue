@@ -8,28 +8,24 @@
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
 		</view>
-		<view class="map-plus-min">
+		<!-- <view class="map-plus-min">
 			<view class="map-plus" @click="mapPlus">
 				<uv-icon name="plus" size="19"></uv-icon>
 			</view>
 			<view class="map-min" @click="mapMin">
 				<uv-icon name="minus" size="19"></uv-icon>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted, computed, watch } from 'vue'
-	import { getCustomList, getCustomDeviceList,  getUserDeviceList, getUserGroupList, delDevice } from '../../api/request.uts'
-	// 导入坐标转换插件
+	import { ref} from 'vue'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	const mapScale = ref(4)
 	const markers = ref<Array<any>>([])
 	let mapCtx = undefined
-	const currentPickerType = ref('')
-	const picker = ref(null)
 	const iconColor = ref('#e6813e')
 	const userLocation = ref({
 		latitude: 0, 
@@ -38,8 +34,6 @@
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
-
-
 	const getLocation = () => {
 		uni.getLocation({
 			type: 'wgs84',
@@ -140,8 +134,6 @@
 
 	const loadUserDeviceList = async (data) => {
 		try {
-			
-
 			let deviceList = []
 			if (data) {
 				if (Array.isArray(data)) {
@@ -156,10 +148,8 @@
 					deviceList = []
 				}
 			}
-
 			// 使用插件转换坐标
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
-
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
 			console.error('获取设备列表失败:', err)
@@ -170,13 +160,8 @@
 		}
 	}
 
-	onLoad(async (options) => {
-		getLocation()
-		await loadUserDeviceList(JSON.parse(options.userDeviceList))
-
-		// 初始化地图上下文
+	const intiMarker = () =>{
 		mapCtx = uni.createMapContext('myMap', this)
-
 		// 启用点聚合
 		if (mapCtx && mapCtx.initMarkerCluster) {
 			mapCtx.initMarkerCluster({
@@ -188,6 +173,12 @@
 				}
 			})
 		}
+	}
+
+	onLoad(async (options) => {
+		getLocation()
+		await loadUserDeviceList(JSON.parse(options.userDeviceList))
+		intiMarker()
 		
 	})
 </script>

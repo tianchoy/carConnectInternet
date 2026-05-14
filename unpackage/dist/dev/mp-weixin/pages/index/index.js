@@ -55,6 +55,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }));
     const markers = common_vendor.ref([]);
     const lastUpdateTime = common_vendor.ref("--:--:--");
+    const STORAGE_KEYS = new common_vendor.UTSJSONObject(
+      {
+        SELECTED_DEVICE: "selected_device_info"
+      }
+      // 计算属性 
+    );
     const safeDeviceDetail = common_vendor.computed(() => {
       var _a2, _b, _c, _d, _f, _g, _h, _j, _k, _l, _m, _q, _r;
       return new common_vendor.UTSJSONObject({
@@ -89,6 +95,58 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return setTimeout(resolve, ms);
       });
     };
+    const saveSelectedDevice = (device) => {
+      try {
+        const deviceInfo = new common_vendor.UTSJSONObject({
+          name: device.name,
+          imei: device.value,
+          deptId: device.deptId,
+          deviceId: device.deviceId,
+          iccid: device.iccid,
+          simMerchant: device.simMerchant,
+          connectionStatus: device.connectionStatus,
+          carType: device.carType,
+          plateNo: device.plateNo
+        });
+        common_vendor.index.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE, deviceInfo);
+        console.log("保存选中设备成功:", deviceInfo);
+      } catch (error) {
+        console.error("保存选中设备失败:", error);
+      }
+    };
+    const getSavedSelectedDevice = () => {
+      try {
+        const savedDevice = common_vendor.index.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE);
+        if (savedDevice && savedDevice.imei) {
+          console.log("获取保存设备成功:", savedDevice);
+          return savedDevice;
+        }
+      } catch (error) {
+        console.error("获取保存设备失败:", error);
+      }
+      return null;
+    };
+    const clearSavedSelectedDevice = () => {
+      try {
+        common_vendor.index.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE);
+        console.log("清除保存设备成功");
+      } catch (error) {
+        console.error("清除保存设备失败:", error);
+      }
+    };
+    const setCurrentCarFromSavedDevice = (savedDevice = null) => {
+      currentCarName.value = savedDevice.name;
+      currentCarImei.value = savedDevice.value;
+      currentCarDeptId.value = savedDevice.deptId;
+      currentCarDeviceId.value = savedDevice.deviceId;
+      currentCarIccId.value = savedDevice.iccid;
+      currentCarSimMerchant.value = savedDevice.simMerchant;
+      currentCarConnectionStatus.value = savedDevice.connectionStatus;
+      currentCarCarType.value = savedDevice.carType;
+      currentCarPlateNo.value = savedDevice.plateNo;
+      center.latitude = savedDevice.latitude;
+      center.longitude = savedDevice.longitude;
+    };
     const handlePicker = () => {
       var _a2;
       if (deviceList.value.length === 0) {
@@ -104,27 +162,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!isLogin.value || !e.value || !e.value[0])
           return Promise.resolve(null);
-        currentCarName.value = e.value[0].name;
-        currentCarImei.value = e.value[0].value;
-        currentCarDeptId.value = e.value[0].deptId;
-        currentCarDeviceId.value = e.value[0].deviceId;
-        currentCarIccId.value = e.value[0].iccid;
-        currentCarSimMerchant.value = e.value[0].simMerchant;
-        currentCarConnectionStatus.value = e.value[0].connectionStatus;
-        currentCarCarType.value = e.value[0].carType;
-        currentCarPlateNo.value = e.value[0].plateNo;
+        const selectedDevice = e.value[0];
+        currentCarName.value = selectedDevice.name;
+        currentCarImei.value = selectedDevice.value;
+        currentCarDeptId.value = selectedDevice.deptId;
+        currentCarDeviceId.value = selectedDevice.deviceId;
+        currentCarIccId.value = selectedDevice.iccid;
+        currentCarSimMerchant.value = selectedDevice.simMerchant;
+        currentCarConnectionStatus.value = selectedDevice.connectionStatus;
+        currentCarCarType.value = selectedDevice.carType;
+        currentCarPlateNo.value = selectedDevice.plateNo;
+        center.latitude = selectedDevice.latitude;
+        center.longitude = selectedDevice.longitude;
+        saveSelectedDevice(selectedDevice);
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载车辆数据...",
           mask: true
         }));
         try {
-          yield loadDeviceDetail(e.value[0].deviceId);
+          yield loadDeviceDetail(selectedDevice.deviceId);
           yield loadDevicePos(new common_vendor.UTSJSONObject({
-            deviceId: e.value[0].deviceId,
-            deviceids: e.value[0].value
+            deviceId: selectedDevice.deviceId,
+            deviceids: selectedDevice.value
           }));
           yield loadTrackPos(new common_vendor.UTSJSONObject({
-            imei: e.value[0].value,
+            imei: selectedDevice.value,
             startTime: utils_formateTime.formatTimes(todayZero),
             endTime: utils_formateTime.formatTimes(nowTime),
             minParkTime: 120,
@@ -164,32 +226,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 simMerchant: item.simMerchant,
                 connectionStatus: item.connectionStatus,
                 carType: item.carType,
-                plateNo: item.plateNo
+                plateNo: item.plateNo,
+                latitude: item.latitude,
+                longitude: item.longitude
               });
             });
-            currentCarName.value = deviceList.value[0].name;
-            currentCarImei.value = deviceList.value[0].value;
-            currentCarDeptId.value = deviceList.value[0].deptId;
-            currentCarDeviceId.value = deviceList.value[0].deviceId;
-            currentCarIccId.value = deviceList.value[0].iccid;
-            currentCarSimMerchant.value = deviceList.value[0].simMerchant;
-            currentCarConnectionStatus.value = deviceList.value[0].connectionStatus;
-            currentCarCarType.value = deviceList.value[0].carType;
-            currentCarPlateNo.value = deviceList.value[0].plateNo;
-            yield loadDeviceDetail(deviceList.value[0].deviceId);
-            yield loadDevicePos(new common_vendor.UTSJSONObject({
-              deviceId: deviceList.value[0].deviceId,
-              deviceids: deviceList.value[0].value
-            }));
-            yield loadTrackPos(new common_vendor.UTSJSONObject({
-              imei: deviceList.value[0].value,
-              startTime: utils_formateTime.formatTimes(todayZero),
-              endTime: utils_formateTime.formatTimes(nowTime),
-              minParkTime: 120,
-              withStop: false,
-              withPos: false,
-              withTrip: true
-            }));
+            const savedDevice = getSavedSelectedDevice();
+            let selectedDevice = null;
+            if (savedDevice && savedDevice.imei) {
+              selectedDevice = common_vendor.UTS.arrayFind(deviceList.value, (device) => {
+                return device.value === savedDevice.imei;
+              });
+              if (!selectedDevice) {
+                clearSavedSelectedDevice();
+                console.log("保存的设备已不存在，使用第一个设备");
+              }
+            }
+            if (!selectedDevice) {
+              selectedDevice = deviceList.value[0];
+              if (selectedDevice) {
+                saveSelectedDevice(selectedDevice);
+              }
+            }
+            if (selectedDevice) {
+              setCurrentCarFromSavedDevice(selectedDevice);
+              yield loadDeviceDetail(selectedDevice.deviceId);
+              console.log("加载车辆详情:", selectedDevice);
+              yield loadDevicePos(new common_vendor.UTSJSONObject({
+                deviceId: selectedDevice.deviceId,
+                deviceids: selectedDevice.value
+              }));
+              yield loadTrackPos(new common_vendor.UTSJSONObject({
+                imei: selectedDevice.value,
+                startTime: utils_formateTime.formatTimes(todayZero),
+                endTime: utils_formateTime.formatTimes(nowTime),
+                minParkTime: 120,
+                withStop: false,
+                withPos: false,
+                withTrip: true
+              }));
+            }
           } else {
             common_vendor.index.showToast({
               title: res.msg || "暂无车辆数据",
@@ -513,7 +589,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const refreshDeviceList = () => {
-      console.log("收到刷新事件，重新加载设备列表");
       loadDeviceList();
     };
     const gotoLogin = () => {
@@ -537,6 +612,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     title: "解绑成功",
                     icon: "success"
                   });
+                  clearSavedSelectedDevice();
                 } else {
                   common_vendor.index.showToast({
                     title: "解绑失败",
@@ -619,7 +695,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
         q: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
         r: statusBarHeight.value + 50 + "px",
-        s: common_vendor.o(refreshLocation, "19"),
+        s: common_vendor.o(refreshLocation, "d2"),
         t: isMapReady.value
       }, isMapReady.value ? {
         v: common_vendor.sei("myMap", "map"),
@@ -628,7 +704,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         y: markers.value,
         z: mapScale.value
       } : {}, {
-        A: common_vendor.o(toRecordDetail, "1d"),
+        A: common_vendor.o(toRecordDetail, "37"),
         B: common_vendor.t(totalTrips.value),
         C: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         D: common_assets._imports_2,
@@ -636,52 +712,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        F: common_vendor.o(toDeviceList, "e6"),
+        F: common_vendor.o(toDeviceDetail, "a2"),
         G: common_assets._imports_3,
         H: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        I: common_vendor.o(toDeviceDetail, "82"),
+        I: common_vendor.o(toFindCar, "ce"),
         J: common_assets._imports_4,
         K: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        L: common_vendor.o(toFindCar, "45"),
+        L: common_vendor.o(toFence, "02"),
         M: common_assets._imports_5,
-        N: common_vendor.p({
-          name: "arrow-right",
-          class: "data-v-00a60067"
-        }),
-        O: common_vendor.o(toFence, "a2"),
-        P: common_assets._imports_6,
-        Q: common_vendor.o(toMsgCenter, "5b"),
-        R: common_assets._imports_7,
-        S: common_vendor.o(($event) => {
+        N: common_vendor.o(toDeviceList, "88"),
+        O: common_assets._imports_6,
+        P: common_vendor.o(toMsgCenter, "08"),
+        Q: common_assets._imports_7,
+        R: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "e5"),
-        T: common_assets._imports_8,
-        U: common_vendor.o(contactCustomerService, "b2"),
-        V: common_assets._imports_9,
-        W: common_vendor.o(unbindDevice, "ea"),
-        X: !isLogin.value
+        }, "84"),
+        S: common_assets._imports_8,
+        T: common_vendor.o(contactCustomerService, "e3"),
+        U: common_assets._imports_9,
+        V: common_vendor.o(unbindDevice, "e6"),
+        W: !isLogin.value
       }, !isLogin.value ? {
-        Y: common_vendor.o(gotoLogin, "26")
+        X: common_vendor.o(gotoLogin, "b9")
       } : {}, {
-        Z: common_vendor.sr(picker, "00a60067-6", {
+        Y: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        aa: common_vendor.o(confirm, "2a"),
-        ab: common_vendor.p({
+        Z: common_vendor.o(confirm, "b1"),
+        aa: common_vendor.p({
           columns: pickerColumns.value,
           keyName: "name",
           class: "r data-v-00a60067"
         }),
-        ac: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        ad: `${_ctx.u_s_b_h}px`,
-        ae: `${_ctx.u_s_a_i_b}px`,
-        af: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        ab: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        ac: `${_ctx.u_s_b_h}px`,
+        ad: `${_ctx.u_s_a_i_b}px`,
+        ae: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

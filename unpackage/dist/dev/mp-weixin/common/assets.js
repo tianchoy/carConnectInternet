@@ -1,9 +1,9 @@
 "use strict";
 const _imports_1$2 = "/static/banner.png";
-const _imports_2$2 = "/static/menu.png";
-const _imports_3$1 = "/static/pos.png";
-const _imports_4 = "/static/car.png";
-const _imports_5 = "/static/dzwl.png";
+const _imports_2$2 = "/static/pos.png";
+const _imports_3$1 = "/static/car.png";
+const _imports_4 = "/static/dzwl.png";
+const _imports_5 = "/static/allDevice.png";
 const _imports_6 = "/static/msg.png";
 const _imports_7 = "/static/pay.png";
 const _imports_8 = "/static/online.png";

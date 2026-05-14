@@ -13,7 +13,6 @@
                         <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
                     </view>
                 </view> 
-                <!-- 设备信息 - 使用安全访问 -->
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
                     <uv-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percentage="safeDeviceDetail.deviceStatus.batteryPercent" height="20rpx" activeColor="#19be6b" inactiveColor="#999"></uv-line-progress>
                     <view v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
@@ -86,16 +85,6 @@
                     </view>
                 </view>
                 <view class="device-list">
-                    <view class="device-item" @click="toDeviceList">
-                        <view class="item-label">
-                            <view class="icon icon-menu"><image src="../../static/menu.png" mode="aspectFill" class="icon-image"></image></view>
-                            <view class="item-info">
-                                <text class="item-title">全部设备</text>
-                                <text class="item-desc">点击去查看全部设备</text>
-                            </view>
-                        </view>
-                        <uv-icon name="arrow-right"></uv-icon>
-                    </view>
                     <view class="device-item"  @click="toDeviceDetail">
                         <view class="item-label">
                             <view class="icon icon-device"><image src="../../static/pos.png" mode="aspectFill" class="icon-image"></image></view>
@@ -130,6 +119,10 @@
                 <view class="service">
                     <view class="service-header">服务中心</view>
                     <view class="service-content">
+                        <view class="service-item" @click="toDeviceList">
+                            <image src="../../static/allDevice.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">全部设备</text>
+                        </view>
                         <view class="service-item" @click="toMsgCenter">
                             <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">警报消息</text>
@@ -212,7 +205,12 @@ const deviceDetail = ref({
 const markers = ref<Array<any>>([])
 const lastUpdateTime = ref('--:--:--')
 
-// 计算属性 - 安全访问设备详情
+// 本地存储key
+const STORAGE_KEYS = {
+    SELECTED_DEVICE: 'selected_device_info'
+}
+
+// 计算属性 
 const safeDeviceDetail = computed(() => {
     return {
         deviceStatus: {
@@ -249,6 +247,66 @@ const initDimensions = () => {
 // 延迟函数
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// 保存选中的设备信息
+const saveSelectedDevice = (device: Device) => {
+    try {
+        const deviceInfo = {
+            name: device.name,
+            imei: device.value,
+            deptId: device.deptId,
+            deviceId: device.deviceId,
+            iccid: device.iccid,
+            simMerchant: device.simMerchant,
+            connectionStatus: device.connectionStatus,
+            carType: device.carType,
+            plateNo: device.plateNo
+        }
+        uni.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE, deviceInfo)
+        console.log('保存选中设备成功:', deviceInfo)
+    } catch (error) {
+        console.error('保存选中设备失败:', error)
+    }
+}
+
+// 获取保存的选中设备
+const getSavedSelectedDevice = () => {
+    try {
+        const savedDevice = uni.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE)
+        if (savedDevice && savedDevice.imei) {
+            console.log('获取保存设备成功:', savedDevice)
+            return savedDevice
+        }
+    } catch (error) {
+        console.error('获取保存设备失败:', error)
+    }
+    return null
+}
+
+// 清除保存的选中设备
+const clearSavedSelectedDevice = () => {
+    try {
+        uni.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE)
+        console.log('清除保存设备成功')
+    } catch (error) {
+        console.error('清除保存设备失败:', error)
+    }
+}
+
+// 根据保存的设备信息设置当前车辆
+const setCurrentCarFromSavedDevice = (savedDevice: any) => {
+    currentCarName.value = savedDevice.name
+    currentCarImei.value = savedDevice.value
+    currentCarDeptId.value = savedDevice.deptId
+    currentCarDeviceId.value = savedDevice.deviceId
+    currentCarIccId.value = savedDevice.iccid
+    currentCarSimMerchant.value = savedDevice.simMerchant
+    currentCarConnectionStatus.value = savedDevice.connectionStatus
+    currentCarCarType.value = savedDevice.carType
+    currentCarPlateNo.value = savedDevice.plateNo
+    center.latitude = savedDevice.latitude
+    center.longitude = savedDevice.longitude
+}
+
 // 处理选择车辆
 const handlePicker = () => {
     if (deviceList.value.length === 0) {
@@ -265,15 +323,21 @@ const handlePicker = () => {
 const confirm = async (e: any) => {
     if (!isLogin.value || !e.value || !e.value[0]) return
     
-    currentCarName.value = e.value[0].name
-    currentCarImei.value = e.value[0].value
-    currentCarDeptId.value = e.value[0].deptId
-    currentCarDeviceId.value = e.value[0].deviceId
-    currentCarIccId.value = e.value[0].iccid
-    currentCarSimMerchant.value = e.value[0].simMerchant
-    currentCarConnectionStatus.value = e.value[0].connectionStatus
-    currentCarCarType.value = e.value[0].carType
-    currentCarPlateNo.value = e.value[0].plateNo
+    const selectedDevice = e.value[0]
+    currentCarName.value = selectedDevice.name
+    currentCarImei.value = selectedDevice.value
+    currentCarDeptId.value = selectedDevice.deptId
+    currentCarDeviceId.value = selectedDevice.deviceId
+    currentCarIccId.value = selectedDevice.iccid
+    currentCarSimMerchant.value = selectedDevice.simMerchant
+    currentCarConnectionStatus.value = selectedDevice.connectionStatus
+    currentCarCarType.value = selectedDevice.carType
+    currentCarPlateNo.value = selectedDevice.plateNo
+    center.latitude = selectedDevice.latitude
+    center.longitude = selectedDevice.longitude
+    
+    // 保存选中的设备信息
+    saveSelectedDevice(selectedDevice)
     
     uni.showLoading({
         title: '加载车辆数据...',
@@ -281,13 +345,13 @@ const confirm = async (e: any) => {
     })
     
     try {
-        await loadDeviceDetail(e.value[0].deviceId);
+        await loadDeviceDetail(selectedDevice.deviceId);
         await loadDevicePos({
-            deviceId: e.value[0].deviceId,
-            deviceids: e.value[0].value
+            deviceId: selectedDevice.deviceId,
+            deviceids: selectedDevice.value
         })
         await loadTrackPos({
-            imei: e.value[0].value,
+            imei: selectedDevice.value,
             startTime: formatTimes(todayZero),
             endTime: formatTimes(nowTime),
             minParkTime: 120,
@@ -328,32 +392,54 @@ const loadDeviceList = async () => {
                 connectionStatus: item.connectionStatus,
                 carType: item.carType,
                 plateNo: item.plateNo,
+                latitude: item.latitude,
+                longitude: item.longitude,
             }))
             
-            currentCarName.value = deviceList.value[0].name
-            currentCarImei.value = deviceList.value[0].value
-            currentCarDeptId.value = deviceList.value[0].deptId
-            currentCarDeviceId.value = deviceList.value[0].deviceId
-            currentCarIccId.value = deviceList.value[0].iccid
-            currentCarSimMerchant.value = deviceList.value[0].simMerchant
-            currentCarConnectionStatus.value = deviceList.value[0].connectionStatus
-            currentCarCarType.value = deviceList.value[0].carType
-            currentCarPlateNo.value = deviceList.value[0].plateNo
+            // 获取保存的设备
+            const savedDevice = getSavedSelectedDevice()
+            let selectedDevice = null
+            
+            if (savedDevice && savedDevice.imei) {
+                // 检查保存的设备是否还在设备列表中
+                selectedDevice = deviceList.value.find(device => device.value === savedDevice.imei)
+                if (!selectedDevice) {
+                    // 保存的设备已被删除，清除保存记录
+                    clearSavedSelectedDevice()
+                    console.log('保存的设备已不存在，使用第一个设备')
+                }
+            }
+            
+            // 如果没有保存的设备或保存的设备无效，使用第一个设备
+            if (!selectedDevice) {
+                selectedDevice = deviceList.value[0]
+                // 保存第一个设备作为默认选中
+                if (selectedDevice) {
+                    saveSelectedDevice(selectedDevice)
+                }
+            }
+            
+            if (selectedDevice) {
+                setCurrentCarFromSavedDevice(selectedDevice)
+                
+                await loadDeviceDetail(selectedDevice.deviceId);
 
-            await loadDeviceDetail(deviceList.value[0].deviceId);
-            await loadDevicePos({
-                deviceId: deviceList.value[0].deviceId,
-                deviceids: deviceList.value[0].value
-            })
-            await loadTrackPos({
-                imei: deviceList.value[0].value,
-                startTime: formatTimes(todayZero),
-                endTime: formatTimes(nowTime),
-                minParkTime: 120,
-                withStop: false,
-                withPos: false,
-                withTrip: true,
-            })
+                console.log('加载车辆详情:',selectedDevice)
+                
+                await loadDevicePos({
+                    deviceId: selectedDevice.deviceId,
+                    deviceids: selectedDevice.value
+                })
+                await loadTrackPos({
+                    imei: selectedDevice.value,
+                    startTime: formatTimes(todayZero),
+                    endTime: formatTimes(nowTime),
+                    minParkTime: 120,
+                    withStop: false,
+                    withPos: false,
+                    withTrip: true,
+                })
+            }
         } else {
             uni.showToast({
                 title: res.msg || '暂无车辆数据',
@@ -420,14 +506,6 @@ const loadTrackPos = async (data: any) => {
             }
             await processTripData(res.data)
             uni.hideLoading()
-        // if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
-        //     console.log('车辆轨迹:', res.data.trips)
-        //     await processTripData(res.data)
-        //     // trackPosInfo.value = res.data.trips
-        //     uni.hideLoading()
-        // } else {
-        //     console.warn('获取轨迹失败:', res.msg)
-        // }
     } catch (error) {
         console.error('加载轨迹失败', error)
     }
@@ -557,7 +635,7 @@ const refreshLocation = async () => {
     uni.showLoading({
         title: '刷新位置中...',
         mask: true
-    })
+    })  
     try {
         await loadDeviceDetail(currentCarDeviceId.value);
         const success = await loadDevicePos({
@@ -748,7 +826,6 @@ const toPay = (iccid : string,simMerchant : string) => {
 
 // 刷新设备列表
 const refreshDeviceList = () => {
-    console.log('收到刷新事件，重新加载设备列表')
     loadDeviceList()
 }
 
@@ -768,14 +845,6 @@ const unbindDevice = async () => {
         content: '确定解绑当前车辆吗？',
         success: async (res) => {
             if (res.confirm) {
-                //判断deviceList的 length，不能解绑最后一个车辆
-                // if(deviceList.value.length == 1){
-                //     uni.showToast({
-                //         title: '不能解绑',
-                //         icon: 'error'
-                //     })
-                //     return
-                // }
                 // 确认解绑
                 const res = await delDevice(currentCarImei.value)
                 if (res.code == 0) {
@@ -783,6 +852,8 @@ const unbindDevice = async () => {
                         title: '解绑成功',
                         icon: 'success'
                     })
+                    // 如果是当前设备，清除保存信息并重新加载
+                    clearSavedSelectedDevice()
                 } else {
                     uni.showToast({
                         title: '解绑失败',
@@ -807,6 +878,8 @@ const handleExit = () => {
                 // 确认退出登录
                 const res = await logout()
                 if(res.code == 0){
+                    // 退出登录时清除保存的设备信息
+                    clearSavedSelectedDevice()
                     uni.removeStorageSync('token')
                     uni.reLaunch({
                         url:'/pages/login/login'
@@ -825,7 +898,6 @@ onShow(async () => {
     const token = uni.getStorageSync('token')
     if (token) {
         // 监听全局刷新事件
-        // refreshDeviceList()
         uni.$on('refreshDeviceList', refreshDeviceList)
 
         const needRefresh = uni.getStorageSync('needRefreshHome')

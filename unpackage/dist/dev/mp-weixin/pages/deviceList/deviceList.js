@@ -1,17 +1,14 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../api/http.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1)();
+  _easycom_custom_navBar_1();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon)();
+  _easycom_custom_navBar();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "deviceList",
@@ -19,8 +16,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const mapScale = common_vendor.ref(4);
     const markers = common_vendor.ref([]);
     let mapCtx = void 0;
-    common_vendor.ref("");
-    common_vendor.ref(null);
     const iconColor = common_vendor.ref("#e6813e");
     const userLocation = common_vendor.ref(new common_vendor.UTSJSONObject({
       latitude: 0,
@@ -39,16 +34,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           console.log("获取位置失败:", err);
         }
       }));
-    };
-    const mapPlus = () => {
-      if (mapScale.value < 20) {
-        mapScale.value += 1;
-      }
-    };
-    const mapMin = () => {
-      if (mapScale.value > 3) {
-        mapScale.value -= 1;
-      }
     };
     const subMsg = () => {
       console.log("订阅消息");
@@ -144,21 +129,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const intiMarker = () => {
+      mapCtx = common_vendor.index.createMapContext("myMap", this);
+      if (mapCtx && mapCtx.initMarkerCluster) {
+        mapCtx.initMarkerCluster(new common_vendor.UTSJSONObject({
+          enableDefaultStyle: true,
+          zoomOnClick: true,
+          gridSize: 60,
+          complete: () => {
+            console.log("聚合初始化完成");
+          }
+        }));
+      }
+    };
     common_vendor.onLoad((options) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         getLocation();
         yield loadUserDeviceList(common_vendor.UTS.JSON.parse(options.userDeviceList));
-        mapCtx = common_vendor.index.createMapContext("myMap", this);
-        if (mapCtx && mapCtx.initMarkerCluster) {
-          mapCtx.initMarkerCluster(new common_vendor.UTSJSONObject({
-            enableDefaultStyle: true,
-            zoomOnClick: true,
-            gridSize: 60,
-            complete: () => {
-              console.log("聚合初始化完成");
-            }
-          }));
-        }
+        intiMarker();
       });
     });
     return (_ctx, _cache) => {
@@ -181,20 +169,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.o(handleTap, "9b"),
         g: userLocation.value.latitude,
         h: userLocation.value.longitude,
-        i: common_vendor.p({
-          name: "plus",
-          size: "19"
-        }),
-        j: common_vendor.o(mapPlus, "fc"),
-        k: common_vendor.p({
-          name: "minus",
-          size: "19"
-        }),
-        l: common_vendor.o(mapMin, "93"),
-        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        n: `${_ctx.u_s_b_h}px`,
-        o: `${_ctx.u_s_a_i_b}px`,
-        p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        j: `${_ctx.u_s_b_h}px`,
+        k: `${_ctx.u_s_a_i_b}px`,
+        l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };
