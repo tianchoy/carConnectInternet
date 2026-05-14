@@ -5,6 +5,7 @@ const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 const utils_gettime = require("../../utils/gettime.js");
 const utils_formateTime = require("../../utils/formateTime.js");
+const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_line_progress_1 = common_vendor.resolveComponent("uv-line-progress");
@@ -371,13 +372,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const createMarker = (id, lat, lng, type, title = null) => {
       const isOnline = safeDeviceDetail.value.connectionStatus === "online";
+      const iconPath = utils_cars.getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value);
       const marker = new common_vendor.UTSJSONObject({
         id,
         latitude: lat,
         longitude: lng,
         width: 35,
         height: 35,
-        iconPath: isOnline ? "../../static/marker.png" : "../../static/offline-marker.png",
+        iconPath,
         callout: new common_vendor.UTSJSONObject({
           content: title || "爱车位置",
           color: isOnline ? "#ffffff" : "#999999",

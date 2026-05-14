@@ -148,6 +148,7 @@ import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,g
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatTimes } from '../../utils/formateTime.uts'
+import { getDeviceIcon } from '../../utils/cars'
 const { nowTime, todayZero } = getTodayZeroTime()
 
 interface Device {
@@ -560,13 +561,14 @@ const refreshLocation = async () => {
 // 创建标记点
 const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
     const isOnline = safeDeviceDetail.value.connectionStatus === 'online'
+    const iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
     const marker = {
         id,
         latitude: lat,
         longitude: lng,
         width: 35,
         height: 35,
-        iconPath: isOnline ? '../../static/marker.png' : '../../static/offline-marker.png',
+        iconPath: iconPath,
         callout: {
             content: title || '爱车位置',
             color: isOnline ? '#ffffff' : '#999999',
