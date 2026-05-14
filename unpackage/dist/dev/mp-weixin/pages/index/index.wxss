@@ -81,6 +81,23 @@
   align-items: center;
   gap: 30rpx;
 }
+.container .top .device-car .nav-tools .exit.data-v-00a60067 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10rpx;
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border-radius: 50%;
+}
+.container .top .device-car .nav-tools .exit.data-v-00a60067:active {
+  background-color: rgba(0, 0, 0, 0.15);
+  transform: scale(0.95);
+}
+.container .top .device-car .nav-tools .exit .exit-icon.data-v-00a60067 {
+  width: 40rpx;
+  height: 40rpx;
+}
 .container .top .device-info.data-v-00a60067 {
   display: flex;
   flex-direction: column;
@@ -93,12 +110,7 @@
   font-size: 26rpx;
   color: #333;
 }
-.container .top .banner.data-v-00a60067 {
-  margin: 20rpx 0;
-  border-radius: 20rpx;
-  overflow: hidden;
-}
-.container .top .banner .banner-image.data-v-00a60067 {
+.container .top .banner-image.data-v-00a60067 {
   width: 100%;
 }
 .container .top .car-state.data-v-00a60067 {
@@ -176,6 +188,10 @@
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 }
 .container .content .mile-record .record-header.data-v-00a60067 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 20rpx 30rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
@@ -183,6 +199,13 @@
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
+}
+.container .content .mile-record .record-header .record-desc.data-v-00a60067 {
+  font-size: 26rpx;
+  color: #07C160;
+  padding: 8rpx 16rpx;
+  background: #f0f9f0;
+  border-radius: 8rpx;
 }
 .container .content .mile-record .ring-container.data-v-00a60067 {
   display: flex;
@@ -270,19 +293,19 @@
   border-radius: 20rpx;
 }
 .container .content .device-list .device-item .item-label.data-v-00a60067 {
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 500;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   align-items: center;
-  gap: 30rpx;
+  gap: 20rpx;
 }
 .container .content .device-list .device-item .item-label .icon.data-v-00a60067 {
-  width: 100rpx;
-  height: 100rpx;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
-  padding: 20rpx;
+  padding: 18rpx;
 }
 .container .content .device-list .device-item .item-label .icon image.data-v-00a60067 {
   width: 100%;
@@ -291,18 +314,20 @@
 .container .content .device-list .device-item .item-label .icon.icon-device.data-v-00a60067 {
   background-color: #f0f9f0;
 }
-.container .content .device-list .device-item .item-label .icon.icon-msg.data-v-00a60067 {
-  background-color: #f7f5f1;
+.container .content .device-list .device-item .item-label .icon.icon-car.data-v-00a60067 {
+  background-color: #f3f8fb;
 }
-.container .content .device-list .device-item .item-label .icon.icon-pay.data-v-00a60067 {
-  background-color: #f7f1f5;
+.container .content .device-list .device-item .item-label .icon.icon-fence.data-v-00a60067 {
+  background-color: #f1f7f4;
+}
+.container .content .device-list .device-item .item-label .icon.icon-menu.data-v-00a60067 {
+  background-color: #f8f3fb;
 }
 .container .content .device-list .device-item .item-label .item-info.data-v-00a60067 {
   font-weight: normal;
 }
 .container .content .device-list .device-item .item-label .item-info .item-desc.data-v-00a60067 {
   color: #ccc;
-  margin-top: 10rpx;
 }
 .container .content .service.data-v-00a60067 {
   display: flex;

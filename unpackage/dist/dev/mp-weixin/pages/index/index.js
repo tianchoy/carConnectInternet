@@ -9,16 +9,14 @@ const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
   const _easycom_uv_line_progress_1 = common_vendor.resolveComponent("uv-line-progress");
-  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
   const _easycom_uv_picker_1 = common_vendor.resolveComponent("uv-picker");
-  (_easycom_uv_icon_1 + _easycom_uv_line_progress_1 + _easycom_uv_button_1 + _easycom_uv_picker_1)();
+  (_easycom_uv_icon_1 + _easycom_uv_line_progress_1 + _easycom_uv_picker_1)();
 }
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
 const _easycom_uv_line_progress = () => "../../uni_modules/uv-line-progress/components/uv-line-progress/uv-line-progress.js";
-const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
 const _easycom_uv_picker = () => "../../uni_modules/uv-picker/components/uv-picker/uv-picker.js";
 if (!Math) {
-  (_easycom_uv_icon + _easycom_uv_line_progress + _easycom_uv_button + _easycom_uv_picker)();
+  (_easycom_uv_icon + _easycom_uv_line_progress + _easycom_uv_picker)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
@@ -28,13 +26,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
+    const userDeviceList = common_vendor.ref([]);
     const isLogin = common_vendor.ref(false);
     const isMapReady = common_vendor.ref(false);
     const mapScale = common_vendor.ref(17);
     const statusBarHeight = common_vendor.ref(20);
     const menuButtonInfo = common_vendor.ref(null);
     const navBarHeight = common_vendor.ref(44);
-    common_vendor.ref(true);
     const deviceList = common_vendor.ref([]);
     const picker = common_vendor.ref(null);
     const currentCarImei = common_vendor.ref("");
@@ -62,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return new common_vendor.UTSJSONObject({
         deviceStatus: new common_vendor.UTSJSONObject({
           batteryPercent: (_c = (_b = (_a2 = deviceDetail.value) === null || _a2 === void 0 ? null : _a2.deviceStatus) === null || _b === void 0 ? null : _b.batteryPercent) !== null && _c !== void 0 ? _c : 0,
-          voltage: (_g = (_f = (_d = deviceDetail.value) === null || _d === void 0 ? null : _d.deviceStatus) === null || _f === void 0 ? null : _f.voltage) !== null && _g !== void 0 ? _g : "--",
+          voltage: (_g = (_f = (_d = deviceDetail.value) === null || _d === void 0 ? null : _d.deviceStatus) === null || _f === void 0 ? null : _f.voltage) !== null && _g !== void 0 ? _g : 0,
           signalStrength: (_k = (_j = (_h = deviceDetail.value) === null || _h === void 0 ? null : _h.deviceStatus) === null || _j === void 0 ? null : _j.signalStrength) !== null && _k !== void 0 ? _k : 0
         }),
         connectionStatus: (_m = (_l = deviceDetail.value) === null || _l === void 0 ? null : _l.connectionStatus) !== null && _m !== void 0 ? _m : "offline",
@@ -155,9 +153,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: 1e3
           });
           if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
+            userDeviceList.value = res.data;
             deviceList.value = res.data.list.map((item = null) => {
               return new common_vendor.UTSJSONObject({
-                name: item.deviceName,
+                name: item.deviceName || item.imei,
                 value: item.imei,
                 deptId: item.companyId,
                 deviceId: item.deviceId,
@@ -215,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceDetail.value = {
               deviceStatus: {
                 batteryPercent: (_b = (_a2 = res.data.deviceStatus) === null || _a2 === void 0 ? null : _a2.batteryPercent) !== null && _b !== void 0 ? _b : 0,
-                voltage: (_d = (_c = res.data.deviceStatus) === null || _c === void 0 ? null : _c.voltage) !== null && _d !== void 0 ? _d : "--",
+                voltage: (_d = (_c = res.data.deviceStatus) === null || _c === void 0 ? null : _c.voltage) !== null && _d !== void 0 ? _d : 0,
                 signalStrength: (_g = (_f = res.data.deviceStatus) === null || _f === void 0 ? null : _f.signalStrength) !== null && _g !== void 0 ? _g : 0
               },
               connectionStatus: (_h = res.data.connectionStatus) !== null && _h !== void 0 ? _h : "offline",
@@ -241,12 +240,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           const res = yield api_request.getTrackPos(data);
-          console.log("车辆轨迹:", res);
-          if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
-            yield processTripData(res.data);
-          } else {
-            console.warn("获取轨迹失败:", res.msg);
+          if (res.code == 401) {
+            common_vendor.index.showToast({
+              title: "登录过期，请重新登录",
+              icon: "none",
+              duration: 2e3
+            });
+            common_vendor.index.removeStorageSync("token");
+            common_vendor.index.reLaunch({
+              url: "/pages/index/index"
+            });
+            return false;
           }
+          yield processTripData(res.data);
+          common_vendor.index.hideLoading();
         } catch (error) {
           console.error("加载轨迹失败", error);
         }
@@ -260,7 +267,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (data.trips && data.trips.length > 0) {
           const processedTrips = yield Promise.all(data.trips.map((trip = null) => {
             return common_vendor.__awaiter(this, void 0, void 0, function* () {
-              return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, trip), { startAddress: "查看位置", endAddress: "查看位置" }));
+              return new common_vendor.UTSJSONObject(Object.assign({}, trip));
             });
           }));
           tripData.value = processedTrips;
@@ -370,6 +377,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const toRecordDetail = () => {
+      if (!isLogin.value)
+        return null;
+      common_vendor.index.navigateTo({
+        url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude
+      });
+    };
+    const toDeviceList = () => {
+      if (!isLogin.value)
+        return null;
+      common_vendor.index.navigateTo({
+        url: "/pages/deviceList/deviceList?userDeviceList=" + common_vendor.UTS.JSON.stringify(userDeviceList.value)
+      });
+    };
     const createMarker = (id, lat, lng, type, title = null) => {
       const isOnline = safeDeviceDetail.value.connectionStatus === "online";
       const iconPath = utils_cars.getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value);
@@ -377,16 +398,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         id,
         latitude: lat,
         longitude: lng,
-        width: 35,
-        height: 35,
+        width: 30,
+        height: 30,
         iconPath,
         callout: new common_vendor.UTSJSONObject({
           content: title || "爱车位置",
           color: isOnline ? "#ffffff" : "#999999",
-          borderRadius: 10,
+          borderRadius: 6,
           bgColor: isOnline ? "#07C160" : "#CCCCCC",
-          padding: 8,
-          fontSize: 14,
+          padding: 4,
+          fontSize: 12,
           display: "ALWAYS"
         }),
         anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 })
@@ -560,16 +581,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = common_vendor.e({
         a: common_vendor.t(currentCarName.value || "请选择车辆"),
-        b: common_vendor.o(handlePicker, "03"),
-        c: common_vendor.o(toAdd, "34"),
-        d: common_vendor.p({
+        b: common_vendor.o(handlePicker, "03")
+      }, {}, {
+        e: common_vendor.o(toAdd, "a2"),
+        f: common_vendor.p({
           name: "plus-circle",
           size: "25",
           class: "data-v-00a60067"
         }),
-        e: safeDeviceDetail.value.deviceStatus.batteryPercent
+        g: safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage
+      }, safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage ? common_vendor.e({
+        h: safeDeviceDetail.value.deviceStatus.batteryPercent
       }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
-        f: common_vendor.p({
+        i: common_vendor.p({
           percentage: safeDeviceDetail.value.deviceStatus.batteryPercent,
           height: "20rpx",
           activeColor: "#19be6b",
@@ -577,77 +601,82 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-00a60067"
         })
       } : {}, {
-        g: safeDeviceDetail.value.deviceStatus.batteryPercent
+        j: safeDeviceDetail.value.deviceStatus.batteryPercent
       }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
-        h: common_vendor.t(safeDeviceDetail.value.deviceStatus.batteryPercent)
+        k: common_vendor.t(safeDeviceDetail.value.deviceStatus.batteryPercent)
       } : {}, {
-        i: safeDeviceDetail.value.deviceStatus.voltage
+        l: safeDeviceDetail.value.deviceStatus.voltage
       }, safeDeviceDetail.value.deviceStatus.voltage ? {
-        j: common_vendor.t(safeDeviceDetail.value.deviceStatus.voltage)
-      } : {}, {
-        k: common_assets._imports_0,
-        l: common_vendor.t(safeDeviceDetail.value.connectionStatus === "online" ? "在线" : "离线"),
-        m: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
-        n: common_vendor.t(devicePosInfo.value.positionUpdateTime),
-        o: statusBarHeight.value + 50 + "px",
-        p: common_vendor.o(refreshLocation, "ca"),
-        q: isMapReady.value
+        m: common_vendor.t(safeDeviceDetail.value.deviceStatus.voltage)
+      } : {}) : {}, {
+        n: common_assets._imports_1,
+        o: common_vendor.t(safeDeviceDetail.value.connectionStatus === "online" ? "在线" : "离线"),
+        p: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
+        q: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
+        r: statusBarHeight.value + 50 + "px",
+        s: common_vendor.o(refreshLocation, "19"),
+        t: isMapReady.value
       }, isMapReady.value ? {
-        r: common_vendor.sei("myMap", "map"),
-        s: center.latitude,
-        t: center.longitude,
-        v: markers.value,
-        w: mapScale.value
+        v: common_vendor.sei("myMap", "map"),
+        w: center.latitude,
+        x: center.longitude,
+        y: markers.value,
+        z: mapScale.value
       } : {}, {
-        x: common_vendor.t(totalTrips.value),
-        y: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
-        z: common_assets._imports_1,
-        A: common_vendor.o(toDeviceDetail, "36"),
-        B: common_vendor.p({
+        A: common_vendor.o(toRecordDetail, "1d"),
+        B: common_vendor.t(totalTrips.value),
+        C: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
+        D: common_assets._imports_2,
+        E: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        C: common_assets._imports_2,
-        D: common_vendor.p({
+        F: common_vendor.o(toDeviceList, "e6"),
+        G: common_assets._imports_3,
+        H: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        E: common_vendor.o(toMsgCenter, "79"),
-        F: common_assets._imports_3,
-        G: common_vendor.t(currentCarIccId.value),
-        H: common_vendor.o(($event) => {
-          return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "c6"),
-        I: common_vendor.p({
-          type: "primary",
-          size: "small",
-          class: "data-v-00a60067"
-        }),
+        I: common_vendor.o(toDeviceDetail, "82"),
         J: common_assets._imports_4,
-        K: common_vendor.o(toFindCar, "e2"),
-        L: common_assets._imports_5,
-        M: common_vendor.o(toFence, "10"),
-        N: common_assets._imports_6,
-        O: common_vendor.o(contactCustomerService, "bd"),
-        P: common_assets._imports_7,
-        Q: common_vendor.o(unbindDevice, "45"),
-        R: !isLogin.value
+        K: common_vendor.p({
+          name: "arrow-right",
+          class: "data-v-00a60067"
+        }),
+        L: common_vendor.o(toFindCar, "45"),
+        M: common_assets._imports_5,
+        N: common_vendor.p({
+          name: "arrow-right",
+          class: "data-v-00a60067"
+        }),
+        O: common_vendor.o(toFence, "a2"),
+        P: common_assets._imports_6,
+        Q: common_vendor.o(toMsgCenter, "5b"),
+        R: common_assets._imports_7,
+        S: common_vendor.o(($event) => {
+          return toPay(currentCarIccId.value, currentCarSimMerchant.value);
+        }, "e5"),
+        T: common_assets._imports_8,
+        U: common_vendor.o(contactCustomerService, "b2"),
+        V: common_assets._imports_9,
+        W: common_vendor.o(unbindDevice, "ea"),
+        X: !isLogin.value
       }, !isLogin.value ? {
-        S: common_vendor.o(gotoLogin, "a8")
+        Y: common_vendor.o(gotoLogin, "26")
       } : {}, {
-        T: common_vendor.sr(picker, "00a60067-5", {
+        Z: common_vendor.sr(picker, "00a60067-6", {
           "k": "picker"
         }),
-        U: common_vendor.o(confirm, "d5"),
-        V: common_vendor.p({
+        aa: common_vendor.o(confirm, "2a"),
+        ab: common_vendor.p({
           columns: pickerColumns.value,
           keyName: "name",
           class: "r data-v-00a60067"
         }),
-        W: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        X: `${_ctx.u_s_b_h}px`,
-        Y: `${_ctx.u_s_a_i_b}px`,
-        Z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        ac: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        ad: `${_ctx.u_s_b_h}px`,
+        ae: `${_ctx.u_s_a_i_b}px`,
+        af: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

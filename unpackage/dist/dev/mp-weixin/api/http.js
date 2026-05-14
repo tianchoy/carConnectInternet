@@ -23,7 +23,7 @@ function handleTokenExpired() {
         });
       }
     });
-  }, 1500);
+  }, 500);
 }
 function requestInterceptor(config) {
   const token = common_vendor.index.getStorageSync("token");

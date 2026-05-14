@@ -1068,14 +1068,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, deviceList.value.length === 0 && !loading.value ? {
         aw: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       } : {}, {
-        ax: loadingMore.value
-      }, loadingMore.value ? {} : {}, {
-        ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
-      }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
+        ax: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
+      }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : loadingMore.value ? {} : {}, {
+        ay: loadingMore.value,
         az: common_vendor.o(handleLoadMore, "05"),
         aA: common_vendor.o(($event) => {
           return deviceDialogPopup.value.close();
-        }, "a7"),
+        }, "2d"),
         aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
           "k": "deviceDialogPopup"
         }),

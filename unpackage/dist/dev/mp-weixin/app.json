@@ -21,7 +21,8 @@
     "pages/userCenter/payDeviceList/payDeviceList",
     "pages/userCenter/renewal/renewal",
     "pages/cmd/cmd",
-    "pages/webview/webview"
+    "pages/webview/webview",
+    "pages/deviceList/deviceList"
   ],
   "window": {
     "navigationStyle": "custom",

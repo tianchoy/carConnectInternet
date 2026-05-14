@@ -7,12 +7,14 @@
                         <text class="car-id" @click="handlePicker">{{currentCarName || '请选择车辆'}}</text>
                     </view>
                     <view class="nav-tools">
+                        <view class="exit" @click="handleExit" v-if="false">
+                            <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
+                        </view>
                         <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
                     </view>
-                </view>
-                
+                </view> 
                 <!-- 设备信息 - 使用安全访问 -->
-                <view class="device-info">
+                <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
                     <uv-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percentage="safeDeviceDetail.deviceStatus.batteryPercent" height="20rpx" activeColor="#19be6b" inactiveColor="#999"></uv-line-progress>
                     <view v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
                     <view v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
@@ -31,7 +33,7 @@
                     </view>
                     <view class="state-item">
                         <text class="state-label">最后定位</text>
-                        <text class="state-value">{{devicePosInfo.positionUpdateTime}}</text>
+                        <text class="state-value">{{devicePosInfo.positionUpdateTime ?? '暂无位置'}}</text>
                     </view>
                 </view>
             </view>
@@ -62,6 +64,7 @@
                 <view class="mile-record">
                     <view class="record-header">
                         <text class="record-title">轨迹记录</text>
+                        <text class="record-desc" @click="toRecordDetail">更多轨迹</text>
                     </view>
                     <view class="ring-container">
                         <view class="ring-item">
@@ -83,47 +86,57 @@
                     </view>
                 </view>
                 <view class="device-list">
-                    <view class="device-item">
-                        <view class="item-label" @click="toDeviceDetail">
+                    <view class="device-item" @click="toDeviceList">
+                        <view class="item-label">
+                            <view class="icon icon-menu"><image src="../../static/menu.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="item-info">
+                                <text class="item-title">全部设备</text>
+                                <text class="item-desc">点击去查看全部设备</text>
+                            </view>
+                        </view>
+                        <uv-icon name="arrow-right"></uv-icon>
+                    </view>
+                    <view class="device-item"  @click="toDeviceDetail">
+                        <view class="item-label">
                             <view class="icon icon-device"><image src="../../static/pos.png" mode="aspectFill" class="icon-image"></image></view>
                             <view class="item-info">
                                 <text class="item-title">设备详情</text>
-                                <text class="item-desc">请点击查看设备更多详情</text>
+                                <text class="item-desc">查看设备更多详情</text>
                             </view>
                         </view>
                         <uv-icon name="arrow-right"></uv-icon>
                     </view>
-                    <view class="device-item" @click="toMsgCenter">
+                    <view class="device-item" @click="toFindCar">
                         <view class="item-label">
-                            <view class="icon icon-msg"><image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="icon icon-car"><image src="../../static/car.png" mode="aspectFill" class="icon-image"></image></view>
                             <view class="item-info">
-                                <text class="item-title">消息中心</text>
-                                <text class="item-desc">请点击查看报警消息</text>
+                                <text class="item-title">一键寻车</text>
+                                <text class="item-desc">点击立即寻找车辆位置</text>
                             </view>
                         </view>
                         <uv-icon name="arrow-right"></uv-icon>
                     </view>
-                    <view class="device-item">
+                    <view class="device-item" @click="toFence">
                         <view class="item-label">
-                            <view class="icon icon-pay"><image src="../../static/pay.png" mode="aspectFill" class="icon-image"></image></view>
+                            <view class="icon icon-fence"><image src="../../static/dzwl.png" mode="aspectFill" class="icon-image"></image></view>
                             <view class="item-info">
-                                <text class="item-title">ID: {{currentCarIccId}}</text>
-                                <text class="item-desc">请点击去续费</text>
+                                <text class="item-title">电子围栏</text>
+                                <text class="item-desc">点击去设置或者查看电子围栏</text>
                             </view>
                         </view>
-                        <uv-button type="primary" size="small"  @click="toPay(currentCarIccId,currentCarSimMerchant)">续费</uv-button>
+                        <uv-icon name="arrow-right"></uv-icon>
                     </view>
                 </view>
                 <view class="service">
                     <view class="service-header">服务中心</view>
                     <view class="service-content">
-                        <view class="service-item" @click="toFindCar">
-                            <image src="../../static/car.png" mode="aspectFill" class="icon-image"></image>
-                            <text class="item-title">一键寻车</text>
+                        <view class="service-item" @click="toMsgCenter">
+                            <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">警报消息</text>
                         </view>
-                        <view class="service-item" @click="toFence">
-                            <image src="../../static/dzwl.png" mode="aspectFill" class="icon-image"></image>
-                            <text class="item-title">电子围栏</text>
+                        <view class="service-item" @click="toPay(currentCarIccId,currentCarSimMerchant)">
+                            <image src="../../static/pay.png" mode="aspectFill" class="icon-image"></image>
+                            <text class="item-title">一键续费</text>
                         </view>
                         <view class="service-item" @click="contactCustomerService">
                             <image src="../../static/online.png" mode="aspectFill" class="icon-image"></image>
@@ -144,7 +157,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, } from 'vue';
-import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice } from '../../api/request.uts'
+import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatTimes } from '../../utils/formateTime.uts'
@@ -168,13 +181,14 @@ const center = reactive({
     latitude: 39.90469,
     longitude: 116.40717
 })
+
+const userDeviceList = ref<Array<any>>([])
 const isLogin = ref(false)
 const isMapReady = ref(false)
 const mapScale = ref(17)
 const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
 const navBarHeight = ref(44)
-const loading = ref(true)
 const deviceList = ref<Array<Device>>([])
 const picker = ref(null)
 const currentCarImei = ref('')
@@ -203,7 +217,7 @@ const safeDeviceDetail = computed(() => {
     return {
         deviceStatus: {
             batteryPercent: deviceDetail.value?.deviceStatus?.batteryPercent ?? 0,
-            voltage: deviceDetail.value?.deviceStatus?.voltage ?? '--',
+            voltage: deviceDetail.value?.deviceStatus?.voltage ?? 0,
             signalStrength: deviceDetail.value?.deviceStatus?.signalStrength ?? 0
         },
         connectionStatus: deviceDetail.value?.connectionStatus ?? 'offline',
@@ -303,8 +317,9 @@ const loadDeviceList = async () => {
         })
         
         if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
+            userDeviceList.value = res.data
             deviceList.value = res.data.list.map((item: any) => ({ 
-                name: item.deviceName, 
+                name: item.deviceName || item.imei, 
                 value: item.imei,
                 deptId: item.companyId,
                 deviceId: item.deviceId,
@@ -339,7 +354,6 @@ const loadDeviceList = async () => {
                 withPos: false,
                 withTrip: true,
             })
-
         } else {
             uni.showToast({
                 title: res.msg || '暂无车辆数据',
@@ -363,7 +377,7 @@ const loadDeviceDetail = async (deviceId: string) => {
             deviceDetail.value = {
                 deviceStatus: {
                     batteryPercent: res.data.deviceStatus?.batteryPercent ?? 0,
-                    voltage: res.data.deviceStatus?.voltage ?? '--',
+                    voltage: res.data.deviceStatus?.voltage ?? 0,
                     signalStrength: res.data.deviceStatus?.signalStrength ?? 0
                 },
                 connectionStatus: res.data.connectionStatus ?? 'offline',
@@ -392,59 +406,71 @@ const averageSpeed = ref(0)
 const loadTrackPos = async (data: any) => {
     try {
         const res = await getTrackPos(data)
-            console.log('车辆轨迹:', res)
-        if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
+            if (res.code == 401) {
+                uni.showToast({
+                    title: '登录过期，请重新登录',
+                    icon: 'none',
+                    duration: 2000
+                })
+                uni.removeStorageSync('token')
+                uni.reLaunch({
+                    url: '/pages/index/index'
+                })
+                return false
+            }
             await processTripData(res.data)
-            // trackPosInfo.value = res.data.trips
-        } else {
-            console.warn('获取轨迹失败:', res.msg)
-        }
+            uni.hideLoading()
+        // if (res.code == 0 && res.data.trips && res.data.trips.length > 0) {
+        //     console.log('车辆轨迹:', res.data.trips)
+        //     await processTripData(res.data)
+        //     // trackPosInfo.value = res.data.trips
+        //     uni.hideLoading()
+        // } else {
+        //     console.warn('获取轨迹失败:', res.msg)
+        // }
     } catch (error) {
         console.error('加载轨迹失败', error)
     }
 }
 
 // 计算属性：总行程数
-	const totalTrips = computed(() => {
-		return tripData.value.length
-	})
+const totalTrips = computed(() => {
+    return tripData.value.length
+})
 
 // 处理行程数据
-	const processTripData = async (data : any) => {
-		if (data.trips && data.trips.length > 0) {
-			// 遍历所有行程，获取地址
-			const processedTrips = await Promise.all(
-				data.trips.map(async (trip : any) => {
+const processTripData = async (data : any) => {
+    if (data.trips && data.trips.length > 0) {
+        // 遍历所有行程，获取地址
+        const processedTrips = await Promise.all(
+            data.trips.map(async (trip : any) => {
+                return {
+                    ...trip,
+                };
+            })
+        );
 
-					return {
-						...trip,
-						startAddress: '查看位置',
-						endAddress: '查看位置',
-					};
-				})
-			);
+        tripData.value = processedTrips;
 
-			tripData.value = processedTrips;
+        // 计算总里程和平均速度
+        let totalDistance = 0;
+        let totalDuration = 0;
+        let totalAvgSpeed = 0;
 
-			// 计算总里程和平均速度
-			let totalDistance = 0;
-			let totalDuration = 0;
-			let totalAvgSpeed = 0;
+        processedTrips.forEach((trip : any) => {
+            totalDistance += trip.distance || 0;
+            totalDuration += trip.duration || 0;
+            totalAvgSpeed += trip.averageSpeed || 0;
+        });
 
-			processedTrips.forEach((trip : any) => {
-				totalDistance += trip.distance || 0;
-				totalDuration += trip.duration || 0;
-				totalAvgSpeed += trip.averageSpeed || 0;
-			});
-
-			totalMileage.value = totalDistance;
-			averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
-		} else {
-			tripData.value = [];
-			totalMileage.value = 0;
-			averageSpeed.value = 0;
-		}
-	};
+        totalMileage.value = totalDistance;
+        averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
+    } else {
+        tripData.value = [];
+        totalMileage.value = 0;
+        averageSpeed.value = 0;
+    }
+};
 
 // 加载设备位置
 const devicePosInfo = ref<any>({})
@@ -558,6 +584,24 @@ const refreshLocation = async () => {
     }
 }
 
+// 跳转轨迹详情
+const toRecordDetail = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.navigateTo({
+        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude
+    })
+}
+
+// 跳转全部设备 
+const toDeviceList = () => {
+    // 检查是否登录
+    if (!isLogin.value) return
+    uni.navigateTo({
+        url: '/pages/deviceList/deviceList?userDeviceList=' + JSON.stringify(userDeviceList.value),
+    })
+}
+
 // 创建标记点
 const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
     const isOnline = safeDeviceDetail.value.connectionStatus === 'online'
@@ -566,16 +610,16 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
         id,
         latitude: lat,
         longitude: lng,
-        width: 35,
-        height: 35,
+        width: 30,
+        height: 30,
         iconPath: iconPath,
         callout: {
             content: title || '爱车位置',
             color: isOnline ? '#ffffff' : '#999999',
-            borderRadius: 10,
+            borderRadius: 6,
             bgColor: isOnline ? '#07C160' : '#CCCCCC',
-            padding: 8,
-            fontSize: 14,
+            padding: 4,
+            fontSize: 12,
             display: 'ALWAYS'
         },
         anchor: { x: 0.5, y: 0.5 }
@@ -700,7 +744,7 @@ const toPay = (iccid : string,simMerchant : string) => {
 }
 
 
-
+// 刷新设备列表
 const refreshDeviceList = () => {
     console.log('收到刷新事件，重新加载设备列表')
     loadDeviceList()
@@ -744,6 +788,32 @@ const unbindDevice = async () => {
                     })
                 }
                 loadDeviceList();
+            }
+        }
+    })
+}
+
+// 退出登录
+const handleExit = () => {
+     // 检查是否登录
+    if (!isLogin.value) return
+    uni.showModal({
+        title: '退出登录',
+        content: '确定退出登录吗？',
+        success: async (res) => {
+            if (res.confirm) {
+                // 确认退出登录
+                const res = await logout()
+                if(res.code == 0){
+                    uni.removeStorageSync('token')
+                    uni.reLaunch({
+                        url:'/pages/login/login'
+                    })
+                }else{
+                    uni.showToast({
+                        title:'退出账户失败'
+                    })
+                }
             }
         }
     })
@@ -852,6 +922,25 @@ onLoad(() => {
                 justify-content: space-between;
                 align-items: center;
                 gap: 30rpx;
+                .exit {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10rpx;
+                    background-color: rgba(0, 0, 0, 0.05);
+                    transition: all 0.2s ease;
+                    
+                    &:active {
+                        background-color: rgba(0, 0, 0, 0.15);
+                        transform: scale(0.95);
+                    }
+                    border-radius: 50%;
+                    
+                    .exit-icon {
+                        width: 40rpx;
+                        height: 40rpx;
+                    }
+                }
             }
         }
         
@@ -868,16 +957,9 @@ onLoad(() => {
                 color: #333;
             }
         }
-        
-        .banner {
-            margin: 20rpx 0;
-            border-radius: 20rpx;
-            overflow: hidden;
-            
-            .banner-image {
+        .banner-image {
                 width: 100%;
             }
-        }
         
         .car-state {
             display: flex;
@@ -964,6 +1046,10 @@ onLoad(() => {
             overflow: hidden;
             box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
             .record-header {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
                 padding:20rpx 30rpx;
                 border-bottom: 1rpx solid #f0f0f0;
                 
@@ -971,6 +1057,13 @@ onLoad(() => {
                     font-size: 32rpx;
                     font-weight: bold;
                     color: #333;
+                }
+                .record-desc {
+                    font-size: 26rpx;
+                    color: #07C160;
+                    padding: 8rpx 16rpx;
+                    background: #f0f9f0;
+                    border-radius: 8rpx;
                 }
             }
             .ring-container {
@@ -1059,19 +1152,18 @@ onLoad(() => {
                 background-color: #fff;
                 border-radius: 20rpx;
                 .item-label{
-                    font-size: 30rpx;
+                    font-size: 28rpx;
                     font-weight: 500;
                     display: flex;
                     flex-direction: row;
                     align-items: flex-start;
                     align-items: center;
-                    gap: 30rpx;
+                    gap: 20rpx;
                     .icon{
-                        width: 100rpx;
-                        height: 100rpx;
-                        
+                        width: 80rpx;
+                        height: 80rpx;
                         border-radius: 50%;
-                        padding: 20rpx;
+                        padding: 18rpx;
                         image{
                             width: 100%;
                             height: 100%;
@@ -1079,18 +1171,20 @@ onLoad(() => {
                         &.icon-device{
                             background-color: #f0f9f0;
                         }
-                        &.icon-msg{
-                            background-color: #f7f5f1;
+                        &.icon-car{
+                            background-color: #f3f8fb;
                         }
-                        &.icon-pay{
-                            background-color: #f7f1f5;
+                        &.icon-fence{
+                            background-color: #f1f7f4;
+                        }
+                        &.icon-menu{
+                            background-color: #f8f3fb;
                         }
                     }
                     .item-info{
                         font-weight: normal;
                         .item-desc{
                             color: #ccc;
-                            margin-top: 10rpx;
                         }
                     }
                 }

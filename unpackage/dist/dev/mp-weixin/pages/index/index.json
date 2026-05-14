@@ -3,7 +3,6 @@
   "usingComponents": {
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
     "uv-line-progress": "../../uni_modules/uv-line-progress/components/uv-line-progress/uv-line-progress",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
     "uv-picker": "../../uni_modules/uv-picker/components/uv-picker/uv-picker"
   }
 }

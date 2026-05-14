@@ -134,6 +134,12 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/deviceList/deviceList",
+			"style": {
+				"navigationBarTitleText": "设备列表"
+			}
 		}
 	],
 	"tabBar": {

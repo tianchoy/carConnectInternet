@@ -24,6 +24,7 @@ if (!Math) {
   "./pages/userCenter/renewal/renewal.js";
   "./pages/cmd/cmd.js";
   "./pages/webview/webview.js";
+  "./pages/deviceList/deviceList.js";
 }
 let updateManager = null;
 function checkForUpdates() {

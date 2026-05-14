@@ -53,7 +53,7 @@ function handleTokenExpired(): void {
                 })
             }
         })
-    }, 1500)
+    }, 500)
 }
 
 // 请求拦截器

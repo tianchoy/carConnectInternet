@@ -686,7 +686,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         G: (_q = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _q.sat
       }, ((_r = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _r.sat) ? {
-        H: common_assets._imports_0$2,
+        H: common_assets._imports_0$1,
         I: common_vendor.t((_s = common_vendor.unref(currentCarInfo).attribute) == null ? void 0 : _s.sat)
       } : {}, {
         J: common_vendor.unref(currentCarInfo).voltage
