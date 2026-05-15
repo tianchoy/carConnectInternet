@@ -20,8 +20,8 @@ interface HttpError {
     data?: any
 }
 
-// const BASE_URL = 'https://car.zdiot.cn:18443/api'
-const BASE_URL = 'http://192.168.3.7:8085/api'
+const BASE_URL = 'https://car.zdiot.cn:18443/api'
+// const BASE_URL = 'http://192.168.3.7:8085/api'
 
 // 处理token过期的函数
 function handleTokenExpired(): void {

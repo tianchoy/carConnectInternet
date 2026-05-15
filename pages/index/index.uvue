@@ -4,7 +4,8 @@
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
                     <view class="current-car">
-                        <text class="car-id" @click="handlePicker">{{currentCarName || '请选择车辆'}}</text>
+                        <text v-if="currentCarName" class="car-id" @click="handlePicker">{{currentCarName}}</text>
+                        <text v-else class="car-id" @click="gotoLogin">请登录</text>
                     </view>
                     <view class="nav-tools">
                         <view class="exit" @click="handleExit" v-if="false">
@@ -143,7 +144,6 @@
                 </view>
             </view>
         </view>
-        <view class="login-view-more" v-if="!isLogin" @click="gotoLogin">登录查看更多</view>
         <uv-picker ref="picker" :columns="pickerColumns" keyName="name" @confirm="confirm"></uv-picker>
     </view>
 </template>
@@ -176,7 +176,6 @@ const center = reactive({
 })
 
 const userDeviceList = ref<Array<any>>([])
-const isLogin = ref(false)
 const isMapReady = ref(false)
 const mapScale = ref(17)
 const statusBarHeight = ref(20)
@@ -321,7 +320,6 @@ const handlePicker = () => {
 
 // 处理选择车辆确认
 const confirm = async (e: any) => {
-    if (!isLogin.value || !e.value || !e.value[0]) return
     
     const selectedDevice = e.value[0]
     currentCarName.value = selectedDevice.name
@@ -372,8 +370,6 @@ const confirm = async (e: any) => {
 
 // 加载车辆列表
 const loadDeviceList = async () => {
-    if (!checkToken()) return
-    isLogin.value = true
     
     try {
         const res = await getUserDeviceList({
@@ -667,7 +663,7 @@ const refreshLocation = async () => {
 // 跳转轨迹详情
 const toRecordDetail = () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude
     })
@@ -676,7 +672,7 @@ const toRecordDetail = () => {
 // 跳转全部设备 
 const toDeviceList = () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/deviceList/deviceList?userDeviceList=' + JSON.stringify(userDeviceList.value),
     })
@@ -710,8 +706,7 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
 // 跳转设备详情
 const toDeviceDetail = (e: any) => {
     // 检查是否登录
-    if (!isLogin.value) return
-
+    if (!isLogin()) return 
     if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
         uni.showToast({
             title: '请先选择车辆',
@@ -726,8 +721,7 @@ const toDeviceDetail = (e: any) => {
 
 // 跳转添加车辆
 const toAdd = () => {
-    // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/addCar/addCar',
     })
@@ -736,7 +730,7 @@ const toAdd = () => {
 // 跳转消息中心
 const toMsgCenter = () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.switchTab({
         url: '/pages/message/message',
     })
@@ -745,7 +739,7 @@ const toMsgCenter = () => {
 // 跳转查找车辆
 const toFindCar = () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
@@ -770,7 +764,7 @@ const toFindCar = () => {
 // 跳转围栏
 const toFence = () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
@@ -790,8 +784,8 @@ const contactCustomerService = () => {
 // 支付
 const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
-        // 检查是否登录
-    if (!isLogin.value) return
+    // 检查是否登录
+    if (!isLogin()) return 
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1) //电信卡
     }
@@ -839,7 +833,7 @@ const gotoLogin = () => {
 // 解绑设备
 const unbindDevice = async () => {
     // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.showModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',
@@ -869,7 +863,7 @@ const unbindDevice = async () => {
 // 退出登录
 const handleExit = () => {
      // 检查是否登录
-    if (!isLogin.value) return
+    if (!isLogin()) return 
     uni.showModal({
         title: '退出登录',
         content: '确定退出登录吗？',
@@ -913,10 +907,16 @@ onUnload(() => {
     uni.$off('refreshDeviceList', refreshDeviceList)
 })
 
-// 检查登录状态
+// 检查token状态
 const checkToken = () => {
     const token = uni.getStorageSync('token')
-    if (!token) {
+    if (!token) return
+    loadDeviceList();
+    return true
+}
+// 检查是否登录
+const isLogin = () => {
+    if (!checkToken()) {
         uni.showToast({
             title: '请先登录',
             icon: 'none'
@@ -930,7 +930,7 @@ const checkToken = () => {
 onLoad(() => {
     uni.hideTabBar()
     initDimensions();
-    loadDeviceList();
+    checkToken();
 })
 </script>
 
@@ -1300,22 +1300,6 @@ onLoad(() => {
                 }
             }
         }
-    }
-
-    .login-view-more {
-        position: fixed;
-        bottom: 200rpx;
-        width: 100%;
-        left: 0rpx;
-        z-index: 100;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        font-size: 28rpx;
-        color: #fff;
-        background-color: #999;
-        padding: 20rpx 0;
     }
 }
 </style>

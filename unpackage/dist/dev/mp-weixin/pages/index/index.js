@@ -27,7 +27,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const userDeviceList = common_vendor.ref([]);
-    const isLogin = common_vendor.ref(false);
     const isMapReady = common_vendor.ref(false);
     const mapScale = common_vendor.ref(17);
     const statusBarHeight = common_vendor.ref(20);
@@ -160,8 +159,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const confirm = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (!isLogin.value || !e.value || !e.value[0])
-          return Promise.resolve(null);
         const selectedDevice = e.value[0];
         currentCarName.value = selectedDevice.name;
         currentCarImei.value = selectedDevice.value;
@@ -207,9 +204,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadDeviceList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (!checkToken())
-          return Promise.resolve(null);
-        isLogin.value = true;
         try {
           const res = yield api_request.getUserDeviceList({
             pageSize: 1e3
@@ -459,14 +453,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const toRecordDetail = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
         url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude
       });
     };
     const toDeviceList = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
         url: "/pages/deviceList/deviceList?userDeviceList=" + common_vendor.UTS.JSON.stringify(userDeviceList.value)
@@ -496,7 +490,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return marker;
     };
     const toDeviceDetail = (e = null) => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
         common_vendor.index.showToast({
@@ -510,21 +504,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const toAdd = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
         url: "/pages/addCar/addCar"
       });
     };
     const toMsgCenter = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.switchTab({
         url: "/pages/message/message"
       });
     };
     const toFindCar = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.openLocation({
         latitude: center.latitude,
@@ -547,7 +541,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const toFence = () => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
         url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
@@ -564,7 +558,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const needRefresh = common_vendor.ref(false);
     const toPay = (iccid, simMerchant) => {
-      if (!isLogin.value)
+      if (!isLogin())
         return null;
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
@@ -598,7 +592,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const unbindDevice = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (!isLogin.value)
+        if (!isLogin())
           return Promise.resolve(null);
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "解绑车辆",
@@ -644,7 +638,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const checkToken = () => {
       const token = common_vendor.index.getStorageSync("token");
-      if (!token) {
+      if (!token)
+        return null;
+      loadDeviceList();
+      return true;
+    };
+    const isLogin = () => {
+      if (!checkToken()) {
         common_vendor.index.showToast({
           title: "请先登录",
           icon: "none"
@@ -656,25 +656,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad(() => {
       common_vendor.index.hideTabBar();
       initDimensions();
-      loadDeviceList();
+      checkToken();
     });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.t(currentCarName.value || "请选择车辆"),
-        b: common_vendor.o(handlePicker, "03")
+        a: currentCarName.value
+      }, currentCarName.value ? {
+        b: common_vendor.t(currentCarName.value),
+        c: common_vendor.o(handlePicker, "d5")
+      } : {
+        d: common_vendor.o(gotoLogin, "87")
       }, {}, {
-        e: common_vendor.o(toAdd, "a2"),
-        f: common_vendor.p({
+        g: common_vendor.o(toAdd, "53"),
+        h: common_vendor.p({
           name: "plus-circle",
           size: "25",
           class: "data-v-00a60067"
         }),
-        g: safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage
+        i: safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage
       }, safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage ? common_vendor.e({
-        h: safeDeviceDetail.value.deviceStatus.batteryPercent
+        j: safeDeviceDetail.value.deviceStatus.batteryPercent
       }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
-        i: common_vendor.p({
+        k: common_vendor.p({
           percentage: safeDeviceDetail.value.deviceStatus.batteryPercent,
           height: "20rpx",
           activeColor: "#19be6b",
@@ -682,69 +686,65 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-00a60067"
         })
       } : {}, {
-        j: safeDeviceDetail.value.deviceStatus.batteryPercent
+        l: safeDeviceDetail.value.deviceStatus.batteryPercent
       }, safeDeviceDetail.value.deviceStatus.batteryPercent ? {
-        k: common_vendor.t(safeDeviceDetail.value.deviceStatus.batteryPercent)
+        m: common_vendor.t(safeDeviceDetail.value.deviceStatus.batteryPercent)
       } : {}, {
-        l: safeDeviceDetail.value.deviceStatus.voltage
+        n: safeDeviceDetail.value.deviceStatus.voltage
       }, safeDeviceDetail.value.deviceStatus.voltage ? {
-        m: common_vendor.t(safeDeviceDetail.value.deviceStatus.voltage)
+        o: common_vendor.t(safeDeviceDetail.value.deviceStatus.voltage)
       } : {}) : {}, {
-        n: common_assets._imports_1,
-        o: common_vendor.t(safeDeviceDetail.value.connectionStatus === "online" ? "在线" : "离线"),
-        p: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
-        q: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
-        r: statusBarHeight.value + 50 + "px",
-        s: common_vendor.o(refreshLocation, "d2"),
-        t: isMapReady.value
+        p: common_assets._imports_1,
+        q: common_vendor.t(safeDeviceDetail.value.connectionStatus === "online" ? "在线" : "离线"),
+        r: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
+        s: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
+        t: statusBarHeight.value + 50 + "px",
+        v: common_vendor.o(refreshLocation, "8e"),
+        w: isMapReady.value
       }, isMapReady.value ? {
-        v: common_vendor.sei("myMap", "map"),
-        w: center.latitude,
-        x: center.longitude,
-        y: markers.value,
-        z: mapScale.value
+        x: common_vendor.sei("myMap", "map"),
+        y: center.latitude,
+        z: center.longitude,
+        A: markers.value,
+        B: mapScale.value
       } : {}, {
-        A: common_vendor.o(toRecordDetail, "37"),
-        B: common_vendor.t(totalTrips.value),
-        C: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
-        D: common_assets._imports_2,
-        E: common_vendor.p({
+        C: common_vendor.o(toRecordDetail, "21"),
+        D: common_vendor.t(totalTrips.value),
+        E: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
+        F: common_assets._imports_2,
+        G: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        F: common_vendor.o(toDeviceDetail, "a2"),
-        G: common_assets._imports_3,
-        H: common_vendor.p({
+        H: common_vendor.o(toDeviceDetail, "c3"),
+        I: common_assets._imports_3,
+        J: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        I: common_vendor.o(toFindCar, "ce"),
-        J: common_assets._imports_4,
-        K: common_vendor.p({
+        K: common_vendor.o(toFindCar, "60"),
+        L: common_assets._imports_4,
+        M: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        L: common_vendor.o(toFence, "02"),
-        M: common_assets._imports_5,
-        N: common_vendor.o(toDeviceList, "88"),
-        O: common_assets._imports_6,
-        P: common_vendor.o(toMsgCenter, "08"),
-        Q: common_assets._imports_7,
-        R: common_vendor.o(($event) => {
+        N: common_vendor.o(toFence, "f5"),
+        O: common_assets._imports_5,
+        P: common_vendor.o(toDeviceList, "7d"),
+        Q: common_assets._imports_6,
+        R: common_vendor.o(toMsgCenter, "4a"),
+        S: common_assets._imports_7,
+        T: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "84"),
-        S: common_assets._imports_8,
-        T: common_vendor.o(contactCustomerService, "e3"),
-        U: common_assets._imports_9,
-        V: common_vendor.o(unbindDevice, "e6"),
-        W: !isLogin.value
-      }, !isLogin.value ? {
-        X: common_vendor.o(gotoLogin, "b9")
-      } : {}, {
+        }, "fd"),
+        U: common_assets._imports_8,
+        V: common_vendor.o(contactCustomerService, "96"),
+        W: common_assets._imports_9,
+        X: common_vendor.o(unbindDevice, "91"),
         Y: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        Z: common_vendor.o(confirm, "b1"),
+        Z: common_vendor.o(confirm, "37"),
         aa: common_vendor.p({
           columns: pickerColumns.value,
           keyName: "name",

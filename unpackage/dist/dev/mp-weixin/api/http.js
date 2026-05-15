@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const BASE_URL = "http://192.168.3.7:8085/api";
+const BASE_URL = "https://car.zdiot.cn:18443/api";
 function handleTokenExpired() {
   console.log("检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
