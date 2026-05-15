@@ -176,6 +176,7 @@
 	}
 
 	onLoad(async (options) => {
+		console.log('onLoad', options)
 		getLocation()
 		await loadUserDeviceList(JSON.parse(options.userDeviceList))
 		intiMarker()

@@ -4,7 +4,7 @@
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
                     <view class="current-car">
-                        <text v-if="currentCarName" class="car-id" @click="handlePicker">{{currentCarName}}</text>
+                        <text v-if="checkToken()" class="car-id" @click="handlePicker">{{currentCarName}}</text>
                         <text v-else class="car-id" @click="gotoLogin">请登录</text>
                     </view>
                     <view class="nav-tools">
@@ -138,7 +138,7 @@
                         </view>
                         <view class="service-item" @click="unbindDevice">
                             <image src="../../static/del.png" mode="aspectFill" class="icon-image"></image>
-                            <text class="item-title" style="color: #ff4d4f;">删除设备</text>
+                            <text class="item-title" style="color: #d81e06;">删除设备</text>
                         </view>
                     </view>
                 </view>
@@ -671,6 +671,7 @@ const toRecordDetail = () => {
 
 // 跳转全部设备 
 const toDeviceList = () => {
+    console.log('toDeviceList')
     // 检查是否登录
     if (!isLogin()) return 
     uni.navigateTo({
@@ -817,12 +818,6 @@ const toPay = (iccid : string,simMerchant : string) => {
     })
 }
 
-
-// 刷新设备列表
-const refreshDeviceList = () => {
-    loadDeviceList()
-}
-
 // 跳转登录页
 const gotoLogin = () => {
     uni.navigateTo({
@@ -889,11 +884,7 @@ const handleExit = () => {
 }
 
 onShow(async () => {
-    const token = uni.getStorageSync('token')
-    if (token) {
-        // 监听全局刷新事件
-        uni.$on('refreshDeviceList', refreshDeviceList)
-
+    if (checkToken()) {
         const needRefresh = uni.getStorageSync('needRefreshHome')
         if (needRefresh) {
             await loadDeviceList()
@@ -902,20 +893,14 @@ onShow(async () => {
     }
 })
 
-onUnload(() => {
-    // 清理事件监听
-    uni.$off('refreshDeviceList', refreshDeviceList)
-})
-
 // 检查token状态
-const checkToken = () => {
+const checkToken = (): boolean => {
     const token = uni.getStorageSync('token')
-    if (!token) return
-    loadDeviceList();
-    return true
+    return !!token
 }
+
 // 检查是否登录
-const isLogin = () => {
+const isLogin = (): boolean => {
     if (!checkToken()) {
         uni.showToast({
             title: '请先登录',
@@ -929,8 +914,11 @@ const isLogin = () => {
 // 页面加载
 onLoad(() => {
     uni.hideTabBar()
-    initDimensions();
-    checkToken();
+    initDimensions()
+    
+    if (checkToken()) {
+        loadDeviceList()
+    }
 })
 </script>
 
@@ -1251,12 +1239,14 @@ onLoad(() => {
                         &.icon-fence{
                             background-color: #f1f7f4;
                         }
-                        &.icon-menu{
-                            background-color: #f8f3fb;
-                        }
                     }
                     .item-info{
                         font-weight: normal;
+                        .item-title{
+                            font-size: 28rpx;
+                            font-weight: bold;
+                            color: #333;
+                        }
                         .item-desc{
                             color: #ccc;
                         }

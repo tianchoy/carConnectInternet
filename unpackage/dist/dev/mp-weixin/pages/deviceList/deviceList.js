@@ -144,6 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((options) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        console.log("onLoad", options);
         getLocation();
         yield loadUserDeviceList(common_vendor.UTS.JSON.parse(options.userDeviceList));
         intiMarker();

@@ -460,6 +460,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const toDeviceList = () => {
+      console.log("toDeviceList");
       if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
@@ -582,9 +583,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }));
     };
-    const refreshDeviceList = () => {
-      loadDeviceList();
-    };
     const gotoLogin = () => {
       common_vendor.index.navigateTo({
         url: "/pages/login/login"
@@ -622,9 +620,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onShow(() => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const token = common_vendor.index.getStorageSync("token");
-        if (token) {
-          common_vendor.index.$on("refreshDeviceList", refreshDeviceList);
+        if (checkToken()) {
           const needRefresh_1 = common_vendor.index.getStorageSync("needRefreshHome");
           if (needRefresh_1) {
             yield loadDeviceList();
@@ -633,15 +629,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     });
-    common_vendor.onUnload(() => {
-      common_vendor.index.$off("refreshDeviceList", refreshDeviceList);
-    });
     const checkToken = () => {
       const token = common_vendor.index.getStorageSync("token");
-      if (!token)
-        return null;
-      loadDeviceList();
-      return true;
+      return !!token;
     };
     const isLogin = () => {
       if (!checkToken()) {
@@ -656,19 +646,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad(() => {
       common_vendor.index.hideTabBar();
       initDimensions();
-      checkToken();
+      if (checkToken()) {
+        loadDeviceList();
+      }
     });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: currentCarName.value
-      }, currentCarName.value ? {
+        a: checkToken()
+      }, checkToken() ? {
         b: common_vendor.t(currentCarName.value),
-        c: common_vendor.o(handlePicker, "d5")
+        c: common_vendor.o(handlePicker, "ae")
       } : {
-        d: common_vendor.o(gotoLogin, "87")
+        d: common_vendor.o(gotoLogin, "37")
       }, {}, {
-        g: common_vendor.o(toAdd, "53"),
+        g: common_vendor.o(toAdd, "f8"),
         h: common_vendor.p({
           name: "plus-circle",
           size: "25",
@@ -699,7 +691,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         r: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
         s: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
         t: statusBarHeight.value + 50 + "px",
-        v: common_vendor.o(refreshLocation, "8e"),
+        v: common_vendor.o(refreshLocation, "ca"),
         w: isMapReady.value
       }, isMapReady.value ? {
         x: common_vendor.sei("myMap", "map"),
@@ -708,7 +700,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         A: markers.value,
         B: mapScale.value
       } : {}, {
-        C: common_vendor.o(toRecordDetail, "21"),
+        C: common_vendor.o(toRecordDetail, "c3"),
         D: common_vendor.t(totalTrips.value),
         E: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         F: common_assets._imports_2,
@@ -716,35 +708,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        H: common_vendor.o(toDeviceDetail, "c3"),
+        H: common_vendor.o(toDeviceDetail, "83"),
         I: common_assets._imports_3,
         J: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        K: common_vendor.o(toFindCar, "60"),
+        K: common_vendor.o(toFindCar, "4f"),
         L: common_assets._imports_4,
         M: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        N: common_vendor.o(toFence, "f5"),
+        N: common_vendor.o(toFence, "32"),
         O: common_assets._imports_5,
-        P: common_vendor.o(toDeviceList, "7d"),
+        P: common_vendor.o(toDeviceList, "13"),
         Q: common_assets._imports_6,
-        R: common_vendor.o(toMsgCenter, "4a"),
+        R: common_vendor.o(toMsgCenter, "42"),
         S: common_assets._imports_7,
         T: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "fd"),
+        }, "39"),
         U: common_assets._imports_8,
-        V: common_vendor.o(contactCustomerService, "96"),
+        V: common_vendor.o(contactCustomerService, "27"),
         W: common_assets._imports_9,
-        X: common_vendor.o(unbindDevice, "91"),
+        X: common_vendor.o(unbindDevice, "ed"),
         Y: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        Z: common_vendor.o(confirm, "37"),
+        Z: common_vendor.o(confirm, "5a"),
         aa: common_vendor.p({
           columns: pickerColumns.value,
           keyName: "name",

@@ -578,8 +578,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         x: common_vendor.t(currentTime.value),
         y: common_vendor.t(currentSpeed.value),
         z: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        A: common_vendor.o(onConfirm, "ec"),
-        B: common_vendor.o(onCancel, "02"),
+        A: common_vendor.o(onConfirm, "8e"),
+        B: common_vendor.o(onCancel, "66"),
         C: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",

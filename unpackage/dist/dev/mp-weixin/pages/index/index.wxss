@@ -320,11 +320,13 @@
 .container .content .device-list .device-item .item-label .icon.icon-fence.data-v-00a60067 {
   background-color: #f1f7f4;
 }
-.container .content .device-list .device-item .item-label .icon.icon-menu.data-v-00a60067 {
-  background-color: #f8f3fb;
-}
 .container .content .device-list .device-item .item-label .item-info.data-v-00a60067 {
   font-weight: normal;
+}
+.container .content .device-list .device-item .item-label .item-info .item-title.data-v-00a60067 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
 }
 .container .content .device-list .device-item .item-label .item-info .item-desc.data-v-00a60067 {
   color: #ccc;
