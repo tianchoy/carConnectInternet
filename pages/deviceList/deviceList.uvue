@@ -22,12 +22,10 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, reactive, onMounted, computed, watch } from 'vue'
-	// 导入坐标转换插件
+	import { ref, computed, watch } from 'vue'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
-	const Login = ref<boolean>(false)
 	const mapScale = ref(4)
 	const showMap = ref(true)
 	const markers = ref<Array<any>>([])
@@ -60,12 +58,9 @@
 	const carGroup = ref<any>([])
 	const columns = ref<Array<{ name : string, value : string }>>([[]])
 	const pickerStateTitle = ref('全部状态')
-	const pickerGroupTitle = ref('全部分组')
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
-	// 当前选中的分组ID
-	const currentGroupId = ref<string>('')
 
 	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
@@ -122,25 +117,6 @@
 		})
 	}
 
-	// 跳转到列表页面
-	const goToList = (status : string) => {
-		// 先切换到列表模式
-		showMap.value = false
-
-		// 根据状态设置筛选条件
-		switch (status) {
-			case 'all':
-				pickerStateTitle.value = '全部状态'
-				break
-			case 'online':
-				pickerStateTitle.value = '在线'
-				break
-			case 'offline':
-				pickerStateTitle.value = '离线'
-				break
-		}
-	}
-
 	const handStatePicker = () => {
 		columns.value = carState.value
 		currentPickerType.value = 'state'
@@ -187,10 +163,8 @@
 			if (device.deviceId && !isNaN(Number(device.deviceId))) {
 				markerId = Number(device.deviceId)
 			} else {
-				// 如果 deviceId 不是有效数字，使用索引作为 fallback
 				markerId = index + 1
 			}
-
 			return {
 				id: markerId,  // 使用数字类型的 ID
 				latitude: lat,
@@ -205,7 +179,7 @@
 					borderRadius: 8,
 					bgColor: '#ffffff'
 				},
-				joinCluster: true,  // 可以重新开启聚合
+				joinCluster: true,
 				anchor: { x: 0.5, y: 0.5 }
 			}
 		}).filter(marker => marker !== null)
@@ -332,8 +306,7 @@
 			}
 		}
 
-		.left-bar,
-		.left-bar-state {
+		.left-bar {
 			position: absolute;
 			top: 20rpx;
 			z-index: 100;
@@ -352,71 +325,5 @@
 		.left-bar {
 			left: 20rpx;
 		}
-
-		.left-bar-state {
-			left: 20rpx;
-			top:270rpx;
-		}
-
-		.login-view-more {
-			position: absolute;
-			bottom: 50rpx;
-			width: 100%;
-			left: 0rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			font-size: 28rpx;
-			color: #fff;
-			background-color: #999;
-			padding: 20rpx 0;
-		}
-		.map-plus-min{
-			position: absolute;
-			bottom: 300rpx;
-			right: 50rpx;
-			z-index: 100;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			font-size: 28rpx;
-			gap:80rpx;
-			.map-plus{
-				width: 60rpx;
-				height: 60rpx;
-				border-width: 1rpx;
-				border-color: #E6E6E6;
-				background-color: #fff;
-				border-style: solid;
-				border-radius: 50%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-			.map-min{
-				width: 60rpx;
-				height: 60rpx;
-				border-width: 1rpx;
-				border-color: #E6E6E6;
-				background-color: #fff;
-				border-style: solid;
-				border-radius: 50%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-		}
-	}
-	.uv-notice-bar{
-		padding: 25rpx 30rpx !important;
-	}
-	.uv-notice__swiper{
-		height: 40rpx !important;
-	}
-	.uvicon-volume{
-		font-size: 40rpx !important;
 	}
 </style>

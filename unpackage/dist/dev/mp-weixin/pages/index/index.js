@@ -792,19 +792,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         P: common_vendor.o(toFence, "dc"),
         Q: common_assets._imports_5,
-        R: common_vendor.o(toMsgCenter, "c5"),
+        R: common_vendor.o(toMsgCenter, "a9"),
         S: common_assets._imports_6,
         T: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "c1"),
+        }, "a3"),
         U: common_assets._imports_7,
-        V: common_vendor.o(contactCustomerService, "26"),
+        V: common_vendor.o(contactCustomerService, "51"),
         W: common_assets._imports_8,
-        X: common_vendor.o(unbindDevice, "bd"),
+        X: common_vendor.o(unbindDevice, "ab"),
         Y: common_vendor.sr(picker, "00a60067-6", {
           "k": "picker"
         }),
-        Z: common_vendor.o(confirm, "0d"),
+        Z: common_vendor.o(confirm, "ab"),
         aa: common_vendor.p({
           color: "#333",
           activeColor: "#ea7312",

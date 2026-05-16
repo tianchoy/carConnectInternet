@@ -17,7 +17,6 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "deviceList",
   setup(__props) {
-    common_vendor.ref(false);
     const mapScale = common_vendor.ref(4);
     const showMap = common_vendor.ref(true);
     const markers = common_vendor.ref([]);
@@ -44,9 +43,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref([]);
     const columns = common_vendor.ref([[]]);
     const pickerStateTitle = common_vendor.ref("全部状态");
-    common_vendor.ref("全部分组");
     const originalDeviceList = common_vendor.ref([]);
-    common_vendor.ref("");
     const filteredDevices = common_vendor.computed(() => {
       if (!Array.isArray(originalDeviceList.value))
         return [];

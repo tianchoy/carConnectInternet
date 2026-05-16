@@ -119,10 +119,6 @@
                 <view class="service">
                     <view class="service-header">服务中心</view>
                     <view class="service-content">
-                        <!-- <view class="service-item" @click="toDeviceList">
-                            <image src="../../static/allDevice.png" mode="aspectFill" class="icon-image"></image>
-                            <text class="item-title">全部设备</text>
-                        </view> -->
                         <view class="service-item" @click="toMsgCenter">
                             <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">警报消息</text>
