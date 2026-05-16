@@ -1,39 +1,100 @@
 <template>
 	<view class="container">
-		<custom-navBar title="设备列表" :show-back="true" backgroundColor="#f1f1f1" textColor="#333" :showCapsule="false"
+		<custom-navBar title="全部设备" :show-back="true" backgroundColor="#f1f1f1" textColor="#333" :showCapsule="false"
 			:isIcon="true" @capsuleClick="subMsg" Icon="bell" :iconColor="iconColor">
 		</custom-navBar>
-		<view class="map-container">
+		<view class="map-container" v-if="showMap">
 			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%"
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
+            <view class="right-bar" v-if="showMap">
+                <view class="allCar">全部 {{totalCount}}</view>
+                <view class="onlineCar">在线 {{onlineCount}}</view>
+                <view class="offlineCar">离线 {{offlineCount}}</view>
+            </view>
+            <view class="left-bar" @click="handStatePicker">
+                <text>{{pickerStateTitle}}</text>
+                <uv-icon name="arrow-down" size="15" color="#fff"></uv-icon>
+            </view>
 		</view>
-		<!-- <view class="map-plus-min">
-			<view class="map-plus" @click="mapPlus">
-				<uv-icon name="plus" size="19"></uv-icon>
-			</view>
-			<view class="map-min" @click="mapMin">
-				<uv-icon name="minus" size="19"></uv-icon>
-			</view>
-		</view> -->
+		<uv-picker ref="picker" :columns="columns" keyName="name" @confirm="confirm"></uv-picker>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref} from 'vue'
+	import { ref, reactive, onMounted, computed, watch } from 'vue'
+	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
+
+	const Login = ref<boolean>(false)
 	const mapScale = ref(4)
+	const showMap = ref(true)
 	const markers = ref<Array<any>>([])
 	let mapCtx = undefined
+	const currentPickerType = ref('')
+	const picker = ref(null)
 	const iconColor = ref('#e6813e')
 	const userLocation = ref({
 		latitude: 0, 
 		longitude: 0
 	})
 
+	// 状态选项
+	const carState = ref([
+		[{
+			name: '全部状态',
+			value: '0'
+		},
+		{
+			name: '在线',
+			value: '1'
+		},
+		{
+			name: '离线',
+			value: '2'
+		}]
+	])
+
+	// 分组选项
+	const carGroup = ref<any>([])
+	const columns = ref<Array<{ name : string, value : string }>>([[]])
+	const pickerStateTitle = ref('全部状态')
+	const pickerGroupTitle = ref('全部分组')
+
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
+	// 当前选中的分组ID
+	const currentGroupId = ref<string>('')
+
+	// 计算属性 筛选逻辑
+	const filteredDevices = computed(() => {
+		if (!Array.isArray(originalDeviceList.value)) return []
+
+		let result = [...originalDeviceList.value]
+
+		// 状态筛选
+		if (pickerStateTitle.value == '在线') {
+			result = result.filter(device => device?.connectionStatus == 'online')
+		} else if (pickerStateTitle.value === '离线') {
+			result = result.filter(device => device?.connectionStatus == 'offline')
+		}
+
+		return result
+	})
+
+	// 计算设备数量统计
+	const totalCount = computed(() => originalDeviceList.value.length)
+	const onlineCount = computed(() => originalDeviceList.value.filter(d => d?.connectionStatus == 'online').length)
+	const offlineCount = computed(() => totalCount.value - onlineCount.value)
+
+	// 自动更新地图标记
+	watch([filteredDevices, showMap], ([devices, isMapVisible]) => {
+		if (isMapVisible) {
+			updateMarkers(devices)
+		}
+	})
+
 	const getLocation = () => {
 		uni.getLocation({
 			type: 'wgs84',
@@ -47,18 +108,6 @@
 			}
 		})
 	}
-	//地图放大
-	const mapPlus = () => {
-		if (mapScale.value < 20) { // 最大缩放级别
-			mapScale.value += 1
-		}
-	}
-	// 地图缩小
-	const mapMin = () => {
-		if (mapScale.value > 3) { // 最小缩放级别
-			mapScale.value -= 1
-		}
-	}
 	// 订阅消息
 	const subMsg = () => {
 		console.log('订阅消息')
@@ -71,6 +120,36 @@
 				console.log('订阅失败:', err)
 			}
 		})
+	}
+
+	// 跳转到列表页面
+	const goToList = (status : string) => {
+		// 先切换到列表模式
+		showMap.value = false
+
+		// 根据状态设置筛选条件
+		switch (status) {
+			case 'all':
+				pickerStateTitle.value = '全部状态'
+				break
+			case 'online':
+				pickerStateTitle.value = '在线'
+				break
+			case 'offline':
+				pickerStateTitle.value = '离线'
+				break
+		}
+	}
+
+	const handStatePicker = () => {
+		columns.value = carState.value
+		currentPickerType.value = 'state'
+		picker.value?.open()
+	}
+
+	const confirm = async (e : { value : Array<{ name : string, value : string, id : string }> }) => {
+		const selected = e.value[0]
+		pickerStateTitle.value = selected.name
 	}
 
 	const handleTap = (e) => {
@@ -160,26 +239,22 @@
 		}
 	}
 
-	const intiMarker = () =>{
-		mapCtx = uni.createMapContext('myMap', this)
-		// 启用点聚合
-		if (mapCtx && mapCtx.initMarkerCluster) {
-			mapCtx.initMarkerCluster({
-				enableDefaultStyle: true,
-				zoomOnClick: true,
-				gridSize: 60,
-				complete: () => {
-					console.log('聚合初始化完成')
-				}
-			})
-		}
-	}
-
 	onLoad(async (options) => {
-		console.log('onLoad', options)
-		getLocation()
-		await loadUserDeviceList(JSON.parse(options.userDeviceList))
-		intiMarker()
+        getLocation()
+        await loadUserDeviceList(JSON.parse(options.userDeviceList))
+        // 初始化地图上下文
+        mapCtx = uni.createMapContext('myMap', this)
+        // 启用点聚合
+        if (mapCtx && mapCtx.initMarkerCluster) {
+            mapCtx.initMarkerCluster({
+                enableDefaultStyle: true,
+                zoomOnClick: true,
+                gridSize: 60,
+                complete: () => {
+                    console.log('聚合初始化完成')
+                }
+            })
+        }
 		
 	})
 </script>
@@ -197,6 +272,106 @@
 			flex: 1;
 			width: 100%;
 			position: relative;
+		}
+
+		.tool-nav {
+			position: absolute;
+			top: 200rpx;
+			right: 20rpx;
+			z-index: 100;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			font-size: 35rpx;
+
+			.btn-map-list {
+				padding: 10rpx;
+				background-color: #1296db;
+				color: #fff;
+				border-radius: 10rpx;
+			}
+		}
+
+		.right-bar {
+			position: absolute;
+			top: 25rpx;
+			right: 20rpx;
+			z-index: 100;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+            gap:20rpx;
+
+			view {
+				padding: 5rpx 15rpx;
+				font-size: 25rpx;
+				margin-bottom: 20rpx;
+				border-radius: 10rpx;
+				color: #fff;
+				/* 添加点击效果 */
+				transition: all 0.2s;
+			}
+
+			view:active {
+				transform: scale(0.95);
+				opacity: 0.8;
+			}
+
+			.allCar {
+				background-color: #1296db;
+			}
+
+			.onlineCar {
+				background-color: #0da117;
+			}
+
+			.offlineCar {
+				background-color: #d81e06;
+			}
+		}
+
+		.left-bar,
+		.left-bar-state {
+			position: absolute;
+			top: 20rpx;
+			z-index: 100;
+			display: flex;
+			align-items: center;
+			padding: 10rpx;
+			border-radius: 10rpx;
+			background-color: rgba(3, 109, 246, 0.71);
+			color: #fff;
+			font-size: 25rpx;
+			flex-direction: row;
+			justify-content: space-between;
+            gap:10rpx;
+		}
+
+		.left-bar {
+			left: 20rpx;
+		}
+
+		.left-bar-state {
+			left: 20rpx;
+			top:270rpx;
+		}
+
+		.login-view-more {
+			position: absolute;
+			bottom: 50rpx;
+			width: 100%;
+			left: 0rpx;
+			z-index: 100;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			font-size: 28rpx;
+			color: #fff;
+			background-color: #999;
+			padding: 20rpx 0;
 		}
 		.map-plus-min{
 			position: absolute;

@@ -119,6 +119,7 @@
 }
 .container .top .banner-image.data-v-00a60067 {
   width: 100%;
+  height: 300rpx;
 }
 .container .top .car-state.data-v-00a60067 {
   display: flex;
@@ -364,11 +365,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20rpx;
+  gap: 10rpx;
 }
 .container .content .service .service-content .service-item .icon-image.data-v-00a60067 {
-  width: 50rpx;
-  height: 50rpx;
+  width: 60rpx;
+  height: 60rpx;
 }
 .container .content .service .service-content .service-item .item-title.data-v-00a60067 {
   font-size: 25rpx;

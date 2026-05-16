@@ -38,6 +38,94 @@
   width: 100%;
   position: relative;
 }
+.container .tool-nav {
+  position: absolute;
+  top: 200rpx;
+  right: 20rpx;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 35rpx;
+}
+.container .tool-nav .btn-map-list {
+  padding: 10rpx;
+  background-color: #1296db;
+  color: #fff;
+  border-radius: 10rpx;
+}
+.container .right-bar {
+  position: absolute;
+  top: 25rpx;
+  right: 20rpx;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20rpx;
+}
+.container .right-bar view {
+  padding: 5rpx 15rpx;
+  font-size: 25rpx;
+  margin-bottom: 20rpx;
+  border-radius: 10rpx;
+  color: #fff;
+  /* 添加点击效果 */
+  transition: all 0.2s;
+}
+.container .right-bar view:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+.container .right-bar .allCar {
+  background-color: #1296db;
+}
+.container .right-bar .onlineCar {
+  background-color: #0da117;
+}
+.container .right-bar .offlineCar {
+  background-color: #d81e06;
+}
+.container .left-bar,
+.container .left-bar-state {
+  position: absolute;
+  top: 20rpx;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 10rpx;
+  border-radius: 10rpx;
+  background-color: rgba(3, 109, 246, 0.71);
+  color: #fff;
+  font-size: 25rpx;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+.container .left-bar {
+  left: 20rpx;
+}
+.container .left-bar-state {
+  left: 20rpx;
+  top: 270rpx;
+}
+.container .login-view-more {
+  position: absolute;
+  bottom: 50rpx;
+  width: 100%;
+  left: 0rpx;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+  color: #fff;
+  background-color: #999;
+  padding: 20rpx 0;
+}
 .container .map-plus-min {
   position: absolute;
   bottom: 300rpx;

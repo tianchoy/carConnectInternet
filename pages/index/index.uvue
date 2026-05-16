@@ -11,6 +11,7 @@
                         <view class="exit" @click="handleExit" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
+                        <uv-icon name="grid-fill" size="25"  @click="toDeviceList"></uv-icon>
                         <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
                     </view>
                 </view> 
@@ -118,10 +119,10 @@
                 <view class="service">
                     <view class="service-header">服务中心</view>
                     <view class="service-content">
-                        <view class="service-item" @click="toDeviceList">
+                        <!-- <view class="service-item" @click="toDeviceList">
                             <image src="../../static/allDevice.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">全部设备</text>
-                        </view>
+                        </view> -->
                         <view class="service-item" @click="toMsgCenter">
                             <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">警报消息</text>
@@ -142,7 +143,14 @@
                 </view>
             </view>
         </view>
-        <uv-picker ref="picker" color="#333" activeColor="#07C160" :columns="pickerColumns" keyName="name" @confirm="confirm"></uv-picker>
+        <uv-picker 
+            ref="picker" 
+            color="#333" 
+            activeColor="#ea7312" 
+            :columns="pickerColumns" 
+            keyName="displayName"
+            @confirm="confirm">
+        </uv-picker>
     </view>
 </template>
 
@@ -175,7 +183,7 @@ const center = reactive({
 
 const userDeviceList = ref<Array<any>>([])
 const isMapReady = ref(false)
-const mapScale = ref(17)
+const mapScale = ref(12)
 const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
 const navBarHeight = ref(44)
@@ -223,7 +231,11 @@ const safeDeviceDetail = computed(() => {
 
 // 处理车辆列表显示
 const pickerColumns = computed(() => {
-    return [deviceList.value]
+    return [deviceList.value.map(device => ({
+        ...device,
+        displayName: `${device.name} (${device.connectionStatus === 'online' ? '在线' : '离线' })`,
+        name: device.name
+    }))]
 })
 
 // 初始化尺寸数据
@@ -1100,6 +1112,7 @@ onLoad(() => {
         }
         .banner-image {
                 width: 100%;
+                height: 300rpx;
             }
         
         .car-state {
@@ -1357,10 +1370,10 @@ onLoad(() => {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: 20rpx;
+                    gap: 10rpx;
                     .icon-image{
-                        width: 50rpx;
-                        height: 50rpx;
+                        width: 60rpx;
+                        height: 60rpx;
                     }
                     .item-title{
                         font-size: 25rpx;
