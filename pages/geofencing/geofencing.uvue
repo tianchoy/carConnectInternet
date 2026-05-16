@@ -122,22 +122,30 @@
 			</view>
 		</uv-popup>
 
-		<!-- 设备绑定弹窗 -->
-		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10">
+		<!-- 设备绑定弹窗 - 修复滚动穿透和加载更多问题 -->
+		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
 			<view class="device-dialog">
 				<view class="dialog-header">
 					<text>设备绑定 - {{ currentFenceName }}</text>
-					<uv-icon name="close" @click="deviceDialogPopup.close()"></uv-icon>
+					<uv-icon name="close" @click="closeDeviceDialog"></uv-icon>
 				</view>
 				<view class="dialog-tabs">
-					<view :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="activeTab = 'bind'">
+					<view :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="switchTab('bind')">
 						已绑定设备
 					</view>
-					<view :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="activeTab = 'unbind'">
+					<view :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="switchTab('unbind')">
 						未绑定设备
 					</view>
 				</view>
-				<scroll-view class="device-list" scroll-y @scrolltolower="handleLoadMore">
+				
+				<!-- 修复滚动区域 -->
+				<scroll-view 
+					class="device-list" 
+					scroll-y 
+					:scroll-top="scrollTop"
+					@scrolltolower="handleLoadMore"
+					:lower-threshold="150"
+				>
 					<view v-for="device in deviceList" :key="device.imei" class="device-item">
 						<view class="device-info">
 							<text class="name">{{ device.plateNo || device.imei }}</text>
@@ -149,35 +157,37 @@
 							size="20">
 						</uv-switch>
 					</view>
+					
 					<view v-if="deviceList.length === 0 && !loading" class="empty">
 						{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}
+					</view>
+					<view v-if="loadingMore" class="loading-tip">
+						<text>正在加载更多...</text>
 					</view>
 					<view v-if="deviceList.length > 0 && !hasMore && !loadingMore" class="no-more">
 						暂无更多数据
 					</view>
-					<view v-else-if="loadingMore" class="loading-tip">
-						<text>正在加载更多...</text>
-					</view>
 				</scroll-view>
-				<view class="dialog-actions">
+				
+				<!-- <view class="dialog-actions">
 					<uv-button @click="deviceDialogPopup.close()">完成</uv-button>
-				</view>
+				</view> -->
 			</view>
 		</uv-popup>
 	</view>
 </template>
 
-<script setup lang="uts">
+<script setup>
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
-	const imei = ref<string | null>('')
-	const connectionStatus = ref<string | null>('')
-	const deptId = ref<string | null>('')
-	const carType = ref<string | null>('')
-	const deviceName = ref<string | null>('')
+	const imei = ref(null)
+	const connectionStatus = ref(null)
+	const deptId = ref(null)
+	const carType = ref(null)
+	const deviceName = ref(null)
 	type Coordinate = {
 		latitude : number;
 		longitude : number;
@@ -188,43 +198,45 @@
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
-	const markers = ref<any[]>([]) // 标记点
-	const carMarker = ref<any>(null) // 车辆标记点
-	const circles = ref<any[]>([]) // 圆形围栏
+	const markers = ref([]) // 标记点
+	const carMarker = ref(null) // 车辆标记点
+	const circles = ref([]) // 圆形围栏
 	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关状态
 	const isDrawing = ref(false)
 	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
-	const points = ref<Array<{ latitude : number, longitude : number }>>([])
-	const polygons = ref<any[]>([]) // 存储地理围栏多边形数据
-	const circleCenter = ref<Coordinate | null>(null);
+	const points = ref([])
+	const polygons = ref([]) // 存储地理围栏多边形数据
+	const circleCenter = ref(null);
 	const circleRadius = ref(0) // 圆形围栏半径（米）
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const currentCar = ref<string | null>('京A12345')
+	const currentCar = ref('京A12345')
 	const lastDirection = ref(0)
-	const showFenceModal = ref<any>(null)
+	const showFenceModal = ref(null)
 
 	// 围栏管理状态
-	const fenceList = ref<any[]>([])
-	const selectedFence = ref<any>(null)
-	const fencesPopup = ref<any>(null)
-	const editDialogPopup = ref<any>(null)
-	const editingFence = ref<any>(null)
+	const fenceList = ref([])
+	const selectedFence = ref(null)
+	const fencesPopup = ref(null)
+	const editDialogPopup = ref(null)
+	const editingFence = ref(null)
 	const fenceForm = reactive({
 		name: '',
 		alarmType: '1'
 	})
 
 	// 设备绑定状态
-	const deviceDialogPopup = ref<any>(null)
+	const deviceDialogPopup = ref(null)
 	const activeTab = ref('bind')
-	const deviceList = ref<any[]>([]) // 当前显示的设备列表
-	const boundDevices = ref<any[]>([]) // 已绑定设备完整列表
+	const deviceList = ref([]) // 当前显示的设备列表
+	const boundDevices = ref([]) // 已绑定设备完整列表
 	const currentFenceName = ref('')
 	const currentFenceId = ref('')
 	const loading = ref(false)
+	const scrollTop = ref(0) // 滚动位置控制
+	let loadMoreTimer = null // 防抖定时器
 
 	// 分页控制变量（已绑定/未绑定设备）
 	const pagination = reactive({
@@ -350,7 +362,7 @@
 	}
 
 	// 计算地图上的旋转角度（修正方向）
-	const calculateMapRotation = (direction : number) : number => {
+	const calculateMapRotation = (direction) => {
 		let rotation = direction
 		if (rotation >= 360) rotation -= 360
 		if (rotation < 0) rotation += 360
@@ -379,7 +391,7 @@
 	}
 
 	// 获取围栏类型（根据area字段判断）
-	const getFenceType = (fence : any) => {
+	const getFenceType = (fence) => {
 		if (fence.type && fence.type !== 'null') {
 			return fence.type
 		}
@@ -459,7 +471,7 @@
 	}
 
 	// 解析POLYGON字符串为坐标数组
-	const parsePolygon = (polygonStr : string) => {
+	const parsePolygon = (polygonStr) => {
 		if (!polygonStr) return []
 
 		// 去除字符串中的"POLYGON
@@ -479,7 +491,7 @@
 	}
 
 	// 解析CIRCLE字符串为圆心和半径
-	const parseCircle = (circleStr : string) => {
+	const parseCircle = (circleStr) => {
 		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
 
 		try {
@@ -515,7 +527,7 @@
 	}
 
 	// 生成POLYGON字符串
-	const generatePolygonString = (points : Array<{ latitude : number, longitude : number }>) => {
+	const generatePolygonString = (points) => {
 		const coords = points.map(point => {
 			const originalCoord = CoordTransform.tencentToWgs84(point.latitude, point.longitude)
 			return `${originalCoord.lat} ${originalCoord.lng}`
@@ -524,13 +536,13 @@
 	}
 
 	// 生成CIRCLE字符串
-	const generateCircleString = (center : { latitude : number, longitude : number }, radius : number) => {
+	const generateCircleString = (center, radius) => {
 		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
 		return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`
 	}
 
 	// 调整地图中心到围栏中心位置
-	const setMapCenterToFence = (fence : any) => {
+	const setMapCenterToFence = (fence) => {
 		const fenceType = getFenceType(fence)
 
 		if (fenceType === 'circle') {
@@ -573,7 +585,7 @@
 	}
 
 	// 根据半径计算合适的缩放级别
-	const calculateZoomLevelFromRadius = (radius : number) => {
+	const calculateZoomLevelFromRadius = (radius) => {
 		if (radius > 50000) return 8   // 50公里以上
 		if (radius > 20000) return 9    // 20-50公里
 		if (radius > 10000) return 10    // 10-20公里
@@ -586,7 +598,7 @@
 	}
 
 	// 计算坐标边界
-	const calculateBounds = (points : any[]) => {
+	const calculateBounds = (points) => {
 		let minLat = points[0].latitude
 		let maxLat = points[0].latitude
 		let minLng = points[0].longitude
@@ -608,7 +620,7 @@
 	}
 
 	// 选择围栏
-	const selectFence = (fence : any) => {
+	const selectFence = (fence) => {
 		selectedFence.value = fence
 		fencesPopup.value?.close()
 		showFenceModal.value?.open()
@@ -634,7 +646,7 @@
 	}
 
 	// 编辑围栏
-	const editFence = (fence : any) => {
+	const editFence = (fence) => {
 		editingFence.value = fence
 		fenceForm.name = fence.name
 		fenceForm.alarmType = fence.alarmType.toString()
@@ -644,7 +656,7 @@
 	}
 
 	// 删除围栏
-	const deleteFence = async (id : string) => {
+	const deleteFence = async (id) => {
 		uni.showModal({
 			title: '确认删除',
 			content: '确定要删除这个围栏吗？',
@@ -733,18 +745,45 @@
 	}
 
 	// 显示绑定设备对话框
-	const showBindDevices = async (fenceId : string) => {
+	const showBindDevices = async (fenceId) => {
 		currentFenceId.value = fenceId
 		currentFenceName.value = selectedFence.value.name
 		deviceDialogPopup.value?.open()
 		activeTab.value = 'bind'
+		scrollTop.value = 0
 		// 初始化分页状态并加载第一页
 		initPagination('bind')
 		await loadBoundDevices(fenceId)
 	}
 
+	// 关闭设备绑定弹窗
+	const closeDeviceDialog = () => {
+		deviceDialogPopup.value?.close()
+		scrollTop.value = 0
+	}
+
+	// 切换标签页
+	// 切换标签页
+	const switchTab = async (tab) => {
+		if (activeTab.value === tab) return
+		
+		activeTab.value = tab
+		scrollTop.value = 0
+		deviceList.value = [] // 清空列表
+		
+		// 重置分页
+		initPagination(tab)
+		
+		// 加载对应数据
+		if (tab === 'bind') {
+			await loadBoundDevices(currentFenceId.value)
+		} else {
+			await loadUnboundDevices()
+		}
+	}
+
 	// 初始化分页状态
-	const initPagination = (tabType : 'bind' | 'unbind') => {
+	const initPagination = (tabType) => {
 		pagination[tabType] = {
 			pageNum: 1,
 			pageSize: 10,
@@ -757,90 +796,90 @@
 		}
 	}
 
-	// 加载已绑定设备
-	const loadBoundDevices = async (fenceId : string) => {
-		const { pageNum, pageSize, hasMore } = pagination.bind
-		// 没有更多数据时停止加载
-		if (!hasMore) return
 
-		pagination.bind.loadingMore = true
+	// 加载已绑定设备
+	const loadBoundDevices = async (fenceId) => {
+		const page = pagination.bind
+		if (!page.hasMore || page.loadingMore) return
+
+		page.loadingMore = true
 		try {
 			const res = await getBoundDevices({
-				pageNum,
-				pageSize,
+				pageNum: page.pageNum,
+				pageSize: page.pageSize,
 				geoId: fenceId
 			})
 
 			if (res.code === 0) {
 				const dataList = res.data.list || []
-				// 首次加载时覆盖数据，后续加载时追加数据
-				if (pageNum === 1) {
+				
+				if (page.pageNum === 1) {
 					boundDevices.value = dataList
 					deviceList.value = dataList
 				} else {
-					boundDevices.value = [...boundDevices.value, ...dataList]
 					deviceList.value = [...deviceList.value, ...dataList]
 				}
-				// 判断是否还有更多数据（当前页数据量小于每页条数则无更多）
-				pagination.bind.hasMore = dataList.length >= pageSize
-				// 页码自增
-				pagination.bind.pageNum += 1
+
+				// 判断是否还有更多
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
 			}
 		} catch (error) {
-			console.error('加载已绑定设备失败:', error)
+			page.hasMore = false
 		} finally {
-			// 结束加载状态
-			pagination.bind.loadingMore = false
+			page.loadingMore = false
 		}
 	}
 
-	// 加载未绑定设备（改造为分页加载）
+	// 加载未绑定设备
 	const loadUnboundDevices = async () => {
-		const { pageNum, pageSize, hasMore } = pagination.unbind
-		// 没有更多数据时停止加载
-		if (!hasMore) return
+		const page = pagination.unbind
+		if (!page.hasMore || page.loadingMore) return
 
-		pagination.unbind.loadingMore = true
+		page.loadingMore = true
 		try {
 			const res = await getUnboundDevices({
-				pageNum,
-				pageSize
+				pageNum: page.pageNum,
+				pageSize: page.pageSize
 			})
 
 			if (res.code === 0) {
 				const dataList = res.data.list || []
-				// 首次加载时覆盖数据，后续加载时追加数据
-				if (pageNum === 1) {
+				
+				if (page.pageNum === 1) {
 					deviceList.value = dataList
 				} else {
 					deviceList.value = [...deviceList.value, ...dataList]
 				}
-				// 判断是否还有更多数据
-				pagination.unbind.hasMore = dataList.length >= pageSize
-				// 页码自增
-				pagination.unbind.pageNum += 1
+
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
 			}
 		} catch (error) {
-			console.error('加载未绑定设备失败:', error)
+			page.hasMore = false
 		} finally {
-			// 结束加载状态
-			pagination.unbind.loadingMore = false
+			page.loadingMore = false
 		}
 	}
 
 	// 处理滚动到底部加载更多
-	const handleLoadMore = () => {
-		if (loadingMore.value || !hasMore.value) return
-
-		if (activeTab.value === 'bind') {
-			loadBoundDevices(currentFenceId.value)
-		} else {
-			loadUnboundDevices()
-		}
+	// 处理滚动到底部加载更多
+const handleLoadMore = () => {
+	if (loadingMore.value || !hasMore.value) return
+	
+	if (activeTab.value === 'bind') {
+		loadBoundDevices(currentFenceId.value)
+	} else {
+		loadUnboundDevices()
 	}
+}
 
 	// 切换设备绑定状态
-	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) => {
+	const toggleDeviceBinding = async (deviceImei, bound) => {
 		loading.value = true
 		try {
 			const params = {
@@ -857,16 +896,17 @@
 
 			if (result.code === 0) {
 				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
-				// 刷新当前标签页数据
+				// 刷新当前标签页数据，重置分页
+				initPagination(activeTab.value)
+				scrollTop.value = 0
+				
 				if (activeTab.value === 'bind') {
-					initPagination('bind')
 					await loadBoundDevices(currentFenceId.value)
 				} else {
-					initPagination('unbind')
 					await loadUnboundDevices()
 				}
 			} else {
-				uni.showToast({ title: '操作失败', icon: 'none' })
+				uni.showToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
 			console.error('设备绑定操作失败:', error)
@@ -877,25 +917,25 @@
 	}
 
 	// 检查设备是否已绑定
-	const isDeviceBound = (deviceImei : string) => {
+	const isDeviceBound = (deviceImei) => {
 		return boundDevices.value.some(device => device.imei === deviceImei)
 	}
 
 	// 监听标签页切换
-	watch(activeTab, async (newVal, oldVal) => {
-		// 初始化新标签页的分页状态
-		initPagination(newVal)
-		// 加载新标签页数据
-		if (newVal === 'bind') {
-			await loadBoundDevices(currentFenceId.value)
-		} else {
-			await loadUnboundDevices()
-		}
-	})
+	// watch(activeTab, async (newVal, oldVal) => {
+	// 	// 初始化新标签页的分页状态
+	// 	initPagination(newVal)
+	// 	// 加载新标签页数据
+	// 	if (newVal === 'bind') {
+	// 		await loadBoundDevices(currentFenceId.value)
+	// 	} else {
+	// 		await loadUnboundDevices()
+	// 	}
+	// })
 
 	/* 电子围栏绘制功能 */
 	// 设置绘制模式
-	const setDrawingMode = (mode : string) => {
+	const setDrawingMode = (mode) => {
 		drawingMode.value = mode
 		// 切换模式时清空当前绘制
 		if (isDrawing.value) {
@@ -917,7 +957,7 @@
 	}
 
 	// 处理地图点击事件
-	const handleMapTap = (e : any) => {
+	const handleMapTap = (e) => {
 		if (isDrawing.value) {
 			if (drawingMode.value === 'polygon') {
 				addNewPoint(e.detail.latitude, e.detail.longitude)
@@ -947,7 +987,7 @@
 	}
 
 	// 计算两点之间的距离（米）
-	const calculateDistance = (lat1 : number, lng1 : number, lat2 : number, lng2 : number) => {
+	const calculateDistance = (lat1, lng1, lat2, lng2) => {
 		const R = 6371000 // 地球半径（米）
 		const dLat = (lat2 - lat1) * Math.PI / 180
 		const dLng = (lng2 - lng1) * Math.PI / 180
@@ -961,7 +1001,7 @@
 	}
 
 	// 添加新点
-	const addNewPoint = (lat : number, lng : number) => {
+	const addNewPoint = (lat, lng) => {
 		points.value.push({ latitude: lat, longitude: lng })
 		updateMapDisplay()
 	}
@@ -1383,7 +1423,7 @@
 		}
 
 		.device-dialog {
-			height: 80vh;
+			height: 70vh;
 			background-color: #fff;
 
 			.dialog-header {
@@ -1416,8 +1456,9 @@
 			}
 
 			.device-list {
-				height: calc(80vh - 200rpx);
+				height: 60vh; 
 				padding: 20rpx;
+				box-sizing: border-box;
 
 				.device-item {
 					display: flex;
@@ -1449,21 +1490,18 @@
 					color: #999;
 				}
 
-				// 加载中提示样式
 				.loading-tip {
 					display: flex;
 					align-items: center;
 					justify-content: center;
 					padding: 30rpx 0;
-					color: #666;
-					font-size: 26rpx;
-
-					uv-loading {
-						margin-right: 15rpx;
+					
+					.load-more-text {
+						font-size: 26rpx;
+						color: #999;
 					}
 				}
 
-				// 无更多数据提示样式
 				.no-more {
 					text-align: center;
 					padding: 30rpx 0;

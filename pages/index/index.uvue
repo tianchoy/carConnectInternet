@@ -5,7 +5,7 @@
                 <view class="device-car">
                     <view class="current-car">
                         <text v-if="checkToken()" class="car-id" @click="handlePicker">{{currentCarName}}</text>
-                        <text v-else class="car-id" @click="gotoLogin">请登录</text>
+                        <text v-else class="login" @click="gotoLogin">点击登录!</text>
                     </view>
                     <view class="nav-tools">
                         <view class="exit" @click="handleExit" v-if="false">
@@ -19,11 +19,9 @@
                     <view v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
                     <view v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
                 </view>
-                
                 <view class="banner">
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
                 </view>
-                
                 <view class="car-state">
                     <view class="state-item">
                         <text class="state-label">设备状态</text>
@@ -144,7 +142,7 @@
                 </view>
             </view>
         </view>
-        <uv-picker ref="picker" :columns="pickerColumns" keyName="name" @confirm="confirm"></uv-picker>
+        <uv-picker ref="picker" color="#333" activeColor="#07C160" :columns="pickerColumns" keyName="name" @confirm="confirm"></uv-picker>
     </view>
 </template>
 
@@ -206,7 +204,8 @@ const lastUpdateTime = ref('--:--:--')
 
 // 本地存储key
 const STORAGE_KEYS = {
-    SELECTED_DEVICE: 'selected_device_info'
+    SELECTED_DEVICE: 'selected_device_info',
+    SELECTED_DEVICE_INDEX: 'selected_device_index'  // 新增：保存选中的设备索引
 }
 
 // 计算属性 
@@ -291,6 +290,37 @@ const clearSavedSelectedDevice = () => {
     }
 }
 
+// 保存选中的设备索引
+const saveSelectedDeviceIndex = (index: number) => {
+    try {
+        uni.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX, index)
+    } catch (error) {
+        console.error('保存选中设备索引失败:', error)
+    }
+}
+
+// 获取保存的选中设备索引
+const getSavedSelectedDeviceIndex = (): number | null => {
+    try {
+        const savedIndex = uni.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX)
+        if (savedIndex !== undefined && savedIndex !== null) {
+            return savedIndex
+        }
+    } catch (error) {
+        console.error('获取保存设备索引失败:', error)
+    }
+    return null
+}
+
+// 清除保存的选中设备索引
+const clearSavedSelectedDeviceIndex = () => {
+    try {
+        uni.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX)
+    } catch (error) {
+        console.error('清除保存设备索引失败:', error)
+    }
+}
+
 // 根据保存的设备信息设置当前车辆
 const setCurrentCarFromSavedDevice = (savedDevice: any) => {
     currentCarName.value = savedDevice.name
@@ -315,12 +345,31 @@ const handlePicker = () => {
         })
         return
     }
+    // 打开 picker
     picker.value?.open()
+    // 获取缓存的索引并设置选中项
+    const savedIndex = getSavedSelectedDeviceIndex()
+    if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+        // 确保 picker 已经完全打开
+        setTimeout(() => {
+            picker.value?.setIndexs([savedIndex], true)
+            console.log('设置 picker 选中索引:', savedIndex)
+        }, 100)
+    } else {
+        const currentIndex = deviceList.value.findIndex(
+            device => device.value === currentCarImei.value
+        )
+        if (currentIndex !== -1) {
+            setTimeout(() => {
+                picker.value?.setIndexs([currentIndex], true)
+                console.log('根据当前设备设置 picker 选中索引:', currentIndex)
+            }, 100)
+        }
+    }
 }
 
 // 处理选择车辆确认
 const confirm = async (e: any) => {
-    
     const selectedDevice = e.value[0]
     currentCarName.value = selectedDevice.name
     currentCarImei.value = selectedDevice.value
@@ -333,6 +382,18 @@ const confirm = async (e: any) => {
     currentCarPlateNo.value = selectedDevice.plateNo
     center.latitude = selectedDevice.latitude
     center.longitude = selectedDevice.longitude
+
+    // 查找选中的索引
+    const selectedIndex = deviceList.value.findIndex(
+        device => device.deviceId === selectedDevice.deviceId
+    );
+    
+    // 保存选中索引到缓存
+    if (selectedIndex !== -1) {
+        saveSelectedDeviceIndex(selectedIndex)
+        // 设置 picker 选中项
+        picker.value?.setIndexs([selectedIndex], true);
+    }
     
     // 保存选中的设备信息
     saveSelectedDevice(selectedDevice)
@@ -391,28 +452,37 @@ const loadDeviceList = async () => {
                 latitude: item.latitude,
                 longitude: item.longitude,
             }))
-            
             // 获取保存的设备
             const savedDevice = getSavedSelectedDevice()
+            const savedIndex = getSavedSelectedDeviceIndex()
+            
             let selectedDevice = null
             
-            if (savedDevice && savedDevice.imei) {
-                // 检查保存的设备是否还在设备列表中
+            // 优先使用保存的索引
+            if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+                selectedDevice = deviceList.value[savedIndex]
+            }
+            
+            // 如果索引无效或设备不存在，尝试使用保存的设备信息
+            if (!selectedDevice && savedDevice && savedDevice.imei) {
                 selectedDevice = deviceList.value.find(device => device.value === savedDevice.imei)
-                if (!selectedDevice) {
+                if (selectedDevice) {
+                    console.log('使用保存的设备信息选择设备:', selectedDevice?.name)
+                } else {
                     // 保存的设备已被删除，清除保存记录
                     clearSavedSelectedDevice()
+                    clearSavedSelectedDeviceIndex()
                     console.log('保存的设备已不存在，使用第一个设备')
                 }
             }
             
             // 如果没有保存的设备或保存的设备无效，使用第一个设备
-            if (!selectedDevice) {
+            if (!selectedDevice && deviceList.value.length > 0) {
                 selectedDevice = deviceList.value[0]
                 // 保存第一个设备作为默认选中
-                if (selectedDevice) {
-                    saveSelectedDevice(selectedDevice)
-                }
+                saveSelectedDevice(selectedDevice)
+                saveSelectedDeviceIndex(0)
+                console.log('使用第一个设备作为默认:', selectedDevice?.name)
             }
             
             if (selectedDevice) {
@@ -843,6 +913,7 @@ const unbindDevice = async () => {
                     })
                     // 如果是当前设备，清除保存信息并重新加载
                     clearSavedSelectedDevice()
+                    clearSavedSelectedDeviceIndex()
                 } else {
                     uni.showToast({
                         title: '解绑失败',
@@ -869,6 +940,7 @@ const handleExit = () => {
                 if(res.code == 0){
                     // 退出登录时清除保存的设备信息
                     clearSavedSelectedDevice()
+                    clearSavedSelectedDeviceIndex()
                     uni.removeStorageSync('token')
                     uni.reLaunch({
                         url:'/pages/login/login'
@@ -975,6 +1047,13 @@ onLoad(() => {
                         border-color: transparent transparent #000 transparent;
                         border-width: 0 0 10px 10px;
                     }
+                }
+                .login{
+                    font-size: 36rpx;
+                    font-weight: bold;
+                    color: #000;
+                    text-align: center;
+                    padding-right: 30rpx;
                 }
             }
             

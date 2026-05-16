@@ -55,11 +55,11 @@ class Coordinate extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "geofencing",
   setup(__props) {
-    const imei = common_vendor.ref("");
-    const connectionStatus = common_vendor.ref("");
-    const deptId = common_vendor.ref("");
-    const carType = common_vendor.ref("");
-    const deviceName = common_vendor.ref("");
+    const imei = common_vendor.ref(null);
+    const connectionStatus = common_vendor.ref(null);
+    const deptId = common_vendor.ref(null);
+    const carType = common_vendor.ref(null);
+    const deviceName = common_vendor.ref(null);
     const center = common_vendor.reactive(new common_vendor.UTSJSONObject({
       latitude: 39.90469,
       longitude: 116.40717
@@ -96,6 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentFenceName = common_vendor.ref("");
     const currentFenceId = common_vendor.ref("");
     const loading = common_vendor.ref(false);
+    const scrollTop = common_vendor.ref(0);
     const pagination = common_vendor.reactive(new common_vendor.UTSJSONObject({
       bind: new common_vendor.UTSJSONObject({
         pageNum: 1,
@@ -163,26 +164,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   // 记录初始方向
                 );
                 lastDirection.value = deviceData.direction || 0;
-                carMarker.value = new common_vendor.UTSJSONObject(
-                  {
-                    id: 0,
-                    latitude: position.latitude,
-                    longitude: position.longitude,
-                    iconPath: utils_cars.getDeviceIcon(connectionStatus.value, carType.value),
-                    width: 25,
-                    height: 25,
-                    rotate: calculateMapRotation(lastDirection.value),
-                    callout: new common_vendor.UTSJSONObject({
-                      content: deviceName.value || "爱车位置",
-                      color: connectionStatus.value == "online" ? "#fff" : "#666",
-                      bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
-                      padding: 5,
-                      borderRadius: 4,
-                      display: "ALWAYS"
-                    })
-                  }
-                  // 更新标记点数组，保留车辆标记点
-                );
+                carMarker.value = {
+                  id: 0,
+                  latitude: position.latitude,
+                  longitude: position.longitude,
+                  iconPath: utils_cars.getDeviceIcon(connectionStatus.value, carType.value),
+                  width: 25,
+                  height: 25,
+                  rotate: calculateMapRotation(lastDirection.value),
+                  callout: new common_vendor.UTSJSONObject({
+                    content: deviceName.value || "爱车位置",
+                    color: connectionStatus.value == "online" ? "#fff" : "#666",
+                    bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
+                    padding: 5,
+                    borderRadius: 4,
+                    display: "ALWAYS"
+                  })
+                };
                 updateMarkers();
                 currentSpeed.value = deviceData.speed || 0;
                 currentAddress.value = deviceData.positionUpdateTime ? `最后定位: ${deviceData.positionUpdateTime}` : "未知位置";
@@ -201,7 +199,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const calculateMapRotation = (direction) => {
+    const calculateMapRotation = (direction = null) => {
       let rotation = direction;
       if (rotation >= 360)
         rotation -= 360;
@@ -248,7 +246,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const fencePolygons = [];
       const fenceCircles = [];
-      fenceList.value.forEach((fence = null, index) => {
+      fenceList.value.forEach((fence, index) => {
         const fenceType = getFenceType(fence);
         if (fenceType === "circle") {
           const circleData = parseCircle(fence.area);
@@ -289,12 +287,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         mapScale.value = calculateZoomLevelFromRadius(firstCircle.radius);
       }
     };
-    const parsePolygon = (polygonStr) => {
+    const parsePolygon = (polygonStr = null) => {
       if (!polygonStr)
         return [];
       const coordStr = polygonStr.replace(/POLYGON \(\(/, "").replace(/\)\)/, "");
       const coordPoints = coordStr.split(",");
-      return coordPoints.map((point) => {
+      return coordPoints.map((point = null) => {
         const _a = common_vendor.__read(point.trim().split(" ").map(Number), 2), lat = _a[0], lng = _a[1];
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
         return new common_vendor.UTSJSONObject({
@@ -303,7 +301,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       });
     };
-    const parseCircle = (circleStr) => {
+    const parseCircle = (circleStr = null) => {
       if (!circleStr || !circleStr.startsWith("CIRCLE"))
         return null;
       try {
@@ -329,14 +327,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
     };
-    const generatePolygonString = (points2) => {
-      const coords = points2.map((point) => {
+    const generatePolygonString = (points2 = null) => {
+      const coords = points2.map((point = null) => {
         const originalCoord = utils_coordTransform.CoordTransform.tencentToWgs84(point.latitude, point.longitude);
         return `${originalCoord.lat} ${originalCoord.lng}`;
       }).join(", ");
       return `POLYGON ((${coords}))`;
     };
-    const generateCircleString = (center2, radius) => {
+    const generateCircleString = (center2 = null, radius = null) => {
       const originalCoord = utils_coordTransform.CoordTransform.tencentToWgs84(center2.latitude, center2.longitude);
       return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`;
     };
@@ -356,7 +354,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return null;
         let totalLat = 0;
         let totalLng = 0;
-        fencePoints.forEach((point) => {
+        fencePoints.forEach((point = null) => {
           totalLat += point.latitude;
           totalLng += point.longitude;
         });
@@ -376,7 +374,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           mapScale.value = 14;
       }
     };
-    const calculateZoomLevelFromRadius = (radius) => {
+    const calculateZoomLevelFromRadius = (radius = null) => {
       if (radius > 5e4)
         return 8;
       if (radius > 2e4)
@@ -395,7 +393,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return 15;
       return 16;
     };
-    const calculateBounds = (points2) => {
+    const calculateBounds = (points2 = null) => {
       let minLat = points2[0].latitude;
       let maxLat = points2[0].latitude;
       let minLng = points2[0].longitude;
@@ -442,7 +440,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       drawingMode.value = getFenceType(fence);
       (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.open();
     };
-    const deleteFence = (id) => {
+    const deleteFence = (id = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "确认删除",
@@ -526,18 +524,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const showBindDevices = (fenceId) => {
+    const showBindDevices = (fenceId = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         currentFenceId.value = fenceId;
         currentFenceName.value = selectedFence.value.name;
         (_a = deviceDialogPopup.value) === null || _a === void 0 ? null : _a.open();
         activeTab.value = "bind";
+        scrollTop.value = 0;
         initPagination("bind");
         yield loadBoundDevices(fenceId);
       });
     };
-    const initPagination = (tabType) => {
+    const closeDeviceDialog = () => {
+      var _a;
+      (_a = deviceDialogPopup.value) === null || _a === void 0 ? null : _a.close();
+      scrollTop.value = 0;
+    };
+    const switchTab = (tab = null) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (activeTab.value === tab)
+          return Promise.resolve(null);
+        activeTab.value = tab;
+        scrollTop.value = 0;
+        deviceList.value = [];
+        initPagination(tab);
+        if (tab === "bind") {
+          yield loadBoundDevices(currentFenceId.value);
+        } else {
+          yield loadUnboundDevices();
+        }
+      });
+    };
+    const initPagination = (tabType = null) => {
       pagination[tabType] = {
         pageNum: 1,
         pageSize: 10,
@@ -548,62 +567,67 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceList.value = [];
       }
     };
-    const loadBoundDevices = (fenceId) => {
+    const loadBoundDevices = (fenceId = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const _a = pagination.bind, pageNum = _a.pageNum, pageSize = _a.pageSize, hasMore2 = _a.hasMore;
-        if (!hasMore2)
+        const page = pagination.bind;
+        if (!page.hasMore || page.loadingMore)
           return Promise.resolve(null);
-        pagination.bind.loadingMore = true;
+        page.loadingMore = true;
         try {
           const res = yield api_request.getBoundDevices({
-            pageNum,
-            pageSize,
+            pageNum: page.pageNum,
+            pageSize: page.pageSize,
             geoId: fenceId
           });
           if (res.code === 0) {
             const dataList = res.data.list || [];
-            if (pageNum === 1) {
+            if (page.pageNum === 1) {
               boundDevices.value = dataList;
               deviceList.value = dataList;
             } else {
-              boundDevices.value = [...boundDevices.value, ...dataList];
               deviceList.value = [...deviceList.value, ...dataList];
             }
-            pagination.bind.hasMore = dataList.length >= pageSize;
-            pagination.bind.pageNum += 1;
+            page.hasMore = dataList.length === page.pageSize;
+            if (page.hasMore)
+              page.pageNum++;
+          } else {
+            page.hasMore = false;
           }
         } catch (error) {
-          console.error("加载已绑定设备失败:", error);
+          page.hasMore = false;
         } finally {
-          pagination.bind.loadingMore = false;
+          page.loadingMore = false;
         }
       });
     };
     const loadUnboundDevices = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const _a = pagination.unbind, pageNum = _a.pageNum, pageSize = _a.pageSize, hasMore2 = _a.hasMore;
-        if (!hasMore2)
+        const page = pagination.unbind;
+        if (!page.hasMore || page.loadingMore)
           return Promise.resolve(null);
-        pagination.unbind.loadingMore = true;
+        page.loadingMore = true;
         try {
           const res = yield api_request.getUnboundDevices({
-            pageNum,
-            pageSize
+            pageNum: page.pageNum,
+            pageSize: page.pageSize
           });
           if (res.code === 0) {
             const dataList = res.data.list || [];
-            if (pageNum === 1) {
+            if (page.pageNum === 1) {
               deviceList.value = dataList;
             } else {
               deviceList.value = [...deviceList.value, ...dataList];
             }
-            pagination.unbind.hasMore = dataList.length >= pageSize;
-            pagination.unbind.pageNum += 1;
+            page.hasMore = dataList.length === page.pageSize;
+            if (page.hasMore)
+              page.pageNum++;
+          } else {
+            page.hasMore = false;
           }
         } catch (error) {
-          console.error("加载未绑定设备失败:", error);
+          page.hasMore = false;
         } finally {
-          pagination.unbind.loadingMore = false;
+          page.loadingMore = false;
         }
       });
     };
@@ -616,7 +640,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         loadUnboundDevices();
       }
     };
-    const toggleDeviceBinding = (deviceImei, bound) => {
+    const toggleDeviceBinding = (deviceImei = null, bound = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         loading.value = true;
         try {
@@ -632,15 +656,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           if (result.code === 0) {
             common_vendor.index.showToast({ title: bound ? "绑定成功" : "解绑成功" });
+            initPagination(activeTab.value);
+            scrollTop.value = 0;
             if (activeTab.value === "bind") {
-              initPagination("bind");
               yield loadBoundDevices(currentFenceId.value);
             } else {
-              initPagination("unbind");
               yield loadUnboundDevices();
             }
           } else {
-            common_vendor.index.showToast({ title: "操作失败", icon: "none" });
+            common_vendor.index.showToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
           console.error("设备绑定操作失败:", error);
@@ -650,22 +674,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const isDeviceBound = (deviceImei) => {
-      return boundDevices.value.some((device = null) => {
+    const isDeviceBound = (deviceImei = null) => {
+      return boundDevices.value.some((device) => {
         return device.imei === deviceImei;
       });
     };
-    common_vendor.watch(activeTab, (newVal, oldVal) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        initPagination(newVal);
-        if (newVal === "bind") {
-          yield loadBoundDevices(currentFenceId.value);
-        } else {
-          yield loadUnboundDevices();
-        }
-      });
-    });
-    const setDrawingMode = (mode) => {
+    const setDrawingMode = (mode = null) => {
       drawingMode.value = mode;
       if (isDrawing.value) {
         points.value = [];
@@ -701,7 +715,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }
     };
-    const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const calculateDistance = (lat1 = null, lng1 = null, lat2 = null, lng2 = null) => {
       const R = 6371e3;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLng = (lng2 - lng1) * Math.PI / 180;
@@ -710,7 +724,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const distance = R * c;
       return distance;
     };
-    const addNewPoint = (lat, lng) => {
+    const addNewPoint = (lat = null, lng = null) => {
       points.value.push({ latitude: lat, longitude: lng });
       updateMapDisplay();
     };
@@ -776,7 +790,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } else {
           const fencePoints = parsePolygon(selectedFence.value.area);
-          fencePoints.forEach((point, index) => {
+          fencePoints.forEach((point = null, index = null) => {
             newMarkers.push({
               id: 2e3 + index,
               latitude: point.latitude,
@@ -794,20 +808,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const updateFencePolygon = () => {
       if (drawingMode.value === "polygon") {
-        polygons.value = points.value.length >= 3 ? [new common_vendor.UTSJSONObject({
+        polygons.value = points.value.length >= 3 ? [{
           points: points.value,
           strokeWidth: 2,
           strokeColor: "#FF0000",
           fillColor: "rgba(255,0,0,0.2)",
           zIndex: 1
-        })] : [];
+        }] : [];
       } else {
         polygons.value = [];
       }
     };
     const updateFenceCircle = () => {
       if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
-        circles.value = [new common_vendor.UTSJSONObject({
+        circles.value = [{
           latitude: circleCenter.value.latitude,
           longitude: circleCenter.value.longitude,
           radius: circleRadius.value,
@@ -815,7 +829,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           strokeColor: "#FF0000",
           fillColor: "rgba(255,0,0,0.2)",
           zIndex: 1
-        })];
+        }];
       } else {
         circles.value = [];
       }
@@ -1031,20 +1045,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "r"
         }),
         am: common_vendor.t(currentFenceName.value),
-        an: common_vendor.o(($event) => {
-          return deviceDialogPopup.value.close();
-        }, "12"),
+        an: common_vendor.o(closeDeviceDialog, "27"),
         ao: common_vendor.p({
           name: "close"
         }),
         ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
         aq: common_vendor.o(($event) => {
-          return activeTab.value = "bind";
-        }, "c8"),
+          return switchTab("bind");
+        }, "f4"),
         ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
         as: common_vendor.o(($event) => {
-          return activeTab.value = "unbind";
-        }, "33"),
+          return switchTab("unbind");
+        }, "d4"),
         at: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(device.plateNo || device.imei),
@@ -1068,19 +1080,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, deviceList.value.length === 0 && !loading.value ? {
         aw: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       } : {}, {
-        ax: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
-      }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : loadingMore.value ? {} : {}, {
-        ay: loadingMore.value,
-        az: common_vendor.o(handleLoadMore, "05"),
-        aA: common_vendor.o(($event) => {
-          return deviceDialogPopup.value.close();
-        }, "2d"),
+        ax: loadingMore.value
+      }, loadingMore.value ? {} : {}, {
+        ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
+      }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
+        az: scrollTop.value,
+        aA: common_vendor.o(handleLoadMore, "a9"),
         aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
           "k": "deviceDialogPopup"
         }),
         aC: common_vendor.p({
           mode: "bottom",
           round: "10",
+          ["mask-click-able"]: false,
           class: "r"
         }),
         aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),

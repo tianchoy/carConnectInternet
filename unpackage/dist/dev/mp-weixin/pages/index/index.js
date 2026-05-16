@@ -56,7 +56,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const lastUpdateTime = common_vendor.ref("--:--:--");
     const STORAGE_KEYS = new common_vendor.UTSJSONObject(
       {
-        SELECTED_DEVICE: "selected_device_info"
+        SELECTED_DEVICE: "selected_device_info",
+        SELECTED_DEVICE_INDEX: "selected_device_index"
+        // 新增：保存选中的设备索引
       }
       // 计算属性 
     );
@@ -133,6 +135,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         console.error("清除保存设备失败:", error);
       }
     };
+    const saveSelectedDeviceIndex = (index) => {
+      try {
+        common_vendor.index.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX, index);
+      } catch (error) {
+        console.error("保存选中设备索引失败:", error);
+      }
+    };
+    const getSavedSelectedDeviceIndex = () => {
+      try {
+        const savedIndex = common_vendor.index.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX);
+        if (savedIndex !== void 0 && savedIndex !== null) {
+          return savedIndex;
+        }
+      } catch (error) {
+        console.error("获取保存设备索引失败:", error);
+      }
+      return null;
+    };
+    const clearSavedSelectedDeviceIndex = () => {
+      try {
+        common_vendor.index.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX);
+      } catch (error) {
+        console.error("清除保存设备索引失败:", error);
+      }
+    };
     const setCurrentCarFromSavedDevice = (savedDevice = null) => {
       currentCarName.value = savedDevice.name;
       currentCarImei.value = savedDevice.value;
@@ -156,9 +183,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
       (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.open();
+      const savedIndex = getSavedSelectedDeviceIndex();
+      if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+        setTimeout(() => {
+          var _a3;
+          (_a3 = picker.value) === null || _a3 === void 0 ? null : _a3.setIndexs([savedIndex], true);
+          console.log("设置 picker 选中索引:", savedIndex);
+        }, 100);
+      } else {
+        const currentIndex = deviceList.value.findIndex((device) => {
+          return device.value === currentCarImei.value;
+        });
+        if (currentIndex !== -1) {
+          setTimeout(() => {
+            var _a3;
+            (_a3 = picker.value) === null || _a3 === void 0 ? null : _a3.setIndexs([currentIndex], true);
+            console.log("根据当前设备设置 picker 选中索引:", currentIndex);
+          }, 100);
+        }
+      }
     };
     const confirm = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a2;
         const selectedDevice = e.value[0];
         currentCarName.value = selectedDevice.name;
         currentCarImei.value = selectedDevice.value;
@@ -171,6 +218,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentCarPlateNo.value = selectedDevice.plateNo;
         center.latitude = selectedDevice.latitude;
         center.longitude = selectedDevice.longitude;
+        const selectedIndex = deviceList.value.findIndex((device) => {
+          return device.deviceId === selectedDevice.deviceId;
+        });
+        if (selectedIndex !== -1) {
+          saveSelectedDeviceIndex(selectedIndex);
+          (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.setIndexs([selectedIndex], true);
+        }
         saveSelectedDevice(selectedDevice);
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
           title: "加载车辆数据...",
@@ -226,21 +280,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             });
             const savedDevice = getSavedSelectedDevice();
+            const savedIndex = getSavedSelectedDeviceIndex();
             let selectedDevice = null;
-            if (savedDevice && savedDevice.imei) {
+            if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+              selectedDevice = deviceList.value[savedIndex];
+            }
+            if (!selectedDevice && savedDevice && savedDevice.imei) {
               selectedDevice = common_vendor.UTS.arrayFind(deviceList.value, (device) => {
                 return device.value === savedDevice.imei;
               });
-              if (!selectedDevice) {
+              if (selectedDevice) {
+                console.log("使用保存的设备信息选择设备:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.name);
+              } else {
                 clearSavedSelectedDevice();
+                clearSavedSelectedDeviceIndex();
                 console.log("保存的设备已不存在，使用第一个设备");
               }
             }
-            if (!selectedDevice) {
+            if (!selectedDevice && deviceList.value.length > 0) {
               selectedDevice = deviceList.value[0];
-              if (selectedDevice) {
-                saveSelectedDevice(selectedDevice);
-              }
+              saveSelectedDevice(selectedDevice);
+              saveSelectedDeviceIndex(0);
+              console.log("使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.name);
             }
             if (selectedDevice) {
               setCurrentCarFromSavedDevice(selectedDevice);
@@ -605,6 +666,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     icon: "success"
                   });
                   clearSavedSelectedDevice();
+                  clearSavedSelectedDeviceIndex();
                 } else {
                   common_vendor.index.showToast({
                     title: "解绑失败",
@@ -658,9 +720,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.t(currentCarName.value),
         c: common_vendor.o(handlePicker, "ae")
       } : {
-        d: common_vendor.o(gotoLogin, "37")
+        d: common_vendor.o(gotoLogin, "c4")
       }, {}, {
-        g: common_vendor.o(toAdd, "f8"),
+        g: common_vendor.o(toAdd, "ee"),
         h: common_vendor.p({
           name: "plus-circle",
           size: "25",
@@ -691,7 +753,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         r: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
         s: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
         t: statusBarHeight.value + 50 + "px",
-        v: common_vendor.o(refreshLocation, "ca"),
+        v: common_vendor.o(refreshLocation, "e7"),
         w: isMapReady.value
       }, isMapReady.value ? {
         x: common_vendor.sei("myMap", "map"),
@@ -700,7 +762,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         A: markers.value,
         B: mapScale.value
       } : {}, {
-        C: common_vendor.o(toRecordDetail, "c3"),
+        C: common_vendor.o(toRecordDetail, "4e"),
         D: common_vendor.t(totalTrips.value),
         E: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         F: common_assets._imports_2,
@@ -708,36 +770,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        H: common_vendor.o(toDeviceDetail, "83"),
+        H: common_vendor.o(toDeviceDetail, "7a"),
         I: common_assets._imports_3,
         J: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        K: common_vendor.o(toFindCar, "4f"),
+        K: common_vendor.o(toFindCar, "eb"),
         L: common_assets._imports_4,
         M: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        N: common_vendor.o(toFence, "32"),
+        N: common_vendor.o(toFence, "e2"),
         O: common_assets._imports_5,
-        P: common_vendor.o(toDeviceList, "13"),
+        P: common_vendor.o(toDeviceList, "00"),
         Q: common_assets._imports_6,
-        R: common_vendor.o(toMsgCenter, "42"),
+        R: common_vendor.o(toMsgCenter, "a3"),
         S: common_assets._imports_7,
         T: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "39"),
+        }, "9f"),
         U: common_assets._imports_8,
-        V: common_vendor.o(contactCustomerService, "27"),
+        V: common_vendor.o(contactCustomerService, "c9"),
         W: common_assets._imports_9,
-        X: common_vendor.o(unbindDevice, "ed"),
+        X: common_vendor.o(unbindDevice, "10"),
         Y: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        Z: common_vendor.o(confirm, "5a"),
+        Z: common_vendor.o(confirm, "9c"),
         aa: common_vendor.p({
+          color: "#333",
+          activeColor: "#07C160",
           columns: pickerColumns.value,
           keyName: "name",
           class: "r data-v-00a60067"

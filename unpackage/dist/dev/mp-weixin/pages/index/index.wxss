@@ -74,6 +74,13 @@
   border-color: transparent transparent #000 transparent;
   border-width: 0 0 10px 10px;
 }
+.container .top .device-car .current-car .login.data-v-00a60067 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  padding-right: 30rpx;
+}
 .container .top .device-car .nav-tools.data-v-00a60067 {
   display: flex;
   flex-direction: row;

@@ -240,7 +240,7 @@
   margin: 0 10rpx;
 }
 .container .device-dialog {
-  height: 80vh;
+  height: 70vh;
   background-color: #fff;
 }
 .container .device-dialog .dialog-header {
@@ -269,8 +269,9 @@
   border-bottom: 4rpx solid #2979ff;
 }
 .container .device-dialog .device-list {
-  height: calc(80vh - 200rpx);
+  height: 60vh;
   padding: 20rpx;
+  box-sizing: border-box;
 }
 .container .device-dialog .device-list .device-item {
   display: flex;
@@ -302,11 +303,10 @@
   align-items: center;
   justify-content: center;
   padding: 30rpx 0;
-  color: #666;
-  font-size: 26rpx;
 }
-.container .device-dialog .device-list .loading-tip uv-loading {
-  margin-right: 15rpx;
+.container .device-dialog .device-list .loading-tip .load-more-text {
+  font-size: 26rpx;
+  color: #999;
 }
 .container .device-dialog .device-list .no-more {
   text-align: center;
