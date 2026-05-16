@@ -717,12 +717,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: checkToken()
       }, checkToken() ? {
-        b: common_vendor.t(currentCarName.value),
+        b: common_vendor.t(currentCarName.value ?? "加载中…"),
         c: common_vendor.o(handlePicker, "ae")
       } : {
-        d: common_vendor.o(gotoLogin, "c4")
+        d: common_vendor.o(gotoLogin, "a8")
       }, {}, {
-        g: common_vendor.o(toAdd, "ee"),
+        g: common_vendor.o(toAdd, "87"),
         h: common_vendor.p({
           name: "plus-circle",
           size: "25",
@@ -753,7 +753,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         r: safeDeviceDetail.value.connectionStatus === "online" ? 1 : "",
         s: common_vendor.t(devicePosInfo.value.positionUpdateTime ?? "暂无位置"),
         t: statusBarHeight.value + 50 + "px",
-        v: common_vendor.o(refreshLocation, "e7"),
+        v: common_vendor.o(refreshLocation, "01"),
         w: isMapReady.value
       }, isMapReady.value ? {
         x: common_vendor.sei("myMap", "map"),
@@ -762,7 +762,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         A: markers.value,
         B: mapScale.value
       } : {}, {
-        C: common_vendor.o(toRecordDetail, "4e"),
+        C: common_vendor.o(toRecordDetail, "7e"),
         D: common_vendor.t(totalTrips.value),
         E: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         F: common_assets._imports_2,
@@ -770,35 +770,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        H: common_vendor.o(toDeviceDetail, "7a"),
+        H: common_vendor.o(toDeviceDetail, "c0"),
         I: common_assets._imports_3,
         J: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        K: common_vendor.o(toFindCar, "eb"),
+        K: common_vendor.o(toFindCar, "e5"),
         L: common_assets._imports_4,
         M: common_vendor.p({
           name: "arrow-right",
           class: "data-v-00a60067"
         }),
-        N: common_vendor.o(toFence, "e2"),
+        N: common_vendor.o(toFence, "01"),
         O: common_assets._imports_5,
-        P: common_vendor.o(toDeviceList, "00"),
+        P: common_vendor.o(toDeviceList, "0a"),
         Q: common_assets._imports_6,
-        R: common_vendor.o(toMsgCenter, "a3"),
+        R: common_vendor.o(toMsgCenter, "7c"),
         S: common_assets._imports_7,
         T: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "9f"),
+        }, "11"),
         U: common_assets._imports_8,
-        V: common_vendor.o(contactCustomerService, "c9"),
+        V: common_vendor.o(contactCustomerService, "4c"),
         W: common_assets._imports_9,
-        X: common_vendor.o(unbindDevice, "10"),
+        X: common_vendor.o(unbindDevice, "f8"),
         Y: common_vendor.sr(picker, "00a60067-5", {
           "k": "picker"
         }),
-        Z: common_vendor.o(confirm, "9c"),
+        Z: common_vendor.o(confirm, "57"),
         aa: common_vendor.p({
           color: "#333",
           activeColor: "#07C160",

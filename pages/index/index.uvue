@@ -4,7 +4,7 @@
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
                     <view class="current-car">
-                        <text v-if="checkToken()" class="car-id" @click="handlePicker">{{currentCarName}}</text>
+                        <text v-if="checkToken()" class="car-id" @click="handlePicker">{{currentCarName ?? '加载中…'}}</text>
                         <text v-else class="login" @click="gotoLogin">点击登录!</text>
                     </view>
                     <view class="nav-tools">
