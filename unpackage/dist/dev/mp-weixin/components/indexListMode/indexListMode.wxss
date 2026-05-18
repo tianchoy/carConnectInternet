@@ -1,4 +1,3 @@
-@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
@@ -25,66 +24,54 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
-  position: relative;
+.list-container {
   width: 100%;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f5f7fa;
+  background-color: #f5f5f5;
+  padding: 0 20rpx;
 }
-.container .map-container {
-  flex: 1;
-  width: 100%;
-  position: relative;
+.list-container .content {
+  max-height: calc(100vh - 260rpx);
+  overflow-y: auto;
 }
-.container .tool-nav {
-  position: absolute;
-  top: 200rpx;
-  right: 20rpx;
-  z-index: 100;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  font-size: 35rpx;
-}
-.container .tool-nav .btn-map-list {
-  padding: 10rpx;
-  background-color: #1296db;
-  color: #fff;
+.list-container .content .list-item {
+  padding: 20rpx;
+  background-color: #fff;
   border-radius: 10rpx;
-}
-.container .right-bar {
-  position: absolute;
-  top: 25rpx;
-  left: 20rpx;
-  z-index: 100;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 20rpx;
-}
-.container .right-bar view {
-  padding: 5rpx 15rpx;
-  font-size: 25rpx;
   margin-bottom: 20rpx;
-  border-radius: 10rpx;
-  color: #fff;
-  /* 添加点击效果 */
-  transition: all 0.2s;
 }
-.container .right-bar view:active {
-  transform: scale(0.95);
-  opacity: 0.8;
+.list-container .content .list-item .title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
 }
-.container .right-bar .allCar {
-  background-color: #1296db;
+.list-container .content .list-item .title .car-number {
+  display: flex;
+  font-size: 35rpx;
+  font-weight: bolder;
+  margin-right: 20rpx;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
 }
-.container .right-bar .onlineCar {
-  background-color: #0da117;
+.list-container .content .list-item .title .device-tools {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10rpx;
 }
-.container .right-bar .offlineCar {
-  background-color: #d81e06;
+.list-container .content .list-item .imei text {
+  color: #ccc;
+}
+.list-container .empty {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: #ccc;
+  height: calc(100vh - 120rpx);
 }
