@@ -121,8 +121,6 @@
 				</view>
 			</view>
 		</uv-popup>
-
-		<!-- 设备绑定弹窗 - 修复滚动穿透和加载更多问题 -->
 		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
 			<view class="device-dialog">
 				<view class="dialog-header">
@@ -137,8 +135,6 @@
 						未绑定设备
 					</view>
 				</view>
-				
-				<!-- 修复滚动区域 -->
 				<scroll-view 
 					class="device-list" 
 					scroll-y 
@@ -148,7 +144,7 @@
 				>
 					<view v-for="device in deviceList" :key="device.imei" class="device-item">
 						<view class="device-info">
-							<text class="name">{{ device.plateNo || device.imei }}</text>
+							<text class="name">{{ device.deviceName || device.plateNo }}</text>
 							<text class="status"
 								v-if="device.connectionStatus">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text>
 						</view>

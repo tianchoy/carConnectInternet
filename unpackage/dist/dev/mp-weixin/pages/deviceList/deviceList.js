@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       }));
     };
-    const goToList = (type) => {
+    const changeState = (type) => {
       pickerStateTitle.value = type;
     };
     const handleTap = (e = null) => {
@@ -228,18 +228,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, showMap.value ? {
         k: common_vendor.t(totalCount.value),
         l: common_vendor.o(($event) => {
-          return goToList("全部状态");
-        }, "6e"),
+          return changeState("全部状态");
+        }, "8d"),
         m: common_vendor.t(onlineCount.value),
         n: common_vendor.o(($event) => {
-          return goToList("在线");
-        }, "cb"),
+          return changeState("在线");
+        }, "4b"),
         o: common_vendor.t(offlineCount.value),
         p: common_vendor.o(($event) => {
-          return goToList("离线");
-        }, "16")
+          return changeState("离线");
+        }, "82")
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "2b"),
+        q: common_vendor.o(unbindDevice, "b2"),
         r: common_vendor.p({
           lists: originalDeviceList.value
         })

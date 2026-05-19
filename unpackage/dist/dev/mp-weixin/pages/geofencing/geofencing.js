@@ -1045,21 +1045,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "r"
         }),
         am: common_vendor.t(currentFenceName.value),
-        an: common_vendor.o(closeDeviceDialog, "27"),
+        an: common_vendor.o(closeDeviceDialog, "a8"),
         ao: common_vendor.p({
           name: "close"
         }),
         ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
         aq: common_vendor.o(($event) => {
           return switchTab("bind");
-        }, "f4"),
+        }, "39"),
         ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
         as: common_vendor.o(($event) => {
           return switchTab("unbind");
-        }, "d4"),
+        }, "74"),
         at: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(device.plateNo || device.imei),
+            a: common_vendor.t(device.deviceName || device.plateNo),
             b: device.connectionStatus
           }, device.connectionStatus ? {
             c: common_vendor.t(device.connectionStatus === "online" ? "在线" : "离线")
@@ -1085,7 +1085,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
       }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
         az: scrollTop.value,
-        aA: common_vendor.o(handleLoadMore, "a9"),
+        aA: common_vendor.o(handleLoadMore, "93"),
         aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
           "k": "deviceDialogPopup"
         }),

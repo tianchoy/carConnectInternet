@@ -8,9 +8,9 @@
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
-                <view class="allCar" @click="goToList('全部状态')">全部 {{totalCount}}</view>
-			<view class="onlineCar" @click="goToList('在线')">在线 {{onlineCount}}</view>
-			<view class="offlineCar" @click="goToList('离线')">离线 {{offlineCount}}</view>
+                <view class="allCar" @click="changeState('全部状态')">全部 {{totalCount}}</view>
+			<view class="onlineCar" @click="changeState('在线')">在线 {{onlineCount}}</view>
+			<view class="offlineCar" @click="changeState('离线')">离线 {{offlineCount}}</view>
             </view>
 		</view>
 		<view v-else>
@@ -37,10 +37,10 @@
 
 	const pickerStateTitle = ref('全部状态')
 
-		// 切换显示模式
-		const showWhat = () => {
-			showMap.value = !showMap.value
-		}
+	// 切换显示模式
+	const showWhat = () => {
+		showMap.value = !showMap.value
+	}
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<any>>([])
@@ -92,6 +92,7 @@
 		await loadUserDeviceList([],true)
 	}
 
+	// 获取当前位置
 	const getLocation = () => {
 		uni.getLocation({
 			type: 'wgs84',
@@ -119,10 +120,12 @@
 		})
 	}
 
-	const goToList = (type : string) => {
+	// 切换筛选状态
+	const changeState= (type : string) => {
 		pickerStateTitle.value = type
 	}
 
+	// 点击地图标记
 	const handleTap = (e) => {
 		const markerId = e.detail.markerId
 		const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
@@ -136,6 +139,7 @@
 		}
 	}
 
+	// 更新地图标记
 	const updateMarkers = (devices) => {
 		if (!Array.isArray(devices)) {
 			devices = []
@@ -180,6 +184,7 @@
 		}).filter(marker => marker !== null)
 	}
 
+	// 加载用户设备列表
 	const loadUserDeviceList = async (data,from) => {
 		try {
 			if(from){

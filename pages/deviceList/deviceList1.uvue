@@ -8,14 +8,6 @@
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
 		</view>
-		<!-- <view class="map-plus-min">
-			<view class="map-plus" @click="mapPlus">
-				<uv-icon name="plus" size="19"></uv-icon>
-			</view>
-			<view class="map-min" @click="mapMin">
-				<uv-icon name="minus" size="19"></uv-icon>
-			</view>
-		</view> -->
 	</view>
 </template>
 
@@ -46,18 +38,6 @@
 				console.log('获取位置失败:', err)
 			}
 		})
-	}
-	//地图放大
-	const mapPlus = () => {
-		if (mapScale.value < 20) { // 最大缩放级别
-			mapScale.value += 1
-		}
-	}
-	// 地图缩小
-	const mapMin = () => {
-		if (mapScale.value > 3) { // 最小缩放级别
-			mapScale.value -= 1
-		}
 	}
 	// 订阅消息
 	const subMsg = () => {
