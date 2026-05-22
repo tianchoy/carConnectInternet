@@ -325,7 +325,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           } else {
             common_vendor.index.showToast({
-              title: res.msg || "暂无车辆数据",
+              title: res.msg + "暂无车辆数据",
               icon: "none"
             });
           }
@@ -459,7 +459,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             console.warn("获取设备位置失败:", res.msg);
             isMapReady.value = false;
             common_vendor.index.showToast({
-              title: res.msg || "获取位置失败",
+              title: res.msg + "获取位置失败",
               icon: "none"
             });
             return false;
