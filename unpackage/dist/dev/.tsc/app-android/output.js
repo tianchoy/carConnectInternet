@@ -357,145 +357,82 @@ class Router {
 	}
 });
 
-// const defaultOption = {
-// 	duration: 300,
-// 	timingFunction: 'linear',
-// 	delay: 0,
-// 	transformOrigin: '50% 50% 0'
-// }
-// #ifdef APP-NVUE
-uni.requireNativePlugin('animation');
+const uvIcon_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
-		// 标签类型info、primary、success、warning、error
-		type: {
+		// 激活部分的颜色
+		activeColor: {
 			type: String,
-			default: 'primary'
+			default: '#19be6b'
 		},
-		// 不可用
-		disabled: {
-			type: [Boolean, String],
-			default: false
-		},
-		// 标签的大小，large，medium，mini
-		size: {
+		inactiveColor: {
 			type: String,
-			default: 'medium'
+			default: '#ececec'
 		},
-		// tag的形状，circle（两边半圆形）, square（方形，带圆角）
-		shape: {
-			type: String,
-			default: 'square'
-		},
-		// 标签文字
-		text: {
+		// 进度百分比，数值
+		percentage: {
 			type: [String, Number],
-			default: ''
+			default: 0
 		},
-		// 背景颜色，默认为空字符串，即不处理
-		bgColor: {
-			type: String,
-			default: ''
+		// 是否在进度条内部显示百分比的值
+		showText: {
+			type: Boolean,
+			default: true
 		},
-		// 标签字体颜色，默认为空字符串，即不处理
-		color: {
-			type: String,
-			default: ''
-		},
-		// 标签的边框颜色
-		borderColor: {
-			type: String,
-			default: ''
-		},
-		// 点击时返回的索引值，用于区分例遍的数组哪个元素被点击了
-		name: {
+		// 进度条的高度，单位px
+		height: {
 			type: [String, Number],
-			default: ''
+			default: 12
 		},
-		// 镂空时是否填充背景色
-		plainFill: {
-			type: Boolean,
-			default: false
-		},
-		// 是否镂空
-		plain: {
-			type: Boolean,
-			default: false
-		},
-		// 是否可关闭
-		closable: {
-			type: Boolean,
-			default: false
-		},
-		// 关闭按钮图标的颜色
-		closeColor: {
-			type: String,
-			default: '#C6C7CB'
-		},
-		// 关闭按钮图标的位置 right（右边）right-top（右上） 默认right-top
-		closePlace: {
-			type: String,
-			default: 'right-top'
-		},
-		// 是否显示
+		...uni.$uv?.props?.lineProgress
+	}
+});
+
+const uvLineProgress_vue_vue_type_style_index_0_lang = {};
+
+({
+	props: {
+		// 是否展示工具条
 		show: {
 			type: Boolean,
 			default: true
 		},
-		// 内置图标，或绝对路径的图片
-		icon: {
-			type: String,
-			default: ''
-		},
-		// 图标颜色
-		iconColor: {
-			type: String,
-			default: ''
-		},
-		// nvue模式下 是否直接显示，在uv-list等cell下面使用就需要设置
-		cellChild: {
+		// 是否显示下边框
+		showBorder: {
 			type: Boolean,
 			default: false
 		},
-		...uni.$uv?.props?.tags
+		// 取消按钮的文字
+		cancelText: {
+			type: String,
+			default: '取消'
+		},
+		// 确认按钮的文字
+		confirmText: {
+			type: String,
+			default: '确认'
+		},
+		// 取消按钮的颜色
+		cancelColor: {
+			type: String,
+			default: '#909193'
+		},
+		// 确认按钮的颜色
+		confirmColor: {
+			type: String,
+			default: '#3c9cff'
+		},
+		// 标题文字
+		title: {
+			type: String,
+			default: ''
+		},
+		...uni.$uv?.props?.toolbar
 	}
 });
 
-({
-	props: {
-		color: {
-			type: String,
-			default: '#d6d7d9'
-		},
-		// 长度，竖向时表现为高度，横向时表现为长度，可以为百分比，带px单位的值等
-		length: {
-			type: [String, Number],
-			default: '100%'
-		},
-		// 线条方向，col-竖向，row-横向
-		direction: {
-			type: String,
-			default: 'row'
-		},
-		// 是否显示细边框
-		hairline: {
-			type: Boolean,
-			default: true
-		},
-		// 线条与上下左右元素的间距，字符串形式，如"30px"、"20px 30px"
-		margin: {
-			type: [String, Number],
-			default: 0
-		},
-		// 是否虚线，true-虚线，false-实线
-		dashed: {
-			type: Boolean,
-			default: false
-		},
-		...uni.$uv?.props?.line
-	}
-});
+const uvToolbar_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -565,6 +502,17 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvLoadingIcon_vue_vue_type_style_index_0_lang = {};
+
+// const defaultOption = {
+// 	duration: 300,
+// 	timingFunction: 'linear',
+// 	delay: 0,
+// 	transformOrigin: '50% 50% 0'
+// }
+// #ifdef APP-NVUE
+uni.requireNativePlugin('animation');
+
 ({
 	props: {
 		// 是否显示遮罩
@@ -591,317 +539,13 @@ uni.requireNativePlugin('animation');
 	}
 });
 
-({
-	props: {
-		// 标题
-		title: {
-			type: [String],
-			default: ''
-		},
-		// 弹窗内容
-		content: {
-			type: String,
-			default: ''
-		},
-		// 确认文案
-		confirmText: {
-			type: String,
-			default: '确认'
-		},
-		// 取消文案
-		cancelText: {
-			type: String,
-			default: '取消'
-		},
-		// 是否显示确认按钮
-		showConfirmButton: {
-			type: Boolean,
-			default: true
-		},
-		// 是否显示取消按钮
-		showCancelButton: {
-			type: Boolean,
-			default: false
-		},
-		// 确认按钮颜色
-		confirmColor: {
-			type: String,
-			default: '#2979ff'
-		},
-		// 取消文字颜色
-		cancelColor: {
-			type: String,
-			default: '#606266'
-		},
-		// 对调确认和取消的位置
-		buttonReverse: {
-			type: Boolean,
-			default: false
-		},
-		// 是否开启缩放效果
-		zoom: {
-			type: Boolean,
-			default: true
-		},
-		// 层级
-		zIndex: {
-			type: [String, Number],
-			default: 10075
-		},
-		// 是否异步关闭，只对确定按钮有效
-		asyncClose: {
-			type: Boolean,
-			default: false
-		},
-		// 是否允许点击遮罩关闭modal
-		closeOnClickOverlay: {
-			type: Boolean,
-			default: true
-		},
-		// 给一个负的margin-top，往上偏移，避免和键盘重合的情况
-		negativeTop: {
-			type: [String, Number],
-			default: 0
-		},
-		// modal宽度，不支持百分比，可以数值，px，rpx单位
-		width: {
-			type: [String, Number],
-			default: '650rpx'
-		},
-		// 文本对齐方式，默认left
-		align: {
-			type: String,
-			default: 'left'
-		},
-		// 文本自定义样式
-		textStyle: {
-			type: [Object, String],
-			default: ''
-		},
-		...uni.$uv?.props?.modal
-	}
-});
+const uvOverlay_vue_vue_type_style_index_0_lang = {};
 
-({
-	props: {
-		// 显示的内容，字符串
-		text: {
-			type: [Array],
-			default: ''
-		},
-		// 是否显示左侧的音量图标
-		icon: {
-			type: [String, Boolean, null],
-			default: 'volume'
-		},
-		// 通告模式，link-显示右箭头，closable-显示右侧关闭图标
-		mode: {
-			type: String,
-			default: ''
-		},
-		// 文字颜色，各图标也会使用文字颜色
-		color: {
-			type: String,
-			default: '#f9ae3d'
-		},
-		// 背景颜色
-		bgColor: {
-			type: String,
-			default: '#fdf6ec'
-		},
-		// 字体大小，单位px
-		fontSize: {
-			type: [String, Number],
-			default: 14
-		},
-		// 水平滚动时的滚动速度，即每秒滚动多少px(px)，这有利于控制文字无论多少时，都能有一个恒定的速度
-		speed: {
-			type: [String, Number],
-			default: 80
-		},
-		// direction = row时，是否使用步进形式滚动
-		step: {
-			type: Boolean,
-			default: false
-		},
-		// 滚动一个周期的时间长，单位ms
-		duration: {
-			type: [String, Number],
-			default: 1500
-		},
-		// 是否禁止用手滑动切换，仅`direction="column"生效`
-		// 目前HX2.6.11，只支持App 2.5.5+、H5 2.5.5+、支付宝小程序、字节跳动小程序
-		disableTouch: {
-			type: Boolean,
-			default: true
-		},
-		// 是否禁止滚动，仅`direction="column"生效`
-		disableScroll: {
-			type: Boolean,
-			default: false
-		},
-		...uni.$uv?.props?.columnNotice
-	}
-});
+const uvStatusBar_vue_vue_type_style_index_0_lang = {};
 
-({
-	props: {
-		// 显示的内容，字符串
-		text: {
-			type: String,
-			default: ''
-		},
-		// 是否显示左侧的音量图标
-		icon: {
-			type: [String, Boolean, null],
-			default: 'volume'
-		},
-		// 通告模式，link-显示右箭头，closable-显示右侧关闭图标
-		mode: {
-			type: String,
-			default: ''
-		},
-		// 文字颜色，各图标也会使用文字颜色
-		color: {
-			type: String,
-			default: '#f9ae3d'
-		},
-		// 背景颜色
-		bgColor: {
-			type: String,
-			default: '#fdf6ec'
-		},
-		// 字体大小，单位px
-		fontSize: {
-			type: [String, Number],
-			default: 14
-		},
-		// 水平滚动时的滚动速度，即每秒滚动多少px(rpx)，这有利于控制文字无论多少时，都能有一个恒定的速度
-		speed: {
-			type: [String, Number],
-			default: 80
-		},
-		...uni.$uv?.props?.rowNotice
-	}
-});
+const uvSafeBottom_vue_vue_type_style_index_0_lang = {};
 
-({
-	props: {
-		// 显示的内容，数组
-		text: {
-			type: [Array, String],
-			default: () => []
-		},
-		// 通告滚动模式，row-横向滚动，column-竖向滚动
-		direction: {
-			type: String,
-			default: 'row'
-		},
-		// direction = row时，是否使用步进形式滚动
-		step: {
-			type: Boolean,
-			default: false
-		},
-		// 是否显示左侧的音量图标
-		icon: {
-			type: [String, Boolean, null],
-			default: 'volume'
-		},
-		// 通告模式，link-显示右箭头，closable-显示右侧关闭图标
-		mode: {
-			type: String,
-			default: ''
-		},
-		// 文字颜色，各图标也会使用文字颜色
-		color: {
-			type: String,
-			default: '#f9ae3d'
-		},
-		// 背景颜色
-		bgColor: {
-			type: String,
-			default: '#fdf6ec'
-		},
-		// 水平滚动时的滚动速度，即每秒滚动多少px(px)，这有利于控制文字无论多少时，都能有一个恒定的速度
-		speed: {
-			type: [String, Number],
-			default: 80
-		},
-		// 字体大小
-		fontSize: {
-			type: [String, Number],
-			default: 14
-		},
-		// 滚动一个周期的时间长，单位ms
-		duration: {
-			type: [String, Number],
-			default: 2000
-		},
-		// 跳转的页面路径
-		url: {
-			type: String,
-			default: ''
-		},
-		// 页面跳转的类型
-		linkType: {
-			type: String,
-			default: 'navigateTo'
-		},
-		// 是否禁止用手滑动切换
-		// 目前HX2.6.11，只支持App 2.5.5+、H5 2.5.5+、支付宝小程序、字节跳动小程序
-		disableTouch: {
-			type: Boolean,
-			default: true
-		},
-		// 是否禁止滚动，仅`direction="column"生效`
-		disableScroll: {
-			type: Boolean,
-			default: false
-		},
-		...uni.$uv?.props?.noticeBar
-	}
-});
-
-({
-	props: {
-		// 是否展示工具条
-		show: {
-			type: Boolean,
-			default: true
-		},
-		// 是否显示下边框
-		showBorder: {
-			type: Boolean,
-			default: false
-		},
-		// 取消按钮的文字
-		cancelText: {
-			type: String,
-			default: '取消'
-		},
-		// 确认按钮的文字
-		confirmText: {
-			type: String,
-			default: '确认'
-		},
-		// 取消按钮的颜色
-		cancelColor: {
-			type: String,
-			default: '#909193'
-		},
-		// 确认按钮的颜色
-		confirmColor: {
-			type: String,
-			default: '#3c9cff'
-		},
-		// 标题文字
-		title: {
-			type: String,
-			default: ''
-		},
-		...uni.$uv?.props?.toolbar
-	}
-});
+const uvPopup_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -999,6 +643,12 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvPicker_vue_vue_type_style_index_0_lang = {};
+
+const index_uvue_vue_type_style_index_0_lang$1 = {};
+
+const customNavBar_uvue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		// 是否显示圆点
@@ -1073,6 +723,8 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvBadge_vue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		value: {
@@ -1131,6 +783,49 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.switch
 	}
 });
+
+const uvSwitch_vue_vue_type_style_index_0_lang = {};
+
+const uvListItem_vue_vue_type_style_index_0_lang = {};
+
+const uvList_vue_vue_type_style_index_0_lang = {};
+
+({
+	props: {
+		color: {
+			type: String,
+			default: '#d6d7d9'
+		},
+		// 长度，竖向时表现为高度，横向时表现为长度，可以为百分比，带px单位的值等
+		length: {
+			type: [String, Number],
+			default: '100%'
+		},
+		// 线条方向，col-竖向，row-横向
+		direction: {
+			type: String,
+			default: 'row'
+		},
+		// 是否显示细边框
+		hairline: {
+			type: Boolean,
+			default: true
+		},
+		// 线条与上下左右元素的间距，字符串形式，如"30px"、"20px 30px"
+		margin: {
+			type: [String, Number],
+			default: 0
+		},
+		// 是否虚线，true-虚线，false-实线
+		dashed: {
+			type: Boolean,
+			default: false
+		},
+		...uni.$uv?.props?.line
+	}
+});
+
+const uvLine_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -1228,6 +923,103 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvLoadMore_vue_vue_type_style_index_0_lang = {};
+
+({
+	props: {
+		// 标题
+		title: {
+			type: [String],
+			default: ''
+		},
+		// 弹窗内容
+		content: {
+			type: String,
+			default: ''
+		},
+		// 确认文案
+		confirmText: {
+			type: String,
+			default: '确认'
+		},
+		// 取消文案
+		cancelText: {
+			type: String,
+			default: '取消'
+		},
+		// 是否显示确认按钮
+		showConfirmButton: {
+			type: Boolean,
+			default: true
+		},
+		// 是否显示取消按钮
+		showCancelButton: {
+			type: Boolean,
+			default: false
+		},
+		// 确认按钮颜色
+		confirmColor: {
+			type: String,
+			default: '#2979ff'
+		},
+		// 取消文字颜色
+		cancelColor: {
+			type: String,
+			default: '#606266'
+		},
+		// 对调确认和取消的位置
+		buttonReverse: {
+			type: Boolean,
+			default: false
+		},
+		// 是否开启缩放效果
+		zoom: {
+			type: Boolean,
+			default: true
+		},
+		// 层级
+		zIndex: {
+			type: [String, Number],
+			default: 10075
+		},
+		// 是否异步关闭，只对确定按钮有效
+		asyncClose: {
+			type: Boolean,
+			default: false
+		},
+		// 是否允许点击遮罩关闭modal
+		closeOnClickOverlay: {
+			type: Boolean,
+			default: true
+		},
+		// 给一个负的margin-top，往上偏移，避免和键盘重合的情况
+		negativeTop: {
+			type: [String, Number],
+			default: 0
+		},
+		// modal宽度，不支持百分比，可以数值，px，rpx单位
+		width: {
+			type: [String, Number],
+			default: '650rpx'
+		},
+		// 文本对齐方式，默认left
+		align: {
+			type: String,
+			default: 'left'
+		},
+		// 文本自定义样式
+		textStyle: {
+			type: [Object, String],
+			default: ''
+		},
+		...uni.$uv?.props?.modal
+	}
+});
+
+const uvModal_vue_vue_type_style_index_0_lang = {};
+
+const message_uvue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		// 文字颜色
@@ -1268,6 +1060,8 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.link
 	}
 });
+
+const uvLink_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -1383,6 +1177,8 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvText_vue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		// 头像图片路径(不能为相对路径)
@@ -1462,6 +1258,10 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.avatar
 	}
 });
+
+const uvAvatar_vue_vue_type_style_index_0_lang = {};
+
+const userCenter_uvue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -1639,6 +1439,8 @@ uni.requireNativePlugin('animation');
 	}
 });
 
+const uvInput_vue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		// input的label提示语
@@ -1688,6 +1490,8 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.formItem
 	}
 });
+
+const uvFormItem_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -1759,6 +1563,8 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.checkbox
 	}
 });
+
+const uvCheckbox_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -1844,6 +1650,8 @@ uni.requireNativePlugin('animation');
 		...uni.$uv?.props?.checkboxGroup
 	}
 });
+
+const uvCheckboxGroup_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2058,6 +1866,14 @@ if (typeof process !== "undefined" && process.env && true && typeof window !== "
 	}
 });
 
+const uvButton_vue_vue_type_style_index_0_lang = {};
+
+const login_uvue_vue_type_style_index_0_lang = {};
+
+const signUp_uvue_vue_type_style_index_0_lang = {};
+
+const subNavBar_uvue_vue_type_style_index_0_lang = {};
+
 ({
 	props: {
 		// 宫格的name
@@ -2073,6 +1889,8 @@ if (typeof process !== "undefined" && process.env && true && typeof window !== "
 		...uni.$uv?.props?.gridItem
 	}
 });
+
+const uvGridItem_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2094,6 +1912,14 @@ if (typeof process !== "undefined" && process.env && true && typeof window !== "
 		...uni.$uv?.props?.grid
 	}
 });
+
+const uvGrid_vue_vue_type_style_index_0_lang = {};
+
+const carInfoDetail_uvue_vue_type_style_index_0_lang = {};
+
+const carIcons_uvue_vue_type_style_index_0_lang = {};
+
+const addCar_uvue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2154,7 +1980,25 @@ if (typeof process !== "undefined" && process.env && true && typeof window !== "
 	}
 });
 
+const lPickerItem_uvue_vue_type_style_index_0_lang = {};
+
+const lPicker_uvue_vue_type_style_index_0_lang = {};
+
+const lOverlay_uvue_vue_type_style_index_0_lang = {};
+
 uni;
+
+const lSvg_uvue_vue_type_style_index_0_lang = {};
+
+const lIcon_uvue_vue_type_style_index_0_lang = {};
+
+const lPopup_uvue_vue_type_style_index_0_lang = {};
+
+const playBack_uvue_vue_type_style_index_0_lang = {};
+
+const index_uvue_vue_type_style_index_0_lang = {};
+
+const vehicleTracking_uvue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2216,6 +2060,120 @@ uni;
 		...uni.$uv?.props?.empty
 	}
 });
+
+const uvEmpty_vue_vue_type_style_index_0_lang = {};
+
+({
+	props: {
+		// 标签类型info、primary、success、warning、error
+		type: {
+			type: String,
+			default: 'primary'
+		},
+		// 不可用
+		disabled: {
+			type: [Boolean, String],
+			default: false
+		},
+		// 标签的大小，large，medium，mini
+		size: {
+			type: String,
+			default: 'medium'
+		},
+		// tag的形状，circle（两边半圆形）, square（方形，带圆角）
+		shape: {
+			type: String,
+			default: 'square'
+		},
+		// 标签文字
+		text: {
+			type: [String, Number],
+			default: ''
+		},
+		// 背景颜色，默认为空字符串，即不处理
+		bgColor: {
+			type: String,
+			default: ''
+		},
+		// 标签字体颜色，默认为空字符串，即不处理
+		color: {
+			type: String,
+			default: ''
+		},
+		// 标签的边框颜色
+		borderColor: {
+			type: String,
+			default: ''
+		},
+		// 点击时返回的索引值，用于区分例遍的数组哪个元素被点击了
+		name: {
+			type: [String, Number],
+			default: ''
+		},
+		// 镂空时是否填充背景色
+		plainFill: {
+			type: Boolean,
+			default: false
+		},
+		// 是否镂空
+		plain: {
+			type: Boolean,
+			default: false
+		},
+		// 是否可关闭
+		closable: {
+			type: Boolean,
+			default: false
+		},
+		// 关闭按钮图标的颜色
+		closeColor: {
+			type: String,
+			default: '#C6C7CB'
+		},
+		// 关闭按钮图标的位置 right（右边）right-top（右上） 默认right-top
+		closePlace: {
+			type: String,
+			default: 'right-top'
+		},
+		// 是否显示
+		show: {
+			type: Boolean,
+			default: true
+		},
+		// 内置图标，或绝对路径的图片
+		icon: {
+			type: String,
+			default: ''
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: ''
+		},
+		// nvue模式下 是否直接显示，在uv-list等cell下面使用就需要设置
+		cellChild: {
+			type: Boolean,
+			default: false
+		},
+		...uni.$uv?.props?.tags
+	}
+});
+
+const uvTags_vue_vue_type_style_index_0_lang = {};
+
+const mileageRecord_uvue_vue_type_style_index_0_lang = {};
+
+const stopRecord_uvue_vue_type_style_index_0_lang = {};
+
+const userInfo_uvue_vue_type_style_index_0_lang = {};
+
+const editPassword_uvue_vue_type_style_index_0_lang = {};
+
+const carList_uvue_vue_type_style_index_0_lang = {};
+
+const carNumberInput_vue_vue_type_style_index_0_lang = {};
+
+const carDetail_uvue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2282,6 +2240,8 @@ uni;
 		...uni.$uv?.props?.radio
 	}
 });
+
+const uvRadio_vue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2372,6 +2332,14 @@ uni;
 		...uni.$uv?.props?.radioGroup
 	}
 });
+
+const uvRadioGroup_vue_vue_type_style_index_0_lang = {};
+
+const geofencing_uvue_vue_type_style_index_0_lang = {};
+
+const scancode_uvue_vue_type_style_index_0_lang = {};
+
+const payDeviceList_uvue_vue_type_style_index_0_lang = {};
 
 ({
 	props: {
@@ -2486,3 +2454,17 @@ uni;
 		...uni.$uv?.props?.numberBox
 	}
 });
+
+const uvNumberBox_vue_vue_type_style_index_0_lang = {};
+
+const renewal_uvue_vue_type_style_index_0_lang = {};
+
+const cmd_uvue_vue_type_style_index_0_lang = {};
+
+const webview_uvue_vue_type_style_index_0_lang = {};
+
+const indexListMode_uvue_vue_type_style_index_0_lang = {};
+
+const deviceList_uvue_vue_type_style_index_0_lang = {};
+
+const App_uvue_vue_type_style_index_0_lang = {};

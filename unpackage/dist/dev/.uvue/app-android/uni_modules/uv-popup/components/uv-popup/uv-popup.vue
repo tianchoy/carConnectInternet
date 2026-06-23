@@ -113,7 +113,7 @@ const __sfc__ = defineComponent({
          */
         type: {
             handler: function (type) {
-                if (!this.config[type])
+                if (!isTruthy(this.config[type]))
                     return;
                 this[this.config[type]](true);
             },
@@ -121,7 +121,7 @@ const __sfc__ = defineComponent({
         },
         isDesktop: {
             handler: function (newVal) {
-                if (!this.config[newVal])
+                if (!isTruthy(this.config[newVal]))
                     return;
                 this[this.config[this.mode]](true);
             },
@@ -176,7 +176,7 @@ const __sfc__ = defineComponent({
             }
             if (this.round) {
                 const value = this.$uv.addUnit(this.round);
-                const mode = this.direction ? this.direction : this.mode;
+                const mode = this.direction != "" ? this.direction : this.mode;
                 style["backgroundColor"] = this.bgColor;
                 if (mode === 'top') {
                     style["borderBottomLeftRadius"] = value;
@@ -223,13 +223,13 @@ const __sfc__ = defineComponent({
                 return;
             }
             let innerType = ['top', 'center', 'bottom', 'left', 'right', 'message', 'dialog', 'share'];
-            if (!(direction && innerType.indexOf(direction) !== -1)) {
+            if (!(isTruthy(direction) && innerType.indexOf(direction) !== -1)) {
                 direction = this.mode;
             }
             else {
                 this.direction = direction;
             }
-            if (!this.config[direction]) {
+            if (!isTruthy(this.config[direction])) {
                 return this.$uv.error(`缺少类型：${direction}`);
             }
             this[this.config[direction]]();
@@ -279,7 +279,7 @@ const __sfc__ = defineComponent({
                 backgroundColor: this.bg
             };
             // TODO 兼容 type 属性 ，后续会废弃
-            if (type)
+            if (isTruthy(type))
                 return;
             this.showPopup = true;
             this.showTrans = true;
@@ -304,7 +304,7 @@ const __sfc__ = defineComponent({
                 backgroundColor: this.bg
             };
             // TODO 兼容 type 属性 ，后续会废弃
-            if (type)
+            if (isTruthy(type))
                 return;
             this.showPopup = true;
             this.showTrans = true;
@@ -328,7 +328,7 @@ const __sfc__ = defineComponent({
                 alignItems: 'center'
             };
             // TODO 兼容 type 属性 ，后续会废弃
-            if (type)
+            if (isTruthy(type))
                 return;
             this.showPopup = true;
             this.showTrans = true;
@@ -347,7 +347,7 @@ const __sfc__ = defineComponent({
                 flexDirection: 'column'
             };
             // TODO 兼容 type 属性 ，后续会废弃
-            if (type)
+            if (isTruthy(type))
                 return;
             this.showPopup = true;
             this.showTrans = true;
@@ -366,7 +366,7 @@ const __sfc__ = defineComponent({
                 flexDirection: 'column'
             };
             // TODO 兼容 type 属性 ，后续会废弃
-            if (type)
+            if (isTruthy(type))
                 return;
             this.showPopup = true;
             this.showTrans = true;
@@ -374,7 +374,7 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-function GenUniModulesUvPopupComponentsUvPopupUvPopupRender(this: InstanceType<typeof __sfc__>): any | null {
+function GenUniModulesUvPopupComponentsUvPopupUvPopupRender(this: ({ $: ComponentInternalInstance; $data: { ani: never[]; showPopup: boolean; showTrans: boolean; popupWidth: number; popupHeight: number; config: { top: string; bottom: string; ... 5 more ...; share: string; }; ... 4 more ...; direction: string; }; ... 12 more ...; $watch<T extends string | ((...args: any) => any)>(source: T, cb: T extends (...args: any) => infer R ? (args_0: R, args_1: R, args_2: OnCleanup) => any : (args_0: any, args_1: any, args_2: OnCleanup) => any, options?: WatchOptions<...> | undefined): WatchStopHandle; } & ... 7 more ... & {}) | ({ $: ComponentInternalInstance; $data: { ani: never[]; showPopup: boolean; showTrans: boolean; popupWidth: number; popupHeight: number; config: { top: string; bottom: string; ... 5 more ...; share: string; }; ... 4 more ...; direction: string; }; ... 12 more ...; $watch<T extends string | ((...args: any) => any)>(source: T, cb: T extends (...args: any) => infer R ? (args_0: R, args_1: R, args_2: OnCleanup) => any : (args_0: any, args_1: any, args_2: OnCleanup) => any, options?: WatchOptions<...> | undefined): WatchStopHandle; } & ... 7 more ... & {})): any | null {
     const _ctx = this;
     const _cache = this.$.renderCache;
     const _component_uv_overlay = resolveEasyComponent("uv-overlay", _easycom_uv_overlay);
@@ -389,7 +389,7 @@ function GenUniModulesUvPopupComponentsUvPopupUvPopupRender(this: InstanceType<t
             style: _nS([_uM({ zIndex: _ctx.zIndex })])
         }), [
             _cE("view", _uM({ onTouchstart: _ctx.touchstart }), [
-                isTrue(_ctx.maskShow && _ctx.overlay)
+                isTrue(_ctx.maskShow ? _ctx.overlay : _ctx.maskShow)
                     ? _cV(_component_uv_overlay, _uM({
                         key: "1",
                         show: _ctx.showTrans,

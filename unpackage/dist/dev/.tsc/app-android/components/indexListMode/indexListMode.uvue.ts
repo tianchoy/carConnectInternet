@@ -28,6 +28,39 @@ __ins.emit(event, ...do_not_transform_spread)
 }
 	const modal = ref<UVModal>()
 	const imeis = ref('')
+	// 是否需要刷新数据
+	const needRefresh = ref(false)
+	// 支付
+	const pay = (iccid : string,simMerchant : string) => {
+		if(simMerchant.toLowerCase() == 'zddx'){
+			iccid = iccid.substring(0,iccid.length-1) //电信卡
+		}
+		
+		console.log(iccid, " at components/indexListMode/indexListMode.uvue:55")
+		// 设置需要刷新的标志
+		needRefresh.value = true
+		
+		//拉起半屏小程序
+		wx.openEmbeddedMiniProgram({
+			appId: 'wx1d647f2cfdc089e6',
+			path: '/pages/home/userSimRecharge?iccid=' + iccid,
+			envVersion: 'release',
+			success(res) {
+				// 打开成功
+				console.log('打开小程序成功', res, " at components/indexListMode/indexListMode.uvue:66")
+			},
+			fail(res) {
+				// 打开失败
+				console.log('打开小程序失败', res, " at components/indexListMode/indexListMode.uvue:70")
+				// 如果打开失败，取消刷新标志
+				needRefresh.value = false
+				uni.showToast({
+					title: '打开支付页面失败',
+					icon: 'none'
+				})
+			}
+		})
+	}
 	// 解绑设备
 	const unbindDevice = (imei : string) => {
 		imeis.value = imei
@@ -81,14 +114,19 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
                 ]),
                 _cE("view", _uM({ class: "device-tools" }), [
                   _cV(_component_uv_tags, _uM({
+                    text: "充值",
+                    type: "success",
+                    onClick: () => {pay(item.iccid,item.simMerchant)}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_uv_tags, _uM({
                     text: "解绑",
                     type: "warning",
                     onClick: () => {unbindDevice(item.imei)}
                   }), null, 8 /* PROPS */, ["onClick"])
                 ])
               ]),
-              _cE("view", _uM({ class: "imei" }), [
-                _cE("text", null, "ID: " + _tD(item.imei), 1 /* TEXT */)
+              _cE("view", null, [
+                _cE("text", _uM({ class: "imei" }), "ID: " + _tD(item.imei), 1 /* TEXT */)
               ])
             ], 8 /* PROPS */, ["onClick"])
           }), 128 /* KEYED_FRAGMENT */),
@@ -117,4 +155,4 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
 })
 export default __sfc__
 export type IndexListModeComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenComponentsIndexListModeIndexListModeStyles = [_uM([["list-container", _pS(_uM([["width", "100%"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["content", _uM([[".list-container ", _uM([["marginTop", "180rpx"], ["overflowY", "auto"]])]])], ["list-item", _uM([[".list-container .content ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"]])]])], ["title", _uM([[".list-container .content .list-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["car-number", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["fontSize", "35rpx"], ["marginRight", "20rpx"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["device-tools", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["empty", _uM([[".list-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["color", "#cccccc"]])]])]])]
+const GenComponentsIndexListModeIndexListModeStyles = [_uM([["list-container", _pS(_uM([["width", "100%"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["content", _uM([[".list-container ", _uM([["overflowY", "auto"]])]])], ["list-item", _uM([[".list-container .content ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"]])]])], ["title", _uM([[".list-container .content .list-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["car-number", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["fontSize", "35rpx"], ["marginRight", "20rpx"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["device-tools", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["imei", _uM([[".list-container .content .list-item ", _uM([["color", "#cccccc"]])]])], ["empty", _uM([[".list-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["color", "#cccccc"]])]])]])]

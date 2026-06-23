@@ -24,6 +24,11 @@ const bindDeviceList = '/device/bindGeofenceList';
 const bindGeofence = '/geofence/bind';
 const unbindGeofence = '/geofence/unbind';
 const deleteDevice = '/userDevice/del';
+// 指令相关的URL常量
+const cmdActionUrl = '/command/cmdAction';
+const cmdByMidUrl = '/command/cmdByMid';
+const cmdSendUrl = '/command/sendCmd';
+const cmdRecordByIdUrl = '/command/recordById?id=';
 // 登陆接口
 export const login = (data: UTSJSONObject): any => {
     return http.post(loginUrl, data);
@@ -144,5 +149,21 @@ export const unbindDevices = (data: {
     imeis: string[];
 }): any => {
     return http.delete(unbindGeofence, data);
+};
+// 命令操作 - 获取指令类型列表
+export const getCmdAction = (): any => {
+    return http.get(cmdActionUrl);
+};
+// 根据类型ID获取指令列表
+export const getCmdByMid = (data: object): any => {
+    return http.get(cmdByMidUrl, data);
+};
+// 发送命令
+export const sendCmd = (data: object): any => {
+    return http.post(cmdSendUrl, data);
+};
+// 根据指令ID获取指令记录详情
+export const getCmdRecordById = (id: string): any => {
+    return http.get(`${cmdRecordByIdUrl}${id}`);
 };
 //# sourceMappingURL=request.uts.map

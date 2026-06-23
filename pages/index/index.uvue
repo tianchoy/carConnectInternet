@@ -4,21 +4,25 @@
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
                     <view class="current-car">
-                        <text v-if="checkToken()" class="car-id" @click="handlePicker">{{currentCarName ?? '加载中…'}}</text>
+                        <view v-if="checkToken()">
+                            <text v-if="currentCarName" class="car-id" @click="handlePicker">{{currentCarName ?? '加载中…'}}</text>
+                            <text v-else class="car-id" @click="handlePicker">暂无设备</text>
+                        </view>
                         <text v-else class="login" @click="gotoLogin">点击登录!</text>
                     </view>
                     <view class="nav-tools">
                         <view class="exit" @click="handleExit" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
+                        <uv-icon name="reload" size="25" @click="handleReload"></uv-icon>
                         <uv-icon name="grid-fill" size="25"  @click="toDeviceList"></uv-icon>
                         <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
                     </view>
                 </view> 
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
                     <uv-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percentage="safeDeviceDetail.deviceStatus.batteryPercent" height="20rpx" activeColor="#19be6b" inactiveColor="#999"></uv-line-progress>
-                    <view v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
-                    <view v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
+                    <view class="info" v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
+                    <view class="info" v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
                 </view>
                 <view class="banner">
                     <image src="../../static/banner.png" mode="aspectFit" class="banner-image"></image>
@@ -991,6 +995,14 @@ const isLogin = (): boolean => {
     return true
 }
 
+// 刷新设备列表
+const handleReload = () => {
+    // 检查是否登录
+    if (!isLogin()) return 
+    loadDeviceList()
+}
+
+
 // 页面加载
 onLoad(() => {
     uni.hideTabBar()
@@ -1101,7 +1113,7 @@ onLoad(() => {
             border-radius: 16rpx;
             width: 50%;
             
-            > view {
+            .info {
                 font-size: 26rpx;
                 color: #333;
             }

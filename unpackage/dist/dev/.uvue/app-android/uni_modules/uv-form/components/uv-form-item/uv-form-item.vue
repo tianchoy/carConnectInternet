@@ -89,7 +89,7 @@ function GenUniModulesUvFormComponentsUvFormItemUvFormItemRender(this: InstanceT
                 })])
         }), [
             renderSlot(_ctx.$slots, "label", {}, (): any[] => [
-                isTrue(_ctx.required || _ctx.leftIcon || _ctx.label)
+                isTrue(_ctx.required ? _ctx.required : _ctx.leftIcon ? _ctx.leftIcon : _ctx.label)
                     ? _cE("view", _uM({
                         key: 0,
                         class: "uv-form-item__body__left",
@@ -138,7 +138,7 @@ function GenUniModulesUvFormComponentsUvFormItemUvFormItemRender(this: InstanceT
             ])
         ], 12 /* STYLE, PROPS */, ["onClick"]),
         renderSlot(_ctx.$slots, "error", {}, (): any[] => [
-            isTrue(!!_ctx.message && _ctx.parentData.errorType === 'message')
+            isTrue(!!(_ctx.message != "") && _ctx.parentData.errorType === 'message')
                 ? _cV(_component_uv_transition, _uM({
                     key: 0,
                     show: true,
@@ -160,7 +160,7 @@ function GenUniModulesUvFormComponentsUvFormItemUvFormItemRender(this: InstanceT
         isTrue(_ctx.borderBottom)
             ? _cV(_component_uv_line, _uM({
                 key: 0,
-                color: _ctx.message && _ctx.parentData.errorType === 'border-bottom' ? '#f56c6c' : '#d6d7d9'
+                color: _ctx.message != "" && _ctx.parentData.errorType === 'border-bottom' ? '#f56c6c' : '#d6d7d9'
             }), null, 8 /* PROPS */, ["color"])
             : _cC("v-if", true)
     ]);

@@ -172,15 +172,43 @@ const _cache = __ins.renderCache;
 	}
 
 	// 手动刷新方法
-	const manualRefresh = () => {
-		loadData({
-			deptId: deptId.value,
-			deviceids: imei.value
-		})
-		uni.showToast({
-			title: '刷新成功',
-			icon: 'success'
-		})
+	const manualRefresh = async () => {
+		uni.showLoading({
+			title: '刷新中...',
+			mask: true
+		});
+
+		try {
+			const success = await loadData({
+				deptId: deptId.value,
+				deviceids: imei.value
+			});
+
+			if (success) {
+				// 手动刷新后强制更新地图
+				setTimeout(() => {
+					refreshMapView();
+				}, 300);
+
+				uni.showToast({
+					title: '刷新成功',
+					icon: 'success'
+				});
+			} else {
+				uni.showToast({
+					title: '刷新失败',
+					icon: 'none'
+				});
+			}
+		} catch (error) {
+			console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:289");
+			uni.showToast({
+				title: '刷新失败',
+				icon: 'none'
+			});
+		} finally {
+			uni.hideLoading();
+		}
 	}
 
 	watch(currentTime, (newVal) => {
@@ -241,7 +269,8 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	const baseList = ref([{
+	const baseList = computed(() => {
+	const list = [{
 		name: '/static/gjhf.png',
 		title: '轨迹回放'
 	}, {
@@ -269,8 +298,20 @@ const _cache = __ins.renderCache;
 	{
 		name: '/static/offpower.png',
 		title: '断开油电'
-	},
-	])
+	}]
+	
+	// 根据 productId 决定是否添加发送指令选项
+	const productId = currentCarInfo.value.productId
+	if (productId === 'product-1141811865601576960' || 
+		productId === 'product-1183161303028600832') {
+		list.push({
+			name: '/static/cmd.png',
+			title: '发送指令'
+		})
+	}
+	
+	return list
+})
 
 	const click = (name) => {
 		const itemTo = name.title
@@ -289,7 +330,7 @@ const _cache = __ins.renderCache;
 		if (itemTo == '里程记录') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType 
+				url: '/pages/mileageRecord/mileageRecord?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType
 			})
 		}
 		if (itemTo == '停车记录') {
@@ -327,11 +368,17 @@ const _cache = __ins.renderCache;
 		if (itemTo == '电子围栏') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
-				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType+ '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
+				url: '/pages/geofencing/geofencing?imei=' + imei.value + '&connectionStatus=' + datainfo.value.connectionStatus + '&plateNo=' + currentCarInfo.value.deviceName + '&carType=' + currentCarInfo.value.carType + '&deptId=' + deptId.value + '&deviceName=' + currentCarInfo.value.deviceName
 			})
 		}
 		if (itemTo == '一键寻车') {
 			navTo()
+		}
+		if (itemTo == '发送指令') {
+			stopAutoRefresh() // 停止刷新
+			uni.navigateTo({
+				url: '/pages/cmd/cmd?imei=' + imei.value
+			})
 		}
 
 	}
@@ -395,7 +442,7 @@ const _cache = __ins.renderCache;
 			// 隐藏加载中
 			uni.hideLoading()
 
-			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:482")
+			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:530")
 			uni.showToast({
 				title: '操作失败，请重试',
 				icon: 'none'
@@ -444,73 +491,190 @@ const _cache = __ins.renderCache;
 					title: '调起地图失败',
 					icon: 'none'
 				});
-				console.error('调起地图失败:', err, " at pages/carInfoDetail/carInfoDetail.uvue:531");
+				console.error('调起地图失败:', err, " at pages/carInfoDetail/carInfoDetail.uvue:579");
 			}
 		});
 	}
 
-	const loadData = async (data : object) => {
-		
+	// 刷新地图视图
+	const refreshMapView = () => {
 		try {
-			const res = await getDevicePos(data)
-			console.log('111111', " at pages/carInfoDetail/carInfoDetail.uvue:540")
-			res.data.forEach(async item => {
-				if (item.imei == imei.value) {
-					datainfo.value = item
+			// 强制更新地图
+			const mapContext = uni.createMapContext('myMap');
 
-					if (!item.latitude || !item.longitude) {
-						uni.showToast({
-							title: '位置信息缺失',
-							icon: 'none'
-						})
-						return
-					}
+			mapContext.moveToLocation({
+				latitude: center.latitude,
+				longitude: center.longitude,
+				scale: mapScale.value,  // 直接设置缩放级别为15
+				success: () => {
+					console.log('地图中心点移动成功，缩放级别：15', " at pages/carInfoDetail/carInfoDetail.uvue:595");
+				},
+				fail: (err) => {
+					console.error('地图中心点移动失败:', err.errMsg, " at pages/carInfoDetail/carInfoDetail.uvue:598");
+				}
+			});
 
-					// 转换坐标到腾讯地图坐标系
-					const convertedCoord = CoordTransform.wgs84ToTencent(item.latitude, item.longitude)
-					center.latitude = convertedCoord.lat
-					center.longitude = convertedCoord.lng
+			
+		} catch (error) {
+			console.error('刷新地图视图失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:604");
+		}
+	}
 
-					await new Promise(resolve => setTimeout(resolve, 100))
+	const delay = (ms : number) => new Promise(resolve => setTimeout(resolve, ms));
 
-					// 更新设备标记
-					const deviceMarker = createMarker(
-						1,
-						convertedCoord.lat,
-						convertedCoord.lng,
-						'device',
-						currentCarInfo.value.deviceName
-					)
+	const loadData = async (data : object, retryCount = 3) => {
+		let retry = retryCount;
 
-					markers.value = [deviceMarker]
+		const tryLoad = async (attempt : number) => {
+			try {
+				const res = await getDevicePos(data);
 
-					// 检查设备状态，如果变为离线状态则停止定时器
-					if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
-						clearInterval(refreshTimer.value)
-						refreshTimer.value = null
-						isRefreshing.value = false
-						uni.showToast({
-							title: '设备已离线，停止自动刷新',
-							icon: 'none'
-						})
-					}
+				// 检查返回结果是否有效
+				if (!res || !res.data || res.data.length === 0) {
+					throw new Error('返回数据为空');
+				}
 
-					// 信号强度监控提醒
-					if (item.attribute?.rssi) {
-						const signalExp = getSignalDetail(item.attribute.rssi).experience;
-						if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
-							console.warn(`设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:586");
+				console.log('接口请求成功', attempt, " at pages/carInfoDetail/carInfoDetail.uvue:622");
+
+				let foundDevice = false;
+
+				// 使用 for...of 替代 forEach，确保 await 生效
+				for (const item of res.data) {
+					if (item.imei == imei.value) {
+						foundDevice = true;
+
+						// 深拷贝数据，确保响应式更新
+						datainfo.value = UTSAndroid.consoleDebugError(JSON.parse(JSON.stringify(item)), " at pages/carInfoDetail/carInfoDetail.uvue:632");
+
+						if (!item.latitude || !item.longitude) {
+							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:635");
+							uni.showToast({
+								title: '位置信息缺失',
+								icon: 'none'
+							})
+							return false;
 						}
+
+						// 确保经纬度是数字类型
+						const lat = Number(item.latitude);
+						const lng = Number(item.longitude);
+
+						if (isNaN(lat) || isNaN(lng)) {
+							console.error('经纬度格式错误', item.latitude, item.longitude, " at pages/carInfoDetail/carInfoDetail.uvue:648");
+							return false;
+						}
+
+						// 同步进行坐标转换
+						let convertedCoord;
+						try {
+							convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
+							console.log('坐标转换结果:', convertedCoord, " at pages/carInfoDetail/carInfoDetail.uvue:656");
+						} catch (transformError) {
+							console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:658");
+							// 如果转换失败，使用原始坐标
+							convertedCoord = { lat: lat, lng: lng };
+						}
+
+						// 强制更新中心点 - 使用同步赋值
+						center.latitude = convertedCoord.lat;
+						center.longitude = convertedCoord.lng;
+
+						console.log('地图中心点更新:', {
+							latitude: center.latitude,
+							longitude: center.longitude
+						}, " at pages/carInfoDetail/carInfoDetail.uvue:667");
+
+						// 在 UTS 环境中，使用 setTimeout 替代 $nextTick
+						await delay(50);
+
+						// 更新设备标记
+						const deviceMarker = createMarker(
+							1,
+							convertedCoord.lat,
+							convertedCoord.lng,
+							'device',
+							currentCarInfo.value.deviceName
+						);
+
+						// 使用强制响应式更新
+						markers.value = [];
+						await delay(50);
+						markers.value = [deviceMarker];
+
+						console.log('标记点更新完成', " at pages/carInfoDetail/carInfoDetail.uvue:689");
+
+						// 检查设备状态，如果变为离线状态则停止定时器
+						if (item.connectionStatus != 'online' && refreshTimer.value !== null) {
+							clearInterval(refreshTimer.value);
+							refreshTimer.value = null;
+							isRefreshing.value = false;
+							uni.showToast({
+								title: '设备已离线，停止自动刷新',
+								icon: 'none'
+							});
+						}
+
+						// 信号强度监控提醒
+						if (item.attribute?.rssi) {
+							const signalExp = getSignalDetail(item.attribute.rssi).experience;
+							if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
+								console.warn(`设备 ${imei.value} 信号较弱: ${item.attribute.rssi}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:706");
+							}
+						}
+
+						// 手动刷新地图
+						setTimeout(() => {
+							refreshMapView();
+						}, 100);
 					}
 				}
-			})
-		} catch (error) {
-			console.error('加载设备数据失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:592");
-			uni.showToast({
-				title: '数据加载失败',
-				icon: 'none'
-			})
+
+				// 如果没有找到对应设备
+				if (!foundDevice) {
+					throw new Error('未找到对应的设备数据');
+				}
+
+				return true; // 成功标志
+
+			} catch (error) {
+				console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:725");
+
+				// 如果不是最后一次重试，则继续重试
+				if (attempt < retry) {
+					// 等待一段时间后重试（指数退避）
+					const delayMs = Math.pow(2, attempt) * 1000; // 2^attempt 秒
+					console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:731");
+
+					await new Promise(resolve => setTimeout(resolve, delayMs));
+
+					// 递归调用重试
+					return tryLoad(attempt + 1);
+				} else {
+					// 所有重试都失败了
+					uni.showToast({
+						title: '数据加载失败，请稍后重试',
+						icon: 'none',
+						duration: 2000
+					});
+
+					// 如果设备在线状态，停止自动刷新
+					if (datainfo.value.connectionStatus == 'online' && refreshTimer.value !== null) {
+						clearInterval(refreshTimer.value);
+						refreshTimer.value = null;
+						isRefreshing.value = false;
+						uni.showToast({
+							title: '数据加载失败，停止自动刷新',
+							icon: 'none'
+						});
+					}
+
+					return false; // 失败标志
+				}
+			}
 		}
+
+		// 开始重试逻辑
+		return tryLoad(1);
 	}
 
 	const refreshAdress = async () => {
@@ -520,40 +684,66 @@ const _cache = __ins.renderCache;
 	}
 
 	onLoad((option) => {
-		deptId.value = option.deptId
-		imei.value = option.imei
-		deviceId.value = option.deviceId
-		userType.value = uni.getStorageSync('userType')
+		deptId.value = option.deptId;
+		imei.value = option.imei;
+		deviceId.value = option.deviceId;
+		userType.value = uni.getStorageSync('userType');
 
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 612, 9),
-			deptId: deptId.value,
-			deviceids: imei.value
-		}
-		uni.showLoading({
-			title: '加载中...',
-		})
-		loadData(data).then(() => {
-			uni.hideLoading()
-			// 数据加载完成后，根据设备状态启动定时器
-			if (datainfo.value.connectionStatus == 'online') {
-				setupAutoRefresh(currentTime.value)
-			}
-		})
-		loadDeviceDetail()
+		// 添加调试监听器
+		watch(center, (newVal, oldVal) => {
+			console.log('center 变化:', {
+				old: oldVal,
+				new: newVal,
+				time: new Date().toISOString()
+			}, " at pages/carInfoDetail/carInfoDetail.uvue:779");
+		}, { deep: true });
+
+		// 先加载设备详情
+		loadDeviceDetail().then(() => {
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 788, 10),
+				deptId: deptId.value,
+				deviceids: imei.value
+			};
+
+			uni.showLoading({
+				title: '加载中...',
+			});
+
+			loadData(data, 3).then((success) => {
+				uni.hideLoading();
+
+				if (success) {
+					// 数据加载成功后，延时设置自动刷新
+					setTimeout(() => {
+						// 手动刷新一次地图视图
+						refreshMapView();
+
+						// 根据设备状态启动定时器
+						if (datainfo.value.connectionStatus == 'online') {
+							setupAutoRefresh(currentTime.value);
+						}
+					}, 500);
+				}
+			}).catch(error => {
+				uni.hideLoading();
+				console.error('初始化加载失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:814");
+			});
+		});
 	})
 
 	const loadDeviceDetail = async () => {
 		if (deviceId.value !== null) {
 			const res = await getDeviceDetail(deviceId.value)
+			console.log('设备详情：',res.data, " at pages/carInfoDetail/carInfoDetail.uvue:822")
 			currentCarInfo.value = res.data
 		} else {
-			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:634")
+			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:825")
 		}
 	}
 
 	//封装markers
 	const createMarker = (id : number, lat : number, lng : number, type : string, title ?: string) => {
-		const marker = {__$originalPosition: new UTSSourceMapPosition("marker", "pages/carInfoDetail/carInfoDetail.uvue", 640, 9),
+		const marker = {__$originalPosition: new UTSSourceMapPosition("marker", "pages/carInfoDetail/carInfoDetail.uvue", 831, 9),
 			id,
 			latitude: lat,
 			longitude: lng,
@@ -574,23 +764,21 @@ const _cache = __ins.renderCache;
 	}
 
 	onShow(() => {
-		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:661")
-
+		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:852")
 		// 如果设备在线且没有在刷新，重新启动自动刷新
 		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
 			setupAutoRefresh(currentTime.value)
 		}
 	})
 
-
 	// 新增页面隐藏时的处理
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:672")
+		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:861")
 		stopAutoRefresh()
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:677")
+		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:866")
 		stopAutoRefresh()
 	})
 
@@ -674,10 +862,13 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
                   class: "address-text"
                 }), _tD(unref(address)), 1 /* TEXT */)
               : _cE("text", _uM({ key: 1 }), _tD(unref(center).latitude) + " , " + _tD(unref(center).longitude), 1 /* TEXT */),
-            _cE("text", _uM({
-              style: _nS(_uM({"color":"#007AFF","margin-left":"20rpx","font-weight":"bold"})),
-              onClick: refreshAdress
-            }), "中文地址", 4 /* STYLE */)
+            isTrue(!unref(address))
+              ? _cE("text", _uM({
+                  key: 2,
+                  style: _nS(_uM({"color":"#007AFF","margin-left":"20rpx","font-weight":"bold"})),
+                  onClick: refreshAdress
+                }), "中文地址", 4 /* STYLE */)
+              : _cC("v-if", true)
           ])
         ]),
         isTrue(unref(currentCarInfo).attribute?.rssi || unref(currentCarInfo).attribute?.sat)
@@ -772,7 +963,7 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
                 _cV(_component_uv_icon, _uM({
                   customStyle: {paddingTop:20+'rpx'},
                   name: item.name,
-                  size: 45
+                  size: 35
                 }), null, 8 /* PROPS */, ["name"]),
                 _cE("text", _uM({ class: "grid-text" }), _tD(item.title), 1 /* TEXT */)
               ]),
@@ -812,4 +1003,4 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
 
 })
 export default __sfc__
-const GenPagesCarInfoDetailCarInfoDetailStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "20rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"], ["animation", "pulse 1.5s infinite"]])]])], ["navTo", _uM([[".container .map-container ", _uM([["width", "60rpx"], ["height", "60rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["position", "absolute"], ["zIndex", 100], ["bottom", "10%"], ["right", "30rpx"], ["paddingTop", "5rpx"], ["paddingRight", "5rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "5rpx"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-map-list-icon", _uM([[".container .tool-nav ", _uM([["width", "100%"], ["height", "100%"], ["paddingTop", "8rpx"], ["paddingRight", "8rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "8rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["backgroundColor", "#69c2f1"]])]])], ["tool-more", _uM([[".container ", _uM([["position", "absolute"], ["top", "30%"], ["right", "20rpx"], ["zIndex", 100], ["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-tool-more-icon", _uM([[".container .tool-more ", _uM([["width", "100%"], ["height", "100%"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingBottom", "70rpx"]])]])], ["refresh-status", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8f9fa"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e8e8e8"]])]])], ["refresh-text", _uM([[".container .tools-panel .refresh-status ", _uM([["fontSize", "26rpx"], ["color", "#666666"]])], [".container .tools-panel .refresh-status .refreshing", _uM([["color", "#1890ff"], ["animation", "rotating 2s linear infinite"]])]])], ["refresh-btn", _uM([[".container .tools-panel .refresh-status ", _uM([["marginLeft", "auto"], ["color", "#1890ff"], ["fontSize", "26rpx"]])]])], ["Imei-box", _uM([[".container .tools-panel ", _uM([["marginTop", "30rpx"], ["marginRight", "30rpx"], ["marginBottom", 0], ["marginLeft", "30rpx"], ["fontSize", "28rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#dcdfe6"]])]])], ["imei-info", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["imeis", _uM([[".container .tools-panel .Imei-box .imei-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["pos-time", _uM([[".container .tools-panel .Imei-box ", _uM([["fontSize", "20rpx"], ["color", "#999999"], ["marginLeft", "30rpx"]])]])], ["pos-date", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["pos-adress", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["addree-box", _uM([[".container .tools-panel .Imei-box .pos-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])], [".container .tools-panel .Imei-box .pos-adress ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])]])], ["address-text", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])]])], ["pos-icon", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])]])], ["signal-container", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["gap", "10rpx"]])]])], ["signal-item", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["mobile-signal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["signal-bars-horizontal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"], ["height", "40rpx"], ["gap", "3rpx"], ["marginRight", "10rpx"]])]])], ["signal-bar-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ", _uM([["width", "8rpx"], ["borderTopLeftRadius", "2rpx"], ["borderTopRightRadius", "2rpx"], ["borderBottomRightRadius", 0], ["borderBottomLeftRadius", 0], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-active", _uM([["!background", "var(--signal-color, #52c41a)"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-off", _uM([["backgroundImage", "none"], ["backgroundColor", "#e8e8e8"]])]])], ["signal-info-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["signal-value", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["color", "#333333"]])]])], ["experience", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["fontWeight", "normal"]])]])], ["satellite-item-h", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["satellite-icon", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["width", "47rpx"], ["height", "47rpx"], ["marginRight", "10rpx"]])]])], ["satellite-text", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["fontSize", "24rpx"], ["color", "#1890ff"], ["fontWeight", "bold"]])]])], ["power", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["battery", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["h-line", _uM([[".container .tools-panel ", _uM([["width", "90%"], ["height", "2rpx"], ["backgroundColor", "#f1f1f1"], ["marginTop", "50rpx"], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"]])]])], ["speed-control", _uM([[".container .tools-panel ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .speed-control ", _uM([["width", "90%"], ["marginTop", 0], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["grid-text", _uM([[".container .tools-panel ", _uM([["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0], ["boxSizing", "border-box"], ["fontSize", "24rpx"]])]])], ["@TRANSITION", _uM([["signal-bar-h", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]
+const GenPagesCarInfoDetailCarInfoDetailStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "20rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"], ["animation", "pulse 1.5s infinite"]])]])], ["navTo", _uM([[".container .map-container ", _uM([["width", "60rpx"], ["height", "60rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["position", "absolute"], ["zIndex", 100], ["bottom", "10%"], ["right", "30rpx"], ["paddingTop", "5rpx"], ["paddingRight", "5rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "5rpx"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-map-list-icon", _uM([[".container .tool-nav ", _uM([["width", "100%"], ["height", "100%"], ["paddingTop", "8rpx"], ["paddingRight", "8rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "8rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["backgroundColor", "#69c2f1"]])]])], ["tool-more", _uM([[".container ", _uM([["position", "absolute"], ["top", "30%"], ["right", "20rpx"], ["zIndex", 100], ["width", "60rpx"], ["height", "60rpx"]])]])], ["btn-tool-more-icon", _uM([[".container .tool-more ", _uM([["width", "100%"], ["height", "100%"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingBottom", "70rpx"]])]])], ["refresh-status", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8f9fa"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e8e8e8"]])]])], ["refresh-text", _uM([[".container .tools-panel .refresh-status ", _uM([["fontSize", "26rpx"], ["color", "#666666"]])], [".container .tools-panel .refresh-status .refreshing", _uM([["color", "#1890ff"], ["animation", "rotating 2s linear infinite"]])]])], ["refresh-btn", _uM([[".container .tools-panel .refresh-status ", _uM([["marginLeft", "auto"], ["color", "#1890ff"], ["fontSize", "26rpx"]])]])], ["Imei-box", _uM([[".container .tools-panel ", _uM([["marginTop", "30rpx"], ["marginRight", "30rpx"], ["marginBottom", 0], ["marginLeft", "30rpx"], ["fontSize", "28rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#dcdfe6"]])]])], ["imei-info", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["imeis", _uM([[".container .tools-panel .Imei-box .imei-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["pos-time", _uM([[".container .tools-panel .Imei-box ", _uM([["fontSize", "20rpx"], ["color", "#999999"], ["marginLeft", "30rpx"]])]])], ["pos-date", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["pos-adress", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["gap", "50rpx"]])]])], ["addree-box", _uM([[".container .tools-panel .Imei-box .pos-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])], [".container .tools-panel .Imei-box .pos-adress ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["fontSize", "22rpx"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["color", "#999999"]])]])], ["address-text", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["wordBreak", "break-all"], ["wordWrap", "break-word"], ["maxWidth", "490rpx"], ["verticalAlign", "top"], ["lineHeight", 1.4]])]])], ["pos-icon", _uM([[".container .tools-panel .Imei-box .pos-date .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])], [".container .tools-panel .Imei-box .pos-adress .addree-box ", _uM([["width", "30rpx"], ["height", "30rpx"], ["marginRight", "10rpx"]])]])], ["signal-container", _uM([[".container .tools-panel .Imei-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["gap", "10rpx"]])]])], ["signal-item", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["mobile-signal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["signal-bars-horizontal", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-end"], ["height", "40rpx"], ["gap", "3rpx"], ["marginRight", "10rpx"]])]])], ["signal-bar-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ", _uM([["width", "8rpx"], ["borderTopLeftRadius", "2rpx"], ["borderTopRightRadius", "2rpx"], ["borderBottomRightRadius", 0], ["borderBottomLeftRadius", 0], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-active", _uM([["!background", "var(--signal-color, #52c41a)"]])], [".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-off", _uM([["backgroundImage", "none"], ["backgroundColor", "#e8e8e8"]])]])], ["signal-info-h", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["signal-value", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["color", "#333333"]])]])], ["experience", _uM([[".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ", _uM([["fontSize", "18rpx"], ["fontWeight", "normal"]])]])], ["satellite-item-h", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["satellite-icon", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["width", "47rpx"], ["height", "47rpx"], ["marginRight", "10rpx"]])]])], ["satellite-text", _uM([[".container .tools-panel .Imei-box .signal-container .satellite-item-h ", _uM([["fontSize", "24rpx"], ["color", "#1890ff"], ["fontWeight", "bold"]])]])], ["power", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["battery", _uM([[".container .tools-panel .Imei-box .signal-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontSize", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f0f8ff"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["h-line", _uM([[".container .tools-panel ", _uM([["width", "90%"], ["height", "2rpx"], ["backgroundColor", "#f1f1f1"], ["marginTop", "50rpx"], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"]])]])], ["speed-control", _uM([[".container .tools-panel ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .speed-control ", _uM([["width", "90%"], ["marginTop", 0], ["marginRight", "auto"], ["marginBottom", 0], ["marginLeft", "auto"]])]])], ["grid-text", _uM([[".container .tools-panel ", _uM([["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0], ["boxSizing", "border-box"], ["fontSize", "24rpx"]])]])], ["@TRANSITION", _uM([["signal-bar-h", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]

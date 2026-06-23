@@ -126,7 +126,7 @@ const __sfc__ = defineComponent({
         },
         // 当键盘输入时，触发input事件
         onInput(e) {
-            let { value = "" } = e.detail || {};
+            let { value = "" } = isTruthy(e.detail) ? e.detail : {};
             // 格式化过滤方法
             const formatter = this.formatter || this.innerFormatter;
             const formatValue = formatter(value);

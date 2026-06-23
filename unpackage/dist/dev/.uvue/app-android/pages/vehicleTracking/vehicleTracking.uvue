@@ -62,11 +62,11 @@ const __sfc__ = defineComponent({
             ]
         ]);
         onLoad((option) => {
-            connectionStatus.value = option["connectionStatus"] || '';
-            imei.value = option["imei"] || '';
-            currentCar.value = option["plateNo"] || '未知车辆';
-            deptId.value = option["deptId"] || '';
-            carType.value = option["carType"] || '';
+            connectionStatus.value = isTruthy(option["connectionStatus"]) ? option["connectionStatus"] : '';
+            imei.value = isTruthy(option["imei"]) ? option["imei"] : '';
+            currentCar.value = isTruthy(option["plateNo"]) ? option["plateNo"] : '未知车辆';
+            deptId.value = isTruthy(option["deptId"]) ? option["deptId"] : '';
+            carType.value = isTruthy(option["carType"]) ? option["carType"] : '';
             loadInitialPosition();
         });
         const loadInitialPosition = async (): Promise<void> => {
@@ -76,12 +76,12 @@ const __sfc__ = defineComponent({
                     deviceids: imei.value
                 } as UTSJSONObject;
                 const res = await getDevicePos(data);
-                if (res?.code === 0 && res.data && res.data.length > 0) {
+                if (res?.code === 0 && isTruthy(res.data) && res.data.length > 0) {
                     let foundDevice = false;
                     res.data.forEach((item: any) => {
                         if (item.imei == imei.value) {
                             foundDevice = true;
-                            if (!item.latitude || !item.longitude) {
+                            if (!isTruthy(item.latitude) || !isTruthy(item.longitude)) {
                                 uni.showToast({
                                     title: '位置信息缺失',
                                     icon: 'none'
@@ -92,20 +92,20 @@ const __sfc__ = defineComponent({
                             // 转换坐标到腾讯地图坐标系
                             const convertedCoord = CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
                             // 设置初始位置
-                            currentPosition.latitude = convertedCoord.lat;
-                            currentPosition.longitude = convertedCoord.lng;
-                            targetPosition.latitude = convertedCoord.lat;
-                            targetPosition.longitude = convertedCoord.lng;
-                            center.latitude = convertedCoord.lat;
-                            center.longitude = convertedCoord.lng;
+                            currentPosition["latitude"] = convertedCoord.lat;
+                            currentPosition["longitude"] = convertedCoord.lng;
+                            targetPosition["latitude"] = convertedCoord.lat;
+                            targetPosition["longitude"] = convertedCoord.lng;
+                            center["latitude"] = convertedCoord.lat;
+                            center["longitude"] = convertedCoord.lng;
                             // 记录初始方向
-                            lastDirection.value = deviceData.direction || 0;
+                            lastDirection.value = isTruthy(deviceData.direction) ? deviceData.direction : 0;
                             currentRotation.value = normalizeRotation(calculateMapRotation(lastDirection.value));
                             targetRotation.value = currentRotation.value;
                             // 立即更新速度信息
-                            currentSpeed.value = deviceData.speed || 0;
-                            currentAddress.value = deviceData.positionUpdateTime || '定位时间未知';
-                            connectionStatus.value = deviceData.connectionStatus || 'unknown';
+                            currentSpeed.value = isTruthy(deviceData.speed) ? deviceData.speed : 0;
+                            currentAddress.value = isTruthy(deviceData.positionUpdateTime) ? deviceData.positionUpdateTime : '定位时间未知';
+                            connectionStatus.value = isTruthy(deviceData.connectionStatus) ? deviceData.connectionStatus : 'unknown';
                             // 设置初始标记点
                             initMarker();
                         }
@@ -119,7 +119,7 @@ const __sfc__ = defineComponent({
                 }
                 else {
                     uni.showToast({
-                        title: res?.message || '获取位置失败',
+                        title: isTruthy(res?.message) ? res?.message : '获取位置失败',
                         icon: 'none'
                     });
                 }
@@ -141,16 +141,15 @@ const __sfc__ = defineComponent({
             lastIconPath = iconPath;
             const marker = { __$originalPosition: new UTSSourceMapPosition("marker", "pages/vehicleTracking/vehicleTracking.uvue", 194, 9),
                 id: 1,
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude,
+                latitude: currentPosition["latitude"],
+                longitude: currentPosition["longitude"],
                 iconPath: iconPath,
                 width: 25,
                 height: 25,
                 rotate: currentRotation.value,
                 anchor: { x: 0.5, y: 0.5 },
                 alpha: 1,
-                fixed: false
-            } as UTSJSONObject;
+                fixed: false } as UTSJSONObject;
             markers.value = [marker];
             markerInitialized.value = true;
             console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:209");
@@ -181,21 +180,20 @@ const __sfc__ = defineComponent({
                 } as UTSJSONObject;
                 const res = await getDevicePos(data);
                 console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:238");
-                if (res?.code === 0 && res.data && res.data.length > 0) {
+                if (res?.code === 0 && isTruthy(res.data) && res.data.length > 0) {
                     const deviceData = res.data.find((item: any): boolean => item.imei == imei.value);
-                    if (deviceData) {
+                    if (isTruthy(deviceData)) {
                         // 转换坐标到腾讯地图坐标系
                         const convertedCoord = CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude));
                         const newPosition = { __$originalPosition: new UTSSourceMapPosition("newPosition", "pages/vehicleTracking/vehicleTracking.uvue", 249, 12),
                             latitude: convertedCoord.lat,
                             longitude: convertedCoord.lng,
-                            speed: deviceData.speed || 0,
-                            address: deviceData.positionUpdateTime || '未知位置',
-                            connectionStatus: deviceData.connectionStatus || 'unknown',
+                            speed: isTruthy(deviceData.speed) ? deviceData.speed : 0,
+                            address: isTruthy(deviceData.positionUpdateTime) ? deviceData.positionUpdateTime : '未知位置',
+                            connectionStatus: isTruthy(deviceData.connectionStatus) ? deviceData.connectionStatus : 'unknown',
                             direction: deviceData.direction !== undefined && deviceData.direction != null
                                 ? deviceData.direction
-                                : lastDirection.value
-                        } as UTSJSONObject;
+                                : lastDirection.value } as UTSJSONObject;
                         // 处理方向数据
                         let newDirection = newPosition["direction"];
                         if (newPosition["direction"] === lastDirection.value) {
@@ -239,14 +237,14 @@ const __sfc__ = defineComponent({
             }
             isProcessingQueue.value = true;
             const nextAnimation = animationQueue.value.shift();
-            targetPosition.latitude = nextAnimation.position.latitude;
-            targetPosition.longitude = nextAnimation.position.longitude;
+            targetPosition["latitude"] = nextAnimation.position.latitude;
+            targetPosition["longitude"] = nextAnimation.position.longitude;
             targetRotation.value = nextAnimation.rotation;
             currentSpeed.value = nextAnimation.speed;
             currentAddress.value = nextAnimation.address;
             connectionStatus.value = nextAnimation.connectionStatus;
             // 计算距离和动画时长
-            const distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude);
+            const distance = calculateDistance(currentPosition["latitude"], currentPosition["longitude"], targetPosition["latitude"], targetPosition["longitude"]);
             // 根据实际速度和距离计算动画时长
             const animationDuration = calculateRealisticAnimationDuration(distance, currentSpeed.value);
             startPositionAnimation(animationDuration, () => {
@@ -294,16 +292,16 @@ const __sfc__ = defineComponent({
         };
         // 开始位置动画
         const startPositionAnimation = (duration: number, onComplete: () => void) => {
-            if (isAnimating.value && animationTimer.value) {
+            if (isAnimating.value && isTruthy(animationTimer.value)) {
                 clearInterval(animationTimer.value);
             }
             isAnimating.value = true;
             const startTime = Date.now();
-            const startLat = currentPosition.latitude;
-            const startLng = currentPosition.longitude;
+            const startLat = currentPosition["latitude"];
+            const startLng = currentPosition["longitude"];
             const startRot = currentRotation.value;
-            const latDiff = targetPosition.latitude - startLat;
-            const lngDiff = targetPosition.longitude - startLng;
+            const latDiff = targetPosition["latitude"] - startLat;
+            const lngDiff = targetPosition["longitude"] - startLng;
             const rotDiff = calculateShortestRotation(startRot, targetRotation.value);
             // 使用更短的时间间隔
             const interval = 30;
@@ -315,12 +313,12 @@ const __sfc__ = defineComponent({
                 // 使用线性运动，保持匀速
                 const linearProgress = progress;
                 // 更新当前位置
-                currentPosition.latitude = startLat + latDiff * linearProgress;
-                currentPosition.longitude = startLng + lngDiff * linearProgress;
+                currentPosition["latitude"] = startLat + latDiff * linearProgress;
+                currentPosition["longitude"] = startLng + lngDiff * linearProgress;
                 currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress);
                 // 更新地图中心点
-                center.latitude = currentPosition.latitude;
-                center.longitude = currentPosition.longitude;
+                center["latitude"] = currentPosition["latitude"];
+                center["longitude"] = currentPosition["longitude"];
                 // 提高流畅度
                 if (now - lastMarkerUpdate >= MARKER_UPDATE_INTERVAL || progress >= 1) {
                     updateMarkerSmooth();
@@ -332,8 +330,8 @@ const __sfc__ = defineComponent({
                     animationTimer.value = null;
                     isAnimating.value = false;
                     // 确保最终位置准确
-                    currentPosition.latitude = targetPosition.latitude;
-                    currentPosition.longitude = targetPosition.longitude;
+                    currentPosition["latitude"] = targetPosition["latitude"];
+                    currentPosition["longitude"] = targetPosition["longitude"];
                     currentRotation.value = normalizeRotation(targetRotation.value);
                     updateMarkerSmooth();
                     onComplete();
@@ -362,16 +360,15 @@ const __sfc__ = defineComponent({
             // 创建新的标记点对象
             const updatedMarker = { __$originalPosition: new UTSSourceMapPosition("updatedMarker", "pages/vehicleTracking/vehicleTracking.uvue", 461, 9),
                 id: 1,
-                latitude: currentPosition.latitude,
-                longitude: currentPosition.longitude,
+                latitude: currentPosition["latitude"],
+                longitude: currentPosition["longitude"],
                 iconPath: needUpdateIcon ? newIconPath : lastIconPath,
                 width: 25,
                 height: 25,
                 rotate: currentRotation.value,
                 anchor: { x: 0.5, y: 0.5 },
                 alpha: 1,
-                fixed: false
-            } as UTSJSONObject;
+                fixed: false } as UTSJSONObject;
             markers.value = [updatedMarker];
             if (needUpdateIcon) {
                 lastIconPath = newIconPath;
@@ -397,7 +394,7 @@ const __sfc__ = defineComponent({
             const interval = 10000;
             isTracking.value = true;
             // 清除之前的定时器
-            if (trackingInterval.value) {
+            if (isTruthy(trackingInterval.value)) {
                 clearInterval(trackingInterval.value);
             }
             // 立即获取一次位置
@@ -416,14 +413,14 @@ const __sfc__ = defineComponent({
         const stopTracking = () => {
             isTracking.value = false;
             // 清除定时器
-            if (trackingInterval.value) {
+            if (isTruthy(trackingInterval.value)) {
                 clearInterval(trackingInterval.value);
                 trackingInterval.value = null;
             }
             // 清理动画状态
             animationQueue.value = [];
             isProcessingQueue.value = false;
-            if (animationTimer.value) {
+            if (isTruthy(animationTimer.value)) {
                 clearInterval(animationTimer.value);
                 animationTimer.value = null;
             }
@@ -442,14 +439,14 @@ const __sfc__ = defineComponent({
             console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:556");
             isTracking.value = false;
             // 清除定时器
-            if (trackingInterval.value) {
+            if (isTruthy(trackingInterval.value)) {
                 clearInterval(trackingInterval.value);
                 trackingInterval.value = null;
             }
             // 清理动画状态
             animationQueue.value = [];
             isProcessingQueue.value = false;
-            if (animationTimer.value) {
+            if (isTruthy(animationTimer.value)) {
                 clearInterval(animationTimer.value);
                 animationTimer.value = null;
             }
@@ -459,14 +456,14 @@ const __sfc__ = defineComponent({
             console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:577");
             isTracking.value = false;
             // 清除定时器
-            if (trackingInterval.value) {
+            if (isTruthy(trackingInterval.value)) {
                 clearInterval(trackingInterval.value);
                 trackingInterval.value = null;
             }
             // 清理动画状态
             animationQueue.value = [];
             isProcessingQueue.value = false;
-            if (animationTimer.value) {
+            if (isTruthy(animationTimer.value)) {
                 clearInterval(animationTimer.value);
                 animationTimer.value = null;
             }
@@ -487,8 +484,8 @@ const __sfc__ = defineComponent({
                 _cE("view", _uM({ class: "map-container" }), [
                     _cV(_component_map, _uM({
                         id: "myMap",
-                        latitude: center.latitude,
-                        longitude: center.longitude,
+                        latitude: center["latitude"],
+                        longitude: center["longitude"],
                         markers: markers.value,
                         scale: mapScale.value,
                         style: _nS(_uM({ "width": "100%", "height": "100%" })),

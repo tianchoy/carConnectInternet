@@ -64,7 +64,7 @@ const __sfc__ = defineComponent({
                 }
                 else {
                     uni.showToast({
-                        title: res.msg || '加载失败',
+                        title: isTruthy(res.msg) ? res.msg : '加载失败',
                         icon: 'none'
                     });
                 }

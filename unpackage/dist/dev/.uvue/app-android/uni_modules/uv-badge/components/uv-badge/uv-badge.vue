@@ -43,7 +43,7 @@ const __sfc__ = defineComponent({
             if (this.absolute) {
                 style["position"] = 'absolute';
                 // 如果有设置offset参数
-                if (this.offset.length) {
+                if (isTruthy(this.offset.length)) {
                     // top和right分为为offset的第一个和第二个值，如果没有第二个值，则right等于top
                     const top = this.offset[0];
                     const right = this.offset[1] || top;

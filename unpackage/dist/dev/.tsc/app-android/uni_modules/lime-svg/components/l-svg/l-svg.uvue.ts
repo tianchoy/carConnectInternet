@@ -259,8 +259,10 @@ __ins.emit(event, ...do_not_transform_spread)
 
 return (): any | null => {
 
+const _component_web_view = resolveComponent("web-view")
+
   return isTrue(_ctx.web)
-    ? _cE("web-view", _uM({
+    ? _cV(_component_web_view, _uM({
         key: 0,
         class: "l-svg",
         ref_key: "webRef",
@@ -269,7 +271,7 @@ return (): any | null => {
         onLoad: loaded,
         onMessage: message,
         src: "/uni_modules/lime-svg/hybrid/html/index.html?v=21"
-      }), null, 544 /* NEED_HYDRATION, NEED_PATCH */)
+      }), null, 512 /* NEED_PATCH */)
     : _cE("native-view", mergeProps(_uM({
         key: 1,
         class: "l-svg"

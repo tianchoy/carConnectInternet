@@ -1,5 +1,4 @@
-
-	/*每个页面公共css */
+/*每个页面公共css */
 .uni-row {
 		flex-direction: row;
 }

@@ -82,12 +82,12 @@ const __sfc__ = defineComponent({
             this.$refs.pickerPopup.close();
         },
         popupChange(e) {
-            if (!e.show)
+            if (!isTruthy(e.show))
                 this.$emit('close');
         },
         // 获取item需要显示的文字，判别为对象还是文本
         getItemText(item): any {
-            if (this.$uv.test.object(item)) {
+            if (isTruthy(this.$uv.test.object(item))) {
                 return item[this.keyName];
             }
             else {
@@ -143,7 +143,7 @@ const __sfc__ = defineComponent({
         // 设置index索引，此方法可被外部调用设置
         setIndexs(index, setLastIndex) {
             this.innerIndex = this.$uv.deepClone(index);
-            if (setLastIndex) {
+            if (isTruthy(setLastIndex)) {
                 this.setLastIndex(index);
             }
         },

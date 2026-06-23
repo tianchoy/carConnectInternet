@@ -113,7 +113,7 @@
   border-radius: 16rpx;
   width: 50%;
 }
-.container .top .device-info > view.data-v-00a60067 {
+.container .top .device-info .info.data-v-00a60067 {
   font-size: 26rpx;
   color: #333;
 }

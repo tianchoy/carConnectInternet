@@ -59,7 +59,7 @@ const __sfc__ = defineComponent({
             default: false
         }
     },
-    data(): UTSJSONObject {
+    data() {
         return {
             isShow: false,
             transform: '',
@@ -72,7 +72,7 @@ const __sfc__ = defineComponent({
     watch: {
         show: {
             handler(newVal) {
-                if (newVal) {
+                if (isTruthy(newVal)) {
                     this.open();
                 }
                 else {
@@ -87,7 +87,7 @@ const __sfc__ = defineComponent({
     },
     computed: {
         // 初始化动画条件
-        transformStyles(): any {
+        transformStyles() {
             const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uv-transition/components/uv-transition/uv-transition.vue", 115, 11),
                 transform: this.transform,
                 opacity: this.opacity,
@@ -112,7 +112,7 @@ const __sfc__ = defineComponent({
          *  ref 触发 初始化动画
          */
         init(obj = {}) {
-            if (obj.duration) {
+            if (isTruthy(obj.duration)) {
                 this.durationTime = obj.duration;
             }
             this.animation = createAnimation(Object.assign(this.config, obj), this);
@@ -129,7 +129,7 @@ const __sfc__ = defineComponent({
          * ref 触发 动画分组
          * @param {Object} obj
          */
-        step(obj, config = {}): UTSJSONObject | null {
+        step(obj, config = {}) {
             if (!this.animation)
                 return;
             for (let i in obj) {
@@ -190,7 +190,7 @@ const __sfc__ = defineComponent({
                 this.animationData = null;
                 this.animation = null;
                 let { opacity, transform } = this.styleInit(false);
-                this.opacity = opacity || 1;
+                this.opacity = isTruthy(opacity) ? opacity : 1;
                 this.transform = transform;
                 this.$emit('change', {
                     detail: this.isShow
@@ -214,32 +214,32 @@ const __sfc__ = defineComponent({
                 buildStyle(type, this.mode);
             }
             else {
-                this.mode.forEach(mode => {
+                (this.mode as unknown[]).forEach(mode => {
                     buildStyle(type, mode);
                 });
             }
             return styles;
         },
         // 处理内置组合动画
-        tranfromInit(type): any {
+        tranfromInit(type) {
             let buildTranfrom = (type, mode) => {
                 let aniNum = null;
                 if (mode === 'fade') {
-                    aniNum = type ? 0 : 1;
+                    aniNum = isTruthy(type) ? 0 : 1;
                 }
                 else {
-                    aniNum = type ? '-100%' : '0';
+                    aniNum = isTruthy(type) ? '-100%' : '0';
                     if (mode === 'zoom-in') {
-                        aniNum = type ? 0.8 : 1;
+                        aniNum = isTruthy(type) ? 0.8 : 1;
                     }
                     if (mode === 'zoom-out') {
-                        aniNum = type ? 1.2 : 1;
+                        aniNum = isTruthy(type) ? 1.2 : 1;
                     }
                     if (mode === 'slide-right') {
-                        aniNum = type ? '100%' : '0';
+                        aniNum = isTruthy(type) ? '100%' : '0';
                     }
                     if (mode === 'slide-bottom') {
-                        aniNum = type ? '100%' : '0';
+                        aniNum = isTruthy(type) ? '100%' : '0';
                     }
                 }
                 this.animation[this.animationMode()[mode]](aniNum);
@@ -248,7 +248,7 @@ const __sfc__ = defineComponent({
                 buildTranfrom(type, this.mode);
             }
             else {
-                this.mode.forEach(mode => {
+                (this.mode as unknown[]).forEach(mode => {
                     buildTranfrom(type, mode);
                 });
             }
@@ -256,13 +256,13 @@ const __sfc__ = defineComponent({
         },
         animationType(type): UTSJSONObject {
             return {
-                fade: type ? 1 : 0,
-                'slide-top': `translateY(${type ? '0' : '-100%'})`,
-                'slide-right': `translateX(${type ? '0' : '100%'})`,
-                'slide-bottom': `translateY(${type ? '0' : '100%'})`,
-                'slide-left': `translateX(${type ? '0' : '-100%'})`,
-                'zoom-in': `scaleX(${type ? 1 : 0.8}) scaleY(${type ? 1 : 0.8})`,
-                'zoom-out': `scaleX(${type ? 1 : 1.2}) scaleY(${type ? 1 : 1.2})`
+                fade: isTruthy(type) ? 1 : 0,
+                'slide-top': `translateY(${isTruthy(type) ? '0' : '-100%'})`,
+                'slide-right': `translateX(${isTruthy(type) ? '0' : '100%'})`,
+                'slide-bottom': `translateY(${isTruthy(type) ? '0' : '100%'})`,
+                'slide-left': `translateX(${isTruthy(type) ? '0' : '-100%'})`,
+                'zoom-in': `scaleX(${isTruthy(type) ? 1 : 0.8}) scaleY(${isTruthy(type) ? 1 : 0.8})`,
+                'zoom-out': `scaleX(${isTruthy(type) ? 1 : 1.2}) scaleY(${isTruthy(type) ? 1 : 1.2})`
             };
         },
         // 内置动画类型与实际动画对应字典

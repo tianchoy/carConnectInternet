@@ -18,9 +18,10 @@ interface HttpError {
     data?: any;
 }
 const BASE_URL = 'https://car.zdiot.cn:18443/api';
+// const BASE_URL = 'http://192.168.3.7:8085/api'
 // 处理token过期的函数
 function handleTokenExpired(): void {
-    __f__('log', 'at api/http.uts:27', '检测到token过期，执行跳转登录页逻辑');
+    __f__('log', 'at api/http.uts:28', '检测到token过期，执行跳转登录页逻辑');
     // 清除本地token
     uni.removeStorageSync('token');
     // 显示提示
@@ -31,27 +32,27 @@ function handleTokenExpired(): void {
     });
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log', 'at api/http.uts:41', '正在跳转到登录页...');
+        __f__('log', 'at api/http.uts:42', '正在跳转到登录页...');
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log', 'at api/http.uts:45', '跳转登录页成功');
+                __f__('log', 'at api/http.uts:46', '跳转登录页成功');
             },
             fail: (err) => {
-                __f__('log', 'at api/http.uts:48', '跳转登录页失败:', err);
+                __f__('log', 'at api/http.uts:49', '跳转登录页失败:', err);
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
                 });
             }
         });
-    }, 1500);
+    }, 500);
 }
 // 请求拦截器
 function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token');
-    if (token) {
-        config.header = config.header || {};
+    if (isTruthy(token)) {
+        config.header = isTruthy(config.header) ? config.header : {};
         config.header!['token'] = `${token}`;
     }
     // 显示加载中
@@ -78,7 +79,7 @@ function responseInterceptor(response: any, config: RequestOptions): any {
         // 创建统一的错误对象
         const error: HttpError = {
             statusCode: statusCode,
-            message: response.errMsg || `请求失败: ${statusCode}`,
+            message: isTruthy(response.errMsg) ? response.errMsg : `请求失败: ${statusCode}`,
             data: response.data
         };
         throw error;
@@ -90,9 +91,9 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
     if (config.showLoading !== false) {
         uni.hideLoading();
     }
-    __f__('log', 'at api/http.uts:107', '请求错误详情:', error);
+    __f__('log', 'at api/http.uts:108', '请求错误详情:', error);
     // 处理错误状态码
-    if (error.statusCode) {
+    if (error.statusCode != 0) {
         switch (error.statusCode) {
             case 401:
                 handleTokenExpired();
@@ -117,7 +118,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
                 break;
             default:
                 uni.showToast({
-                    title: error.message || `请求错误: ${error.statusCode}`,
+                    title: error.message != "" ? error.message : `请求错误: ${error.statusCode}`,
                     icon: 'none'
                 });
         }
@@ -135,9 +136,9 @@ function request<T = any>(options: RequestOptions): Promise<T> {
     // 合并配置
     const config: RequestOptions = {
         url: options.url,
-        method: options.method || 'GET',
-        data: options.data || {},
-        header: options.header || {},
+        method: isTruthy(options.method) ? options.method : 'GET',
+        data: isTruthy(options.data) ? options.data : {},
+        header: isTruthy(options.header) ? options.header : {},
         showLoading: options.showLoading !== false,
         ...options
     };
@@ -164,7 +165,7 @@ function request<T = any>(options: RequestOptions): Promise<T> {
             fail: (error: any) => {
                 const httpError: HttpError = {
                     statusCode: 0,
-                    message: error.errMsg || '网络请求失败',
+                    message: isTruthy(error.errMsg) ? error.errMsg : '网络请求失败',
                     data: error
                 };
                 errorHandler(httpError, processedConfig);
@@ -213,8 +214,8 @@ const http = {
             const fullUrl = url.startsWith('http') ? url : BASE_URL + url;
             // 添加token到header
             const token = uni.getStorageSync('token');
-            const header = options.header || {};
-            if (token) {
+            const header = isTruthy(options.header) ? options.header : {};
+            if (isTruthy(token)) {
                 header['token'] = `${token}`;
             }
             // 显示加载中
@@ -262,7 +263,7 @@ const http = {
                     }
                     const httpError: HttpError = {
                         statusCode: 0,
-                        message: error.errMsg || '文件上传失败',
+                        message: isTruthy(error.errMsg) ? error.errMsg : '文件上传失败',
                         data: error
                     };
                     errorHandler(httpError, options);

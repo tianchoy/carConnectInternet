@@ -3,6 +3,33 @@ import _easycom_uv_grid_item from '@/uni_modules/uv-grid/components/uv-grid-item
 import _easycom_uv_grid from '@/uni_modules/uv-grid/components/uv-grid/uv-grid.vue';
 import _easycom_uv_popup from '@/uni_modules/uv-popup/components/uv-popup/uv-popup.vue';
 import { ref } from 'vue';
+function __uts_large_iconList_fill_fill_1(__arr: UTSJSONObject[]): void {
+    __arr.push({ name: 'car', title: '轿车', img: '/static/cars/online/car.png' });
+    __arr.push({ name: 'bus', title: '公交车', img: '/static/cars/online/bus.png' });
+    __arr.push({ name: 'bike', title: '自行车', img: '/static/cars/online/bike.png' });
+    __arr.push({ name: 'moto', title: '摩托车', img: '/static/cars/online/moto.png' });
+    __arr.push({ name: 'diandong', title: '电动车', img: '/static/cars/online/diandong.png' });
+    __arr.push({ name: 'huoche', title: '货车', img: '/static/cars/online/huoche.png' });
+    __arr.push({ name: 'sanlun', title: '三轮车', img: '/static/cars/online/sanlun.png' });
+    __arr.push({ name: 'tuola', title: '拖拉机', img: '/static/cars/online/tuola.png' });
+    __arr.push({ name: 'suv', title: '越野车', img: '/static/cars/online/suv.png' });
+    __arr.push({ name: 'baby', title: '婴儿车', img: '/static/cars/online/baby.png' });
+    __arr.push({ name: 'tank', title: '坦克', img: '/static/cars/online/tank.png' });
+    __arr.push({ name: 'zhuangjia', title: '装甲车', img: '/static/cars/online/zhuangjia.png' });
+    __arr.push({ name: 'wajue', title: '挖掘机', img: '/static/cars/online/wajue.png' });
+    __arr.push({ name: 'plan', title: '飞机', img: '/static/cars/online/plan.png' });
+    __arr.push({ name: 'walk', title: '步行', img: '/static/cars/online/walk.png' });
+    __arr.push({ name: 'muma', title: '木马', img: '/static/cars/online/muma.png' });
+    __arr.push({ name: 'hangmu', title: '航母', img: '/static/cars/online/hangmu.png' });
+    __arr.push({ name: 'junjian', title: '军舰', img: '/static/cars/online/junjian.png' });
+    __arr.push({ name: 'tuiche', title: '手推车', img: '/static/cars/online/tuiche.png' });
+    __arr.push({ name: 'train', title: '火车', img: '/static/cars/online/train.png' });
+}
+function __uts_large_iconList_build_0(): UTSJSONObject[] {
+    const __arr = [] as UTSJSONObject[];
+    __uts_large_iconList_fill_fill_1(__arr);
+    return __arr;
+}
 interface Props {
     title?: string;
     col?: number;
@@ -32,28 +59,7 @@ const __sfc__ = defineComponent({
             __ins.emit(event, ...do_not_transform_spread);
         }
         // 在组件内部定义完整的图标列表
-        const iconList = [
-            { name: 'car', title: '轿车', img: '/static/cars/online/car.png' },
-            { name: 'bus', title: '公交车', img: '/static/cars/online/bus.png' },
-            { name: 'bike', title: '自行车', img: '/static/cars/online/bike.png' },
-            { name: 'moto', title: '摩托车', img: '/static/cars/online/moto.png' },
-            { name: 'diandong', title: '电动车', img: '/static/cars/online/diandong.png' },
-            { name: 'huoche', title: '货车', img: '/static/cars/online/huoche.png' },
-            { name: 'sanlun', title: '三轮车', img: '/static/cars/online/sanlun.png' },
-            { name: 'tuola', title: '拖拉机', img: '/static/cars/online/tuola.png' },
-            { name: 'suv', title: '越野车', img: '/static/cars/online/suv.png' },
-            { name: 'baby', title: '婴儿车', img: '/static/cars/online/baby.png' },
-            { name: 'tank', title: '坦克', img: '/static/cars/online/tank.png' },
-            { name: 'zhuangjia', title: '装甲车', img: '/static/cars/online/zhuangjia.png' },
-            { name: 'wajue', title: '挖掘机', img: '/static/cars/online/wajue.png' },
-            { name: 'plan', title: '飞机', img: '/static/cars/online/plan.png' },
-            { name: 'walk', title: '步行', img: '/static/cars/online/walk.png' },
-            { name: 'muma', title: '木马', img: '/static/cars/online/muma.png' },
-            { name: 'hangmu', title: '航母', img: '/static/cars/online/hangmu.png' },
-            { name: 'junjian', title: '军舰', img: '/static/cars/online/junjian.png' },
-            { name: 'tuiche', title: '手推车', img: '/static/cars/online/tuiche.png' },
-            { name: 'train', title: '火车', img: '/static/cars/online/train.png' },
-        ] as UTSJSONObject[];
+        const iconList = __uts_large_iconList_build_0();
         const popupRef = ref(null);
         // 选择图标处理函数
         const handleSelect = (item: any) => {

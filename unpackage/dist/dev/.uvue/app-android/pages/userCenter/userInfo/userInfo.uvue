@@ -21,7 +21,7 @@ const __sfc__ = defineComponent({
             createTime: ""
         } as UserInfo);
         onLoad((options) => {
-            if (options["userInfo"]) {
+            if (isTruthy(options["userInfo"])) {
                 try {
                     const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"]), " at pages/userCenter/userInfo/userInfo.uvue:71")), " at pages/userCenter/userInfo/userInfo.uvue:71") as UTSJSONObject;
                     userInfo.value = {
@@ -29,7 +29,7 @@ const __sfc__ = defineComponent({
                         mobile: parsedInfo.getString("mobile") || "",
                         type: parsedInfo.getNumber("type") || 0,
                         createTime: parsedInfo.getString("createTime") || ""
-                    };
+                    } as UserInfo;
                     console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:78");
                 }
                 catch (e: any) {

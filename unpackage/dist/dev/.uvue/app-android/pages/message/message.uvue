@@ -33,7 +33,7 @@ const __sfc__ = defineComponent({
             // 获取 token
             const token = uni.getStorageSync('token');
             // 如果有 token，加载消息列表
-            if (token) {
+            if (isTruthy(token)) {
                 Login.value = true;
                 loadMsgList(true);
             }
@@ -109,7 +109,7 @@ const __sfc__ = defineComponent({
         };
         // 启动新消息检查
         const startNewMessageCheck = () => {
-            if (checkTimer) {
+            if (isTruthy(checkTimer)) {
                 stopNewMessageCheck();
             }
             console.log('启动定时消息检查', " at pages/message/message.uvue:168");
@@ -123,7 +123,7 @@ const __sfc__ = defineComponent({
         };
         // 停止新消息检查
         const stopNewMessageCheck = () => {
-            if (checkTimer) {
+            if (isTruthy(checkTimer)) {
                 console.log('停止定时消息检查', " at pages/message/message.uvue:181");
                 clearInterval(checkTimer);
                 checkTimer = null;
@@ -148,9 +148,9 @@ const __sfc__ = defineComponent({
                     pageSize: 1
                 });
                 if (res.code == 0 && res.msg == 'success') {
-                    const data = res.data || { list: [], total: 0 };
+                    const data = isTruthy(res.data) ? res.data : { list: [], total: 0 };
                     const latestMessage = data.list?.[0];
-                    if (latestMessage && latestMessage.createTime) {
+                    if (isTruthy(latestMessage) && isTruthy(latestMessage.createTime)) {
                         const messageTime = new Date(latestMessage.createTime).getTime();
                         if (messageTime > lastUpdateTime.value) {
                             // 有新消息
@@ -217,21 +217,21 @@ const __sfc__ = defineComponent({
                     pageSize: pageSize.value
                 });
                 if (res.code == 0 && res.msg == 'success') {
-                    const data = res.data || { list: [], totalPage: 0 };
-                    totalPage.value = data.totalPage || 1;
+                    const data = isTruthy(res.data) ? res.data : { list: [], totalPage: 0 };
+                    totalPage.value = isTruthy(data.totalPage) ? data.totalPage : 1;
                     console.log('第', currPage.value, '页接口返回:', data, " at pages/message/message.uvue:287");
                     console.log('第', currPage.value, '页列表长度:', data.list?.length, " at pages/message/message.uvue:288");
                     if (isInit) {
-                        msgList.value = data.list || [];
+                        msgList.value = isTruthy(data.list) ? data.list : [];
                         // 更新最后更新时间
-                        if (data.list && data.list.length > 0) {
+                        if (isTruthy(data.list) && data.list.length > 0) {
                             lastUpdateTime.value = new Date().getTime();
                         }
                     }
                     else {
-                        const newData = data.list || [];
+                        const newData = isTruthy(data.list) ? data.list : [];
                         console.log('即将添加的新数据长度:', newData.length, " at pages/message/message.uvue:298");
-                        // 去重处理：基于 messageId
+                        // 去重
                         const existingIds = new Set(msgList.value.map((item): any => item["messageId"]));
                         const uniqueNewData = newData.filter((item: UTSJSONObject): boolean => !existingIds.has(item["messageId"]));
                         if (uniqueNewData.length > 0) {
@@ -308,7 +308,7 @@ const __sfc__ = defineComponent({
             }
         };
         const formatTime = (timeString: string): string => {
-            if (!timeString)
+            if (!(timeString != ""))
                 return '';
             try {
                 const date = new Date(timeString);
@@ -340,7 +340,7 @@ const __sfc__ = defineComponent({
             return _cE(Fragment, null, [
                 _cV(_component_custom_navBar, _uM({
                     title: "消息中心",
-                    "show-back": false,
+                    "show-back": true,
                     backgroundColor: "#fff",
                     textColor: "#333",
                     showCapsule: false,
@@ -375,7 +375,7 @@ const __sfc__ = defineComponent({
                                 : _cC("v-if", true),
                             _cE(Fragment, null, RenderHelpers.renderList(msgList.value, (item, index, __index, _cached): any => {
                                 return _cV(_component_uv_list, _uM({
-                                    key: item["messageId"] || index
+                                    key: isTruthy(item["messageId"]) ? item["messageId"] : index
                                 }), _uM({
                                     default: withSlotCtx((): any[] => [
                                         _cV(_component_uv_list_item, _uM({

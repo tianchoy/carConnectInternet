@@ -85,7 +85,7 @@ const __sfc__ = defineComponent({
         };
         onMounted(() => {
             getSystemInfo();
-            if (formRef.value) {
+            if (isTruthy(formRef.value)) {
                 formRef.value!.setRules(rules);
             }
         });

@@ -18,7 +18,7 @@ export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override appid: string = "__UNI__662B0B4"
     override versionName: string = "1.0.0"
     override versionCode: string = "100"
-    override uniCompilerVersion: string = "4.84"
+    override uniCompilerVersion: string = "5.11"
     
     constructor() { super() }
 }
@@ -43,6 +43,9 @@ import GenPagesGeofencingGeofencingClass from './pages/geofencing/geofencing.uvu
 import GenPagesScancodeScancodeClass from './pages/scancode/scancode.uvue'
 import GenPagesUserCenterPayDeviceListPayDeviceListClass from './pages/userCenter/payDeviceList/payDeviceList.uvue'
 import GenPagesUserCenterRenewalRenewalClass from './pages/userCenter/renewal/renewal.uvue'
+import GenPagesCmdCmdClass from './pages/cmd/cmd.uvue'
+import GenPagesWebviewWebviewClass from './pages/webview/webview.uvue'
+import GenPagesDeviceListDeviceListClass from './pages/deviceList/deviceList.uvue'
 function definePageRoutes() {
 __uniRoutes.push({ path: "pages/index/index", component: GenPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationBarTitleText","车联网"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/message/message", component: GenPagesMessageMessageClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","消息"]]) } as UniPageRoute)
@@ -64,12 +67,15 @@ __uniRoutes.push({ path: "pages/geofencing/geofencing", component: GenPagesGeofe
 __uniRoutes.push({ path: "pages/scancode/scancode", component: GenPagesScancodeScancodeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/userCenter/payDeviceList/payDeviceList", component: GenPagesUserCenterPayDeviceListPayDeviceListClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/userCenter/renewal/renewal", component: GenPagesUserCenterRenewalRenewalClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/cmd/cmd", component: GenPagesCmdCmdClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/webview/webview", component: GenPagesWebviewWebviewClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/deviceList/deviceList", component: GenPagesDeviceListDeviceListClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","设备列表"]]) } as UniPageRoute)
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["color","#2c2c2c"],["selectedColor","#d81e06"],["borderStyle","black"],["backgroundColor","#ffffff"],["list",[_uM([["pagePath","pages/index/index"],["iconPath","/static/tabBar/home.png"],["selectedIconPath","/static/tabBar/home1.png"],["text","首页"]]),_uM([["pagePath","pages/message/message"],["iconPath","/static/tabBar/message.png"],["selectedIconPath","/static/tabBar/message1.png"],["text","消息"]]),_uM([["pagePath","pages/userCenter/userCenter"],["iconPath","/static/tabBar/userCenter.png"],["selectedIconPath","/static/tabBar/userCenter1.png"],["text","我的"]])]]])
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","pages/index/index"],["style",_uM([["navigationBarTitleText","车联网"]])]])
 function defineAppConfig(){
   __uniConfig.entryPagePath = '/pages/index/index'
-  __uniConfig.globalStyle = _uM([["navigationStyle","custom"],["navigationBarTextStyle","black"],["navigationBarTitleText","uni-app x"],["navigationBarBackgroundColor","#F8F8F8"],["backgroundColor","#F8F8F8"]])
+  __uniConfig.globalStyle = _uM([["navigationStyle","custom"],["navigationBarTextStyle","black"],["navigationBarTitleText","车联网"],["navigationBarBackgroundColor","#F8F8F8"],["backgroundColor","#F8F8F8"]])
   __uniConfig.getTabBarConfig = ():Map<string, any> | null =>  _uM([["color","#2c2c2c"],["selectedColor","#d81e06"],["borderStyle","black"],["backgroundColor","#ffffff"],["list",[_uM([["pagePath","pages/index/index"],["iconPath","/static/tabBar/home.png"],["selectedIconPath","/static/tabBar/home1.png"],["text","首页"]]),_uM([["pagePath","pages/message/message"],["iconPath","/static/tabBar/message.png"],["selectedIconPath","/static/tabBar/message1.png"],["text","消息"]]),_uM([["pagePath","pages/userCenter/userCenter"],["iconPath","/static/tabBar/userCenter.png"],["selectedIconPath","/static/tabBar/userCenter1.png"],["text","我的"]])]]])
   __uniConfig.tabBar = __uniConfig.getTabBarConfig()
   __uniConfig.conditionUrl = ''

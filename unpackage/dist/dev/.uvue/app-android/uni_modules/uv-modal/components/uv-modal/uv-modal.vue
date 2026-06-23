@@ -51,7 +51,7 @@ const __sfc__ = defineComponent({
             this.$refs.modalPopup.close();
         },
         popupChange(e) {
-            if (!e.show)
+            if (!isTruthy(e.show))
                 this.$emit('close');
         },
         // 点击确定按钮

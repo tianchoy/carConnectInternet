@@ -151,7 +151,7 @@ const __sfc__ = defineComponent({
         btnWrapperStyle(): UTSJSONObject {
             const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uv-button/components/uv-button/uv-button.vue", 308, 11), } as UTSJSONObject;
             const customStyle = this.$uv.addStyle(this.customStyle);
-            if (customStyle.width)
+            if (isTruthy(customStyle.width))
                 style["width"] = customStyle.width;
             return style;
         }

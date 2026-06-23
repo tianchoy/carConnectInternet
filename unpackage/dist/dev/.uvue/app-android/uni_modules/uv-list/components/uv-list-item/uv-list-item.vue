@@ -138,13 +138,13 @@ const __sfc__ = defineComponent({
     },
     computed: {
         directionData(): string {
-            return this.direction ? this.direction : (this.parentData.direction ? this.parentData.direction : 'row');
+            return this.direction != "" ? this.direction : (this.parentData.direction != "" ? this.parentData.direction : 'row');
         }
     },
     watch: {
         'customStyle.padding': {
             handler(padding) {
-                if (padding)
+                if (isTruthy(padding))
                     this.setPadding(padding);
             },
             immediate: true
@@ -173,7 +173,7 @@ const __sfc__ = defineComponent({
         this.list = this.getForm();
         // 判断是否存在 uv-list 组件
         if (this.list) {
-            if (!this.list.firstChildAppend) {
+            if (!isTruthy(this.list.firstChildAppend)) {
                 this.list.firstChildAppend = true;
                 this.isFirstChild = true;
             }
@@ -185,7 +185,7 @@ const __sfc__ = defineComponent({
                 this.$uv.error('uv-list-item必须搭配uv-list组件使用');
             }
             this.$nextTick(() => {
-                if (!(this.padding.top || this.padding.right || this.padding.bottom || this.padding.left)) {
+                if (!(this.padding.top != "" || this.padding.right != "" || this.padding.bottom != "" || this.padding.left != "")) {
                     this.setPadding(this.parentData.padding);
                 }
             });
@@ -234,7 +234,7 @@ const __sfc__ = defineComponent({
             let parentName = parent.$options.name;
             while (parentName !== name) {
                 parent = parent.$parent;
-                if (!parent)
+                if (!isTruthy(parent))
                     return false;
                 parentName = parent.$options.name;
             }
@@ -245,7 +245,7 @@ const __sfc__ = defineComponent({
                 this.openPage();
                 return;
             }
-            if (this.clickable || this.link) {
+            if (this.clickable || isTruthy(this.link)) {
                 this.$emit('click', {
                     data: {}
                 });
@@ -304,8 +304,8 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
     const _component_uv_switch = resolveEasyComponent("uv-switch", _easycom_uv_switch);
     return _cE("view", _uM({
         class: _nC([_uM({ 'uv-list-item--disabled': _ctx.disabled }), "uv-list-item"]),
-        style: _nS([_ctx.$uv.addStyle(_ctx.customStyle), _uM({ 'background-color': _ctx.customStyle.backgroundColor ? _ctx.customStyle.backgroundColor : '#fff' })]),
-        "hover-class": (!_ctx.clickable && !_ctx.link) || _ctx.disabled || _ctx.showSwitch ? '' : 'uv-list-item--hover',
+        style: _nS([_ctx.$uv.addStyle(_ctx.customStyle), _uM({ 'background-color': isTruthy(_ctx.customStyle.backgroundColor) ? _ctx.customStyle.backgroundColor : '#fff' })]),
+        "hover-class": (!_ctx.clickable && !isTruthy(_ctx.link)) || isTruthy(_ctx.disabled) || isTruthy(_ctx.showSwitch) ? '' : 'uv-list-item--hover',
         onClick: _ctx.onClick
     }), [
         isTrue(!_ctx.isFirstChild)
@@ -317,7 +317,7 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
         _cE("view", _uM({ class: "uv-list-item__wrapper" }), [
             renderSlot(_ctx.$slots, "default", {}, (): any[] => [
                 _cE("view", _uM({
-                    class: _nC(["uv-list-item__container", _uM({ 'container--right': _ctx.showArrow || _ctx.link, 'flex--direction': _ctx.directionData === 'column' })]),
+                    class: _nC(["uv-list-item__container", _uM({ 'container--right': isTruthy(_ctx.showArrow) ? _ctx.showArrow : _ctx.link, 'flex--direction': _ctx.directionData === 'column' })]),
                     style: _nS(_uM({ paddingTop: _ctx.padding.top, paddingLeft: _ctx.padding.left, paddingRight: _ctx.padding.right, paddingBottom: _ctx.padding.bottom }))
                 }), [
                     renderSlot(_ctx.$slots, "header", {}, (): any[] => [
@@ -349,12 +349,12 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
                     ]),
                     renderSlot(_ctx.$slots, "body", {}, (): any[] => [
                         _cE("view", _uM({
-                            class: _nC(["uv-list-item__content", _uM({ 'uv-list-item__content--center': _ctx.thumb || _ctx.showExtraIcon || _ctx.showBadge || _ctx.showSwitch })])
+                            class: _nC(["uv-list-item__content", _uM({ 'uv-list-item__content--center': _ctx.thumb != "" ? _ctx.thumb : isTruthy(_ctx.showExtraIcon) ? _ctx.showExtraIcon : isTruthy(_ctx.showBadge) ? _ctx.showBadge : _ctx.showSwitch })])
                         }), [
                             isTrue(_ctx.title)
                                 ? _cE("text", _uM({
                                     key: 0,
-                                    class: _nC(["uv-list-item__content-title", [_ctx.ellipsis && `uv-line-${_ctx.ellipsis}`]])
+                                    class: _nC(["uv-list-item__content-title", [isTruthy(_ctx.ellipsis) ? `uv-line-${_ctx.ellipsis}` : _ctx.ellipsis]])
                                 }), _tD(_ctx.title), 3 /* TEXT, CLASS */)
                                 : _cC("v-if", true),
                             isTrue(_ctx.note)
@@ -366,7 +366,7 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
                         ], 2 /* CLASS */)
                     ]),
                     renderSlot(_ctx.$slots, "footer", {}, (): any[] => [
-                        isTrue(_ctx.rightText || _ctx.showBadge || _ctx.showSwitch)
+                        isTrue(_ctx.rightText != "" ? _ctx.rightText : isTruthy(_ctx.showBadge) ? _ctx.showBadge : _ctx.showSwitch)
                             ? _cE("view", _uM({
                                 key: 0,
                                 class: _nC(["uv-list-item__extra", _uM({ 'flex--justify': _ctx.directionData === 'column' })])
@@ -380,7 +380,7 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
                                 isTrue(_ctx.showBadge)
                                     ? _cV(_component_uv_badge, _uM({
                                         key: 1,
-                                        show: !!(_ctx.badge.show || _ctx.badge.isDot || _ctx.badge.value),
+                                        show: !!(isTruthy(_ctx.badge.show) || isTruthy(_ctx.badge.isDot) || isTruthy(_ctx.badge.value)),
                                         isDot: _ctx.badge.isDot,
                                         value: _ctx.badge.value,
                                         max: _ctx.badge.max,
@@ -408,7 +408,7 @@ function GenUniModulesUvListComponentsUvListItemUvListItemRender(this: InstanceT
                 ], 6 /* CLASS, STYLE */)
             ])
         ]),
-        isTrue(_ctx.showArrow || _ctx.link)
+        isTrue(isTruthy(_ctx.showArrow) ? _ctx.showArrow : _ctx.link)
             ? _cV(_component_uv_icon, _uM({
                 key: 1,
                 size: "34rpx",

@@ -63,7 +63,7 @@ const __sfc__ = defineComponent({
         const markers = ref<Array<any>>([]);
         // 日期函数
         function safeParseDate(dateStr: string): number {
-            if (!dateStr)
+            if (!(dateStr != ""))
                 return 0;
             const iosCompatibleStr = dateStr.replace(/-/g, '/');
             const date = new Date(iosCompatibleStr);
@@ -79,7 +79,7 @@ const __sfc__ = defineComponent({
         }
         // 格式化日期显示
         function formatDateForDisplay(dateStr: string): string {
-            if (!dateStr)
+            if (!(dateStr != ""))
                 return '';
             return dateStr.replace(/\//g, '-');
         }
@@ -125,10 +125,10 @@ const __sfc__ = defineComponent({
         // 调整地图以适应轨迹
         function adjustMapToFitTrack() {
             const bounds = calculateTrackBounds();
-            if (!bounds)
+            if (!isTruthy(bounds))
                 return;
-            center.latitude = (bounds.minLat + bounds.maxLat) / 2;
-            center.longitude = (bounds.minLng + bounds.maxLng) / 2;
+            center["latitude"] = (bounds.minLat + bounds.maxLat) / 2;
+            center["longitude"] = (bounds.minLng + bounds.maxLng) / 2;
             const latDiff = bounds.maxLat - bounds.minLat;
             const lngDiff = bounds.maxLng - bounds.minLng;
             const maxDiff = Math.max(latDiff, lngDiff);
@@ -168,7 +168,7 @@ const __sfc__ = defineComponent({
                     iconPath: getDeviceIcon(carStatus.value, carType.value),
                     width: 25,
                     height: 25,
-                    rotate: trackPoints.value[0].rotation || 0,
+                    rotate: isTruthy(trackPoints.value[0].rotation) ? trackPoints.value[0].rotation : 0,
                     // anchor: { x: 0.5, y: 0.5 },
                     // callout: {
                     // 	content: plateNo,
@@ -213,7 +213,7 @@ const __sfc__ = defineComponent({
         }
         // 更新轨迹线
         function updatePolyline() {
-            if (!trackPoints.value || trackPoints.value.length < 2) {
+            if (!(trackPoints.value != null) || trackPoints.value.length < 2) {
                 polyline.value = [];
                 return;
             }
@@ -250,17 +250,17 @@ const __sfc__ = defineComponent({
         }
         // 更新小车位置
         function updateCarPosition() {
-            if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+            if (isTruthy(carMarker.value) && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
                 const point = trackPoints.value[currentIndex.value];
                 carMarker.value.latitude = point.latitude;
                 carMarker.value.longitude = point.longitude;
-                carMarker.value.rotate = point.rotation || 0;
+                carMarker.value.rotate = isTruthy(point.rotation) ? point.rotation : 0;
                 // 每5个点更新一次中心点
                 if (currentIndex.value % 5 == 0 ||
                     currentIndex.value == 0 ||
                     currentIndex.value == trackPoints.value.length - 1) {
-                    center.latitude = point.latitude;
-                    center.longitude = point.longitude;
+                    center["latitude"] = point.latitude;
+                    center["longitude"] = point.longitude;
                 }
             }
         }
@@ -343,13 +343,13 @@ const __sfc__ = defineComponent({
             updateCarPosition();
             updatePolyline();
             const point = trackPoints.value[currentIndex.value];
-            currentSpeed.value = point.speed || 0;
-            currentTime.value = point.deviceTime || '';
+            currentSpeed.value = isTruthy(point.speed) ? point.speed : 0;
+            currentTime.value = isTruthy(point.deviceTime) ? point.deviceTime : '';
         }
         // 暂停回放
         function pausePlayback() {
             isPlaying.value = false;
-            if (playbackTimer) {
+            if (isTruthy(playbackTimer)) {
                 clearTimeout(playbackTimer);
                 playbackTimer = null;
             }
@@ -360,7 +360,7 @@ const __sfc__ = defineComponent({
             currentIndex.value = 0;
             currentSpeed.value = 0;
             if (trackPoints.value.length > 0) {
-                currentTime.value = trackPoints.value[0].deviceTime || '';
+                currentTime.value = isTruthy(trackPoints.value[0].deviceTime) ? trackPoints.value[0].deviceTime : '';
             }
             updateCarPosition();
             updatePolyline();
@@ -386,7 +386,7 @@ const __sfc__ = defineComponent({
             sTime.value = option["startTime"];
             eTime.value = option["endTime"];
             console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:476");
-            if (sTime.value && eTime.value) {
+            if (sTime.value != "" && eTime.value != "") {
                 startTime.value = sTime.value;
                 endTime.value = eTime.value;
                 loadTrackPos();
@@ -412,7 +412,7 @@ const __sfc__ = defineComponent({
             } as UTSJSONObject;
             const res = await getTrackPos(data);
             //当轨迹数据不为空时，处理轨迹数据
-            if (res.data.positions && res.data.positions.length > 0) {
+            if (isTruthy(res.data.positions) && res.data.positions.length > 0) {
                 processTrackData(res.data.positions);
                 uni.hideLoading();
             }
@@ -434,8 +434,8 @@ const __sfc__ = defineComponent({
             const originalLng = parseFloat(lng.value);
             const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng);
             // 设置地图中心点
-            center.latitude = convertedCoord.lat;
-            center.longitude = convertedCoord.lng;
+            center["latitude"] = convertedCoord.lat;
+            center["longitude"] = convertedCoord.lng;
             mapScale.value = 15;
             // 创建当前位置标记
             const currentPoint = { __$originalPosition: new UTSSourceMapPosition("currentPoint", "pages/playBack/playBack.uvue", 535, 9),
@@ -531,8 +531,8 @@ const __sfc__ = defineComponent({
                 _cE("view", _uM({ class: "map-container" }), [
                     _cV(_component_map, _uM({
                         id: "myMap",
-                        latitude: center.latitude,
-                        longitude: center.longitude,
+                        latitude: center["latitude"],
+                        longitude: center["longitude"],
                         markers: markers.value,
                         polyline: polyline.value,
                         scale: mapScale.value,
@@ -644,5 +644,5 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "50rpx"], ["paddingBottom", 0], ["paddingLeft", "50rpx"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "25rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])];
+const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "25rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])];
 //# sourceMappingURL=playBack.uvue.map

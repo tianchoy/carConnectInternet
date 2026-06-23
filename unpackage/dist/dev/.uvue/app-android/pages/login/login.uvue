@@ -49,7 +49,7 @@ const __sfc__ = defineComponent({
         const smsformRef = ref<UvFormInstance | null>(null);
         const deviceModel = ref('');
         const saveAccountPassword = () => {
-            if (rememberPassword.value && form.value.username && form.value.password) {
+            if (rememberPassword.value && form.value.username != "" && form.value.password != "") {
                 const accountInfo = { __$originalPosition: new UTSSourceMapPosition("accountInfo", "pages/login/login.uvue", 103, 10),
                     username: form.value.username,
                     password: form.value.password,
@@ -64,9 +64,9 @@ const __sfc__ = defineComponent({
         const loadSavedAccount = () => {
             try {
                 const savedAccount = uni.getStorageSync('savedEnterpriseAccount');
-                if (savedAccount) {
-                    form.value.username = savedAccount.username || '';
-                    form.value.password = savedAccount.password || '';
+                if (isTruthy(savedAccount)) {
+                    form.value.username = isTruthy(savedAccount.username) ? savedAccount.username : '';
+                    form.value.password = isTruthy(savedAccount.password) ? savedAccount.password : '';
                     rememberPassword.value = true;
                 }
             }
@@ -148,7 +148,7 @@ const __sfc__ = defineComponent({
         };
         const getCode = () => {
             // 1. 先检查手机号是否为空
-            if (!smsform.value.phone) {
+            if (!(smsform.value.phone != "")) {
                 uni.showToast({
                     title: '请先输入手机号',
                     icon: 'none'
@@ -165,7 +165,7 @@ const __sfc__ = defineComponent({
                 return;
             }
             // 3. 检查是否在冷却期内
-            if (!uCode.value?.canGetCode) {
+            if (!isTruthy(uCode.value?.canGetCode)) {
                 uni.showToast({
                     title: '请稍后再试',
                     icon: 'none'
@@ -203,10 +203,10 @@ const __sfc__ = defineComponent({
         };
         onMounted(() => {
             getSystemInfo();
-            if (formRef.value) {
+            if (isTruthy(formRef.value)) {
                 formRef.value!.setRules(pswrules);
             }
-            if (smsformRef.value) {
+            if (isTruthy(smsformRef.value)) {
                 smsformRef.value!.setRules(smsrules);
             }
             // 页面加载时尝试加载保存的企业账号
@@ -260,6 +260,7 @@ const __sfc__ = defineComponent({
                         fail: reject
                     });
                 });
+                console.log('微信登录code:', loginRes.code, " at pages/login/login.uvue:336");
                 // 2. 发送到后端解密处理
                 const res = await PostWechatlogin({
                     code: loginRes.code,
@@ -267,14 +268,17 @@ const __sfc__ = defineComponent({
                     iv: e.detail.iv
                 });
                 // 3. 检查返回数据是否有效
-                if (!res) {
-                    throw new Error('接口返回数据为空');
+                if (!isTruthy(res) && !isTruthy(res.data)) {
+                    uni.showToast({
+                        title: res.msg,
+                        icon: 'none'
+                    });
                 }
-                if (!res.data) {
-                    throw new Error('接口返回数据: data为null');
-                }
-                if (!res.data.token) {
-                    throw new Error('登录失败: 未获取到token');
+                if (!isTruthy(res.data.token)) {
+                    uni.showToast({
+                        title: '登录失败: 未获取到token',
+                        icon: 'none'
+                    });
                 }
                 // 4. 登录成功处理
                 uni.setStorageSync('token', res.data.token);
@@ -283,7 +287,7 @@ const __sfc__ = defineComponent({
                 });
             }
             catch (error: any) {
-                console.error('微信登录失败:', error, " at pages/login/login.uvue:363");
+                console.error('微信登录失败:', error, " at pages/login/login.uvue:367");
                 uni.showToast({
                     title: '微信登录失败',
                     icon: 'none'
@@ -294,7 +298,7 @@ const __sfc__ = defineComponent({
             }
         };
         const submit = () => {
-            console.log(docState.value, " at pages/login/login.uvue:374");
+            console.log(docState.value, " at pages/login/login.uvue:378");
             if (!docState.value) {
                 uni.showToast({
                     title: '请先阅读并同意用户协议',
@@ -305,7 +309,7 @@ const __sfc__ = defineComponent({
             if (loginType.value) {
                 // 账号密码登录
                 formRef.value?.validate().then(res => {
-                    const newFormData = { __$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 386, 11),
+                    const newFormData = { __$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 390, 11),
                         ...form.value,
                         from: deviceModel.value,
                         type: "USER"
@@ -320,7 +324,7 @@ const __sfc__ = defineComponent({
                         });
                     }).catch(err => {
                         uni.showToast({
-                            title: err.msg || '登录失败',
+                            title: isTruthy(err.msg) ? err.msg : '登录失败',
                             icon: 'error'
                         });
                     });
@@ -334,7 +338,7 @@ const __sfc__ = defineComponent({
             else {
                 // 短信验证码登录
                 smsformRef.value?.validate().then(res => {
-                    const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/login/login.uvue", 415, 11),
+                    const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/login/login.uvue", 419, 11),
                         phone: smsform.value.phone,
                         code: smsform.value.code,
                         from: deviceModel.value,
@@ -360,6 +364,70 @@ const __sfc__ = defineComponent({
                 });
             }
         };
+        //弹出用户协议弹窗
+        const gotoAgreement = () => {
+            uni.showModal({
+                title: '用户协议',
+                content: userAgreement,
+                showCancel: false,
+            });
+        };
+        //弹出隐私政策弹窗
+        const gotoPrivacy = () => {
+            uni.showModal({
+                title: '隐私政策',
+                content: privacyPolicy,
+                showCancel: false,
+            });
+        };
+        const userAgreement = `
+
+欢迎使用车联网平台！\n
+
+一、服务条款的确认和接纳\n
+本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n
+
+二、服务内容\n
+1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n
+2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n
+
+三、用户账号\n
+用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n
+
+四、用户隐私保护\n
+保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n
+
+五、免责声明\n
+1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n
+2. 对于因不可抗力造成的服务中断，平台不承担责任。\n
+
+六、法律适用\n	
+本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n
+
+如有任何疑问，请联系我们。`;
+        const privacyPolicy = `
+
+车联网平台非常重视您的隐私保护！\n
+
+一、信息收集\n
+1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n
+2. 我们会在您注册、使用服务时收集必要的信息。\n
+
+二、信息使用\n
+1. 我们使用收集的信息来提供、维护和改进服务。\n
+2. 我们不会向第三方出售或分享您的个人信息。\n
+
+三、信息保护 \n
+1. 我们采用行业标准的安全措施保护您的信息。\n
+2. 我们会定期评估安全措施的有效性。\n
+
+四、未成年人保护\n
+我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n
+
+五、政策更新\n
+我们可能会更新隐私政策，更新后的政策将在平台公布。\n
+
+如有任何隐私问题，请联系我们。`;
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
             const _component_uv_input = resolveEasyComponent("uv-input", _easycom_uv_input);
@@ -487,17 +555,25 @@ const __sfc__ = defineComponent({
                                 }), " 个人用户登录 ", 32 /* NEED_HYDRATION */)
                                 : _cC("v-if", true)
                         ]),
-                    _cE("view", _uM({
-                        class: "documents",
-                        onClick: isDocState
-                    }), [
+                    _cE("view", _uM({ class: "documents" }), [
                         _cV(_component_uv_checkbox_group, null, _uM({
                             default: withSlotCtx((): any[] => [
                                 _cV(_component_uv_checkbox, _uM({
                                     checked: docState.value,
                                     onChange: isDocState
                                 }), null, 8 /* PROPS */, ["checked"]),
-                                _cE("view", _uM({ class: "doc-info-box" }), " 已阅读并同意《用户协议》《隐私政策》 ")
+                                _cE("view", _uM({ class: "doc-info-box" }), [
+                                    " 已阅读并同意",
+                                    _cE("text", _uM({
+                                        class: "doc-link",
+                                        onClick: gotoAgreement
+                                    }), "《用户协议》"),
+                                    "和",
+                                    _cE("text", _uM({
+                                        class: "doc-link",
+                                        onClick: gotoPrivacy
+                                    }), "《隐私政策》")
+                                ])
                             ]),
                             _: 1 /* STABLE */
                         }))
@@ -518,5 +594,5 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "100rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "100rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["remember-text", _uM([[".container .content .remember-password ", _uM([["marginLeft", "10rpx"], ["color", "#666666"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["btn-text", _uM([[".container ", _uM([["marginLeft", 10]])]])]])];
+const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "100rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "100rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["remember-text", _uM([[".container .content .remember-password ", _uM([["marginLeft", "10rpx"], ["color", "#666666"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["btn-text", _uM([[".container ", _uM([["marginLeft", 10]])]])]])];
 //# sourceMappingURL=login.uvue.map

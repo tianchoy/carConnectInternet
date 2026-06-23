@@ -50,7 +50,7 @@ const __sfc__ = defineComponent({
             handler(newVal) {
                 this.avatarUrl = newVal;
                 // 如果没有传src，则主动触发error事件，用于显示默认的头像，否则src为''空字符等的时候，会无内容展示
-                if (!newVal) {
+                if (!isTruthy(newVal)) {
                     this.errorHandler();
                 }
             }

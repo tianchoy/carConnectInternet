@@ -80,7 +80,7 @@ class CoordTransform {
         if (!Array.isArray(devices))
             return [];
         return devices.map((device): any => {
-            if (!device)
+            if (!isTruthy(device))
                 return device;
             const lat = Number(device.latitude);
             const lng = Number(device.longitude);

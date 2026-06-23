@@ -115,7 +115,7 @@ function GenUniModulesUvSwitchComponentsUvSwitchUvSwitchRender(this: InstanceTyp
             style: _nS([_ctx.bgStyle])
         }), null, 4 /* STYLE */),
         _cE("view", _uM({
-            class: _nC(["uv-switch__node", [_ctx.innerValue && 'uv-switch__node--on']]),
+            class: _nC(["uv-switch__node", [_ctx.innerValue ? 'uv-switch__node--on' : _ctx.innerValue]]),
             style: _nS([_ctx.nodeStyle]),
             ref: "uv-switch__node"
         }), [

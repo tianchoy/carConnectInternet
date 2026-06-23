@@ -25,7 +25,7 @@ const __sfc__ = defineComponent({
     watch: {
         // 当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
         parentData() {
-            if (this.children.length) {
+            if (isTruthy(this.children.length)) {
                 this.children.map(child => {
                     // 判断子组件(uv-radio)如果有updateParentData方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
                     typeof (child.updateParentData) == 'function' && child.updateParentData();

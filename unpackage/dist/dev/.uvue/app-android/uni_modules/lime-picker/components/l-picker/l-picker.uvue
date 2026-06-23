@@ -94,7 +94,7 @@ const __sfc__ = defineComponent({
             }
         } as WritableComputedOptions<PickerValue[]>);
         const isEmpty = computed((): boolean => {
-            return props.columns.length == 0 && pickerItemInstanceArray.every((child): boolean => child.options.length == 0);
+            return props.columns.length == 0 && pickerItemInstanceArray.every((child, _index, _array): boolean => child.options.length == 0);
         });
         const styles = computed((): Map<string, any> => {
             const style = new Map<string, any>();
@@ -111,7 +111,7 @@ const __sfc__ = defineComponent({
         const curValueArray = ref([...pickerValue.value]);
         const curItemArray: PickerColumnItem[] = [];
         const realColumns = computed((): PickerColumn[] => {
-            const pickerColumns = pickerItemInstanceArray.map((child): PickerColumn => child.options);
+            const pickerColumns = pickerItemInstanceArray.map((child, _index, _array): PickerColumn => child.options);
             if (pickerColumns.length > 0) {
                 return pickerColumns;
             }
@@ -138,7 +138,7 @@ const __sfc__ = defineComponent({
         const updatePickerItems = () => {
             const _indexs: number[] = [];
             const _values: any[] = [];
-            pickerItemInstanceArray.forEach((child, column) => {
+            pickerItemInstanceArray.forEach((child, column, _array) => {
                 if (child.options.length == 0)
                     return;
                 const value = curValueArray.value.length > column ? curValueArray.value[column] : null;
@@ -319,6 +319,6 @@ const __sfc__ = defineComponent({
 });
 export default __sfc__;
 export type LPickerComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesLimePickerComponentsLPickerLPickerStyles = [_uM([["l-picker", _pS(_uM([["position", "relative"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"]]))], ["l-picker__toolbar", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "space-between"], ["overflow", "hidden"], ["height", "116rpx"], ["flexDirection", "row"], ["position", "relative"]]))], ["l-picker__title", _pS(_uM([["position", "absolute"], ["left", "50%"], ["top", "50%"], ["transform", "translateX(-50%) translateY(-50%)"], ["textAlign", "center"], ["overflow", "hidden"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["color", "rgba(0,0,0,0.88)"], ["lineHeight", "52rpx"], ["fontWeight", "700"], ["fontSize", 18]]))], ["l-picker__cancel", _pS(_uM([["fontSize", 16], ["lineHeight", "116rpx"], ["height", "100%"], ["paddingTop", 0], ["paddingRight", "32rpx"], ["paddingBottom", 0], ["paddingLeft", "32rpx"], ["color", "rgba(0,0,0,0.65)"]]))], ["l-picker__confirm", _pS(_uM([["fontSize", 16], ["lineHeight", "116rpx"], ["height", "100%"], ["paddingTop", 0], ["paddingRight", "32rpx"], ["paddingBottom", 0], ["paddingLeft", "32rpx"], ["color", "#3283ff"]]))], ["l-picker__main", _pS(_uM([["display", "flex"], ["height", "400rpx"], ["flexDirection", "row"], ["paddingTop", 0], ["paddingRight", "16rpx"], ["paddingBottom", 0], ["paddingLeft", "16rpx"]]))], ["l-picker__empty", _pS(_uM([["pointerEvents", "none"], ["justifyContent", "center"], ["alignItems", "center"], ["display", "flex"], ["position", "absolute"], ["top", 0], ["bottom", 0], ["left", 0], ["right", 0], ["zIndex", 3]]))], ["l-picker__loading", _pS(_uM([["zIndex", 3], ["backgroundImage", "none"], ["backgroundColor", "rgba(255,255,255,0.9)"], ["justifyContent", "center"], ["alignItems", "center"], ["display", "flex"], ["position", "absolute"], ["top", 0], ["bottom", 0], ["left", 0], ["right", 0]]))]])];
+const GenUniModulesLimePickerComponentsLPickerLPickerStyles = [_uM([["l-picker", _pS(_uM([["position", "relative"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"]]))], ["l-picker__toolbar", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "space-between"], ["overflow", "hidden"], ["height", "116rpx"], ["flexDirection", "row"], ["position", "relative"]]))], ["l-picker__title", _pS(_uM([["position", "absolute"], ["left", "50%"], ["top", "50%"], ["transform", "translateX(-50%) translateY(-50%)"], ["textAlign", "center"], ["overflow", "hidden"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["color", "rgba(0,0,0,0.88)"], ["lineHeight", "52rpx"], ["fontWeight", 700], ["fontSize", 18]]))], ["l-picker__cancel", _pS(_uM([["fontSize", 16], ["lineHeight", "116rpx"], ["height", "100%"], ["paddingTop", 0], ["paddingRight", "32rpx"], ["paddingBottom", 0], ["paddingLeft", "32rpx"], ["color", "rgba(0,0,0,0.65)"]]))], ["l-picker__confirm", _pS(_uM([["fontSize", 16], ["lineHeight", "116rpx"], ["height", "100%"], ["paddingTop", 0], ["paddingRight", "32rpx"], ["paddingBottom", 0], ["paddingLeft", "32rpx"], ["color", "#3283ff"]]))], ["l-picker__main", _pS(_uM([["display", "flex"], ["height", "400rpx"], ["flexDirection", "row"], ["paddingTop", 0], ["paddingRight", "16rpx"], ["paddingBottom", 0], ["paddingLeft", "16rpx"]]))], ["l-picker__empty", _pS(_uM([["pointerEvents", "none"], ["justifyContent", "center"], ["alignItems", "center"], ["display", "flex"], ["position", "absolute"], ["top", 0], ["bottom", 0], ["left", 0], ["right", 0], ["zIndex", 3]]))], ["l-picker__loading", _pS(_uM([["zIndex", 3], ["backgroundImage", "none"], ["backgroundColor", "rgba(255,255,255,0.9)"], ["justifyContent", "center"], ["alignItems", "center"], ["display", "flex"], ["position", "absolute"], ["top", 0], ["bottom", 0], ["left", 0], ["right", 0]]))]])];
 import { LPickerItemComponentPublicInstance } from "@/uni_modules/lime-picker/components/l-picker-item/l-picker-item.uvue";
 //# sourceMappingURL=l-picker.uvue.map

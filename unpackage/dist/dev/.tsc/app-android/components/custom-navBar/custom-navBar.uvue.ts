@@ -7,7 +7,7 @@ const __sfc__ = defineComponent({
 		showBack: { type: Boolean, default: true },
 		backText: { type: String, default: '' },
 		showCapsule: { type: Boolean, default: true },
-		backgroundColor: { type: String, default: '#ffffff' },
+		backgroundColor: { type: String, default: '#f1f1f1' },
 		textColor: { type: String, default: '#000000' },
 		isIcon: { type: Boolean, default: true },
 		Icon: { type: String, default: 'plus-circle' },
@@ -73,9 +73,9 @@ const _component_uv_icon = resolveEasyComponent("uv-icon",_easycom_uv_icon)
 
   return _cE(Fragment, null, [
     _cE("view", _uM({
-      style: _nS(_ctx.isShowStyle?_uM({ height: unref(statusBarHeight) + 'px','background-color':'#fff',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'})
+      style: _nS(_ctx.isShowStyle?_uM({ height: unref(statusBarHeight) + 'px','background-color':'#f1f1f1',position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'})
 		:
-		_uM({ height: unref(statusBarHeight) + 'px','background-color':'#fff',}) )
+		_uM({ height: unref(statusBarHeight) + 'px','background-color':'#f1f1f1',}) )
     }), null, 4 /* STYLE */),
     _cE("view", _uM({
       class: "navbar",
@@ -139,4 +139,4 @@ const _component_uv_icon = resolveEasyComponent("uv-icon",_easycom_uv_icon)
 })
 export default __sfc__
 export type CustomNavBarComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenComponentsCustomNavBarCustomNavBarStyles = [_uM([["navbar", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]]))], ["back-btn", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["width", "70rpx"], ["height", "40rpx"], ["zIndex", 10]]))], ["title", _pS(_uM([["textAlign", "center"], ["fontWeight", "bold"], ["fontSize", "36rpx"]]))], ["capsule", _pS(_uM([["textAlign", "center"]]))], ["capsule-item", _pS(_uM([["width", 40], ["height", "100%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["icon", _pS(_uM([["width", "40rpx"], ["height", "40rpx"]]))], ["menu-icon", _pS(_uM([["width", "60rpx"], ["height", "60rpx"]]))]])]
+const GenComponentsCustomNavBarCustomNavBarStyles = [_uM([["navbar", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]]))], ["back-btn", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["width", "70rpx"], ["height", "40rpx"], ["zIndex", 10], ["justifyContent", "center"]]))], ["title", _pS(_uM([["textAlign", "center"], ["fontWeight", "bold"], ["fontSize", "36rpx"]]))], ["capsule", _pS(_uM([["textAlign", "center"]]))], ["capsule-item", _pS(_uM([["width", 40], ["height", "100%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["icon", _pS(_uM([["width", "40rpx"], ["height", "40rpx"]]))], ["menu-icon", _pS(_uM([["width", "60rpx"], ["height", "60rpx"]]))]])]

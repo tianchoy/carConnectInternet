@@ -310,6 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleGetPhoneNumber = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        console.log("e", e);
         if (!docState.value) {
           common_vendor.index.showToast({
             title: "请先阅读并同意用户协议",

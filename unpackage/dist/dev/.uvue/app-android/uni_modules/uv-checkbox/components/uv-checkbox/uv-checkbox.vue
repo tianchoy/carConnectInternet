@@ -62,11 +62,11 @@ const __sfc__ = defineComponent({
         },
         // 组件尺寸，对应size的值，默认值为21px
         elSize(): number {
-            return this.size ? this.size : (this.parentData.size ? this.parentData.size : 21);
+            return this.size ? this.size : (this.parentData.size != 0 ? this.parentData.size : 21);
         },
         // 组件的勾选图标的尺寸，默认12px
         elIconSize(): number {
-            return this.iconSize ? this.iconSize : (this.parentData.iconSize ? this.parentData.iconSize : 12);
+            return this.iconSize ? this.iconSize : (this.parentData.iconSize != 0 ? this.parentData.iconSize : 12);
         },
         // 组件选中激活时的颜色
         elActiveColor(): string {
@@ -79,15 +79,15 @@ const __sfc__ = defineComponent({
         },
         // label的颜色
         elLabelColor(): string {
-            return this.labelColor ? this.labelColor : (this.parentData.labelColor ? this.parentData.labelColor : '#606266');
+            return this.labelColor ? this.labelColor : (this.parentData.labelColor != "" ? this.parentData.labelColor : '#606266');
         },
         // 组件的形状
         elShape(): string {
-            return this.shape ? this.shape : (this.parentData.shape ? this.parentData.shape : 'circle');
+            return this.shape ? this.shape : (this.parentData.shape != "" ? this.parentData.shape : 'circle');
         },
         // label大小
         elLabelSize() {
-            return this.$uv.addUnit(this.labelSize ? this.labelSize : (this.parentData.labelSize ? this.parentData.labelSize :
+            return this.$uv.addUnit(this.labelSize ? this.labelSize : (this.parentData.labelSize != 0 ? this.parentData.labelSize :
                 '15'));
         },
         elIconColor(): string {
@@ -152,17 +152,17 @@ const __sfc__ = defineComponent({
             }
             this.$nextTick(() => {
                 let parentValue = [];
-                if (this.parentData.value.length) {
+                if (isTruthy(this.parentData.value.length)) {
                     parentValue = this.parentData.value;
                 }
-                else if (this.parentData.modelValue.length) {
+                else if (isTruthy(this.parentData.modelValue.length)) {
                     parentValue = this.parentData.modelValue;
                 }
                 // 设置初始化时，是否默认选中的状态，父组件uv-checkbox-group的value可能是array，所以额外判断
                 if (this.checked) {
                     this.isChecked = true;
                 }
-                else if (this.$uv.test.array(parentValue)) {
+                else if (isTruthy(this.$uv.test.array(parentValue))) {
                     // 查找数组是是否存在this.name元素值
                     this.isChecked = parentValue.some((item): boolean => {
                         return item === this.name;
@@ -257,6 +257,6 @@ function GenUniModulesUvCheckboxComponentsUvCheckboxUvCheckboxRender(this: Insta
     ], 14 /* CLASS, STYLE, PROPS */, ["onClick"]);
 }
 export type UvCheckboxComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUvCheckboxComponentsUvCheckboxUvCheckboxStyles = [_uM([["uv-border-bottom", _pS(_uM([["!borderBottomWidth", 0.5], ["!borderTopColor", "#dadbde"], ["!borderRightColor", "#dadbde"], ["!borderBottomColor", "#dadbde"], ["!borderLeftColor", "#dadbde"], ["borderBottomStyle", "solid"]]))], ["uv-checkbox", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["overflow", "hidden"], ["alignItems", "center"]]))], ["uv-checkbox-label--left", _pS(_uM([["flexDirection", "row"]]))], ["uv-checkbox-label--right", _pS(_uM([["flexDirection", "row-reverse"], ["justifyContent", "space-between"]]))], ["uv-checkbox__icon-wrap", _pS(_uM([["boxSizing", "border-box"], ["transitionProperty", "borderColor,backgroundColor,color"], ["transitionDuration", "0.2s"], ["color", "rgba(0,0,0,0)"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["textAlign", "center"], ["fontSize", 6], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopColor", "#c8c9cc"], ["borderRightColor", "#c8c9cc"], ["borderBottomColor", "#c8c9cc"], ["borderLeftColor", "#c8c9cc"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["uv-checkbox__icon-wrap--square", _pS(_uM([["borderTopLeftRadius", 3], ["borderTopRightRadius", 3], ["borderBottomRightRadius", 3], ["borderBottomLeftRadius", 3]]))], ["uv-checkbox__icon-wrap--checked", _pS(_uM([["color", "#ffffff"], ["backgroundColor", "#FF0000"], ["borderTopColor", "#2979ff"], ["borderRightColor", "#2979ff"], ["borderBottomColor", "#2979ff"], ["borderLeftColor", "#2979ff"]]))], ["uv-checkbox__icon-wrap--disabled", _pS(_uM([["!backgroundColor", "#ebedf0"]]))], ["uv-checkbox__icon-wrap--disabled--checked", _pS(_uM([["!color", "#c8c9cc"]]))], ["uv-checkbox__label", _pS(_uM([["wordWrap", "break-word"], ["marginLeft", 5], ["marginRight", 12], ["color", "#606266"], ["fontSize", 15]]))], ["uv-checkbox__label--disabled", _pS(_uM([["color", "#c8c9cc"]]))], ["uv-checkbox__label-wrap", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingLeft", 6]]))], ["@TRANSITION", _uM([["uv-checkbox__icon-wrap", _uM([["property", "borderColor,backgroundColor,color"], ["duration", "0.2s"]])]])]])];
+const GenUniModulesUvCheckboxComponentsUvCheckboxUvCheckboxStyles = [_uM([["uv-border-bottom", _pS(_uM([["!borderBottomWidth", 0.5], ["!borderTopColor", "#dadbde"], ["!borderRightColor", "#dadbde"], ["!borderBottomColor", "#dadbde"], ["!borderLeftColor", "#dadbde"], ["borderBottomStyle", "solid"]]))], ["uv-checkbox", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["overflow", "hidden"], ["alignItems", "center"]]))], ["uv-checkbox-label--left", _pS(_uM([["flexDirection", "row"]]))], ["uv-checkbox-label--right", _pS(_uM([["flexDirection", "row-reverse"], ["justifyContent", "space-between"]]))], ["uv-checkbox__icon-wrap", _pS(_uM([["boxSizing", "border-box"], ["transitionProperty", "borderColor,backgroundColor,color"], ["transitionDuration", "0.2s"], ["color", "rgba(0,0,0,0)"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["textAlign", "center"], ["fontSize", 6], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopColor", "#c8c9cc"], ["borderRightColor", "#c8c9cc"], ["borderBottomColor", "#c8c9cc"], ["borderLeftColor", "#c8c9cc"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["uv-checkbox__icon-wrap--circle", _pS(_uM([["borderTopLeftRadius", "100%"], ["borderTopRightRadius", "100%"], ["borderBottomRightRadius", "100%"], ["borderBottomLeftRadius", "100%"]]))], ["uv-checkbox__icon-wrap--square", _pS(_uM([["borderTopLeftRadius", 3], ["borderTopRightRadius", 3], ["borderBottomRightRadius", 3], ["borderBottomLeftRadius", 3]]))], ["uv-checkbox__icon-wrap--checked", _pS(_uM([["color", "#ffffff"], ["backgroundColor", "#FF0000"], ["borderTopColor", "#2979ff"], ["borderRightColor", "#2979ff"], ["borderBottomColor", "#2979ff"], ["borderLeftColor", "#2979ff"]]))], ["uv-checkbox__icon-wrap--disabled", _pS(_uM([["!backgroundColor", "#ebedf0"]]))], ["uv-checkbox__icon-wrap--disabled--checked", _pS(_uM([["!color", "#c8c9cc"]]))], ["uv-checkbox__label", _pS(_uM([["wordWrap", "break-word"], ["marginLeft", 5], ["marginRight", 12], ["color", "#606266"], ["fontSize", 15]]))], ["uv-checkbox__label--disabled", _pS(_uM([["color", "#c8c9cc"]]))], ["uv-checkbox__label-wrap", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingLeft", 6]]))], ["@TRANSITION", _uM([["uv-checkbox__icon-wrap", _uM([["property", "borderColor,backgroundColor,color"], ["duration", "0.2s"]])]])]])];
 import _easycom_uv_icon from '@/uni_modules/uv-icon/components/uv-icon/uv-icon.vue';
 //# sourceMappingURL=uv-checkbox.vue.map

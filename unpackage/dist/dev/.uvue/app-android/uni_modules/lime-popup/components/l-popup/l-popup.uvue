@@ -115,9 +115,9 @@ const __sfc__ = defineComponent({
         } as UseTransitionOptions);
         const overlayZIndex = computed((): number => props.zIndex > 0 ? props.zIndex - 1 : 998);
         const rootClass = computed((): string => {
-            const safe = props.safeAreaInsetTop && props.position == 'top'
+            const safe = isTruthy(props.safeAreaInsetTop) && props.position == 'top'
                 ? 'l-popup--safe-top'
-                : props.safeAreaInsetBottom && props.position == 'bottom'
+                : isTruthy(props.safeAreaInsetBottom) && props.position == 'bottom'
                     ? 'l-popup--safe-bottom'
                     : '';
             return `l-popup--${props.position} ${safe} ${classes.value}`;
@@ -148,7 +148,7 @@ const __sfc__ = defineComponent({
             return style;
         });
         const handleOverlayClick = () => {
-            if (props.closeOnClickOverlay) {
+            if (isTruthy(props.closeOnClickOverlay)) {
                 innerValue.value = false;
                 emit('click-overlay');
             }
@@ -175,7 +175,7 @@ const __sfc__ = defineComponent({
             const _component_l_overlay = resolveEasyComponent("l-overlay", _easycom_l_overlay);
             const _component_l_icon = resolveEasyComponent("l-icon", _easycom_l_icon);
             return _cE(Fragment, null, [
-                isTrue(_ctx.destroyOnClose ? unref(display) && _ctx.overlay : _ctx.overlay)
+                isTrue(isTruthy(_ctx.destroyOnClose) ? unref(display) ? _ctx.overlay : unref(display) : _ctx.overlay)
                     ? _cV(_component_l_overlay, _uM({
                         key: 0,
                         visible: unref(innerValue),
@@ -186,7 +186,7 @@ const __sfc__ = defineComponent({
                         onClick: handleOverlayClick
                     }), null, 8 /* PROPS */, ["visible", "zIndex", "preventScrollThrough", "l-style"])
                     : _cC("v-if", true),
-                isTrue(_ctx.destroyOnClose ? unref(display) : unref(inited))
+                isTrue(isTruthy(_ctx.destroyOnClose) ? unref(display) : unref(inited))
                     ? _cE("view", _uM({
                         key: 1,
                         class: _nC(["l-popup", unref(rootClass)]),

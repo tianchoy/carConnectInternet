@@ -86,7 +86,7 @@ const __sfc__ = defineComponent({
         icon(): any {
             // 如果内置的图标中找不到对应的图标，就直接返回name值，因为用户可能传入的是unicode代码
             const code = icons['uvicon-' + this.name];
-            return code ? unescape(`%u${code}`) : ['uvicon'].indexOf(this.customPrefix) > -1 ? this.name : '';
+            return isTruthy(code) ? unescape(`%u${code}`) : ['uvicon'].indexOf(this.customPrefix) > -1 ? this.name : '';
         }
     },
     methods: {

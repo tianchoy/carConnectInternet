@@ -2004,6 +2004,9 @@ var protocols$1 = /* @__PURE__ */ Object.freeze({
   request
 });
 function parseXReturnValue(methodName, res) {
+  if (isObject(res) && hasOwn(res, "errno")) {
+    res.errCode = res.errno;
+  }
   const protocol = protocols$1[methodName];
   if (protocol && isFunction(protocol.returnValue)) {
     return protocol.returnValue(res);
@@ -2166,14 +2169,18 @@ function getOSInfo(system, platform) {
   if (platform && false) {
     osName = platform;
     osVersion = system;
+    system = `${osName} ${osVersion}`;
   } else {
-    osName = system.split(" ")[0] || platform;
+    {
+      osName = platform;
+    }
     osVersion = system.split(" ")[1] || "";
   }
   osName = osName.toLowerCase();
   switch (osName) {
     case "harmony":
     case "ohos":
+    case "openharmonyos":
     case "openharmony":
       osName = "harmonyos";
       break;
@@ -2190,12 +2197,22 @@ function getOSInfo(system, platform) {
   }
   return {
     osName,
-    osVersion
+    osVersion,
+    system
   };
+}
+function getPlatform(platform) {
+  platform = platform.toLowerCase();
+  {
+    if (platform === "ohos") {
+      platform = "harmonyos";
+    }
+  }
+  return platform;
 }
 function populateParameters(fromRes, toRes) {
   const { brand = "", model = "", system = "", language = "", theme, version: version2, platform, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
-  const { osName, osVersion } = getOSInfo(system, platform);
+  const { osName, osVersion, system: updatedSystem } = getOSInfo(system, platform);
   let hostVersion = version2;
   let deviceType = getGetDeviceType(fromRes, model);
   let deviceBrand = getDeviceBrand(brand);
@@ -2210,9 +2227,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.08",
-    uniCompilerVersion: "5.08",
-    uniRuntimeVersion: "5.08",
+    uniCompileVersion: "5.13",
+    uniCompilerVersion: "5.13",
+    uniRuntimeVersion: "5.13",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -2229,6 +2246,8 @@ function populateParameters(fromRes, toRes) {
     hostFontSizeSetting: fontSizeSetting,
     windowTop: 0,
     windowBottom: 0,
+    platform: getPlatform(platform),
+    system: updatedSystem,
     // TODO
     osLanguage: void 0,
     osTheme: void 0,
@@ -2240,20 +2259,23 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.08");
-      parameters.uniRuntimeVersionCode = parseFloat("5.08");
+      parameters.uniCompilerVersionCode = parseFloat("5.13");
+      parameters.uniRuntimeVersionCode = parseFloat("5.13");
     } catch (error) {
     }
   }
   extend(toRes, parameters);
 }
 function getGetDeviceType(fromRes, model) {
+  const platform = fromRes.platform || "";
   let deviceType = fromRes.deviceType || "phone";
   {
     const deviceTypeMaps = {
       ipad: "pad",
       windows: "pc",
-      mac: "pc"
+      mac: "pc",
+      linux: "pc",
+      pc: "pc"
     };
     const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
     const _model = model.toLowerCase();
@@ -2263,6 +2285,11 @@ function getGetDeviceType(fromRes, model) {
         deviceType = deviceTypeMaps[_m];
         break;
       }
+    }
+  }
+  {
+    if (platform === "ohos_pc") {
+      deviceType = "pc";
     }
   }
   return deviceType;
@@ -2346,7 +2373,8 @@ const getDeviceInfo = {
       deviceBrand,
       deviceModel: model,
       osName,
-      osVersion
+      osVersion,
+      platform: getPlatform(platform)
     });
   }
 };
@@ -2368,14 +2396,20 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.08",
-      uniCompilerVersion: "5.08",
-      uniRuntimeVersion: "5.08"
+      uniCompileVersion: "5.13",
+      uniCompilerVersion: "5.13",
+      uniRuntimeVersion: "5.13"
     };
+    try {
+      if (typeof wx.getAccountInfoSync === "function") {
+        parameters.packagename = wx.getAccountInfoSync().miniProgram.appId;
+      }
+    } catch (error) {
+    }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.08");
-        parameters.uniRuntimeVersionCode = parseFloat("5.08");
+        parameters.uniCompilerVersionCode = parseFloat("5.13");
+        parameters.uniRuntimeVersionCode = parseFloat("5.13");
       } catch (error) {
       }
     }
@@ -7507,11 +7541,12 @@ class UniAnimation {
     toRaw(this.scope).setData({
       ["$eA." + this.id]: JSON.stringify({
         id: this.id,
-        playState: "cancel",
+        playState: "idle",
         keyframes: this.parsedKeyframes,
         options: this.options
       })
     });
+    this._playState = "idle";
   }
   finish() {
     throw new Error("finish not implemented.");
@@ -7528,6 +7563,7 @@ class UniAnimation {
         options: this.options
       })
     });
+    this._playState = "running";
   }
 }
 function handleDirection(keyframes, direction) {
@@ -7638,6 +7674,10 @@ class UniElement {
     this.dataset = {};
     this.offsetTop = NaN;
     this.offsetLeft = NaN;
+    this.scrollTop = NaN;
+    this.scrollLeft = NaN;
+    this.scrollHeight = NaN;
+    this.scrollWidth = NaN;
     this.id = id;
     this.tagName = name.toUpperCase();
     this.nodeName = this.tagName;
@@ -7882,7 +7922,7 @@ function initMiniProgramNode(uniElement, ins) {
   if (uniElement.tagName === "SCROLL-VIEW") {
     uniElement.$node = new Promise((resolve2) => {
       setTimeout(() => {
-        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true }, (res) => {
+        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true, scrollOffset: true }, (res) => {
           const node = res.node;
           resolve2(node);
           uniElement.$node = {
@@ -7890,10 +7930,24 @@ function initMiniProgramNode(uniElement, ins) {
               fn(node);
             }
           };
+          setUniElementScrollOffset(uniElement, res);
         }).exec();
       }, 2);
     });
   }
+}
+function setUniElementScrollOffset(uniElement, res) {
+  const properties = [
+    "scrollTop",
+    "scrollLeft",
+    "scrollHeight",
+    "scrollWidth"
+  ];
+  properties.forEach((prop) => {
+    if (res[prop] !== void 0) {
+      uniElement[prop] = res[prop];
+    }
+  });
 }
 function vOn(value, key) {
   const instance = getCurrentInstance();

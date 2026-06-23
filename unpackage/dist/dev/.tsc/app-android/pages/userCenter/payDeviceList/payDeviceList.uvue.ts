@@ -52,7 +52,7 @@ const _cache = __ins.renderCache;
 
 		loading.value = true
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 92, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 96, 10),
 				page: currPage.value,
 				pageSize: pageSize.value
 			}
@@ -84,7 +84,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:124")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:128")
 			uni.showToast({
 				title: '加载失败，请重试',
 				icon: 'none'
@@ -106,7 +106,7 @@ const _cache = __ins.renderCache;
 		}
 		// iccid = iccid.substring(0,iccid.length-1)
 		
-		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:146")
+		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:150")
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		
@@ -117,11 +117,11 @@ const _cache = __ins.renderCache;
 			envVersion: 'release',
 			success(res) {
 				// 打开成功
-				console.log('打开小程序成功', res, " at pages/userCenter/payDeviceList/payDeviceList.uvue:157")
+				console.log('打开小程序成功', res, " at pages/userCenter/payDeviceList/payDeviceList.uvue:161")
 			},
 			fail(res) {
 				// 打开失败
-				console.log('打开小程序失败', res, " at pages/userCenter/payDeviceList/payDeviceList.uvue:161")
+				console.log('打开小程序失败', res, " at pages/userCenter/payDeviceList/payDeviceList.uvue:165")
 				// 如果打开失败，取消刷新标志
 				needRefresh.value = false
 				uni.showToast({
@@ -167,12 +167,26 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
           }), [
             _cE("view", _uM({ class: "device-info" }), [
               _cE("view", _uM({ class: "label title" }), _tD(item.deviceName), 1 /* TEXT */),
-              _cE("view", _uM({ class: "value" }), _tD(item.plateNo), 1 /* TEXT */)
+              _cE("view", _uM({ class: "value" }))
             ]),
-            _cE("view", _uM({ class: "device-info" }), [
-              _cE("view", _uM({ class: "label" }), "ICCID:"),
-              _cE("view", _uM({ class: "value" }), _tD(item.iccid), 1 /* TEXT */)
-            ]),
+            isTrue(item.iccid)
+              ? _cE("view", _uM({
+                  key: 0,
+                  class: "device-info"
+                }), [
+                  _cE("view", _uM({ class: "label" }), "ICCID:"),
+                  _cE("view", _uM({ class: "value" }), _tD(item.iccid), 1 /* TEXT */)
+                ])
+              : _cC("v-if", true),
+            isTrue(item.imei && item.imei != '')
+              ? _cE("view", _uM({
+                  key: 1,
+                  class: "device-info"
+                }), [
+                  _cE("view", _uM({ class: "label" }), "ID:"),
+                  _cE("view", _uM({ class: "value" }), _tD(item.imei), 1 /* TEXT */)
+                ])
+              : _cC("v-if", true),
             _cE("view", _uM({ class: "device-info" }), [
               _cE("view"),
               _cE("text", _uM({

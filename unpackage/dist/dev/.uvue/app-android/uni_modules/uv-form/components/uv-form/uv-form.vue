@@ -45,7 +45,7 @@ const __sfc__ = defineComponent({
         },
         // 监听属性的变化，通知子组件uv-form-item重新获取信息
         propsChange(n) {
-            if (this.children?.length) {
+            if (isTruthy(this.children?.length)) {
                 this.children.map((child) => {
                     // 判断子组件(uv-form-item)如果有updateParentData方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
                     typeof child.updateParentData == "function" &&
@@ -113,7 +113,7 @@ const __sfc__ = defineComponent({
             props = [].concat(props);
             this.children.map((child) => {
                 // 如果uv-form-item的prop在props数组中，则清除对应的校验结果信息
-                if (props[0] === undefined || props.includes(child.prop)) {
+                if (props[0] === undefined || isTruthy(props.includes(child.prop))) {
                     child.message = null;
                 }
             });
@@ -130,7 +130,7 @@ const __sfc__ = defineComponent({
                 this.children.map((child) => {
                     // 用于存放form-item的错误信息
                     const childErrors = [];
-                    if (value.includes(child.prop)) {
+                    if (isTruthy(value.includes(child.prop))) {
                         // 获取对应的属性，通过类似'a.b.c'的形式
                         const propertyVal = this.$uv.getProperty(this.model, child.prop);
                         // 属性链数组
@@ -138,7 +138,7 @@ const __sfc__ = defineComponent({
                         const propertyName = propertyChain[propertyChain.length - 1];
                         const rule = this.formRules[child.prop];
                         // 如果不存在对应的规则，直接返回，否则校验器会报错
-                        if (!rule)
+                        if (!isTruthy(rule))
                             return;
                         // rule规则可为数组形式，也可为对象形式，此处拼接成为数组
                         const rules = [].concat(rule);
@@ -157,12 +157,12 @@ const __sfc__ = defineComponent({
                             validator.validate({
                                 [propertyName]: propertyVal,
                             }, (errors, fields) => {
-                                if (this.$uv.test.array(errors)) {
+                                if (isTruthy(this.$uv.test.array(errors))) {
                                     errorsRes.push(...errors);
                                     childErrors.push(...errors);
                                 }
                                 this.$nextTick(() => {
-                                    child.message = childErrors[0]?.message ? childErrors[0]?.message : null;
+                                    child.message = isTruthy(childErrors[0]?.message) ? childErrors[0]?.message : null;
                                 });
                             });
                         }
@@ -180,7 +180,7 @@ const __sfc__ = defineComponent({
                     // 获取所有form-item的prop，交给validateField方法进行校验
                     const formItemProps = this.children.map((item): any => item.prop);
                     this.validateField(formItemProps, (errors) => {
-                        if (errors.length) {
+                        if (isTruthy(errors.length)) {
                             // 如果错误提示方式为toast，则进行提示
                             this.errorType === 'toast' && this.$uv.toast(errors[0].message);
                             reject(errors);

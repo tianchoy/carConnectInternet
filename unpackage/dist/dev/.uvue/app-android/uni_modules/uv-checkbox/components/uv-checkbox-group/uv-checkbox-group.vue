@@ -33,10 +33,10 @@ const __sfc__ = defineComponent({
         // 拉取父组件新的变化后的参数
         parentData(): never[][] {
             let value = [];
-            if (this.value.length) {
+            if (isTruthy(this.value.length)) {
                 value = this.value;
             }
-            else if (this.modelValue.length) {
+            else if (isTruthy(this.modelValue.length)) {
                 value = this.modelValue;
             }
             return [value, this.disabled, this.inactiveColor, this.activeColor, this.size, this.labelDisabled, this.shape,
@@ -50,7 +50,7 @@ const __sfc__ = defineComponent({
     watch: {
         // 当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
         parentData() {
-            if (this.children.length) {
+            if (isTruthy(this.children.length)) {
                 this.children.map(child => {
                     // 判断子组件(uv-checkbox)如果有init方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
                     typeof (child.init) === 'function' && child.init();
@@ -70,7 +70,7 @@ const __sfc__ = defineComponent({
             const values = [];
             this.children.map(child => {
                 // 将被选中的checkbox，放到数组中返回
-                if (child.isChecked) {
+                if (isTruthy(child.isChecked)) {
                     values.push(child.name);
                 }
             });

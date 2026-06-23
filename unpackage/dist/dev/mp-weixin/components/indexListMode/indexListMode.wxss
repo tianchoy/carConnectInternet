@@ -64,7 +64,7 @@
   align-items: center;
   gap: 10rpx;
 }
-.list-container .content .list-item .imei text {
+.list-container .content .list-item .imei {
   color: #ccc;
 }
 .list-container .empty {

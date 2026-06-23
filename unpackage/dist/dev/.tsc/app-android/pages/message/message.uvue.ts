@@ -259,7 +259,7 @@ const _cache = __ins.renderCache;
 					const newData = data.list || []
 					console.log('即将添加的新数据长度:', newData.length, " at pages/message/message.uvue:298")
 					
-					// 去重处理：基于 messageId
+					// 去重
 					const existingIds = new Set(msgList.value.map(item => item.messageId))
 					const uniqueNewData = newData.filter((item: UTSJSONObject) => !existingIds.has(item.messageId))
 					
@@ -370,7 +370,7 @@ const _component_uv_modal = resolveEasyComponent("uv-modal",_easycom_uv_modal)
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
       title: "消息中心",
-      "show-back": false,
+      "show-back": true,
       backgroundColor: "#fff",
       textColor: "#333",
       showCapsule: false,
