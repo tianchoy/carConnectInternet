@@ -6,7 +6,7 @@
                     <view class="current-car">
                         <view v-if="checkToken()">
                             <text v-if="currentCarName" class="car-id" @click="handlePicker">{{currentCarName ?? '加载中…'}}</text>
-                            <text v-else class="car-id" @click="handlePicker">暂无设备</text>
+                            <text v-else class="car-id">暂无设备</text>
                         </view>
                         <text v-else class="login" @click="gotoLogin">点击登录!</text>
                     </view>
