@@ -148,15 +148,14 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
 
 // 封装uni.request
 function request<T = any>(options: RequestOptions): Promise<T> {
-
     // 合并配置
     const config: RequestOptions = {
+        ...options,
         url: options.url,
         method: options.method || 'GET',
         data: options.data || {},
         header: options.header || {},
         showLoading: options.showLoading !== false,
-        // ...options
     }
     
     // 处理完整URL
@@ -197,25 +196,26 @@ function request<T = any>(options: RequestOptions): Promise<T> {
 const http = {
     get<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
         return request<T>({
+            ...options,
             url,
             data,
             method: 'GET',
-            ...options
         })
     },
     
     post<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
-        console.log('POST请求数据:',url, data)
         return request<T>({
+            ...options,
             url,
             data,
             method: 'POST',
-            ...options
+            
         })
     },
     
     put<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
         return request<T>({
+            ...options,
             url,
             data,
             method: 'PUT',
@@ -225,10 +225,11 @@ const http = {
     
     delete<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
         return request<T>({
+            ...options,
             url,
             data,
             method: 'DELETE',
-            ...options
+
         })
     },
     

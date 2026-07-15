@@ -1,0 +1,79 @@
+<template>
+  <view class="i-card i-center"
+    ><text class="i-title">{{ title }}</text
+    ><text class="i-muted">{{ description }}</text
+    ><view class="i-btn" @click="emit('retry')"
+      ><text class="i-btn-text">重试</text></view
+    ></view
+  >
+</template>
+<script setup lang="uts">
+defineOptions({ name: 'i-no-network' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - title: 主标题文本，用于组件顶部或主要说明位置。
+ * - description: 辅助描述文本，用于补充说明当前组件内容。
+ */
+const props = defineProps({
+  title: { type: String, default: '网络不可用' },
+  description: { type: String, default: '请检查网络连接后重试。' },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - retry: 点击重试按钮时触发。
+ */
+const emit = defineEmits(['retry'])
+</script>
+<style>
+.i-card {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+.i-center {
+  align-items: center;
+}
+</style>

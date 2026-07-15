@@ -1,0 +1,342 @@
+<template>
+  <view
+    class="i-fab"
+    :style="fabStyle"
+    @touchstart.stop="handleTouchStart"
+    @touchmove.stop.prevent="handleTouchMove"
+    @touchend.stop="handleTouchEnd"
+    @click="handleClick"
+    @longpress="handleLongPress"
+  >
+    <slot>
+      <view v-if="icon == '+'" class="i-fab__plus">
+        <view class="i-fab__plus-line" :style="plusLineStyle"></view>
+        <view class="i-fab__plus-line i-fab__plus-line--vertical" :style="plusLineStyle"></view>
+      </view>
+      <text v-else class="i-fab__default-icon" :style="iconStyle">{{ icon }}</text>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-fab' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x floating button 浮球。
+ * - duration: 松手后吸附动画时长，单位 ms。
+ * - threshold: 左右边界安全距离，单位 px；吸附到两侧时保留这个距离。
+ * - thresholdTop: 顶部安全距离，单位 px。
+ * - thresholdBottom: 底部安全距离，单位 px。
+ * - round: 圆角，支持数字、px、rpx；默认 64，通常配合 50px 尺寸形成圆形。
+ * - offset: 当前坐标，支持 v-model:offset；预设 [-1,-1] 右下、[-2,-2] 左下、[-3,-3] 左上、[-4,-4] 右上、[-5,-5] 底部居中。
+ * - bgColor: 背景色，支持普通颜色和 linear-gradient 渐变。
+ * - width: 浮球宽度，支持数字、px、rpx。
+ * - height: 浮球高度，支持数字、px、rpx。
+ * - adsorption: 是否开启左右吸附；false 时松手后停留在释放位置。
+ * - disabled: 是否禁止拖动。
+ * - zIndex: 浮球层级。
+ * - icon/color: 本项目兼容默认插槽图标；传入默认 slot 时可完全自定义内容。
+ */
+const props = defineProps({
+  duration: { type: Number, default: 650 },
+  threshold: { type: Number, default: 12 },
+  thresholdTop: { type: Number, default: 0 },
+  thresholdBottom: { type: Number, default: 12 },
+  round: { type: [String, Number], default: '64' },
+  offset: {
+    type: Array,
+    default() {
+      return [-1, -1]
+    },
+  },
+  bgColor: { type: String, default: '' },
+  width: { type: [String, Number], default: '50px' },
+  height: { type: [String, Number], default: '50px' },
+  adsorption: { type: Boolean, default: true },
+  disabled: { type: Boolean, default: false },
+  zIndex: { type: Number, default: 87 },
+  icon: { type: String, default: '+' },
+  color: { type: String, default: '#ffffff' },
+})
+
+/**
+ * Emits 说明：浮球点击、长按、拖动坐标变化与 v-model 同步。
+ * - click: 点击浮球时触发；拖动后的 click 会被过滤。
+ * - longpress: 长按浮球超过平台 longpress 阈值时触发。
+ * - change: 坐标变化时触发，参数为 [x, y]。
+ * - update:offset: 同步当前坐标，支持 v-model:offset。
+ */
+const emit = defineEmits(['click', 'longpress', 'change', 'update:offset'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const x = ref(0)
+const y = ref(0)
+const startClientX = ref(0)
+const startClientY = ref(0)
+const startX = ref(0)
+const startY = ref(0)
+const moving = ref(false)
+const moved = ref(false)
+const windowWidth = ref(375)
+const windowHeight = ref(667)
+
+const fabStyle = computed(() => {
+  const bg = bgColor.value.length > 0 ? bgColor.value : '#1296f7'
+  const transition = moving.value ? '0ms' : String(props.duration) + 'ms'
+  return (
+    'left:' +
+    String(Math.round(x.value)) +
+    'px;top:' +
+    String(Math.round(y.value)) +
+    'px;width:' +
+    formatSize(props.width) +
+    ';height:' +
+    formatSize(props.height) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';background:' +
+    bg +
+    ';z-index:' +
+    String(props.zIndex) +
+    ';transition-duration:' +
+    transition +
+    ';'
+  )
+})
+
+const iconStyle = computed(() => {
+  return (
+    'color:' +
+    props.color +
+    ';width:' +
+    formatSize(props.width) +
+    ';height:' +
+    formatSize(props.height) +
+    ';line-height:' +
+    formatSize(props.height) +
+    ';'
+  )
+})
+
+const plusLineStyle = computed(() => {
+  return 'background-color:' + props.color + ';'
+})
+
+watch(
+  () => props.offset,
+  () => {
+    applyOffset()
+  },
+)
+
+onMounted(() => {
+  refreshWindowInfo()
+  nextTick(() => {
+    applyOffset()
+  })
+})
+
+function refreshWindowInfo() {
+  if (typeof window != 'undefined') {
+    windowWidth.value = Number(window.innerWidth)
+    windowHeight.value = Number(window.innerHeight)
+    return
+  }
+  const info = uni.getWindowInfo()
+  windowWidth.value = Number(info.windowWidth)
+  windowHeight.value = Number(info.windowHeight)
+}
+
+function applyOffset() {
+  refreshWindowInfo()
+  const next = resolveOffset(props.offset)
+  x.value = next[0]
+  y.value = next[1]
+}
+
+function resolveOffset(value) {
+  const first = offsetValue(value, 0)
+  const second = offsetValue(value, 1)
+  const widthValue = numericSize(props.width)
+  const heightValue = numericSize(props.height)
+
+  if (first == -1 && second == -1) return [rightX(widthValue), bottomY(heightValue)]
+  if (first == -2 && second == -2) return [leftX(), bottomY(heightValue)]
+  if (first == -3 && second == -3) return [leftX(), topY()]
+  if (first == -4 && second == -4) return [rightX(widthValue), topY()]
+  if (first == -5 && second == -5) return [centerX(widthValue), bottomY(heightValue)]
+
+  return [clampX(first, widthValue), clampY(second, heightValue)]
+}
+
+function offsetValue(value, index): number {
+  if (value == null || value.length <= index) return 0
+  const numberValue = Number(value[index])
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function leftX(): number {
+  return Number(props.threshold)
+}
+
+function rightX(widthValue: number): number {
+  return windowWidth.value - widthValue - Number(props.threshold)
+}
+
+function centerX(widthValue: number): number {
+  return (windowWidth.value - widthValue) / 2
+}
+
+function topY(): number {
+  return Number(props.thresholdTop)
+}
+
+function bottomY(heightValue: number): number {
+  return windowHeight.value - heightValue - Number(props.thresholdBottom)
+}
+
+function clampX(value: number, widthValue: number): number {
+  const min = leftX()
+  const max = rightX(widthValue)
+  if (value < min) return min
+  if (value > max) return max
+  return value
+}
+
+function clampY(value: number, heightValue: number): number {
+  const min = topY()
+  const max = bottomY(heightValue)
+  if (value < min) return min
+  if (value > max) return max
+  return value
+}
+
+function handleTouchStart(event) {
+  if (props.disabled) return
+  refreshWindowInfo()
+  const point = readTouch(event)
+  startClientX.value = point[0]
+  startClientY.value = point[1]
+  startX.value = x.value
+  startY.value = y.value
+  moving.value = true
+  moved.value = false
+}
+
+function handleTouchMove(event) {
+  if (props.disabled) return
+  const point = readTouch(event)
+  const widthValue = numericSize(props.width)
+  const heightValue = numericSize(props.height)
+  const nextX = clampX(startX.value + point[0] - startClientX.value, widthValue)
+  const nextY = clampY(startY.value + point[1] - startClientY.value, heightValue)
+  x.value = nextX
+  y.value = nextY
+  moved.value = true
+  emitOffset()
+}
+
+function handleTouchEnd() {
+  if (props.disabled) return
+  moving.value = false
+  if (props.adsorption) {
+    const widthValue = numericSize(props.width)
+    const middle = windowWidth.value / 2
+    const center = x.value + widthValue / 2
+    x.value = center < middle ? leftX() : rightX(widthValue)
+  }
+  emitOffset()
+  setTimeout(() => {
+    moved.value = false
+  }, 120)
+}
+
+function handleClick() {
+  if (moved.value) return
+  emit('click')
+}
+
+function handleLongPress() {
+  emit('longpress')
+}
+
+function emitOffset() {
+  const value = [Math.round(x.value), Math.round(y.value)]
+  emit('change', value)
+  emit('update:offset', value)
+}
+
+function readTouch(event) {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return [0, 0]
+  return [Number(point.clientX), Number(point.clientY)]
+}
+
+function numericSize(value): number {
+  const text = String(value)
+  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+defineExpose({ applyOffset })
+</script>
+
+<style>
+.i-fab {
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition-property: left, top;
+  transition-timing-function: ease-out;
+  box-shadow: 0 8px 22px rgba(18, 150, 247, 0.28);
+}
+
+.i-fab__default-icon {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+}
+
+.i-fab__plus {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.i-fab__plus-line {
+  position: absolute;
+  left: 1px;
+  top: 9px;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.i-fab__plus-line--vertical {
+  left: 9px;
+  top: 1px;
+  width: 2px;
+  height: 18px;
+}
+</style>

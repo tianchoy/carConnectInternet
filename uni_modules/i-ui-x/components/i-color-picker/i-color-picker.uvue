@@ -1,0 +1,1452 @@
+<template>
+  <view class="i-color-picker">
+    <view class="i-color-picker__tabs">
+      <view
+        :class="
+          activeMode == 'rgb'
+            ? 'i-color-picker__tab i-color-picker__tab--active'
+            : 'i-color-picker__tab'
+        "
+        @click="setActiveMode('rgb')"
+      >
+        <text
+          :class="
+            activeMode == 'rgb'
+              ? 'i-color-picker__tab-text i-color-picker__tab-text--active'
+              : 'i-color-picker__tab-text'
+          "
+          >RGB</text
+        >
+      </view>
+      <view
+        :class="
+          activeMode == 'spectrum'
+            ? 'i-color-picker__tab i-color-picker__tab--active'
+            : 'i-color-picker__tab'
+        "
+        @click="setActiveMode('spectrum')"
+      >
+        <text
+          :class="
+            activeMode == 'spectrum'
+              ? 'i-color-picker__tab-text i-color-picker__tab-text--active'
+              : 'i-color-picker__tab-text'
+          "
+          >光谱</text
+        >
+      </view>
+      <view
+        :class="
+          activeMode == 'card'
+            ? 'i-color-picker__tab i-color-picker__tab--active'
+            : 'i-color-picker__tab'
+        "
+        @click="setActiveMode('card')"
+      >
+        <text
+          :class="
+            activeMode == 'card'
+              ? 'i-color-picker__tab-text i-color-picker__tab-text--active'
+              : 'i-color-picker__tab-text'
+          "
+          >色卡</text
+        >
+      </view>
+    </view>
+
+    <view v-if="activeMode == 'rgb'" class="i-color-picker__rgb">
+      <view class="i-color-picker__rgb-row">
+        <text class="i-color-picker__rgb-label i-color-picker__rgb-label--red"
+          >R</text
+        >
+        <slider
+          class="i-color-picker__rgb-slider"
+          :value="redValue"
+          :min="0"
+          :max="255"
+          :step="1"
+          :disabled="disabled"
+          activeColor="#ff4d4f"
+          backgroundColor="#eef0f4"
+          @changing="handleRgbChanging('r', $event)"
+          @change="handleRgbChange('r', $event)"
+        />
+        <text class="i-color-picker__rgb-value">{{ redValue }}</text>
+      </view>
+      <view class="i-color-picker__rgb-row">
+        <text
+          class="i-color-picker__rgb-label i-color-picker__rgb-label--green"
+          >G</text
+        >
+        <slider
+          class="i-color-picker__rgb-slider"
+          :value="greenValue"
+          :min="0"
+          :max="255"
+          :step="1"
+          :disabled="disabled"
+          activeColor="#19be6b"
+          backgroundColor="#eef0f4"
+          @changing="handleRgbChanging('g', $event)"
+          @change="handleRgbChange('g', $event)"
+        />
+        <text class="i-color-picker__rgb-value">{{ greenValue }}</text>
+      </view>
+      <view class="i-color-picker__rgb-row">
+        <text
+          class="i-color-picker__rgb-label i-color-picker__rgb-label--blue"
+          >B</text
+        >
+        <slider
+          class="i-color-picker__rgb-slider"
+          :value="blueValue"
+          :min="0"
+          :max="255"
+          :step="1"
+          :disabled="disabled"
+          activeColor="#2979ff"
+          backgroundColor="#eef0f4"
+          @changing="handleRgbChanging('b', $event)"
+          @change="handleRgbChange('b', $event)"
+        />
+        <text class="i-color-picker__rgb-value">{{ blueValue }}</text>
+      </view>
+    </view>
+
+    <view v-if="activeMode == 'spectrum'" class="i-color-picker__spectrum">
+      <view :id="panelId" class="i-color-picker__panel" :style="panelStyle">
+        <view class="i-color-picker__panel-grid">
+          <view
+            v-for="row in panelRows"
+            :key="row"
+            class="i-color-picker__panel-row"
+            :style="panelRowStyle"
+          >
+            <view
+              v-for="column in panelColumns"
+              :key="column"
+              class="i-color-picker__panel-cell"
+              :style="getPanelCellStyle(row, column)"
+            ></view>
+          </view>
+        </view>
+        <view
+          class="i-color-picker__panel-touch"
+          @touchstart.stop.prevent="handlePanelTouchStart"
+          @touchmove.stop.prevent="handlePanelTouchMove"
+          @touchend="handlePanelTouchEnd"
+          @click="handlePanelClick"
+        ></view>
+        <view class="i-color-picker__indicator" :style="indicatorStyle"></view>
+      </view>
+    </view>
+
+    <view v-if="activeMode == 'card'" class="i-color-picker__card">
+      <view class="i-color-picker__card-grid">
+        <view
+          v-for="row in cardRows"
+          :key="row"
+          class="i-color-picker__card-row"
+        >
+          <view
+            v-for="column in cardColumns"
+            :key="column"
+            :class="
+              isCardCellActive(row, column)
+                ? 'i-color-picker__card-cell i-color-picker__card-cell--active'
+                : 'i-color-picker__card-cell'
+            "
+            :style="'background-color:' + getCardColor(row, column)"
+            @click="selectCardCell(row, column)"
+          >
+            <view
+              v-if="isCardCellActive(row, column)"
+              class="i-color-picker__card-check"
+            ></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view
+      v-if="showAlpha"
+      class="i-color-picker__track i-color-picker__track--alpha"
+    >
+      <view class="i-color-picker__alpha-checker"></view>
+      <view class="i-color-picker__alpha-bg" :style="alphaTrackStyle"></view>
+      <slider
+        class="i-color-picker__slider"
+        :value="alphaPercent"
+        :min="0"
+        :max="100"
+        :step="1"
+        :disabled="disabled"
+        activeColor="rgba(255,255,255,0)"
+        backgroundColor="rgba(255,255,255,0)"
+        @changing="handleAlphaChanging"
+        @change="handleAlphaChange"
+      />
+    </view>
+
+    <view v-if="showInput" class="i-color-picker__input-row">
+      <view class="i-color-picker__mode">
+        <text class="i-color-picker__mode-text">{{ modeText }}</text>
+      </view>
+      <input
+        class="i-color-picker__input"
+        :value="hexInput"
+        :disabled="disabled"
+        @input="handleHexInput"
+        @confirm="commitHexInput"
+      />
+      <view class="i-color-picker__preview" :style="previewStyle"></view>
+    </view>
+
+    <view
+      v-if="showRecommend"
+      :class="
+        activeMode == 'card'
+          ? 'i-color-picker__recommend i-color-picker__recommend--card'
+          : 'i-color-picker__recommend'
+      "
+    >
+      <text class="i-color-picker__label">推荐颜色</text>
+      <scroll-view class="i-color-picker__swatches-scroll" scroll-x="true">
+        <view class="i-color-picker__swatches">
+          <view
+            v-for="row in recommendRowList"
+            :key="row.key"
+            class="i-color-picker__swatch-row"
+          >
+            <view
+              v-for="item in row.colors"
+              :key="item.value"
+              :class="
+                normalizeToHex(item.value) == currentHex
+                  ? 'i-color-picker__swatch i-color-picker__swatch--active'
+                  : 'i-color-picker__swatch'
+              "
+              :style="'background-color:' + item.value"
+              @click="selectColor(item.value)"
+            ></view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <text v-if="showCurrent" class="i-color-picker__current"
+      >当前颜色: {{ outputValue }}</text
+    >
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+
+defineOptions({ name: 'i-color-picker' })
+
+/**
+ * Props 说明：用于控制颜色选择器的初始颜色、输入区、透明度、推荐色和禁用状态。
+ * - value: 当前选中的颜色值；支持 #RRGGBB、#RGB，也兼容 primary/success/warning/danger/info 语义色。
+ * - colors: 推荐颜色列表；可传字符串数组，也可传包含 value 字段的对象数组。
+ * - mode: 输入区展示模式，当前支持 HEX，保留该参数便于后续扩展 RGB/HSB。
+ * - selectMode: 选择器交互模式枚举；rgb 表示 RGB 滑条，spectrum 表示二维光谱色板，card 表示色卡矩阵。
+ * - alpha: 透明度，取值 0 - 1；showAlpha 为 true 时会参与输出 rgba 文本。
+ * - showAlpha: 是否显示透明度滑条。
+ * - showInput: 是否显示 HEX 输入框和右侧颜色预览。
+ * - showRecommend: 是否显示推荐颜色色块；推荐色来自 colors 参数，未传时使用组件默认推荐色。
+ * - showCurrent: 是否显示“当前颜色”文本。
+ * - disabled: 是否禁用选择、输入和滑动交互。
+ * - panelHeight: 上方二维色板高度，支持数字或带单位字符串。
+ */
+const props = defineProps({
+  value: { type: String, default: '#2979ff' },
+  colors: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  mode: { type: String, default: 'HEX' },
+  selectMode: { type: String, default: 'spectrum' },
+  alpha: { type: Number, default: 1 },
+  showAlpha: { type: Boolean, default: true },
+  showInput: { type: Boolean, default: true },
+  showRecommend: { type: Boolean, default: true },
+  showCurrent: { type: Boolean, default: true },
+  disabled: { type: Boolean, default: false },
+  panelHeight: { type: [String, Number], default: 260 },
+})
+
+/**
+ * Emits 说明：向页面同步颜色选择结果。
+ * - change: 颜色变化时触发；参数为当前输出颜色，showAlpha 时可能是 rgba(...)。
+ * - input: 用户输入或拖动过程中触发；参数为当前输出颜色。
+ * - update:value: 同步 value 受控值，便于外部双向绑定。
+ * - update:modelValue: 同步 modelValue，兼容 v-model。
+ * - mode-change: 切换选择模式时触发；参数为 rgb、spectrum 或 card。
+ */
+const emit = defineEmits(['change', 'input', 'update:value', 'update:modelValue', 'mode-change'])
+
+const activeMode = ref(normalizeSelectMode(props.selectMode))
+const hue = ref(210)
+const saturation = ref(72)
+const brightness = ref(88)
+const colorHex = ref(
+  normalizeToHex(props.value).length > 0 ? normalizeToHex(props.value) : '#2979ff',
+)
+const spectrumX = ref(50)
+const spectrumY = ref(50)
+const alphaPercent = ref(Math.round(props.alpha * 100))
+const selectedCardColor = ref('')
+const hexInput = ref('')
+const panelRows = ref(18)
+const panelColumns = ref(18)
+const cardRows = ref(10)
+const cardColumns = ref(12)
+const panelId =
+  'i-color-picker-panel-' + String(Date.now()) + '-' + String(Math.round(Math.random() * 100000))
+const panelRectLeft = ref(0)
+const panelRectTop = ref(0)
+const panelRectWidth = ref(0)
+const panelRectHeight = ref(0)
+
+const defaultColors = ref([
+  '#ff1d1d',
+  '#ff8a00',
+  '#ffd21e',
+  '#00e923',
+  '#18bfe2',
+  '#0800ee',
+  '#8e2de2',
+  '#f000d4',
+  '#000000',
+  '#666666',
+  '#cfcfcf',
+  '#2491f2',
+  '#40c51b',
+  '#ffb319',
+  '#ff2633',
+  '#ff6268',
+  '#ffb36a',
+  '#4fc3bd',
+])
+
+const modeText = computed(() => {
+  return props.mode.toUpperCase() + ' ▾'
+})
+
+const currentHex = computed(() => {
+  return colorHex.value
+})
+
+const currentHsl = computed(() => {
+  return hexToHsl(currentHex.value)
+})
+
+const redValue = computed(() => {
+  return hexToRgb(currentHex.value)[0]
+})
+
+const greenValue = computed(() => {
+  return hexToRgb(currentHex.value)[1]
+})
+
+const blueValue = computed(() => {
+  return hexToRgb(currentHex.value)[2]
+})
+
+const outputValue = computed(() => {
+  if (!props.showAlpha || alphaPercent.value >= 100) return currentHex.value
+  const rgb = hexToRgb(currentHex.value)
+  return (
+    'rgba(' +
+    rgb[0] +
+    ', ' +
+    rgb[1] +
+    ', ' +
+    rgb[2] +
+    ', ' +
+    (alphaPercent.value / 100).toFixed(2) +
+    ')'
+  )
+})
+
+const panelStyle = computed(() => {
+  return 'height:' + formatSize(props.panelHeight) + ';background-color:#ffffff;'
+})
+
+const indicatorStyle = computed(() => {
+  return 'left:' + spectrumX.value + '%;top:' + spectrumY.value + '%;'
+})
+
+const panelRowStyle = computed(() => {
+  return (
+    'height:' +
+    Number(String(props.panelHeight).replace('px', '').replace('rpx', '')) / panelRows.value +
+    'px;'
+  )
+})
+
+const alphaTrackStyle = computed(() => {
+  return 'background:linear-gradient(to right,rgba(255,255,255,0),' + currentHex.value + ');'
+})
+
+const previewStyle = computed(() => {
+  return 'background-color:' + outputValue.value + ';'
+})
+
+const recommendedList = computed(() => {
+  const list = []
+  if (props.colors.length > 0) {
+    for (let i = 0; i < props.colors.length; i++) {
+      const item = props.colors[i]
+      const text = normalizeColorItem(item)
+      if (text.length > 0) list.push({ value: text })
+    }
+    return list
+  }
+  for (let i = 0; i < defaultColors.value.length; i++) {
+    list.push({ value: defaultColors.value[i] })
+  }
+  return list
+})
+
+const recommendRowList = computed(() => {
+  const list = recommendedList.value
+  const rows = 2
+  const columns = Math.ceil(list.length / rows)
+  const result = []
+  for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+    const rowColors = []
+    for (let columnIndex = 0; columnIndex < columns; columnIndex++) {
+      const index = rowIndex * columns + columnIndex
+      if (index < list.length) rowColors.push(list[index])
+    }
+    if (rowColors.length > 0) {
+      result.push({ key: String(rowIndex), colors: rowColors })
+    }
+  }
+  return result
+})
+
+watch(
+  () => props.value,
+  (nextValue) => {
+    applyColor(nextValue, false)
+  },
+)
+
+watch(
+  () => props.alpha,
+  (nextValue) => {
+    alphaPercent.value = clamp(Math.round(nextValue * 100), 0, 100)
+  },
+)
+
+watch(
+  () => props.selectMode,
+  (nextValue) => {
+    activeMode.value = normalizeSelectMode(nextValue)
+  },
+)
+
+applyColor(props.value, false)
+
+function setActiveMode(value) {
+  if (props.disabled) return
+  const nextMode = normalizeSelectMode(value)
+  if (activeMode.value == nextMode) return
+  activeMode.value = nextMode
+  emit('mode-change', nextMode)
+}
+
+function handleHueChanging(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hue.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
+}
+
+function handleHueChange(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hue.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
+}
+
+function handleAlphaChanging(event) {
+  if (props.disabled) return
+  alphaPercent.value = Number(event.detail.value)
+  emitInput()
+}
+
+function handleAlphaChange(event) {
+  if (props.disabled) return
+  alphaPercent.value = Number(event.detail.value)
+  commit()
+}
+
+function handleSaturationChanging(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  saturation.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
+}
+
+function handleSaturationChange(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  saturation.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
+}
+
+function handleBrightnessChanging(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  brightness.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  emitInput()
+}
+
+function handleBrightnessChange(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  brightness.value = Number(event.detail.value)
+  colorHex.value = hsvToHex(hue.value, saturation.value, brightness.value)
+  commit()
+}
+
+function handleRgbChanging(channel, event) {
+  if (props.disabled) return
+  updateRgbValue(channel, Number(event.detail.value))
+  emitInput()
+}
+
+function handleRgbChange(channel, event) {
+  if (props.disabled) return
+  updateRgbValue(channel, Number(event.detail.value))
+  commit()
+}
+
+function handleHexInput(event) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  hexInput.value = event.detail.value
+  const normalized = normalizeHex(hexInput.value)
+  if (normalized.length > 0) {
+    applyColor(normalized, false)
+    emitInput()
+  }
+}
+
+function commitHexInput() {
+  selectedCardColor.value = ''
+  const normalized = normalizeHex(hexInput.value)
+  if (normalized.length > 0) {
+    applyColor(normalized, false)
+    commit()
+  }
+}
+
+function selectColor(value) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  applyColor(value, true)
+}
+
+function selectCardCell(row, column) {
+  if (props.disabled) return
+  const color = getCardColor(row, column)
+  selectedCardColor.value = color
+  applyColor(color, true)
+}
+
+function selectPanelCell(column, row) {
+  if (props.disabled) return
+  selectedCardColor.value = ''
+  const ratioX = (Number(column) - 1) / (panelColumns.value - 1)
+  const ratioY = (Number(row) - 1) / (panelRows.value - 1)
+  updateSpectrumValue(ratioX, ratioY)
+  commit()
+}
+
+function getPanelCellStyle(row, column) {
+  const rowNumber = Number(row)
+  const columnNumber = Number(column)
+  const hueValue =
+    panelRows.value <= 1 ? 0 : Math.round(((rowNumber - 1) / (panelRows.value - 1)) * 360)
+  const lightnessValue =
+    panelColumns.value <= 1
+      ? 50
+      : Math.round(98 - ((columnNumber - 1) / (panelColumns.value - 1)) * 96)
+  return 'background-color:' + hslToHex(hueValue, 100, lightnessValue) + ';'
+}
+
+function handlePanelTouchStart(event) {
+  updatePanelByTouch(event)
+  emitInput()
+}
+
+function handlePanelTouchMove(event) {
+  updatePanelByTouch(event)
+  emitInput()
+}
+
+function handlePanelTouchEnd() {
+  commit()
+}
+
+function handlePanelClick(event) {
+  updatePanelByEvent(event)
+  commit()
+}
+
+function updatePanelByTouch(event) {
+  if (props.disabled) return
+  const touch = event.touches != null && event.touches.length > 0 ? event.touches[0] : null
+  if (touch == null) return
+  updatePanelByPoint(event, touch)
+  refreshPanelRect(event, touch, true)
+}
+
+function updatePanelByEvent(event) {
+  if (props.disabled) return
+  updatePanelByPoint(event, event)
+  refreshPanelRect(event, event, true)
+}
+
+function updatePanelByPoint(event, point) {
+  selectedCardColor.value = ''
+  const rect = getPanelRect(event)
+  const width = rect[2] <= 0 ? 1 : rect[2]
+  const height = rect[3] <= 0 ? 1 : rect[3]
+  let x = readPointValue(point, 'offsetX')
+  let y = readPointValue(point, 'offsetY')
+  if (isNaN(x)) x = readPointValue(event, 'offsetX')
+  if (isNaN(y)) y = readPointValue(event, 'offsetY')
+  if (isLocalPoint(x, y, width, height)) {
+    updateSpectrumValue(x / width, y / height)
+    return
+  }
+
+  x = readPointValue(point, 'clientX')
+  y = readPointValue(point, 'clientY')
+  if (isNaN(x)) x = readPointValue(event, 'clientX')
+  if (isNaN(y)) y = readPointValue(event, 'clientY')
+  if (isAbsolutePoint(x, y)) {
+    if (isLikelyLocalPoint(x, y, width, height, rect)) {
+      updateSpectrumValue(x / width, y / height)
+      return
+    }
+    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
+    return
+  }
+
+  x = readPointValue(point, 'screenX')
+  y = readPointValue(point, 'screenY')
+  if (isNaN(x)) x = readPointValue(event, 'screenX')
+  if (isNaN(y)) y = readPointValue(event, 'screenY')
+  if (isAbsolutePoint(x, y)) {
+    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
+    return
+  }
+
+  x = readPointValue(point, 'pageX')
+  y = readPointValue(point, 'pageY')
+  if (isNaN(x)) x = readPointValue(event, 'pageX')
+  if (isNaN(y)) y = readPointValue(event, 'pageY')
+  if (isAbsolutePoint(x, y)) {
+    updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
+    return
+  }
+
+  x = readPointValue(point, 'x')
+  y = readPointValue(point, 'y')
+  if (isNaN(x)) x = readPointValue(event, 'x')
+  if (isNaN(y)) y = readPointValue(event, 'y')
+  if (isLocalPoint(x, y, width, height)) {
+    updateSpectrumValue(x / width, y / height)
+    return
+  }
+  if (isAbsolutePoint(x, y)) updateSpectrumValue((x - rect[0]) / width, (y - rect[1]) / height)
+}
+
+function updateSpectrumValue(ratioX, ratioY) {
+  const nextX = clamp(ratioX, 0, 1)
+  const nextY = clamp(ratioY, 0, 1)
+  const nextHue = Math.round(nextY * 360)
+  const nextLightness = Math.round(100 - nextX * 100)
+  applyColor(hslToHex(nextHue, 100, nextLightness), false)
+  spectrumX.value = Math.round(nextX * 100)
+  spectrumY.value = Math.round(nextY * 100)
+}
+
+function isCardCellActive(row, column) {
+  return selectedCardColor.value == getCardColor(row, column)
+}
+
+function getCardColor(row, column) {
+  const greyList = [
+    '#f1f1f1',
+    '#dcdcdc',
+    '#c8c8c8',
+    '#b3b3b3',
+    '#9e9e9e',
+    '#898989',
+    '#747474',
+    '#5f5f5f',
+    '#4a4a4a',
+    '#333333',
+    '#191919',
+    '#000000',
+  ]
+  const hueList = [178, 202, 232, 258, 282, 310, 334, 358, 22, 47, 72, 100]
+  if (Number(row) == 1) return greyList[Number(column) - 1]
+  const lightnessList = [16, 24, 32, 42, 52, 62, 72, 82, 92]
+  const saturationList = [96, 94, 90, 86, 78, 66, 52, 34, 18]
+  const index = Number(row) - 2
+  return hslToHex(hueList[Number(column) - 1], saturationList[index], lightnessList[index])
+}
+
+function updateRgbValue(channel, value) {
+  selectedCardColor.value = ''
+  const rgb = hexToRgb(currentHex.value)
+  if (channel == 'r') rgb[0] = Math.round(clamp(value, 0, 255))
+  if (channel == 'g') rgb[1] = Math.round(clamp(value, 0, 255))
+  if (channel == 'b') rgb[2] = Math.round(clamp(value, 0, 255))
+  applyColor(rgbToHex(rgb[0], rgb[1], rgb[2]), false)
+}
+
+function getPanelRect(event) {
+  if (panelRectWidth.value > 0 && panelRectHeight.value > 0) {
+    return [panelRectLeft.value, panelRectTop.value, panelRectWidth.value, panelRectHeight.value]
+  }
+  const target = event.currentTarget
+  if (
+    target != null &&
+    target.getBoundingClientRect != null &&
+    typeof target.getBoundingClientRect == 'function'
+  ) {
+    const rect = target.getBoundingClientRect()
+    return [
+      normalizeRectPoint(rect.left, rect.x),
+      normalizeRectPoint(rect.top, rect.y),
+      Number(rect.width),
+      Number(rect.height),
+    ]
+  }
+  return [0, 0, 320, Number(String(props.panelHeight).replace('px', '').replace('rpx', ''))]
+}
+
+function refreshPanelRect(event, point, shouldUpdate) {
+  const element = uni.getElementById(panelId)
+  if (
+    element != null &&
+    element.getBoundingClientRect != null &&
+    typeof element.getBoundingClientRect == 'function'
+  ) {
+    const rect = element.getBoundingClientRect()
+    setPanelRect(rect)
+    if (shouldUpdate) updatePanelByPoint(event, point)
+    return
+  }
+  if (
+    element != null &&
+    element.getBoundingClientRectAsync != null &&
+    typeof element.getBoundingClientRectAsync == 'function'
+  ) {
+    element
+      .getBoundingClientRectAsync()
+      .then((rect) => {
+        setPanelRect(rect)
+        if (shouldUpdate) updatePanelByPoint(event, point)
+      })
+      .catch(() => {
+        refreshPanelRectBySelector(event, point, shouldUpdate)
+      })
+    return
+  }
+
+  refreshPanelRectBySelector(event, point, shouldUpdate)
+}
+
+function refreshPanelRectBySelector(event, point, shouldUpdate) {
+  uni
+    .createSelectorQuery()
+    .select('#' + panelId)
+    .boundingClientRect((rect) => {
+      setPanelRect(rect)
+      if (shouldUpdate) updatePanelByPoint(event, point)
+    })
+    .exec()
+}
+
+function setPanelRect(rect) {
+  if (rect == null) return
+  panelRectLeft.value = normalizeRectPoint(rect.left, rect.x)
+  panelRectTop.value = normalizeRectPoint(rect.top, rect.y)
+  panelRectWidth.value = Number(rect.width)
+  panelRectHeight.value = Number(rect.height)
+}
+
+function normalizeRectPoint(first, fallback) {
+  const firstValue = Number(first)
+  if (!isNaN(firstValue)) return firstValue
+  const fallbackValue = Number(fallback)
+  if (!isNaN(fallbackValue)) return fallbackValue
+  return 0
+}
+
+function isLocalPoint(x, y, width, height) {
+  if (isNaN(x) || isNaN(y)) return false
+  return x >= 0 && y >= 0 && x <= width && y <= height
+}
+
+function isLikelyLocalPoint(x, y, width, height, rect) {
+  if (!isLocalPoint(x, y, width, height)) return false
+  if (rect[0] == 0 && rect[1] == 0) return true
+  const absoluteLocalX = x - rect[0]
+  const absoluteLocalY = y - rect[1]
+  if (!isLocalPoint(absoluteLocalX, absoluteLocalY, width, height)) return true
+  return false
+}
+
+function isAbsolutePoint(x, y) {
+  return !isNaN(x) && !isNaN(y)
+}
+
+function readPointValue(point, key) {
+  if (point == null) return NaN
+  let value = point[key]
+  if (value == null && point.detail != null) value = point.detail[key]
+  if (value == null) return NaN
+  return Number(value)
+}
+
+function getSpectrumPosition(hex) {
+  const hsl = hexToHsl(hex)
+  return [Math.round(100 - hsl[2]), Math.round((hsl[0] / 360) * 100)]
+}
+
+function applyColor(value, shouldCommit) {
+  const parsed = parseCssColor(value)
+  const hex = parsed.hex.length > 0 ? parsed.hex : normalizeToHex(value)
+  if (hex.length == 0) return
+  if (parsed.alpha >= 0) alphaPercent.value = clamp(Math.round(parsed.alpha * 100), 0, 100)
+  const hsv = hexToHsv(hex)
+  const spectrum = getSpectrumPosition(hex)
+  colorHex.value = hex
+  hue.value = hsv[0]
+  saturation.value = hsv[1]
+  brightness.value = hsv[2]
+  spectrumX.value = spectrum[0]
+  spectrumY.value = spectrum[1]
+  syncHexInput()
+  if (shouldCommit) commit()
+}
+
+function emitInput() {
+  syncHexInput()
+  emit('input', outputValue.value)
+}
+
+function commit() {
+  syncHexInput()
+  emit('input', outputValue.value)
+  emit('change', outputValue.value)
+  emit('update:value', outputValue.value)
+  emit('update:modelValue', outputValue.value)
+}
+
+function syncHexInput() {
+  hexInput.value = currentHex.value.replace('#', '# ')
+}
+
+function normalizeColorItem(item) {
+  const text = String(item)
+  if (text.indexOf('#') == 0) return normalizeToHex(text)
+  if (text.indexOf('value') >= 0 && text.indexOf('#') >= 0) {
+    const start = text.indexOf('#')
+    return normalizeToHex(text.substring(start, start + 7))
+  }
+  return normalizeToHex(text)
+}
+
+function normalizeToHex(value) {
+  const parsed = parseCssColor(value)
+  if (parsed.hex.length > 0) return parsed.hex
+  const semantic = semanticToHex(String(value))
+  if (semantic.length > 0) return semantic
+  return normalizeHex(String(value))
+}
+
+function parseCssColor(value) {
+  const text = String(value).replace(' ', '').replace(' ', '').trim().toLowerCase()
+  if (text == 'transparent') return { hex: '#ffffff', alpha: 0 }
+  if (text.indexOf('rgb(') != 0 && text.indexOf('rgba(') != 0) return { hex: '', alpha: -1 }
+  const start = text.indexOf('(')
+  const end = text.indexOf(')')
+  if (start < 0 || end <= start) return { hex: '', alpha: -1 }
+  const parts = text.substring(start + 1, end).split(',')
+  if (parts.length < 3) return { hex: '', alpha: -1 }
+  const red = Math.round(clamp(Number(parts[0]), 0, 255))
+  const green = Math.round(clamp(Number(parts[1]), 0, 255))
+  const blue = Math.round(clamp(Number(parts[2]), 0, 255))
+  let alpha = -1
+  if (parts.length > 3) alpha = clamp(Number(parts[3]), 0, 1)
+  return { hex: rgbToHex(red, green, blue), alpha: alpha }
+}
+
+function semanticToHex(value) {
+  if (value == 'primary') return '#2979ff'
+  if (value == 'success') return '#19be6b'
+  if (value == 'warning') return '#ff9900'
+  if (value == 'danger' || value == 'error') return '#fa3534'
+  if (value == 'info') return '#909399'
+  return ''
+}
+
+function normalizeHex(value) {
+  let text = String(value).replace(' ', '').replace(' ', '').trim()
+  if (text.indexOf('#') != 0) text = '#' + text
+  if (text.length == 4) {
+    text =
+      '#' +
+      text.charAt(1) +
+      text.charAt(1) +
+      text.charAt(2) +
+      text.charAt(2) +
+      text.charAt(3) +
+      text.charAt(3)
+  }
+  if (text.length != 7) return ''
+  return text.toLowerCase()
+}
+
+function hsvToHex(h, s, v) {
+  const rgb = hsvToRgb(h, s, v)
+  return '#' + toHex(rgb[0]) + toHex(rgb[1]) + toHex(rgb[2])
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + toHex(r) + toHex(g) + toHex(b)
+}
+
+function hsvToRgb(h, s, v) {
+  const hh = ((h % 360) + 360) % 360
+  const ss = clamp(s, 0, 100) / 100
+  const vv = clamp(v, 0, 100) / 100
+  const c = vv * ss
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
+  const m = vv - c
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hh < 60) {
+    r = c
+    g = x
+    b = 0
+  } else if (hh < 120) {
+    r = x
+    g = c
+    b = 0
+  } else if (hh < 180) {
+    r = 0
+    g = c
+    b = x
+  } else if (hh < 240) {
+    r = 0
+    g = x
+    b = c
+  } else if (hh < 300) {
+    r = x
+    g = 0
+    b = c
+  } else {
+    r = c
+    g = 0
+    b = x
+  }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+}
+
+function hexToRgb(hex) {
+  const text = normalizeHex(hex)
+  if (text.length == 0) return [0, 0, 0]
+  return [
+    parseInt(text.substring(1, 3), 16),
+    parseInt(text.substring(3, 5), 16),
+    parseInt(text.substring(5, 7), 16),
+  ]
+}
+
+function hexToHsv(hex) {
+  const rgb = hexToRgb(hex)
+  const r = rgb[0] / 255
+  const g = rgb[1] / 255
+  const b = rgb[2] / 255
+  const max = Math.max(r, Math.max(g, b))
+  const min = Math.min(r, Math.min(g, b))
+  const delta = max - min
+  let nextHue = 0
+  if (delta != 0) {
+    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
+    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
+    else nextHue = 60 * ((r - g) / delta + 4)
+  }
+  if (nextHue < 0) nextHue = nextHue + 360
+  const nextSaturation = max == 0 ? 0 : (delta / max) * 100
+  return [Math.round(nextHue), Math.round(nextSaturation), Math.round(max * 100)]
+}
+
+function hslToHex(h, s, l) {
+  const rgb = hslToRgb(h, s, l)
+  return '#' + toHex(rgb[0]) + toHex(rgb[1]) + toHex(rgb[2])
+}
+
+function hslToRgb(h, s, l) {
+  const hh = ((h % 360) + 360) % 360
+  const ss = clamp(s, 0, 100) / 100
+  const ll = clamp(l, 0, 100) / 100
+  const c = (1 - Math.abs(2 * ll - 1)) * ss
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1))
+  const m = ll - c / 2
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hh < 60) {
+    r = c
+    g = x
+    b = 0
+  } else if (hh < 120) {
+    r = x
+    g = c
+    b = 0
+  } else if (hh < 180) {
+    r = 0
+    g = c
+    b = x
+  } else if (hh < 240) {
+    r = 0
+    g = x
+    b = c
+  } else if (hh < 300) {
+    r = x
+    g = 0
+    b = c
+  } else {
+    r = c
+    g = 0
+    b = x
+  }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+}
+
+function hexToHsl(hex) {
+  const rgb = hexToRgb(hex)
+  const r = rgb[0] / 255
+  const g = rgb[1] / 255
+  const b = rgb[2] / 255
+  const max = Math.max(r, Math.max(g, b))
+  const min = Math.min(r, Math.min(g, b))
+  const delta = max - min
+  let nextHue = 0
+  if (delta != 0) {
+    if (max == r) nextHue = 60 * (((g - b) / delta) % 6)
+    else if (max == g) nextHue = 60 * ((b - r) / delta + 2)
+    else nextHue = 60 * ((r - g) / delta + 4)
+  }
+  if (nextHue < 0) nextHue = nextHue + 360
+  const nextLightness = (max + min) / 2
+  const nextSaturation = delta == 0 ? 0 : delta / (1 - Math.abs(2 * nextLightness - 1))
+  return [Math.round(nextHue), Math.round(nextSaturation * 100), Math.round(nextLightness * 100)]
+}
+
+function toHex(value) {
+  const text = clamp(value, 0, 255).toString(16)
+  return text.length == 1 ? '0' + text : text
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function normalizeSelectMode(value) {
+  const text = String(value).toLowerCase()
+  if (text == 'rgb') return 'rgb'
+  if (text == 'card' || text == 'palette' || text == 'color-card') return 'card'
+  return 'spectrum'
+}
+</script>
+
+<style>
+.i-color-picker {
+  width: 100%;
+}
+
+.i-color-picker__tabs {
+  height: 48px;
+  margin-bottom: 18px;
+  padding: 3px;
+  border-radius: 12px;
+  background-color: #f3f5f9;
+  flex-direction: row;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #edf0f5;
+}
+
+.i-color-picker__tab {
+  flex: 1;
+  height: 40px;
+  border-radius: 9px;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.i-color-picker__tab--active {
+  background-color: #ffffff;
+  border-color: #e8eef8;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.08);
+}
+
+.i-color-picker__tab-text {
+  color: #30343b;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-color-picker__tab-text--active {
+  color: #1989fa;
+  font-weight: 700;
+}
+
+.i-color-picker__rgb {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+}
+
+.i-color-picker__rgb-row {
+  min-height: 42px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-color-picker__rgb-label {
+  width: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.i-color-picker__rgb-label--red {
+  color: #ff4d4f;
+}
+
+.i-color-picker__rgb-label--green {
+  color: #19be6b;
+}
+
+.i-color-picker__rgb-label--blue {
+  color: #2979ff;
+}
+
+.i-color-picker__rgb-slider {
+  flex: 1;
+}
+
+.i-color-picker__rgb-value {
+  width: 42px;
+  color: #303133;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: right;
+}
+
+.i-color-picker__card {
+  padding: 0 0 2px;
+}
+
+.i-color-picker__card-grid {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.i-color-picker__card-row {
+  flex-direction: row;
+}
+
+.i-color-picker__card-cell {
+  position: relative;
+  width: 8.333333%;
+  height: 28px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.12);
+  align-items: center;
+  justify-content: center;
+}
+
+.i-color-picker__card-cell--active {
+  border-width: 3px;
+  border-color: #1989fa;
+  z-index: 2;
+}
+
+.i-color-picker__card-check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 9px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ffffff;
+  background-color: rgba(25, 137, 250, 0.88);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.28);
+}
+
+.i-color-picker__panel {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.i-color-picker__panel-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.i-color-picker__panel-row {
+  flex: 1;
+  flex-direction: row;
+}
+
+.i-color-picker__panel-cell {
+  flex: 1;
+}
+
+.i-color-picker__panel-touch {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 6;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.i-color-picker__indicator {
+  position: absolute;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  margin-top: -17px;
+  border-radius: 17px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: #ffffff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
+}
+
+.i-color-picker__adjust {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #f6f8fb;
+}
+
+.i-color-picker__adjust-row {
+  min-height: 34px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-color-picker__adjust-label {
+  width: 22px;
+  color: #606266;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.i-color-picker__adjust-slider {
+  flex: 1;
+}
+
+.i-color-picker__adjust-value {
+  width: 46px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: right;
+}
+
+.i-color-picker__track {
+  position: relative;
+  height: 28px;
+  margin-top: 16px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.i-color-picker__hue-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #ff00ff,
+    #ff0000
+  );
+}
+
+.i-color-picker__alpha-checker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #eef0f4;
+}
+
+.i-color-picker__alpha-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.i-color-picker__slider {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: -8px;
+  height: 44px;
+}
+
+.i-color-picker__input-row {
+  margin-top: 18px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-color-picker__mode {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: #f4f6fa;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-color-picker__mode-text {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.i-color-picker__input {
+  flex: 1;
+  height: 40px;
+  margin-left: 10px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #f4f6fa;
+  color: #303133;
+  font-size: 15px;
+}
+
+.i-color-picker__preview {
+  width: 42px;
+  height: 40px;
+  margin-left: 10px;
+  border-radius: 6px;
+}
+
+.i-color-picker__recommend {
+  margin-top: 20px;
+}
+
+.i-color-picker__recommend--card {
+  margin-top: 4px;
+}
+
+.i-color-picker__label {
+  color: #909399;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-color-picker__swatches-scroll {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.i-color-picker__swatches {
+  flex-direction: column;
+}
+
+.i-color-picker__swatch-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.i-color-picker__swatch {
+  width: 30px;
+  height: 30px;
+  margin-right: 7px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.i-color-picker__swatch--active {
+  border-color: #2979ff;
+}
+
+.i-color-picker__current {
+  margin-top: 12px;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+</style>

@@ -1,0 +1,91 @@
+<template>
+  <view :class="colClass" :style="colStyle">
+    <slot></slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-col' })
+
+/**
+ * Props 说明：参考 Element Plus Layout Col 的 24 栅格列。
+ * - span: 栅格占据的列数，范围 0-24。
+ * - offset: 栅格左侧间隔格数。
+ * - push: 栅格向右移动格数。
+ * - pull: 栅格向左移动格数。
+ * - padding: 手动列内边距；通常推荐由父级 i-row 的 gutter 控制。
+ */
+const props = defineProps({
+  span: {
+    type: [String, Number],
+    default: 24,
+  },
+  offset: {
+    type: [String, Number],
+    default: 0,
+  },
+  push: {
+    type: [String, Number],
+    default: 0,
+  },
+  pull: {
+    type: [String, Number],
+    default: 0,
+  },
+  padding: {
+    type: [String, Number],
+    default: '',
+  },
+})
+
+const emit = defineEmits([])
+
+const colClass = computed(() => {
+  return 'i-col i-col--span-' + String(clampGrid(props.span))
+})
+
+const colStyle = computed(() => {
+  const span = clampGrid(props.span)
+  const offset = clampGrid(props.offset)
+  const push = clampGrid(props.push)
+  const pull = clampGrid(props.pull)
+  let style = 'width:' + gridPercent(span) + ';'
+  if (span == 0) style = style + 'display:none;'
+  if (offset > 0) style = style + 'margin-left:' + gridPercent(offset) + ';'
+  if (push > 0 || pull > 0) style = style + 'position:relative;'
+  if (push > 0) style = style + 'left:' + gridPercent(push) + ';'
+  if (pull > 0) style = style + 'right:' + gridPercent(pull) + ';'
+  if (String(props.padding).length > 0)
+    style = style + 'padding:' + formatSize(props.padding) + ';'
+  return style
+})
+
+function clampGrid(value) {
+  const number = Math.floor(Number(value))
+  if (number <= 0) return 0
+  if (number >= 24) return 24
+  return number
+}
+
+function gridPercent(value) {
+  if (value <= 0) return '0%'
+  if (value >= 24) return '100%'
+  return ((value / 24) * 100).toFixed(4) + '%'
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-col {
+  min-height: 1px;
+  box-sizing: border-box;
+}
+
+</style>

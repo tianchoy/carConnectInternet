@@ -3,15 +3,15 @@ const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
-  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_button_1)();
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_button_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
-const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
+const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
+const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_button)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_button)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cmd",
@@ -95,10 +95,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         console.log("选择指令类型:", typeId, typeof commandRecords.value);
         try {
           loading.value = true;
-          const response = yield api_request.getCmdByMid({
+          const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({
             imei: imei.value,
             cmdmId: typeId
-          });
+          }));
           if (response.code == 0) {
             commands.value = response.data;
           } else {
@@ -172,13 +172,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               cmdData = cmdData.replace(placeholder, value);
             }
           });
-          const response = yield api_request.sendCmd({
+          const response = yield api_request.sendCmd(new common_vendor.UTSJSONObject({
             imei: imei.value,
             type: selectedCommand.value.cmdCode,
             password: null,
             cmdData: encodeURIComponent(cmdData),
             predictCmdId: selectedCommand.value.predictCmdId
-          });
+          }));
           if (response.code == 0) {
             common_vendor.index.showToast({
               title: "指令发送成功",
@@ -300,9 +300,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             l: "param_" + index
           });
         }),
-        h: common_vendor.o(sendCommand, "8b"),
+        h: common_vendor.o(sendCommand, "3d"),
         i: common_vendor.p({
           type: "primary",
+          text: "发送指令",
           disabled: !isFormValid.value,
           class: "submit-btn data-v-c4271740"
         })

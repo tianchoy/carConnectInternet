@@ -1,0 +1,490 @@
+<template>
+  <view class="i-keyboard">
+    <view class="i-keyboard__trigger" @click="open">
+      <slot :show="opened">
+        <view class="i-keyboard__display">
+          <text class="i-keyboard__value">{{ displayText }}</text>
+        </view>
+      </slot>
+    </view>
+
+    <view v-if="opened" class="i-keyboard__mask" @click="cancel">
+      <view class="i-keyboard__panel" :style="panelStyle" @click.stop="noop">
+        <view class="i-keyboard__head">
+          <text class="i-keyboard__cancel" @click="cancel">取消</text>
+          <text class="i-keyboard__title">{{ resolvedTitle }}</text>
+          <text
+            class="i-keyboard__confirm-text"
+            :style="primaryTextStyle"
+            @click="confirm"
+          >
+            确定
+          </text>
+        </view>
+
+        <view class="i-keyboard__preview">
+          <text class="i-keyboard__preview-value" :style="fontTextStyle">
+            {{ displayText }}
+          </text>
+        </view>
+
+        <view class="i-keyboard__grid">
+          <view
+            v-for="key in numberKeys"
+            :key="key"
+            class="i-keyboard__key"
+            :style="keyStyle"
+            @click="press(key)"
+          >
+            <text class="i-keyboard__key-text" :style="fontTextStyle">{{
+              key
+            }}</text>
+          </view>
+
+          <view
+            v-if="digit"
+            class="i-keyboard__key"
+            :style="keyStyle"
+            @click="press('00')"
+          >
+            <text class="i-keyboard__key-text" :style="fontTextStyle">00</text>
+          </view>
+          <view class="i-keyboard__key" :style="keyStyle" @click="press('0')">
+            <text class="i-keyboard__key-text" :style="fontTextStyle">0</text>
+          </view>
+          <view
+            v-if="digit"
+            class="i-keyboard__key"
+            :style="keyStyle"
+            @click="press('.')"
+          >
+            <text class="i-keyboard__key-text" :style="fontTextStyle">.</text>
+          </view>
+
+          <view
+            class="i-keyboard__key i-keyboard__key--muted"
+            :style="keyStyle"
+            @click="clear"
+          >
+            <text class="i-keyboard__key-text" :style="fontTextStyle"
+              >清空</text
+            >
+          </view>
+          <view
+            class="i-keyboard__key i-keyboard__key--muted"
+            :style="keyStyle"
+            @click="backspace"
+          >
+            <text class="i-keyboard__key-text" :style="fontTextStyle"
+              >删除</text
+            >
+          </view>
+          <view
+            class="i-keyboard__key i-keyboard__key--primary"
+            :style="confirmStyle"
+            @click="confirm"
+          >
+            <text class="i-keyboard__key-text i-keyboard__key-text--primary"
+              >确认</text
+            >
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-keyboard' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x number keyboard，并兼容旧版 i-keyboard 参数。
+ * - modelValue: 当前输入值，配合 update:modelValue 实现 v-model。
+ * - value: 旧版当前值别名；未传 modelValue 时用于初始化和同步。
+ * - maxLen: 最大输入长度。
+ * - maxlength: 旧版最大输入长度别名；maxLen 未显式变化时兼容使用。
+ * - modelShow: 当前键盘打开状态，配合 update:modelShow 实现 v-model:model-show。
+ * - title: 顶部标题；为空时展示默认安全键盘文案。
+ * - color: 主按钮色；为空时使用默认主题蓝。
+ * - btnColor: 数字按钮背景色。
+ * - bgColor: 键盘背景色，支持 primary/success/warning/error/info 语义色或 HEX/RGB。
+ * - fontColor: 按键和输入预览文字颜色。
+ * - max: 输入的最大数值，0 表示不限制；仅 number 模式生效。
+ * - digit: 是否显示小数点和 00 填充键；false 时为整数键盘。
+ * - mode: number 为数字键盘，password 为密码键盘，密码模式下以圆点显示。
+ * - hold: 点击确认后是否保持键盘不收起。
+ * - placeholder: 旧版占位提示；没有值时显示。
+ * - showDot: 旧版小数点开关别名；传 true 时等价 digit=true。
+ */
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  value: {
+    type: String,
+    default: '',
+  },
+  maxLen: {
+    type: Number,
+    default: 9,
+  },
+  maxlength: {
+    type: Number,
+    default: 0,
+  },
+  modelShow: {
+    type: Boolean,
+    default: false,
+  },
+  title: {
+    type: String,
+    default: '',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+  btnColor: {
+    type: String,
+    default: 'transparent',
+  },
+  bgColor: {
+    type: String,
+    default: 'info',
+  },
+  fontColor: {
+    type: String,
+    default: '#3b3b3b',
+  },
+  max: {
+    type: Number,
+    default: 0,
+  },
+  digit: {
+    type: Boolean,
+    default: true,
+  },
+  mode: {
+    type: String,
+    default: 'number',
+  },
+  hold: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: '请输入数字',
+  },
+  showDot: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：组件对外同步输入值和弹层状态。
+ * - change: 值变化时触发，参数为最新字符串。
+ * - input: 兼容旧版输入事件，同 change。
+ * - delete: 点击删除时触发，参数为删除后的值。
+ * - clear: 点击清空时触发。
+ * - confirm: 点击确认时触发，参数为当前值。
+ * - cancel: 点击取消或遮罩关闭时触发，参数为当前值。
+ * - update:modelValue: 同步 modelValue。
+ * - update:value: 兼容旧版 value 同步。
+ * - update:modelShow: 同步键盘打开状态。
+ */
+const emit = defineEmits([
+  'change',
+  'input',
+  'delete',
+  'clear',
+  'confirm',
+  'cancel',
+  'update:modelValue',
+  'update:value',
+  'update:modelShow',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const opened = ref(props.modelShow)
+const current = ref(initialValue())
+const numberKeys = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+
+const resolvedMaxLen = computed(() => {
+  if (props.maxlength > 0) return props.maxlength
+  return props.maxLen
+})
+
+const resolvedTitle = computed(() => {
+  return props.title.length > 0 ? props.title : '安全键盘请放心输入'
+})
+
+const resolvedColor = computed(() => {
+  return props.color.length > 0 ? parseColor(props.color) : '#3c9cff'
+})
+
+const displayText = computed(() => {
+  if (current.value.length == 0) return props.placeholder
+  if (props.mode == 'password') {
+    let text = ''
+    for (let i = 0; i < current.value.length; i++) text = text + '●'
+    return text
+  }
+  return current.value
+})
+
+const panelStyle = computed(() => {
+  return 'background-color:' + parseColor(bgColor.value) + ';'
+})
+
+const keyStyle = computed(() => {
+  return 'background-color:' + parseColor(props.btnColor) + ';'
+})
+
+const confirmStyle = computed(() => {
+  return 'background-color:' + resolvedColor.value + ';'
+})
+
+const primaryTextStyle = computed(() => {
+  return 'color:' + resolvedColor.value + ';'
+})
+
+const fontTextStyle = computed(() => {
+  return 'color:' + props.fontColor + ';'
+})
+
+watch(
+  () => props.modelShow,
+  (value) => {
+    opened.value = value
+  },
+)
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    current.value = value
+  },
+)
+
+watch(
+  () => props.value,
+  (value) => {
+    if (props.modelValue.length == 0) current.value = value
+  },
+)
+
+function initialValue() {
+  if (props.modelValue.length > 0) return props.modelValue
+  return props.value
+}
+
+function open() {
+  opened.value = true
+  emit('update:modelShow', true)
+}
+
+function close() {
+  opened.value = false
+  emit('update:modelShow', false)
+}
+
+function press(key) {
+  let nextValue = current.value
+
+  if (key == '.') {
+    if (!props.digit && !props.showDot) return
+    if (nextValue.indexOf('.') >= 0) return
+    nextValue = nextValue.length == 0 ? '0.' : nextValue + '.'
+  } else if (key == '00') {
+    if (!props.digit) return
+    nextValue = nextValue.length == 0 ? '0' : nextValue + key
+  } else {
+    nextValue = nextValue + key
+  }
+
+  if (nextValue.length > resolvedMaxLen.value) return
+  if (!isAllowedByMax(nextValue)) return
+
+  current.value = nextValue
+  emitValue()
+}
+
+function backspace() {
+  if (current.value.length > 0) {
+    current.value = current.value.substring(0, current.value.length - 1)
+  }
+  emit('delete', current.value)
+  emitValue()
+}
+
+function clear() {
+  current.value = ''
+  emit('clear')
+  emitValue()
+}
+
+function confirm() {
+  emit('confirm', current.value)
+  if (!props.hold) close()
+}
+
+function cancel() {
+  emit('cancel', current.value)
+  close()
+}
+
+function noop() {}
+
+function emitValue() {
+  emit('change', current.value)
+  emit('input', current.value)
+  emit('update:modelValue', current.value)
+  emit('update:value', current.value)
+}
+
+function isAllowedByMax(value) {
+  if (props.mode == 'password') return true
+  if (props.max <= 0) return true
+  if (value.length == 0 || value == '0.' || value.substring(value.length - 1) == '.') {
+    return true
+  }
+  const numberValue = Number(value)
+  if (isNaN(numberValue)) return false
+  return numberValue <= props.max
+}
+
+function parseColor(value) {
+  if (value == 'primary') return '#3c9cff'
+  if (value == 'success') return '#5ac725'
+  if (value == 'warning') return '#f9ae3d'
+  if (value == 'error' || value == 'danger') return '#f56c6c'
+  if (value == 'info') return '#f5f7fa'
+  if (value.length == 0 || value == 'transparent') return 'transparent'
+  return value
+}
+</script>
+
+<style>
+.i-keyboard {
+  width: 100%;
+}
+
+.i-keyboard__trigger {
+  width: 100%;
+}
+
+.i-keyboard__display {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  justify-content: center;
+}
+
+.i-keyboard__value {
+  color: #303133;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.i-keyboard__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 120;
+  background-color: rgba(0, 0, 0, 0.32);
+  justify-content: flex-end;
+}
+
+.i-keyboard__panel {
+  padding: 12px 12px 18px;
+  border-radius: 16px 16px 0 0;
+}
+
+.i-keyboard__head {
+  min-height: 42px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-keyboard__cancel,
+.i-keyboard__confirm-text {
+  width: 58px;
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-keyboard__confirm-text {
+  text-align: right;
+}
+
+.i-keyboard__title {
+  flex: 1;
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-keyboard__preview {
+  height: 46px;
+  margin-bottom: 10px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.78);
+  justify-content: center;
+}
+
+.i-keyboard__preview-value {
+  font-size: 17px;
+  line-height: 24px;
+}
+
+.i-keyboard__grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.i-keyboard__key {
+  width: 31.6%;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-keyboard__key--muted {
+  background-color: rgba(255, 255, 255, 0.76);
+}
+
+.i-keyboard__key--primary {
+  background-color: #3c9cff;
+}
+
+.i-keyboard__key-text {
+  color: #303133;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.i-keyboard__key-text--primary {
+  color: #ffffff;
+}
+</style>

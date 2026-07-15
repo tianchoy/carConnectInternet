@@ -1,0 +1,801 @@
+<template>
+  <view class="i-slider-menu" :style="wrapStyle">
+    <template v-if="normalizedMenuPosition == 'left'">
+      <view class="i-slider-menu__side" :style="sideStyle">
+        <view
+          v-if="showToggleMenu"
+          :class="toggleClass"
+          @click="toggleMenu"
+        >
+          <slot name="toggle" :opened="menuOpened">
+            <text class="i-slider-menu__toggle-icon">{{ menuOpened ? '☰' : '›' }}</text>
+            <text v-if="menuOpened" class="i-slider-menu__toggle-text">MENU</text>
+          </slot>
+        </view>
+        <scroll-view
+          scroll-y
+          class="i-slider-menu__side-scroll"
+          :scroll-into-view="sideScrollIntoView"
+          :scroll-with-animation="true"
+          :show-scrollbar="showScrollbar"
+        >
+          <view
+            v-for="(item, index) in normalizedList"
+            :id="'i-slider-menu-side-' + String(index)"
+            :key="itemKey(item, index)"
+            :class="menuItemClass(item, index)"
+            :style="menuItemStyle(item, index)"
+            @click="selectMenu(item, index)"
+          >
+            <slot
+              name="menu"
+              :item="item"
+              :index="index"
+              :active="isActive(item, index)"
+              :opened="menuOpened"
+            >
+              <slot
+                name="item"
+                :item="item"
+                :index="index"
+                :active="isActive(item, index)"
+                :opened="menuOpened"
+              >
+                <view :class="menuInnerClass">
+                  <text
+                    v-if="menuOpened && itemIcon(item).length > 0"
+                    class="i-slider-menu__menu-icon"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemIcon(item) }}
+                  </text>
+                  <text
+                    v-if="menuOpened"
+                    class="i-slider-menu__menu-text"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemLabel(item, index) }}
+                  </text>
+                  <text
+                    v-if="!menuOpened"
+                    class="i-slider-menu__menu-collapsed"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemShortText(item, index) }}
+                  </text>
+                </view>
+              </slot>
+            </slot>
+          </view>
+        </scroll-view>
+      </view>
+      <view class="i-slider-menu__content" :style="contentStyle">
+        <slot name="contentTop" :menuid="currentId" :item="currentItem" :index="currentIndex"></slot>
+        <scroll-view
+          v-if="layoutMode == 'scroll'"
+          scroll-y
+          class="i-slider-menu__content-scroll"
+          :scroll-into-view="scrollIntoView"
+          :scroll-with-animation="true"
+          :show-scrollbar="showScrollbar"
+          @scroll="onContentScroll"
+          @touchstart="handleContentTouchStart"
+          @touchmove="handleContentTouchMove"
+          @touchend="handleContentTouchEnd"
+          @touchcancel="handleContentTouchEnd"
+        >
+          <view
+            v-for="(item, index) in normalizedList"
+            :id="'i-slider-menu-section-' + String(index)"
+            :key="'content-' + itemKey(item, index)"
+            :class="contentItemClass(item, index)"
+          >
+            <slot
+              :height="heightText"
+              :menuid="itemId(item, index)"
+              :item="item"
+              :index="index"
+              :active="isActive(item, index)"
+            >
+              <view class="i-slider-menu__content-card">
+                <text
+                  class="i-slider-menu__content-title"
+                  :style="contentItemTextStyle(item, index)"
+                >
+                  {{ itemLabel(item, index) }}
+                </text>
+                <text class="i-slider-menu__content-desc">
+                  {{ itemDesc(item, index) }}
+                </text>
+              </view>
+            </slot>
+          </view>
+        </scroll-view>
+        <view v-else class="i-slider-menu__content-static">
+          <slot
+            :height="heightText"
+            :menuid="currentId"
+            :item="currentItem"
+            :index="currentIndex"
+          >
+            <view class="i-slider-menu__content-card">
+              <text
+                class="i-slider-menu__content-title"
+                :style="contentItemTextStyle(currentItem, currentIndex)"
+              >
+                {{ itemLabel(currentItem, currentIndex) }}
+              </text>
+              <text class="i-slider-menu__content-desc">
+                {{ itemDesc(currentItem, currentIndex) }}
+              </text>
+            </view>
+          </slot>
+        </view>
+      </view>
+    </template>
+
+    <template v-else>
+      <view class="i-slider-menu__content" :style="contentStyle">
+        <slot name="contentTop" :menuid="currentId" :item="currentItem" :index="currentIndex"></slot>
+        <scroll-view
+          v-if="layoutMode == 'scroll'"
+          scroll-y
+          class="i-slider-menu__content-scroll"
+          :scroll-into-view="scrollIntoView"
+          :scroll-with-animation="true"
+          :show-scrollbar="showScrollbar"
+          @scroll="onContentScroll"
+          @touchstart="handleContentTouchStart"
+          @touchmove="handleContentTouchMove"
+          @touchend="handleContentTouchEnd"
+          @touchcancel="handleContentTouchEnd"
+        >
+          <view
+            v-for="(item, index) in normalizedList"
+            :id="'i-slider-menu-section-' + String(index)"
+            :key="'content-right-' + itemKey(item, index)"
+            :class="contentItemClass(item, index)"
+          >
+            <slot
+              :height="heightText"
+              :menuid="itemId(item, index)"
+              :item="item"
+              :index="index"
+              :active="isActive(item, index)"
+            >
+              <view class="i-slider-menu__content-card">
+                <text
+                  class="i-slider-menu__content-title"
+                  :style="contentItemTextStyle(item, index)"
+                >
+                  {{ itemLabel(item, index) }}
+                </text>
+                <text class="i-slider-menu__content-desc">
+                  {{ itemDesc(item, index) }}
+                </text>
+              </view>
+            </slot>
+          </view>
+        </scroll-view>
+        <view v-else class="i-slider-menu__content-static">
+          <slot
+            :height="heightText"
+            :menuid="currentId"
+            :item="currentItem"
+            :index="currentIndex"
+          >
+            <view class="i-slider-menu__content-card">
+              <text
+                class="i-slider-menu__content-title"
+                :style="contentItemTextStyle(currentItem, currentIndex)"
+              >
+                {{ itemLabel(currentItem, currentIndex) }}
+              </text>
+              <text class="i-slider-menu__content-desc">
+                {{ itemDesc(currentItem, currentIndex) }}
+              </text>
+            </view>
+          </slot>
+        </view>
+      </view>
+      <view class="i-slider-menu__side" :style="sideStyle">
+        <view
+          v-if="showToggleMenu"
+          :class="toggleClass"
+          @click="toggleMenu"
+        >
+          <slot name="toggle" :opened="menuOpened">
+            <text class="i-slider-menu__toggle-icon">{{ menuOpened ? '☰' : '‹' }}</text>
+            <text v-if="menuOpened" class="i-slider-menu__toggle-text">MENU</text>
+          </slot>
+        </view>
+        <scroll-view
+          scroll-y
+          class="i-slider-menu__side-scroll"
+          :scroll-into-view="sideScrollIntoView"
+          :scroll-with-animation="true"
+          :show-scrollbar="showScrollbar"
+        >
+          <view
+            v-for="(item, index) in normalizedList"
+            :id="'i-slider-menu-side-' + String(index)"
+            :key="'right-' + itemKey(item, index)"
+            :class="menuItemClass(item, index)"
+            :style="menuItemStyle(item, index)"
+            @click="selectMenu(item, index)"
+          >
+            <slot
+              name="menu"
+              :item="item"
+              :index="index"
+              :active="isActive(item, index)"
+              :opened="menuOpened"
+            >
+              <slot
+                name="item"
+                :item="item"
+                :index="index"
+                :active="isActive(item, index)"
+                :opened="menuOpened"
+              >
+                <view :class="menuInnerClass">
+                  <text
+                    v-if="menuOpened && itemIcon(item).length > 0"
+                    class="i-slider-menu__menu-icon"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemIcon(item) }}
+                  </text>
+                  <text
+                    v-if="menuOpened"
+                    class="i-slider-menu__menu-text"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemLabel(item, index) }}
+                  </text>
+                  <text
+                    v-if="!menuOpened"
+                    class="i-slider-menu__menu-collapsed"
+                    :style="menuTextStyle(item, index)"
+                  >
+                    {{ itemShortText(item, index) }}
+                  </text>
+                </view>
+              </slot>
+            </slot>
+          </view>
+        </scroll-view>
+      </view>
+    </template>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-slider-menu' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x side menu 侧边菜单。
+ * - width: 组件整体宽度，auto 表示占满父容器宽度。
+ * - height: 组件整体高度，必填语义，不建议为 auto。
+ * - showScrollbar: 是否显示左右滚动条。
+ * - activeTextColor: 左侧菜单选中文字颜色；为空时使用主题蓝色。
+ * - textColor: 左侧菜单未选中文字颜色。
+ * - fontSize: 左侧菜单文字大小。
+ * - itemTextColor: 右侧内容项目未选中文字颜色。
+ * - itemActiveColor: 右侧内容项目选中文字颜色；为空时使用主题蓝色。
+ * - sliderBgColor: 侧边栏背景颜色。
+ * - sliderContentBgColor: 右侧内容区域背景颜色。
+ * - sliderWidth: 侧边栏展开宽度。
+ * - list: 菜单数据；每项支持 id/value/name/text/title/label/icon/desc/disabled。
+ * - modelValue: 当前选中项 id，支持 v-model。
+ * - showToggleMenu: 是否显示顶部收起/展开按钮。
+ * - menuPosition: 菜单位置，可取 left 或 right；不建议动态切换。
+ * - itemHeight: 左侧菜单项高度，只支持具体尺寸如 44、44px、88rpx。
+ * - itemSelectedStyle: 左侧菜单选中项自定义样式，可传字符串或对象。
+ * - layoutMode: 内容区布局模式；default 为单内容插槽，scroll 为按 list 循环内容块并可随菜单滚动定位。
+ * - pageScrollOnBottom: 内容区滚到底后继续上滑时，是否推动页面继续向下滚动。
+ * - pageScrollTop: 当前页面滚动距离；开启 pageScrollOnBottom 时用于计算页面滚动目标。
+ */
+const props = defineProps({
+  width: { type: String, default: 'auto' },
+  height: { type: String, default: '100%' },
+  showScrollbar: { type: Boolean, default: false },
+  activeTextColor: { type: String, default: '' },
+  textColor: { type: String, default: '#888888' },
+  fontSize: { type: String, default: '16' },
+  itemTextColor: { type: String, default: '#333333' },
+  itemActiveColor: { type: String, default: '' },
+  sliderBgColor: { type: String, default: '#f5f5f5' },
+  sliderContentBgColor: { type: String, default: 'white' },
+  sliderWidth: { type: String, default: '100' },
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  modelValue: { type: String, default: '' },
+  showToggleMenu: { type: Boolean, default: false },
+  menuPosition: { type: String, default: 'left' },
+  itemHeight: { type: String, default: '44' },
+  itemSelectedStyle: { type: [String, Object], default: '' },
+  layoutMode: { type: String, default: 'default' },
+  pageScrollOnBottom: { type: Boolean, default: false },
+  pageScrollTop: { type: Number, default: 0 },
+})
+
+/**
+ * Emits 说明：用于同步菜单选择。
+ * - change: 手动切换时触发，返回 { id, index, item }。
+ * - update:modelValue: 同步当前选中项 id。
+ */
+const emit = defineEmits(['change', 'update:modelValue'])
+
+const normalizedList = computed(() => {
+  if (props.list.length > 0) return props.list
+  return [
+    { id: 'jiangxi', text: '江西省1', icon: '☁', desc: '江西省内容' },
+    { id: 'anhui', text: '安徽2', icon: '▣', desc: '安徽内容' },
+    { id: 'fujian', text: '福建3', icon: '◆', desc: '福建内容' },
+    { id: 'beijing', text: '北京4', icon: '▥', desc: '北京内容' },
+  ]
+})
+
+const menuOpened = ref(true)
+const currentIndex = ref(resolveInitialIndex())
+const scrollIntoView = ref('i-slider-menu-section-' + String(currentIndex.value))
+const sideScrollIntoView = ref('i-slider-menu-side-' + String(currentIndex.value))
+const syncingFromContentScroll = ref(false)
+const contentAtBottom = ref(false)
+const lastContentTouchY = ref(0)
+const pageScrollTarget = ref(Number(props.pageScrollTop))
+
+const normalizedMenuPosition = computed(() => {
+  return props.menuPosition == 'right' ? 'right' : 'left'
+})
+
+const activeColorValue = computed(() => {
+  return props.activeTextColor.length > 0 ? props.activeTextColor : '#2979ff'
+})
+
+const itemActiveColorValue = computed(() => {
+  return props.itemActiveColor.length > 0 ? props.itemActiveColor : '#2979ff'
+})
+
+const heightText = computed(() => formatSize(props.height))
+
+const currentItem = computed(() => {
+  if (currentIndex.value < 0 || currentIndex.value >= normalizedList.value.length) return null
+  return normalizedList.value[currentIndex.value]
+})
+
+const currentId = computed(() => itemId(currentItem.value, currentIndex.value))
+
+const wrapStyle = computed(() => {
+  return (
+    'width:' +
+    formatWidth(props.width) +
+    ';height:' +
+    heightText.value +
+    ';'
+  )
+})
+
+const sideStyle = computed(() => {
+  const width = menuOpened.value ? formatSize(props.sliderWidth) : '56px'
+  return (
+    'width:' +
+    width +
+    ';height:' +
+    heightText.value +
+    ';background-color:' +
+    props.sliderBgColor +
+    ';'
+  )
+})
+
+const toggleClass = computed(() => {
+  return menuOpened.value
+    ? 'i-slider-menu__toggle'
+    : 'i-slider-menu__toggle i-slider-menu__toggle--collapsed'
+})
+
+const menuInnerClass = computed(() => {
+  return menuOpened.value
+    ? 'i-slider-menu__menu-inner'
+    : 'i-slider-menu__menu-inner i-slider-menu__menu-inner--collapsed'
+})
+
+const contentStyle = computed(() => {
+  return (
+    'height:' +
+    heightText.value +
+    ';background-color:' +
+    props.sliderContentBgColor +
+    ';'
+  )
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    const index = resolveInitialIndex()
+    currentIndex.value = index
+    sideScrollIntoView.value = sideSectionId(index)
+    if (syncingFromContentScroll.value) {
+      syncingFromContentScroll.value = false
+      return
+    }
+    scrollIntoView.value = contentSectionId(index)
+  },
+)
+
+watch(
+  () => props.pageScrollTop,
+  (nextValue) => {
+    const value = Number(nextValue)
+    if (!isNaN(value)) pageScrollTarget.value = value
+  },
+)
+
+function toggleMenu() {
+  menuOpened.value = !menuOpened.value
+}
+
+function selectMenu(item, index) {
+  if (isItemDisabled(item)) return
+  currentIndex.value = index
+  scrollIntoView.value = contentSectionId(index)
+  sideScrollIntoView.value = sideSectionId(index)
+  const id = itemId(item, index)
+  emit('update:modelValue', id)
+  emit('change', { id, index, item })
+}
+
+function onContentScroll(event) {
+  if (props.layoutMode != 'scroll') return
+  const count = normalizedList.value.length
+  if (count <= 0) return
+
+  const detail = event.detail
+  const scrollTop = Number(detail.scrollTop)
+  const scrollHeight = Number(detail.scrollHeight)
+  const viewportHeight = parseSizeValue(props.height)
+  const maxScrollTop = Math.max(scrollHeight - viewportHeight, 0)
+  contentAtBottom.value = maxScrollTop > 0 && scrollTop >= maxScrollTop - 2
+  let index = 0
+
+  if (scrollHeight > 0 && maxScrollTop > 0) {
+    const itemHeight = scrollHeight / count
+    index = Math.floor((scrollTop + itemHeight * 0.35) / itemHeight)
+    if (scrollTop >= maxScrollTop - 2) index = count - 1
+  }
+
+  if (index < 0) index = 0
+  if (index >= count) index = count - 1
+  if (index == currentIndex.value) return
+
+  currentIndex.value = index
+  sideScrollIntoView.value = sideSectionId(index)
+  const item = normalizedList.value[index]
+  const id = itemId(item, index)
+  syncingFromContentScroll.value = true
+  emit('update:modelValue', id)
+  emit('change', { id, index, item })
+}
+
+function handleContentTouchStart(event) {
+  lastContentTouchY.value = readTouchY(event)
+  pageScrollTarget.value = Number(props.pageScrollTop)
+}
+
+function handleContentTouchMove(event) {
+  if (!props.pageScrollOnBottom || props.layoutMode != 'scroll') return
+  if (!contentAtBottom.value) return
+  const currentY = readTouchY(event)
+  if (isNaN(currentY) || isNaN(lastContentTouchY.value)) return
+  const delta = lastContentTouchY.value - currentY
+  lastContentTouchY.value = currentY
+  if (delta <= 0) return
+  const pageTop = Number(props.pageScrollTop)
+  const baseTop = Math.max(isNaN(pageTop) ? 0 : pageTop, pageScrollTarget.value)
+  const nextTop = baseTop + delta
+  pageScrollTarget.value = nextTop
+  uni.pageScrollTo({
+    scrollTop: nextTop,
+    duration: 0,
+  })
+}
+
+function handleContentTouchEnd() {
+  lastContentTouchY.value = 0
+  pageScrollTarget.value = Number(props.pageScrollTop)
+}
+
+function resolveInitialIndex(): number {
+  const expected = String(props.modelValue)
+  if (expected.length > 0) {
+    for (let i = 0; i < normalizedList.value.length; i++) {
+      if (itemId(normalizedList.value[i], i) == expected) return i
+    }
+  }
+  return normalizedList.value.length > 0 ? 0 : -1
+}
+
+function isActive(item, index): boolean {
+  return currentIndex.value == index || itemId(item, index) == String(props.modelValue)
+}
+
+function isItemDisabled(item): boolean {
+  if (item != null && typeof item == 'object') return item['disabled'] == true
+  return false
+}
+
+function itemId(item, index): string {
+  const id = itemField(item, 'id')
+  if (id.length > 0) return id
+  const value = itemField(item, 'value')
+  if (value.length > 0) return value
+  return String(index)
+}
+
+function itemLabel(item, index): string {
+  const text = itemField(item, 'text')
+  if (text.length > 0) return text
+  const label = itemField(item, 'label')
+  if (label.length > 0) return label
+  const title = itemField(item, 'title')
+  if (title.length > 0) return title
+  const name = itemField(item, 'name')
+  if (name.length > 0) return name
+  if (item != null && typeof item != 'object') return String(item)
+  return '菜单' + String(index + 1)
+}
+
+function itemDesc(item, index): string {
+  const desc = itemField(item, 'desc')
+  if (desc.length > 0) return desc
+  const description = itemField(item, 'description')
+  if (description.length > 0) return description
+  return itemLabel(item, index) + ' 的内容区域'
+}
+
+function itemIcon(item): string {
+  return itemField(item, 'icon')
+}
+
+function itemShortText(item, index): string {
+  const icon = itemIcon(item)
+  if (icon.length > 0) return icon
+  const label = itemLabel(item, index)
+  if (label.length == 0) return String(index + 1)
+  return label.substring(0, 1)
+}
+
+function itemField(item, keyName): string {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value != null) return String(value)
+  }
+  return ''
+}
+
+function itemKey(item, index): string {
+  return itemId(item, index) + '-' + String(index)
+}
+
+function menuItemClass(item, index): string {
+  const classes = ['i-slider-menu__menu-item']
+  if (isActive(item, index)) classes.push('i-slider-menu__menu-item--active')
+  if (!menuOpened.value) classes.push('i-slider-menu__menu-item--collapsed')
+  if (isItemDisabled(item)) classes.push('i-slider-menu__menu-item--disabled')
+  return classes.join(' ')
+}
+
+function contentItemClass(item, index): string {
+  const classes = ['i-slider-menu__content-item']
+  if (isActive(item, index)) classes.push('i-slider-menu__content-item--active')
+  return classes.join(' ')
+}
+
+function menuItemStyle(item, index): string {
+  let style = 'height:' + formatSize(props.itemHeight) + ';'
+  if (isActive(item, index)) {
+    style += 'background-color:rgba(41,121,255,0.12);'
+    style += stringifyStyle(props.itemSelectedStyle)
+  }
+  return style
+}
+
+function menuTextStyle(item, index): string {
+  const color = isActive(item, index) ? activeColorValue.value : props.textColor
+  return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
+}
+
+function contentItemTextStyle(item, index): string {
+  const color = isActive(item, index) ? itemActiveColorValue.value : props.itemTextColor
+  return 'color:' + color + ';'
+}
+
+function formatWidth(value): string {
+  if (value == 'auto') return '100%'
+  return formatSize(value)
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (
+    text == 'auto' ||
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function parseSizeValue(value): number {
+  const text = String(value)
+    .replace('px', '')
+    .replace('rpx', '')
+    .replace('%', '')
+  const size = Number(text)
+  return Number.isNaN(size) ? 0 : size
+}
+
+function readTouchY(event): number {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return NaN
+  if (point.pageY != null) return Number(point.pageY)
+  if (point.clientY != null) return Number(point.clientY)
+  return NaN
+}
+
+function contentSectionId(index): string {
+  return 'i-slider-menu-section-' + String(index)
+}
+
+function sideSectionId(index): string {
+  return 'i-slider-menu-side-' + String(index)
+}
+
+function stringifyStyle(value): string {
+  if (value == null) return ''
+  if (typeof value == 'object') {
+    let style = ''
+    const keys = Object.keys(value)
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i]
+      const cssKey = camelToKebab(key)
+      style += cssKey + ':' + String(value[key]) + ';'
+    }
+    return style
+  }
+  const text = String(value)
+  if (text.length == 0 || text == '[object Object]') return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+function camelToKebab(value): string {
+  let result = ''
+  for (let i = 0; i < value.length; i++) {
+    const char = value.charAt(i)
+    const lower = char.toLowerCase()
+    if (char != lower && i > 0) result += '-'
+    result += lower
+  }
+  return result
+}
+</script>
+
+<style>
+.i-slider-menu {
+  flex-direction: row;
+  overflow: hidden;
+}
+.i-slider-menu__side {
+  flex-shrink: 0;
+  overflow: hidden;
+  transition-property: width;
+  transition-duration: 180ms;
+  transition-timing-function: ease;
+}
+.i-slider-menu__toggle {
+  height: 44px;
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-slider-menu__toggle--collapsed {
+  padding: 0;
+  justify-content: center;
+}
+.i-slider-menu__toggle-icon {
+  width: 22px;
+  color: #2979ff;
+  font-size: 17px;
+  line-height: 22px;
+  text-align: center;
+}
+.i-slider-menu__toggle-text {
+  margin-left: 8px;
+  color: #2979ff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.i-slider-menu__side-scroll {
+  flex: 1;
+}
+.i-slider-menu__menu-item {
+  position: relative;
+  justify-content: center;
+}
+.i-slider-menu__menu-item--disabled {
+  opacity: 0.45;
+}
+.i-slider-menu__menu-inner {
+  min-width: 0;
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-slider-menu__menu-inner--collapsed {
+  width: 56px;
+  padding: 0;
+  justify-content: center;
+}
+.i-slider-menu__menu-icon {
+  width: 20px;
+  margin-right: 6px;
+  text-align: center;
+  line-height: 22px;
+}
+.i-slider-menu__menu-text {
+  flex: 1;
+  line-height: 22px;
+}
+.i-slider-menu__menu-collapsed {
+  width: 44px;
+  text-align: center;
+  line-height: 22px;
+}
+.i-slider-menu__content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.i-slider-menu__content-scroll,
+.i-slider-menu__content-static {
+  flex: 1;
+}
+.i-slider-menu__content-item {
+  padding: 12px;
+}
+.i-slider-menu__content-card {
+  min-height: 118px;
+  padding: 18px;
+  border-radius: 8px;
+  background-color: #f4f5fa;
+}
+.i-slider-menu__content-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
+.i-slider-menu__content-desc {
+  margin-top: 8px;
+  color: #7a8294;
+  font-size: 13px;
+  line-height: 20px;
+}
+</style>

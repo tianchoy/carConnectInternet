@@ -1,0 +1,348 @@
+<template>
+  <view :class="formClass">
+    <slot></slot>
+    <text
+      v-if="message.length > 0"
+      :class="messageClass"
+      :style="messageStyle"
+      >{{ message }}</text
+    >
+    <view v-if="showActions" class="i-form__actions">
+      <i-button size="small" plain @click="reset">{{ resetText }}</i-button>
+      <i-button size="small" type="primary" @click="submit">{{
+        submitText
+      }}</i-button>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, nextTick, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-form' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x form，提供表单容器、校验和提交能力。
+ * - modelValue: 表单数据对象，和 rules/fields 中的 name 对应。
+ * - fields: 字段配置数组，兼容旧版写法；支持 name、label、value、required、message。
+ * - rules: 校验规则数组；当 fields 为空时使用，支持 required、message、validator。
+ * - showActions: 是否显示内置提交/重置按钮。
+ * - submitText/resetText: 内置按钮文案。
+ * - labelDirection: 标签方向，horizontal 横向，vertical 纵向。
+ * - errorAlign: 错误信息对齐方式，left、center、right。
+ * - errorAutoPage: 校验失败后是否滚动到首个错误字段。
+ * - scrollOffsetTop: 滚动到错误字段时的顶部偏移。
+ * - scrollDuration: 滚动动画时长。
+ * - scrollIdPrefix: 字段滚动定位 id 前缀，需要和 i-form-item 保持一致。
+ * - watchValidStatus: 是否在字段变化时实时输出 modelValid。
+ * - modelValid: 当前校验状态，建议通过 v-model:valid 或 update:modelValid 读取。
+ */
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+  fields: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  rules: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  showActions: {
+    type: Boolean,
+    default: false,
+  },
+  submitText: {
+    type: String,
+    default: '提交',
+  },
+  resetText: {
+    type: String,
+    default: '重置',
+  },
+  labelDirection: {
+    type: String,
+    default: 'horizontal',
+  },
+  errorAlign: {
+    type: String,
+    default: 'left',
+  },
+  errorAutoPage: {
+    type: Boolean,
+    default: true,
+  },
+  scrollOffsetTop: {
+    type: [String, Number],
+    default: 12,
+  },
+  scrollDuration: {
+    type: [String, Number],
+    default: 300,
+  },
+  scrollIdPrefix: {
+    type: String,
+    default: 'i-form-item-',
+  },
+  watchValidStatus: {
+    type: Boolean,
+    default: false,
+  },
+  modelValid: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：表单校验和提交状态。
+ * - submit: 提交表单时触发，参数包含 valid、values、errors。
+ * - reset: 重置组件状态时触发。
+ * - validate: 触发表单校验时触发。
+ * - scroll-to-error: 校验失败并准备滚动到错误项时触发，参数包含 field、targetId、selector。
+ * - update:modelValid/update:valid: 输出实时或手动校验结果。
+ */
+const emit = defineEmits([
+  'submit',
+  'reset',
+  'validate',
+  'scroll-to-error',
+  'update:modelValid',
+  'update:valid',
+])
+
+const valid = ref(true)
+const message = ref('')
+const errors = ref([])
+
+const formClass = computed(() => {
+  const classes = ['i-form']
+  if (props.labelDirection == 'vertical') classes.push('i-form--vertical')
+  return classes.join(' ')
+})
+
+const messageClass = computed(() => {
+  return valid.value
+    ? 'i-form__message i-form__message--success'
+    : 'i-form__message i-form__message--error'
+})
+
+const messageStyle = computed(() => {
+  return 'text-align:' + props.errorAlign + ';'
+})
+
+function activeFields() {
+  if (props.fields.length > 0) return props.fields
+  return props.rules
+}
+
+function fieldValue(item) {
+  if (item.value != null) return item.value
+  const name = String(item.name == null ? '' : item.name)
+  if (name.length == 0) return ''
+  const values = props.modelValue
+  if (values != null && typeof values == 'object' && values[name] != null) {
+    return values[name]
+  }
+  return ''
+}
+
+function fieldLabel(item) {
+  const label = String(item.label == null ? item.name : item.label)
+  return label.length > 0 ? label : '字段'
+}
+
+function fieldRequired(item) {
+  return item.required == true
+}
+
+function fieldMessage(item) {
+  const customMessage = String(item.message == null ? '' : item.message)
+  if (customMessage.length > 0) return customMessage
+  return fieldLabel(item) + '不能为空'
+}
+
+function checkField(item, selectedKeys) {
+  const name = String(item.name == null ? '' : item.name)
+  if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0) return ''
+  const value = fieldValue(item)
+  if (fieldRequired(item) && String(value).length == 0) {
+    return fieldMessage(item)
+  }
+  return ''
+}
+
+function collectValues() {
+  const values = {}
+  const list = activeFields()
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    const name = String(item.name == null ? '' : item.name)
+    if (name.length > 0) values[name] = fieldValue(item)
+  }
+  return values
+}
+
+function validateFields(selectedKeys, silent) {
+  const list = activeFields()
+  const nextErrors = []
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    const errorMessage = checkField(item, selectedKeys)
+    if (errorMessage.length > 0) {
+      nextErrors.push({
+        field: String(item.name == null ? '' : item.name),
+        message: errorMessage,
+      })
+    }
+  }
+  errors.value = nextErrors
+  valid.value = nextErrors.length == 0
+  if (!silent) {
+    message.value = valid.value ? '校验通过' : String(nextErrors[0].message)
+    emit('validate', {
+      valid: valid.value,
+      message: message.value,
+      errors: nextErrors,
+      values: collectValues(),
+    })
+    if (!valid.value) scrollToFirstError(nextErrors)
+  }
+  emit('update:modelValid', valid.value)
+  emit('update:valid', valid.value)
+  return valid.value
+}
+
+function validate() {
+  return validateFields([], false)
+}
+
+function validFields(keys) {
+  return validateFields(keys, false)
+}
+
+function checkAsyncVaildStatus() {
+  return validateFields([], true)
+}
+
+function clearValid() {
+  valid.value = true
+  message.value = ''
+  errors.value = []
+  emit('update:modelValid', true)
+  emit('update:valid', true)
+}
+
+function submit() {
+  const isValid = validate()
+  const result = {
+    valid: isValid,
+    values: collectValues(),
+    errors: errors.value,
+    message: message.value,
+  }
+  emit('submit', result)
+}
+
+function reset() {
+  clearValid()
+  emit('reset', {
+    values: collectValues(),
+  })
+}
+
+function scrollToFirstError(nextErrors) {
+  if (!props.errorAutoPage || nextErrors.length == 0) return
+  const field = String(nextErrors[0].field == null ? '' : nextErrors[0].field)
+  if (field.length == 0) return
+  const targetId = scrollTargetId(field)
+  const selector = '#' + targetId
+  emit('scroll-to-error', {
+    field,
+    targetId,
+    selector,
+    offsetTop: Number(props.scrollOffsetTop),
+    duration: Number(props.scrollDuration),
+  })
+  nextTick(() => {
+    uni.pageScrollTo({
+      selector,
+      offsetTop: Number(props.scrollOffsetTop),
+      duration: Number(props.scrollDuration),
+    })
+  })
+}
+
+function scrollTargetId(name) {
+  return props.scrollIdPrefix + normalizeIdName(name)
+}
+
+function normalizeIdName(name) {
+  const text = String(name)
+  let result = ''
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    const char = text.charAt(i)
+    const isNumber = code >= 48 && code <= 57
+    const isUpper = code >= 65 && code <= 90
+    const isLower = code >= 97 && code <= 122
+    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
+      result = result + char
+    } else {
+      result = result + '-'
+    }
+  }
+  return result
+}
+
+watch(
+  () => [props.fields, props.rules, props.modelValue, props.watchValidStatus],
+  () => {
+    if (props.watchValidStatus) validateFields([], true)
+  },
+  { deep: true }
+)
+
+defineExpose({
+  valid: validFields,
+  validate,
+  clearValid,
+  checkAsyncVaildStatus,
+  submit,
+  reset,
+})
+</script>
+
+<style>
+.i-form {
+  padding: 4px 0;
+}
+
+.i-form__message {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-form__message--success {
+  color: #19be6b;
+}
+
+.i-form__message--error {
+  color: #fa3534;
+}
+
+.i-form__actions {
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+</style>

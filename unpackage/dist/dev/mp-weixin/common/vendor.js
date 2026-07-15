@@ -8367,6 +8367,34 @@ function vFor(source, renderItem) {
   }
   return ret;
 }
+function renderSlot(name, props = {}, key) {
+  const instance = getCurrentInstance();
+  const { parent, isMounted, ctx: { $scope } } = instance;
+  const vueIds = ($scope.properties || $scope.props).uI;
+  if (!vueIds) {
+    return;
+  }
+  if (!parent && !isMounted) {
+    onMounted(() => {
+      renderSlot(name, props, key);
+    }, instance);
+    return;
+  }
+  const invoker = findScopedSlotInvoker(vueIds, instance);
+  if (invoker) {
+    invoker(name, props, key);
+  }
+}
+function findScopedSlotInvoker(vueId, instance) {
+  let parent = instance.parent;
+  while (parent) {
+    const invokers = parent.$ssi;
+    if (invokers && invokers[vueId]) {
+      return invokers[vueId];
+    }
+    parent = parent.parent;
+  }
+}
 function setRef(ref2, id, opts = {}) {
   const { $templateRefs } = getCurrentInstance();
   $templateRefs.push({ i: id, r: ref2, k: opts.k, f: opts.f });
@@ -8488,6 +8516,7 @@ function parseVirtualHostClass(className) {
 }
 const o = (value, key) => vOn(value, key);
 const f = (source, renderItem) => vFor(source, renderItem);
+const r = (name, props, key) => renderSlot(name, props, key);
 const s = (value) => stringifyStyle(value);
 const e = (target, ...sources) => extend(target, ...sources);
 const n = (value) => normalizeClass(value);
@@ -9603,15 +9632,15 @@ function __read(o2, n2) {
   var m = typeof Symbol === "function" && o2[Symbol.iterator];
   if (!m)
     return o2;
-  var i = m.call(o2), r, ar = [], e2;
+  var i = m.call(o2), r2, ar = [], e2;
   try {
-    while ((n2 === void 0 || n2-- > 0) && !(r = i.next()).done)
-      ar.push(r.value);
+    while ((n2 === void 0 || n2-- > 0) && !(r2 = i.next()).done)
+      ar.push(r2.value);
   } catch (error) {
     e2 = { error };
   } finally {
     try {
-      if (r && !r.done && (m = i["return"]))
+      if (r2 && !r2.done && (m = i["return"]))
         m.call(i);
     } finally {
       if (e2)
@@ -9774,6 +9803,7 @@ exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.provide = provide;
 exports.pvhc = pvhc;
+exports.r = r;
 exports.reactive = reactive;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;

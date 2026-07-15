@@ -1,0 +1,124 @@
+<template>
+  <view class="i-divider" @click="emit('click')">
+    <view class="i-divider__line" :style="beforeLineStyle"></view>
+    <view v-if="dot" class="i-divider__dot" :style="dotStyle"></view>
+    <view v-else class="i-divider__content">
+      <slot>
+        <text class="i-divider__text" :style="textStyle">{{ text }}</text>
+      </slot>
+    </view>
+    <view class="i-divider__line" :style="afterLineStyle"></view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-divider' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Divider 文档。
+ * - dashed: 是否显示为虚线。
+ * - hairline: 是否使用细线。
+ * - dot: 是否以圆点替代文字，优先级高于 text 和默认插槽。
+ * - position: 内容文本位置，可取 left / center / right。
+ * - text: 文本内容。
+ * - size: 文本大小。
+ * - color: 文本颜色。
+ * - bold: 文本是否加粗。
+ * - lineColor: 分割线颜色。
+ */
+const props = defineProps({
+  dashed: { type: Boolean, default: false },
+  hairline: { type: Boolean, default: true },
+  dot: { type: Boolean, default: false },
+  position: { type: String, default: 'center' },
+  text: { type: [String, Number], default: '' },
+  size: { type: [String, Number], default: 14 },
+  color: { type: String, default: '#909399' },
+  bold: { type: Boolean, default: false },
+  lineColor: { type: String, default: '#dcdfe6' },
+})
+
+/**
+ * Emits 说明：严格保留 Divider 文档事件。
+ * - click: divider 组件被点击时触发。
+ */
+const emit = defineEmits(['click'])
+
+const beforeLineStyle = computed(() => {
+  return lineStyle(lineWeightBefore())
+})
+
+const afterLineStyle = computed(() => {
+  return lineStyle(lineWeightAfter())
+})
+
+const textStyle = computed(() => {
+  let style = 'color:' + props.color + ';'
+  style = style + 'font-size:' + formatSize(props.size) + ';'
+  if (props.bold) style = style + 'font-weight:700;'
+  return style
+})
+
+const dotStyle = computed(() => {
+  return 'background-color:' + props.lineColor + ';'
+})
+
+function lineStyle(flexValue: number): string {
+  const width = props.hairline ? '0.5px' : '1px'
+  const lineType = props.dashed ? 'dashed' : 'solid'
+  return (
+    'flex:' +
+    String(flexValue) +
+    ';border-top-width:' +
+    width +
+    ';border-top-style:' +
+    lineType +
+    ';border-top-color:' +
+    props.lineColor +
+    ';'
+  )
+}
+
+function lineWeightBefore(): number {
+  if (props.position == 'left') return 1
+  if (props.position == 'right') return 8
+  return 1
+}
+
+function lineWeightAfter(): number {
+  if (props.position == 'left') return 8
+  if (props.position == 'right') return 1
+  return 1
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-divider {
+  min-height: 32px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-divider__line {
+  height: 0;
+}
+.i-divider__content {
+  padding: 0 12px;
+}
+.i-divider__text {
+  line-height: 20px;
+}
+.i-divider__dot {
+  width: 8px;
+  height: 8px;
+  margin: 0 12px;
+  border-radius: 99px;
+}
+</style>

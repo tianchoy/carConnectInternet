@@ -8,29 +8,51 @@
 		</view>
 
 		<view class="content">
-			<uv-form :model="form" :rules="pswrules" ref="formRef" v-if="pswLogin">
-				<uv-form-item label="" prop="username" labelWidth="0">
-					<uv-input prefixIcon="account-fill" v-model="form.username" :type="text" placeholder="请输入账号" />
-				</uv-form-item>
-				<uv-form-item label="" prop="password" labelWidth="0">
-					<uv-input prefixIcon="lock-fill" v-model="form.password" :type="showpw?'password':'text'"
-						@input="filterNonLatin" placeholder="请输入密码" :password="showpw"
-						customStyle="border:1rpx solid red;height:80rpx">
-						<template v-slot:suffix>
-							<uv-icon :name="showpw?'eye-off-outline':'eye'" size="20" @click="showpwfun" />
-						</template>
-					</uv-input>
-				</uv-form-item>
-				<view class="remember-password" v-if="pswLogin">
-					<uv-checkbox-group>
-						<uv-checkbox :checked="rememberPassword" @change="toggleRememberPassword"></uv-checkbox>
-						<view class="remember-text">记住密码</view>
-					</uv-checkbox-group>
-				</view>
-			</uv-form>
+			<view v-if="pswLogin">
+				<i-form 
+					ref="formRef" 
+					:modelValue="form" 
+					:rules="pswrules" 
+					labelDirection="horizontal"
+					watchValidStatus
+					@update:modelValid="formValid = $event"
+				>
+					<i-form-item name="username" label="" required labelDirection="horizontal" labelWidth="0">
+						<i-input 
+							v-model="form.username" 
+							placeholder="请输入账号" 
+							clearable
+							prefixIcon="account-fill"
+						/>
+					</i-form-item>
+					
+					<i-form-item name="password" label="" required labelDirection="horizontal" labelWidth="0">
+						<i-input 
+							v-model="form.password" 
+							@input="filterNonLatin" 
+							placeholder="请输入密码"
+							:password="true"
+						>
+						</i-input>
+					</i-form-item>
 
-			<uv-button v-if="pswLogin" type="primary" @click="submit">提交</uv-button>
+					<!-- 记住密码 -->
+					<view class="remember-password">
+						<i-checkbox 
+							:checked="rememberPassword" 
+							@change="toggleRememberPassword"
+							label="记住密码"
+						>
+							
+						</i-checkbox>
+					</view>
+					
+					<!-- 提交按钮 -->
+					<i-button type="primary" @click="submit" :loading="loading">提交</i-button>
+				</i-form>
+			</view>
 
+			<!-- 个人用户登录（微信登录） -->
 			<view v-else>
 				<button v-if="!docState" type="primary" plain="true" @click="loginBt">
 					个人用户登录
@@ -41,114 +63,50 @@
 				</button>
 			</view>
 
+			<!-- 用户协议 -->
 			<view class="documents">
-				<uv-checkbox-group>
-					<uv-checkbox :checked="docState" @change="isDocState"></uv-checkbox>
+				<i-checkbox :checked="docState" @change="isDocState">
 					<view class="doc-info-box">
 						已阅读并同意<text class="doc-link" @click="gotoAgreement">《用户协议》</text>和<text class="doc-link" @click="gotoPrivacy">《隐私政策》</text>
 					</view>
-				</uv-checkbox-group>
+				</i-checkbox>
 			</view>
 		</view>
+		
 		<view class="other-way">
 			<view class="noLogin" @click="gotoIndex">暂不登录</view>
-			<view class="BLogin" @click="isPswLogin">{{pswLogin?'个人用户登录':'企业用户登录'}}</view>
+			<view class="BLogin" @click="isPswLogin">{{pswLogin ? '个人用户登录' : '企业用户登录'}}</view>
 		</view>
-
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, onMounted } from 'vue'
+	import { ref, onMounted, nextTick } from 'vue'
 	import { login, PostWechatlogin } from '../../api/request.uts'
 
-	const showpw = ref(true)
 	const docState = ref(false)
-	const loginType = ref(true)
-	const tips = ref('')
-	const uCode = ref(null)
-	const pswLogin = ref(false)
-	const rememberPassword = ref(false) // 新增：记住密码状态
+	const pswLogin = ref(false) // true: 企业用户登录(账号密码), false: 个人用户登录(微信)
+	const rememberPassword = ref(false)
+	const formValid = ref(false)
+	const loading = ref(false)
 
-	// 定义表单类型
+	// ===== 表单数据 =====
 	type FormData = {
-		username : string
-		password : string
-	}
-	type smsFormData = {
-		phone : string,
-		code : string
-	}
-
-	type UvFormInstance = {
-		setRules : (rules : Record<string, any>) => void
-		validate : () => Promise<boolean>
+		username: string
+		password: string
 	}
 
 	const form = ref<FormData>({
 		username: '',
 		password: ''
 	})
-	const smsform = ref<smsFormData>({
-		phone: '',
-		code: ''
-	})
 
-	const formRef = ref<UvFormInstance | null>(null)
-	const smsformRef = ref<UvFormInstance | null>(null)
+	// ===== 表单引用 =====
+	// 使用 any 类型避免类型冲突
+	const formRef = ref<any>(null)
 	const deviceModel = ref('')
 
-	const saveAccountPassword = () => {
-		if (rememberPassword.value && form.value.username && form.value.password) {
-			const accountInfo = {
-				username: form.value.username,
-				password: form.value.password,
-			}
-			uni.setStorageSync('savedEnterpriseAccount', accountInfo)
-		} else if (!rememberPassword.value) {
-			uni.removeStorageSync('savedEnterpriseAccount')
-		}
-	}
-
-	// 从本地存储加载账号密码
-	const loadSavedAccount = () => {
-		try {
-			const savedAccount = uni.getStorageSync('savedEnterpriseAccount')
-			if (savedAccount) {
-
-				form.value.username = savedAccount.username || ''
-				form.value.password = savedAccount.password || ''
-				rememberPassword.value = true
-
-			}
-		} catch (error) {
-			console.error('加载保存的账号密码失败:', error)
-		}
-	}
-
-	// 切换记住密码状态
-	const toggleRememberPassword = () => {
-		rememberPassword.value = !rememberPassword.value
-		// 如果取消记住密码，立即清除保存的数据
-		if (!rememberPassword.value) {
-			uni.removeStorageSync('savedEnterpriseAccount')
-		}
-	}
-
-	const isPswLogin = () => {
-		pswLogin.value = !pswLogin.value
-		// 切换到企业用户登录时，尝试加载保存的账号
-		if (pswLogin.value) {
-			setTimeout(() => {
-				loadSavedAccount()
-			}, 100)
-		}
-	}
-
-	const filterNonLatin = (e) => {
-		form.value.password = e.replace(/[^\x00-\x7F]/g, '')
-	}
-
+	// ===== 表单验证规则 =====
 	const pswrules = {
 		username: [
 			{
@@ -166,119 +124,152 @@
 		]
 	}
 
-	const smsrules = {
-		phone: [
-			{
-				required: true,
-				message: '请输入手机号',
-				trigger: ['blur', 'change']
-			},
-			{
-				validator: (rule, value, callback) => {
-					const phoneReg = /^1[3-9]\d{9}$/
-					if (!phoneReg.test(value)) {
-						callback(new Error('请输入正确的手机号'))
-					} else {
-						callback()
-					}
-				},
-				trigger: ['blur', 'change']
+	// ===== 核心功能函数 =====
+
+	// 切换企业/个人登录
+	const isPswLogin = () => {
+		pswLogin.value = !pswLogin.value
+		if (pswLogin.value) {
+			// 切换到企业登录时，加载保存的账号
+			setTimeout(() => {
+				loadSavedAccount()
+			}, 100)
+		}
+	}
+
+	// 记住密码切换
+	const toggleRememberPassword = () => {
+		rememberPassword.value = !rememberPassword.value
+		if (!rememberPassword.value) {
+			uni.removeStorageSync('savedEnterpriseAccount')
+		}
+	}
+
+	// 保存账号密码
+	const saveAccountPassword = () => {
+		if (rememberPassword.value && form.value.username && form.value.password) {
+			const accountInfo = {
+				username: form.value.username,
+				password: form.value.password,
 			}
-		],
-		code: [
-			{
-				required: true,
-				message: '请输入验证码',
-				trigger: ['blur', 'change']
-			},
-			{
-				len: 6,
-				message: '验证码长度为6位',
-				trigger: ['blur', 'change']
+			uni.setStorageSync('savedEnterpriseAccount', accountInfo)
+		} else if (!rememberPassword.value) {
+			uni.removeStorageSync('savedEnterpriseAccount')
+		}
+	}
+
+	// 加载保存的账号密码
+	const loadSavedAccount = () => {
+		try {
+			const savedAccount = uni.getStorageSync('savedEnterpriseAccount')
+			if (savedAccount) {
+				form.value.username = savedAccount.username || ''
+				form.value.password = savedAccount.password || ''
+				rememberPassword.value = true
 			}
-		]
-	}
-
-	const codeChange = (text) => {
-		tips.value = text
-	}
-
-	const getCode = () => {
-		// 1. 先检查手机号是否为空
-		if (!smsform.value.phone) {
-			uni.showToast({
-				title: '请先输入手机号',
-				icon: 'none'
-			})
-			return
+		} catch (error) {
+			console.error('加载保存的账号密码失败:', error)
 		}
-
-		// 2. 验证手机号格式是否正确
-		const phoneReg = /^1[3-9]\d{9}$/
-		if (!phoneReg.test(smsform.value.phone)) {
-			uni.showToast({
-				title: '手机号格式不正确',
-				icon: 'none'
-			})
-			return
-		}
-
-		// 3. 检查是否在冷却期内
-		if (!uCode.value?.canGetCode) {
-			uni.showToast({
-				title: '请稍后再试',
-				icon: 'none'
-			})
-			return
-		}
-
-		// 所有验证通过，开始获取验证码
-		uni.showLoading({
-			title: '验证码发送中...'
-		})
-
-		// 模拟请求
-		setTimeout(() => {
-			uni.hideLoading()
-			uCode.value.start() // 启动倒计时
-			uni.showToast({
-				title: '验证码已发送',
-				icon: 'success'
-			})
-		}, 1000)
 	}
 
-	const showpwfun = () => {
-		showpw.value = !showpw.value
+	// 密码过滤（只允许ASCII字符）
+	const filterNonLatin = (e: any) => {
+		form.value.password = e.replace(/[^\x00-\x7F]/g, '')
 	}
 
+	// 用户协议勾选
 	const isDocState = () => {
-		console.log('docState.value:', docState.value)
 		docState.value = !docState.value
 	}
 
-	const smsLogin = () => {
-		loginType.value = !loginType.value
-	}
-
-	//获取系统信息
+	// 获取系统信息
 	const getSystemInfo = () => {
 		const res = uni.getSystemInfoSync()
 		deviceModel.value = res.deviceModel
+		console.log('设备型号:', deviceModel.value)
 	}
 
-	onMounted(() => {
-		getSystemInfo()
-		if (formRef.value) {
-			formRef.value.setRules(pswrules)
-		}
-		if (smsformRef.value) {
-			smsformRef.value.setRules(smsrules)
-		}
-		// 页面加载时尝试加载保存的企业账号
-		loadSavedAccount()
-	})
+	// ===== 表单验证 - 直接使用 i-form 的 validate 方法 =====
+	const validateForm = (): Promise<boolean> => {
+		return new Promise((resolve, reject) => {
+			console.log('开始验证表单, formRef.value:', formRef.value)
+			
+			if (!formRef.value) {
+				console.error('表单实例为空')
+				reject(new Error('表单实例不存在'))
+				return
+			}
+			
+			// 检查是否有 validate 方法
+			if (typeof formRef.value.validate !== 'function') {
+				console.error('validate 方法不存在，尝试使用其他方法')
+				// 有些版本可能使用不同方法名
+				if (typeof formRef.value.validateForm === 'function') {
+					formRef.value.validateForm((valid: boolean) => {
+						console.log('validateForm 验证结果:', valid)
+						if (valid) {
+							resolve(true)
+						} else {
+							reject(new Error('表单验证失败'))
+						}
+					})
+					return
+				}
+				reject(new Error('表单验证方法不存在'))
+				return
+			}
+			
+			// 调用 validate 方法
+			try {
+				const result = formRef.value.validate()
+				console.log('validate 同步返回:', result)
+				
+				// 如果返回的是 Promise
+				if (result && typeof result.then === 'function') {
+					result.then((valid: boolean) => {
+						console.log('validate Promise 结果:', valid)
+						if (valid) {
+							resolve(true)
+						} else {
+							reject(new Error('表单验证失败'))
+						}
+					}).catch((err: any) => {
+						console.error('validate Promise 错误:', err)
+						reject(err)
+					})
+					return
+				}
+				
+				// 如果返回的是 boolean
+				if (typeof result === 'boolean') {
+					if (result) {
+						resolve(true)
+					} else {
+						reject(new Error('表单验证失败'))
+					}
+					return
+				}
+				
+				// 如果使用回调方式
+				formRef.value.validate((valid: boolean, errors?: any[]) => {
+					console.log('validate 回调结果:', valid, errors)
+					if (valid) {
+						resolve(true)
+					} else {
+						reject(errors || new Error('表单验证失败'))
+					}
+				})
+				
+			} catch (error) {
+				console.error('验证执行异常:', error)
+				reject(error)
+			}
+		})
+	}
 
+	// ===== 登录相关函数 =====
+
+	// 个人用户登录（微信）
 	const loginBt = () => {
 		if (!docState.value) {
 			uni.showToast({
@@ -288,15 +279,9 @@
 			return
 		}
 	}
-	const gotoIndex = () => {
-		uni.reLaunch({
-			url: '/pages/index/index'
-		})
-	}
 
-	// 微信登录处理函数
-	const handleGetPhoneNumber = async (e) => {
-		console.log('e',e)
+	// 微信登录处理
+	const handleGetPhoneNumber = async (e: any) => {
 		if (!docState.value) {
 			uni.showToast({
 				title: '请先阅读并同意用户协议',
@@ -305,7 +290,6 @@
 			return
 		}
 
-		// 处理授权结果
 		if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
 			uni.showToast({
 				title: '您拒绝了授权',
@@ -325,7 +309,6 @@
 		try {
 			uni.showLoading({ title: '登录中...' })
 
-			// 1. 获取微信登录code
 			const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
 				uni.login({
 					provider: 'weixin',
@@ -334,21 +317,18 @@
 				})
 			})
 
-			console.log('微信登录code:', loginRes.code)
-
-			// 2. 发送到后端解密处理
 			const res = await PostWechatlogin({
 				code: loginRes.code,
 				encryptedData: e.detail.encryptedData,
 				iv: e.detail.iv
 			})
 
-			// 3. 检查返回数据是否有效
-			if (!res && !res.data) {
+			if (!res || !res.data) {
 				uni.showToast({
-					title: res.msg,
+					title: res?.msg || '登录失败',
 					icon: 'none'
 				})
+				return
 			}
 
 			if (!res.data.token) {
@@ -356,13 +336,19 @@
 					title: '登录失败: 未获取到token',
 					icon: 'none'
 				})
+				return
 			}
 
-			// 4. 登录成功处理
 			uni.setStorageSync('token', res.data.token)
-			uni.reLaunch({
-				url: '/pages/index/index'
+			uni.showToast({
+				title: '登录成功',
+				icon: 'success'
 			})
+			setTimeout(() => {
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
+			}, 500)
 
 		} catch (error) {
 			console.error('微信登录失败:', error)
@@ -375,8 +361,9 @@
 		}
 	}
 
-	const submit = () => {
-		console.log(docState.value)
+	// 提交登录（账号密码）
+	const submit = async () => {
+		
 		if (!docState.value) {
 			uni.showToast({
 				title: '请先阅读并同意用户协议',
@@ -384,75 +371,95 @@
 			})
 			return
 		}
-
-		if (loginType.value) {
-			// 账号密码登录
-			formRef.value?.validate().then(res => {
-				const newFormData = {
-					...form.value,
-					from: deviceModel.value,
-					type: "USER"
-				}
-				// 请求登陆接口
-				login(newFormData).then(res => {
-					// 登录成功后保存账号密码（如果勾选了记住密码）
-					saveAccountPassword()
-
-					uni.setStorageSync('token', res.data.token)
+		
+		try {
+			// 表单验证
+			console.log('准备验证表单...')
+			await validateForm()
+			console.log('✅ 表单验证通过')
+			
+			// 构建请求参数
+			const newFormData = {
+				username: form.value.username,
+				password: form.value.password,
+				from: deviceModel.value,
+				type: "USER"
+			}
+			console.log('📤 请求参数:', newFormData)
+			
+			// 显示加载状态
+			loading.value = true
+			uni.showLoading({
+				title: '登录中...',
+				mask: true
+			})
+			
+			// 调用登录接口
+			console.log('🚀 开始调用 login 接口...')
+			const res = await login(newFormData)
+			console.log('✅ 登录接口返回:', res)
+			
+			// 隐藏加载状态
+			loading.value = false
+			uni.hideLoading()
+			
+			// 处理登录成功
+			if (res && res.data && res.data.token) {
+				saveAccountPassword()
+				uni.setStorageSync('token', res.data.token)
+				uni.showToast({
+					title: '登录成功',
+					icon: 'success'
+				})
+				setTimeout(() => {
 					uni.reLaunch({
 						url: '/pages/index/index'
 					})
-				}).catch(err => {
-					uni.showToast({
-						title: err.msg || '登录失败',
-						icon: 'error'
-					})
+				}, 500)
+			} else {
+				uni.showToast({
+					title: res?.msg || '登录失败，请重试',
+					icon: 'error'
 				})
-			}).catch(errors => {
+			}
+			
+		} catch (error: any) {
+			console.error('❌ 登录失败:', error)
+			loading.value = false
+			uni.hideLoading()
+			
+			// 判断是验证错误还是接口错误
+			if (error && error.message) {
 				uni.showToast({
 					icon: 'error',
-					title: '请填写正确的账号密码'
+					title: error.message || '请填写正确的账号密码'
 				})
-			})
-		} else {
-			// 短信验证码登录
-			smsformRef.value?.validate().then(res => {
-				const params = {
-					phone: smsform.value.phone,
-					code: smsform.value.code,
-					from: deviceModel.value,
-					type: "SMS"
-				}
-				// 请求短信登录接口
-				// apiSmsLogin(params).then(res => {
-				// 	uni.setStorageSync('token', res.data.token)
-				// 	uni.reLaunch({
-				// 		url: '/pages/index/index'
-				// 	})
-				// }).catch(err => {
-				// 	uni.showToast({
-				// 		title: err.message || '登录失败',
-				// 		icon: 'error'
-				// 	})
-				// })
-			}).catch(errors => {
+			} else {
 				uni.showToast({
 					icon: 'error',
-					title: '请填写正确的手机号和验证码'
+					title: '登录失败，请检查网络后重试'
 				})
-			})
+			}
 		}
 	}
-	//弹出用户协议弹窗
-	const gotoAgreement = () => {	
+
+	// 跳转到首页
+	const gotoIndex = () => {
+		uni.reLaunch({
+			url: '/pages/index/index'
+		})
+	}
+
+	// ===== 协议弹窗 =====
+	const gotoAgreement = () => {
 		uni.showModal({
 			title: '用户协议',
 			content: userAgreement,
 			showCancel: false,
 		})
 	}
-	//弹出隐私政策弹窗
-	const gotoPrivacy = () => {	
+
+	const gotoPrivacy = () => {
 		uni.showModal({
 			title: '隐私政策',
 			content: privacyPolicy,
@@ -460,53 +467,68 @@
 		})
 	}
 
+	// ===== 生命周期 =====
+	onMounted(() => {
+		getSystemInfo()
+		loadSavedAccount()
+		console.log('pswLogin 初始值:', pswLogin.value)
+		console.log('formRef 初始值:', formRef.value)
+		
+		// 延迟检查 formRef
+		setTimeout(() => {
+			console.log('延迟检查 formRef.value:', formRef.value)
+			if (formRef.value) {
+				console.log('formRef 的方法:', Object.keys(formRef.value))
+			}
+		}, 500)
+	})
+
+	// ===== 协议内容 =====
 	const userAgreement = `
+欢迎使用车联网平台！
 
-欢迎使用车联网平台！\n
+一、服务条款的确认和接纳
+本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。
 
-一、服务条款的确认和接纳\n
-本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n
+二、服务内容
+1. 车联网平台提供车辆管理、远程控制、数据分析等服务。
+2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。
 
-二、服务内容\n
-1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n
-2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n
+三、用户账号
+用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。
 
-三、用户账号\n
-用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n
+四、用户隐私保护
+保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。
 
-四、用户隐私保护\n
-保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n
+五、免责声明
+1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。
+2. 对于因不可抗力造成的服务中断，平台不承担责任。
 
-五、免责声明\n
-1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n
-2. 对于因不可抗力造成的服务中断，平台不承担责任。\n
-
-六、法律适用\n	
-本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n
+六、法律适用
+本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。
 
 如有任何疑问，请联系我们。`
 
-const privacyPolicy = `
+	const privacyPolicy = `
+车联网平台非常重视您的隐私保护！
 
-车联网平台非常重视您的隐私保护！\n
+一、信息收集
+1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。
+2. 我们会在您注册、使用服务时收集必要的信息。
 
-一、信息收集\n
-1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n
-2. 我们会在您注册、使用服务时收集必要的信息。\n
+二、信息使用
+1. 我们使用收集的信息来提供、维护和改进服务。
+2. 我们不会向第三方出售或分享您的个人信息。
 
-二、信息使用\n
-1. 我们使用收集的信息来提供、维护和改进服务。\n
-2. 我们不会向第三方出售或分享您的个人信息。\n
+三、信息保护
+1. 我们采用行业标准的安全措施保护您的信息。
+2. 我们会定期评估安全措施的有效性。
 
-三、信息保护 \n
-1. 我们采用行业标准的安全措施保护您的信息。\n
-2. 我们会定期评估安全措施的有效性。\n
+四、未成年人保护
+我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。
 
-四、未成年人保护\n
-我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n
-
-五、政策更新\n
-我们可能会更新隐私政策，更新后的政策将在平台公布。\n
+五、政策更新
+我们可能会更新隐私政策，更新后的政策将在平台公布。
 
 如有任何隐私问题，请联系我们。`
 </script>
@@ -534,10 +556,8 @@ const privacyPolicy = `
 				font-size: 40rpx;
 				font-weight: bold;
 				color: #333;
-
 			}
 		}
-
 
 		.content {
 			background-color: #fff;
@@ -559,28 +579,29 @@ const privacyPolicy = `
 				align-items: center;
 				font-size: 25rpx;
 				margin-top: 40rpx;
-				.doc-info-box{
+				
+				.doc-info-box {
 					display: flex;
 					flex-direction: row;
 					justify-content: center;
 					align-items: center;
-					.doc-link{
+					margin-left: 10px;
+					.doc-link {
 						color: #007AFF;
 					}
 				}
 			}
 
-			// 新增：记住密码样式
 			.remember-password {
 				display: flex;
 				flex-direction: row;
 				align-items: center;
 				margin: 20rpx 0;
 				font-size: 25rpx;
-
-				.remember-text {
-					margin-left: 10rpx;
-					color: #666;
+				
+				:deep(.i-checkbox) {
+					display: flex;
+					align-items: center;
 				}
 			}
 		}
@@ -610,6 +631,10 @@ const privacyPolicy = `
 
 		.btn-text {
 			margin-left: 10px;
+		}
+
+		:deep(.i-form-item){
+			padding: 12px 0;
 		}
 	}
 </style>

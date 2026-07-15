@@ -8,22 +8,20 @@ const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
-  const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
-  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
-  const _easycom_uv_modal_1 = common_vendor.resolveComponent("uv-modal");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1 + _easycom_uv_input_1 + _easycom_uv_modal_1)();
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_grid_1 = common_vendor.resolveComponent("i-grid");
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_modal_1 = common_vendor.resolveComponent("i-modal");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_grid_1 + _easycom_i_input_1 + _easycom_i_modal_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
-const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
-const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
-const _easycom_uv_modal = () => "../../uni_modules/uv-modal/components/uv-modal/uv-modal.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_i_grid = () => "../../uni_modules/i-ui-x/components/i-grid/i-grid.js";
+const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
+const _easycom_i_modal = () => "../../uni_modules/i-ui-x/components/i-modal/i-modal.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_input + _easycom_uv_modal)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_grid + _easycom_i_input + _easycom_i_modal)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carInfoDetail",
@@ -50,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     ]);
     const refreshTimer = common_vendor.ref(null);
     const isRefreshing = common_vendor.ref(false);
-    const popupRef = common_vendor.ref(null);
+    const popupRef = common_vendor.ref(false);
     const psw = common_vendor.ref("");
     const currentOperation = common_vendor.ref(0);
     const modalTitle = common_vendor.ref("验证密码");
@@ -199,29 +197,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const baseList = common_vendor.computed(() => {
       const list = [new common_vendor.UTSJSONObject({
-        name: "/static/gjhf.png",
-        title: "轨迹回放"
+        image: "/static/gjhf.png",
+        text: "轨迹回放"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/clgz.png",
-        title: "车辆跟踪"
+        image: "/static/clgz.png",
+        text: "车辆跟踪"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/lcjl.png",
-        title: "里程记录"
+        image: "/static/lcjl.png",
+        text: "里程记录"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/tcjl.png",
-        title: "停车记录"
+        image: "/static/tcjl.png",
+        text: "停车记录"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/dzwl.png",
-        title: "电子围栏"
+        image: "/static/dzwl.png",
+        text: "电子围栏"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/navto.png",
-        title: "一键寻车"
+        image: "/static/navto.png",
+        text: "一键寻车"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/power.png",
-        title: "恢复油电"
+        image: "/static/power.png",
+        text: "恢复油电"
       }), new common_vendor.UTSJSONObject({
-        name: "/static/offpower.png",
-        title: "断开油电"
+        image: "/static/offpower.png",
+        text: "断开油电"
       })];
       const productId = currentCarInfo.value.productId;
       if (productId === "product-1141811865601576960" || productId === "product-1183161303028600832") {
@@ -233,7 +231,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return list;
     });
     const click = (name = null) => {
-      const itemTo = name.title;
+      console.log(name);
+      const itemTo = name.text;
       if (itemTo == "轨迹回放") {
         stopAutoRefresh();
         common_vendor.index.navigateTo({
@@ -263,7 +262,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           psw.value = "";
           currentOperation.value = 1;
           modalTitle.value = "验证密码";
-          popupRef.value.open();
+          popupRef.value = true;
         } else {
           executeOperation(1);
         }
@@ -273,7 +272,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           psw.value = "";
           currentOperation.value = 2;
           modalTitle.value = "验证密码";
-          popupRef.value.open();
+          popupRef.value = true;
         } else {
           executeOperation(2);
         }
@@ -316,13 +315,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "执行中...",
             mask: true
           }));
-          const res = yield api_request.sendCommand({
+          const res = yield api_request.sendCommand(new common_vendor.UTSJSONObject({
             imei: imei.value,
             password: userType.value == "1" ? psw.value : "",
             params: ["1111"],
             predictCmdId,
             type
-          });
+          }));
           common_vendor.index.hideLoading();
           if (res.code == 0) {
             common_vendor.index.showToast({
@@ -651,9 +650,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         h: common_vendor.unref(mapScale),
         i: common_vendor.t(common_vendor.unref(imei)),
         j: common_vendor.p({
-          name: "arrow-right",
-          bold: true,
-          size: 16
+          name: "/static/arrow-right.png",
+          fontSize: "16"
         }),
         k: common_vendor.o(carDetail, "4a"),
         l: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
@@ -700,45 +698,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         O: common_vendor.t(common_vendor.unref(datainfo).batteryPercent),
         P: getBatteryColor(common_vendor.unref(datainfo).batteryPercent)
       } : {}) : {}, {
-        Q: common_vendor.f(common_vendor.unref(baseList), (item, index, i0) => {
-          return {
-            a: "6cb34a81-5-" + i0 + "," + ("6cb34a81-4-" + i0),
-            b: common_vendor.p({
-              customStyle: {
-                paddingTop: "20rpx"
-              },
-              name: item.name,
-              size: 35
-            }),
-            c: common_vendor.t(item.title),
-            d: index,
-            e: common_vendor.o(($event) => {
-              return click(item);
-            }, index),
-            f: "6cb34a81-4-" + i0 + ",6cb34a81-3"
-          };
-        }),
+        Q: common_vendor.o(($event) => {
+          return click($event);
+        }, "bd"),
         R: common_vendor.p({
-          col: 5
+          items: common_vendor.unref(baseList),
+          col: 5,
+          itemHeight: "88",
+          round: "8",
+          imageSize: 30,
+          iconColor: "#3c9cff",
+          textColor: "#606266",
+          showBorder: true
         }),
-        S: common_vendor.o(($event) => {
+        S: common_vendor.o(_ctx.filterNonLatin, "47"),
+        T: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "7e"),
-        T: common_vendor.p({
-          placeholder: "请输入账户密码",
-          prefixIcon: "lock",
-          border: "surround",
+        }, "a4"),
+        U: common_vendor.p({
+          placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        U: common_vendor.sr(popupRef, "6cb34a81-6", {
-          "k": "popupRef"
-        }),
-        V: common_vendor.o(confirm, "7a"),
+        V: common_vendor.o(confirm, "78"),
         W: common_vendor.p({
-          title: common_vendor.unref(modalTitle),
-          class: "r"
+          show: common_vendor.unref(popupRef),
+          title: common_vendor.unref(modalTitle)
         }),
         X: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         Y: `${_ctx.u_s_b_h}px`,

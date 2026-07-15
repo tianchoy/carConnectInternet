@@ -1,0 +1,128 @@
+<template>
+  <view class="i-card" @click="emitClick">
+    <text class="i-muted">{{ title }}</text>
+    <text class="i-amount" :style="'color:' + color">{{ formatted }}</text>
+    <view class="i-row">
+      <view class="i-btn" @click.stop="step(-100)"
+        ><text class="i-btn-text">-100</text></view
+      >
+      <view class="i-btn" @click.stop="step(100)"
+        ><text class="i-btn-text">+100</text></view
+      >
+    </view>
+  </view>
+</template>
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+
+defineOptions({ name: 'i-amount' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - value: 组件当前值；通常用于受控状态，并会配合 change / update:value 回传。
+ * - title: 主标题文本，用于组件顶部或主要说明位置。
+ * - prefix: 前缀文本，例如金额符号。
+ * - suffix: 后缀文本，例如单位。
+ * - decimals: 小数位数。
+ * - separator: 是否使用千分位分隔符。
+ * - color: 文字、图标或线条颜色。
+ */
+const props = defineProps({
+  value: { type: Number, default: 12980.5 },
+  title: { type: String, default: '金额格式化' },
+  prefix: { type: String, default: '¥' },
+  suffix: { type: String, default: '' },
+  decimals: { type: Number, default: 2 },
+  separator: { type: Boolean, default: true },
+  color: { type: String, default: '#303133' },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ * - update:value: 同步 value 受控值，便于外部双向绑定。
+ */
+const emit = defineEmits(['click', 'change', 'update:value'])
+
+const current = ref(props.value)
+
+const formatted = computed(() => {
+  const fixed = Number(current.value).toFixed(props.decimals)
+  const parts = fixed.split('.')
+  const intPart = props.separator ? parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') : parts[0]
+  return props.prefix + intPart + (parts.length > 1 ? '.' + parts[1] : '') + props.suffix
+})
+
+watch(
+  () => props.value,
+  (nextValue) => {
+    current.value = nextValue
+  },
+)
+
+function step(delta) {
+  current.value = current.value + delta
+  emit('change', current.value)
+  emit('update:value', current.value)
+}
+
+function emitClick() {
+  emit('click', current.value)
+}
+</script>
+<style>
+.i-card {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+
+.i-amount {
+  margin-top: 6px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+}
+</style>

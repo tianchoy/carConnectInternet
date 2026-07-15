@@ -1,0 +1,140 @@
+<template>
+  <view class="i-skeleton">
+    <view v-if="loading" class="i-skeleton__wrap">
+      <view
+        v-if="avatar"
+        class="i-skeleton__avatar"
+        :class="animate ? 'i-skeleton--animate' : ''"
+        :style="avatarStyle"
+      ></view>
+      <view class="i-skeleton__content">
+        <view
+          v-if="title"
+          class="i-skeleton__title"
+          :class="animate ? 'i-skeleton--animate' : ''"
+          :style="titleStyle"
+        ></view>
+        <view
+          v-for="index in rowCount"
+          :key="index"
+          class="i-skeleton__row"
+          :class="animate ? 'i-skeleton--animate' : ''"
+          :style="rowStyle(index - 1)"
+        ></view>
+      </view>
+    </view>
+    <view v-else>
+      <slot></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-skeleton' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Skeleton 文档。
+ * - loading: 是否显示骨架占位图；为 false 时显示默认插槽内容。
+ * - animate: 是否开启骨架块加载动画。
+ * - rows: 段落占位行数。
+ * - rowsWidth: 段落宽度；可传单个值或数组分别控制每行宽度。
+ * - rowsHeight: 段落高度；可传单个值或数组分别控制每行高度。
+ * - title: 是否显示标题占位图。
+ * - titleWidth: 标题占位宽度。
+ * - titleHeight: 标题占位高度。
+ * - avatar: 是否显示头像占位图。
+ * - avatarSize: 头像占位图大小。
+ * - avatarShape: 头像形状，可取 circle / square。
+ */
+const props = defineProps({
+  loading: { type: Boolean, default: true },
+  animate: { type: Boolean, default: true },
+  rows: { type: [String, Number], default: 0 },
+  rowsWidth: { type: [String, Number, Array], default: '100%' },
+  rowsHeight: { type: [String, Number, Array], default: 18 },
+  title: { type: Boolean, default: true },
+  titleWidth: { type: [String, Number], default: '50%' },
+  titleHeight: { type: [String, Number], default: 18 },
+  avatar: { type: Boolean, default: false },
+  avatarSize: { type: [String, Number], default: 32 },
+  avatarShape: { type: String, default: 'circle' },
+})
+
+const rowCount = computed(() => {
+  const count = Number(props.rows)
+  if (isNaN(count) || count < 0) return 0
+  return Math.floor(count)
+})
+
+const titleStyle = computed(() => {
+  return 'width:' + formatSize(props.titleWidth) + ';height:' + formatSize(props.titleHeight) + ';'
+})
+
+const avatarStyle = computed(() => {
+  let style = 'width:' + formatSize(props.avatarSize) + ';height:' + formatSize(props.avatarSize) + ';'
+  if (props.avatarShape == 'circle') {
+    style = style + 'border-radius:999px;'
+  } else {
+    style = style + 'border-radius:4px;'
+  }
+  return style
+})
+
+function rowStyle(index: number): string {
+  return (
+    'width:' +
+    formatSize(arrayValue(props.rowsWidth, index)) +
+    ';height:' +
+    formatSize(arrayValue(props.rowsHeight, index)) +
+    ';'
+  )
+}
+
+function arrayValue(source, index: number) {
+  if (Array.isArray(source)) {
+    if (index < source.length) return source[index]
+    if (source.length > 0) return source[source.length - 1]
+  }
+  return source
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-skeleton {
+  width: 100%;
+}
+.i-skeleton__wrap {
+  flex-direction: row;
+}
+.i-skeleton__avatar {
+  margin-right: 12px;
+  flex-shrink: 0;
+  background-color: #ebeef5;
+}
+.i-skeleton__content {
+  flex: 1;
+}
+.i-skeleton__title {
+  margin-bottom: 16px;
+  border-radius: 3px;
+  background-color: #ebeef5;
+}
+.i-skeleton__row {
+  margin-top: 10px;
+  border-radius: 3px;
+  background-color: #ebeef5;
+}
+.i-skeleton--animate {
+  opacity: 0.72;
+}
+</style>

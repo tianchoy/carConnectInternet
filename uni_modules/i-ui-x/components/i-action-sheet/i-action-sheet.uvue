@@ -1,0 +1,500 @@
+<template>
+  <view>
+    <view class="i-action-sheet__trigger" @click="open">
+      <slot name="trigger">
+        <slot></slot>
+      </slot>
+    </view>
+
+    <view
+      v-if="innerShow"
+      class="i-action-sheet__mask"
+      @click="handleOverlayClick"
+    ></view>
+    <view
+      v-if="innerShow"
+      class="i-action-sheet__panel"
+      :style="panelStyle"
+    >
+      <view
+        v-if="closeable"
+        class="i-action-sheet__close"
+        @click="closeByUser"
+      >
+        <text class="i-action-sheet__close-text">×</text>
+      </view>
+
+      <view
+        v-if="title.length > 0 || description.length > 0"
+        class="i-action-sheet__header"
+      >
+        <text
+          v-if="title.length > 0"
+          class="i-action-sheet__title"
+          :style="titleStyleText"
+        >
+          {{ title }}
+        </text>
+        <text v-if="description.length > 0" class="i-action-sheet__desc">
+          {{ description }}
+        </text>
+      </view>
+
+      <scroll-view scroll-y="true" class="i-action-sheet__scroll">
+        <button
+          v-for="(item, index) in actions"
+          :key="String(index) + '-' + getActionText(item)"
+          :class="getItemClass(item)"
+          :disabled="isDisabled(item) || isLoading(item)"
+          :open-type="getActionOpenType(item)"
+          :app-parameter="appParameter"
+          :lang="lang"
+          :session-from="sessionFrom"
+          :send-message-title="sendMessageTitle"
+          :send-message-path="sendMessagePath"
+          :send-message-img="sendMessageImg"
+          :show-message-card="showMessageCard"
+          @click="handleSelect(item, index)"
+          @getuserinfo="handleOpenEvent('getuserinfo', $event)"
+          @contact="handleOpenEvent('contact', $event)"
+          @getphonenumber="handleOpenEvent('getphonenumber', $event)"
+          @chooseavatar="handleOpenEvent('chooseavatar', $event)"
+          @error="handleOpenEvent('error', $event)"
+          @launchapp="handleOpenEvent('launchapp', $event)"
+          @opensetting="handleOpenEvent('opensetting', $event)"
+        >
+          <view class="i-action-sheet__item-inner">
+            <view class="i-action-sheet__main">
+              <i-icon
+                v-if="getActionIcon(item).length > 0"
+                class="i-action-sheet__icon"
+                :name="getActionIcon(item)"
+                fontSize="17"
+                :color="getItemColor(item)"
+              ></i-icon>
+              <text
+                class="i-action-sheet__item-text"
+                :style="'color:' + getItemColor(item)"
+              >
+                {{ getActionText(item) }}
+              </text>
+            </view>
+            <text v-if="getSubname(item).length > 0" class="i-action-sheet__subname">
+              {{ getSubname(item) }}
+            </text>
+            <text v-if="isLoading(item)" class="i-action-sheet__loading">
+              加载中
+            </text>
+          </view>
+        </button>
+      </scroll-view>
+
+      <view
+        v-if="cancelText.length > 0"
+        class="i-action-sheet__cancel"
+        @click="closeByUser"
+      >
+        <text class="i-action-sheet__cancel-text">{{ cancelText }}</text>
+      </view>
+      <view v-if="props.safeBottom" class="i-action-sheet__safe-bottom"></view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-action-sheet' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对照 ActionSheet 操作菜单文档。
+ * - show: 是否展示操作菜单，通常配合 update:show 做双向可见状态同步。
+ * - title: 顶部标题文本，为空时不展示标题。
+ * - titleStyle: 标题自定义样式，字符串样式可直接作用到标题文本。
+ * - closeable: 是否显示右上角关闭图标。
+ * - description: 选项上方的描述信息，常用于解释本次操作影响。
+ * - actions: 菜单项数组；每项支持 name、subname、color、disabled、loading、openType、value、icon。
+ * - cancelText: 取消按钮文字；为空时不展示底部取消按钮。
+ * - closeOnClickAction: 点击菜单项后是否自动关闭弹层。
+ * - safeBottom: 是否开启底部安全区适配，避免贴近设备底部。
+ * - openType: 小程序开放能力类型，会透传到菜单项 button。
+ * - closeOnMask: 点击遮罩是否允许关闭弹层。
+ * - height: 菜单面板高度；为空时根据内容自适应，超出后列表区域滚动。
+ * - round: 顶部圆角值，数字会自动补 px。
+ * - lang: openType 获取用户信息时指定返回语言，默认 en。
+ * - sessionFrom: openType="contact" 时的会话来源。
+ * - sendMessageTitle: openType="contact" 时会话内消息卡片标题。
+ * - sendMessagePath: openType="contact" 时会话内消息卡片跳转路径。
+ * - sendMessageImg: openType="contact" 时会话内消息卡片图片。
+ * - showMessageCard: openType="contact" 时是否显示会话内消息卡片。
+ * - appParameter: openType="launchApp" 时传递给 App 的参数。
+ * - customStyle: 面板自定义样式，字符串样式可直接作用到面板。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: false },
+  title: { type: String, default: '' },
+  titleStyle: { type: [String, Object], default: '' },
+  closeable: { type: Boolean, default: false },
+  description: { type: String, default: '' },
+  actions: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  cancelText: { type: String, default: '' },
+  closeOnClickAction: { type: Boolean, default: true },
+  safeBottom: { type: Boolean, default: true },
+  openType: { type: String, default: '' },
+  closeOnMask: { type: Boolean, default: true },
+  height: { type: [String, Number], default: '' },
+  round: { type: [String, Number], default: 10 },
+  lang: { type: String, default: 'en' },
+  sessionFrom: { type: String, default: '' },
+  sendMessageTitle: { type: String, default: '' },
+  sendMessagePath: { type: String, default: '' },
+  sendMessageImg: { type: String, default: '' },
+  showMessageCard: { type: Boolean, default: false },
+  appParameter: { type: String, default: '' },
+  customStyle: { type: [String, Object], default: '' },
+})
+
+/**
+ * Emits 说明：对照 DCloud uni-app x ActionSheet 文档事件。
+ * - select: 点击可用菜单项时触发，返回 { index, item, name, value }。
+ * - close: 点击取消按钮、关闭图标或遮罩关闭时触发。
+ * - getuserinfo: openType 获取用户信息回调。
+ * - contact: openType 客服消息回调。
+ * - getphonenumber: openType 获取手机号回调。
+ * - chooseavatar: openType 选择头像回调。
+ * - error: 使用开放能力发生错误时触发。
+ * - launchapp: openType 打开 App 成功时触发。
+ * - opensetting: openType 打开授权设置页后触发。
+ * - update:show: 辅助同步 show 状态，方便 v-model:show 使用。
+ */
+const emit = defineEmits([
+  'select',
+  'close',
+  'getuserinfo',
+  'contact',
+  'getphonenumber',
+  'chooseavatar',
+  'error',
+  'launchapp',
+  'opensetting',
+  'update:show',
+])
+
+
+
+
+const innerShow = ref(props.show)
+
+const titleStyleText = computed(() => {
+  if (typeof props.titleStyle == 'string') return props.titleStyle
+  return ''
+})
+
+const panelStyle = computed(() => {
+  let style = ''
+  style += 'border-top-left-radius:' + formatSize(props.round) + ';'
+  style += 'border-top-right-radius:' + formatSize(props.round) + ';'
+  if (String(props.height).length > 0) {
+    style += 'height:' + formatSize(props.height) + ';'
+  }
+  if (typeof props.customStyle == 'string') {
+    style += props.customStyle
+  }
+  return style
+})
+
+watch(
+  () => props.show,
+  (value) => {
+    innerShow.value = value
+  },
+)
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.length == 0) return '0px'
+  if (text.indexOf('vh') > -1 || text.indexOf('vw') > -1) {
+    const numberValue = Number(text.replace('vh', '').replace('vw', ''))
+    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
+  }
+  if (
+    text.indexOf('px') > -1 ||
+    text.indexOf('rpx') > -1 ||
+    text.indexOf('%') > -1
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  if (keyName == 'name' || keyName == 'value') return String(item)
+  return ''
+}
+
+function getActionText(item) {
+  return itemValue(item, 'name')
+}
+
+function getActionValue(item) {
+  const value = itemValue(item, 'value')
+  if (value.length > 0) return value
+  return getActionText(item)
+}
+
+function getSubname(item) {
+  return itemValue(item, 'subname')
+}
+
+function getActionIcon(item) {
+  return itemValue(item, 'icon')
+}
+
+function getActionColor(item) {
+  const color = itemValue(item, 'color')
+  if (color.length > 0) return color
+  return '#303133'
+}
+
+function getItemColor(item) {
+  if (isDisabled(item)) return '#b8b8b8'
+  return getActionColor(item)
+}
+
+function getActionOpenType(item) {
+  const itemOpenType = itemValue(item, 'openType')
+  if (itemOpenType.length > 0) return itemOpenType
+  return props.openType
+}
+
+function isDisabled(item) {
+  if (item == null) return false
+  if (typeof item == 'object') return item['disabled'] == true
+  return false
+}
+
+function isLoading(item) {
+  if (item == null) return false
+  if (typeof item == 'object') return item['loading'] == true
+  return false
+}
+
+function getItemClass(item) {
+  if (isDisabled(item)) {
+    return 'i-action-sheet__item i-action-sheet__item--disabled'
+  }
+  if (isLoading(item)) {
+    return 'i-action-sheet__item i-action-sheet__item--loading'
+  }
+  return 'i-action-sheet__item'
+}
+
+function open() {
+  if (innerShow.value) return
+  innerShow.value = true
+  emit('update:show', true)
+}
+
+function closeSilently() {
+  if (!innerShow.value) return
+  innerShow.value = false
+  emit('update:show', false)
+}
+
+function closeByUser() {
+  if (!innerShow.value) return
+  innerShow.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  closeByUser()
+}
+
+function buildPayload(item, index) {
+  return {
+    index,
+    item,
+    name: getActionText(item),
+    value: getActionValue(item),
+  }
+}
+
+function handleSelect(item, index) {
+  if (isDisabled(item) || isLoading(item)) return
+  emit('select', buildPayload(item, index))
+  if (props.closeOnClickAction) closeSilently()
+}
+
+function handleOpenEvent(name, event) {
+  emit(name, event)
+}
+
+defineExpose({ open, close: closeByUser })
+</script>
+
+<style>
+.i-action-sheet__trigger {
+  flex-direction: column;
+}
+
+.i-action-sheet__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 99;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.i-action-sheet__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background-color: #f7f7f7;
+  overflow: hidden;
+}
+
+.i-action-sheet__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-action-sheet__close-text {
+  color: #909193;
+  font-size: 24px;
+  line-height: 28px;
+}
+
+.i-action-sheet__header {
+  min-height: 38px;
+  padding: 8px 48px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eeeeee;
+  background-color: #ffffff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-action-sheet__title {
+  color: #909193;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+}
+
+.i-action-sheet__desc {
+  margin-top: 4px;
+  color: #909193;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.i-action-sheet__scroll {
+  max-height: 320px;
+  background-color: #ffffff;
+}
+
+.i-action-sheet__item {
+  min-height: 51px;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  background-color: #ffffff;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #f2f3f5;
+}
+
+.i-action-sheet__item--disabled {
+  background-color: #fafafa;
+  opacity: 1;
+}
+
+.i-action-sheet__item--loading {
+  opacity: 0.72;
+}
+
+.i-action-sheet__item-inner {
+  min-height: 51px;
+  padding: 8px 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-action-sheet__main {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-action-sheet__icon {
+  margin-right: 6px;
+}
+
+.i-action-sheet__item-text {
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-action-sheet__subname {
+  margin-top: 2px;
+  color: #909193;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.i-action-sheet__loading {
+  margin-top: 2px;
+  color: #909193;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-action-sheet__cancel {
+  min-height: 52px;
+  margin-top: 8px;
+  background-color: #ffffff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-action-sheet__cancel-text {
+  color: #303133;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.i-action-sheet__safe-bottom {
+  height: 12px;
+  background-color: #ffffff;
+}
+</style>

@@ -1,14 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-if (!Array) {
-  const _easycom_uv_picker_1 = common_vendor.resolveComponent("uv-picker");
-  _easycom_uv_picker_1();
-}
-const _easycom_uv_picker = () => "../../uni_modules/uv-picker/components/uv-picker/uv-picker.js";
-if (!Math) {
-  _easycom_uv_picker();
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "sub-navBar",
   props: {
@@ -57,7 +49,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   emits: ["update:currentTime", "update:currentCar"],
   setup(__props, _a) {
-    var __emit = _a.emit;
+    _a.emit;
     const props = __props;
     const columns = common_vendor.ref([]);
     const picker = common_vendor.ref(null);
@@ -74,16 +66,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentPickerType.value = "car";
       (_a2 = picker.value) === null || _a2 === void 0 ? null : _a2.open();
     };
-    const confirm = (e) => {
-      const selected = e.value[0];
-      if (currentPickerType.value === "time") {
-        emit("update:currentTime", selected.label);
-      } else if (currentPickerType.value === "car") {
-        emit("update:currentCar", selected.label);
-      }
-      currentPickerType.value = "";
-    };
-    const emit = __emit;
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -109,18 +91,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         j: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         k: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`,
-        n: common_vendor.sr(picker, "f630fc82-0", {
-          "k": "picker"
-        }),
-        o: common_vendor.o(confirm, "69"),
-        p: common_vendor.p({
-          showPicker: true,
-          columns: common_vendor.unref(columns),
-          keyName: "label",
-          class: "r data-v-f630fc82"
-        })
+        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "cover-view"),
+        m: `${_ctx.u_s_b_h}px`,
+        n: `${_ctx.u_s_a_i_b}px`,
+        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

@@ -3,10 +3,9 @@
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "sub-nav-bar": "../../components/sub-navBar/sub-navBar",
-    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
-    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
-    "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
-    "uv-modal": "../../uni_modules/uv-modal/components/uv-modal/uv-modal"
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-grid": "../../uni_modules/i-ui-x/components/i-grid/i-grid",
+    "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
+    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal"
   }
 }

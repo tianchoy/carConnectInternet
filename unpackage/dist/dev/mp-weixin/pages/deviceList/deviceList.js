@@ -213,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: true,
           isIcon: true,
-          Icon: "grid",
+          Icon: "/static/maps.png",
           iconColor: iconColor.value
         }),
         c: showMap.value
@@ -221,7 +221,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.sei("myMap", "map"),
         e: markers.value,
         f: mapScale.value,
-        g: common_vendor.o(handleTap, "74"),
+        g: common_vendor.o(handleTap, "41"),
         h: userLocation.value.latitude,
         i: userLocation.value.longitude,
         j: showMap.value
@@ -229,17 +229,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         k: common_vendor.t(totalCount.value),
         l: common_vendor.o(($event) => {
           return changeState("全部状态");
-        }, "8d"),
+        }, "5f"),
         m: common_vendor.t(onlineCount.value),
         n: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "4b"),
+        }, "17"),
         o: common_vendor.t(offlineCount.value),
         p: common_vendor.o(($event) => {
           return changeState("离线");
-        }, "82")
+        }, "8c")
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "b2"),
+        q: common_vendor.o(unbindDevice, "1b"),
         r: common_vendor.p({
           lists: originalDeviceList.value
         })

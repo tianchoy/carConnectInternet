@@ -1,0 +1,142 @@
+<template>
+  <view
+    v-if="show"
+    class="i-loading-page"
+    :style="overlayStyle"
+    @click="handleOverlayClick"
+  >
+    <view
+      class="i-loading-page__panel"
+      :style="panelStyle"
+      @click.stop="handlePanelClick"
+    >
+      <i-loading
+        :type="type"
+        :size="loadingSize"
+        :text="text"
+        :vertical="vertical"
+      ></i-loading>
+      <text
+        v-if="description.length > 0"
+        class="i-loading-page__description"
+        >{{ description }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-loading-page' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - show: 控制组件是否显示，适用于弹层、遮罩、提示等可见状态。
+ * - text: 主要展示文本。
+ * - description: 辅助描述文本，用于补充说明当前组件内容。
+ * - type: 组件类型，用于切换视觉风格或语义状态。
+ * - loadingSize: loadingSize 配置项，用于控制组件展示或交互行为。
+ * - vertical: vertical 配置项，用于控制组件展示或交互行为。
+ * - closeOnMask: 点击遮罩是否关闭加载页。
+ * - bgColor: 背景颜色。
+ * - customStyle: customStyle 配置项，用于控制组件展示或交互行为。
+ */
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  text: {
+    type: String,
+    default: 'Loading',
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  type: {
+    type: String,
+    default: 'primary',
+  },
+  loadingSize: {
+    type: [String, Number],
+    default: 'large',
+  },
+  vertical: {
+    type: Boolean,
+    default: false,
+  },
+  closeOnMask: { type: Boolean, default: false },
+  bgColor: {
+    type: String,
+    default: 'rgba(255, 255, 255, 0.92)',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - close: 组件关闭或收起时触发。
+ * - update:show: 同步 show 可见状态。
+ */
+const emit = defineEmits(['click', 'close', 'update:show'])
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const overlayStyle = computed(() => {
+  return 'background-color:' + bgColor.value + ';'
+})
+
+const panelStyle = computed(() => {
+  return props.customStyle
+})
+
+function handleOverlayClick() {
+  emit('click')
+  if (props.closeOnMask) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+function handlePanelClick() {}
+</script>
+
+<style>
+.i-loading-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.i-loading-page__panel {
+  min-width: 180px;
+  padding: 24px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+}
+
+.i-loading-page__description {
+  margin-top: 10px;
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+}
+</style>

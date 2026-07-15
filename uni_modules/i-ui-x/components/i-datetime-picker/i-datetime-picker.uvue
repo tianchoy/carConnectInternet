@@ -1,0 +1,694 @@
+<template>
+  <view class="i-datetime-picker">
+    <view class="i-datetime-picker__trigger" @click="openByTrigger">
+      <slot name="trigger">
+        <slot>
+          <view class="i-datetime-picker__input">
+            <text class="i-datetime-picker__input-text">{{
+              displayValue
+            }}</text>
+            <text class="i-datetime-picker__arrow">›</text>
+          </view>
+        </slot>
+      </slot>
+    </view>
+
+    <view
+      v-if="opened"
+      class="i-datetime-picker__mask"
+      @click="handleOverlayClick"
+    >
+      <view
+        class="i-datetime-picker__panel"
+        :style="panelStyle"
+        @click.stop=""
+      >
+        <view v-if="showToolbar" class="i-datetime-picker__toolbar">
+          <text
+            class="i-datetime-picker__cancel"
+            :style="'color:' + cancelColor + ';'"
+            @click="cancel"
+          >
+            {{ cancelText }}
+          </text>
+          <text class="i-datetime-picker__title">{{ title }}</text>
+          <text
+            class="i-datetime-picker__confirm"
+            :style="'color:' + confirmColor + ';'"
+            @click="confirm"
+          >
+            {{ confirmText }}
+          </text>
+        </view>
+
+        <view v-if="loading" class="i-datetime-picker__loading">
+          <text class="i-datetime-picker__loading-text">加载中...</text>
+        </view>
+
+        <view class="i-datetime-picker__body">
+          <view v-if="showDateColumn" class="i-datetime-picker__item-wrap">
+            <text class="i-datetime-picker__label">{{ dateLabel }}</text>
+            <picker
+              mode="date"
+              :value="datePickerValue"
+              :start="startDate"
+              :end="endDate"
+              :fields="dateFields"
+              :disabled="disabled || loading"
+              @change="handleDateChange"
+            >
+              <view class="i-datetime-picker__item">
+                <text class="i-datetime-picker__value">{{
+                  datePickerValue
+                }}</text>
+              </view>
+            </picker>
+          </view>
+
+          <view v-if="showTimeColumn" class="i-datetime-picker__item-wrap">
+            <text class="i-datetime-picker__label">{{ timeLabel }}</text>
+            <picker
+              mode="time"
+              :value="currentTime"
+              :start="startTime"
+              :end="endTime"
+              :disabled="disabled || loading"
+              @change="handleTimeChange"
+            >
+              <view class="i-datetime-picker__item">
+                <text class="i-datetime-picker__value">{{ currentTime }}</text>
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-datetime-picker' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 DatetimePicker，并保留旧版 date/time 写法。
+ * - modelValue: 当前绑定值；date/datetime/year-month 通常为时间戳，time 为 HH:mm。
+ * - show: 是否展示底部弹层。
+ * - showToolbar: 是否显示顶部取消/标题/确认操作栏。
+ * - title: 顶部标题。
+ * - mode: 选择模式；datetime 为日期+时间，date 为年月日，time 为时分，year-month 为年月。
+ * - minDate: 可选的最小日期时间，时间戳毫秒，默认当前时间前 10 年。
+ * - maxDate: 可选的最大日期时间，时间戳毫秒，默认当前时间后 10 年。
+ * - minHour/maxHour: time 模式可选小时范围。
+ * - minMinute/maxMinute: time 模式可选分钟范围。
+ * - loading: 是否显示加载中状态。
+ * - cancelText/confirmText: 取消和确认按钮文字。
+ * - cancelColor/confirmColor: 取消和确认按钮颜色。
+ * - closeOnMask: 点击遮罩是否关闭弹层。
+ * - round: 弹层顶部圆角。
+ * - date/time: 旧版日期和时间值兼容。
+ * - dateLabel/timeLabel: 日期和时间列的标签。
+ * - disabled: 是否禁用触发和选择。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  showToolbar: {
+    type: Boolean,
+    default: true,
+  },
+  title: {
+    type: String,
+    default: '请选择',
+  },
+  mode: {
+    type: String,
+    default: 'datetime',
+  },
+  minDate: {
+    type: Number,
+    default: 0,
+  },
+  maxDate: {
+    type: Number,
+    default: 0,
+  },
+  minHour: {
+    type: Number,
+    default: 0,
+  },
+  maxHour: {
+    type: Number,
+    default: 23,
+  },
+  minMinute: {
+    type: Number,
+    default: 0,
+  },
+  maxMinute: {
+    type: Number,
+    default: 59,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  cancelText: {
+    type: String,
+    default: '取消',
+  },
+  confirmText: {
+    type: String,
+    default: '确认',
+  },
+  cancelColor: {
+    type: String,
+    default: '#909193',
+  },
+  confirmColor: {
+    type: String,
+    default: '#3c9cff',
+  },
+  closeOnMask: { type: Boolean, default: true },
+  round: {
+    type: [String, Number],
+    default: 16,
+  },
+  date: {
+    type: String,
+    default: '2026-05-22',
+  },
+  time: {
+    type: String,
+    default: '16:30',
+  },
+  dateLabel: {
+    type: String,
+    default: '日期',
+  },
+  timeLabel: {
+    type: String,
+    default: '时间',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发弹层状态、选择变化和确认结果。
+ * - open/close: 弹层打开和关闭时触发。
+ * - cancel: 点击取消时触发，参数为当前事件对象。
+ * - change: 日期或时间变化时触发，参数包含 value、date、time、timestamp、mode。
+ * - confirm: 点击确认时触发，参数包含 value、date、time、timestamp、mode。
+ * - update:modelValue: 同步 v-model 值。
+ * - update:show: 同步 show 弹层状态。
+ * - update:date/update:time: 兼容旧版 date/time 双字段同步。
+ */
+const emit = defineEmits([
+  'open',
+  'close',
+  'cancel',
+  'change',
+  'confirm',
+  'update:modelValue',
+  'update:show',
+  'update:date',
+  'update:time',
+])
+
+
+
+const opened = ref(props.show)
+const currentDate = ref(props.date)
+const currentTime = ref(props.time)
+
+const normalizedMode = computed(() => {
+  if (props.mode == 'date') return 'date'
+  if (props.mode == 'time') return 'time'
+  if (props.mode == 'year-month') return 'year-month'
+  return 'datetime'
+})
+
+const showDateColumn = computed(() => normalizedMode.value != 'time')
+const showTimeColumn = computed(() => normalizedMode.value == 'datetime' || normalizedMode.value == 'time')
+
+const dateFields = computed(() => {
+  if (normalizedMode.value == 'year-month') return 'month'
+  return 'day'
+})
+
+const datePickerValue = computed(() => {
+  if (normalizedMode.value == 'year-month') return currentDate.value.substring(0, 7)
+  return currentDate.value
+})
+
+const startDate = computed(() => {
+  return formatDate(minDateValue())
+})
+
+const endDate = computed(() => {
+  return formatDate(maxDateValue())
+})
+
+const startTime = computed(() => {
+  if (normalizedMode.value != 'time') return boundaryStartTime()
+  return padNumber(validHour(props.minHour)) + ':' + padNumber(validMinute(props.minMinute))
+})
+
+const endTime = computed(() => {
+  if (normalizedMode.value != 'time') return boundaryEndTime()
+  return padNumber(validHour(props.maxHour)) + ':' + padNumber(validMinute(props.maxMinute))
+})
+
+const displayValue = computed(() => {
+  if (normalizedMode.value == 'time') return currentTime.value
+  if (normalizedMode.value == 'date') return currentDate.value
+  if (normalizedMode.value == 'year-month') return currentDate.value.substring(0, 7)
+  return currentDate.value + ' ' + currentTime.value
+})
+
+const panelStyle = computed(() => {
+  const radius = formatSize(props.round)
+  return 'border-radius:' + radius + ' ' + radius + ' 0 0;'
+})
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (opened.value == nextValue) return
+    opened.value = nextValue
+    if (nextValue) {
+      syncFromProps()
+      emit('open')
+    } else {
+      emit('close')
+    }
+  },
+)
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () => props.date,
+  () => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () => props.time,
+  () => {
+    syncFromProps()
+  },
+)
+
+watch(
+  () => props.minDate,
+  () => {
+    clampCurrent()
+  },
+)
+
+watch(
+  () => props.maxDate,
+  () => {
+    clampCurrent()
+  },
+)
+
+syncFromProps()
+
+function openByTrigger() {
+  if (props.disabled) return
+  open()
+}
+
+function open() {
+  if (opened.value) return
+  syncFromProps()
+  opened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function close() {
+  if (!opened.value) return
+  opened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function cancel() {
+  emit('cancel', buildEvent())
+  close()
+}
+
+function confirm() {
+  const event = buildEvent()
+  emit('confirm', event)
+  emitValue()
+  close()
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  close()
+}
+
+function handleDateChange(event) {
+  const value = String(event.detail.value)
+  if (normalizedMode.value == 'year-month') {
+    currentDate.value = value + '-01'
+  } else {
+    currentDate.value = value
+  }
+  clampCurrent()
+  emit('update:date', currentDate.value)
+  emit('change', buildEvent())
+  if (!props.showToolbar) emitValue()
+}
+
+function handleTimeChange(event) {
+  currentTime.value = String(event.detail.value)
+  clampCurrent()
+  emit('update:time', currentTime.value)
+  emit('change', buildEvent())
+  if (!props.showToolbar) emitValue()
+}
+
+function syncFromProps() {
+  const modelText = String(props.modelValue)
+  if (modelText.length > 0) {
+    applyValue(props.modelValue)
+  } else {
+    currentDate.value = props.date
+    currentTime.value = props.time
+  }
+  clampCurrent()
+}
+
+function applyValue(value) {
+  if (normalizedMode.value == 'time') {
+    currentTime.value = normalizeTime(String(value))
+    return
+  }
+
+  const numberValue = Number(value)
+  if (!isNaN(numberValue) && numberValue > 0) {
+    currentDate.value = formatDate(numberValue)
+    currentTime.value = formatTime(numberValue)
+    return
+  }
+
+  const text = String(value)
+  if (text.length >= 10) currentDate.value = text.substring(0, 10)
+  if (text.length >= 16) currentTime.value = text.substring(11, 16)
+}
+
+function emitValue() {
+  const event = buildEvent()
+  emit('update:modelValue', event.value)
+  emit('update:date', currentDate.value)
+  emit('update:time', currentTime.value)
+}
+
+function buildEvent() {
+  return {
+    value: outputValue(),
+    date: currentDate.value,
+    time: currentTime.value,
+    timestamp: currentTimestamp(),
+    mode: normalizedMode.value,
+  }
+}
+
+function outputValue() {
+  if (normalizedMode.value == 'time') return currentTime.value
+  return currentTimestamp()
+}
+
+function clampCurrent() {
+  if (normalizedMode.value == 'time') {
+    currentTime.value = clampTime(currentTime.value)
+    return
+  }
+
+  let timestamp = currentTimestamp()
+  const minValue = minDateValue()
+  const maxValue = maxDateValue()
+  if (timestamp < minValue) timestamp = minValue
+  if (timestamp > maxValue) timestamp = maxValue
+  currentDate.value = formatDate(timestamp)
+  currentTime.value = formatTime(timestamp)
+}
+
+function currentTimestamp() {
+  return dateTimeToTimestamp(currentDate.value, currentTime.value)
+}
+
+function dateTimeToTimestamp(dateText, timeText) {
+  const year = Number(dateText.substring(0, 4))
+  const month = Number(dateText.substring(5, 7)) - 1
+  const day = Number(dateText.substring(8, 10))
+  const hour = Number(timeText.substring(0, 2))
+  const minute = Number(timeText.substring(3, 5))
+  return new Date(year, month, day, hour, minute, 0).getTime()
+}
+
+function minDateValue() {
+  if (props.minDate > 0) return props.minDate
+  const now = new Date()
+  return new Date(now.getFullYear() - 10, now.getMonth(), now.getDate(), 0, 0, 0).getTime()
+}
+
+function maxDateValue() {
+  if (props.maxDate > 0) return props.maxDate
+  const now = new Date()
+  return new Date(now.getFullYear() + 10, now.getMonth(), now.getDate(), 23, 59, 59).getTime()
+}
+
+function boundaryStartTime() {
+  if (currentDate.value == formatDate(minDateValue())) return formatTime(minDateValue())
+  return '00:00'
+}
+
+function boundaryEndTime() {
+  if (currentDate.value == formatDate(maxDateValue())) return formatTime(maxDateValue())
+  return '23:59'
+}
+
+function clampTime(value) {
+  const text = normalizeTime(value)
+  const current = timeToMinutes(text)
+  const minValue = validHour(props.minHour) * 60 + validMinute(props.minMinute)
+  const maxValue = validHour(props.maxHour) * 60 + validMinute(props.maxMinute)
+  let nextValue = current
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > maxValue) nextValue = maxValue
+  return padNumber(Math.floor(nextValue / 60)) + ':' + padNumber(nextValue % 60)
+}
+
+function timeToMinutes(value) {
+  return Number(value.substring(0, 2)) * 60 + Number(value.substring(3, 5))
+}
+
+function normalizeTime(value) {
+  if (value.length >= 5) return value.substring(0, 5)
+  return '00:00'
+}
+
+function formatDate(timestamp) {
+  const date = new Date(timestamp)
+  return (
+    String(date.getFullYear()) +
+    '-' +
+    padNumber(date.getMonth() + 1) +
+    '-' +
+    padNumber(date.getDate())
+  )
+}
+
+function formatTime(timestamp) {
+  const date = new Date(timestamp)
+  return padNumber(date.getHours()) + ':' + padNumber(date.getMinutes())
+}
+
+function validHour(value) {
+  const numberValue = Number(value)
+  if (numberValue < 0) return 0
+  if (numberValue > 23) return 23
+  return numberValue
+}
+
+function validMinute(value) {
+  const numberValue = Number(value)
+  if (numberValue < 0) return 0
+  if (numberValue > 59) return 59
+  return numberValue
+}
+
+function padNumber(value) {
+  const numberValue = Number(value)
+  return numberValue < 10 ? '0' + String(numberValue) : String(numberValue)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  open,
+  close,
+  setFormatter() {
+    // 微信小程序不支持通过 props 传函数，这里保留 DCloud uni-app x 兼容入口。
+  },
+})
+</script>
+
+<style>
+.i-datetime-picker {
+  width: 100%;
+}
+
+.i-datetime-picker__trigger {
+  width: 100%;
+}
+
+.i-datetime-picker__input {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-datetime-picker__input-text {
+  flex: 1;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-datetime-picker__arrow {
+  width: 20px;
+  color: #909193;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: right;
+  transform: rotate(90deg);
+}
+
+.i-datetime-picker__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 150;
+  background-color: rgba(0, 0, 0, 0.42);
+  justify-content: flex-end;
+}
+
+.i-datetime-picker__panel {
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.i-datetime-picker__toolbar {
+  height: 48px;
+  padding: 0 16px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-datetime-picker__cancel,
+.i-datetime-picker__confirm {
+  width: 64px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-datetime-picker__confirm {
+  text-align: right;
+}
+
+.i-datetime-picker__title {
+  flex: 1;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.i-datetime-picker__loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48px;
+  bottom: 0;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.78);
+  align-items: center;
+  justify-content: center;
+}
+
+.i-datetime-picker__loading-text {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-datetime-picker__body {
+  padding: 16px;
+}
+
+.i-datetime-picker__item-wrap {
+  margin-bottom: 12px;
+}
+
+.i-datetime-picker__label {
+  margin-bottom: 8px;
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-datetime-picker__item {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #f5f7fa;
+  justify-content: center;
+}
+
+.i-datetime-picker__value {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+</style>

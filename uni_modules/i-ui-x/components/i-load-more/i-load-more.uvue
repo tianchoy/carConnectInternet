@@ -1,0 +1,61 @@
+<template>
+  <view class="i-load" @click="next"
+    ><text class="i-text">{{ label }}</text></view
+  >
+</template>
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+
+defineOptions({ name: 'i-load-more' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - status: 当前状态值，用于决定组件展示文案和交互状态。
+ */
+const props = defineProps({
+  status: {
+    type: String,
+    default: 'loadmore',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - loadmore: 请求加载更多数据时触发。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ */
+const emit = defineEmits(['click', 'loadmore', 'change'])
+
+const current = ref(props.status)
+
+const label = computed(() => {
+  if (current.value == 'loading') return '加载中...'
+  if (current.value == 'nomore') return '没有更多了'
+  return '点击加载更多'
+})
+
+function next() {
+  emit('click', current.value)
+  if (current.value == 'loadmore') {
+    current.value = 'loading'
+    emit('loadmore')
+    emit('change', current.value)
+    setTimeout(() => {
+      current.value = 'nomore'
+      emit('change', current.value)
+    }, 800)
+  }
+}
+</script>
+<style>
+.i-load {
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+.i-text {
+  color: #909399;
+  font-size: 13px;
+}
+</style>

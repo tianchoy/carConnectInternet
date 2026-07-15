@@ -1,0 +1,123 @@
+<template>
+  <view
+    :class="active ? 'i-steps-item i-steps-item--active' : 'i-steps-item'"
+    :style="itemStyle"
+    @click="handleClick"
+  >
+    <view class="i-steps-item__dot" :style="dotStyle">
+      <text v-if="indexText.length > 0" class="i-steps-item__index">
+        {{ indexText }}
+      </text>
+    </view>
+    <view class="i-steps-item__content">
+      <text class="i-steps-item__title" :style="'color:' + titleColor">
+        {{ title }}
+      </text>
+      <text
+        v-if="description.length > 0"
+        class="i-steps-item__desc"
+        :style="'color:' + descriptionColor"
+      >
+        {{ description }}
+      </text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-steps-item' })
+
+/**
+ * Props 说明：单个步骤项展示配置。
+ * - title: 步骤标题。
+ * - description: 步骤说明。
+ * - active: 是否为激活/完成态。
+ * - indexText: 圆点中显示的序号或字符。
+ * - activeColor: 激活态圆点颜色。
+ * - inactiveColor: 未激活圆点颜色。
+ * - titleColor: 标题颜色。
+ * - descriptionColor: 描述颜色。
+ * - bgColor: 背景色。
+ */
+const props = defineProps({
+  title: { type: String, default: '步骤标题' },
+  description: { type: String, default: '步骤描述信息' },
+  active: { type: Boolean, default: true },
+  indexText: { type: String, default: '' },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#dcdfe6' },
+  titleColor: { type: String, default: '#303133' },
+  descriptionColor: { type: String, default: '#909399' },
+  bgColor: { type: String, default: '#ffffff' },
+})
+
+/**
+ * Emits 说明：步骤项点击事件。
+ * - click: 点击步骤项时触发。
+ */
+const emit = defineEmits(['click'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const itemStyle = computed(() => {
+  return 'background-color:' + bgColor.value + ';'
+})
+
+const dotStyle = computed(() => {
+  return 'background-color:' + (props.active ? props.activeColor : props.inactiveColor) + ';'
+})
+
+function handleClick() {
+  emit('click')
+}
+</script>
+
+<style>
+.i-steps-item {
+  padding: 12px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-steps-item--active {
+  background-color: #ecf5ff;
+}
+
+.i-steps-item__dot {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-steps-item__index {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.i-steps-item__content {
+  flex: 1;
+}
+
+.i-steps-item__title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-steps-item__desc {
+  margin-top: 3px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

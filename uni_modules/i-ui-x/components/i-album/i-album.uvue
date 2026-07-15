@@ -1,0 +1,223 @@
+<template>
+  <view class="i-album" :style="albumStyle">
+    <view
+      v-for="(item, index) in visibleImages"
+      :key="imageKey(item, index)"
+      class="i-album__item"
+      :style="itemStyle"
+      @click="preview(index)"
+    >
+      <image
+        class="i-album__image"
+        :src="imageUrl(item)"
+        :mode="imageMode"
+      ></image>
+      <view
+        v-if="showMore && index == visibleImages.length - 1 && moreCount > 0"
+        class="i-album__more"
+      >
+        <text class="i-album__more-text">+{{ moreCount }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-album' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Album，用于图片九宫格展示。
+ * - urls/images: 图片地址列表，urls 为参考 API，images 为旧版别名。
+ * - singleSize: 单图时图片长边尺寸。
+ * - multipleSize: 多图时图片边长。
+ * - space: 图片之间的间距。
+ * - singleMode/multipleMode: 单图和多图的 image mode。
+ * - maxCount: 最多展示数量，超出时最后一张显示剩余数量。
+ * - previewFullImage: 点击是否调用 uni.previewImage。
+ * - showMore: 是否显示超出数量提示。
+ * - keyName: urls 为对象数组时读取图片地址的字段名。
+ */
+const props = defineProps({
+  urls: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  images: {
+    type: Array,
+    default() {
+      return ['/static/logo.png', '/static/logo.png', '/static/logo.png']
+    },
+  },
+  singleSize: {
+    type: [String, Number],
+    default: 180,
+  },
+  multipleSize: {
+    type: [String, Number],
+    default: 70,
+  },
+  space: {
+    type: [String, Number],
+    default: 6,
+  },
+  singleMode: {
+    type: String,
+    default: 'scaleToFill',
+  },
+  multipleMode: {
+    type: String,
+    default: 'aspectFill',
+  },
+  maxCount: {
+    type: [String, Number],
+    default: 9,
+  },
+  previewFullImage: {
+    type: Boolean,
+    default: true,
+  },
+  showMore: {
+    type: Boolean,
+    default: true,
+  },
+  keyName: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：图片预览和宽度通知。
+ * - preview: 点击图片时触发，参数为图片地址。
+ * - show-all: 点击超出提示时兼容旧版触发，参数为全部图片。
+ * - albumWidth: 组件宽度估算值，便于外部文字对齐。
+ */
+const emit = defineEmits(['preview', 'show-all', 'albumWidth'])
+
+const dataImages = computed(() => {
+  return props.urls.length > 0 ? props.urls : props.images
+})
+
+const visibleImages = computed(() => {
+  return dataImages.value.slice(0, Number(props.maxCount))
+})
+
+const moreCount = computed(() => {
+  const count = dataImages.value.length - Number(props.maxCount)
+  return count > 0 ? count : 0
+})
+
+const imageMode = computed(() => {
+  return dataImages.value.length == 1 ? props.singleMode : props.multipleMode
+})
+
+const albumStyle = computed(() => {
+  const width = dataImages.value.length == 1 ? formatSize(props.singleSize) : '100%'
+  emit('albumWidth', width)
+  return 'width:' + width + ';'
+})
+
+const itemStyle = computed(() => {
+  const size =
+    dataImages.value.length == 1 ? formatSize(props.singleSize) : formatSize(props.multipleSize)
+  return (
+    'width:' +
+    size +
+    ';height:' +
+    size +
+    ';margin-right:' +
+    formatSize(props.space) +
+    ';margin-bottom:' +
+    formatSize(props.space) +
+    ';'
+  )
+})
+
+function preview(index) {
+  const url = imageUrl(visibleImages.value[index])
+  emit('preview', url)
+  if (moreCount.value > 0 && index == visibleImages.value.length - 1) {
+    emit('show-all', dataImages.value)
+  }
+  if (!props.previewFullImage) return
+  uni.previewImage({
+    urls: imageUrls(),
+    current: url,
+  })
+}
+
+function imageUrls() {
+  const list = []
+  for (let i = 0; i < dataImages.value.length; i++) {
+    list.push(imageUrl(dataImages.value[i]))
+  }
+  return list
+}
+
+function imageUrl(item) {
+  if (typeof item == 'object' && props.keyName.length > 0) {
+    const value = item[props.keyName]
+    if (value != null) return String(value)
+  }
+  if (typeof item == 'object') {
+    const value = item['url']
+    if (value != null) return String(value)
+  }
+  return String(item)
+}
+
+function imageKey(item, index) {
+  return imageUrl(item) + '-' + String(index)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+</script>
+
+<style>
+.i-album {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.i-album__item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #f5f7fa;
+}
+
+.i-album__image {
+  width: 100%;
+  height: 100%;
+}
+
+.i-album__more {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.48);
+  align-items: center;
+  justify-content: center;
+}
+
+.i-album__more-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+</style>

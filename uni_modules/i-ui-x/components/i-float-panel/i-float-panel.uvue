@@ -1,0 +1,349 @@
+<template>
+  <view class="i-float-panel__root" :style="rootStyle">
+    <view
+      v-if="overlay"
+      :class="overlayClass"
+      :style="overlayComputedStyle"
+      @click="handleOverlayClick"
+    ></view>
+
+    <view
+      class="i-float-panel"
+      :style="panelStyle"
+      @touchstart.stop="handleContentTouchStart"
+      @touchmove.stop.prevent="handleTouchMove"
+      @touchend.stop="handleTouchEnd"
+      @touchcancel.stop="handleTouchEnd"
+    >
+      <view
+        class="i-float-panel__handle"
+        @touchstart.stop="handleHandleTouchStart"
+        @touchmove.stop.prevent="handleTouchMove"
+        @touchend.stop="handleTouchEnd"
+        @touchcancel.stop="handleTouchEnd"
+      >
+        <slot name="handle">
+          <view class="i-float-panel__handle-bar"></view>
+        </slot>
+      </view>
+
+      <scroll-view
+        v-if="scrollable && !contentDraggable"
+        class="i-float-panel__content"
+        scroll-y="true"
+      >
+        <slot></slot>
+      </scroll-view>
+      <view
+        v-else
+        class="i-float-panel__content"
+        @touchstart.stop="handleContentTouchStart"
+        @touchmove.stop.prevent="handleTouchMove"
+        @touchend.stop="handleTouchEnd"
+        @touchcancel.stop="handleTouchEnd"
+      >
+        <slot></slot>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-float-panel' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 FloatPanel 文档。
+ * - height: 面板默认高度，未传 anchors 时作为唯一锚点。
+ * - anchors: 自定义锚点高度列表，支持数字 px 或百分比字符串。
+ * - safeBottom: 是否适配底部安全区域。
+ * - contentDraggable: 是否允许内容区域拖动；false 时仅头部可拖动。
+ * - overlay: 是否显示遮罩层。
+ * - overlayOpacity: 遮罩层透明度，取值 0 到 1。
+ * - closeOnMask: 点击遮罩是否关闭到最低锚点。
+ * - overlayFade: 是否启用遮罩淡入淡出效果。
+ * - bgColor: 面板背景颜色。
+ * - duration: 面板吸附动画持续时间，单位 ms。
+ * - defaultAnchor: 默认展示的锚点索引。
+ * - scrollable: 面板内容是否可滚动；当 contentDraggable=true 时优先保证面板拖动跟手。
+ * - zIndex: 面板层级。
+ */
+const props = defineProps({
+  height: { type: Number, default: 600 },
+  anchors: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  safeBottom: { type: Boolean, default: true },
+  contentDraggable: { type: Boolean, default: true },
+  overlay: { type: Boolean, default: false },
+  overlayOpacity: { type: [String, Number], default: 0.35 },
+  closeOnMask: { type: Boolean, default: false },
+  overlayFade: { type: Boolean, default: true },
+  bgColor: { type: String, default: '#ffffff' },
+  duration: { type: [String, Number], default: 300 },
+  defaultAnchor: { type: Number, default: 0 },
+  scrollable: { type: Boolean, default: true },
+  zIndex: { type: Number, default: 1000 },
+})
+
+/**
+ * Emits 说明：严格保留 FloatPanel 文档事件。
+ * - change: 面板吸附到锚点后触发，返回 index 与 height。
+ * - move: 面板拖动过程中触发，返回当前 height。
+ */
+const emit = defineEmits(['change', 'move'])
+
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const currentIndex = ref(normalizeAnchorIndex(props.defaultAnchor))
+const currentHeight = ref(anchorHeight(currentIndex.value))
+const startY = ref(0)
+const startHeight = ref(0)
+const dragging = ref(false)
+
+const rootStyle = computed(() => {
+  return 'z-index:' + String(props.zIndex) + ';'
+})
+
+const overlayClass = computed(() => {
+  return props.overlayFade ? 'i-float-panel__overlay i-float-panel__overlay--fade' : 'i-float-panel__overlay'
+})
+
+const overlayComputedStyle = computed(() => {
+  return 'background-color:rgba(0,0,0,' + String(props.overlayOpacity) + ');'
+})
+
+const panelStyle = computed(() => {
+  let style = 'height:' + formatSize(currentHeight.value) + ';'
+  style = style + 'background-color:' + bgColor.value + ';'
+  style = style + 'transition-duration:' + (dragging.value ? '0ms' : formatMs(props.duration)) + ';'
+  style = style + 'transition-property:' + (dragging.value ? 'none' : 'height') + ';'
+  if (props.safeBottom) {
+    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
+  }
+  return style
+})
+
+watch(
+  () => props.defaultAnchor,
+  (nextValue) => {
+    toAnchor(nextValue)
+  },
+)
+
+watch(
+  () => props.height,
+  () => {
+    currentHeight.value = anchorHeight(currentIndex.value)
+  },
+)
+
+watch(
+  () => props.anchors,
+  () => {
+    currentIndex.value = normalizeAnchorIndex(currentIndex.value)
+    currentHeight.value = anchorHeight(currentIndex.value)
+  },
+)
+
+function handleContentTouchStart(event) {
+  if (!props.contentDraggable) return
+  handleTouchStart(event)
+}
+
+function handleHandleTouchStart(event) {
+  handleTouchStart(event)
+}
+
+function handleTouchStart(event) {
+  dragging.value = true
+  startY.value = readTouchY(event)
+  startHeight.value = currentHeight.value
+}
+
+function handleTouchMove(event) {
+  if (!dragging.value) return
+  const deltaY = readTouchY(event) - startY.value
+  currentHeight.value = clampHeight(startHeight.value - deltaY)
+  emit('move', {
+    height: currentHeight.value,
+  })
+}
+
+function handleTouchEnd() {
+  if (!dragging.value) return
+  dragging.value = false
+  snapToNearestAnchor()
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  toAnchor(0)
+}
+
+function toAnchor(index: number) {
+  const nextIndex = normalizeAnchorIndex(index)
+  currentIndex.value = nextIndex
+  currentHeight.value = anchorHeight(nextIndex)
+  emit('change', {
+    index: nextIndex,
+    height: currentHeight.value,
+  })
+}
+
+function snapToNearestAnchor() {
+  const heights = normalizedAnchors()
+  let nearestIndex = 0
+  let nearestDistance = Math.abs(currentHeight.value - heights[0])
+  for (let i = 1; i < heights.length; i++) {
+    const distance = Math.abs(currentHeight.value - heights[i])
+    if (distance < nearestDistance) {
+      nearestDistance = distance
+      nearestIndex = i
+    }
+  }
+  toAnchor(nearestIndex)
+}
+
+function normalizedAnchors() {
+  const list = []
+  if (props.anchors.length > 0) {
+    for (let i = 0; i < props.anchors.length; i++) {
+      list.push(normalizeAnchorValue(props.anchors[i]))
+    }
+  }
+  if (list.length == 0) list.push(props.height)
+  list.sort((a, b) => a - b)
+  return list
+}
+
+function anchorHeight(index: number): number {
+  const list = normalizedAnchors()
+  return list[normalizeAnchorIndex(index)]
+}
+
+function normalizeAnchorIndex(index: number): number {
+  const listLength = props.anchors.length > 0 ? props.anchors.length : 1
+  if (index < 0) return 0
+  if (index >= listLength) return listLength - 1
+  return index
+}
+
+function normalizeAnchorValue(value): number {
+  const text = String(value)
+  if (text.indexOf('%') >= 0) {
+    const percent = Number(text.replace('%', ''))
+    if (isNaN(percent)) return props.height
+    return Math.round((percent / 100) * screenHeight())
+  }
+  const numberValue = Number(value)
+  if (isNaN(numberValue)) return props.height
+  return numberValue
+}
+
+function clampHeight(value: number): number {
+  const list = normalizedAnchors()
+  const minValue = list[0]
+  const maxValue = list[list.length - 1]
+  if (value < minValue) return minValue
+  if (value > maxValue) return maxValue
+  return value
+}
+
+function screenHeight(): number {
+  const info = uni.getSystemInfoSync()
+  const height = Number(info.windowHeight)
+  if (isNaN(height) || height <= 0) return 667
+  return height
+}
+
+function readTouchY(event): number {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return 0
+  const clientY = Number(point.clientY)
+  if (!isNaN(clientY)) return clientY
+  return Number(point.pageY)
+}
+
+function formatMs(value): string {
+  const text = String(value)
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  toAnchor,
+})
+</script>
+
+<style>
+.i-float-panel__root {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.i-float-panel__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: auto;
+}
+.i-float-panel__overlay--fade {
+  opacity: 1;
+}
+.i-float-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.1);
+  transition-property: transform;
+  transition-timing-function: ease;
+  pointer-events: auto;
+}
+.i-float-panel__handle {
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+}
+.i-float-panel__handle-bar {
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  background-color: #dcdfe6;
+}
+.i-float-panel__content {
+  flex: 1;
+  padding: 0 16px 16px;
+}
+</style>

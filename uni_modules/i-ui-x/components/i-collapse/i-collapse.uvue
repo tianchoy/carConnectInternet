@@ -1,0 +1,386 @@
+<template>
+  <view :class="collapseClass">
+    <slot>
+      <view
+        v-for="(item, index) in items"
+        :key="itemKey(item, index)"
+        :class="itemClass(item, index)"
+      >
+        <view
+          :class="itemHeadClass(item)"
+          @click="toggle(item, index)"
+        >
+          <view v-if="itemIcon(item).length > 0" class="i-collapse__icon">
+            <text class="i-collapse__icon-text">{{ itemIcon(item) }}</text>
+          </view>
+          <view class="i-collapse__title-wrap">
+            <text :class="titleClass(item)">{{ itemTitle(item, index) }}</text>
+            <text v-if="itemLabel(item).length > 0" class="i-collapse__label">
+              {{ itemLabel(item) }}
+            </text>
+          </view>
+          <text v-if="itemValue(item).length > 0" class="i-collapse__value">
+            {{ itemValue(item) }}
+          </text>
+          <text v-if="itemIsLink(item)" :class="arrowClass(item, index)">›</text>
+        </view>
+        <view
+          v-if="isActive(item, index)"
+          class="i-collapse__body"
+          :style="bodyStyle(item)"
+        >
+          <text class="i-collapse__content">{{ itemContent(item) }}</text>
+        </view>
+      </view>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-collapse' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Collapse 文档，并保留 items 便于无子组件时演示。
+ * - value: 当前展开面板的 name 数组；accordion 为 true 时只保留一个展开项。
+ * - accordion: 是否开启手风琴模式，开启后同一时间只展开一个面板。
+ * - border: 是否显示外边框。
+ * - items: 内置数据源；为空时可通过默认插槽放置 i-collapse-item。
+ */
+const props = defineProps({
+  value: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  accordion: { type: Boolean, default: false },
+  border: { type: Boolean, default: true },
+  items: {
+    type: Array,
+    default() {
+      return [
+        {
+          title: '文档指南',
+          name: 'Docs guide',
+          content: '从安装、配置到平台差异说明，帮助你快速接入组件。',
+        },
+        {
+          title: '组件全面',
+          name: 'Variety components',
+          content: '基础、表单、反馈、布局和导航组件均可按需使用。',
+        },
+        {
+          title: '众多利器',
+          name: 'Numerous tools',
+          content: '内置常用交互状态和事件回传，便于快速开发页面。',
+        },
+      ]
+    },
+  },
+})
+
+/**
+ * Emits 说明：严格保留文档相关事件。
+ * - change: 展开状态变化时触发，返回当前展开 name 数组。
+ * - open: 面板展开时触发，返回当前展开项 name。
+ * - close: 面板收起时触发，返回当前收起项 name。
+ * - update:value: 同步 value 受控值，便于外部双向绑定。
+ */
+const emit = defineEmits(['change', 'open', 'close', 'update:value'])
+
+const activeNames = ref(normalizeNames(props.value))
+
+const collapseClass = computed(() => {
+  const classes = ['i-collapse']
+  if (props.border) classes.push('i-collapse--border')
+  return classes.join(' ')
+})
+
+watch(
+  () => props.value,
+  (nextValue) => {
+    activeNames.value = normalizeNames(nextValue)
+  },
+)
+
+function toggle(item, index) {
+  if (itemDisabled(item)) return
+  const name = itemName(item, index)
+  const exists = hasName(name)
+  if (exists) {
+    close(name)
+    return
+  }
+  open(name)
+}
+
+function open(name: string = '') {
+  const target = name.length > 0 ? name : itemName(props.items[0], 0)
+  if (target.length == 0) return
+  if (props.accordion) {
+    activeNames.value = [target]
+  } else if (!hasName(target)) {
+    activeNames.value.push(target)
+  }
+  emitChange()
+  emit('open', target)
+}
+
+function close(name: string = '') {
+  const target = name.length > 0 ? name : activeNames.value[0]
+  const next: string[] = []
+  activeNames.value.forEach((item) => {
+    if (item != target) next.push(item)
+  })
+  activeNames.value = next
+  emitChange()
+  emit('close', target)
+}
+
+function emitChange() {
+  const next = activeNames.value.slice()
+  emit('change', next)
+  emit('update:value', next)
+}
+
+function isActive(item, index): boolean {
+  return hasName(itemName(item, index))
+}
+
+function hasName(name: string): boolean {
+  return activeNames.value.indexOf(name) >= 0
+}
+
+function normalizeNames(value): string[] {
+  const result: string[] = []
+  if (Array.isArray(value)) {
+    value.forEach((item) => {
+      result.push(String(item))
+    })
+  } else if (value != null && String(value).length > 0) {
+    result.push(String(value))
+  }
+  if (props.accordion && result.length > 1) return [result[0]]
+  return result
+}
+
+function itemKey(item, index): string {
+  return itemName(item, index) + '-' + String(index)
+}
+
+function itemName(item, index): string {
+  const value = itemField(item, 'name')
+  return value.length > 0 ? value : String(index)
+}
+
+function itemTitle(item, index): string {
+  const value = itemField(item, 'title')
+  return value.length > 0 ? value : '折叠面板 ' + String(index + 1)
+}
+
+function itemValue(item): string {
+  return itemField(item, 'value')
+}
+
+function itemLabel(item): string {
+  return itemField(item, 'label')
+}
+
+function itemIcon(item): string {
+  return itemField(item, 'icon')
+}
+
+function itemContent(item): string {
+  const content = itemField(item, 'content')
+  return content.length > 0 ? content : '折叠面板内容'
+}
+
+function itemDisabled(item): boolean {
+  if (item != null && typeof item == 'object') return item['disabled'] == true
+  return false
+}
+
+function itemIsLink(item): boolean {
+  if (item != null && typeof item == 'object' && item['isLink'] != null) {
+    return item['isLink'] == true
+  }
+  return true
+}
+
+function itemClickable(item): boolean {
+  if (item != null && typeof item == 'object' && item['clickable'] != null) {
+    return item['clickable'] == true
+  }
+  return true
+}
+
+function itemBorder(item): boolean {
+  if (item != null && typeof item == 'object' && item['border'] != null) {
+    return item['border'] == true
+  }
+  return true
+}
+
+function itemAlign(item): string {
+  const align = itemField(item, 'align')
+  return align.length > 0 ? align : 'left'
+}
+
+function itemDuration(item): number {
+  if (item != null && typeof item == 'object' && item['duration'] != null) {
+    return Number(item['duration'])
+  }
+  return 300
+}
+
+function itemField(item, keyName): string {
+  if (item != null && typeof item == 'object') {
+    const value = item[keyName]
+    if (value != null) return String(value)
+  }
+  if (typeof item == 'string') return item
+  return ''
+}
+
+function itemClass(item, index): string {
+  const classes = ['i-collapse__item']
+  if (itemBorder(item)) classes.push('i-collapse__item--border')
+  if (index >= props.items.length - 1) classes.push('i-collapse__item--last')
+  if (isActive(item, index)) classes.push('i-collapse__item--active')
+  return classes.join(' ')
+}
+
+function itemHeadClass(item): string {
+  const classes = ['i-collapse__head']
+  if (itemDisabled(item)) classes.push('i-collapse__head--disabled')
+  if (itemClickable(item) && !itemDisabled(item)) classes.push('i-collapse__head--clickable')
+  if (itemAlign(item) == 'center') classes.push('i-collapse__head--center')
+  if (itemAlign(item) == 'right') classes.push('i-collapse__head--right')
+  return classes.join(' ')
+}
+
+function titleClass(item): string {
+  const classes = ['i-collapse__title']
+  if (itemDisabled(item)) classes.push('i-collapse__title--disabled')
+  return classes.join(' ')
+}
+
+function arrowClass(item, index): string {
+  const classes = ['i-collapse__arrow']
+  if (isActive(item, index)) classes.push('i-collapse__arrow--active')
+  if (itemDisabled(item)) classes.push('i-collapse__arrow--disabled')
+  return classes.join(' ')
+}
+
+function bodyStyle(item): string {
+  return ''
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-collapse {
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-collapse--border {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ebeef5;
+}
+.i-collapse__item {
+  background-color: #ffffff;
+}
+.i-collapse__item--border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #ebeef5;
+}
+.i-collapse__item--last {
+  border-bottom-width: 0;
+}
+.i-collapse__head {
+  min-height: 48px;
+  padding: 0 14px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-collapse__head--clickable {
+  opacity: 1;
+}
+.i-collapse__head--disabled {
+  opacity: 0.55;
+}
+.i-collapse__head--center {
+  justify-content: center;
+}
+.i-collapse__head--right {
+  justify-content: flex-end;
+}
+.i-collapse__icon {
+  width: 22px;
+  margin-right: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.i-collapse__icon-text {
+  color: #909399;
+  font-size: 15px;
+  line-height: 20px;
+}
+.i-collapse__title-wrap {
+  flex: 1;
+  justify-content: center;
+}
+.i-collapse__title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-collapse__title--disabled {
+  color: #c0c4cc;
+}
+.i-collapse__label {
+  margin-top: 2px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-collapse__value {
+  margin-left: 10px;
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+}
+.i-collapse__arrow {
+  width: 22px;
+  margin-left: 4px;
+  color: #909399;
+  font-size: 22px;
+  line-height: 22px;
+  text-align: center;
+  transform: rotate(0deg);
+}
+.i-collapse__arrow--active {
+  transform: rotate(90deg);
+}
+.i-collapse__arrow--disabled {
+  color: #c0c4cc;
+}
+.i-collapse__body {
+  padding: 0 14px 14px 14px;
+}
+.i-collapse__content {
+  color: #606266;
+  font-size: 13px;
+  line-height: 21px;
+}
+</style>

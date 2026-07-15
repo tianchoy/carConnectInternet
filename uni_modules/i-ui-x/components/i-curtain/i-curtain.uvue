@@ -1,0 +1,286 @@
+<template>
+  <view>
+    <view v-if="opened" class="i-curtain" :style="rootStyle">
+      <view
+        v-if="overlay"
+        class="i-curtain__overlay"
+        :style="overlayComputedStyle"
+        @click="handleOverlayClick"
+      ></view>
+
+      <view class="i-curtain__panel" :style="panelStyle" @click.stop="">
+        <slot></slot>
+
+        <view
+          v-if="closeable"
+          :class="closeClass"
+          :style="closeStyle"
+          @click="close"
+          @tap="close"
+        >
+          <slot name="close">
+            <text class="i-curtain__close-text" @click.stop="close" @tap.stop="close">
+              {{ closeIconText }}
+            </text>
+          </slot>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-curtain' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Curtain 文档。
+ * - show: 是否显示幕帘。
+ * - closeable: 是否显示关闭图标。
+ * - closeIcon: 关闭图标名称，close-circle 会显示圆形关闭按钮。
+ * - closeIconColor: 关闭图标颜色。
+ * - closeIconSize: 关闭图标大小，单位 px 或传入带单位字符串。
+ * - closeIconPos: 关闭图标位置，支持 top/bottom/outset 系列位置。
+ * - overlay: 是否显示遮罩层。
+ * - overlayStyle: 遮罩自定义样式，支持字符串样式。
+ * - closeOnMask: 点击遮罩是否关闭幕帘。
+ * - zIndex: 幕帘层级。
+ * - safeBottom: 是否预留底部安全区。
+ * - safeTop: 是否预留顶部安全区。
+ * - bgColor: 幕帘内容背景色，默认透明。
+ * - overlayOpacity: 遮罩透明度，取值 0 到 1。
+ * - width: 幕帘内容宽度。
+ * - height: 幕帘内容高度。
+ * - customStyle: 幕帘内容自定义样式，支持字符串样式。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: true },
+  closeable: { type: Boolean, default: true },
+  closeIcon: { type: String, default: 'close-circle' },
+  closeIconColor: { type: String, default: '#ffffff' },
+  closeIconSize: { type: [String, Number], default: 24 },
+  closeIconPos: { type: String, default: 'outset-bottom-center' },
+  overlay: { type: Boolean, default: true },
+  overlayStyle: { type: [String, Object], default: '' },
+  closeOnMask: { type: Boolean, default: false },
+  zIndex: { type: [String, Number], default: 10075 },
+  safeBottom: { type: Boolean, default: true },
+  safeTop: { type: Boolean, default: false },
+  bgColor: { type: String, default: 'transparent' },
+  overlayOpacity: { type: [String, Number], default: 0.5 },
+  width: { type: [String, Number], default: '' },
+  height: { type: [String, Number], default: '' },
+  customStyle: { type: [String, Object], default: '' },
+})
+
+/**
+ * Emits 说明：严格保留 Curtain 文档事件。
+ * - open: 幕帘打开时触发。
+ * - close: 幕帘关闭时触发。
+ * - update:show: 同步 show 可见状态。
+ */
+const emit = defineEmits(['open', 'close', 'update:show'])
+
+
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const opened = ref(props.show)
+
+const rootStyle = computed(() => {
+  return 'z-index:' + String(props.zIndex) + ';'
+})
+
+const overlayComputedStyle = computed(() => {
+  let style = 'background-color:rgba(0,0,0,' + String(props.overlayOpacity) + ');'
+  style = style + stringifyStyle(props.overlayStyle)
+  return style
+})
+
+const panelStyle = computed(() => {
+  let style = 'background-color:' + bgColor.value + ';'
+  style = style + safeAreaStyle()
+  if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  style = style + stringifyStyle(props.customStyle)
+  return style
+})
+
+const closeClass = computed(() => {
+  const classes = ['i-curtain__close']
+  classes.push('i-curtain__close--' + normalizeClosePos())
+  return classes.join(' ')
+})
+
+const closeStyle = computed(() => {
+  return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';'
+})
+
+const closeIconText = computed(() => {
+  if (props.closeIcon == 'close' || props.closeIcon == 'close-circle') return '×'
+  return props.closeIcon
+})
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (opened.value == nextValue) return
+    opened.value = nextValue
+    emit(nextValue ? 'open' : 'close')
+  },
+)
+
+function open() {
+  if (opened.value) return
+  opened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function close() {
+  if (!opened.value) return
+  opened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  close()
+}
+
+function normalizeClosePos(): string {
+  const value = props.closeIconPos
+  if (
+    value == 'top-left' ||
+    value == 'top-right' ||
+    value == 'bottom-left' ||
+    value == 'bottom-right' ||
+    value == 'outset-top-left' ||
+    value == 'outset-top-right' ||
+    value == 'outset-top-center' ||
+    value == 'outset-bottom-left' ||
+    value == 'outset-bottom-right'
+  ) {
+    return value
+  }
+  return 'outset-bottom-center'
+}
+
+function safeAreaStyle(): string {
+  let style = ''
+  if (props.safeTop) style = style + 'padding-top:env(safe-area-inset-top);'
+  if (props.safeBottom) style = style + 'padding-bottom:env(safe-area-inset-bottom);'
+  return style
+}
+
+function stringifyStyle(value): string {
+  if (value == null) return ''
+  const text = String(value)
+  if (text == '[object Object]') return ''
+  if (text.length == 0) return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-curtain {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+}
+.i-curtain__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.i-curtain__panel {
+  position: relative;
+  min-width: 240px;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+}
+.i-curtain__close {
+  position: absolute;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 99px;
+  background-color: rgba(0, 0, 0, 0.18);
+  align-items: center;
+  justify-content: center;
+}
+.i-curtain__close--top-left {
+  left: 8px;
+  top: 8px;
+}
+.i-curtain__close--top-right {
+  right: 8px;
+  top: 8px;
+}
+.i-curtain__close--bottom-left {
+  left: 8px;
+  bottom: 8px;
+}
+.i-curtain__close--bottom-right {
+  right: 8px;
+  bottom: 8px;
+}
+.i-curtain__close--outset-top-left {
+  left: 0;
+  top: -50px;
+}
+.i-curtain__close--outset-top-right {
+  right: 0;
+  top: -50px;
+}
+.i-curtain__close--outset-top-center {
+  left: 50%;
+  top: -50px;
+  margin-left: -20px;
+}
+.i-curtain__close--outset-bottom-left {
+  left: 0;
+  bottom: -50px;
+}
+.i-curtain__close--outset-bottom-right {
+  right: 0;
+  bottom: -50px;
+}
+.i-curtain__close--outset-bottom-center {
+  left: 50%;
+  bottom: -50px;
+  margin-left: -20px;
+}
+.i-curtain__close-text {
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 40px;
+  text-align: center;
+}
+</style>

@@ -1,0 +1,134 @@
+<template>
+  <view :class="colorClass" @click="handleClick">
+    <view :class="swatchClass" :style="swatchStyle"></view>
+    <view class="i-color__content">
+      <text class="i-color__name">{{ name }}</text>
+      <text class="i-color__value">{{ value }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-color' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - name: name 配置项，用于控制组件展示或交互行为。
+ * - value: 组件当前值；通常用于受控状态，并会配合 change / update:value 回传。
+ * - type: 组件类型，用于切换视觉风格或语义状态。
+ * - copyable: copyable 配置项，用于控制组件展示或交互行为。
+ * - disabled: 禁用状态；禁用后组件降低视觉权重，并不再派发 click/copy。
+ */
+const props = defineProps({
+  name: {
+    type: String,
+    default: 'Primary',
+  },
+  value: {
+    type: String,
+    default: '#2979ff',
+  },
+  type: {
+    type: String,
+    default: 'primary',
+  },
+  copyable: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - copy: 执行复制动作时触发。
+ */
+const emit = defineEmits(['click', 'copy'])
+
+const swatchClass = computed(() => {
+  return 'i-color__swatch i-color__swatch--' + props.type
+})
+
+const colorClass = computed(() => {
+  return props.disabled ? 'i-color i-color--disabled' : 'i-color'
+})
+
+const swatchStyle = computed(() => {
+  if (props.value.length > 0) return 'background-color:' + props.value + ';'
+  return ''
+})
+
+function handleClick() {
+  if (props.disabled) return
+  emit('click', {
+    name: props.name,
+    value: props.value,
+    type: props.type,
+  })
+  if (props.copyable) emit('copy', props.value)
+}
+</script>
+
+<style>
+.i-color {
+  flex-direction: row;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.i-color__swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+.i-color--disabled {
+  opacity: 0.55;
+}
+
+.i-color__swatch--primary {
+  background-color: #2979ff;
+}
+
+.i-color__swatch--success {
+  background-color: #19be6b;
+}
+
+.i-color__swatch--warning {
+  background-color: #ff9900;
+}
+
+.i-color__swatch--danger {
+  background-color: #fa3534;
+}
+
+.i-color__swatch--info {
+  background-color: #909399;
+}
+
+.i-color__content {
+  margin-left: 12px;
+}
+
+.i-color__name {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-color__value {
+  margin-top: 2px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

@@ -1,0 +1,227 @@
+<template>
+  <view :id="itemId" :class="itemClass">
+    <view v-if="showLabel" :class="headerClass" :style="headerStyle">
+      <text v-if="required" class="i-form-item__required">*</text>
+      <text class="i-form-item__label" :style="labelStyle">{{ label }}</text>
+    </view>
+    <view class="i-form-item__body">
+      <view :class="contentClass">
+        <slot></slot>
+      </view>
+      <text v-if="error.length > 0" class="i-form-item__error" :style="footerStyle">{{
+        error
+      }}</text>
+      <text v-else-if="hint.length > 0" class="i-form-item__hint" :style="footerStyle">{{
+        hint
+      }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-form-item' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x form item，用于承载单个字段。
+ * - name: 字段名称，用于外部 rules/modelValue 对应。
+ * - label: 说明标签文本。
+ * - hint/error: 底部提示或错误信息，error 优先。
+ * - required: 是否显示必填星号。
+ * - scrollId/scrollIdPrefix: 校验失败滚动定位用 id，默认由 name 自动生成。
+ * - labelWidth: 横向表单标签宽度。
+ * - labelDirection: 标签方向，horizontal 横向，vertical 纵向。
+ * - labelFontColor/labelFontSize: 标签颜色和字号。
+ * - showLabel: 是否显示标签。
+ * - errorAlign: 底部错误/提示对齐方式，left、center、right。
+ */
+const props = defineProps({
+  name: {
+    type: String,
+    default: '',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+  error: {
+    type: String,
+    default: '',
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  scrollId: {
+    type: String,
+    default: '',
+  },
+  scrollIdPrefix: {
+    type: String,
+    default: 'i-form-item-',
+  },
+  labelWidth: {
+    type: [String, Number],
+    default: '100px',
+  },
+  labelDirection: {
+    type: String,
+    default: 'vertical',
+  },
+  labelFontColor: {
+    type: String,
+    default: '#303133',
+  },
+  labelFontSize: {
+    type: [String, Number],
+    default: '14px',
+  },
+  showLabel: {
+    type: Boolean,
+    default: true,
+  },
+  errorAlign: {
+    type: String,
+    default: 'left',
+  },
+})
+
+const emit = defineEmits([])
+
+const itemId = computed(() => {
+  if (props.scrollId.length > 0) return props.scrollId
+  if (props.name.length == 0) return ''
+  return props.scrollIdPrefix + normalizeIdName(props.name)
+})
+
+const itemClass = computed(() => {
+  const classes = ['i-form-item']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item--horizontal')
+  return classes.join(' ')
+})
+
+const headerClass = computed(() => {
+  const classes = ['i-form-item__header']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item__header--horizontal')
+  return classes.join(' ')
+})
+
+const contentClass = computed(() => {
+  const classes = ['i-form-item__content']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item__content--horizontal')
+  return classes.join(' ')
+})
+
+const headerStyle = computed(() => {
+  if (props.labelDirection != 'horizontal') return ''
+  return 'width:' + formatSize(props.labelWidth) + ';'
+})
+
+const labelStyle = computed(() => {
+  return (
+    'color:' +
+    props.labelFontColor +
+    ';font-size:' +
+    formatSize(props.labelFontSize) +
+    ';'
+  )
+})
+
+const footerStyle = computed(() => {
+  return 'text-align:' + props.errorAlign + ';'
+})
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function normalizeIdName(name) {
+  const text = String(name)
+  let result = ''
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    const char = text.charAt(i)
+    const isNumber = code >= 48 && code <= 57
+    const isUpper = code >= 65 && code <= 90
+    const isLower = code >= 97 && code <= 122
+    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
+      result = result + char
+    } else {
+      result = result + '-'
+    }
+  }
+  return result
+}
+</script>
+
+<style>
+.i-form-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.i-form-item--horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.i-form-item__header {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-form-item__header--horizontal {
+  min-height: 40px;
+}
+
+.i-form-item__required {
+  margin-right: 4px;
+  color: #fa3534;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-form-item__label {
+  color: #303133;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-form-item__content {
+  margin-top: 8px;
+}
+
+.i-form-item__content--horizontal {
+  margin-top: 0;
+}
+
+.i-form-item__body {
+  flex: 1;
+}
+
+.i-form-item__hint {
+  margin-top: 6px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-form-item__error {
+  margin-top: 6px;
+  color: #fa3534;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+</style>

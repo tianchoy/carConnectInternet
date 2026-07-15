@@ -1,65 +1,68 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
-  const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
-  const _easycom_uv_popup_1 = common_vendor.resolveComponent("uv-popup");
-  (_easycom_uv_icon_1 + _easycom_uv_grid_item_1 + _easycom_uv_grid_1 + _easycom_uv_popup_1)();
+  const _easycom_i_grid_1 = common_vendor.resolveComponent("i-grid");
+  const _easycom_i_popup_1 = common_vendor.resolveComponent("i-popup");
+  (_easycom_i_grid_1 + _easycom_i_popup_1)();
 }
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
-const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
-const _easycom_uv_popup = () => "../../uni_modules/uv-popup/components/uv-popup/uv-popup.js";
+const _easycom_i_grid = () => "../../uni_modules/i-ui-x/components/i-grid/i-grid.js";
+const _easycom_i_popup = () => "../../uni_modules/i-ui-x/components/i-popup/i-popup.js";
 if (!Math) {
-  (_easycom_uv_icon + _easycom_uv_grid_item + _easycom_uv_grid + _easycom_uv_popup)();
+  (_easycom_i_grid + _easycom_i_popup)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "car-icons",
   props: {
     title: { default: "请选择图标" },
-    col: { default: 5 },
-    iconSize: { default: 50 },
+    col: { default: 4 },
+    iconSize: { default: 40 },
     safeAreaInsetBottom: { type: Boolean, default: true }
   },
   emits: ["select"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
     const emit = __emit;
+    const visible = common_vendor.ref(false);
     const iconList = [
-      new common_vendor.UTSJSONObject({ name: "car", title: "轿车", img: "/static/cars/online/car.png" }),
-      new common_vendor.UTSJSONObject({ name: "bus", title: "公交车", img: "/static/cars/online/bus.png" }),
-      new common_vendor.UTSJSONObject({ name: "bike", title: "自行车", img: "/static/cars/online/bike.png" }),
-      new common_vendor.UTSJSONObject({ name: "moto", title: "摩托车", img: "/static/cars/online/moto.png" }),
-      new common_vendor.UTSJSONObject({ name: "diandong", title: "电动车", img: "/static/cars/online/diandong.png" }),
-      new common_vendor.UTSJSONObject({ name: "huoche", title: "货车", img: "/static/cars/online/huoche.png" }),
-      new common_vendor.UTSJSONObject({ name: "sanlun", title: "三轮车", img: "/static/cars/online/sanlun.png" }),
-      new common_vendor.UTSJSONObject({ name: "tuola", title: "拖拉机", img: "/static/cars/online/tuola.png" }),
-      new common_vendor.UTSJSONObject({ name: "suv", title: "越野车", img: "/static/cars/online/suv.png" }),
-      new common_vendor.UTSJSONObject({ name: "baby", title: "婴儿车", img: "/static/cars/online/baby.png" }),
-      new common_vendor.UTSJSONObject({ name: "tank", title: "坦克", img: "/static/cars/online/tank.png" }),
-      new common_vendor.UTSJSONObject({ name: "zhuangjia", title: "装甲车", img: "/static/cars/online/zhuangjia.png" }),
-      new common_vendor.UTSJSONObject({ name: "wajue", title: "挖掘机", img: "/static/cars/online/wajue.png" }),
-      new common_vendor.UTSJSONObject({ name: "plan", title: "飞机", img: "/static/cars/online/plan.png" }),
-      new common_vendor.UTSJSONObject({ name: "walk", title: "步行", img: "/static/cars/online/walk.png" }),
-      new common_vendor.UTSJSONObject({ name: "muma", title: "木马", img: "/static/cars/online/muma.png" }),
-      new common_vendor.UTSJSONObject({ name: "hangmu", title: "航母", img: "/static/cars/online/hangmu.png" }),
-      new common_vendor.UTSJSONObject({ name: "junjian", title: "军舰", img: "/static/cars/online/junjian.png" }),
-      new common_vendor.UTSJSONObject({ name: "tuiche", title: "手推车", img: "/static/cars/online/tuiche.png" }),
-      new common_vendor.UTSJSONObject({ name: "train", title: "火车", img: "/static/cars/online/train.png" })
+      new common_vendor.UTSJSONObject({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
+      new common_vendor.UTSJSONObject({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
+      new common_vendor.UTSJSONObject({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
+      new common_vendor.UTSJSONObject({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
+      new common_vendor.UTSJSONObject({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
+      new common_vendor.UTSJSONObject({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
+      new common_vendor.UTSJSONObject({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
+      new common_vendor.UTSJSONObject({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
+      new common_vendor.UTSJSONObject({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
+      new common_vendor.UTSJSONObject({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
+      new common_vendor.UTSJSONObject({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
+      new common_vendor.UTSJSONObject({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
+      new common_vendor.UTSJSONObject({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
+      new common_vendor.UTSJSONObject({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
+      new common_vendor.UTSJSONObject({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
+      new common_vendor.UTSJSONObject({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
+      new common_vendor.UTSJSONObject({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
+      new common_vendor.UTSJSONObject({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
+      new common_vendor.UTSJSONObject({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
+      new common_vendor.UTSJSONObject({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
     ];
-    const popupRef = common_vendor.ref(null);
+    common_vendor.computed(() => {
+      const cols = props.col > 0 ? props.col : 4;
+      return 100 / cols + "%";
+    });
     const handleSelect = (item = null) => {
+      console.log("选择的图标:", item);
       emit("select", item);
       close();
     };
+    const handlePopupClick = () => {
+      console.log("Popup clicked");
+    };
     const open = () => {
-      var _a2;
-      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.open();
+      visible.value = true;
     };
     const close = () => {
-      var _a2;
-      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.close();
+      visible.value = false;
     };
     const getIconByName = (name) => {
       return common_vendor.UTS.arrayFind(iconList, (item) => {
@@ -75,42 +78,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.f(iconList, (item, index, i0) => {
-          return {
-            a: "a1ffb157-3-" + i0 + "," + ("a1ffb157-2-" + i0),
-            b: common_vendor.p({
-              customStyle: {
-                paddingTop: "20rpx"
-              },
-              name: item.img,
-              size: _ctx.iconSize,
-              class: "data-v-a1ffb157"
-            }),
-            c: common_vendor.t(item.title),
-            d: index,
-            e: common_vendor.o(($event) => {
-              return handleSelect(item);
-            }, index),
-            f: "a1ffb157-2-" + i0 + ",a1ffb157-1"
-          };
-        }),
+        a: common_vendor.o(($event) => {
+          return handleSelect($event);
+        }, "73"),
         b: common_vendor.p({
+          items: iconList,
+          col: 4,
+          itemHeight: "88",
+          round: "8",
+          imageSize: 30,
+          iconColor: "#3c9cff",
+          textColor: "#606266",
+          showBorder: true,
           class: "data-v-a1ffb157"
         }),
-        c: common_vendor.p({
-          col: _ctx.col,
-          class: "data-v-a1ffb157"
-        }),
-        d: common_vendor.sr(popupRef, "a1ffb157-0", {
-          "k": "popupRef"
-        }),
-        e: common_vendor.gei(_ctx, ""),
+        c: common_vendor.gei(_ctx, ""),
+        d: common_vendor.o(close, "db"),
+        e: common_vendor.o(handlePopupClick, "a5"),
         f: common_vendor.p({
+          show: visible.value,
           title: _ctx.title,
           mode: "bottom",
-          safeAreaInsetBottom: _ctx.safeAreaInsetBottom,
+          safeBottom: _ctx.safeAreaInsetBottom,
+          showClose: true,
           id: common_vendor.gei(_ctx, ""),
-          class: "r data-v-a1ffb157"
+          class: "data-v-a1ffb157"
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };

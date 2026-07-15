@@ -1,0 +1,372 @@
+<template>
+  <view class="i-number-box">
+    <view
+      v-if="showMinus"
+      :class="minusClass"
+      :style="buttonStyle"
+      @click="minus"
+    >
+      <slot name="minus">
+        <text class="i-number-box__btn-text" :style="iconStyle">-</text>
+      </slot>
+    </view>
+    <slot name="input">
+      <input
+        class="i-number-box__input"
+        :style="inputStyle"
+        type="digit"
+        :value="displayValue"
+        :disabled="disabled || disabledInput || !inputable"
+        :cursor-spacing="Number(cursorSpacing)"
+        @input="handleInput"
+        @focus="handleFocus"
+        @blur="handleBlur"
+      />
+    </slot>
+    <view v-if="showPlus" :class="plusClass" :style="buttonStyle" @click="plus">
+      <slot name="plus">
+        <text class="i-number-box__btn-text" :style="iconStyle">+</text>
+      </slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-number-box' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 NumberBox，用于数值步进。
+ * - name: 步进器标识符，会在 change 回调中返回。
+ * - modelValue/value: 当前数值。
+ * - min/max: 可输入的最小值和最大值。
+ * - step: 每次点击加减的步长，支持小数。
+ * - integer: 是否只能输入正整数。
+ * - disabled/disabledInput/disablePlus/disableMinus: 禁用全部、输入框、加按钮、减按钮。
+ * - asyncChange: 是否异步变更，开启后只触发事件，不主动改内部值。
+ * - inputWidth/buttonSize/buttonRound: 输入框宽度、按钮大小、按钮圆角。
+ * - showMinus/showPlus: 是否显示加减按钮。
+ * - decimalLength: 小数位数。
+ * - color/bgColor/inputBgColor/disableColor/disableBgColor/iconStyle/iconSize: 颜色和图标样式。
+ * - cursorSpacing: 键盘弹起时光标与键盘距离。
+ */
+const props = defineProps({
+  name: {
+    type: [String, Number],
+    default: '',
+  },
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  value: {
+    type: [String, Number],
+    default: 1,
+  },
+  min: {
+    type: [String, Number],
+    default: 1,
+  },
+  max: {
+    type: [String, Number],
+    default: 999999,
+  },
+  step: {
+    type: [String, Number],
+    default: 1,
+  },
+  integer: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  disabledInput: {
+    type: Boolean,
+    default: false,
+  },
+  asyncChange: {
+    type: Boolean,
+    default: false,
+  },
+  inputWidth: {
+    type: [String, Number],
+    default: 35,
+  },
+  showMinus: {
+    type: Boolean,
+    default: true,
+  },
+  showPlus: {
+    type: Boolean,
+    default: true,
+  },
+  decimalLength: {
+    type: [String, Number],
+    default: -1,
+  },
+  color: {
+    type: String,
+    default: '#323233',
+  },
+  buttonSize: {
+    type: [String, Number],
+    default: 30,
+  },
+  bgColor: {
+    type: String,
+    default: '#EBECEE',
+  },
+  cursorSpacing: {
+    type: [String, Number],
+    default: 100,
+  },
+  disablePlus: {
+    type: Boolean,
+    default: false,
+  },
+  disableMinus: {
+    type: Boolean,
+    default: false,
+  },
+  iconStyle: {
+    type: String,
+    default: '',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 15,
+  },
+  buttonRound: {
+    type: [String, Number],
+    default: 4,
+  },
+  inputBgColor: {
+    type: String,
+    default: '',
+  },
+  disableColor: {
+    type: String,
+    default: '#f7f8fa',
+  },
+  disableBgColor: {
+    type: String,
+    default: '#c8c9cc',
+  },
+  inputable: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+/**
+ * Emits 说明：数值变化和边界操作回调。
+ * - update:modelValue/update:value: 同步当前数值。
+ * - change: 输入框内容变化时触发，参数 { value, name }。
+ * - plus/minus: 点击增加或减少按钮时触发。
+ * - overlimit: 超出 min/max 或按钮禁用时触发，参数为 plus/minus。
+ * - focus/blur: 输入框聚焦和失焦。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'change',
+  'plus',
+  'minus',
+  'overlimit',
+  'focus',
+  'blur',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const current = ref(normalizeValue(initialValue()))
+
+const displayValue = computed(() => {
+  return formatNumber(current.value)
+})
+
+const minusDisabled = computed(() => {
+  return props.disabled || props.disableMinus || current.value <= Number(props.min)
+})
+
+const plusDisabled = computed(() => {
+  return props.disabled || props.disablePlus || current.value >= Number(props.max)
+})
+
+const minusClass = computed(() => {
+  return minusDisabled.value
+    ? 'i-number-box__btn i-number-box__btn--disabled'
+    : 'i-number-box__btn'
+})
+
+const plusClass = computed(() => {
+  return plusDisabled.value
+    ? 'i-number-box__btn i-number-box__btn--disabled'
+    : 'i-number-box__btn'
+})
+
+const buttonStyle = computed(() => {
+  const disabled = props.disabled
+  return (
+    'width:' +
+    formatSize(props.buttonSize) +
+    ';height:' +
+    formatSize(props.buttonSize) +
+    ';border-radius:' +
+    formatSize(props.buttonRound) +
+    ';background-color:' +
+    (disabled ? props.disableBgColor : bgColor.value) +
+    ';'
+  )
+})
+
+const inputStyle = computed(() => {
+  return (
+    'width:' +
+    formatSize(props.inputWidth) +
+    ';height:' +
+    formatSize(props.buttonSize) +
+    ';color:' +
+    (props.disabled ? props.disableColor : props.color) +
+    ';background-color:' +
+    (props.disabled
+      ? props.disableBgColor
+      : props.inputBgColor.length > 0
+        ? props.inputBgColor
+        : bgColor.value) +
+    ';'
+  )
+})
+
+const iconStyle = computed(() => {
+  return (
+    'color:' +
+    props.color +
+    ';font-size:' +
+    formatSize(props.iconSize) +
+    ';' +
+    props.iconStyle
+  )
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = normalizeValue(initialValue())
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = normalizeValue(initialValue())
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return props.modelValue
+  return props.value
+}
+
+function minus() {
+  if (minusDisabled.value) {
+    emit('overlimit', 'minus')
+    return
+  }
+  emit('minus')
+  setValue(current.value - Number(props.step))
+}
+
+function plus() {
+  if (plusDisabled.value) {
+    emit('overlimit', 'plus')
+    return
+  }
+  emit('plus')
+  setValue(current.value + Number(props.step))
+}
+
+function handleInput(event) {
+  const rawValue = Number(event.detail.value)
+  if (isNaN(rawValue)) return
+  setValue(rawValue)
+}
+
+function setValue(value) {
+  const nextValue = normalizeValue(value)
+  if (!props.asyncChange) current.value = nextValue
+  const event = { value: nextValue, name: props.name }
+  emit('change', event)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+}
+
+function normalizeValue(value) {
+  let nextValue = Number(value)
+  if (isNaN(nextValue)) nextValue = Number(props.min)
+  if (nextValue < Number(props.min)) nextValue = Number(props.min)
+  if (nextValue > Number(props.max)) nextValue = Number(props.max)
+  if (props.integer) nextValue = Math.round(nextValue)
+  const decimal = Number(props.decimalLength)
+  if (decimal >= 0) nextValue = Number(nextValue.toFixed(decimal))
+  return nextValue
+}
+
+function formatNumber(value) {
+  const decimal = Number(props.decimalLength)
+  if (decimal >= 0) return Number(value).toFixed(decimal)
+  return String(value)
+}
+
+function handleFocus(event) {
+  emit('focus', event)
+}
+
+function handleBlur(event) {
+  emit('blur', event)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-number-box {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-number-box__btn {
+  align-items: center;
+  justify-content: center;
+}
+
+.i-number-box__btn--disabled {
+  opacity: 0.45;
+}
+
+.i-number-box__btn-text {
+  color: #323233;
+  font-size: 15px;
+  line-height: 18px;
+}
+
+.i-number-box__input {
+  margin: 0 4px;
+  border-radius: 4px;
+  color: #303133;
+  font-size: 14px;
+  text-align: center;
+}
+</style>

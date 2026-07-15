@@ -1,0 +1,293 @@
+<template>
+  <view v-if="visible" class="i-notify" :style="notifyStyle">
+    <view v-if="currentShowIcon" class="i-notify__icon">
+      <slot name="icon">
+        <text class="i-notify__icon-text" :style="textStyle">
+          {{ iconText }}
+        </text>
+      </slot>
+    </view>
+    <text class="i-notify__text" :style="textStyle">
+      {{ currentMessage }}
+    </text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onUnmounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-notify' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Notify 文档和基础 v-model:show 示例。
+ * - show: 是否显示通知；用于 v-model:show 受控展示。
+ * - top: 通知距离页面顶部的距离。
+ * - type: 主题类型，支持 primary、success、warning、error。
+ * - color: 通知文字和图标颜色。
+ * - bgColor: 自定义背景色；为空时按 type 使用默认主题色。
+ * - message: 展示的文字内容。
+ * - duration: 展示时长，单位 ms；为 0 时不自动关闭。
+ * - fontSize: 文字大小，支持数字或带单位字符串。
+ * - safeTop: 是否预留顶部安全区。
+ * - align: 文字对齐方式，支持 left、center、right。
+ * - zIndex: 通知层级。
+ * - customStyle: 自定义样式；字符串样式会追加到根节点。
+ * - showIcon: 是否显示左侧图标区域。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: false },
+  top: { type: [String, Number], default: 0 },
+  type: { type: String, default: 'primary' },
+  color: { type: String, default: '#ffffff' },
+  bgColor: { type: String, default: '' },
+  message: { type: String, default: '' },
+  duration: { type: [String, Number], default: 3000 },
+  fontSize: { type: [String, Number], default: 15 },
+  safeTop: { type: Boolean, default: false },
+  align: { type: String, default: 'center' },
+  zIndex: { type: [String, Number], default: 100 },
+  customStyle: { type: [String, Object], default: '' },
+  showIcon: { type: Boolean, default: true },
+})
+
+/**
+ * Emits 说明：对齐文档事件，并额外支持 v-model:show 同步。
+ * - open: 通知打开时触发。
+ * - close: 通知关闭时触发。
+ * - update:show: 同步 show 受控值，支撑 v-model:show。
+ */
+const emit = defineEmits(['open', 'close', 'update:show'])
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const visible = ref(props.show)
+const timer = ref(0)
+const currentTop = ref(props.top)
+const currentType = ref(props.type)
+const currentColor = ref(props.color)
+const currentBgColor = ref(bgColor.value)
+const currentMessage = ref(props.message)
+const currentDuration = ref(props.duration)
+const currentFontSize = ref(props.fontSize)
+const currentSafeTop = ref(props.safeTop)
+const currentAlign = ref(props.align)
+const currentZIndex = ref(props.zIndex)
+const currentCustomStyle = ref(props.customStyle)
+const currentShowIcon = ref(props.showIcon)
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (nextValue) {
+      applyOptions(null, '')
+      showNotify()
+    } else {
+      close()
+    }
+  },
+)
+
+onUnmounted(() => {
+  clearTimeout(timer.value)
+})
+
+const notifyStyle = computed(() => {
+  let style = 'top:' + topValue() + ';'
+  style += 'z-index:' + String(currentZIndex.value) + ';'
+  style += 'background-color:' + resolveBgColor() + ';'
+  style += 'justify-content:' + justifyContent() + ';'
+  if (typeof currentCustomStyle.value == 'string') style += currentCustomStyle.value
+  return style
+})
+
+const textStyle = computed(() => {
+  return [
+    'color:' + currentColor.value,
+    'font-size:' + addUnit(currentFontSize.value),
+    'text-align:' + normalizeAlign(currentAlign.value),
+  ].join(';')
+})
+
+const iconText = computed(() => {
+  if (currentType.value == 'success') return '✓'
+  if (currentType.value == 'warning') return '!'
+  if (currentType.value == 'error') return '×'
+  return 'i'
+})
+
+function show(options) {
+  applyOptions(options, '')
+  showNotify()
+}
+
+function primary(options) {
+  applyOptions(options, 'primary')
+  showNotify()
+}
+
+function success(options) {
+  applyOptions(options, 'success')
+  showNotify()
+}
+
+function warning(options) {
+  applyOptions(options, 'warning')
+  showNotify()
+}
+
+function error(options) {
+  applyOptions(options, 'error')
+  showNotify()
+}
+
+function close() {
+  clearTimeout(timer.value)
+  if (!visible.value) return
+  visible.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function showNotify() {
+  clearTimeout(timer.value)
+  visible.value = true
+  emit('open')
+  emit('update:show', true)
+  const duration = Number(currentDuration.value)
+  if (duration > 0) {
+    timer.value = setTimeout(() => {
+      close()
+    }, duration)
+  }
+}
+
+function applyOptions(options, forcedType) {
+  currentTop.value = props.top
+  currentType.value = forcedType.length > 0 ? forcedType : props.type
+  currentColor.value = props.color
+  currentBgColor.value = bgColor.value
+  currentMessage.value = props.message
+  currentDuration.value = props.duration
+  currentFontSize.value = props.fontSize
+  currentSafeTop.value = props.safeTop
+  currentAlign.value = props.align
+  currentZIndex.value = props.zIndex
+  currentCustomStyle.value = props.customStyle
+  currentShowIcon.value = props.showIcon
+
+  if (options == null) return
+  if (typeof options == 'string') {
+    currentMessage.value = options
+    return
+  }
+  if (typeof options == 'object') {
+    setValue(options, 'top')
+    setValue(options, 'type')
+    setValue(options, 'color')
+    setValue(options, 'bgColor')
+    setValue(options, 'message')
+    setValue(options, 'duration')
+    setValue(options, 'fontSize')
+    setValue(options, 'safeTop')
+    setValue(options, 'align')
+    setValue(options, 'zIndex')
+    setValue(options, 'customStyle')
+    setValue(options, 'showIcon')
+  }
+}
+
+function setValue(options, keyName) {
+  const value = options[keyName]
+  if (value == null) return
+  if (keyName == 'top') currentTop.value = value
+  if (keyName == 'type') currentType.value = String(value)
+  if (keyName == 'color') currentColor.value = String(value)
+  if (keyName == 'bgColor') currentBgColor.value = String(value)
+  if (keyName == 'message') currentMessage.value = String(value)
+  if (keyName == 'duration') currentDuration.value = value
+  if (keyName == 'fontSize') currentFontSize.value = value
+  if (keyName == 'safeTop') currentSafeTop.value = value == true
+  if (keyName == 'align') currentAlign.value = String(value)
+  if (keyName == 'zIndex') currentZIndex.value = value
+  if (keyName == 'customStyle') currentCustomStyle.value = value
+  if (keyName == 'showIcon') currentShowIcon.value = value == true
+}
+
+function addUnit(value: any): string {
+  if (typeof value == 'number') return value.toString() + 'px'
+  const text = value == null ? '' : value.toString()
+  if (text == '') return '0px'
+  const unitReg = new RegExp('[a-zA-Z%]+$')
+  return unitReg.test(text) ? text : text + 'px'
+}
+
+function topValue(): string {
+  const offset = Number(currentTop.value)
+  const safeTop = currentSafeTop.value ? 44 : 0
+  if (!isNaN(offset)) return (offset + safeTop).toString() + 'px'
+  if (currentSafeTop.value) return '44px'
+  return addUnit(currentTop.value)
+}
+
+function normalizeAlign(value: string): string {
+  if (value == 'left' || value == 'right') return value
+  return 'center'
+}
+
+function justifyContent(): string {
+  const align = normalizeAlign(currentAlign.value)
+  if (align == 'left') return 'flex-start'
+  if (align == 'right') return 'flex-end'
+  return 'center'
+}
+
+function resolveBgColor(): string {
+  if (currentBgColor.value.length > 0) return currentBgColor.value
+  if (currentType.value == 'success') return '#19be6b'
+  if (currentType.value == 'warning') return '#ff9900'
+  if (currentType.value == 'error') return '#fa3534'
+  return '#2979ff'
+}
+
+defineExpose({
+  show,
+  primary,
+  success,
+  warning,
+  error,
+  close,
+})
+</script>
+
+<style>
+.i-notify {
+  position: fixed;
+  left: 0;
+  right: 0;
+  min-height: 44px;
+  padding: 10px 16px;
+  flex-direction: row;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+.i-notify__icon {
+  width: 24px;
+  height: 22px;
+  margin-right: 6px;
+  align-items: center;
+  justify-content: center;
+}
+.i-notify__icon-text {
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+}
+.i-notify__text {
+  flex: 1;
+  line-height: 22px;
+}
+</style>

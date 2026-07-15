@@ -1,0 +1,139 @@
+<template>
+  <view :class="rowClass" :style="rowStyle">
+    <slot></slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-row' })
+
+/**
+ * Props 说明：参考 Element Plus Layout Row 的 24 栅格行容器。
+ * - gutter: 栅格间隔，单位 px。
+ * - justify: 水平排列方式，支持 start、center、end、space-between、space-around、space-evenly，也兼容 between/around/evenly。
+ * - align: 垂直排列方式，支持 top、middle、center、bottom、stretch。
+ * - wrap: 是否允许换行。
+ */
+const props = defineProps({
+  gutter: {
+    type: [String, Number],
+    default: 0,
+  },
+  justify: {
+    type: String,
+    default: 'start',
+  },
+  align: {
+    type: String,
+    default: 'top',
+  },
+  wrap: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+const emit = defineEmits([])
+
+const rowClass = computed(() => {
+  const classes = [
+    'i-row',
+    'i-row--align-' + normalizeAlign(props.align),
+    'i-row--justify-' + normalizeJustify(props.justify),
+  ]
+  if (!props.wrap) classes.push('i-row--nowrap')
+  if (Number(props.gutter) > 0) classes.push('i-row--gutter')
+  return classes.join(' ')
+})
+
+const rowStyle = computed(() => {
+  const gutter = Number(props.gutter)
+  if (gutter <= 0) return ''
+  const half = gutter / 2
+  return 'margin-left:-' + half + 'px;margin-right:-' + half + 'px;'
+})
+
+function normalizeJustify(value) {
+  const text = String(value)
+  if (text == 'between') return 'space-between'
+  if (text == 'around') return 'space-around'
+  if (text == 'evenly') return 'space-evenly'
+  if (
+    text == 'start' ||
+    text == 'center' ||
+    text == 'end' ||
+    text == 'space-between' ||
+    text == 'space-around' ||
+    text == 'space-evenly'
+  )
+    return text
+  return 'start'
+}
+
+function normalizeAlign(value) {
+  const text = String(value)
+  if (text == 'middle') return 'center'
+  if (
+    text == 'top' ||
+    text == 'center' ||
+    text == 'bottom' ||
+    text == 'stretch'
+  )
+    return text
+  return 'top'
+}
+</script>
+
+<style>
+.i-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.i-row--nowrap {
+  flex-wrap: nowrap;
+}
+
+.i-row--align-top {
+  align-items: flex-start;
+}
+
+.i-row--align-center {
+  align-items: center;
+}
+
+.i-row--align-bottom {
+  align-items: flex-end;
+}
+
+.i-row--align-stretch {
+  align-items: stretch;
+}
+
+.i-row--justify-start {
+  justify-content: flex-start;
+}
+
+.i-row--justify-center {
+  justify-content: center;
+}
+
+.i-row--justify-end {
+  justify-content: flex-end;
+}
+
+.i-row--justify-space-between {
+  justify-content: space-between;
+}
+
+.i-row--justify-space-around {
+  justify-content: space-around;
+}
+
+.i-row--justify-space-evenly {
+  justify-content: space-evenly;
+}
+</style>

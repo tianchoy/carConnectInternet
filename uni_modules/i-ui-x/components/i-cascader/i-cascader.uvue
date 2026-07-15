@@ -1,0 +1,736 @@
+<template>
+  <view class="i-cascader-root" :style="rootStyle">
+    <view v-if="popup" class="i-cascader-field" @click="openPopup">
+      <text :class="fieldTextClass">{{ displayText }}</text>
+      <text class="i-cascader-field__arrow">›</text>
+    </view>
+
+    <view v-if="!popup" class="i-cascader">
+      <slot name="header" :menus="menus">
+        <view class="i-cascader__header">
+          <text
+            v-for="menu in menus"
+            :key="menu.id"
+            class="i-cascader__crumb"
+            :style="activeTextStyle"
+          >
+            {{ menu.title }}
+          </text>
+          <text v-if="menus.length == 0" class="i-cascader__placeholder">
+            {{ placeholder }}
+          </text>
+        </view>
+      </slot>
+
+      <scroll-view
+        class="i-cascader__scroll"
+        :scroll-x="true"
+        :scroll-left="scrollLeft"
+        :scroll-with-animation="true"
+      >
+        <view class="i-cascader__columns">
+          <view
+            v-for="(column, parentIndex) in levels"
+            :key="'level-' + parentIndex"
+            class="i-cascader__column"
+            :style="columnStyle"
+          >
+            <view
+              v-for="(item, childrenIndex) in column"
+              :key="item.id"
+              :class="itemClass(item)"
+              @click="selectItem(item, parentIndex, childrenIndex)"
+            >
+              <text :class="itemTextClass(item)" :style="itemTextStyle(item)">
+                {{ item.title }}
+              </text>
+              <text v-if="hasChildren(item)" class="i-cascader__arrow">›</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view
+      v-if="popup && popupOpened"
+      class="i-cascader-popup-mask"
+      @click="handleOverlayClick"
+    >
+      <view class="i-cascader-popup" @click.stop="">
+        <view class="i-cascader-popup__head">
+          <text class="i-cascader-popup__close" @click="closePopup">
+            {{ closeText }}
+          </text>
+          <text class="i-cascader-popup__title">{{ title }}</text>
+          <text class="i-cascader-popup__confirm" @click="confirmPopup">
+            {{ confirmText }}
+          </text>
+        </view>
+
+        <view class="i-cascader">
+          <slot name="header" :menus="menus">
+            <view class="i-cascader__header">
+              <text
+                v-for="menu in menus"
+                :key="menu.id"
+                class="i-cascader__crumb"
+                :style="activeTextStyle"
+              >
+                {{ menu.title }}
+              </text>
+              <text v-if="menus.length == 0" class="i-cascader__placeholder">
+                {{ placeholder }}
+              </text>
+            </view>
+          </slot>
+
+          <scroll-view
+            class="i-cascader__scroll"
+            :scroll-x="true"
+            :scroll-left="scrollLeft"
+            :scroll-with-animation="true"
+          >
+            <view class="i-cascader__columns">
+              <view
+                v-for="(column, parentIndex) in levels"
+                :key="'popup-level-' + parentIndex"
+                class="i-cascader__column"
+                :style="columnStyle"
+              >
+                <view
+                  v-for="(item, childrenIndex) in column"
+                  :key="item.id"
+                  :class="itemClass(item)"
+                  @click="selectItem(item, parentIndex, childrenIndex)"
+                >
+                  <text
+                    :class="itemTextClass(item)"
+                    :style="itemTextStyle(item)"
+                  >
+                    {{ item.title }}
+                  </text>
+                  <text v-if="hasChildren(item)" class="i-cascader__arrow">
+                    ›
+                  </text>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-cascader' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x cascader，并保留旧版省市参数兼容。
+ * - width: 组件宽度，可以为 auto、px、rpx、百分比或纯数字。
+ * - height: 内容区域高度，不建议为 auto。
+ * - columnWidth: 每一级列宽；默认 112px，移动端弹层里可以完整露出三级。
+ * - list: 树形数据，节点结构为 { id, title, children, disabled }。
+ * - modelValue: 当前选中项 id；选中叶子或弹层确定时同步。
+ * - fontSize: 选项文字大小。
+ * - itemTextColor: 未选中选项文字颜色。
+ * - darkItemTextColor: 暗黑模式文字颜色预留配置。
+ * - itemActiveColor: 选中项文字颜色；为空时使用主题蓝。
+ * - sliderContentBgColor: 内容区域背景颜色。
+ * - popup: 是否启用弹层模式；启用后点击输入框区域打开底部级联面板。
+ * - show: 弹层模式下控制弹层是否展示，配合 update:show 支持受控写法。
+ * - title: 弹层顶部标题。
+ * - placeholder: 未选择时输入框和头部占位文字。
+ * - closeText: 弹层左侧关闭按钮文字。
+ * - confirmText: 弹层右侧确定按钮文字。
+ * - closeOnMask: 点击遮罩时是否关闭弹层。
+ * - province/city: 旧版二级省市选择兼容参数。
+ */
+const props = defineProps({
+  width: {
+    type: String,
+    default: 'auto',
+  },
+  height: {
+    type: String,
+    default: '150',
+  },
+  columnWidth: {
+    type: String,
+    default: '112',
+  },
+  list: {
+    type: Array,
+    default: () => [],
+  },
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  fontSize: {
+    type: String,
+    default: '18',
+  },
+  itemTextColor: {
+    type: String,
+    default: '#333333',
+  },
+  darkItemTextColor: {
+    type: String,
+    default: '',
+  },
+  itemActiveColor: {
+    type: String,
+    default: '',
+  },
+  sliderContentBgColor: {
+    type: String,
+    default: 'rgba(0,0,0,0)',
+  },
+  popup: {
+    type: Boolean,
+    default: false,
+  },
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  title: {
+    type: String,
+    default: '请选择',
+  },
+  placeholder: {
+    type: String,
+    default: '请选择',
+  },
+  closeText: {
+    type: String,
+    default: '关闭',
+  },
+  confirmText: {
+    type: String,
+    default: '确定',
+  },
+  closeOnMask: { type: Boolean, default: true },
+  province: {
+    type: String,
+    default: '',
+  },
+  city: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发级联路径和确认结果。
+ * - change: 选中路径变化时触发，参数为 ids 数组。
+ * - cellClick: 点击任意项时触发，参数为 item、列索引、行索引。
+ * - confirm: 选中叶子或弹层确定时触发，参数为 id、ids。
+ * - open: 弹层打开时触发。
+ * - close: 弹层关闭时触发。
+ * - cancel: 点击左侧关闭按钮时触发。
+ * - update:modelValue: 同步当前确认的 id。
+ * - update:show: 同步弹层展示状态。
+ * - update:province/update:city: 兼容旧版省市同步。
+ */
+const emit = defineEmits([
+  'change',
+  'cellClick',
+  'confirm',
+  'open',
+  'close',
+  'cancel',
+  'update:modelValue',
+  'update:show',
+  'update:province',
+  'update:city',
+])
+
+
+
+const activeIds = ref([])
+const popupOpened = ref(props.show)
+const scrollLeft = ref(0)
+
+const defaultList = ref([
+  {
+    title: '广东省',
+    id: '199',
+  },
+  {
+    title: '江西',
+    id: '1-1',
+    children: [
+      {
+        title: '南昌',
+        id: '1',
+        children: [
+          { title: '青山湖区', id: '1-2' },
+          { title: '高新区', id: '1-3' },
+          { title: '红谷滩区', id: '1-4' },
+          {
+            title: '东湖区',
+            id: '1-5',
+            children: [
+              { title: '三级-青山湖区', id: '1-2-1' },
+              { title: '三级-高新区', id: '1-3-1' },
+              { title: '三级-红谷滩区', id: '1-4-1' },
+              { title: '三级-东湖区', id: '1-5-1' },
+            ],
+          },
+        ],
+      },
+      { title: '九江', id: '2' },
+      { title: '赣州', id: '8', disabled: true },
+      { title: '吉安', id: '9' },
+      { title: '抚州', id: '10' },
+    ],
+  },
+  {
+    title: '江苏',
+    id: '4-1',
+    children: [
+      { title: '常熟', id: '4' },
+      { title: '苏州', id: '5' },
+      { title: '小上海', id: '6' },
+    ],
+  },
+  { title: '安徽(被禁用)', id: '7', disabled: true },
+  { title: '湖南', id: '99' },
+])
+
+const sourceList = computed(() => {
+  return props.list.length > 0 ? props.list : defaultList.value
+})
+
+const levels = computed(() => {
+  const result = []
+  let children = sourceList.value
+  result.push(children)
+
+  for (let i = 0; i < activeIds.value.length; i++) {
+    const item = findInList(children, String(activeIds.value[i]))
+    if (item == null || !hasChildren(item)) break
+    children = item.children
+    result.push(children)
+  }
+
+  return result
+})
+
+const menus = computed(() => {
+  const result = []
+  let children = sourceList.value
+  for (let i = 0; i < activeIds.value.length; i++) {
+    const item = findInList(children, String(activeIds.value[i]))
+    if (item == null) break
+    result.push({
+      id: item.id,
+      title: item.title,
+    })
+    if (!hasChildren(item)) break
+    children = item.children
+  }
+  return result
+})
+
+const rootStyle = computed(() => {
+  let style = ''
+  if (props.width != 'auto') style = style + 'width:' + formatSize(props.width) + ';'
+  style = style + 'background-color:' + props.sliderContentBgColor + ';'
+  return style
+})
+
+const columnStyle = computed(() => {
+  return (
+    'height:' +
+    formatSize(props.height) +
+    ';width:' +
+    formatSize(props.columnWidth) +
+    ';'
+  )
+})
+
+const activeTextStyle = computed(() => {
+  return 'color:' + activeColor() + ';'
+})
+
+const displayText = computed(() => {
+  if (menus.value.length == 0) return props.placeholder
+
+  const texts = []
+  for (let i = 0; i < menus.value.length; i++) texts.push(menus.value[i].title)
+  return texts.join(' / ')
+})
+
+const fieldTextClass = computed(() => {
+  return menus.value.length == 0
+    ? 'i-cascader-field__text i-cascader-field__text--placeholder'
+    : 'i-cascader-field__text'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncByModelValue()
+  },
+)
+
+watch(
+  () => props.list,
+  () => {
+    syncByModelValue()
+  },
+)
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (popupOpened.value == nextValue) return
+    popupOpened.value = nextValue
+    if (nextValue) emit('open')
+    else emit('close')
+  },
+)
+
+syncByModelValue()
+
+function syncByModelValue() {
+  const id = props.modelValue.length > 0 ? props.modelValue : legacyId()
+  if (id.length == 0) {
+    activeIds.value = []
+    return
+  }
+
+  const path = findPath(sourceList.value, id)
+  activeIds.value = path
+  const item = currentItem()
+  scrollToColumnCount(item != null && hasChildren(item) ? path.length + 1 : path.length)
+}
+
+function legacyId() {
+  if (props.city.length > 0) return props.city
+  return props.province
+}
+
+function selectItem(item, parentIndex, childrenIndex) {
+  emit('cellClick', item, parentIndex, childrenIndex)
+  if (item.disabled) return
+
+  const nextIds = activeIds.value.slice(0, parentIndex)
+  nextIds.push(item.id)
+  activeIds.value = nextIds
+
+  emit('change', activeIds.value)
+  syncLegacyPath()
+  scrollToColumnCount(hasChildren(item) ? nextIds.length + 1 : nextIds.length)
+
+  if (!props.popup && !hasChildren(item)) confirmItem(item)
+}
+
+function confirmItem(item) {
+  emit('confirm', item.id, activeIds.value)
+  emit('update:modelValue', item.id)
+  if (props.popup) closePopupOnly()
+}
+
+function confirmPopup() {
+  const item = currentItem()
+  if (item == null || item.disabled) return
+  confirmItem(item)
+}
+
+function openPopup() {
+  if (popupOpened.value) return
+  popupOpened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function closePopup() {
+  emit('cancel')
+  closePopupOnly()
+}
+
+function closePopupOnly() {
+  if (!popupOpened.value) return
+  popupOpened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  closePopupOnly()
+}
+
+function currentItem() {
+  if (activeIds.value.length == 0) return null
+  let children = sourceList.value
+  let current = null
+
+  for (let i = 0; i < activeIds.value.length; i++) {
+    current = findInList(children, String(activeIds.value[i]))
+    if (current == null) return null
+    if (!hasChildren(current)) return current
+    children = current.children
+  }
+
+  return current
+}
+
+function syncLegacyPath() {
+  if (activeIds.value.length > 0) emit('update:province', String(activeIds.value[0]))
+  if (activeIds.value.length > 1) emit('update:city', String(activeIds.value[1]))
+}
+
+function scrollToColumnCount(count) {
+  const keepVisibleCount = 2
+  if (count <= keepVisibleCount) {
+    scrollLeft.value = 0
+    return
+  }
+
+  scrollLeft.value = (count - keepVisibleCount) * columnWidthNumber()
+}
+
+function itemClass(item) {
+  const classes = ['i-cascader__item']
+  if (isActive(item)) classes.push('i-cascader__item--active')
+  if (item.disabled) classes.push('i-cascader__item--disabled')
+  if (hasChildren(item)) classes.push('i-cascader__item--parent')
+  return classes.join(' ')
+}
+
+function itemTextClass(item) {
+  return isActive(item) ? 'i-cascader__text i-cascader__text--active' : 'i-cascader__text'
+}
+
+function itemTextStyle(item) {
+  let style = 'font-size:' + formatSize(props.fontSize) + ';'
+  style = style + 'color:' + (isActive(item) ? activeColor() : props.itemTextColor) + ';'
+  if (props.darkItemTextColor.length > 0) {
+    style = style + '--i-cascader-dark-color:' + props.darkItemTextColor + ';'
+  }
+  return style
+}
+
+function activeColor() {
+  return props.itemActiveColor.length > 0 ? props.itemActiveColor : '#3c9cff'
+}
+
+function isActive(item) {
+  return activeIds.value.indexOf(item.id) >= 0
+}
+
+function hasChildren(item) {
+  return item.children != null && item.children.length > 0
+}
+
+function findInList(list, id) {
+  for (let i = 0; i < list.length; i++) {
+    if (String(list[i].id) == id) return list[i]
+  }
+  return null
+}
+
+function findPath(list, id) {
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    if (String(item.id) == id) return [item.id]
+    if (hasChildren(item)) {
+      const childPath = findPath(item.children, id)
+      if (childPath.length > 0) {
+        const result = [item.id]
+        for (let j = 0; j < childPath.length; j++) result.push(childPath[j])
+        return result
+      }
+    }
+  }
+  return []
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (
+    text == 'auto' ||
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function columnWidthNumber() {
+  const value = parseFloat(String(props.columnWidth))
+  if (isNaN(value) || value <= 0) return 112
+  return value
+}
+</script>
+
+<style>
+.i-cascader-root {
+  width: 100%;
+}
+
+.i-cascader {
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.i-cascader-field {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-cascader-field__text {
+  flex: 1;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-cascader-field__text--placeholder {
+  color: #909399;
+}
+
+.i-cascader-field__arrow {
+  width: 20px;
+  color: #909399;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: right;
+  transform: rotate(90deg);
+}
+
+.i-cascader-popup-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 150;
+  background-color: rgba(0, 0, 0, 0.42);
+  justify-content: flex-end;
+}
+
+.i-cascader-popup {
+  padding: 16px 16px 24px;
+  border-radius: 16px 16px 0 0;
+  background-color: #ffffff;
+}
+
+.i-cascader-popup__head {
+  min-height: 32px;
+  margin-bottom: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-cascader-popup__close {
+  width: 60px;
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-cascader-popup__title {
+  flex: 1;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.i-cascader-popup__confirm {
+  width: 60px;
+  color: #1989fa;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: right;
+}
+
+.i-cascader__header {
+  min-height: 42px;
+  padding: 0 12px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-cascader__crumb {
+  margin-right: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.i-cascader__placeholder {
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-cascader__scroll {
+  width: 100%;
+}
+
+.i-cascader__columns {
+  flex-direction: row;
+}
+
+.i-cascader__column {
+  width: 112px;
+  padding: 8px 0;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: #eef0f4;
+}
+
+.i-cascader__item {
+  min-height: 40px;
+  padding: 0 10px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-cascader__item--active {
+  background-color: #f4f9ff;
+}
+
+.i-cascader__item--disabled {
+  opacity: 0.42;
+}
+
+.i-cascader__text {
+  flex: 1;
+  color: #333333;
+  line-height: 22px;
+}
+
+.i-cascader__text--active {
+  font-weight: 700;
+}
+
+.i-cascader__arrow {
+  width: 18px;
+  color: #909399;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+}
+</style>

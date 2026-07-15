@@ -1,0 +1,465 @@
+<template>
+  <view class="i-image-root" :style="rootStyle">
+    <view :class="wrapClass" :style="wrapStyle" @click="handleClick">
+      <image
+        v-if="src.length > 0 && !failed"
+        class="i-image__media"
+        :style="mediaStyle"
+        :src="src"
+        :mode="mode"
+        :lazy-load="lazyLoad"
+        :show-menu-by-longpress="showMenuByLongpress"
+        :webp="webp"
+        @load="handleLoad"
+        @error="handleError"
+      ></image>
+
+      <view
+        v-if="loading && showLoading"
+        class="i-image__fallback"
+        :style="fallbackStyle"
+      >
+        <slot name="loading">
+          <image
+            v-if="loadingIconIsImage"
+            class="i-image__fallback-image"
+            :src="loadingIcon"
+            mode="aspectFit"
+          ></image>
+          <text v-else class="i-image__fallback-icon">{{
+            loadingIconText
+          }}</text>
+        </slot>
+      </view>
+
+      <view
+        v-if="failed && showError"
+        class="i-image__fallback"
+        :style="fallbackStyle"
+      >
+        <slot name="error">
+          <image
+            v-if="errorIconIsImage"
+            class="i-image__fallback-image"
+            :src="errorIcon"
+            mode="aspectFit"
+          ></image>
+          <text v-else class="i-image__fallback-icon">{{
+            errorIconText
+          }}</text>
+        </slot>
+      </view>
+    </view>
+
+    <view v-if="previewVisible" class="i-image-preview">
+      <view class="i-image-preview__bar">
+        <text class="i-image-preview__count">{{ previewCountText }}</text>
+        <text class="i-image-preview__close" @click="closePreview">关闭</text>
+      </view>
+      <image
+        class="i-image-preview__media"
+        :src="currentPreviewUrl"
+        mode="aspectFit"
+      ></image>
+      <view v-if="previewUrls.length > 1" class="i-image-preview__actions">
+        <text class="i-image-preview__action" @click="prevPreview"
+          >上一张</text
+        >
+        <text class="i-image-preview__action" @click="nextPreview"
+          >下一张</text
+        >
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+
+defineOptions({ name: 'i-image' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Image 图片组件设计，用于增强 uni-app x 原生 image。
+ * - src: 图片地址，建议传入绝对路径、网络路径或项目静态资源路径。
+ * - mode: 图片裁剪和缩放模式，透传给原生 image，例如 aspectFill、aspectFit、widthFix。
+ * - width: 图片容器宽度，支持 number、px、rpx、%；数字默认按 px 处理。
+ * - height: 图片容器高度，支持 number、px、rpx、%、auto；数字默认按 px 处理。
+ * - shape: 图片形状，square 为方形，circle 为圆形。
+ * - round: 方形图片的圆角值；shape 为 circle 时会强制圆形。
+ * - fade: 是否在图片加载完成后显示淡入动画。
+ * - duration: fade 动画过渡时间，单位 ms。
+ * - lazyLoad: 是否开启原生 image 懒加载能力。
+ * - previewSrcList: 点击图片时用于组件内置预览层的图片数组；为空时不触发预览。
+ * - previewIndex: 预览时打开 previewSrcList 中的索引。
+ * - showMenuByLongpress: 是否开启长按图片显示识别菜单，平台不支持时会被忽略。
+ * - loadingIcon: 加载中的图标名或图片地址；图片地址会以 image 方式渲染。
+ * - errorIcon: 加载失败的图标名或图片地址；图片地址会以 image 方式渲染。
+ * - showLoading: 是否显示加载中的图标或 loading 插槽。
+ * - showError: 是否显示加载错误的图标或 error 插槽。
+ * - webp: 是否解析 webp 图片，平台不支持时会被忽略。
+ * - bgColor: 图片容器背景色，常用于加载中、失败或深色页面融合。
+ * - customStyle: 追加到组件根节点的自定义样式字符串。
+ */
+const props = defineProps({
+  src: {
+    type: String,
+    default: '',
+  },
+  mode: {
+    type: String,
+    default: 'aspectFill',
+  },
+  width: {
+    type: [String, Number],
+    default: 300,
+  },
+  height: {
+    type: [String, Number],
+    default: 225,
+  },
+  shape: {
+    type: String,
+    default: 'square',
+  },
+  round: {
+    type: [String, Number],
+    default: 0,
+  },
+  fade: {
+    type: Boolean,
+    default: true,
+  },
+  duration: {
+    type: [String, Number],
+    default: 500,
+  },
+  lazyLoad: {
+    type: Boolean,
+    default: true,
+  },
+  previewSrcList: {
+    type: Array,
+    default: () => [],
+  },
+  previewIndex: {
+    type: Number,
+    default: 0,
+  },
+  showMenuByLongpress: {
+    type: Boolean,
+    default: true,
+  },
+  loadingIcon: {
+    type: String,
+    default: 'photo',
+  },
+  errorIcon: {
+    type: String,
+    default: 'error-circle',
+  },
+  showLoading: {
+    type: Boolean,
+    default: false,
+  },
+  showError: {
+    type: Boolean,
+    default: false,
+  },
+  webp: {
+    type: Boolean,
+    default: false,
+  },
+  bgColor: {
+    type: String,
+    default: '#f3f4f6',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：向页面派发图片交互和加载状态。
+ * - click: 点击图片容器时触发。
+ * - load: 图片加载成功时触发，参数为原生 load 事件对象。
+ * - error: 图片加载失败时触发，参数为原生 error 事件对象。
+ */
+const emit = defineEmits(['click', 'load', 'error'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const loading = ref(props.src.length > 0)
+const failed = ref(props.src.length == 0)
+const loaded = ref(false)
+const previewVisible = ref(false)
+const currentPreview = ref(0)
+
+const rootStyle = computed(() => {
+  return sizeStyle()
+})
+
+const wrapClass = computed(() => {
+  if (props.shape == 'circle') return 'i-image i-image--circle'
+  return 'i-image i-image--square'
+})
+
+const wrapStyle = computed(() => {
+  let style = sizeStyle()
+  style = style + 'background-color:' + bgColor.value + ';'
+
+  if (props.shape == 'circle') {
+    style = style + 'border-radius:9999px;'
+  } else {
+    style = style + 'border-radius:' + formatSize(props.round) + ';'
+  }
+
+  if (props.customStyle.length > 0) style = style + props.customStyle
+  return style
+})
+
+const mediaStyle = computed(() => {
+  let style = sizeStyle()
+
+  if (props.fade) {
+    const opacity = loaded.value ? '1' : '0'
+    style =
+      style +
+      'opacity:' +
+      opacity +
+      ';transition-property:opacity;transition-duration:' +
+      formatDuration(props.duration) +
+      'ms;'
+  }
+
+  return style
+})
+
+const fallbackStyle = computed(() => {
+  return 'background-color:' + bgColor.value + ';'
+})
+
+const loadingIconIsImage = computed(() => {
+  return isImagePath(props.loadingIcon)
+})
+
+const errorIconIsImage = computed(() => {
+  return isImagePath(props.errorIcon)
+})
+
+const loadingIconText = computed(() => {
+  if (props.loadingIcon == 'photo') return 'IMG'
+  return props.loadingIcon
+})
+
+const errorIconText = computed(() => {
+  if (props.errorIcon == 'error-circle') return '!'
+  return props.errorIcon
+})
+
+const previewUrls = computed(() => {
+  const urls = []
+  for (let i = 0; i < props.previewSrcList.length; i++) {
+    const item = String(props.previewSrcList[i])
+    if (item.length > 0) urls.push(item)
+  }
+  return urls
+})
+
+const currentPreviewUrl = computed(() => {
+  if (previewUrls.value.length == 0) return ''
+  return previewUrls.value[currentPreview.value]
+})
+
+const previewCountText = computed(() => {
+  if (previewUrls.value.length == 0) return '0/0'
+  return String(currentPreview.value + 1) + '/' + String(previewUrls.value.length)
+})
+
+watch(
+  () => props.src,
+  () => {
+    loading.value = props.src.length > 0
+    failed.value = props.src.length == 0
+    loaded.value = false
+  },
+)
+
+function formatSize(value) {
+  const text = String(value)
+  if (text == 'auto') return 'auto'
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function formatDuration(value) {
+  const duration = Number(value)
+  if (duration >= 0) return String(duration)
+  return '500'
+}
+
+function sizeStyle() {
+  return 'width:' + formatSize(props.width) + ';height:' + formatSize(props.height) + ';'
+}
+
+function isImagePath(value) {
+  const text = String(value)
+  if (text.indexOf('/') >= 0) return true
+  if (text.indexOf('http') == 0) return true
+  if (text.indexOf('.png') >= 0) return true
+  if (text.indexOf('.jpg') >= 0) return true
+  if (text.indexOf('.jpeg') >= 0) return true
+  if (text.indexOf('.webp') >= 0) return true
+  if (text.indexOf('.gif') >= 0) return true
+  return false
+}
+
+function handleClick() {
+  emit('click')
+  if (previewUrls.value.length == 0) return
+
+  let current = props.previewIndex
+  if (current < 0) current = 0
+  if (current >= previewUrls.value.length) current = previewUrls.value.length - 1
+
+  currentPreview.value = current
+  previewVisible.value = true
+}
+
+function closePreview() {
+  previewVisible.value = false
+}
+
+function prevPreview() {
+  if (previewUrls.value.length == 0) return
+  if (currentPreview.value <= 0) {
+    currentPreview.value = previewUrls.value.length - 1
+    return
+  }
+  currentPreview.value = currentPreview.value - 1
+}
+
+function nextPreview() {
+  if (previewUrls.value.length == 0) return
+  if (currentPreview.value >= previewUrls.value.length - 1) {
+    currentPreview.value = 0
+    return
+  }
+  currentPreview.value = currentPreview.value + 1
+}
+
+function handleLoad(event) {
+  loading.value = false
+  failed.value = false
+  loaded.value = true
+  emit('load', event)
+}
+
+function handleError(event) {
+  loading.value = false
+  failed.value = true
+  loaded.value = false
+  emit('error', event)
+}
+</script>
+
+<style>
+.i-image-root {
+  position: relative;
+}
+
+.i-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.i-image--circle {
+  border-radius: 9999px;
+}
+
+.i-image__media {
+}
+
+.i-image__fallback {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-image__fallback-icon {
+  color: #909399;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.i-image__fallback-image {
+  width: 24px;
+  height: 24px;
+}
+
+.i-image-preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.92);
+}
+
+.i-image-preview__bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  height: 56px;
+  padding: 0 18px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-image-preview__count,
+.i-image-preview__close,
+.i-image-preview__action {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-image-preview__close,
+.i-image-preview__action {
+  padding: 8px 10px;
+}
+
+.i-image-preview__media {
+  width: 100%;
+  height: 100%;
+}
+
+.i-image-preview__actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  z-index: 2;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-image-preview__action {
+  margin: 0 10px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+</style>

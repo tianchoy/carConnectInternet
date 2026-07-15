@@ -1,0 +1,304 @@
+<template>
+  <view
+    :class="cardClass"
+    :style="cardStyle"
+    @click="handleClick"
+  >
+    <view
+      v-if="showHeaderArea"
+      class="i-card__header"
+      :class="headerBorderBottom ? 'i-card__header--border' : ''"
+      :style="headerComputedStyle"
+      @click.stop="handleHeaderClick"
+    >
+      <slot name="header">
+        <image
+          v-if="thumbText.length > 0"
+          class="i-card__thumb"
+          :src="thumbText"
+          :style="thumbStyle"
+          mode="aspectFill"
+        ></image>
+        <view class="i-card__title-main">
+          <text class="i-card__title" :style="titleStyle">{{ title }}</text>
+          <text
+            v-if="subTitleText.length > 0"
+            class="i-card__subtitle"
+            :style="subTitleStyle"
+          >
+            {{ subTitle }}
+          </text>
+        </view>
+        <text v-if="extraText.length > 0" class="i-card__extra">{{ extra }}</text>
+      </slot>
+    </view>
+
+    <view
+      class="i-card__body"
+      :style="bodyComputedStyle"
+      @click.stop="handleBodyClick"
+    >
+      <slot></slot>
+    </view>
+
+    <view
+      v-if="hasFooter"
+      class="i-card__footer"
+      :class="footerBorderTop ? 'i-card__footer--border' : ''"
+      :style="footerComputedStyle"
+      @click.stop="handleFooterClick"
+    >
+      <slot name="footer"></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, useSlots } from 'vue'
+
+defineOptions({ name: 'i-card' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Card 文档。
+ * - title: 头部左侧标题。
+ * - titleColor: 标题颜色。
+ * - titleSize: 标题字号，默认按 rpx 处理。
+ * - subTitle: 头部标题下方的副标题。
+ * - subTitleColor: 副标题颜色。
+ * - subTitleSize: 副标题字号，默认按 rpx 处理。
+ * - border: 是否显示卡片外边框。
+ * - index: 标识当前卡片，点击事件会原样返回。
+ * - shadow: 是否显示卡片阴影。
+ * - round: 卡片圆角值，默认按 rpx 处理。
+ * - headerStyle: 头部自定义样式字符串。
+ * - bodyStyle: 主体自定义样式字符串。
+ * - footerStyle: 底部自定义样式字符串。
+ * - headerBorderBottom: 是否显示头部下边框。
+ * - footerBorderTop: 是否显示底部上边框。
+ * - extra: 头部右侧额外内容。
+ * - thumb: 缩略图路径，显示在标题左侧。
+ * - thumbWidth: 缩略图宽高，默认按 rpx 处理。
+ * - thumbCircle: 缩略图是否显示为圆形。
+ * - thumbRadius: 缩略图圆角值。
+ * - padding: header/body/footer 的统一内边距。
+ * - showHeader: 是否显示头部。
+ */
+const props = defineProps({
+  title: { type: String, default: '' },
+  titleColor: { type: String, default: '#303133' },
+  titleSize: { type: [String, Number], default: 30 },
+  subTitle: { type: String, default: '' },
+  subTitleColor: { type: String, default: '#909399' },
+  subTitleSize: { type: [String, Number], default: 26 },
+  border: { type: Boolean, default: false },
+  index: { type: [String, Number], default: '' },
+  shadow: { type: Boolean, default: false },
+  round: { type: [String, Number], default: 16 },
+  headerStyle: { type: [String, Object], default: '' },
+  bodyStyle: { type: [String, Object], default: '' },
+  footerStyle: { type: [String, Object], default: '' },
+  headerBorderBottom: { type: Boolean, default: true },
+  footerBorderTop: { type: Boolean, default: true },
+  extra: { type: String, default: '' },
+  thumb: { type: String, default: '' },
+  thumbWidth: { type: [String, Number], default: 60 },
+  thumbCircle: { type: Boolean, default: false },
+  thumbRadius: { type: [String, Number], default: '' },
+  padding: { type: [String, Number], default: '' },
+  showHeader: { type: Boolean, default: true },
+})
+
+/**
+ * Emits 说明：严格对齐 Card 文档。
+ * - click: 点击卡片任意区域时触发，返回 index。
+ * - headerClick: 点击头部时触发，返回 index。
+ * - bodyClick: 点击主体时触发，返回 index。
+ * - footerClick: 点击底部时触发，返回 index。
+ */
+const emit = defineEmits(['click', 'headerClick', 'bodyClick', 'footerClick'])
+const slots = useSlots()
+
+const hasHeader = computed(() => {
+  return slots.header != null
+})
+
+const hasFooter = computed(() => {
+  return slots.footer != null
+})
+
+const titleText = computed(() => {
+  return String(props.title)
+})
+
+const subTitleText = computed(() => {
+  return String(props.subTitle)
+})
+
+const extraText = computed(() => {
+  return String(props.extra)
+})
+
+const thumbText = computed(() => {
+  return String(props.thumb)
+})
+
+const showHeaderArea = computed(() => {
+  return (
+    props.showHeader &&
+    (hasHeader.value ||
+      titleText.value.length > 0 ||
+      subTitleText.value.length > 0 ||
+      extraText.value.length > 0 ||
+      thumbText.value.length > 0)
+  )
+})
+
+const cardClass = computed(() => {
+  let value = 'i-card'
+  if (props.border) value = value + ' i-card--border'
+  if (props.shadow) value = value + ' i-card--shadow'
+  return value
+})
+
+const cardStyle = computed(() => {
+  return 'border-radius:' + formatSize(props.round) + ';'
+})
+
+const headerComputedStyle = computed(() => {
+  return areaStyle(props.headerStyle)
+})
+
+const bodyComputedStyle = computed(() => {
+  return areaStyle(props.bodyStyle)
+})
+
+const footerComputedStyle = computed(() => {
+  return areaStyle(props.footerStyle)
+})
+
+const titleStyle = computed(() => {
+  return 'color:' + props.titleColor + ';font-size:' + formatSize(props.titleSize) + ';'
+})
+
+const subTitleStyle = computed(() => {
+  return 'color:' + props.subTitleColor + ';font-size:' + formatSize(props.subTitleSize) + ';'
+})
+
+const thumbStyle = computed(() => {
+  let value = 'width:' + formatSize(props.thumbWidth) + ';height:' + formatSize(props.thumbWidth) + ';'
+  if (props.thumbCircle) {
+    value = value + 'border-radius:999px;'
+  } else if (String(props.thumbRadius).length > 0) {
+    value = value + 'border-radius:' + formatSize(props.thumbRadius) + ';'
+  }
+  return value
+})
+
+function areaStyle(customStyle): string {
+  let value = ''
+  if (String(props.padding).length > 0) {
+    value = value + 'padding:' + formatBoxSize(props.padding) + ';'
+  }
+  value = value + stringifyStyle(customStyle)
+  return value
+}
+
+function handleClick() {
+  emit('click', props.index)
+}
+
+function handleHeaderClick() {
+  emit('headerClick', props.index)
+  emit('click', props.index)
+}
+
+function handleBodyClick() {
+  emit('bodyClick', props.index)
+  emit('click', props.index)
+}
+
+function handleFooterClick() {
+  emit('footerClick', props.index)
+  emit('click', props.index)
+}
+
+function stringifyStyle(value): string {
+  if (value == null) return ''
+  const text = String(value)
+  if (text == '[object Object]' || text.length == 0) return ''
+  return text
+}
+
+function formatBoxSize(value): string {
+  const text = String(value)
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'rpx'
+}
+</script>
+
+<style>
+.i-card {
+  overflow: hidden;
+  background-color: #ffffff;
+}
+.i-card--border {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ebeef5;
+}
+.i-card--shadow {
+  box-shadow: 0 8px 24px rgba(31, 45, 61, 0.12);
+}
+.i-card__header {
+  min-height: 48px;
+  padding: 12px 14px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-card__header--border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #ebeef5;
+}
+.i-card__thumb {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.i-card__title-main {
+  flex: 1;
+}
+.i-card__title {
+  color: #303133;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-card__subtitle {
+  margin-top: 3px;
+  line-height: 18px;
+}
+.i-card__extra {
+  margin-left: 10px;
+  color: #909399;
+  font-size: 13px;
+}
+.i-card__body {
+  padding: 14px;
+}
+.i-card__footer {
+  min-height: 44px;
+  padding: 10px 14px;
+}
+.i-card__footer--border {
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #ebeef5;
+}
+</style>

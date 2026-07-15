@@ -1,0 +1,64 @@
+<template>
+  <text :class="titleClass" @click="copyTitle">{{ text }}</text>
+</template>
+
+<script setup lang="uts">
+import { computed } from "vue";
+
+defineOptions({ name: "i-demo-title" });
+
+/**
+ * Props 说明：用于 demo 页面顶部标题，点击标题可复制标题文案。
+ * - text: 页面标题文案，例如 "Popover 弹出气泡"。
+ * - variant: 标题样式类型，page 为普通 demo 页标题，nav 为自定义导航栏居中标题。
+ */
+const props = defineProps({
+  text: {
+    type: String,
+    default: "",
+  },
+  variant: {
+    type: String,
+    default: "page",
+  },
+});
+
+/**
+ * Emits 说明：复制结果回传。
+ * - copy: 标题复制成功时触发，参数为复制的标题文案。
+ */
+const emit = defineEmits(["copy"]);
+
+const titleClass = computed(() => {
+  return props.variant == "nav"
+    ? "i-demo-title i-demo-title--nav"
+    : "i-demo-title";
+});
+
+function copyTitle() {
+  if (props.text.length == 0) return;
+  uni.setClipboardData({
+    data: props.text,
+    success: () => {
+      emit("copy", props.text);
+    },
+  });
+}
+</script>
+
+<style>
+.i-demo-title {
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 34px;
+}
+
+.i-demo-title--nav {
+  flex: 1;
+  color: #111827;
+  font-size: 21px;
+  line-height: 30px;
+  text-align: center;
+}
+</style>

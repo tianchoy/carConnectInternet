@@ -1,0 +1,262 @@
+<template>
+  <view class="i-steps" :class="direction == 'column' ? 'i-steps--column' : ''">
+    <view
+      v-for="(item, index) in items"
+      :key="String(index) + '-' + getItemTitle(item)"
+      :class="direction == 'column' ? 'i-step i-step--column' : 'i-step'"
+      @click="select(item, index)"
+    >
+      <view class="i-step__head">
+        <view
+          :class="
+            index <= currentIndex
+              ? 'i-step__dot i-step__dot--active'
+              : 'i-step__dot'
+          "
+          :style="getDotStyle(index)"
+        >
+          <text v-if="showIndex" class="i-step__index">{{ index + 1 }}</text>
+        </view>
+        <view
+          v-if="index < items.length - 1"
+          :class="
+            direction == 'column'
+              ? 'i-step__line i-step__line--column'
+              : 'i-step__line'
+          "
+          :style="getLineStyle(index)"
+        ></view>
+      </view>
+      <view :class="stepContentClass">
+        <text
+          :class="
+            index <= currentIndex
+              ? 'i-step__title i-step__title--active'
+              : 'i-step__title'
+          "
+          :style="getTitleStyle(index)"
+        >
+          {{ getItemTitle(item) }}
+        </text>
+        <text v-if="getItemDesc(item).length > 0" class="i-step__desc">
+          {{ getItemDesc(item) }}
+        </text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-steps' })
+
+/**
+ * Props 说明：步骤条数据与状态配置。
+ * - value: 当前步骤索引，支持 update:value 同步。
+ * - current: 当前步骤索引，优先级高于 value。
+ * - items: 步骤数组；对象项支持 title/name/text、description/desc、status。
+ * - direction: 排列方向，row 横向，column 纵向。
+ * - activeColor: 已完成/当前步骤颜色。
+ * - inactiveColor: 未完成步骤颜色。
+ * - showIndex: 是否在圆点内显示序号。
+ * - disabled: 是否禁用点击切换。
+ */
+const props = defineProps({
+  value: { type: Number, default: 1 },
+  current: { type: Number, default: -1 },
+  items: {
+    type: Array,
+    default() {
+      return ['提交', '审核', '完成']
+    },
+  },
+  direction: { type: String, default: 'row' },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#dcdfe6' },
+  showIndex: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
+})
+
+/**
+ * Emits 说明：步骤点击和受控同步。
+ * - click: 点击步骤时触发，返回 { index, item, title }。
+ * - change: 当前步骤变化时触发，参数同 click。
+ * - update:value: 同步当前步骤索引。
+ */
+const emit = defineEmits(['click', 'change', 'update:value'])
+
+const currentIndex = ref(resolveCurrent())
+
+const stepContentClass = computed(() => {
+  return props.direction == 'column'
+    ? 'i-step__content i-step__content--column'
+    : 'i-step__content'
+})
+
+watch(
+  () => props.value,
+  () => {
+    currentIndex.value = resolveCurrent()
+  },
+)
+
+watch(
+  () => props.current,
+  () => {
+    currentIndex.value = resolveCurrent()
+  },
+)
+
+function resolveCurrent() {
+  if (props.current >= 0) return props.current
+  return props.value
+}
+
+function getValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  return String(item)
+}
+
+function getItemTitle(item) {
+  const title = getValue(item, 'title')
+  if (title.length > 0) return title
+  const name = getValue(item, 'name')
+  if (name.length > 0) return name
+  const text = getValue(item, 'text')
+  if (text.length > 0) return text
+  return String(item)
+}
+
+function getItemDesc(item) {
+  const desc = getValue(item, 'description')
+  if (desc.length > 0) return desc
+  return getValue(item, 'desc')
+}
+
+function getDotStyle(index) {
+  const color = index <= currentIndex.value ? props.activeColor : props.inactiveColor
+  return 'background-color:' + color + ';'
+}
+
+function getLineStyle(index) {
+  const color = index < currentIndex.value ? props.activeColor : props.inactiveColor
+  return 'background-color:' + color + ';'
+}
+
+function getTitleStyle(index) {
+  const color = index <= currentIndex.value ? props.activeColor : '#606266'
+  return 'color:' + color + ';'
+}
+
+function select(item, index) {
+  const payload = {
+    index,
+    item,
+    title: getItemTitle(item),
+  }
+  emit('click', payload)
+  if (props.disabled) return
+  if (currentIndex.value == index) return
+  currentIndex.value = index
+  emit('change', payload)
+  emit('update:value', index)
+}
+</script>
+
+<style>
+.i-steps {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  flex-direction: row;
+}
+
+.i-steps--column {
+  flex-direction: column;
+}
+
+.i-step {
+  flex: 1;
+  align-items: center;
+}
+
+.i-step--column {
+  flex-direction: row;
+  align-items: flex-start;
+  min-height: 62px;
+}
+
+.i-step__head {
+  position: relative;
+  align-items: center;
+}
+
+.i-step__dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-step__dot--active {
+  background-color: #2979ff;
+}
+
+.i-step__index {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.i-step__line {
+  position: absolute;
+  left: 24px;
+  top: 11px;
+  width: 64px;
+  height: 2px;
+}
+
+.i-step__line--column {
+  left: 11px;
+  top: 24px;
+  width: 2px;
+  height: 36px;
+}
+
+.i-step__content {
+  margin-top: 8px;
+  align-items: center;
+}
+
+.i-step__content--column {
+  flex: 1;
+  margin-top: 0;
+  margin-left: 10px;
+  align-items: flex-start;
+}
+
+.i-step__title {
+  color: #606266;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.i-step__title--active {
+  color: #2979ff;
+  font-weight: 600;
+}
+
+.i-step__desc {
+  margin-top: 3px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

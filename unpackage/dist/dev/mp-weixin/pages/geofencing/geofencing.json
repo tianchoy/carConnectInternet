@@ -3,14 +3,13 @@
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "sub-nav-bar": "../../components/sub-navBar/sub-navBar",
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
+    "i-popup": "../../uni_modules/i-ui-x/components/i-popup/i-popup",
+    "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
+    "i-radio": "../../uni_modules/i-ui-x/components/i-radio/i-radio",
     "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
-    "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup",
-    "uv-input": "../../uni_modules/uv-input/components/uv-input/uv-input",
-    "uv-radio": "../../uni_modules/uv-radio/components/uv-radio/uv-radio",
-    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
-    "uv-radio-group": "../../uni_modules/uv-radio/components/uv-radio-group/uv-radio-group",
-    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
-    "uv-switch": "../../uni_modules/uv-switch/components/uv-switch/uv-switch"
+    "uv-switch": "../../uni_modules/uv-switch/components/uv-switch/uv-switch",
+    "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup"
   }
 }

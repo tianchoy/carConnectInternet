@@ -1,0 +1,81 @@
+<template>
+  <view v-if="visible" class="i-back-top" :style="wrapStyle" @click="backTop">
+    <text v-if="icon.length > 0" class="i-back-top__icon" :style="textStyle">{{ icon }}</text>
+    <text v-if="text.length > 0" class="i-back-top__text" :style="textStyle">{{ text }}</text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-back-top' })
+
+/**
+ * Props 说明：参考 BackTop 返回顶部。
+ * - scrollTop: 当前页面滚动距离，由页面 onPageScroll 传入。
+ * - top: 大于该距离时显示。
+ * - text/icon: 展示文字和图标文本。
+ * - right/bottom: 固定定位距离。
+ * - bgColor/color: 背景色和文字色。
+ * - duration: 回到顶部动画时长。
+ * - zIndex: 固定层级。
+ */
+const props = defineProps({
+  scrollTop: { type: Number, default: 0 },
+  top: { type: Number, default: 400 },
+  text: { type: String, default: '顶部' },
+  icon: { type: String, default: '↑' },
+  right: { type: [String, Number], default: 20 },
+  bottom: { type: [String, Number], default: 60 },
+  bgColor: { type: String, default: '#2979ff' },
+  color: { type: String, default: '#ffffff' },
+  duration: { type: Number, default: 200 },
+  zIndex: { type: Number, default: 90 },
+})
+
+/**
+ * Emits 说明：
+ * - click: 点击返回顶部按钮时触发。
+ */
+const emit = defineEmits(['click'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const visible = computed(() => props.scrollTop >= props.top)
+const wrapStyle = computed(() => {
+  return 'right:' + formatSize(props.right) + ';bottom:' + formatSize(props.bottom) + ';background-color:' + bgColor.value + ';z-index:' + String(props.zIndex) + ';'
+})
+const textStyle = computed(() => 'color:' + props.color + ';')
+
+function backTop() {
+  uni.pageScrollTo({ scrollTop: 0, duration: props.duration })
+  emit('click')
+}
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-back-top {
+  position: fixed;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 4px 8px;
+  border-radius: 23px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+.i-back-top__icon {
+  font-size: 18px;
+  line-height: 20px;
+}
+.i-back-top__text {
+  font-size: 11px;
+  line-height: 14px;
+}
+</style>

@@ -1,0 +1,201 @@
+<template>
+  <view class="i-swipe-action">
+    <slot>
+      <i-swipe-action-item
+        v-for="(item, index) in items"
+        :key="itemKey(item, index)"
+        :disabled="disabled"
+        :threshold="threshold"
+        @change="handleItemChange(index, $event)"
+      >
+        <view class="i-swipe-action__cell">
+          <text class="i-swipe-action__title">{{ itemTitle(item, index) }}</text>
+          <text class="i-swipe-action__desc">{{ itemDesc(item) }}</text>
+        </view>
+        <template #right>
+          <view
+            v-for="(action, actionIndex) in itemActions(item)"
+            :key="actionKey(action, actionIndex)"
+            class="i-swipe-action__button"
+            :style="'background-color:' + actionColor(action, actionIndex)"
+            @click.stop="handleAction(index, actionIndex, action)"
+          >
+            <text class="i-swipe-action__button-text">
+              {{ actionText(action, actionIndex) }}
+            </text>
+          </view>
+        </template>
+      </i-swipe-action-item>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+defineOptions({ name: 'i-swipe-action' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 SwipeAction 文档，并保留 items 便于独立演示。
+ * - disabled: 是否禁用整个滑动操作区域。
+ * - threshold: 滑动距离阈值，表示超过操作按钮宽度的比例后自动展开。
+ * - items: 内置列表数据；为空时通过默认插槽放置 i-swipe-action-item。
+ */
+const props = defineProps({
+  disabled: { type: Boolean, default: false },
+  threshold: { type: Number, default: 0.3 },
+  items: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+})
+
+/**
+ * Emits 说明：父组件文档未声明事件，这里仅用于内置 items 模式的操作回传。
+ * - select: 点击内置 actions 时触发，返回 itemIndex、actionIndex 和 action。
+ * - change: 内置 item 打开或关闭时触发。
+ */
+const emit = defineEmits(['select', 'change'])
+
+const openedIndex = ref(-1)
+const openedDirection = ref('')
+
+function open(direction: string = 'right', index: number = 0) {
+  if (props.disabled) return
+  openedIndex.value = index
+  openedDirection.value = direction
+  emit('change', {
+    index,
+    direction,
+    open: true,
+  })
+}
+
+function close(index: number = -1) {
+  const closeIndex = index < 0 ? openedIndex.value : index
+  openedIndex.value = -1
+  openedDirection.value = ''
+  emit('change', {
+    index: closeIndex,
+    direction: '',
+    open: false,
+  })
+}
+
+function handleItemChange(index, payload) {
+  if (payload != null && payload['open'] == true) {
+    openedIndex.value = index
+    openedDirection.value = String(payload['direction'])
+  }
+  emit('change', {
+    index,
+    direction: payload == null ? '' : String(payload['direction']),
+    open: payload == null ? false : payload['open'] == true,
+  })
+}
+
+function handleAction(itemIndex, actionIndex, action) {
+  emit('select', {
+    itemIndex,
+    actionIndex,
+    action,
+  })
+  close(itemIndex)
+}
+
+function itemKey(item, index): string {
+  return itemTitle(item, index) + '-' + String(index)
+}
+
+function actionKey(action, index): string {
+  return actionText(action, index) + '-' + String(index)
+}
+
+function itemValue(item, keyName): string {
+  if (item != null && typeof item == 'object') {
+    const value = item[keyName]
+    if (value != null) return String(value)
+  }
+  return ''
+}
+
+function itemTitle(item, index): string {
+  const title = itemValue(item, 'title')
+  if (title.length > 0) return title
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  return '滑动单元格 ' + String(index + 1)
+}
+
+function itemDesc(item): string {
+  const desc = itemValue(item, 'desc')
+  return desc.length > 0 ? desc : '左滑显示右侧操作菜单'
+}
+
+function itemActions(item): any[] {
+  if (item != null && typeof item == 'object') {
+    const actions = item['actions']
+    if (Array.isArray(actions)) return actions
+  }
+  return ['删除']
+}
+
+function actionText(action, index): string {
+  if (action != null && typeof action == 'object') {
+    const text = action['text']
+    if (text != null) return String(text)
+  }
+  if (typeof action == 'string') return action
+  return '操作' + String(index + 1)
+}
+
+function actionColor(action, index): string {
+  if (action != null && typeof action == 'object') {
+    const color = action['color']
+    if (color != null) return String(color)
+  }
+  return index == 0 ? '#3c9cff' : '#f56c6c'
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-swipe-action {
+  overflow: hidden;
+}
+.i-swipe-action__cell {
+  min-height: 58px;
+  padding: 10px 14px;
+  justify-content: center;
+  background-color: #ffffff;
+}
+.i-swipe-action__title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-swipe-action__desc {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-swipe-action__button {
+  width: 62px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.i-swipe-action__button-text {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 18px;
+}
+</style>

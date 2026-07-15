@@ -6,30 +6,29 @@ const utils_cars = require("../../utils/cars.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
+  const _easycom_i_popup_1 = common_vendor.resolveComponent("i-popup");
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_radio_1 = common_vendor.resolveComponent("i-radio");
+  const _component_i_radio_group = common_vendor.resolveComponent("i-radio-group");
   const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  const _easycom_uv_popup_1 = common_vendor.resolveComponent("uv-popup");
-  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
-  const _easycom_uv_radio_1 = common_vendor.resolveComponent("uv-radio");
-  const _easycom_uv_grid_item_1 = common_vendor.resolveComponent("uv-grid-item");
-  const _easycom_uv_radio_group_1 = common_vendor.resolveComponent("uv-radio-group");
-  const _easycom_uv_grid_1 = common_vendor.resolveComponent("uv-grid");
   const _easycom_uv_switch_1 = common_vendor.resolveComponent("uv-switch");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_button_1 + _easycom_uv_popup_1 + _easycom_uv_input_1 + _easycom_uv_radio_1 + _easycom_uv_grid_item_1 + _easycom_uv_radio_group_1 + _easycom_uv_grid_1 + _easycom_uv_switch_1)();
+  const _easycom_uv_popup_1 = common_vendor.resolveComponent("uv-popup");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_popup_1 + _easycom_i_input_1 + _easycom_i_radio_1 + _component_i_radio_group + _easycom_uv_icon_1 + _easycom_uv_switch_1 + _easycom_uv_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
+const _easycom_i_popup = () => "../../uni_modules/i-ui-x/components/i-popup/i-popup.js";
+const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
+const _easycom_i_radio = () => "../../uni_modules/i-ui-x/components/i-radio/i-radio.js";
 const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_button = () => "../../uni_modules/uv-button/components/uv-button/uv-button.js";
-const _easycom_uv_popup = () => "../../uni_modules/uv-popup/components/uv-popup/uv-popup.js";
-const _easycom_uv_input = () => "../../uni_modules/uv-input/components/uv-input/uv-input.js";
-const _easycom_uv_radio = () => "../../uni_modules/uv-radio/components/uv-radio/uv-radio.js";
-const _easycom_uv_grid_item = () => "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item.js";
-const _easycom_uv_radio_group = () => "../../uni_modules/uv-radio/components/uv-radio-group/uv-radio-group.js";
-const _easycom_uv_grid = () => "../../uni_modules/uv-grid/components/uv-grid/uv-grid.js";
 const _easycom_uv_switch = () => "../../uni_modules/uv-switch/components/uv-switch/uv-switch.js";
+const _easycom_uv_popup = () => "../../uni_modules/uv-popup/components/uv-popup/uv-popup.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_button + _easycom_uv_popup + _easycom_uv_input + _easycom_uv_radio + _easycom_uv_grid_item + _easycom_uv_radio_group + _easycom_uv_grid + _easycom_uv_switch)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_popup + _easycom_i_input + _easycom_i_radio + _easycom_uv_icon + _easycom_uv_switch + _easycom_uv_popup)();
 }
 class Coordinate extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -505,7 +504,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           let result = null;
           if (editingFence.value) {
-            result = yield api_request.updateGeofence(Object.assign({ id: editingFence.value.id }, fenceData));
+            result = yield api_request.updateGeofence(new common_vendor.UTSJSONObject(Object.assign({ id: editingFence.value.id }, fenceData)));
           } else {
             result = yield api_request.addGeofence(fenceData);
           }
@@ -574,11 +573,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         page.loadingMore = true;
         try {
-          const res = yield api_request.getBoundDevices({
+          const res = yield api_request.getBoundDevices(new common_vendor.UTSJSONObject({
             pageNum: page.pageNum,
             pageSize: page.pageSize,
             geoId: fenceId
-          });
+          }));
           if (res.code === 0) {
             const dataList = res.data.list || [];
             if (page.pageNum === 1) {
@@ -607,10 +606,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         page.loadingMore = true;
         try {
-          const res = yield api_request.getUnboundDevices({
+          const res = yield api_request.getUnboundDevices(new common_vendor.UTSJSONObject({
             pageNum: page.pageNum,
             pageSize: page.pageSize
-          });
+          }));
           if (res.code === 0) {
             const dataList = res.data.list || [];
             if (page.pageNum === 1) {
@@ -896,26 +895,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           var _a;
           selectedFence.value = null;
           (_a = showFenceModal.value) == null ? void 0 : _a.close();
-        }, "b2"),
+        }, "05"),
         q: common_vendor.p({
           name: "close"
         }),
         r: common_vendor.o(($event) => {
           return editFence(selectedFence.value);
-        }, "27"),
+        }, "4d"),
         s: common_vendor.p({
           size: "small"
         }),
         t: common_vendor.o(($event) => {
           return deleteFence(selectedFence.value.id);
-        }, "e7"),
+        }, "5b"),
         v: common_vendor.p({
           size: "small",
           type: "error"
         }),
         w: common_vendor.o(($event) => {
           return showBindDevices(selectedFence.value.id);
-        }, "a9"),
+        }, "2e"),
         x: common_vendor.p({
           size: "small",
           type: "primary"
@@ -933,7 +932,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, !isDrawing.value && !selectedFence.value ? {
         B: common_vendor.o(($event) => {
           return setDrawingMode("polygon");
-        }, "7c"),
+        }, "24"),
         C: common_vendor.p({
           type: drawingMode.value == "polygon" ? "success" : "default",
           size: "small",
@@ -941,39 +940,48 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         D: common_vendor.o(($event) => {
           return setDrawingMode("circle");
-        }, "ff"),
+        }, "3f"),
         E: common_vendor.p({
           type: drawingMode.value == "circle" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0"
         })
       } : {}, {
-        F: common_vendor.o(startDrawing, "bf"),
+        F: common_vendor.o(startDrawing, "1b"),
         G: common_vendor.p({
-          disabled: isDrawing.value || selectedFence.value
+          disabled: isDrawing.value || selectedFence.value,
+          size: "small"
         }),
-        H: common_vendor.o(finishDrawing, "58"),
+        H: common_vendor.o(finishDrawing, "48"),
         I: common_vendor.p({
-          disabled: !isDrawing.value || !canFinishDrawing.value
+          disabled: !isDrawing.value || !canFinishDrawing.value,
+          size: "small"
         }),
-        J: common_vendor.o(clearDrawing, "37"),
-        K: common_vendor.o(showFenceList, "69"),
-        L: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
-        M: drawingMode.value === "polygon"
+        J: common_vendor.o(clearDrawing, "1a"),
+        K: common_vendor.p({
+          size: "small"
+        }),
+        L: common_vendor.o(showFenceList, "9b"),
+        M: common_vendor.p({
+          size: "small"
+        }),
+        N: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
+        O: drawingMode.value === "polygon"
       }, drawingMode.value === "polygon" ? {
-        N: common_vendor.t(points.value.length)
+        P: common_vendor.t(points.value.length)
       } : {}, {
-        O: drawingMode.value === "circle"
+        Q: drawingMode.value === "circle"
       }, drawingMode.value === "circle" ? {
-        P: common_vendor.t(circleRadius.value.toFixed(2) || 0)
+        R: common_vendor.t(circleRadius.value.toFixed(2) || 0)
       } : {}, {
-        Q: common_vendor.o(($event) => {
+        S: common_vendor.o(($event) => {
           return fencesPopup.value.close();
-        }, "13"),
-        R: common_vendor.p({
-          name: "close"
+        }, "df"),
+        T: common_vendor.p({
+          name: "/static/close.png",
+          fontSize: "15"
         }),
-        S: common_vendor.f(fenceList.value, (fence, k0, i0) => {
+        U: common_vendor.f(fenceList.value, (fence, k0, i0) => {
           return {
             a: common_vendor.t(fence.name),
             b: common_vendor.t(getFenceType(fence) === "circle" ? "圆形" : "多边形"),
@@ -985,79 +993,77 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, fence.id)
           };
         }),
-        T: common_vendor.p({
-          name: "arrow-right"
+        V: common_vendor.p({
+          name: "/static/arrow-right.png",
+          fontSize: "15"
         }),
-        U: fenceList.value.length === 0
+        W: fenceList.value.length === 0
       }, fenceList.value.length === 0 ? {} : {}, {
-        V: common_vendor.sr(fencesPopup, "45be0509-13", {
+        X: common_vendor.sr(fencesPopup, "45be0509-13", {
           "k": "fencesPopup"
         }),
-        W: common_vendor.p({
+        Y: common_vendor.p({
           mode: "bottom",
           round: "10",
           class: "r"
         }),
-        X: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
-        Y: common_vendor.o(($event) => {
+        Z: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
+        aa: common_vendor.o(($event) => {
           return fenceForm.name = $event;
-        }, "de"),
-        Z: common_vendor.p({
+        }, "3e"),
+        ab: common_vendor.p({
           placeholder: "请输入围栏名称",
           border: "surround",
           modelValue: fenceForm.name
         }),
-        aa: common_vendor.p({
+        ac: common_vendor.p({
           name: "0"
         }),
-        ab: common_vendor.p({
+        ad: common_vendor.p({
           name: "1"
         }),
-        ac: common_vendor.p({
+        ae: common_vendor.p({
           name: "2"
         }),
-        ad: common_vendor.p({
+        af: common_vendor.p({
           name: "3"
         }),
-        ae: common_vendor.o(($event) => {
+        ag: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "c0"),
-        af: common_vendor.p({
+        }, "80"),
+        ah: common_vendor.p({
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
-        ag: common_vendor.p({
-          col: 2
-        }),
-        ah: common_vendor.o(($event) => {
+        ai: common_vendor.o(($event) => {
           return editDialogPopup.value.close();
-        }, "7a"),
-        ai: common_vendor.o(saveFence, "d2"),
-        aj: common_vendor.p({
+        }, "93"),
+        aj: common_vendor.o(saveFence, "45"),
+        ak: common_vendor.p({
           type: "primary"
         }),
-        ak: common_vendor.sr(editDialogPopup, "45be0509-16", {
+        al: common_vendor.sr(editDialogPopup, "45be0509-16", {
           "k": "editDialogPopup"
         }),
-        al: common_vendor.p({
+        am: common_vendor.p({
           mode: "center",
           round: "10",
           class: "r"
         }),
-        am: common_vendor.t(currentFenceName.value),
-        an: common_vendor.o(closeDeviceDialog, "a8"),
-        ao: common_vendor.p({
+        an: common_vendor.t(currentFenceName.value),
+        ao: common_vendor.o(closeDeviceDialog, "f5"),
+        ap: common_vendor.p({
           name: "close"
         }),
-        ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
-        aq: common_vendor.o(($event) => {
+        aq: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
+        ar: common_vendor.o(($event) => {
           return switchTab("bind");
-        }, "39"),
-        ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
-        as: common_vendor.o(($event) => {
+        }, "8d"),
+        as: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
+        at: common_vendor.o(($event) => {
           return switchTab("unbind");
-        }, "74"),
-        at: common_vendor.f(deviceList.value, (device, k0, i0) => {
+        }, "34"),
+        av: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(device.deviceName || device.plateNo),
             b: device.connectionStatus
@@ -1067,7 +1073,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => {
               return toggleDeviceBinding(device.imei, $event);
             }, device.imei),
-            e: "45be0509-32-" + i0 + ",45be0509-30",
+            e: "45be0509-27-" + i0 + ",45be0509-25",
             f: common_vendor.p({
               ["model-value"]: isDeviceBound(device.imei),
               disabled: loading.value || loadingMore.value,
@@ -1076,29 +1082,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: device.imei
           });
         }),
-        av: deviceList.value.length === 0 && !loading.value
+        aw: deviceList.value.length === 0 && !loading.value
       }, deviceList.value.length === 0 && !loading.value ? {
-        aw: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
+        ax: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       } : {}, {
-        ax: loadingMore.value
+        ay: loadingMore.value
       }, loadingMore.value ? {} : {}, {
-        ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
+        az: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
       }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
-        az: scrollTop.value,
-        aA: common_vendor.o(handleLoadMore, "93"),
-        aB: common_vendor.sr(deviceDialogPopup, "45be0509-30", {
+        aA: scrollTop.value,
+        aB: common_vendor.o(handleLoadMore, "fd"),
+        aC: common_vendor.sr(deviceDialogPopup, "45be0509-25", {
           "k": "deviceDialogPopup"
         }),
-        aC: common_vendor.p({
+        aD: common_vendor.p({
           mode: "bottom",
           round: "10",
           ["mask-click-able"]: false,
           class: "r"
         }),
-        aD: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        aE: `${_ctx.u_s_b_h}px`,
-        aF: `${_ctx.u_s_a_i_b}px`,
-        aG: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        aE: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        aF: `${_ctx.u_s_b_h}px`,
+        aG: `${_ctx.u_s_a_i_b}px`,
+        aH: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

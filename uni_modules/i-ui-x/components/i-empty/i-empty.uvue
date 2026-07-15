@@ -1,0 +1,117 @@
+<template>
+  <view class="i-empty" :style="wrapStyle" @click="emit('click')">
+    <slot name="image">
+      <image v-if="image.length > 0" class="i-empty__image" :src="image" mode="aspectFit"></image>
+      <text v-else class="i-empty__icon" :style="iconStyle">{{ icon }}</text>
+    </slot>
+    <text class="i-empty__text" :style="textStyle">{{ text }}</text>
+    <text v-if="description.length > 0" class="i-empty__desc" :style="descStyle">{{ description }}</text>
+    <slot>
+      <view v-if="showButton" class="i-empty__button" :style="buttonStyle" @click.stop="emit('retry')">
+        <text class="i-empty__button-text" :style="buttonTextStyle">{{ buttonText }}</text>
+      </view>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-empty' })
+
+/**
+ * Props 说明：参考 Empty 空状态。
+ * - icon: 图标文本。
+ * - image: 图片路径，存在时优先显示图片。
+ * - text: 主提示文案。
+ * - description: 辅助说明文案。
+ * - buttonText: 操作按钮文字。
+ * - showButton: 是否显示默认操作按钮。
+ * - iconSize/iconColor/textColor/descriptionColor/buttonColor/buttonTextColor: 样式控制。
+ * - padding/bgColor: 容器间距和背景色。
+ */
+const props = defineProps({
+  icon: { type: String, default: '∅' },
+  image: { type: String, default: '' },
+  text: { type: String, default: '暂无数据' },
+  description: { type: String, default: '可以点击按钮重新加载。' },
+  buttonText: { type: String, default: '重新加载' },
+  showButton: { type: Boolean, default: true },
+  iconSize: { type: [String, Number], default: 42 },
+  iconColor: { type: String, default: '#c0c4cc' },
+  textColor: { type: String, default: '#303133' },
+  descriptionColor: { type: String, default: '#909399' },
+  buttonColor: { type: String, default: '#2979ff' },
+  buttonTextColor: { type: String, default: '#ffffff' },
+  padding: { type: [String, Number], default: '28px 16px' },
+  bgColor: { type: String, default: '#ffffff' },
+})
+
+/**
+ * Emits 说明：
+ * - click: 点击空状态整体时触发。
+ * - retry: 点击默认按钮时触发。
+ */
+const emit = defineEmits(['click', 'retry'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const wrapStyle = computed(() => 'padding:' + formatBoxSize(props.padding) + ';background-color:' + bgColor.value + ';')
+const iconStyle = computed(() => 'font-size:' + formatSize(props.iconSize) + ';color:' + props.iconColor + ';')
+const textStyle = computed(() => 'color:' + props.textColor + ';')
+const descStyle = computed(() => 'color:' + props.descriptionColor + ';')
+const buttonStyle = computed(() => 'background-color:' + props.buttonColor + ';')
+const buttonTextStyle = computed(() => 'color:' + props.buttonTextColor + ';')
+
+function formatBoxSize(value): string {
+  const text = String(value)
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-empty {
+  border-radius: 8px;
+  align-items: center;
+}
+.i-empty__image {
+  width: 110px;
+  height: 110px;
+}
+.i-empty__icon {
+  line-height: 52px;
+}
+.i-empty__text {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-empty__desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+.i-empty__button {
+  min-width: 96px;
+  height: 36px;
+  margin-top: 14px;
+  padding: 0 14px;
+  border-radius: 18px;
+  align-items: center;
+  justify-content: center;
+}
+.i-empty__button-text {
+  font-size: 13px;
+  line-height: 18px;
+}
+</style>

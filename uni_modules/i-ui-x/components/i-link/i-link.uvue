@@ -1,0 +1,66 @@
+<template>
+  <navigator v-if="isInternal && !disabled" :url="realUrl" :open-type="openType" class="i-link" @click="open">
+    <slot><text class="i-link__text" :style="textStyle">{{ text }}</text></slot>
+  </navigator>
+  <text v-else class="i-link__text" :style="textStyle" @click="open">{{ text }}</text>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-link' })
+
+/**
+ * Props 说明：参考 Link 超链接。
+ * - text: 链接文字。
+ * - url/href: 跳转地址，href 为兼容别名。
+ * - openType: navigator 打开方式。
+ * - color/fontSize: 文字颜色和字号。
+ * - underLine: 是否显示下划线。
+ * - disabled: 是否禁用点击和跳转。
+ */
+const props = defineProps({
+  text: { type: String, default: '打开链接' },
+  url: { type: String, default: '/pages/index/index' },
+  href: { type: String, default: '' },
+  openType: { type: String, default: 'navigate' },
+  color: { type: String, default: '#2979ff' },
+  fontSize: { type: [String, Number], default: 14 },
+  underLine: { type: Boolean, default: true },
+  disabled: { type: Boolean, default: false },
+})
+
+/**
+ * Emits 说明：
+ * - click: 点击链接时触发，返回 URL。
+ * - open: 链接准备打开时触发，返回 URL。
+ */
+const emit = defineEmits(['click', 'open'])
+const realUrl = computed(() => props.href.length > 0 ? props.href : props.url)
+const isInternal = computed(() => realUrl.value.indexOf('/') == 0)
+const textStyle = computed(() => {
+  let style = 'font-size:' + formatSize(props.fontSize) + ';color:' + (props.disabled ? '#c0c4cc' : props.color) + ';'
+  style += 'text-decoration:' + (props.underLine ? 'underline' : 'none') + ';'
+  return style
+})
+function open() {
+  if (props.disabled) return
+  emit('click', realUrl.value)
+  emit('open', realUrl.value)
+}
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-link {
+  flex-direction: row;
+}
+.i-link__text {
+  font-size: 14px;
+  line-height: 22px;
+}
+</style>

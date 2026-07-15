@@ -1,0 +1,51 @@
+<template>
+  <view class="i-safe-bottom" :style="safeBottomStyle"></view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-safe-bottom' })
+
+/**
+ * Props 说明：本组件按 UniAppX 安全区占位需求实现，本组件按 UniAppX 安全区占位需求实现。
+ * - height: 额外占位高度，默认 0；支持数字、px、rpx、百分比。
+ * - bgColor: 占位区域背景颜色。
+ * - safeBottom: 是否叠加系统底部安全区高度。
+ */
+const props = defineProps({
+  height: { type: [String, Number], default: 0 },
+  bgColor: { type: String, default: 'transparent' },
+  safeBottom: { type: Boolean, default: true },
+})
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const safeBottomStyle = computed(() => {
+  const extraHeight = formatSize(props.height)
+  const height = props.safeBottom
+    ? 'calc(env(safe-area-inset-bottom) + ' + extraHeight + ')'
+    : extraHeight
+
+  return 'height:' + height + ';background-color:' + bgColor.value + ';'
+})
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-safe-bottom {
+  width: 100%;
+  flex-shrink: 0;
+}
+</style>

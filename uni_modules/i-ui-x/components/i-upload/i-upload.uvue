@@ -1,0 +1,484 @@
+<template>
+  <view class="i-upload" :style="customStyle">
+    <view class="i-upload__files" :style="filesStyle">
+      <view
+        v-for="(item, index) in currentFiles"
+        :key="fileKey(item, index)"
+        class="i-upload__file"
+        :style="fileStyle"
+        @click="preview(index)"
+      >
+        <slot name="file" :file="item" :index="index">
+          <image
+            v-if="previewImage && isImage(item)"
+            class="i-upload__image"
+            :src="fileUrl(item)"
+            :mode="imageMode"
+          ></image>
+          <text v-else class="i-upload__file-name">{{ fileName(item) }}</text>
+          <text v-if="fileStatus(item).length > 0" class="i-upload__status">
+            {{ fileStatus(item) }}
+          </text>
+        </slot>
+        <text
+          v-if="deletable && fileDeletable(item)"
+          class="i-upload__remove"
+          @click.stop="remove(index)"
+        >
+          ×
+        </text>
+      </view>
+      <view
+        v-if="currentFiles.length < maxCount && !disabled"
+        class="i-upload__box"
+        :style="fileStyle"
+        @click="choose"
+      >
+        <slot>
+          <text class="i-upload__plus" :style="uploadIconStyle">
+            {{ uploadIconText }}
+          </text>
+          <text class="i-upload__text">{{
+            uploadText.length > 0 ? uploadText : text
+          }}</text>
+        </slot>
+      </view>
+    </view>
+    <text v-if="hint.length > 0" class="i-upload__hint">{{ hint }}</text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-upload' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Upload，基于 UniAppX chooseImage 实现图片选择。
+ * - modelValue/value/fileList: 已上传或已选择文件列表。
+ * - name: 文件字段名，会在 beforeRead、afterRead 和删除事件中返回。
+ * - capture/camera/sizeType/multiple: 图片选择配置。
+ * - uploadIcon/uploadIconColor/uploadText: 上传区域图标和文字。
+ * - useBeforeRead: 是否在读取前触发 beforeRead。
+ * - previewFullImage/previewImage/imageMode: 是否预览和图片裁剪模式。
+ * - maxCount/disabled/deletable: 数量、禁用和删除控制。
+ * - width/height/round/gutter/customStyle: 外观样式。
+ * - showProgress: 是否展示上传状态文字。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [Array, String],
+    default() {
+      return []
+    },
+  },
+  value: {
+    type: [Array, String],
+    default() {
+      return []
+    },
+  },
+  fileList: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  capture: {
+    type: Array,
+    default() {
+      return ['album', 'camera']
+    },
+  },
+  camera: {
+    type: String,
+    default: 'back',
+  },
+  uploadIcon: {
+    type: String,
+    default: 'camera-fill',
+  },
+  uploadIconColor: {
+    type: String,
+    default: '#c0c4cc',
+  },
+  useBeforeRead: {
+    type: Boolean,
+    default: false,
+  },
+  previewFullImage: {
+    type: Boolean,
+    default: true,
+  },
+  maxCount: {
+    type: Number,
+    default: 52,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  imageMode: {
+    type: String,
+    default: 'aspectFill',
+  },
+  name: {
+    type: String,
+    default: 'file',
+  },
+  sizeType: {
+    type: Array,
+    default() {
+      return ['original', 'compressed']
+    },
+  },
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
+  deletable: {
+    type: Boolean,
+    default: true,
+  },
+  uploadText: {
+    type: String,
+    default: '',
+  },
+  width: {
+    type: [String, Number],
+    default: '',
+  },
+  height: {
+    type: [String, Number],
+    default: '',
+  },
+  previewImage: {
+    type: Boolean,
+    default: true,
+  },
+  round: {
+    type: [String, Number],
+    default: 8,
+  },
+  showProgress: {
+    type: Boolean,
+    default: false,
+  },
+  gutter: {
+    type: [String, Number],
+    default: 8,
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+  text: {
+    type: String,
+    default: 'Upload',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：文件读取、预览、删除和错误。
+ * - update:modelValue/update:value/change: 同步文件列表。
+ * - beforeRead: 读取前触发，参数含 file、index、name。
+ * - afterRead: 读取后触发，参数含 file、index、name。
+ * - clickPreview: 点击预览时触发。
+ * - delete/remove: 删除文件时触发。
+ * - error: 选择文件失败时触发。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'change',
+  'beforeRead',
+  'afterRead',
+  'clickPreview',
+  'delete',
+  'remove',
+  'error',
+  'choose',
+])
+
+const currentFiles = ref(initialFiles())
+
+const fileStyle = computed(() => {
+  const width = String(props.width).length > 0 ? props.width : 104
+  const height = String(props.height).length > 0 ? props.height : 104
+  const gutter = formatSize(props.gutter)
+  return (
+    'width:' +
+    formatSize(width) +
+    ';height:' +
+    formatSize(height) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';margin-right:' +
+    gutter +
+    ';margin-bottom:' +
+    gutter +
+    ';'
+  )
+})
+
+const filesStyle = computed(() => {
+  return ''
+})
+
+const uploadIconText = props.uploadIcon.indexOf('camera') >= 0 ? '+' : props.uploadIcon
+
+const uploadIconStyle = computed(() => {
+  return 'color:' + props.uploadIconColor + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    currentFiles.value = initialFiles()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    currentFiles.value = initialFiles()
+  },
+)
+
+watch(
+  () => props.fileList,
+  () => {
+    currentFiles.value = initialFiles()
+  },
+)
+
+function initialFiles() {
+  if (props.fileList.length > 0) return props.fileList
+  if (Array.isArray(props.modelValue) && props.modelValue.length > 0) return props.modelValue
+  if (Array.isArray(props.value)) return props.value
+  return []
+}
+
+function choose() {
+  if (props.disabled) return
+  emit('choose')
+  const remain = props.maxCount - currentFiles.value.length
+  if (remain <= 0) return
+  uni.chooseImage({
+    count: props.multiple ? remain : 1,
+    sizeType: props.sizeType,
+    sourceType: props.capture,
+    success: (res) => {
+      const files = []
+      for (let i = 0; i < res.tempFilePaths.length; i++) {
+        const file = {
+          type: 'image',
+          url: res.tempFilePaths[i],
+          status: 'success',
+          message: '',
+          name: 'image-' + String(i),
+        }
+        files.push(file)
+      }
+      if (props.useBeforeRead) {
+        emit('beforeRead', { file: files, index: currentFiles.value.length, name: props.name })
+      }
+      const nextFiles = currentFiles.value.concat(files)
+      currentFiles.value = nextFiles
+      syncFiles(nextFiles)
+      emit('afterRead', { file: files, index: currentFiles.value.length - files.length, name: props.name })
+    },
+    fail: (error) => {
+      emit('error', error)
+    },
+  })
+}
+
+function preview(index) {
+  const file = currentFiles.value[index]
+  const url = fileUrl(file)
+  emit('clickPreview', { name: props.name, index, file: url })
+  if (!props.previewFullImage || !isImage(file)) return
+  uni.previewImage({
+    urls: imageUrls(),
+    current: url,
+  })
+}
+
+function remove(index) {
+  const file = currentFiles.value[index]
+  const nextFiles = []
+  for (let i = 0; i < currentFiles.value.length; i++) {
+    if (i != index) nextFiles.push(currentFiles.value[i])
+  }
+  currentFiles.value = nextFiles
+  syncFiles(nextFiles)
+  const event = { name: props.name, index, file: fileUrl(file) }
+  emit('delete', event)
+  emit('remove', event)
+}
+
+function syncFiles(files) {
+  emit('update:modelValue', files)
+  emit('update:value', files)
+  emit('change', files)
+}
+
+function imageUrls() {
+  const list = []
+  for (let i = 0; i < currentFiles.value.length; i++) {
+    const file = currentFiles.value[i]
+    if (isImage(file)) list.push(fileUrl(file))
+  }
+  return list
+}
+
+function isImage(file) {
+  const url = fileUrl(file)
+  return (
+    url.indexOf('.png') >= 0 ||
+    url.indexOf('.jpg') >= 0 ||
+    url.indexOf('.jpeg') >= 0 ||
+    url.indexOf('.webp') >= 0 ||
+    url.indexOf('/static/') >= 0 ||
+    url.indexOf('tmp') >= 0
+  )
+}
+
+function fileUrl(file) {
+  if (typeof file == 'object') {
+    const value = file['url']
+    if (value != null) return String(value)
+  }
+  return String(file)
+}
+
+function fileName(file) {
+  if (typeof file == 'object') {
+    const value = file['name']
+    if (value != null) return String(value)
+  }
+  return fileUrl(file)
+}
+
+function fileStatus(file) {
+  if (!props.showProgress) return ''
+  if (typeof file == 'object') {
+    const value = file['status']
+    if (value != null) return String(value)
+  }
+  return ''
+}
+
+function fileDeletable(file) {
+  if (typeof file == 'object') {
+    const value = file['deletable']
+    if (value == false) return false
+  }
+  return true
+}
+
+function fileKey(file, index) {
+  return fileUrl(file) + '-' + String(index)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-upload {
+  align-items: flex-start;
+}
+
+.i-upload__files {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.i-upload__file {
+  position: relative;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #eef0f5;
+  background-color: #f6f8fb;
+}
+
+.i-upload__image {
+  width: 100%;
+  height: 100%;
+}
+
+.i-upload__file-name {
+  padding: 12px;
+  color: #606266;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-upload__status {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3px 0;
+  background-color: rgba(0, 0, 0, 0.48);
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.i-upload__remove {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.i-upload__box {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: #b7d7ff;
+  background-color: #f3f8ff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-upload__plus {
+  color: #3c9cff;
+  font-size: 30px;
+  line-height: 34px;
+}
+
+.i-upload__text {
+  margin-top: 4px;
+  color: #5a6b85;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-upload__hint {
+  margin-top: 8px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

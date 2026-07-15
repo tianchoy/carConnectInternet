@@ -1,0 +1,393 @@
+<template>
+  <view :class="rootClass" :style="rootStyle">
+    <view
+      v-if="innerShow && closeOnClickOutside"
+      class="i-popover__outside"
+      :style="outsideStyle"
+      @click="handleOutsideClick"
+      @touchend="handleOutsideClick"
+    ></view>
+
+    <view
+      :class="disabled ? 'i-popover__trigger i-popover__trigger--disabled' : 'i-popover__trigger'"
+      @click="toggleFromTrigger"
+      @touchend="toggleFromTrigger"
+    >
+      <slot>
+        <view class="i-popover__default-trigger">
+          <text class="i-popover__default-trigger-text">打开气泡</text>
+        </view>
+      </slot>
+    </view>
+
+    <view v-if="innerShow" :class="panelClass" :style="panelStyle">
+      <slot name="content">
+        <text class="i-popover__text" :style="contentStyle">{{ content }}</text>
+      </slot>
+      <view v-if="showArrow" :class="arrowClass" :style="arrowStyle"></view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from "vue";
+
+defineOptions({ name: "i-popover" });
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范 Popover 气泡提示。
+ * - show: 是否显示弹出层，外部传入 true 时默认展开。
+ * - content: 弹出层文本内容；复杂内容请使用 content 插槽。
+ * - position: 弹出方向，支持 top | bottom | left | right | auto；auto 在 UniAppX 中按 bottom 等价展示。
+ * - showArrow: 是否显示指向触发元素的小箭头。
+ * - arrowSize: 箭头大小，数字会自动转为 px。
+ * - arrowOffset: 箭头相对气泡起始边的偏移量；top/bottom 控制 left，left/right 控制 top。
+ * - arrowColor: 箭头颜色；通常与 bgColor 保持一致。
+ * - bgColor: 弹出层背景色。
+ * - color: 文本颜色。
+ * - fontSize: 文本字号，数字会自动转为 px。
+ * - padding: 弹出层内边距，支持完整 CSS padding 写法。
+ * - round: 弹出层圆角，数字会自动转为 px。
+ * - width: 弹出层宽度；为空时根据内容自适应。
+ * - zIndex: 弹出层层级。
+ * - duration: 动画时长，UniAppX 当前以样式预留形式支持。
+ * - closeOnClickOutside: 是否点击气泡外的空白区域时关闭；启用后会渲染透明遮罩接收点击。
+ * - disabled: 是否禁用触发。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: false },
+  content: { type: String, default: "" },
+  position: { type: String, default: "top" },
+  showArrow: { type: Boolean, default: true },
+  arrowSize: { type: [String, Number], default: "12px" },
+  arrowOffset: { type: [String, Number], default: "" },
+  arrowColor: { type: String, default: "#000" },
+  bgColor: { type: String, default: "#060607" },
+  color: { type: String, default: "#fff" },
+  fontSize: { type: [String, Number], default: "14px" },
+  padding: { type: [String, Number], default: "8px 12px" },
+  round: { type: [String, Number], default: "4px" },
+  width: { type: [String, Number], default: "" },
+  zIndex: { type: [String, Number], default: 999 },
+  duration: { type: [String, Number], default: 300 },
+  closeOnClickOutside: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
+});
+
+/**
+ * Emits 说明：官方文档没有列出 Events；这里仅保留显示状态同步，便于 demo 和受控场景使用。
+ * - update:show: 内部点击触发显示变化时同步最新 show 值。
+ */
+const emit = defineEmits(["update:show"]);
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const innerShow = ref(props.show);
+const lastToggleTime = ref(0);
+
+const rootClass = computed(() => {
+  return innerShow.value ? "i-popover i-popover--active" : "i-popover";
+});
+
+const rootStyle = computed(() => {
+  return "";
+});
+
+const panelClass = computed(() => {
+  return "i-popover__panel i-popover__panel--" + normalizedPosition();
+});
+
+const arrowClass = computed(() => {
+  return "i-popover__arrow i-popover__arrow--" + normalizedPosition();
+});
+
+const panelStyle = computed(() => {
+  let style =
+    "background-color:" +
+    bgColor.value +
+    ";padding:" +
+    formatBoxSize(props.padding) +
+    ";border-radius:" +
+    formatSize(props.round) +
+    ";z-index:" +
+    String(props.zIndex) +
+    ";transition-duration:" +
+    String(props.duration) +
+    "ms;";
+  const widthText = String(props.width);
+  if (widthText.length > 0) {
+    style = style + "width:" + formatSize(props.width) + ";";
+  }
+  return style;
+});
+
+const contentStyle = computed(() => {
+  return "color:" + props.color + ";font-size:" + formatSize(props.fontSize) + ";";
+});
+
+const outsideStyle = computed(() => {
+  return "z-index:" + String(Number(props.zIndex) - 1) + ";";
+});
+
+const arrowStyle = computed(() => {
+  const size = formatHalfSize(props.arrowSize);
+  const position = normalizedPosition();
+  const offset = normalizedArrowOffset(position);
+  let style =
+    "position:absolute;width:0;height:0;z-index:" +
+    String(Number(props.zIndex) + 1) +
+    ";";
+
+  if (position == "bottom") {
+    return (
+      style +
+      "left:" +
+      offset +
+      ";top:-" +
+      size +
+      ";border-left:" +
+      size +
+      " solid transparent;border-right:" +
+      size +
+      " solid transparent;border-bottom:" +
+      size +
+      " solid " +
+      props.arrowColor +
+      ";"
+    );
+  }
+
+  if (position == "left") {
+    return (
+      style +
+      "right:-" +
+      size +
+      ";top:" +
+      offset +
+      ";border-top:" +
+      size +
+      " solid transparent;border-bottom:" +
+      size +
+      " solid transparent;border-left:" +
+      size +
+      " solid " +
+      props.arrowColor +
+      ";"
+    );
+  }
+
+  if (position == "right") {
+    return (
+      style +
+      "left:-" +
+      size +
+      ";top:" +
+      offset +
+      ";border-top:" +
+      size +
+      " solid transparent;border-bottom:" +
+      size +
+      " solid transparent;border-right:" +
+      size +
+      " solid " +
+      props.arrowColor +
+      ";"
+    );
+  }
+
+  return (
+    style +
+    "left:" +
+    offset +
+    ";bottom:-" +
+    size +
+    ";border-left:" +
+    size +
+    " solid transparent;border-right:" +
+    size +
+    " solid transparent;border-top:" +
+    size +
+    " solid " +
+    props.arrowColor +
+    ";"
+  );
+});
+
+watch(
+  () => props.show,
+  (value) => {
+    innerShow.value = value;
+  },
+);
+
+function normalizedPosition() {
+  if (props.position == "bottom") return "bottom";
+  if (props.position == "left") return "left";
+  if (props.position == "right") return "right";
+  if (props.position == "auto") return "bottom";
+  return "top";
+}
+
+function normalizedArrowOffset(position): string {
+  const text = String(props.arrowOffset);
+  if (text.length > 0) return formatSize(props.arrowOffset);
+  if (position == "left" || position == "right") return "14px";
+  return "24px";
+}
+
+function formatSize(value): string {
+  const text = String(value);
+  if (
+    text.indexOf("px") >= 0 ||
+    text.indexOf("rpx") >= 0 ||
+    text.indexOf("%") >= 0 ||
+    text == "auto"
+  ) {
+    return text;
+  }
+  return text + "px";
+}
+
+function formatBoxSize(value): string {
+  const text = String(value);
+  if (text.indexOf(" ") >= 0) return text;
+  return formatSize(value);
+}
+
+function formatHalfSize(value): string {
+  const text = String(value);
+  if (text.indexOf("rpx") == text.length - 3) {
+    const amount = Number(text.substring(0, text.length - 3));
+    if (amount == amount) return String(amount / 2) + "rpx";
+  }
+
+  if (text.indexOf("px") == text.length - 2) {
+    const amount = Number(text.substring(0, text.length - 2));
+    if (amount == amount) return String(amount / 2) + "px";
+  }
+
+  const amount = Number(text);
+  if (amount == amount) return String(amount / 2) + "px";
+  return "6px";
+}
+
+function toggleFromTrigger() {
+  const now = Date.now();
+  if (now - lastToggleTime.value < 280) return;
+  lastToggleTime.value = now;
+  toggle();
+}
+
+function toggle() {
+  if (props.disabled) return;
+  if (innerShow.value) hide();
+  else show();
+}
+
+function show() {
+  if (props.disabled) return;
+  innerShow.value = true;
+  emit("update:show", true);
+}
+
+function hide() {
+  innerShow.value = false;
+  emit("update:show", false);
+}
+
+function handleOutsideClick() {
+  if (!props.closeOnClickOutside) return;
+  if (!innerShow.value) return;
+  hide();
+}
+
+defineExpose({ show, hide });
+</script>
+
+<style>
+.i-popover {
+  position: relative;
+  overflow: visible;
+  min-height: 36px;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.i-popover--active {
+  z-index: 999;
+}
+
+.i-popover__outside {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.i-popover__trigger {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-popover__trigger--disabled {
+  opacity: 0.45;
+}
+
+.i-popover__default-trigger {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-popover__default-trigger-text {
+  color: #2979ff;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-popover__panel {
+  position: absolute;
+  min-width: 64px;
+  overflow: visible;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+}
+
+.i-popover__panel--top {
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 12px;
+}
+
+.i-popover__panel--bottom {
+  left: 0;
+  top: 100%;
+  margin-top: 12px;
+}
+
+.i-popover__panel--left {
+  right: 100%;
+  top: 0;
+  margin-right: 12px;
+}
+
+.i-popover__panel--right {
+  left: 100%;
+  top: 0;
+  margin-left: 12px;
+}
+
+.i-popover__arrow {
+  position: absolute;
+}
+
+.i-popover__text {
+  line-height: 20px;
+}
+</style>

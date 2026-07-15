@@ -1,0 +1,145 @@
+<template>
+  <view class="i-section" :style="sectionStyle" @click="handleClick">
+    <view class="i-section__head">
+      <view v-if="showLine" class="i-section__line" :style="lineStyle"></view>
+      <view class="i-section__title-wrap">
+        <slot name="title">
+          <text class="i-section__title" :style="titleStyle">{{ title }}</text>
+        </slot>
+        <text v-if="description.length > 0" class="i-section__desc" :style="descriptionStyle">
+          {{ description }}
+        </text>
+      </view>
+      <slot name="right">
+        <text v-if="moreText.length > 0" class="i-section__more" @click.stop="handleMore">
+          {{ moreText }}
+        </text>
+      </slot>
+    </view>
+    <view v-if="hasDefault" class="i-section__body">
+      <slot></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, useSlots } from 'vue'
+
+defineOptions({ name: 'i-section' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Section 分区标题。
+ * - title: 左侧主标题。
+ * - description: 标题下方说明文字。
+ * - moreText: 右侧操作文字，空字符串时隐藏。
+ * - showLine: 是否显示左侧竖线。
+ * - lineColor: 左侧竖线颜色。
+ * - titleColor: 标题颜色。
+ * - descriptionColor: 描述文字颜色。
+ * - bgColor: 容器背景色。
+ * - padding: 容器内边距。
+ * - bold: 标题是否加粗。
+ * - clickable: 是否允许点击整块触发 click。
+ */
+const props = defineProps({
+  title: { type: String, default: '区块标题' },
+  description: { type: String, default: '' },
+  moreText: { type: String, default: '更多' },
+  showLine: { type: Boolean, default: true },
+  lineColor: { type: String, default: '#2979ff' },
+  titleColor: { type: String, default: '#303133' },
+  descriptionColor: { type: String, default: '#909399' },
+  bgColor: { type: String, default: 'transparent' },
+  padding: { type: [String, Number], default: '0' },
+  bold: { type: Boolean, default: true },
+  clickable: { type: Boolean, default: true },
+})
+
+/**
+ * Emits 说明：
+ * - click: 点击分区时触发。
+ * - more: 点击右侧更多文字时触发。
+ */
+const emit = defineEmits(['click', 'more'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const slots = useSlots()
+const hasDefault = computed(() => slots.default != null)
+
+const sectionStyle = computed(() => {
+  return 'background-color:' + bgColor.value + ';padding:' + formatBoxSize(props.padding) + ';'
+})
+
+const lineStyle = computed(() => {
+  return 'background-color:' + props.lineColor + ';'
+})
+
+const titleStyle = computed(() => {
+  return 'color:' + props.titleColor + ';font-weight:' + (props.bold ? '700' : '400') + ';'
+})
+
+const descriptionStyle = computed(() => {
+  return 'color:' + props.descriptionColor + ';'
+})
+
+function handleClick() {
+  if (!props.clickable) return
+  emit('click')
+}
+
+function handleMore() {
+  emit('more')
+}
+
+function formatBoxSize(value): string {
+  const text = String(value)
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-section {
+  width: 100%;
+}
+.i-section__head {
+  min-height: 28px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-section__line {
+  width: 4px;
+  height: 16px;
+  margin-right: 8px;
+  border-radius: 4px;
+}
+.i-section__title-wrap {
+  flex: 1;
+}
+.i-section__title {
+  font-size: 16px;
+  line-height: 22px;
+}
+.i-section__desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-section__more {
+  margin-left: 12px;
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 20px;
+}
+.i-section__body {
+  margin-top: 10px;
+}
+</style>

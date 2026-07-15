@@ -1,0 +1,56 @@
+<template>
+  <view class="i-gap" :style="gapStyle"></view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-gap' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Gap 文档。
+ * - bgColor: 间隔槽背景颜色。
+ * - height: 间隔槽高度，单位 px 或传入带单位字符串。
+ * - marginTop: 与前一个元素的距离，单位 px 或传入带单位字符串。
+ * - marginBottom: 与后一个元素的距离，单位 px 或传入带单位字符串。
+ */
+const props = defineProps({
+  bgColor: { type: String, default: 'transparent' },
+  height: { type: [String, Number], default: 20 },
+  marginTop: { type: [String, Number], default: 0 },
+  marginBottom: { type: [String, Number], default: 0 },
+})
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const gapStyle = computed(() => {
+  return (
+    'height:' +
+    formatSize(props.height) +
+    ';background-color:' +
+    bgColor.value +
+    ';margin-top:' +
+    formatSize(props.marginTop) +
+    ';margin-bottom:' +
+    formatSize(props.marginBottom) +
+    ';'
+  )
+})
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-gap {
+  width: 100%;
+  flex-shrink: 0;
+}
+</style>

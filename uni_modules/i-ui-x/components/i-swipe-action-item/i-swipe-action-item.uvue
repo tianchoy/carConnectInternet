@@ -1,0 +1,240 @@
+<template>
+  <view
+    :id="itemId"
+    class="i-swipe-action-item"
+    @touchstart.stop="handleTouchStart"
+    @touchmove.stop.prevent="handleTouchMove"
+    @touchend.stop="handleTouchEnd"
+    @touchcancel.stop="handleTouchEnd"
+  >
+    <view
+      v-if="hasLeftSlot"
+      :id="leftId"
+      class="i-swipe-action-item__left"
+      :style="leftActionStyle"
+    >
+      <slot name="left"></slot>
+    </view>
+    <view
+      class="i-swipe-action-item__content"
+      :style="contentStyle"
+      @click="handleContentClick"
+    >
+      <slot></slot>
+    </view>
+    <view
+      v-if="hasRightSlot"
+      :id="rightId"
+      class="i-swipe-action-item__right"
+      :style="rightActionStyle"
+    >
+      <slot name="right"></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, nextTick, onMounted, ref, useSlots } from 'vue'
+
+defineOptions({ name: 'i-swipe-action-item' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 SwipeActionItem 文档。
+ * - disabled: 是否禁用当前滑动项。
+ * - closeOnClick: 点击内容区域或操作按钮后是否关闭当前滑动项。
+ * - threshold: 滑动距离阈值，表示超过按钮宽度比例后自动展开。
+ * - leftWidth: 左侧操作区展开宽度；传 0 时自动测量。
+ * - rightWidth: 右侧操作区展开宽度；传 0 时自动测量。
+ */
+const props = defineProps({
+  disabled: { type: Boolean, default: false },
+  closeOnClick: { type: Boolean, default: true },
+  threshold: { type: Number, default: 0.3 },
+  leftWidth: { type: Number, default: 0 },
+  rightWidth: { type: Number, default: 0 },
+})
+
+/**
+ * Emits 说明：对齐文档事件。
+ * - change: 组件打开或关闭时触发，返回 open 与 direction。
+ */
+const emit = defineEmits(['change'])
+
+const slots = useSlots()
+const itemId = 'i-swipe-action-item-' + String(Math.floor(Math.random() * 1000000))
+const leftId = itemId + '-left'
+const rightId = itemId + '-right'
+const direction = ref('')
+const offset = ref(0)
+const startX = ref(0)
+const startOffset = ref(0)
+const touching = ref(false)
+const measuredLeftWidth = ref(60)
+const measuredRightWidth = ref(120)
+
+const hasLeftSlot = computed(() => slots['left'] != null)
+const hasRightSlot = computed(() => slots['right'] != null)
+
+const contentStyle = computed(() => {
+  return 'transform:translateX(' + String(offset.value) + 'px);'
+})
+
+const leftActionStyle = computed(() => {
+  if (offset.value > 0) return 'opacity:1;'
+  return 'opacity:0;'
+})
+
+const rightActionStyle = computed(() => {
+  if (offset.value < 0) return 'opacity:1;'
+  return 'opacity:0;'
+})
+
+function handleTouchStart(event) {
+  if (props.disabled) return
+  touching.value = true
+  startX.value = readTouchX(event)
+  startOffset.value = offset.value
+  refreshWidths()
+}
+
+function handleTouchMove(event) {
+  if (props.disabled || !touching.value) return
+  const currentX = readTouchX(event)
+  if (isNaN(currentX) || isNaN(startX.value)) return
+  let next = startOffset.value + currentX - startX.value
+  const maxLeft = hasLeftSlot.value ? getLeftWidth() : 0
+  const maxRight = hasRightSlot.value ? getRightWidth() : 0
+  if (next > maxLeft) next = maxLeft
+  if (next < 0 - maxRight) next = 0 - maxRight
+  offset.value = next
+}
+
+function handleTouchEnd() {
+  if (!touching.value) return
+  touching.value = false
+  const maxLeft = hasLeftSlot.value ? getLeftWidth() : 0
+  const maxRight = hasRightSlot.value ? getRightWidth() : 0
+  if (offset.value > maxLeft * props.threshold && maxLeft > 0) {
+    open('left')
+    return
+  }
+  if (0 - offset.value > maxRight * props.threshold && maxRight > 0) {
+    open('right')
+    return
+  }
+  close()
+}
+
+function handleContentClick() {
+  if (props.closeOnClick && direction.value.length > 0) close()
+}
+
+function open(nextDirection: string = 'right') {
+  if (props.disabled) return
+  if (nextDirection == 'left' && hasLeftSlot.value) {
+    offset.value = getLeftWidth()
+    direction.value = 'left'
+  } else if (hasRightSlot.value) {
+    offset.value = 0 - getRightWidth()
+    direction.value = 'right'
+  }
+  emit('change', {
+    open: direction.value.length > 0,
+    direction: direction.value,
+  })
+}
+
+function close() {
+  offset.value = 0
+  const previous = direction.value
+  direction.value = ''
+  emit('change', {
+    open: false,
+    direction: previous,
+  })
+}
+
+function refreshWidths() {
+  uni
+    .createSelectorQuery()
+    .select('#' + leftId)
+    .boundingClientRect((rect) => {
+      if (rect != null && rect.width != null && Number(rect.width) > 0) {
+        measuredLeftWidth.value = Number(rect.width)
+      }
+    })
+    .select('#' + rightId)
+    .boundingClientRect((rect) => {
+      if (rect != null && rect.width != null && Number(rect.width) > 0) {
+        measuredRightWidth.value = Number(rect.width)
+      }
+    })
+    .exec()
+}
+
+function getLeftWidth(): number {
+  if (props.leftWidth > 0) return props.leftWidth
+  return measuredLeftWidth.value
+}
+
+function getRightWidth(): number {
+  if (props.rightWidth > 0) return props.rightWidth
+  return measuredRightWidth.value
+}
+
+function readTouchX(event): number {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return NaN
+  const clientX = Number(point.clientX)
+  if (!isNaN(clientX)) return clientX
+  const pageX = Number(point.pageX)
+  if (!isNaN(pageX)) return pageX
+  return Number(point.x)
+}
+
+defineExpose({
+  open,
+  close,
+})
+
+onMounted(() => {
+  nextTick(() => {
+    refreshWidths()
+  })
+})
+</script>
+
+<style>
+.i-swipe-action-item {
+  position: relative;
+  min-height: 58px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+.i-swipe-action-item__left,
+.i-swipe-action-item__right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  flex-direction: row;
+  z-index: 0;
+}
+.i-swipe-action-item__left {
+  left: 0;
+}
+.i-swipe-action-item__right {
+  right: 0;
+}
+.i-swipe-action-item__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 58px;
+  background-color: #ffffff;
+}
+</style>

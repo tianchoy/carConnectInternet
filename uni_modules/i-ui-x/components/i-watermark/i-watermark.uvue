@@ -1,0 +1,67 @@
+<template>
+  <view class="i-watermark" @click="emit('click')">
+    <slot></slot>
+    <view class="i-watermark__layer">
+      <text
+        v-for="i in count"
+        :key="i"
+        class="i-watermark__text"
+        :style="'color:' + color + ';opacity:' + opacity"
+        >{{ text }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+defineOptions({ name: 'i-watermark' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - text: 主要展示文本。
+ * - count: count 配置项，用于控制组件展示或交互行为。
+ * - color: 文字、图标或线条颜色。
+ * - opacity: opacity 配置项，用于控制组件展示或交互行为。
+ */
+const props = defineProps({
+  text: { type: String, default: 'I UI X' },
+  count: { type: Number, default: 12 },
+  color: { type: String, default: '#303133' },
+  opacity: { type: Number, default: 0.12 },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ */
+const emit = defineEmits(['click'])
+</script>
+
+<style>
+.i-watermark {
+  position: relative;
+  min-height: 180px;
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+.i-watermark__layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  transform: rotate(-20deg);
+  pointer-events: none;
+}
+.i-watermark__text {
+  width: 120px;
+  height: 48px;
+  font-size: 14px;
+  line-height: 48px;
+  text-align: center;
+}
+</style>

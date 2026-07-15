@@ -20,7 +20,7 @@
 						<text>ID: {{imei}}</text>
 						<text class="pos-time"></text>
 					</view>
-					<uv-icon name="arrow-right" :bold="true" :size="16"></uv-icon>
+					<i-icon name="/static/arrow-right.png" fontSize="16"></i-icon>
 				</view>
 				<view class="pos-date">
 					<view class="addree-box">定位时间: {{datainfo.positionUpdateTime}}</view>
@@ -79,21 +79,32 @@
 					</view>
 				</view>
 			</view>
-			<uv-grid :col="5">
-				<uv-grid-item v-for="(item,index) in baseList" :key="index" @click="click(item)">
-					<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.name" :size="35"></uv-icon>
-					<text class="grid-text">{{item.title}}</text>
-				</uv-grid-item>
-			</uv-grid>
+			  <i-grid
+				:items="baseList"
+				:col="5"
+				itemHeight="88"
+				round="8"
+				:imageSize="30"
+				iconColor="#3c9cff"
+				textColor="#606266"
+				:showBorder="true"
+				@click="click($event)"
+			></i-grid>
 		</view>
 
 		<view>
-			<uv-modal ref="popupRef" :title="modalTitle" @confirm="confirm">
+			<i-modal :show="popupRef" :title="modalTitle" @confirm="confirm">
 				<view>
-					<uv-input placeholder="请输入账户密码" prefixIcon="lock" border="surround" clearable :password="true"
-						v-model="psw"></uv-input>
+					<i-input 
+						v-model="psw" 
+						@input="filterNonLatin" 
+						placeholder="请输入密码"
+						clearable
+						:password="true"
+					>
+					</i-input>
 				</view>
-			</uv-modal>
+			</i-modal>
 		</view>
 	</view>
 </template>
@@ -128,7 +139,7 @@
 	const refreshTimer = ref<number | null>(null)
 	const isRefreshing = ref(false)
 
-	const popupRef = ref(null);
+	const popupRef = ref(false);
 	const psw = ref('')
 	const currentOperation = ref(0) // 0:无操作 1:恢复油电 2:断开油电
 	const modalTitle = ref('验证密码')
@@ -356,33 +367,33 @@
 
 	const baseList = computed(() => {
 	const list = [{
-		name: '/static/gjhf.png',
-		title: '轨迹回放'
+		image: '/static/gjhf.png',
+		text: '轨迹回放'
 	}, {
-		name: '/static/clgz.png',
-		title: '车辆跟踪'
+		image: '/static/clgz.png',
+		text: '车辆跟踪'
 	}, {
-		name: '/static/lcjl.png',
-		title: '里程记录'
+		image: '/static/lcjl.png',
+		text: '里程记录'
 	}, {
-		name: '/static/tcjl.png',
-		title: '停车记录'
+		image: '/static/tcjl.png',
+		text: '停车记录'
 	},
 	{
-		name: '/static/dzwl.png',
-		title: '电子围栏'
+		image: '/static/dzwl.png',
+		text: '电子围栏'
 	},
 	{
-		name: '/static/navto.png',
-		title: '一键寻车'
+		image: '/static/navto.png',
+		text: '一键寻车'
 	},
 	{
-		name: '/static/power.png',
-		title: '恢复油电'
+		image: '/static/power.png',
+		text: '恢复油电'
 	},
 	{
-		name: '/static/offpower.png',
-		title: '断开油电'
+		image: '/static/offpower.png',
+		text: '断开油电'
 	}]
 	
 	// 根据 productId 决定是否添加发送指令选项
@@ -399,7 +410,8 @@
 })
 
 	const click = (name) => {
-		const itemTo = name.title
+		console.log(name)
+		const itemTo = name.text
 		if (itemTo == '轨迹回放') {
 			stopAutoRefresh() // 停止刷新
 			uni.navigateTo({
@@ -431,7 +443,7 @@
 				psw.value = ''
 				currentOperation.value = 1
 				modalTitle.value = '验证密码'
-				popupRef.value.open();
+				popupRef.value = true
 			} else {
 				// 不需要密码验证，直接执行操作
 				executeOperation(1);
@@ -444,7 +456,7 @@
 				psw.value = ''
 				currentOperation.value = 2
 				modalTitle.value = '验证密码'
-				popupRef.value.open();
+				popupRef.value = true
 			} else {
 				// 不需要密码验证，直接执行操作
 				executeOperation(2);

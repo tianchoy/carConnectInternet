@@ -1,0 +1,69 @@
+<template>
+  <view
+    class="i-avatar"
+    :style="
+      'width:' +
+      size +
+      'px;height:' +
+      size +
+      'px;border-radius:' +
+      (round ? size / 2 : 8) +
+      'px;background-color:' +
+      bgColor
+    "
+    @click="emit('click')"
+    ><image
+      v-if="src.length > 0"
+      class="i-img"
+      :src="src"
+      mode="aspectFill"
+    ></image
+    ><text v-else class="i-text">{{ text }}</text></view
+  >
+</template>
+<script setup lang="uts">
+import { computed } from 'vue'
+defineOptions({ name: 'i-avatar' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - src: 图片资源地址。
+ * - text: 主要展示文本。
+ * - size: 组件尺寸，通常影响宽高或字号。
+ * - round: 是否使用圆形样式。
+ * - bgColor: 背景颜色。
+ */
+const props = defineProps({
+  src: { type: String, default: '' },
+  text: { type: String, default: 'LC' },
+  size: { type: Number, default: 54 },
+  round: { type: Boolean, default: true },
+  bgColor: { type: String, default: '#2979ff' },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ */
+const emit = defineEmits(['click'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+</script>
+<style>
+.i-avatar {
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+.i-img {
+  width: 100%;
+  height: 100%;
+}
+.i-text {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+</style>

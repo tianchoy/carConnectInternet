@@ -1,0 +1,81 @@
+<template>
+  <view class="i-line" :style="lineStyle"></view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-line' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Line 文档。
+ * - color: 线条颜色。
+ * - length: 线条长度；横向时为宽度，竖向时为高度，支持数字、px、rpx、百分比。
+ * - direction: 线条方向，row 为横向，col 为竖向。
+ * - hairline: 是否显示细线条。
+ * - margin: 线条与外部元素的间距，支持 "30px" 或 "20px 30px"。
+ * - dashed: 是否显示为虚线。
+ */
+const props = defineProps({
+  color: { type: String, default: '#d6d7d9' },
+  length: { type: [String, Number], default: '100%' },
+  direction: { type: String, default: 'row' },
+  hairline: { type: Boolean, default: true },
+  margin: { type: [String, Number], default: 0 },
+  dashed: { type: Boolean, default: false },
+})
+
+const lineStyle = computed(() => {
+  const width = props.hairline ? '0.5px' : '1px'
+  const lineType = props.dashed ? 'dashed' : 'solid'
+  const margin = formatBoxSize(props.margin)
+  if (props.direction == 'col') {
+    return (
+      'height:' +
+      formatSize(props.length) +
+      ';width:0;border-left-width:' +
+      width +
+      ';border-left-style:' +
+      lineType +
+      ';border-left-color:' +
+      props.color +
+      ';margin:' +
+      margin +
+      ';'
+    )
+  }
+  return (
+    'width:' +
+    formatSize(props.length) +
+    ';height:0;border-top-width:' +
+    width +
+    ';border-top-style:' +
+    lineType +
+    ';border-top-color:' +
+    props.color +
+    ';margin:' +
+    margin +
+    ';'
+  )
+})
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function formatBoxSize(value): string {
+  const text = String(value)
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+</script>
+
+<style>
+.i-line {
+  flex-shrink: 0;
+}
+</style>

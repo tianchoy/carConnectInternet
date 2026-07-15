@@ -48,7 +48,8 @@ const addDevice = (data) => {
   return api_http.http.post(addDeviceUrl, data);
 };
 const delDevice = (imei) => {
-  return api_http.http.post(deleteDevice, new common_vendor.UTSJSONObject({ imei }));
+  const data = new common_vendor.UTSJSONObject({ imei });
+  return api_http.http.post(deleteDevice, data);
 };
 const getUserDeviceList = (data) => {
   return api_http.http.post(userDeviceList, data);

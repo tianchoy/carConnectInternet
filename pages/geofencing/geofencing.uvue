@@ -18,19 +18,19 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		<uv-popup ref="showFenceModal" mode="center" round='10'>
+		<i-popup ref="showFenceModal" mode="center" round='10'>
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ selectedFence.name }}</text>
-					<uv-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></uv-icon>
+					<i-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></i-icon>
 				</view>
 				<view class="fence-actions">
-					<uv-button size="small" @click="editFence(selectedFence)">编辑</uv-button>
-					<uv-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</uv-button>
-					<uv-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</uv-button>
+					<i-button size="small" @click="editFence(selectedFence)">编辑</i-button>
+					<i-button size="small" type="error" @click="deleteFence(selectedFence.id)">删除</i-button>
+					<i-button size="small" type="primary" @click="showBindDevices(selectedFence.id)">绑定设备</i-button>
 				</view>
 			</view>
-		</uv-popup>
+		</i-popup>
 
 
 		<!-- 绘制控制面板 -->
@@ -39,30 +39,30 @@
 			<view class="drawing-mode-selector" v-if="!isDrawing && !selectedFence">
 				<view class="mode-title">选择围栏类型:</view>
 				<view class="mode-buttons">
-					<uv-button :type="drawingMode == 'polygon' ? 'success' : 'default'" size="small"
+					<i-button :type="drawingMode == 'polygon' ? 'success' : 'default'" size="small"
 						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('polygon')">
 						多边形
-					</uv-button>
-					<uv-button :type="drawingMode == 'circle' ? 'success' : 'default'" size="small"
+					</i-button>
+					<i-button :type="drawingMode == 'circle' ? 'success' : 'default'" size="small"
 						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('circle')">
 						圆形
-					</uv-button>
+					</i-button>
 				</view>
 			</view>
 
 			<view class="tool-tag-item">
-				<uv-button @click="startDrawing" :disabled="isDrawing || selectedFence">
+				<i-button @click="startDrawing" :disabled="isDrawing || selectedFence" size="small">
 					开始绘制
-				</uv-button>
-				<uv-button @click="finishDrawing" :disabled="!isDrawing || !canFinishDrawing">
+				</i-button>
+				<i-button @click="finishDrawing" :disabled="!isDrawing || !canFinishDrawing" size="small">
 					完成绘制
-				</uv-button>
-				<uv-button @click="clearDrawing">
+				</i-button>
+				<i-button @click="clearDrawing" size="small">
 					重置绘制
-				</uv-button>
-				<uv-button @click="showFenceList">
+				</i-button>
+				<i-button @click="showFenceList" size="small">
 					围栏列表
-				</uv-button>
+				</i-button>
 			</view>
 
 			<view class="status-info">
@@ -73,11 +73,11 @@
 		</view>
 
 		<!-- 围栏列表弹窗 -->
-		<uv-popup ref="fencesPopup" mode="bottom" round="10">
+		<i-popup ref="fencesPopup" mode="bottom" round="10">
 			<view class="fence-list">
 				<view class="list-header">
 					<text class="title">围栏列表</text>
-					<uv-icon name="close" @click="fencesPopup.close()"></uv-icon>
+					<i-icon name="/static/close.png" fontSize="15" @click="fencesPopup.close()"></i-icon>
 				</view>
 				<scroll-view class="list-content" scroll-y>
 					<view v-for="fence in fenceList" :key="fence.id" class="fence-item" @click="selectFence(fence)">
@@ -86,41 +86,39 @@
 							<text class="type">{{ getFenceType(fence) === 'circle' ? '圆形' : '多边形' }}</text>
 							<text class="devices">绑定设备: {{ fence.deviceCount || 0 }}台</text>
 						</view>
-						<uv-icon name="arrow-right"></uv-icon>
+						<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 					</view>
 					<view v-if="fenceList.length === 0" class="empty">
 						暂无围栏数据
 					</view>
 				</scroll-view>
 			</view>
-		</uv-popup>
+		</i-popup>
 
 		<!-- 围栏编辑弹窗 -->
-		<uv-popup ref="editDialogPopup" mode="center" round="10">
+		<i-popup ref="editDialogPopup" mode="center" round="10">
 			<view class="edit-dialog">
 				<view class="dialog-header">
 					<text>{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
 				</view>
 				<view class="dialog-content">
-					<uv-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></uv-input>
+					<i-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></i-input>
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
-						<uv-grid :col="2">
-							<uv-radio-group v-model="fenceForm.alarmType" iconPlacement="left">
-								<uv-grid-item><uv-radio name="0">不告警</uv-radio></uv-grid-item>
-								<uv-grid-item><uv-radio name="1">出入告警</uv-radio></uv-grid-item>
-								<uv-grid-item><uv-radio name="2">出告警</uv-radio></uv-grid-item>
-								<uv-grid-item><uv-radio name="3">入告警</uv-radio></uv-grid-item>
-							</uv-radio-group>
-						</uv-grid>
+						<i-radio-group v-model="fenceForm.alarmType" iconPlacement="left">
+							<i-radio name="0">不告警</i-radio>
+							<i-radio name="1">出入告警</i-radio>
+							<i-radio name="2">出告警</i-radio>
+							<i-radio name="3">入告警</i-radio>
+						</i-radio-group>
 					</view>
 				</view>
 				<view class="dialog-actions">
-					<uv-button @click="editDialogPopup.close()">取消</uv-button>
-					<uv-button type="primary" @click="saveFence">保存</uv-button>
+					<i-button @click="editDialogPopup.close()">取消</i-button>
+					<i-button type="primary" @click="saveFence">保存</i-button>
 				</view>
 			</view>
-		</uv-popup>
+		</i-popup>
 		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
 			<view class="device-dialog">
 				<view class="dialog-header">
@@ -1371,7 +1369,6 @@ const handleLoadMore = () => {
 		}
 
 		.edit-dialog {
-			width: 600rpx;
 			background-color: #fff;
 			border-radius: 16rpx;
 			overflow: hidden;

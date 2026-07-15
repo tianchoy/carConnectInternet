@@ -1,0 +1,452 @@
+<template>
+  <view :class="wrapClass" :style="wrapStyle">
+    <slot name="prefix">
+      <text
+        v-if="prefiicon.length > 0 || prefix.length > 0"
+        class="i-input__prefix"
+        :style="prefiiconStyle"
+      >
+        {{ prefix.length > 0 ? prefix : prefiicon }}
+      </text>
+    </slot>
+    <input
+      class="i-input__field"
+      :style="fieldStyle"
+      :type="type"
+      :value="current"
+      :placeholder="placeholder"
+      :placeholder-class="placeholderClass"
+      :placeholder-style="placeholderStyleText"
+      :password="passwordVisible"
+      :disabled="disabled"
+      :maxlength="Number(maxlength)"
+      :confirm-type="confirmType"
+      :confirm-hold="confirmHold"
+      :inputmode="inputmode"
+      :focus="focus"
+      :cursor="Number(cursor)"
+      :cursor-spacing="Number(cursorSpacing)"
+      :selection-start="Number(selectionStart)"
+      :selection-end="Number(selectionEnd)"
+      :adjust-position="adjustPosition"
+      @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @confirm="handleConfirm"
+      @keyboardheightchange="handleKeyboardHeightChange"
+    />
+    <text v-if="showWordLimit" class="i-input__count">
+      {{ current.length }}/{{ maxlength }}
+    </text>
+    <text
+      v-if="clearable && current.length > 0 && !disabled && !readonly"
+      class="i-input__clear"
+      @click="clear"
+    >
+      ×
+    </text>
+    <text
+      v-if="password && showPasswordToggle"
+      class="i-input__eye"
+      @click="togglePassword"
+    >
+      {{ passwordVisible ? "show" : "hide" }}
+    </text>
+    <slot name="suffix">
+      <text
+        v-if="suffiicon.length > 0"
+        class="i-input__suffix"
+        :style="suffiiconStyle"
+      >
+        {{ suffiicon }}
+      </text>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-input' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Input，封装 UniAppX 原生 input。
+ * - modelValue/value: 输入值，支持 v-model 和旧版 value。
+ * - type/inputmode: 输入类型。
+ * - height: 输入框高度。
+ * - disabled/readonly: 禁用和只读；只读不会置灰，但会阻止同步修改。
+ * - disabledColor: 禁用背景色。
+ * - clearable: 是否显示清除控件。
+ * - password/showPasswordToggle: 密码模式和密码显隐切换。
+ * - maxlength: 最大输入长度，-1 为不限制。
+ * - placeholder/placeholderClass/placeholderStyle: 占位内容和样式。
+ * - showWordLimit: 是否显示字数统计。
+ * - confirmType/confirmHold/focus/cursor/cursorSpacing/selectionStart/selectionEnd/adjustPosition: 原生 input 行为透传。
+ * - inputAlign/fontSize/color: 输入文本样式。
+ * - prefiicon/suffiicon: 前后图标文本，也可用 prefix/suffix slot 自定义。
+ * - border/shape/round/borderColor/bgColor/customStyle: 外观样式。
+ * - formatter: UniAppX 小程序端不传函数，保留 setFormatter 方法入口。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  value: {
+    type: [String, Number],
+    default: '',
+  },
+  type: {
+    type: String,
+    default: 'text',
+  },
+  height: {
+    type: [String, Number],
+    default: '40px',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  disabledColor: {
+    type: String,
+    default: '#f5f7fa',
+  },
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  password: {
+    type: Boolean,
+    default: false,
+  },
+  showPasswordToggle: {
+    type: Boolean,
+    default: true,
+  },
+  maxlength: {
+    type: [String, Number],
+    default: -1,
+  },
+  placeholder: {
+    type: String,
+    default: '',
+  },
+  placeholderClass: {
+    type: String,
+    default: 'input-placeholder',
+  },
+  placeholderStyle: {
+    type: String,
+    default: '',
+  },
+  showWordLimit: {
+    type: Boolean,
+    default: false,
+  },
+  confirmType: {
+    type: String,
+    default: 'done',
+  },
+  confirmHold: {
+    type: Boolean,
+    default: false,
+  },
+  focus: {
+    type: Boolean,
+    default: false,
+  },
+  cursor: {
+    type: [String, Number],
+    default: -1,
+  },
+  cursorSpacing: {
+    type: [String, Number],
+    default: 30,
+  },
+  selectionStart: {
+    type: [String, Number],
+    default: -1,
+  },
+  selectionEnd: {
+    type: [String, Number],
+    default: -1,
+  },
+  adjustPosition: {
+    type: Boolean,
+    default: true,
+  },
+  inputAlign: {
+    type: String,
+    default: 'left',
+  },
+  fontSize: {
+    type: [String, Number],
+    default: '15px',
+  },
+  color: {
+    type: String,
+    default: '#303133',
+  },
+  prefiicon: {
+    type: String,
+    default: '',
+  },
+  prefiiconStyle: {
+    type: String,
+    default: '',
+  },
+  suffiicon: {
+    type: String,
+    default: '',
+  },
+  suffiiconStyle: {
+    type: String,
+    default: '',
+  },
+  border: {
+    type: String,
+    default: 'surround',
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  shape: {
+    type: String,
+    default: 'square',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+  round: {
+    type: String,
+    default: '4px',
+  },
+  borderColor: {
+    type: String,
+    default: '#e5e5e5',
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  inputmode: {
+    type: String,
+    default: 'text',
+  },
+  prefix: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：输入框状态和内容变化。
+ * - update:modelValue/update:value: 同步输入值。
+ * - input/change: 内容变化时触发。
+ * - focus/blur/confirm/keyboardheightchange: 原生事件透传。
+ * - clear: 点击清空控件时触发。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'input',
+  'change',
+  'focus',
+  'blur',
+  'confirm',
+  'keyboardheightchange',
+  'clear',
+])
+
+
+const inputBgColor = computed(() => {
+  return props.bgColor
+})
+const current = ref(initialValue())
+const focused = ref(false)
+const passwordVisible = ref(props.password)
+
+const wrapClass = computed(() => {
+  const classes = ['i-input']
+  if (props.disabled) classes.push('i-input--disabled')
+  if (focused.value && !props.disabled) classes.push('i-input--focus')
+  if (props.shape == 'circle') classes.push('i-input--circle')
+  return classes.join(' ')
+})
+
+const wrapStyle = computed(() => {
+  let style =
+    'min-height:' +
+    formatSize(props.height) +
+    ';background-color:' +
+    (props.disabled ? props.disabledColor : inputBgColor.value) +
+    ';border-radius:' +
+    (props.shape == 'circle' ? formatSize(props.height) : props.round) +
+    ';'
+  if (props.border == 'surround') {
+    style +=
+      'border-width:1px;border-style:solid;border-color:' +
+      props.borderColor +
+      ';'
+  }
+  if (props.border == 'bottom') {
+    style +=
+      'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:' +
+      props.borderColor +
+      ';'
+  }
+  return style + props.customStyle
+})
+
+const fieldStyle = computed(() => {
+  return (
+    'height:' +
+    formatSize(props.height) +
+    ';color:' +
+    props.color +
+    ';font-size:' +
+    formatSize(props.fontSize) +
+    ';text-align:' +
+    props.inputAlign +
+    ';'
+  )
+})
+
+const placeholderStyleText = computed(() => {
+  if (props.placeholderStyle.length > 0) return props.placeholderStyle
+  return 'color:#c0c4cc;'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return String(props.modelValue)
+  return String(props.value)
+}
+
+function handleInput(event) {
+  const nextValue = String(event.detail.value)
+  if (props.readonly) {
+    current.value = initialValue()
+    return
+  }
+  current.value = nextValue
+  emitValue(nextValue)
+}
+
+function emitValue(value) {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('input', value)
+  emit('change', value)
+}
+
+function handleFocus(event) {
+  focused.value = true
+  emit('focus', event)
+}
+
+function handleBlur(event) {
+  focused.value = false
+  emit('blur', event)
+}
+
+function handleConfirm(event) {
+  emit('confirm', event.detail.value)
+}
+
+function handleKeyboardHeightChange(event) {
+  emit('keyboardheightchange', event)
+}
+
+function clear() {
+  current.value = ''
+  emitValue('')
+  emit('clear')
+}
+
+function togglePassword() {
+  passwordVisible.value = !passwordVisible.value
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  setFormatter() {
+    // 小程序端不支持函数 props，保留方法名用于兼容 组件 API。
+  },
+})
+</script>
+
+<style>
+.i-input {
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-input--disabled {
+  opacity: 0.76;
+}
+
+.i-input--focus {
+  border-color: #3c9cff;
+}
+
+.i-input__prefix,
+.i-input__suffix {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-input__prefix {
+  margin-right: 8px;
+}
+
+.i-input__suffix,
+.i-input__clear,
+.i-input__eye,
+.i-input__count {
+  margin-left: 8px;
+}
+
+.i-input__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.i-input__clear,
+.i-input__eye {
+  color: #c0c4cc;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.i-input__count {
+  color: #c0c4cc;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

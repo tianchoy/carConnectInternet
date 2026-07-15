@@ -1,0 +1,186 @@
+<template>
+  <view class="i-pagination" :style="wrapStyle">
+    <view :class="prevDisabled ? 'i-pagination__button i-pagination__button--disabled' : 'i-pagination__button'" @click="prev">
+      <text :class="prevDisabled ? 'i-pagination__button-text i-pagination__button-text--disabled' : 'i-pagination__button-text'">{{ prevText }}</text>
+    </view>
+    <view class="i-pagination__pages">
+      <text
+        v-if="mode == 'simple'"
+        class="i-pagination__page-text"
+        :style="inactiveTextStyle"
+      >{{ currentPage }} / {{ totalPages }}</text>
+      <view
+        v-else
+        v-for="item in pageList"
+        :key="String(item)"
+        :class="currentPage == item ? 'i-pagination__num i-pagination__num--active' : 'i-pagination__num'"
+        :style="currentPage == item ? activeStyle : inactivePageStyle"
+        @click="setPage(item)"
+      >
+        <text
+          :class="currentPage == item ? 'i-pagination__num-text i-pagination__num-text--active' : 'i-pagination__num-text'"
+          :style="currentPage == item ? '' : inactiveTextStyle"
+        >{{ item }}</text>
+      </view>
+    </view>
+    <view :class="nextDisabled ? 'i-pagination__button i-pagination__button--disabled' : 'i-pagination__button'" @click="next">
+      <text :class="nextDisabled ? 'i-pagination__button-text i-pagination__button-text--disabled' : 'i-pagination__button-text'">{{ nextText }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-pagination' })
+
+/**
+ * Props 说明：参考 Pagination 分页。
+ * - page/current: 当前页码，page 为兼容别名。
+ * - total: 数据总条数。
+ * - pageSize: 每页条数。
+ * - pageCount: 直接指定总页数，优先级高于 total/pageSize。
+ * - mode: simple 简洁模式，number 页码模式。
+ * - maxPageButtons: number 模式下最多显示几个页码，避免移动端横向溢出。
+ * - activeColor/inactiveColor/bgColor: 样式颜色。
+ * - disabled: 是否禁用。
+ * - prevText/nextText: 上一页、下一页文案。
+ */
+const props = defineProps({
+  page: { type: Number, default: 1 },
+  current: { type: Number, default: 0 },
+  total: { type: Number, default: 50 },
+  pageSize: { type: Number, default: 10 },
+  pageCount: { type: Number, default: 0 },
+  mode: { type: String, default: 'simple' },
+  maxPageButtons: { type: Number, default: 5 },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#606266' },
+  bgColor: { type: String, default: '#ffffff' },
+  disabled: { type: Boolean, default: false },
+  prevText: { type: String, default: '上一页' },
+  nextText: { type: String, default: '下一页' },
+})
+
+/**
+ * Emits 说明：
+ * - change: 页码变化时触发，返回当前页码。
+ * - prev/next: 点击上一页/下一页成功后触发。
+ * - update:page/update:current: 同步当前页码。
+ */
+const emit = defineEmits(['change', 'prev', 'next', 'update:page', 'update:current'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const currentPage = ref(initialPage())
+
+const totalPages = computed(() => {
+  if (props.pageCount > 0) return props.pageCount
+  const size = props.pageSize <= 0 ? 10 : props.pageSize
+  const count = Math.ceil(props.total / size)
+  return count <= 0 ? 1 : count
+})
+const prevDisabled = computed(() => props.disabled || currentPage.value <= 1)
+const nextDisabled = computed(() => props.disabled || currentPage.value >= totalPages.value)
+const wrapStyle = computed(() => 'background-color:' + bgColor.value + ';')
+const activeStyle = computed(() => 'background-color:' + props.activeColor + ';')
+const inactivePageStyle = computed(() => 'background-color:#f5f7fa;')
+const inactiveTextStyle = computed(() => 'color:' + props.inactiveColor + ';')
+const pageList = computed(() => {
+  const list = []
+  const max = props.maxPageButtons <= 0 ? 5 : props.maxPageButtons
+  const half = Math.floor(max / 2)
+  let start = currentPage.value - half
+  if (start < 1) start = 1
+  let end = start + max - 1
+  if (end > totalPages.value) {
+    end = totalPages.value
+    start = Math.max(1, end - max + 1)
+  }
+  for (let i = start; i <= end; i++) list.push(i)
+  return list
+})
+
+watch(() => props.page, () => currentPage.value = initialPage())
+watch(() => props.current, () => currentPage.value = initialPage())
+
+function initialPage(): number {
+  if (props.current > 0) return props.current
+  return props.page
+}
+function setPage(page: number) {
+  if (props.disabled) return
+  const nextPage = Math.max(1, Math.min(totalPages.value, page))
+  if (nextPage == currentPage.value) return
+  currentPage.value = nextPage
+  emit('change', currentPage.value)
+  emit('update:page', currentPage.value)
+  emit('update:current', currentPage.value)
+}
+function prev() {
+  if (prevDisabled.value) return
+  setPage(currentPage.value - 1)
+  emit('prev', currentPage.value)
+}
+function next() {
+  if (nextDisabled.value) return
+  setPage(currentPage.value + 1)
+  emit('next', currentPage.value)
+}
+</script>
+
+<style>
+.i-pagination {
+  padding: 12px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.i-pagination__button {
+  min-width: 76px;
+  height: 34px;
+  border-radius: 17px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-pagination__button--disabled {
+  background-color: #f5f7fa;
+}
+.i-pagination__button-text {
+  color: #2979ff;
+  font-size: 13px;
+}
+.i-pagination__button-text--disabled {
+  color: #c0c4cc;
+}
+.i-pagination__pages {
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.i-pagination__page-text {
+  color: #303133;
+  font-size: 14px;
+  font-weight: 600;
+}
+.i-pagination__num {
+  width: 30px;
+  height: 30px;
+  margin: 0 3px;
+  border-radius: 15px;
+  background-color: #f5f7fa;
+  align-items: center;
+  justify-content: center;
+}
+.i-pagination__num-text {
+  color: #606266;
+  font-size: 13px;
+}
+.i-pagination__num-text--active {
+  color: #ffffff;
+}
+</style>

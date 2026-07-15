@@ -1,1 +1,0 @@
-{"version":3,"file":"types.uts","sourceRoot":"","sources":["uni_modules/lime-icon/components/l-icon/types.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,cAAc,GAAG;IAC5B,GAAG,EAAE,OAAO,CAAC;IACb,KAAK,EAAE,GAAG,CAAC,MAAM,EAAE,GAAG,GAAC,IAAI,CAAC,CAAA;CAC5B,CAAA","sourcesContent":["export type IconCollection = {\r\n\thas: boolean,\r\n\ticons: Map<string, any|null>\r\n}\r\n"]}

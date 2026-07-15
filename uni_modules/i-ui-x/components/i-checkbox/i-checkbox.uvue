@@ -1,0 +1,328 @@
+<template>
+  <view :class="wrapClass" @click="toggle">
+    <slot name="icon" :checked="checked">
+      <view v-if="shape != 'button'" class="i-checkbox__box" :style="boxStyle">
+        <text v-if="checked" class="i-checkbox__mark" :style="markStyle"
+          >✓</text
+        >
+      </view>
+    </slot>
+    <slot :checked="checked">
+      <text
+        :class="labelClass"
+        :style="labelStyle"
+        @click.stop="toggleByLabel"
+      >
+        {{ label }}
+      </text>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-checkbox' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Checkbox，支持单个布尔值或数组多选。
+ * - name: 选项标识符，数组模式下用于判断是否选中。
+ * - modelValue/value: 绑定值；Array 表示多选，Boolean 表示单个开关。
+ * - checked: 单独控制选中状态。
+ * - shape: 外观形状，square、circle、check、button。
+ * - disabled: 是否禁用。
+ * - activeColor/inactiveColor/iconColor/activeLabelColor: 选中、未选中、图标和选中文字颜色。
+ * - size/iconSize/labelSize: 尺寸。
+ * - placement/iconPlacement/borderBottom/plain: 布局和按钮样式。
+ * - label/labelColor/labelDisabled: 文本和是否禁止点击文本。
+ */
+const props = defineProps({
+  name: {
+    type: [String, Number],
+    default: '',
+  },
+  modelValue: {
+    type: [Array, Boolean, String, Number],
+    default: false,
+  },
+  value: {
+    type: [Array, Boolean, String, Number],
+    default: false,
+  },
+  checked: {
+    type: Boolean,
+    default: false,
+  },
+  shape: {
+    type: String,
+    default: 'square',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  activeColor: {
+    type: String,
+    default: '#2979ff',
+  },
+  inactiveColor: {
+    type: String,
+    default: '#dcdfe6',
+  },
+  size: {
+    type: [String, Number],
+    default: 20,
+  },
+  placement: {
+    type: String,
+    default: 'row',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  labelSize: {
+    type: [String, Number],
+    default: 14,
+  },
+  labelColor: {
+    type: String,
+    default: '#303133',
+  },
+  labelDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  iconColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 14,
+  },
+  iconPlacement: {
+    type: String,
+    default: 'left',
+  },
+  borderBottom: {
+    type: Boolean,
+    default: false,
+  },
+  activeLabelColor: {
+    type: String,
+    default: '',
+  },
+  plain: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+/**
+ * Emits 说明：选中状态变化。
+ * - change: 复选框状态变化时触发，参数为最新绑定值。
+ * - update:modelValue/update:value: 同步绑定值。
+ * - update:checked: 同步单项 checked 状态。
+ */
+const emit = defineEmits(['change', 'update:modelValue', 'update:value', 'update:checked'])
+
+const internalChecked = ref(isChecked())
+
+const checked = computed(() => {
+  return internalChecked.value
+})
+
+const wrapClass = computed(() => {
+  const classes = ['i-checkbox']
+  if (props.placement == 'column') classes.push('i-checkbox--column')
+  if (props.iconPlacement == 'right') classes.push('i-checkbox--right')
+  if (props.shape == 'button') classes.push('i-checkbox--button')
+  if (props.plain && props.shape == 'button') classes.push('i-checkbox--plain')
+  if (checked.value) classes.push('i-checkbox--checked')
+  if (props.shape == 'button' && checked.value) classes.push('i-checkbox--button-checked')
+  if (props.shape == 'button' && props.plain && checked.value) {
+    classes.push('i-checkbox--button-plain-checked')
+  }
+  if (props.disabled) classes.push('i-checkbox--disabled')
+  if (props.borderBottom) classes.push('i-checkbox--border')
+  return classes.join(' ')
+})
+
+const labelClass = computed(() => {
+  const classes = ['i-checkbox__label']
+  if (props.shape == 'button') classes.push('i-checkbox__label--button')
+  return classes.join(' ')
+})
+
+const boxStyle = computed(() => {
+  return (
+    'width:' +
+    formatSize(props.size) +
+    ';height:' +
+    formatSize(props.size) +
+    ';border-radius:' +
+    (props.shape == 'circle' ? formatSize(props.size) : '4px') +
+    ';border-color:' +
+    (checked.value ? props.activeColor : props.inactiveColor) +
+    ';background-color:' +
+    (checked.value && props.shape != 'check' ? props.activeColor : 'transparent') +
+    ';'
+  )
+})
+
+const markStyle = computed(() => {
+  return 'color:' + props.iconColor + ';font-size:' + formatSize(props.iconSize) + ';'
+})
+
+const labelStyle = computed(() => {
+  let color = props.labelColor
+  if (checked.value && props.activeLabelColor.length > 0) color = props.activeLabelColor
+  return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+watch(
+  () => props.checked,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+function toggle() {
+  if (props.disabled) return
+  updateChecked(!checked.value)
+}
+
+function toggleByLabel() {
+  if (props.labelDisabled) return
+  toggle()
+}
+
+function updateChecked(nextChecked) {
+  const previousChecked = checked.value
+  internalChecked.value = nextChecked
+  const nextValue = buildValue(nextChecked, previousChecked)
+  emit('update:checked', nextChecked)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+  emit('change', nextValue)
+}
+
+function isChecked() {
+  if (props.checked) return true
+  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      if (String(value[i]) == String(props.name)) return true
+    }
+    return false
+  }
+  if (typeof value == 'boolean') return value
+  return String(value) == String(props.name)
+}
+
+function buildValue(nextChecked, previousChecked) {
+  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
+  if (Array.isArray(value)) {
+    const list = value.slice(0)
+    const exists = previousChecked
+    if (nextChecked && !exists) list.push(props.name)
+    if (!nextChecked && exists) {
+      const nextList = []
+      for (let i = 0; i < list.length; i++) {
+        if (String(list[i]) != String(props.name)) nextList.push(list[i])
+      }
+      return nextList
+    }
+    return list
+  }
+  return nextChecked
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-checkbox {
+  min-height: 32px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-checkbox--right {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
+.i-checkbox--button {
+  min-width: 64px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dcdfe6;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-checkbox--button-checked {
+  border-color: #2979ff;
+  background-color: #ecf5ff;
+}
+
+.i-checkbox--button-plain-checked {
+  background-color: #ffffff;
+}
+
+.i-checkbox--disabled {
+  opacity: 0.5;
+}
+
+.i-checkbox--border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+}
+
+.i-checkbox__box {
+  border-width: 1px;
+  border-style: solid;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-checkbox__mark {
+  line-height: 18px;
+}
+
+.i-checkbox__label {
+  margin-left: 8px;
+  line-height: 22px;
+}
+
+.i-checkbox__label--button {
+  margin-left: 0;
+  text-align: center;
+}
+</style>

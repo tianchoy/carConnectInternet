@@ -1,0 +1,148 @@
+<template>
+  <view class="i-code-demo">
+    <view class="i-code-demo__toolbar">
+      <text class="i-code-demo__title" @click="copyCode">{{ title }}</text>
+      <view class="i-code-demo__actions">
+        <view class="i-code-demo__button" @click="copyCode">
+          <text class="i-code-demo__button-text">{{ copyText }}</text>
+        </view>
+        <view
+          class="i-code-demo__button i-code-demo__button--primary"
+          @click="toggle"
+        >
+          <text
+            class="i-code-demo__button-text i-code-demo__button-text--primary"
+          >
+            {{ visible ? "收起代码" : "查看代码" }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view v-if="visible" class="i-code-demo__body" :scroll-y="true">
+      <text class="i-code-demo__code">{{ code }}</text>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from "vue";
+
+defineOptions({ name: "i-code-demo" });
+
+/**
+ * Props 说明：用于在 demo 页面展示可复制的实现代码。
+ * - title: 代码块标题。
+ * - code: 需要展示和复制的实现代码文本。
+ */
+const props = defineProps({
+  title: {
+    type: String,
+    default: "实现代码",
+  },
+  code: {
+    type: String,
+    default: "",
+  },
+});
+
+const visible = ref(false);
+const copyText = ref("复制代码");
+
+function toggle() {
+  visible.value = !visible.value;
+}
+
+function copyCode() {
+  if (props.code.length == 0) return;
+  uni.setClipboardData({
+    data: props.code,
+    success: () => {
+      copyText.value = "已复制";
+      setTimeout(() => {
+        copyText.value = "复制代码";
+      }, 1200);
+    },
+    fail: () => {
+      copyText.value = "复制失败";
+      setTimeout(() => {
+        copyText.value = "复制代码";
+      }, 1200);
+    },
+  });
+}
+</script>
+
+<style>
+.i-code-demo {
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.i-code-demo__toolbar {
+  min-height: 48px;
+  padding: 8px 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #ebeef5;
+}
+
+.i-code-demo__title {
+  flex: 1;
+  min-height: 32px;
+  color: #303133;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  justify-content: center;
+}
+
+.i-code-demo__actions {
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.i-code-demo__button {
+  height: 32px;
+  margin-left: 8px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background-color: #f5f7fa;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-code-demo__button--primary {
+  background-color: #ecf5ff;
+}
+
+.i-code-demo__button-text {
+  color: #606266;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.i-code-demo__button-text--primary {
+  color: #1989fa;
+}
+
+.i-code-demo__body {
+  max-height: 360px;
+  padding: 12px;
+  background-color: #f7f8fa;
+}
+
+.i-code-demo__code {
+  color: #303133;
+  font-size: 12px;
+  line-height: 18px;
+  font-family: monospace;
+}
+</style>

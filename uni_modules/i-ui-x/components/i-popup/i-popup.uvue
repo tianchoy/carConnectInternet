@@ -1,0 +1,817 @@
+<template>
+  <view>
+    <view class="i-popup__trigger" @click="open">
+      <slot name="trigger"></slot>
+    </view>
+
+    <view v-if="opened" class="i-popup" :style="rootStyle">
+      <view
+        v-if="overlay"
+        class="i-popup__overlay"
+        :style="overlayComputedStyle"
+        @click="handleOverlayClick"
+      ></view>
+      <view
+        :class="panelClass"
+        :style="panelStyle"
+        @click.stop=""
+      >
+        <slot name="bg"></slot>
+
+        <view
+          v-if="swipeClose && swipeHandle"
+          class="i-popup__swipe-handle"
+          @touchstart.stop="handleHandleTouchStart"
+          @touchmove.stop.prevent="handleTouchMove"
+          @touchend.stop="handleTouchEnd"
+          @touchcancel.stop="handleTouchEnd"
+        >
+          <view class="i-popup__swipe-bar"></view>
+        </view>
+
+        <slot v-if="normalizedMode == 'bottom'" name="contentTop"></slot>
+
+        <slot name="header">
+          <view v-if="showTitle && title.length > 0" class="i-popup__header">
+            <slot name="title">
+              <text class="i-popup__title" :style="titleStyleText">{{ title }}</text>
+            </slot>
+          </view>
+        </slot>
+
+        <view
+          v-if="showClose"
+          :class="closeClass"
+          :style="closeStyle"
+          @click="close"
+        >
+          <text class="i-popup__close-text">{{ closeIconText }}</text>
+        </view>
+
+        <view v-if="disabledScroll" class="i-popup__body" :style="bodyStyle">
+          <slot v-if="contentVisible"></slot>
+        </view>
+        <scroll-view
+          v-else
+          scroll-y
+          class="i-popup__body i-popup__body--scroll"
+          :style="bodyStyle"
+        >
+          <slot v-if="contentVisible"></slot>
+        </scroll-view>
+
+        <slot name="footer">
+          <view v-if="showFooter" class="i-popup__footer" :style="footerStyle">
+            <view
+              v-if="showCancel"
+              class="i-popup__footer-button i-popup__footer-button--cancel"
+              @click="cancel"
+            >
+              <text class="i-popup__footer-cancel">{{ cancelTextValue }}</text>
+            </view>
+            <view
+              :class="
+                disabledConfirm
+                  ? 'i-popup__footer-button i-popup__footer-button--confirm i-popup__footer-button--disabled'
+                  : 'i-popup__footer-button i-popup__footer-button--confirm'
+              "
+              @click="confirm"
+            >
+              <text class="i-popup__footer-confirm" :style="confirmTextStyle">
+                {{ confirmTextValue }}
+              </text>
+            </view>
+          </view>
+        </slot>
+
+        <view
+          v-if="closeable && !showClose"
+          :class="closeClass"
+          :style="closeStyle"
+          @click="close"
+        >
+          <text class="i-popup__close-text">{{ closeIconText }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-popup' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x drawer，同时兼容原 i-popup/DCloud uni-app x Popup 用法。
+ * - show: 是否展示弹窗，通常由外部通过 update:show 同步控制。
+ * - overlay: 是否显示遮罩层。
+ * - mode: 弹出方向，可取 left / top / right / bottom / center。
+ * - position: drawer 风格打开方向；传入后优先于 mode。
+ * - title: 弹窗标题；也可以通过 header 插槽完全自定义。
+ * - showTitle: 是否显示标题区域。
+ * - showClose: 是否显示 drawer 风格关闭按钮。
+ * - showFooter: 是否显示底部操作栏。
+ * - showCancel: footer 中是否显示取消按钮。
+ * - cancelText: 取消按钮文案。
+ * - confirmText: 确认按钮文案。
+ * - titleStyle: 标题自定义样式，支持字符串样式。
+ * - duration: 动画时长，单位 ms；当前用于过渡时长样式。
+ * - closeable: 是否显示关闭图标。
+ * - overlayStyle: 遮罩自定义样式，支持字符串样式。
+ * - overlayOpacity: 遮罩透明度，取值 0 到 1。
+ * - closeOnMask: 点击遮罩是否关闭弹窗。
+ * - overlayClick: drawer 风格遮罩点击关闭开关，优先级高于 closeOnMask。
+ * - zIndex: 弹窗层级。
+ * - safeBottom: 是否预留底部安全区。
+ * - safeTop: 是否预留顶部安全区。
+ * - closeIcon: 关闭图标名称或文本，内置 close 显示为 ×。
+ * - closeIconColor: 关闭图标颜色。
+ * - closeIconSize: 关闭图标大小。
+ * - closeIconPos: 关闭图标位置，可取 top-right / top-left / bottom-left / bottom-right。
+ * - margin: 外边距。
+ * - navbarHeight: 顶部弹出时额外避让的导航栏高度。
+ * - round: 圆角值，仅对 top / bottom / center 生效。
+ * - zoom: center 模式是否开启缩放感。
+ * - bgColor: 弹窗背景色，transparent 可去除背景。
+ * - size: drawer 风格尺寸。左右时表示宽度，上下时表示高度。
+ * - maxHeight: 内容最大高度。
+ * - width: 弹窗宽度。
+ * - height: 弹窗高度，top / center / bottom 模式有效。
+ * - customStyle: 面板自定义样式，支持字符串样式。
+ * - customWrapStyle: drawer 风格容器自定义样式。
+ * - customFooterStyle: footer 自定义样式。
+ * - contentMargin: 内容区域边距。
+ * - offsetTop: 顶部偏移量。
+ * - offsetBottom: 底部偏移量。
+ * - lazy: 是否等打开动画后再展示内容。
+ * - disabledScroll: 是否禁用内部 scroll-view。
+ * - disabledConfirm: 是否禁用确认按钮。
+ * - btnColor: 确认按钮主题色。
+ * - swipeClose: 是否开启滑动关闭。
+ * - swipeHandle: 是否显示滑动手柄。
+ * - contentDraggable: 是否允许内容区域拖动关闭。
+ * - swipeCloseThreshold: 滑动关闭阈值，单位 px。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: false },
+  overlay: { type: Boolean, default: true },
+  mode: { type: String, default: 'bottom' },
+  position: { type: String, default: '' },
+  title: { type: String, default: '' },
+  showTitle: { type: Boolean, default: true },
+  showClose: { type: Boolean, default: false },
+  showFooter: { type: Boolean, default: false },
+  showCancel: { type: Boolean, default: true },
+  cancelText: { type: String, default: '' },
+  confirmText: { type: String, default: '' },
+  titleStyle: { type: [String, Object], default: '' },
+  duration: { type: [String, Number], default: 300 },
+  closeable: { type: Boolean, default: false },
+  overlayStyle: { type: [String, Object], default: '' },
+  overlayOpacity: { type: [String, Number], default: 0.5 },
+  closeOnMask: { type: Boolean, default: true },
+  overlayClick: { type: Boolean, default: true },
+  overflayBgColor: { type: String, default: '' },
+  zIndex: { type: [String, Number], default: 10075 },
+  safeBottom: { type: Boolean, default: true },
+  safeTop: { type: Boolean, default: false },
+  closeIcon: { type: String, default: 'close' },
+  closeIconColor: { type: String, default: '#909399' },
+  closeIconSize: { type: [String, Number], default: 18 },
+  closeIconPos: { type: String, default: 'top-right' },
+  margin: { type: [String, Number], default: 0 },
+  navbarHeight: { type: Number, default: 0 },
+  round: { type: [String, Number], default: 16 },
+  zoom: { type: Boolean, default: true },
+  bgColor: { type: String, default: '#ffffff' },
+  size: { type: [String, Number], default: '' },
+  maxHeight: { type: [String, Number], default: '' },
+  width: { type: [String, Number], default: '' },
+  height: { type: [String, Number], default: '' },
+  customStyle: { type: [String, Object], default: '' },
+  customWrapStyle: { type: [String, Object], default: '' },
+  customFooterStyle: { type: [String, Object], default: '' },
+  contentMargin: { type: [String, Number], default: 16 },
+  widthCoverCenter: { type: Boolean, default: false },
+  offsetTop: { type: [String, Number], default: '0' },
+  offsetBottom: { type: [String, Number], default: '0' },
+  lazy: { type: Boolean, default: false },
+  disabledScroll: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
+  disabledConfirm: { type: Boolean, default: false },
+  btnColor: { type: String, default: '' },
+  swipeClose: { type: Boolean, default: false },
+  swipeHandle: { type: Boolean, default: true },
+  contentDraggable: { type: Boolean, default: true },
+  swipeCloseThreshold: { type: [String, Number], default: 50 },
+})
+
+/**
+ * Emits 说明：严格保留 Popup 文档事件。
+ * - click: 点击遮罩时触发。
+ * - open: 弹出层打开后触发。
+ * - close: 弹出层收起后触发。
+ * - beforeOpen: 弹出层打开前触发。
+ * - beforeClose: 弹出层关闭前触发。
+ * - cancel: 点击取消按钮触发。
+ * - confirm: 点击确认按钮触发。
+ * - update:show: 同步 show 可见状态。
+ */
+const emit = defineEmits([
+  'click',
+  'open',
+  'close',
+  'beforeOpen',
+  'beforeClose',
+  'cancel',
+  'confirm',
+  'update:show',
+])
+
+
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const opened = ref(props.show)
+const active = ref(props.show)
+const contentReady = ref(!props.lazy || props.show)
+const startX = ref(0)
+const startY = ref(0)
+const offsetX = ref(0)
+const offsetY = ref(0)
+const touching = ref(false)
+let closeTimer = 0
+let lazyTimer = 0
+
+const rootStyle = computed(() => {
+  return 'z-index:' + String(props.zIndex) + ';'
+})
+
+const panelClass = computed(() => {
+  const classes = ['i-popup__panel']
+  classes.push('i-popup__panel--' + normalizedMode.value)
+  if (shouldCoverCenter()) classes.push('i-popup__panel--cover-center')
+  return classes.join(' ')
+})
+
+const normalizedMode = computed(() => {
+  if (
+    drawerPosition.value == 'left' ||
+    drawerPosition.value == 'right' ||
+    drawerPosition.value == 'top' ||
+    drawerPosition.value == 'center'
+  ) {
+    return drawerPosition.value
+  }
+  return 'bottom'
+})
+
+const drawerPosition = computed(() => {
+  if (props.position.length > 0) return props.position
+  return props.mode
+})
+
+const overlayComputedStyle = computed(() => {
+  let bgColor = 'rgba(0,0,0,' + String(props.overlayOpacity) + ')'
+  if (props.overflayBgColor.length > 0) bgColor = props.overflayBgColor
+  let style = 'background-color:' + bgColor + ';'
+  style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
+  style = style + 'transition-duration:' + formatMs(props.duration) + ';'
+  style = style + stringifyStyle(props.overlayStyle)
+  return style
+})
+
+const titleStyleText = computed(() => {
+  return stringifyStyle(props.titleStyle)
+})
+
+const panelStyle = computed(() => {
+  let style = 'background-color:' + bgColor.value + ';'
+  style = style + 'transition-duration:' + formatMs(props.duration) + ';'
+  style = style + marginStyle()
+  style = style + sizeStyle()
+  style = style + roundStyle()
+  style = style + safeAreaStyle()
+  style = style + transformStyle()
+  style = style + stringifyStyle(props.customStyle)
+  style = style + stringifyStyle(props.customWrapStyle)
+  return style
+})
+
+const bodyStyle = computed(() => {
+  let style = 'padding:' + formatSize(props.contentMargin) + ';'
+  if (String(props.maxHeight).length > 0) style = style + 'max-height:' + formatSize(props.maxHeight) + ';'
+  return style
+})
+
+const footerStyle = computed(() => {
+  return stringifyStyle(props.customFooterStyle)
+})
+
+const confirmTextStyle = computed(() => {
+  const color = props.btnColor.length > 0 ? props.btnColor : '#1989fa'
+  return 'color:' + color + ';'
+})
+
+const confirmTextValue = computed(() => {
+  return props.confirmText.length > 0 ? props.confirmText : '确定'
+})
+
+const cancelTextValue = computed(() => {
+  return props.cancelText.length > 0 ? props.cancelText : '取消'
+})
+
+const contentVisible = computed(() => {
+  return !props.lazy || contentReady.value
+})
+
+const closeClass = computed(() => {
+  const classes = ['i-popup__close']
+  classes.push('i-popup__close--' + normalizeClosePos())
+  return classes.join(' ')
+})
+
+const closeStyle = computed(() => {
+  return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';'
+})
+
+const closeIconText = computed(() => {
+  if (props.closeIcon == 'close') return '×'
+  return props.closeIcon
+})
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (nextValue) {
+      openPanel(false)
+    } else {
+      closePanel(false)
+    }
+  },
+)
+
+function open() {
+  openPanel(true)
+}
+
+function close() {
+  closePanel(true)
+}
+
+function openPanel(shouldEmitUpdate: boolean) {
+  if (props.disabled) return
+  if (opened.value && active.value) return
+  clearTimers()
+  emit('beforeOpen')
+  opened.value = true
+  resetOffset()
+  if (!props.lazy) contentReady.value = true
+  setTimeout(() => {
+    active.value = true
+    if (props.lazy) {
+      lazyTimer = setTimeout(() => {
+        contentReady.value = true
+        lazyTimer = 0
+      }, animationDuration())
+    }
+    emit('open')
+    if (shouldEmitUpdate) emit('update:show', true)
+  }, 20)
+}
+
+function closePanel(shouldEmitUpdate: boolean) {
+  if (!opened.value && !active.value) return
+  clearTimers()
+  emit('beforeClose')
+  active.value = false
+  if (props.lazy) contentReady.value = false
+  resetOffset()
+  closeTimer = setTimeout(() => {
+    opened.value = false
+    closeTimer = 0
+    emit('close')
+    if (shouldEmitUpdate) emit('update:show', false)
+  }, animationDuration())
+}
+
+function clearTimers() {
+  if (closeTimer > 0) {
+    clearTimeout(closeTimer)
+    closeTimer = 0
+  }
+  if (lazyTimer > 0) {
+    clearTimeout(lazyTimer)
+    lazyTimer = 0
+  }
+}
+
+function handleOverlayClick() {
+  emit('click')
+  if (!props.overlayClick || !props.closeOnMask) return
+  close()
+}
+
+function cancel() {
+  emit('cancel')
+  close()
+}
+
+function confirm() {
+  if (props.disabledConfirm) return
+  emit('confirm')
+  close()
+}
+
+function handleContentTouchStart(event) {
+  if (!props.contentDraggable) return
+  handleTouchStart(event)
+}
+
+function handleHandleTouchStart(event) {
+  handleTouchStart(event)
+}
+
+function handleTouchStart(event) {
+  if (!props.swipeClose) return
+  touching.value = true
+  startX.value = readTouchX(event)
+  startY.value = readTouchY(event)
+}
+
+function handleTouchMove(event) {
+  if (!props.swipeClose || !touching.value) return
+  const currentX = readTouchX(event)
+  const currentY = readTouchY(event)
+  const deltaX = currentX - startX.value
+  const deltaY = currentY - startY.value
+  if (normalizedMode.value == 'bottom' && deltaY > 0) offsetY.value = deltaY
+  if (normalizedMode.value == 'top' && deltaY < 0) offsetY.value = deltaY
+  if (normalizedMode.value == 'left' && deltaX < 0) offsetX.value = deltaX
+  if (normalizedMode.value == 'right' && deltaX > 0) offsetX.value = deltaX
+  if (normalizedMode.value == 'center' && deltaY > 0) offsetY.value = deltaY
+}
+
+function handleTouchEnd() {
+  if (!touching.value) return
+  touching.value = false
+  const threshold = Number(props.swipeCloseThreshold)
+  if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
+    close()
+    return
+  }
+  resetOffset()
+}
+
+function resetOffset() {
+  offsetX.value = 0
+  offsetY.value = 0
+  touching.value = false
+}
+
+function transformStyle(): string {
+  const x = String(offsetX.value)
+  const y = String(offsetY.value)
+  if (normalizedMode.value == 'center') {
+    const scale = props.zoom ? (active.value ? '1' : '0.88') : '1'
+    return (
+      'opacity:' +
+      (active.value ? '1' : '0') +
+      ';transform:translate(-50%,-50%) translate(' +
+      x +
+      'px,' +
+      y +
+      'px) scale(' +
+      scale +
+      ');'
+    )
+  }
+  if (normalizedMode.value == 'bottom') {
+    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
+    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '100%') + ');'
+  }
+  if (normalizedMode.value == 'top') {
+    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
+    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '-100%') + ');'
+  }
+  if (normalizedMode.value == 'left') {
+    return 'transform:translateX(' + (active.value ? x + 'px' : '-100%') + ');'
+  }
+  if (normalizedMode.value == 'right') {
+    return 'transform:translateX(' + (active.value ? x + 'px' : '100%') + ');'
+  }
+  return ''
+}
+
+function marginStyle(): string {
+  const margin = formatSize(props.margin)
+  if (margin == '0px') return ''
+  return 'margin:' + margin + ';'
+}
+
+function sizeStyle(): string {
+  let style = ''
+  const size = String(props.size)
+  if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
+    if (String(props.width).length > 0) {
+      style = style + 'width:' + formatSize(props.width) + ';'
+    } else if (size.length > 0) {
+      style = style + 'width:' + formatSize(size) + ';'
+    }
+  } else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
+    if (String(props.width).length == 0 && !shouldCoverCenter()) {
+      style = style + 'width:100%;'
+    }
+    if (String(props.height).length > 0) {
+      style = style + 'height:' + formatSize(props.height) + ';'
+    } else if (size.length > 0) {
+      style = style + 'height:' + formatSize(size) + ';'
+    }
+    if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  } else {
+    if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+    if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  }
+  if (normalizedMode.value == 'top') {
+    if (props.navbarHeight > 0) style = style + 'top:' + String(props.navbarHeight) + 'px;'
+    if (String(props.offsetTop).length > 0) style = style + 'top:' + formatSize(props.offsetTop) + ';'
+  }
+  if (normalizedMode.value == 'bottom' && String(props.offsetBottom).length > 0) {
+    style = style + 'bottom:' + formatSize(props.offsetBottom) + ';'
+  }
+  return style
+}
+
+function roundStyle(): string {
+  const round = formatSize(props.round)
+  if (normalizedMode.value == 'top') return 'border-radius:0 0 ' + round + ' ' + round + ';'
+  if (normalizedMode.value == 'bottom') return 'border-radius:' + round + ' ' + round + ' 0 0;'
+  if (normalizedMode.value == 'left') return 'border-radius:0 ' + round + ' ' + round + ' 0;'
+  if (normalizedMode.value == 'right') return 'border-radius:' + round + ' 0 0 ' + round + ';'
+  if (normalizedMode.value == 'center') return 'border-radius:' + round + ';'
+  return ''
+}
+
+function safeAreaStyle(): string {
+  let style = ''
+  if (props.safeTop && normalizedMode.value == 'top') {
+    style = style + 'padding-top:env(safe-area-inset-top);'
+  }
+  if (props.safeBottom && normalizedMode.value == 'bottom') {
+    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
+  }
+  return style
+}
+
+function normalizeClosePos(): string {
+  if (
+    props.closeIconPos == 'top-left' ||
+    props.closeIconPos == 'bottom-left' ||
+    props.closeIconPos == 'bottom-right'
+  ) {
+    return props.closeIconPos
+  }
+  return 'top-right'
+}
+
+function stringifyStyle(value): string {
+  if (value == null) return ''
+  const text = String(value)
+  if (text == '[object Object]') return ''
+  if (text.length == 0) return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+function formatMs(value): string {
+  const text = String(value)
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
+}
+
+function animationDuration(): number {
+  const text = String(props.duration)
+  if (text.indexOf('ms') >= 0) return Number(text.replace('ms', ''))
+  if (text.indexOf('s') >= 0) return Number(text.replace('s', '')) * 1000
+  const duration = Number(text)
+  if (isNaN(duration)) return 300
+  return duration
+}
+
+function isVerticalMode(): boolean {
+  return normalizedMode.value == 'top' || normalizedMode.value == 'bottom'
+}
+
+function shouldCoverCenter(): boolean {
+  return props.widthCoverCenter && isVerticalMode() && String(props.width).length > 0
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function readTouchX(event): number {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return 0
+  const clientX = Number(point.clientX)
+  if (!isNaN(clientX)) return clientX
+  return Number(point.pageX)
+}
+
+function readTouchY(event): number {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return 0
+  const clientY = Number(point.clientY)
+  if (!isNaN(clientY)) return clientY
+  return Number(point.pageY)
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-popup__trigger {
+  flex-direction: column;
+}
+.i-popup {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.i-popup__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+.i-popup__panel {
+  position: absolute;
+  overflow: hidden;
+  flex-direction: column;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.18);
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.i-popup__panel--bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 160px;
+}
+.i-popup__panel--top {
+  left: 0;
+  right: 0;
+  top: 0;
+  min-height: 160px;
+}
+.i-popup__panel--left {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+}
+.i-popup__panel--right {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+}
+.i-popup__panel--center {
+  left: 50%;
+  top: 50%;
+  width: 300px;
+}
+.i-popup__panel--cover-center {
+  left: 50%;
+  right: auto;
+  width: 375px;
+  width: 100%;
+  transform-origin: center center;
+}
+.i-popup__swipe-handle {
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+.i-popup__swipe-bar {
+  width: 38px;
+  height: 4px;
+  border-radius: 99px;
+  background-color: #d9dee8;
+}
+.i-popup__header {
+  min-height: 54px;
+  padding: 0 52px 0 18px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #f2f3f5;
+  align-items: center;
+  justify-content: center;
+}
+.i-popup__title {
+  color: #303133;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.i-popup__close {
+  position: absolute;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 34px;
+  background-color: rgba(245, 247, 250, 0.92);
+  align-items: center;
+  justify-content: center;
+}
+.i-popup__close--top-right {
+  right: 12px;
+  top: 10px;
+}
+.i-popup__close--top-left {
+  left: 12px;
+  top: 10px;
+}
+.i-popup__close--bottom-left {
+  left: 12px;
+  bottom: 10px;
+}
+.i-popup__close--bottom-right {
+  right: 12px;
+  bottom: 10px;
+}
+.i-popup__close-text {
+  color: #606266;
+  font-size: 22px;
+  line-height: 34px;
+  text-align: center;
+}
+.i-popup__body {
+  position: relative;
+  flex: 1;
+}
+.i-popup__body--scroll {
+  flex: 1;
+}
+.i-popup__footer {
+  min-height: 58px;
+  padding: 10px 14px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #f2f3f5;
+  background-color: #ffffff;
+  flex-direction: row;
+}
+.i-popup__footer-button {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.i-popup__footer-button--cancel {
+  margin-right: 8px;
+  background-color: #f5f7fb;
+}
+.i-popup__footer-button--confirm {
+  background-color: #eef6ff;
+}
+.i-popup__footer-button--disabled {
+  opacity: 0.45;
+}
+.i-popup__footer-cancel,
+.i-popup__footer-confirm {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-popup__footer-cancel {
+  color: #606266;
+}
+</style>

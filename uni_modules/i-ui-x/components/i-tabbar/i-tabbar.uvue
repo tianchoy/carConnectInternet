@@ -1,0 +1,314 @@
+<template>
+  <view>
+    <view :class="fixed ? 'i-tabbar i-tabbar--fixed' : 'i-tabbar'" :style="barStyle">
+      <view
+        v-for="(item, index) in list"
+        :key="String(index) + '-' + getItemText(item)"
+        :class="isDisabled(item) ? 'i-tabbar__item i-tabbar__item--disabled' : 'i-tabbar__item'"
+        @click="select(item, index)"
+      >
+        <view class="i-tabbar__icon-wrap">
+          <text
+            class="i-tabbar__icon"
+            :style="getIconStyle(item, index)"
+          >
+            {{ getItemIcon(item) }}
+          </text>
+          <view v-if="getItemBadge(item).length > 0" class="i-tabbar__badge">
+            <text class="i-tabbar__badge-text">{{ getItemBadge(item) }}</text>
+          </view>
+          <view v-if="isItemDot(item)" class="i-tabbar__dot"></view>
+        </view>
+        <text
+          class="i-tabbar__text"
+          :style="getTextStyle(item, index)"
+        >
+          {{ getItemText(item) }}
+        </text>
+      </view>
+    </view>
+    <view v-if="fixed && placeholder" :style="placeholderStyle"></view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-tabbar' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Tabbar 底部导航。
+ * - value: 当前选中值。
+ * - current: 当前选中索引，传入 >=0 时优先使用索引。
+ * - list: 导航项数组；对象支持 text、name、value、icon、badge、disabled、url。
+ * - items: list 兼容别名。
+ * - fixed: 是否固定在页面底部。
+ * - placeholder: 固定时是否需要占位，本组件通过外部布局自行处理。
+ * - activeColor: 选中颜色。
+ * - inactiveColor: 未选中颜色。
+ * - height: 导航栏高度。
+ * - iconSize: 图标字号。
+ * - fontSize: 文字字号。
+ * - zIndex: 固定层级。
+ * - safeBottom: 是否预留底部安全区。
+ * - bgColor: 背景色。
+ * - border: 是否显示顶部边线。
+ * - disabled: 是否整体禁用。
+ */
+const props = defineProps({
+  value: { type: [String, Number], default: '' },
+  current: { type: Number, default: -1 },
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  items: {
+    type: Array,
+    default() {
+      return [
+        { text: '首页', value: 'home', icon: '⌂' },
+        { text: '消息', value: 'message', icon: '✉', badge: '3' },
+        { text: '我的', value: 'mine', icon: '☺' },
+      ]
+    },
+  },
+  fixed: { type: Boolean, default: false },
+  placeholder: { type: Boolean, default: false },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#909193' },
+  bgColor: { type: String, default: '#ffffff' },
+  height: { type: [String, Number], default: 60 },
+  iconSize: { type: [String, Number], default: 26 },
+  fontSize: { type: [String, Number], default: 12 },
+  zIndex: { type: [String, Number], default: 80 },
+  safeBottom: { type: Boolean, default: true },
+  border: { type: Boolean, default: true },
+  disabled: { type: Boolean, default: false },
+})
+
+/**
+ * Emits 说明：底部导航点击和选中同步。
+ * - click: 点击导航项时触发，返回 { index, text, value, item }。
+ * - change: 选中项变化时触发，参数同 click。
+ * - select: 选中项时触发，参数同 click。
+ * - update:value: 同步当前 value。
+ * - update:current: 同步当前索引。
+ */
+const emit = defineEmits(['click', 'change', 'select', 'update:value', 'update:current'])
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const list = computed(() => {
+  if (props.list.length > 0) return props.list
+  return props.items
+})
+
+const currentIndex = ref(resolveIndex())
+
+const barStyle = computed(() => {
+  let style =
+    'min-height:' +
+    formatSize(props.height) +
+    ';background-color:' +
+    bgColor.value +
+    ';z-index:' +
+    String(props.zIndex) +
+    ';'
+  if (props.safeBottom) style += 'padding-bottom:env(safe-area-inset-bottom);'
+  if (props.border) {
+    style += 'border-top-width:1px;border-top-style:solid;border-top-color:#ebeef5;'
+  }
+  return style
+})
+const placeholderStyle = computed(() => {
+  return 'height:' + formatSize(props.height) + ';padding-bottom:env(safe-area-inset-bottom);'
+})
+
+watch(
+  () => props.value,
+  () => {
+    currentIndex.value = resolveIndex()
+  },
+)
+
+watch(
+  () => props.current,
+  () => {
+    currentIndex.value = resolveIndex()
+  },
+)
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  if (keyName == 'text' || keyName == 'name' || keyName == 'value') return String(item)
+  return ''
+}
+
+function getItemText(item) {
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  return itemValue(item, 'name')
+}
+
+function getItemValue(item) {
+  const value = itemValue(item, 'value')
+  if (value.length > 0) return value
+  return getItemText(item)
+}
+
+function getItemIcon(item) {
+  const icon = itemValue(item, 'icon')
+  if (icon.length > 0) return icon
+  return '•'
+}
+
+function getItemBadge(item) {
+  return itemValue(item, 'badge')
+}
+
+function isDisabled(item) {
+  if (item == null) return false
+  if (typeof item == 'object') return item['disabled'] == true
+  return false
+}
+
+function isItemDot(item) {
+  if (item == null) return false
+  if (typeof item == 'object') return item['dot'] == true
+  return false
+}
+
+function resolveIndex() {
+  if (props.current >= 0) return props.current
+  const expected = String(props.value)
+  for (let i = 0; i < list.value.length; i++) {
+    const item = list.value[i]
+    if (getItemValue(item) == expected || getItemText(item) == expected) return i
+  }
+  return 0
+}
+
+function buildPayload(item, index) {
+  return {
+    index,
+    text: getItemText(item),
+    value: getItemValue(item),
+    item,
+  }
+}
+
+function getIconStyle(item, index) {
+  const color = isDisabled(item) ? '#c8c9cc' : (currentIndex.value == index ? props.activeColor : props.inactiveColor)
+  return 'color:' + color + ';font-size:' + formatSize(props.iconSize) + ';'
+}
+
+function getTextStyle(item, index) {
+  const color = isDisabled(item) ? '#c8c9cc' : (currentIndex.value == index ? props.activeColor : props.inactiveColor)
+  return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function select(item, index) {
+  if (props.disabled || isDisabled(item)) return
+  const payload = buildPayload(item, index)
+  emit('click', payload)
+  if (currentIndex.value == index) return
+  currentIndex.value = index
+  emit('select', payload)
+  emit('change', payload)
+  emit('update:value', payload.value)
+  emit('update:current', index)
+}
+</script>
+
+<style>
+.i-tabbar {
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.i-tabbar--fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+}
+
+.i-tabbar__item {
+  flex: 1;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.i-tabbar__item--disabled {
+  opacity: 0.55;
+}
+
+.i-tabbar__icon-wrap {
+  position: relative;
+  width: 34px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.i-tabbar__icon {
+  line-height: 28px;
+  text-align: center;
+}
+
+.i-tabbar__text {
+  margin-top: 2px;
+  line-height: 16px;
+}
+
+.i-tabbar__badge {
+  position: absolute;
+  right: -8px;
+  top: -7px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: #f56c6c;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-tabbar__badge-text {
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.i-tabbar__dot {
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #f56c6c;
+}
+</style>

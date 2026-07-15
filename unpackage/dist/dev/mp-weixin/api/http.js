@@ -1,5 +1,78 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+class RequestOptions extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          url: { type: String, optional: false },
+          method: { type: "Unknown", optional: true },
+          data: { type: "Any", optional: true },
+          header: { type: "Unknown", optional: true },
+          showLoading: { type: Boolean, optional: true }
+        };
+      },
+      name: "RequestOptions"
+    };
+  }
+  constructor(options, metadata = RequestOptions.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.url = this.__props__.url;
+    this.method = this.__props__.method;
+    this.data = this.__props__.data;
+    this.header = this.__props__.header;
+    this.showLoading = this.__props__.showLoading;
+    delete this.__props__;
+  }
+}
+class HttpResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$(T) {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          message: { type: String, optional: false },
+          data: { type: "Unknown", optional: false }
+        };
+      },
+      name: "HttpResponse"
+    };
+  }
+  constructor(options, metadata = HttpResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.message = this.__props__.message;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
+class HttpError extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          statusCode: { type: Number, optional: false },
+          message: { type: String, optional: false },
+          data: { type: "Any", optional: true }
+        };
+      },
+      name: "HttpError"
+    };
+  }
+  constructor(options, metadata = HttpError.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.statusCode = this.__props__.statusCode;
+    this.message = this.__props__.message;
+    this.data = this.__props__.data;
+    delete this.__props__;
+  }
+}
 const BASE_URL = "https://car.zdiot.cn:18443/api";
 function handleTokenExpired() {
   console.log("检测到token过期，执行跳转登录页逻辑");
@@ -38,11 +111,11 @@ function responseInterceptor(response = null, config) {
   if (statusCode === 200) {
     return response.data;
   } else {
-    const error = {
+    const error = new HttpError({
       statusCode,
       message: response.errMsg || `请求失败: ${statusCode}`,
       data: response.data
-    };
+    });
     throw error;
   }
 }
@@ -88,7 +161,7 @@ function errorHandler(error, config) {
   }
 }
 function request(options) {
-  const config = Object.assign({ url: options.url, method: options.method || "GET", data: options.data || new common_vendor.UTSJSONObject({}), header: options.header || {}, showLoading: options.showLoading !== false }, options);
+  const config = new RequestOptions(Object.assign(Object.assign({}, options), { url: options.url, method: options.method || "GET", data: options.data || new common_vendor.UTSJSONObject({}), header: options.header || {}, showLoading: options.showLoading !== false }));
   if (!config.url.startsWith("http")) {
     config.url = BASE_URL + config.url;
   }
@@ -103,46 +176,76 @@ function request(options) {
         reject(error);
       }
     }, fail: (error = null) => {
-      const httpError = {
+      const httpError = new HttpError({
         statusCode: 0,
         message: error.errMsg || "网络请求失败",
         data: error
-      };
+      });
       errorHandler(httpError, processedConfig);
       reject(httpError);
     } }));
   });
 }
 const http = new common_vendor.UTSJSONObject({
-  get(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
-    return request(Object.assign({
+  get(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new RequestOptions(Object.assign(Object.assign({ header: null, showLoading: null }, options), {
       url,
       data,
       method: "GET"
-    }, options));
+    })));
   },
-  post(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
-    return request(Object.assign({
+  post(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new RequestOptions(Object.assign(Object.assign({ header: null, showLoading: null }, options), {
       url,
       data,
       method: "POST"
-    }, options));
+    })));
   },
-  put(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
-    return request(Object.assign({
+  put(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new RequestOptions(Object.assign(Object.assign(Object.assign({ header: null, showLoading: null }, options), {
       url,
       data,
       method: "PUT"
-    }, options));
+    }), options)));
   },
-  delete(url, data = new common_vendor.UTSJSONObject({}), options = {}) {
-    return request(Object.assign({
+  delete(url, data = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new RequestOptions(Object.assign(Object.assign({ header: null, showLoading: null }, options), {
       url,
       data,
       method: "DELETE"
-    }, options));
+    })));
   },
-  upload(url, filePath, name = "file", formData = new common_vendor.UTSJSONObject({}), options = {}) {
+  upload(url, filePath, name = "file", formData = new common_vendor.UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
     return new Promise((resolve, reject) => {
       const fullUrl = url.startsWith("http") ? url : BASE_URL + url;
       const token = common_vendor.index.getStorageSync("token");
@@ -174,11 +277,11 @@ const http = new common_vendor.UTSJSONObject({
               resolve(res.data);
             }
           } else {
-            const error = {
+            const error = new HttpError({
               statusCode: res.statusCode,
               message: "文件上传失败",
               data: res.data
-            };
+            });
             errorHandler(error, options);
             reject(error);
           }
@@ -187,11 +290,11 @@ const http = new common_vendor.UTSJSONObject({
           if (options.showLoading !== false) {
             common_vendor.index.hideLoading();
           }
-          const httpError = {
+          const httpError = new HttpError({
             statusCode: 0,
             message: error.errMsg || "文件上传失败",
             data: error
-          };
+          });
           errorHandler(httpError, options);
           reject(httpError);
         }

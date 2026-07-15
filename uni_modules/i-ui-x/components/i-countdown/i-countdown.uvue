@@ -1,0 +1,153 @@
+<template>
+  <view class="i-card" @click="emit('click', remain)">
+    <text class="i-title">{{ display }}</text>
+    <text class="i-muted">{{ running ? "计时中" : "已暂停" }}</text>
+    <view class="i-row">
+      <view class="i-btn" @click.stop="toggle"
+        ><text class="i-btn-text">{{ running ? "暂停" : "开始" }}</text></view
+      >
+      <view class="i-btn i-btn--plain" @click.stop="reset"
+        ><text class="i-btn-text">重置</text></view
+      >
+    </view>
+  </view>
+</template>
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+
+defineOptions({ name: 'i-countdown' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - time: 倒计时时长，单位为秒。
+ * - autoStart: 是否在组件挂载后自动开始。
+ */
+const props = defineProps({
+  time: { type: Number, default: 90 },
+  autoStart: { type: Boolean, default: true },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ * - end: 流程结束时触发。
+ * - start: 开始倒计时、动画或流程时触发。
+ * - pause: 暂停倒计时、动画或流程时触发。
+ * - reset: 重置组件状态时触发。
+ * - update:time: 同步剩余时间。
+ */
+const emit = defineEmits(['click', 'change', 'end', 'start', 'pause', 'reset', 'update:time'])
+
+const remain = ref(props.time)
+const running = ref(false)
+const timer = ref(0)
+
+const display = computed(() => {
+  const h = Math.floor(remain.value / 3600)
+  const m = Math.floor((remain.value % 3600) / 60)
+  const s = remain.value % 60
+  const mm = m < 10 ? '0' + m : String(m)
+  const ss = s < 10 ? '0' + s : String(s)
+  return h > 0 ? (h < 10 ? '0' + h : String(h)) + ':' + mm + ':' + ss : mm + ':' + ss
+})
+
+watch(
+  () => props.time,
+  (nextValue) => {
+    remain.value = nextValue
+  },
+)
+
+onMounted(() => {
+  if (props.autoStart) start()
+})
+
+onUnmounted(() => {
+  clearInterval(timer.value)
+})
+
+function start() {
+  if (running.value) return
+  running.value = true
+  emit('start', remain.value)
+  timer.value = setInterval(() => {
+    if (remain.value <= 0) {
+      clearInterval(timer.value)
+      running.value = false
+      emit('end', 0)
+      return
+    }
+    remain.value = remain.value - 1
+    emit('change', remain.value)
+    emit('update:time', remain.value)
+  }, 1000)
+}
+
+function pause() {
+  clearInterval(timer.value)
+  running.value = false
+  emit('pause', remain.value)
+}
+
+function toggle() {
+  if (running.value) pause()
+  else start()
+}
+
+function reset() {
+  clearInterval(timer.value)
+  running.value = false
+  remain.value = props.time
+  emit('reset', remain.value)
+  emit('change', remain.value)
+}
+</script>
+<style>
+.i-card {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+</style>

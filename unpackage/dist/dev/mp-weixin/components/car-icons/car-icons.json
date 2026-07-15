@@ -1,9 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-grid-item": "../../uni_modules/uv-grid/components/uv-grid-item/uv-grid-item",
-    "uv-grid": "../../uni_modules/uv-grid/components/uv-grid/uv-grid",
-    "uv-popup": "../../uni_modules/uv-popup/components/uv-popup/uv-popup"
+    "i-grid": "../../uni_modules/i-ui-x/components/i-grid/i-grid",
+    "i-popup": "../../uni_modules/i-ui-x/components/i-popup/i-popup"
   }
 }

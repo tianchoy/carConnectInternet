@@ -1,0 +1,217 @@
+<template>
+  <view
+    :class="mode == 'button' ? 'i-subsection i-subsection--button' : 'i-subsection'"
+    :style="'background-color:' + bgColor"
+  >
+    <view
+      v-for="(item, index) in list"
+      :key="String(index) + '-' + getItemName(item)"
+      :class="getItemClass(item, index)"
+      :style="getItemStyle(index)"
+      @click="select(item, index)"
+    >
+      <text
+        :class="
+          currentIndex == index
+            ? 'i-subsection__text i-subsection__text--active'
+            : 'i-subsection__text'
+        "
+        :style="getTextStyle(index)"
+      >
+        {{ getItemName(item) }}
+      </text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-subsection' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Subsection/Segmented 分段器。
+ * - value: 当前选中值。
+ * - current: 当前选中索引，传入 >=0 时优先使用索引。
+ * - list: 分段项数组；对象支持 name、text、value、disabled。
+ * - items: list 兼容别名。
+ * - mode: 分段器形态，button 为胶囊按钮，subsection 为普通分段。
+ * - activeColor: 选中背景或文字色。
+ * - inactiveColor: 未选中文字色。
+ * - bgColor: 背景色。
+ * - disabled: 是否禁用全部交互。
+ */
+const props = defineProps({
+  value: { type: [String, Number], default: '' },
+  current: { type: Number, default: -1 },
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  items: {
+    type: Array,
+    default() {
+      return ['待付款', '待发货', '待收货']
+    },
+  },
+  mode: { type: String, default: 'button' },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#606266' },
+  bgColor: { type: String, default: '#f2f3f5' },
+  disabled: { type: Boolean, default: false },
+})
+
+/**
+ * Emits 说明：分段选中同步。
+ * - click: 点击分段项时触发，返回 { index, name, value, item }。
+ * - change: 选中项变化时触发，参数同 click。
+ * - select: 选中项时触发，参数同 click。
+ * - update:value: 同步当前 value。
+ * - update:current: 同步当前索引。
+ */
+const emit = defineEmits(['click', 'change', 'select', 'update:value', 'update:current'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const list = computed(() => {
+  if (props.list.length > 0) return props.list
+  return props.items
+})
+
+const currentIndex = ref(resolveIndex())
+
+watch(
+  () => props.value,
+  () => {
+    currentIndex.value = resolveIndex()
+  },
+)
+
+watch(
+  () => props.current,
+  () => {
+    currentIndex.value = resolveIndex()
+  },
+)
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  if (keyName == 'name' || keyName == 'text' || keyName == 'value') return String(item)
+  return ''
+}
+
+function getItemName(item) {
+  const name = itemValue(item, 'name')
+  if (name.length > 0) return name
+  return itemValue(item, 'text')
+}
+
+function getItemValue(item) {
+  const value = itemValue(item, 'value')
+  if (value.length > 0) return value
+  return getItemName(item)
+}
+
+function isDisabled(item) {
+  if (item == null) return false
+  if (typeof item == 'object') return item['disabled'] == true
+  return false
+}
+
+function resolveIndex() {
+  if (props.current >= 0) return props.current
+  const expected = String(props.value)
+  for (let i = 0; i < list.value.length; i++) {
+    const item = list.value[i]
+    if (getItemValue(item) == expected || getItemName(item) == expected) return i
+  }
+  return 0
+}
+
+function getItemStyle(index) {
+  if (currentIndex.value != index) return ''
+  if (props.mode == 'button') {
+    return 'background-color:' + props.activeColor + ';'
+  }
+  return ''
+}
+
+function getItemClass(item, index) {
+  let className = currentIndex.value == index ? 'i-subsection__item i-subsection__item--active' : 'i-subsection__item'
+  if (isDisabled(item)) className += ' i-subsection__item--disabled'
+  return className
+}
+
+function getTextStyle(index) {
+  if (currentIndex.value != index) return 'color:' + props.inactiveColor + ';'
+  if (props.mode == 'button') return 'color:#ffffff;'
+  return 'color:' + props.activeColor + ';'
+}
+
+function buildPayload(item, index) {
+  return {
+    index,
+    name: getItemName(item),
+    value: getItemValue(item),
+    item,
+  }
+}
+
+function select(item, index) {
+  if (props.disabled || isDisabled(item)) return
+  const payload = buildPayload(item, index)
+  emit('click', payload)
+  if (currentIndex.value == index) return
+  currentIndex.value = index
+  emit('select', payload)
+  emit('change', payload)
+  emit('update:value', payload.value)
+  emit('update:current', index)
+}
+</script>
+
+<style>
+.i-subsection {
+  min-height: 38px;
+  padding: 3px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-subsection--button {
+  background-color: #f2f3f5;
+}
+
+.i-subsection__item {
+  flex: 1;
+  min-height: 32px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-subsection__item--disabled {
+  opacity: 0.55;
+}
+
+.i-subsection__text {
+  color: #606266;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-subsection__text--active {
+  color: #ffffff;
+  font-weight: 600;
+}
+</style>

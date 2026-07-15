@@ -1,0 +1,344 @@
+<template>
+  <view
+    v-if="visible && currentMask"
+    class="i-toast__mask"
+    :style="'z-index:' + String(Number(currentZIndex) - 1)"
+  ></view>
+  <view
+    v-if="visible"
+    :class="toastClass"
+    :style="toastStyle"
+  >
+    <view
+      v-if="currentLoading"
+      class="i-toast__loading"
+      :style="loadingStyle"
+    ></view>
+    <image
+      v-else-if="isImageIcon"
+      class="i-toast__image"
+      :src="currentIcon"
+      mode="aspectFit"
+    ></image>
+    <view v-else-if="displayIcon.length > 0" :class="iconClass">
+      <text class="i-toast__icon-text">{{ displayIcon }}</text>
+    </view>
+    <text class="i-toast__text">{{ currentTitle }}</text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onUnmounted, ref } from 'vue'
+
+defineOptions({ name: 'i-toast' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对照 Toast 消息提示文档。
+ * - zIndex: Toast 展示时的层级，遮罩层会自动比它低 1。
+ * - loading: 是否展示加载状态。
+ * - title: 显示的文字内容。
+ * - icon: 图标字符或图片绝对路径，空时按 type 自动选择图标。
+ * - type: 主题类型，支持 default、primary、success、error、warning。
+ * - mask: 是否显示透明遮罩，防止点击穿透。
+ * - position: 展示位置，支持 top、center、bottom。
+ * - duration: 展示时间，单位 ms；小于等于 0 时不自动关闭。
+ * - fill: 是否使用实体图标样式。
+ * - customStyle: Toast 面板自定义样式，字符串样式可直接作用到面板。
+ */
+const props = defineProps({
+  zIndex: { type: [String, Number], default: 10090 },
+  loading: { type: Boolean, default: false },
+  title: { type: String, default: '' },
+  icon: { type: String, default: '' },
+  type: { type: String, default: 'default' },
+  mask: { type: Boolean, default: false },
+  position: { type: String, default: 'center' },
+  duration: { type: [String, Number], default: 2000 },
+  fill: { type: Boolean, default: false },
+  customStyle: { type: [String, Object], default: '' },
+})
+
+const visible = ref(false)
+const timer = ref(0)
+const currentZIndex = ref(props.zIndex)
+const currentLoading = ref(props.loading)
+const currentTitle = ref(props.title)
+const currentIcon = ref(props.icon)
+const currentType = ref(props.type)
+const currentMask = ref(props.mask)
+const currentPosition = ref(props.position)
+const currentDuration = ref(props.duration)
+const currentFill = ref(props.fill)
+const currentCustomStyle = ref(props.customStyle)
+const loadingAngle = ref(0)
+let loadingTimer = 0
+
+const toastClass = computed(() => {
+  return 'i-toast i-toast--' + normalizePosition(currentPosition.value)
+})
+
+const toastStyle = computed(() => {
+  let style = 'z-index:' + String(currentZIndex.value) + ';'
+  style += 'background-color:' + resolveBgColor() + ';'
+  if (typeof currentCustomStyle.value == 'string') style += currentCustomStyle.value
+  return style
+})
+
+const iconClass = computed(() => {
+  if (currentFill.value) return 'i-toast__icon i-toast__icon--fill'
+  return 'i-toast__icon'
+})
+
+const displayIcon = computed(() => {
+  if (currentIcon.value.length > 0 && !isImagePath(currentIcon.value)) {
+    return currentIcon.value
+  }
+  if (currentType.value == 'success') return '✓'
+  if (currentType.value == 'error') return '×'
+  if (currentType.value == 'warning') return '!'
+  if (currentType.value == 'primary') return 'i'
+  return ''
+})
+
+const isImageIcon = computed(() => {
+  return currentIcon.value.length > 0 && isImagePath(currentIcon.value)
+})
+
+const loadingStyle = computed(() => {
+  return 'transform:rotate(' + String(loadingAngle.value) + 'deg);'
+})
+
+onUnmounted(() => {
+  clearTimeout(timer.value)
+  stopLoadingAnimation()
+})
+
+function open(options) {
+  applyOptions(options, '')
+  showToast()
+}
+
+function close() {
+  clearTimeout(timer.value)
+  stopLoadingAnimation()
+  visible.value = false
+}
+
+function primary(options) {
+  applyOptions(options, 'primary')
+  showToast()
+}
+
+function success(options) {
+  applyOptions(options, 'success')
+  showToast()
+}
+
+function error(options) {
+  applyOptions(options, 'error')
+  showToast()
+}
+
+function warning(options) {
+  applyOptions(options, 'warning')
+  showToast()
+}
+
+function showLoading(options) {
+  applyOptions(options, 'default')
+  currentLoading.value = true
+  if (currentTitle.value.length == 0) currentTitle.value = '加载中'
+  showToast()
+}
+
+function showToast() {
+  clearTimeout(timer.value)
+  visible.value = true
+  if (currentLoading.value) {
+    startLoadingAnimation()
+  } else {
+    stopLoadingAnimation()
+  }
+  const duration = Number(currentDuration.value)
+  if (duration > 0) {
+    timer.value = setTimeout(() => {
+      close()
+    }, duration)
+  }
+}
+
+function applyOptions(options, forcedType) {
+  currentZIndex.value = props.zIndex
+  currentLoading.value = props.loading
+  currentTitle.value = props.title
+  currentIcon.value = props.icon
+  currentType.value = forcedType.length > 0 ? forcedType : props.type
+  currentMask.value = props.mask
+  currentPosition.value = props.position
+  currentDuration.value = props.duration
+  currentFill.value = props.fill
+  currentCustomStyle.value = props.customStyle
+
+  if (options == null) return
+  if (typeof options == 'string') {
+    currentTitle.value = options
+    return
+  }
+  if (typeof options == 'object') {
+    setValue(options, 'zIndex')
+    setValue(options, 'loading')
+    setValue(options, 'title')
+    setValue(options, 'icon')
+    setValue(options, 'type')
+    setValue(options, 'mask')
+    setValue(options, 'position')
+    setValue(options, 'duration')
+    setValue(options, 'fill')
+    setValue(options, 'customStyle')
+  }
+}
+
+function setValue(options, keyName) {
+  const value = options[keyName]
+  if (value == null) return
+  if (keyName == 'zIndex') currentZIndex.value = value
+  if (keyName == 'loading') currentLoading.value = value == true
+  if (keyName == 'title') currentTitle.value = String(value)
+  if (keyName == 'icon') currentIcon.value = String(value)
+  if (keyName == 'type') currentType.value = String(value)
+  if (keyName == 'mask') currentMask.value = value == true
+  if (keyName == 'position') currentPosition.value = String(value)
+  if (keyName == 'duration') currentDuration.value = value
+  if (keyName == 'fill') currentFill.value = value == true
+  if (keyName == 'customStyle') currentCustomStyle.value = value
+}
+
+function startLoadingAnimation() {
+  if (loadingTimer > 0) return
+  loadingTimer = setInterval(() => {
+    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
+  }, 50)
+}
+
+function stopLoadingAnimation() {
+  if (loadingTimer > 0) {
+    clearInterval(loadingTimer)
+    loadingTimer = 0
+  }
+  loadingAngle.value = 0
+}
+
+function normalizeAngle(value: number): number {
+  let angle = value % 360
+  if (angle < 0) angle = angle + 360
+  return angle
+}
+
+function normalizePosition(value) {
+  if (value == 'top' || value == 'bottom') return value
+  return 'center'
+}
+
+function resolveBgColor() {
+  if (currentType.value == 'primary') return '#2979ff'
+  if (currentType.value == 'success') return '#19be6b'
+  if (currentType.value == 'warning') return '#ff9900'
+  if (currentType.value == 'error') return '#fa3534'
+  return 'rgba(0, 0, 0, 0.78)'
+}
+
+function isImagePath(value) {
+  const text = String(value)
+  return text.indexOf('/') >= 0 || text.indexOf('http') == 0
+}
+
+defineExpose({
+  open,
+  close,
+  primary,
+  success,
+  error,
+  warning,
+  showLoading,
+})
+</script>
+
+<style>
+.i-toast__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.i-toast {
+  position: fixed;
+  left: 50px;
+  right: 50px;
+  min-width: 96px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-toast--top {
+  top: 0;
+}
+
+.i-toast--center {
+  top: 45%;
+}
+
+.i-toast--bottom {
+  bottom: 0;
+}
+
+.i-toast__text {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-toast__icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-toast__icon--fill {
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.i-toast__icon-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.i-toast__image {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.i-toast__loading {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+  border-radius: 14px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.38);
+  border-top-color: #ffffff;
+}
+</style>

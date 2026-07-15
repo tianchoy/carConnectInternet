@@ -1,0 +1,437 @@
+<template>
+  <view
+    :id="buttonId"
+    class="i-slider-button"
+    :style="wrapStyle"
+    @touchstart.stop.prevent="handleTouchStart"
+    @touchmove.stop.prevent="handleTouchMove"
+    @touchend.stop.prevent="handleTouchEnd"
+    @touchcancel.stop.prevent="handleTouchEnd"
+  >
+    <view class="i-slider-button__rail" :style="railStyle"></view>
+    <text class="i-slider-button__text" :style="textStyle">
+      <slot>{{ currentText }}</slot>
+    </text>
+    <view class="i-slider-button__thumb" :style="thumbStyle">
+      <slot name="thumb">
+        <text class="i-slider-button__thumb-text" :style="thumbIconStyle">›</text>
+      </slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-slider-button' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 SliderButton，用于滑动验证/确认。
+ * - text: 未完成时按钮文字。
+ * - width/height: 按钮宽高。
+ * - round: 外层圆角。
+ * - bgColor: 背景颜色。
+ * - railIndex: 滑道层级，保留 API。
+ * - railColor/railRadius: 滑过区域颜色和圆角。
+ * - textColor/activeTextColor/fontSize/textBold: 文案样式。
+ * - disabled: 是否禁用。
+ * - successText: 成功后的文字。
+ * - autoReset/resetDelay: 成功后是否自动重置和延迟。
+ * - threshold: 成功阈值，0-1。
+ * - value/modelValue: 是否已成功，兼容旧版 doneText/value。
+ */
+const props = defineProps({
+  text: {
+    type: String,
+    default: '滑动解锁',
+  },
+  width: {
+    type: [String, Number],
+    default: '100%',
+  },
+  height: {
+    type: [String, Number],
+    default: 45,
+  },
+  round: {
+    type: [String, Number],
+    default: 100,
+  },
+  bgColor: {
+    type: String,
+    default: '#e0e0e0',
+  },
+  railIndex: {
+    type: [String, Number],
+    default: 1,
+  },
+  railColor: {
+    type: String,
+    default: '#2979ff',
+  },
+  railRadius: {
+    type: [String, Number],
+    default: 100,
+  },
+  textColor: {
+    type: String,
+    default: '#c2c2c2',
+  },
+  activeTextColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  fontSize: {
+    type: [String, Number],
+    default: 16,
+  },
+  textBold: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  successText: {
+    type: String,
+    default: '验证成功',
+  },
+  doneText: {
+    type: String,
+    default: '',
+  },
+  autoReset: {
+    type: Boolean,
+    default: false,
+  },
+  resetDelay: {
+    type: Number,
+    default: 2000,
+  },
+  threshold: {
+    type: Number,
+    default: 0.5,
+  },
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  value: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：滑动过程、成功和重置。
+ * - change: 滑动过程中触发，参数为 0-1 的进度。
+ * - success: 滑动超过阈值时触发。
+ * - reset: 重置滑动按钮时触发。
+ * - update:modelValue/update:value: 同步成功状态。
+ */
+const emit = defineEmits([
+  'change',
+  'success',
+  'reset',
+  'update:modelValue',
+  'update:value',
+  'confirm',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const successed = ref(props.modelValue || props.value)
+const progress = ref(successed.value ? 1 : 0)
+const buttonId = 'i-slider-button-' + String(Math.floor(Math.random() * 1000000))
+const buttonRectLeft = ref(0)
+const buttonRectWidth = ref(0)
+const touching = ref(false)
+
+const wrapStyle = computed(() => {
+  return (
+    'width:' +
+    formatSize(props.width) +
+    ';height:' +
+    formatSize(props.height) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';background-color:' +
+    bgColor.value +
+    ';'
+  )
+})
+
+const railStyle = computed(() => {
+  const thumbSize = numericSize(props.height, 45) - 8
+  const percent = progress.value * 100
+  const followOffset = thumbSize * (1 - progress.value)
+  const width =
+    progress.value <= 0
+      ? '0%'
+      : 'calc(' + String(percent) + '% + ' + formatSize(followOffset) + ')'
+  return (
+    'width:' +
+    width +
+    ';height:' +
+    formatSize(props.height) +
+    ';border-radius:' +
+    formatSize(props.railRadius) +
+    ';background-color:' +
+    props.railColor +
+    ';z-index:' +
+    String(props.railIndex) +
+    ';'
+  )
+})
+
+const textStyle = computed(() => {
+  return (
+    'color:' +
+    (successed.value ? props.activeTextColor : props.textColor) +
+    ';font-size:' +
+    formatSize(props.fontSize) +
+    ';font-weight:' +
+    (props.textBold ? '700' : '400') +
+    ';line-height:' +
+    formatSize(props.height) +
+    ';'
+  )
+})
+
+const currentText = computed(() => {
+  if (!successed.value) return props.text
+  return props.doneText.length > 0 ? props.doneText : props.successText
+})
+
+const thumbStyle = computed(() => {
+  const size = numericSize(props.height, 45) - 8
+  const offset = progress.value * 100
+  const marginLeft = 0 - size * progress.value
+  return (
+    'width:' +
+    formatSize(size) +
+    ';height:' +
+    formatSize(size) +
+    ';border-radius:' +
+    formatSize(size) +
+    ';top:4px;left:' +
+    String(offset) +
+    '%;margin-left:' +
+    formatSize(marginLeft) +
+    ';'
+  )
+})
+
+const thumbIconStyle = computed(() => {
+  return (
+    'color:' +
+    props.railColor +
+    ';font-size:' +
+    formatSize(18) +
+    ';line-height:' +
+    formatSize(22) +
+    ';'
+  )
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    successed.value = props.modelValue
+    progress.value = successed.value ? 1 : 0
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    successed.value = props.value
+    progress.value = successed.value ? 1 : 0
+  },
+)
+
+function handleTouchStart(event) {
+  if (props.disabled || successed.value) return
+  touching.value = true
+  refreshButtonRect(event, true)
+}
+
+function handleTouchMove(event) {
+  if (props.disabled || successed.value || !touching.value) return
+  updateProgressByTouch(event)
+}
+
+function handleTouchEnd(event) {
+  if (!touching.value) return
+  updateProgressByTouch(event)
+  touching.value = false
+  if (progress.value >= props.threshold) {
+    markSuccess()
+  } else {
+    reset()
+  }
+}
+
+function refreshButtonRect(event, shouldUpdate) {
+  const element = uni.getElementById(buttonId)
+  if (
+    element != null &&
+    element.getBoundingClientRect != null &&
+    typeof element.getBoundingClientRect == 'function'
+  ) {
+    const rect = element.getBoundingClientRect()
+    setButtonRect(rect)
+    if (shouldUpdate) updateProgressByTouch(event)
+    return
+  }
+  if (
+    element != null &&
+    element.getBoundingClientRectAsync != null &&
+    typeof element.getBoundingClientRectAsync == 'function'
+  ) {
+    element
+      .getBoundingClientRectAsync()
+      .then((rect) => {
+        setButtonRect(rect)
+        if (shouldUpdate) updateProgressByTouch(event)
+      })
+      .catch(() => {
+        refreshButtonRectBySelector(event, shouldUpdate)
+      })
+    return
+  }
+  refreshButtonRectBySelector(event, shouldUpdate)
+}
+
+function refreshButtonRectBySelector(event, shouldUpdate) {
+  uni
+    .createSelectorQuery()
+    .select('#' + buttonId)
+    .boundingClientRect((rect) => {
+      setButtonRect(rect)
+      if (shouldUpdate) updateProgressByTouch(event)
+    })
+    .exec()
+}
+
+function setButtonRect(rect) {
+  if (rect == null) return
+  buttonRectLeft.value = normalizeRectPoint(rect.left, rect.x)
+  buttonRectWidth.value = Number(rect.width)
+}
+
+function updateProgressByTouch(event) {
+  const x = readTouchX(event)
+  if (isNaN(x) || buttonRectWidth.value <= 0) return
+  let nextProgress = (x - buttonRectLeft.value) / buttonRectWidth.value
+  if (nextProgress < 0) nextProgress = 0
+  if (nextProgress > 1) nextProgress = 1
+  progress.value = nextProgress
+  emit('change', progress.value)
+}
+
+function markSuccess() {
+  successed.value = true
+  progress.value = 1
+  emit('success')
+  emit('confirm')
+  emit('update:modelValue', true)
+  emit('update:value', true)
+  if (props.autoReset) {
+    setTimeout(() => {
+      reset()
+    }, props.resetDelay)
+  }
+}
+
+function reset() {
+  successed.value = false
+  progress.value = 0
+  emit('reset')
+  emit('update:modelValue', false)
+  emit('update:value', false)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function numericSize(value, fallback) {
+  const text = String(value)
+  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return fallback
+  return numberValue
+}
+
+function readTouchX(event) {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return NaN
+  const clientX = Number(point.clientX)
+  if (!isNaN(clientX)) return clientX
+  const pageX = Number(point.pageX)
+  if (!isNaN(pageX)) return pageX
+  return Number(point.x)
+}
+
+function normalizeRectPoint(first, fallback) {
+  const firstValue = Number(first)
+  if (!isNaN(firstValue)) return firstValue
+  const fallbackValue = Number(fallback)
+  if (!isNaN(fallbackValue)) return fallbackValue
+  return 0
+}
+
+defineExpose({ reset })
+</script>
+
+<style>
+.i-slider-button {
+  position: relative;
+  overflow: hidden;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(31, 45, 61, 0.04);
+}
+
+.i-slider-button__rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.i-slider-button__text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  text-align: center;
+}
+
+.i-slider-button__thumb {
+  position: absolute;
+  z-index: 4;
+  background-color: #ffffff;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(31, 45, 61, 0.16);
+}
+
+.i-slider-button__thumb-text {
+  color: #2979ff;
+  font-size: 18px;
+  line-height: 22px;
+}
+</style>

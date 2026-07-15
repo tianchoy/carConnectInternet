@@ -1,0 +1,683 @@
+<template>
+  <view
+    v-if="shouldRender"
+    :class="wrapperClass"
+    :style="wrapperStyle"
+    @click="handleOverlayClick"
+  >
+    <view :class="panelClass" :style="panelStyle" @click.stop="noop">
+      <view v-if="showTitle" class="i-calendar__title-row">
+        <text class="i-calendar__cancel" @click="handleClose">取消</text>
+        <text class="i-calendar__title">{{ title }}</text>
+        <text
+          class="i-calendar__confirm"
+          :style="confirmStyle"
+          @click="confirm"
+        >
+          {{ confirmText }}
+        </text>
+      </view>
+
+      <view v-if="showSubtitle" class="i-calendar__nav">
+        <text class="i-calendar__nav-btn" @click="prevMonth">‹</text>
+        <text class="i-calendar__month">{{ currentMonthText }}</text>
+        <text class="i-calendar__nav-btn" @click="nextMonth">›</text>
+      </view>
+
+      <view class="i-calendar__week">
+        <text v-for="day in weekDays" :key="day" class="i-calendar__week-day">
+          {{ day }}
+        </text>
+      </view>
+
+      <view class="i-calendar__grid">
+        <view
+          v-for="item in days"
+          :key="item.key"
+          :class="dayClass(item)"
+          :style="dayStyle(item)"
+          @click="select(item)"
+        >
+          <text :class="dayTextClass(item)">{{ item.text }}</text>
+          <text v-if="dayTip(item).length > 0" class="i-calendar__day-tip">
+            {{ dayTip(item) }}
+          </text>
+        </view>
+      </view>
+
+      <view v-if="mode == 'range'" class="i-calendar__range-result">
+        <text class="i-calendar__range-text">{{ rangeResultText }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-calendar' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Calendar，并按 UniAppX 组件习惯实现。
+ * - show: 弹层模式下控制日历显示隐藏；insert 为 true 时始终以内联面板展示。
+ * - insert: 是否以内联方式直接插入页面；false 时为底部弹层。
+ * - title: 顶部标题文本。
+ * - showTitle: 是否显示标题栏，标题栏内包含取消和确认按钮。
+ * - showSubtitle: 是否显示当前年月和上/下月切换区域。
+ * - mode: 选择模式，single 为单日，multiple 为多日，range 为日期范围。
+ * - defaultDate: 默认选中的日期；single 可传字符串，multiple/range 建议传数组。
+ * - value: 兼容旧用法的当前日期值；未设置 defaultDate 时作为默认选中值。
+ * - month: 指定初始展示月份，格式为 yyyy-mm；为空时根据默认日期或当前日期展示。
+ * - minDate: 最小可选日期，格式为 yyyy-mm-dd；为空则不限制。
+ * - maxDate: 最大可选日期，格式为 yyyy-mm-dd；为空则不限制。
+ * - color: 主题色，用于选中日期和确认按钮。
+ * - startText: range 模式下开始日期底部提示文字。
+ * - endText: range 模式下结束日期底部提示文字。
+ * - confirmText: 右上角确认按钮文案。
+ * - closeOnMask: 弹层模式下点击遮罩是否关闭。
+ * - readonly: 只读状态，禁止选择日期但允许翻月查看。
+ * - customStyle: 面板自定义样式字符串。
+ */
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  insert: {
+    type: Boolean,
+    default: true,
+  },
+  title: {
+    type: String,
+    default: '日期选择',
+  },
+  showTitle: {
+    type: Boolean,
+    default: true,
+  },
+  showSubtitle: {
+    type: Boolean,
+    default: true,
+  },
+  mode: {
+    type: String,
+    default: 'single',
+  },
+  defaultDate: {
+    type: [String, Array],
+    default: '',
+  },
+  value: {
+    type: [String, Array],
+    default: '',
+  },
+  month: {
+    type: String,
+    default: '',
+  },
+  minDate: {
+    type: String,
+    default: '',
+  },
+  maxDate: {
+    type: String,
+    default: '',
+  },
+  color: {
+    type: String,
+    default: '#3c9cff',
+  },
+  startText: {
+    type: String,
+    default: '开始',
+  },
+  endText: {
+    type: String,
+    default: '结束',
+  },
+  confirmText: {
+    type: String,
+    default: '确定',
+  },
+  closeOnMask: { type: Boolean, default: true },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件对外通知选择结果和弹层状态。
+ * - change: 点击日期时触发，返回当前临时选择值。
+ * - confirm: 点击确定时触发，返回最终选择值。
+ * - close: 点击取消、遮罩或确认关闭弹层时触发。
+ * - month-change: 翻月时触发，返回 yyyy-mm。
+ * - update:show: 弹层显示状态同步。
+ * - update:value: 选择值同步，single 返回字符串，multiple 返回数组，range 返回 [start, end]。
+ * - update:modelValue: 兼容 v-model，同 update:value。
+ */
+const emit = defineEmits([
+  'change',
+  'confirm',
+  'close',
+  'month-change',
+  'update:show',
+  'update:value',
+  'update:modelValue',
+])
+
+
+
+const weekDays = ref(['日', '一', '二', '三', '四', '五', '六'])
+const today = normalizeDate(new Date())
+const selectedSingle = ref('')
+const selectedMultiple = ref([])
+const rangeStart = ref('')
+const rangeEnd = ref('')
+const year = ref(new Date().getFullYear())
+const monthIndex = ref(new Date().getMonth())
+
+const shouldRender = computed(() => {
+  if (props.insert) return true
+  return props.show
+})
+
+const wrapperClass = computed(() => {
+  return props.insert ? 'i-calendar i-calendar--insert' : 'i-calendar i-calendar--popup'
+})
+
+const panelClass = computed(() => {
+  return props.insert ? 'i-calendar__panel' : 'i-calendar__panel i-calendar__panel--popup'
+})
+
+const wrapperStyle = computed(() => {
+  return props.insert ? '' : 'background-color:rgba(0,0,0,0.36);'
+})
+
+const panelStyle = computed(() => {
+  return props.customStyle
+})
+
+const confirmStyle = computed(() => {
+  return 'color:' + props.color + ';'
+})
+
+const currentMonthText = computed(() => {
+  const month = monthIndex.value + 1
+  return year.value + '-' + pad(month)
+})
+
+const rangeResultText = computed(() => {
+  if (rangeStart.value.length == 0) return '请选择开始日期'
+  if (rangeEnd.value.length == 0) return '开始日期：' + rangeStart.value
+  return '日期范围：' + rangeStart.value + ' 至 ' + rangeEnd.value
+})
+
+const days = computed(() => {
+  const firstDay = new Date(year.value, monthIndex.value, 1).getDay()
+  const total = new Date(year.value, monthIndex.value + 1, 0).getDate()
+  const list = []
+
+  for (let i = 0; i < firstDay; i++) {
+    list.push({
+      key: 'empty-' + i,
+      text: '',
+      value: '',
+      empty: true,
+    })
+  }
+
+  for (let day = 1; day <= total; day++) {
+    const value = year.value + '-' + pad(monthIndex.value + 1) + '-' + pad(day)
+    list.push({
+      key: value,
+      text: String(day),
+      value,
+      empty: false,
+    })
+  }
+
+  return list
+})
+
+watch(
+  () => props.defaultDate,
+  () => {
+    syncSelection()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    syncSelection()
+  },
+)
+
+watch(
+  () => props.month,
+  () => {
+    syncViewMonth()
+  },
+)
+
+watch(
+  () => props.mode,
+  () => {
+    syncSelection()
+  },
+)
+
+syncSelection()
+
+function syncSelection() {
+  const source = hasSelectionValue(props.defaultDate) ? props.defaultDate : props.value
+  selectedSingle.value = ''
+  selectedMultiple.value = []
+  rangeStart.value = ''
+  rangeEnd.value = ''
+
+  if (props.mode == 'multiple') {
+    selectedMultiple.value = normalizeDateList(source)
+  } else if (props.mode == 'range') {
+    const values = normalizeDateList(source)
+    if (values.length > 0) rangeStart.value = values[0]
+    if (values.length > 1) rangeEnd.value = values[1]
+  } else {
+    selectedSingle.value = firstDate(source)
+  }
+
+  syncViewMonth()
+}
+
+function syncViewMonth() {
+  if (props.month.length >= 7) {
+    const parts = props.month.split('-')
+    const nextYear = Number(parts[0])
+    const nextMonth = Number(parts[1])
+    if (!isNaN(nextYear) && !isNaN(nextMonth)) {
+      year.value = nextYear
+      monthIndex.value = clamp(nextMonth - 1, 0, 11)
+      return
+    }
+  }
+
+  const anchor = firstSelectedDate()
+  const date = parseDate(anchor.length > 0 ? anchor : today)
+  year.value = date.getFullYear()
+  monthIndex.value = date.getMonth()
+}
+
+function firstSelectedDate() {
+  if (props.mode == 'multiple' && selectedMultiple.value.length > 0) {
+    return String(selectedMultiple.value[0])
+  }
+  if (props.mode == 'range' && rangeStart.value.length > 0) return rangeStart.value
+  return selectedSingle.value
+}
+
+function select(item) {
+  if (item.empty || props.readonly || isDisabled(item.value)) return
+
+  if (props.mode == 'multiple') {
+    toggleMultiple(item.value)
+  } else if (props.mode == 'range') {
+    selectRange(item.value)
+  } else {
+    selectedSingle.value = item.value
+  }
+
+  const value = currentValue()
+  emit('change', value)
+  emit('update:value', value)
+  emit('update:modelValue', value)
+}
+
+function toggleMultiple(value) {
+  const list = selectedMultiple.value.slice()
+  const index = list.indexOf(value)
+  if (index >= 0) {
+    list.splice(index, 1)
+  } else {
+    list.push(value)
+  }
+  selectedMultiple.value = list
+}
+
+function selectRange(value) {
+  if (rangeStart.value.length == 0 || rangeEnd.value.length > 0) {
+    rangeStart.value = value
+    rangeEnd.value = ''
+    return
+  }
+
+  if (value < rangeStart.value) {
+    rangeEnd.value = rangeStart.value
+    rangeStart.value = value
+    return
+  }
+
+  rangeEnd.value = value
+}
+
+function confirm() {
+  const value = currentValue()
+  emit('confirm', value)
+  emit('update:value', value)
+  emit('update:modelValue', value)
+  if (!props.insert) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+function handleClose() {
+  emit('update:show', false)
+  emit('close')
+}
+
+function handleOverlayClick() {
+  if (props.insert) return
+  if (!props.closeOnMask) return
+  handleClose()
+}
+
+function noop() {}
+
+function prevMonth() {
+  const next = new Date(year.value, monthIndex.value - 1, 1)
+  year.value = next.getFullYear()
+  monthIndex.value = next.getMonth()
+  emit('month-change', currentMonthText.value)
+}
+
+function nextMonth() {
+  const next = new Date(year.value, monthIndex.value + 1, 1)
+  year.value = next.getFullYear()
+  monthIndex.value = next.getMonth()
+  emit('month-change', currentMonthText.value)
+}
+
+function currentValue() {
+  if (props.mode == 'multiple') return selectedMultiple.value
+  if (props.mode == 'range') return [rangeStart.value, rangeEnd.value]
+  return selectedSingle.value
+}
+
+function dayClass(item) {
+  const classes = ['i-calendar__day']
+  if (item.empty) classes.push('i-calendar__day--empty')
+  if (isDisabled(item.value)) classes.push('i-calendar__day--disabled')
+  if (isSelected(item.value)) classes.push('i-calendar__day--selected')
+  if (isInRange(item.value)) classes.push('i-calendar__day--range')
+  if (item.value == today) classes.push('i-calendar__day--today')
+  return classes.join(' ')
+}
+
+function dayTextClass(item) {
+  const classes = ['i-calendar__day-text']
+  if (isSelected(item.value)) classes.push('i-calendar__day-text--selected')
+  if (isDisabled(item.value)) classes.push('i-calendar__day-text--disabled')
+  return classes.join(' ')
+}
+
+function dayStyle(item) {
+  if (item.empty) return ''
+  if (isSelected(item.value)) return 'background-color:' + props.color + ';'
+  if (isInRange(item.value)) return 'background-color:' + hexToLightColor(props.color) + ';'
+  return ''
+}
+
+function dayTip(item) {
+  if (props.mode != 'range') return ''
+  if (item.value == rangeStart.value) return props.startText
+  if (item.value == rangeEnd.value) return props.endText
+  return ''
+}
+
+function isSelected(value) {
+  if (value.length == 0) return false
+  if (props.mode == 'multiple') return selectedMultiple.value.indexOf(value) >= 0
+  if (props.mode == 'range') return value == rangeStart.value || value == rangeEnd.value
+  return value == selectedSingle.value
+}
+
+function isInRange(value) {
+  if (props.mode != 'range') return false
+  if (rangeStart.value.length == 0 || rangeEnd.value.length == 0) return false
+  return value > rangeStart.value && value < rangeEnd.value
+}
+
+function isDisabled(value) {
+  if (value.length == 0) return false
+  if (props.minDate.length > 0 && value < normalizeDateText(props.minDate)) return true
+  if (props.maxDate.length > 0 && value > normalizeDateText(props.maxDate)) return true
+  return false
+}
+
+function hasSelectionValue(value) {
+  if (Array.isArray(value)) return value.length > 0
+  return String(value).length > 0
+}
+
+function normalizeDateList(value) {
+  const list = []
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const text = normalizeDateText(String(value[i]))
+      if (text.length > 0) list.push(text)
+    }
+  } else {
+    const text = normalizeDateText(String(value))
+    if (text.length > 0) list.push(text)
+  }
+  return list
+}
+
+function firstDate(value) {
+  const list = normalizeDateList(value)
+  if (list.length > 0) return list[0]
+  return ''
+}
+
+function normalizeDateText(value) {
+  if (value.length == 0) return ''
+  const date = parseDate(value)
+  return normalizeDate(date)
+}
+
+function normalizeDate(date) {
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+}
+
+function parseDate(value) {
+  const date = new Date(String(value).replace(/-/g, '/'))
+  if (isNaN(date.getTime())) return new Date()
+  return date
+}
+
+function pad(value) {
+  return value < 10 ? '0' + String(value) : String(value)
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function hexToLightColor(value) {
+  const color = value.indexOf('#') == 0 ? value : '#3c9cff'
+  if (color.length != 7) return 'rgba(60,156,255,0.14)'
+  const r = parseInt(color.substring(1, 3), 16)
+  const g = parseInt(color.substring(3, 5), 16)
+  const b = parseInt(color.substring(5, 7), 16)
+  return 'rgba(' + r + ',' + g + ',' + b + ',0.14)'
+}
+</script>
+
+<style>
+.i-calendar {
+  width: 100%;
+}
+
+.i-calendar--insert {
+  position: relative;
+}
+
+.i-calendar--popup {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 110;
+  justify-content: flex-end;
+}
+
+.i-calendar__panel {
+  padding: 14px;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.i-calendar__panel--popup {
+  border-radius: 16px 16px 0 0;
+}
+
+.i-calendar__title-row {
+  min-height: 42px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-calendar__title {
+  flex: 1;
+  color: #303133;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.i-calendar__cancel,
+.i-calendar__confirm {
+  width: 64px;
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-calendar__confirm {
+  text-align: right;
+}
+
+.i-calendar__nav {
+  min-height: 40px;
+  margin-top: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-calendar__month {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-calendar__nav-btn {
+  width: 42px;
+  color: #2979ff;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  text-align: center;
+}
+
+.i-calendar__week,
+.i-calendar__grid {
+  margin-top: 10px;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.i-calendar__week-day,
+.i-calendar__day {
+  width: 14.2857%;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-calendar__week-day {
+  height: 28px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-calendar__day {
+  height: 46px;
+  border-radius: 8px;
+}
+
+.i-calendar__day--range {
+  border-radius: 0;
+}
+
+.i-calendar__day--today {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #d9ecff;
+}
+
+.i-calendar__day--empty {
+  background-color: transparent;
+  border-width: 0;
+}
+
+.i-calendar__day--disabled {
+  opacity: 0.38;
+}
+
+.i-calendar__day-text {
+  color: #303133;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.i-calendar__day-text--selected {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.i-calendar__day-text--disabled {
+  color: #c0c4cc;
+}
+
+.i-calendar__day-tip {
+  margin-top: 2px;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.i-calendar__range-result {
+  min-height: 34px;
+  margin-top: 12px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background-color: #f5f7fb;
+  justify-content: center;
+}
+
+.i-calendar__range-text {
+  color: #606266;
+  font-size: 13px;
+  line-height: 20px;
+}
+</style>

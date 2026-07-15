@@ -1,0 +1,558 @@
+<template>
+  <view :class="wrapClass" :style="wrapStyle" @click="handleTap">
+    <input
+      v-if="useSystemKeyboard"
+      class="i-code__input"
+      :value="current"
+      :type="type"
+      :password="password"
+      :maxlength="effectiveMaxlength"
+      :disabled="disabled"
+      :focus="inputFocus"
+      :confirm-type="confirmType"
+      :cursor-spacing="Number(cursorSpacing)"
+      @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @confirm="handleConfirm"
+      @keyboardheightchange="handleKeyboardHeightChange"
+    />
+
+    <view class="i-code__row">
+      <view
+        v-for="i in effectiveMaxlength"
+        :key="i"
+        :class="boxClass(i)"
+        :style="boxStyle(i)"
+      >
+        <text v-if="getChar(i).length > 0" class="i-code__text" :style="textStyle">
+          {{ password ? "•" : getChar(i) }}
+        </text>
+        <view
+          v-if="getChar(i).length == 0 && placeShape == 'round'"
+          :class="placeholderClass(i, 'dot')"
+          :style="placeholderStyle(i, 'dot')"
+        ></view>
+        <view
+          v-if="getChar(i).length == 0 && placeShape == 'line'"
+          :class="placeholderClass(i, 'line')"
+          :style="placeholderStyle(i, 'line')"
+        ></view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-code' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 验证码输入规范，提供验证码格子输入能力。
+ * - modelValue/value: 当前输入值，支持 v-model 和旧 value。
+ * - maxlength/length: 验证码最大长度；length 为兼容旧版别名。
+ * - autoFocus/focus: 是否主动聚焦并拉起系统键盘，需 useSysKeyborad 为 true。
+ * - useSysKeyborad/useSysKeyboard: 是否使用系统键盘；false 时可配合外部数字键盘更新 v-model。
+ * - gutter/width/height/fontSize/round: 格子间距、宽高、文字大小和圆角。
+ * - fontColor: 激活文字色，同时用作激活边线或填充色。
+ * - bgColor: skin 为 fill 时的背景色。
+ * - borderColor: skin 为 outline 时激活边线色。
+ * - unBorderColor: skin 为 outline 时未激活边线色。
+ * - skin: 外观风格，可选 outline、fill、none。
+ * - placeShape: 未输入时占位形状，可选 round、line、空字符串。
+ * - disabled/password/type/confirmType/cursorSpacing: 原生 input 行为透传。
+ */
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  value: {
+    type: String,
+    default: '',
+  },
+  maxlength: {
+    type: Number,
+    default: 4,
+  },
+  length: {
+    type: Number,
+    default: 0,
+  },
+  autoFocus: {
+    type: Boolean,
+    default: false,
+  },
+  focus: {
+    type: Boolean,
+    default: false,
+  },
+  useSysKeyborad: {
+    type: Boolean,
+    default: true,
+  },
+  useSysKeyboard: {
+    type: Boolean,
+    default: true,
+  },
+  gutter: {
+    type: String,
+    default: '8',
+  },
+  width: {
+    type: String,
+    default: '50',
+  },
+  height: {
+    type: String,
+    default: '50',
+  },
+  fontColor: {
+    type: String,
+    default: '#1989fa',
+  },
+  fontSize: {
+    type: String,
+    default: '21',
+  },
+  round: {
+    type: String,
+    default: '8',
+  },
+  bgColor: {
+    type: String,
+    default: '#f0f0f0',
+  },
+  borderColor: {
+    type: String,
+    default: '',
+  },
+  unBorderColor: {
+    type: String,
+    default: '#e3e3e3',
+  },
+  skin: {
+    type: String,
+    default: 'outline',
+  },
+  placeShape: {
+    type: String,
+    default: 'round',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  password: {
+    type: Boolean,
+    default: false,
+  },
+  type: {
+    type: String,
+    default: 'number',
+  },
+  confirmType: {
+    type: String,
+    default: 'done',
+  },
+  cursorSpacing: {
+    type: Number,
+    default: 24,
+  },
+})
+
+/**
+ * Emits 说明：验证码输入交互。
+ * - click: 点击组件时触发。
+ * - input/change: 输入内容变化时触发，参数为最新值。
+ * - confirm: 达到 maxlength 或键盘确认时触发，参数为当前值，可能多次触发。
+ * - update:modelValue/update:value: 同步受控值。
+ * - focus/blur/keyboardheightchange: 原生 input 事件透传。
+ * - clear: clear 方法清空时触发。
+ */
+const emit = defineEmits([
+  'click',
+  'input',
+  'change',
+  'confirm',
+  'update:modelValue',
+  'update:value',
+  'focus',
+  'blur',
+  'keyboardheightchange',
+  'clear',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const current = ref(initialValue())
+const inputFocus = ref(props.autoFocus || props.focus)
+const confirmedValue = ref('')
+const breathStep = ref(0)
+let breathForward = true
+let breathTimer = 0
+
+const effectiveMaxlength = computed(() => {
+  if (props.length > 0) return props.length
+  return props.maxlength > 0 ? props.maxlength : 4
+})
+
+const useSystemKeyboard = computed(() => {
+  return props.useSysKeyborad && props.useSysKeyboard
+})
+
+const wrapClass = computed(() => {
+  const classes = ['i-code']
+  if (props.disabled) classes.push('i-code--disabled')
+  return classes.join(' ')
+})
+
+const wrapStyle = computed(() => {
+  return 'height:' + formatSize(props.height) + ';'
+})
+
+const textStyle = computed(() => {
+  const color = props.skin == 'fill' ? '#ffffff' : activeColor()
+  return 'color:' + color + ';font-size:' + formatSize(props.fontSize) + ';'
+})
+
+const breathEnabled = computed(() => {
+  return !props.disabled && inputFocus.value && current.value.length < effectiveMaxlength.value
+})
+
+const breathOpacity = computed(() => {
+  return 0.45 + (breathStep.value / 12) * 0.55
+})
+
+const breathScale = computed(() => {
+  return 1 + (breathStep.value / 12) * 0.35
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncExternalValue()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    syncExternalValue()
+  },
+)
+
+watch(
+  () => props.focus,
+  (nextValue) => {
+    inputFocus.value = nextValue
+  },
+)
+
+watch(
+  () => breathEnabled.value,
+  (nextValue) => {
+    if (nextValue) {
+      startBreath()
+    } else {
+      stopBreath()
+    }
+  },
+)
+
+onMounted(() => {
+  if (breathEnabled.value) startBreath()
+})
+
+onUnmounted(() => {
+  stopBreath()
+})
+
+function initialValue() {
+  if (props.modelValue.length > 0) return props.modelValue
+  return props.value
+}
+
+function normalizeValue(value) {
+  let text = String(value)
+  if (text.length > effectiveMaxlength.value) {
+    text = text.substring(0, effectiveMaxlength.value)
+  }
+  return text
+}
+
+function syncExternalValue() {
+  current.value = normalizeValue(initialValue())
+  checkConfirm(current.value)
+}
+
+function handleTap() {
+  if (props.disabled) return
+  emit('click')
+  if (useSystemKeyboard.value) {
+    inputFocus.value = true
+  }
+}
+
+function handleInput(event) {
+  setValue(String(event.detail.value))
+}
+
+function handleFocus(event) {
+  inputFocus.value = true
+  emit('focus', event)
+}
+
+function handleBlur(event) {
+  inputFocus.value = false
+  emit('blur', event)
+}
+
+function handleConfirm() {
+  emit('confirm', current.value)
+}
+
+function handleKeyboardHeightChange(event) {
+  emit('keyboardheightchange', event)
+}
+
+function setValue(value) {
+  if (props.disabled) return
+  const nextValue = normalizeValue(value)
+  current.value = nextValue
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+  emit('input', nextValue)
+  emit('change', nextValue)
+  checkConfirm(nextValue)
+}
+
+function checkConfirm(nextValue) {
+  if (nextValue.length >= effectiveMaxlength.value && confirmedValue.value != nextValue) {
+    confirmedValue.value = nextValue
+    emit('confirm', nextValue)
+  }
+  if (nextValue.length < effectiveMaxlength.value) {
+    confirmedValue.value = ''
+  }
+}
+
+function insert(value) {
+  if (current.value.length >= effectiveMaxlength.value) return
+  setValue(current.value + String(value))
+}
+
+function backspace() {
+  if (current.value.length == 0) return
+  setValue(current.value.substring(0, current.value.length - 1))
+}
+
+function clear() {
+  current.value = ''
+  confirmedValue.value = ''
+  emit('update:modelValue', '')
+  emit('update:value', '')
+  emit('input', '')
+  emit('change', '')
+  emit('clear')
+}
+
+function focusInput() {
+  if (!useSystemKeyboard.value || props.disabled) return
+  inputFocus.value = true
+}
+
+function blurInput() {
+  inputFocus.value = false
+}
+
+function boxClass(index) {
+  const classes = ['i-code__box']
+  if (getChar(index).length > 0) classes.push('i-code__box--filled')
+  if (isInputSlot(index)) {
+    classes.push('i-code__box--active')
+  }
+  return classes.join(' ')
+}
+
+function placeholderClass(index, shape) {
+  const classes = shape == 'line' ? ['i-code__line'] : ['i-code__dot']
+  if (isInputSlot(index)) {
+    classes.push(shape == 'line' ? 'i-code__line--active' : 'i-code__dot--active')
+  }
+  return classes.join(' ')
+}
+
+function placeholderStyle(index, shape) {
+  if (!isInputSlot(index)) return ''
+  const opacity = String(breathOpacity.value)
+  const scale = String(breathScale.value)
+  if (shape == 'line') {
+    return 'opacity:' + opacity + ';transform:scaleX(' + scale + ');'
+  }
+  return 'opacity:' + opacity + ';transform:scale(' + scale + ');'
+}
+
+function boxStyle(index) {
+  const filled = getChar(index).length > 0
+  const active = filled || isInputSlot(index)
+  let style =
+    'width:' +
+    formatSize(props.width) +
+    ';height:' +
+    formatSize(props.height) +
+    ';margin-right:' +
+    (index == effectiveMaxlength.value ? '0' : formatSize(props.gutter)) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';'
+  if (props.skin == 'fill') {
+    style += 'background-color:' + (active ? activeColor() : bgColor.value) + ';'
+  } else if (props.skin == 'outline') {
+    style +=
+      'border-width:1px;border-style:solid;border-color:' +
+      (active ? outlineColor() : props.unBorderColor) +
+      ';background-color:#ffffff;'
+  } else {
+    style += 'background-color:transparent;'
+  }
+  return style
+}
+
+function getChar(index) {
+  return current.value.substring(index - 1, index)
+}
+
+function isInputSlot(index) {
+  return (
+    !props.disabled &&
+    inputFocus.value &&
+    index == current.value.length + 1 &&
+    current.value.length < effectiveMaxlength.value
+  )
+}
+
+function startBreath() {
+  if (breathTimer > 0) return
+  breathTimer = setInterval(() => {
+    if (breathForward) {
+      breathStep.value = breathStep.value + 1
+      if (breathStep.value >= 12) {
+        breathStep.value = 12
+        breathForward = false
+      }
+    } else {
+      breathStep.value = breathStep.value - 1
+      if (breathStep.value <= 0) {
+        breathStep.value = 0
+        breathForward = true
+      }
+    }
+  }, 80)
+}
+
+function stopBreath() {
+  if (breathTimer > 0) {
+    clearInterval(breathTimer)
+    breathTimer = 0
+  }
+  breathStep.value = 0
+  breathForward = true
+}
+
+function activeColor() {
+  return props.fontColor.length > 0 ? props.fontColor : '#1989fa'
+}
+
+function outlineColor() {
+  if (props.borderColor.length > 0) return props.borderColor
+  return activeColor()
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
+    const numberValue = Number(text.replace('vh', '').replace('vw', ''))
+    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
+  }
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  insert,
+  backspace,
+  clear,
+  focus: focusInput,
+  blur: blurInput,
+})
+</script>
+
+<style>
+.i-code {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-code--disabled {
+  opacity: 0.58;
+}
+
+.i-code__input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.i-code__row {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-code__box {
+  align-items: center;
+  justify-content: center;
+}
+
+.i-code__text {
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.i-code__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: #d4d7de;
+}
+
+.i-code__dot--active {
+  background-color: #1989fa;
+  opacity: 1;
+}
+
+.i-code__line {
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #d4d7de;
+}
+
+.i-code__line--active {
+  background-color: #1989fa;
+  opacity: 1;
+}
+</style>

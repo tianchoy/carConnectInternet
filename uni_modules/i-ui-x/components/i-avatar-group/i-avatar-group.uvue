@@ -1,0 +1,65 @@
+<template>
+  <view class="i-row"
+    ><view
+      v-for="(item, index) in items"
+      :key="item"
+      class="i-avatar"
+      :style="
+        'margin-left:' + (index == 0 ? 0 : -10) + 'px;z-index:' + (20 - index)
+      "
+      @click="select(item, index)"
+      ><text class="i-text">{{ item }}</text></view
+    ></view
+  >
+</template>
+<script setup lang="uts">
+defineOptions({ name: 'i-avatar-group' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - items: 列表数据源；组件会根据数组渲染可选项或展示项。
+ */
+const props = defineProps({
+  items: {
+    type: Array,
+    default() {
+      return ['A', 'B', 'C', 'D']
+    },
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - select: 选择某一项时触发，通常返回索引和值组成的结果。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ */
+const emit = defineEmits(['select', 'change'])
+
+function select(item, index) {
+  const payload = String(index) + ':' + String(item)
+  emit('select', payload)
+  emit('change', payload)
+}
+</script>
+<style>
+.i-row {
+  flex-direction: row;
+  align-items: center;
+}
+.i-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 21px;
+  border-width: 2px;
+  border-color: #ffffff;
+  border-style: solid;
+  background-color: #2979ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-text {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+</style>

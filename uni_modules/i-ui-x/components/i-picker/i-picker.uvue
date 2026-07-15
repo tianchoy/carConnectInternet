@@ -1,0 +1,825 @@
+<template>
+  <view class="i-picker">
+    <view v-if="showInput" class="i-picker__trigger" @click="openByTrigger">
+      <slot name="trigger">
+        <slot>
+          <view class="i-picker__input">
+            <text :class="displayTextClass">{{ displayText }}</text>
+            <text class="i-picker__arrow">›</text>
+          </view>
+        </slot>
+      </slot>
+    </view>
+
+    <view v-if="opened" class="i-picker__mask" @click="handleOverlayClick">
+      <view class="i-picker__panel" :style="panelStyle" @click.stop="">
+        <view v-if="showToolbar" class="i-picker__toolbar">
+          <text
+            class="i-picker__cancel"
+            :style="'color:' + cancelColor + ';'"
+            @click="cancel"
+          >
+            {{ cancelText }}
+          </text>
+          <text class="i-picker__title">{{ title }}</text>
+          <text
+            class="i-picker__confirm"
+            :style="'color:' + confirmColor + ';'"
+            @click="confirm"
+          >
+            {{ confirmText }}
+          </text>
+        </view>
+
+        <view v-if="loading" class="i-picker__loading">
+          <text class="i-picker__loading-text">加载中...</text>
+        </view>
+
+        <picker-view
+          class="i-picker__columns"
+          :style="columnsStyle"
+          :value="currentIndexs"
+          :indicator-style="indicatorStyle"
+          @change="handlePickerChange"
+        >
+          <picker-view-column v-if="columnCount > 0" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column0"
+              :key="item.value"
+              :class="itemClass(item, 0, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 0, itemIndex)"
+                :style="itemTextStyle(item, 0, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="columnCount > 1" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column1"
+              :key="item.value"
+              :class="itemClass(item, 1, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 1, itemIndex)"
+                :style="itemTextStyle(item, 1, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="columnCount > 2" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column2"
+              :key="item.value"
+              :class="itemClass(item, 2, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 2, itemIndex)"
+                :style="itemTextStyle(item, 2, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="columnCount > 3" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column3"
+              :key="item.value"
+              :class="itemClass(item, 3, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 3, itemIndex)"
+                :style="itemTextStyle(item, 3, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="columnCount > 4" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column4"
+              :key="item.value"
+              :class="itemClass(item, 4, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 4, itemIndex)"
+                :style="itemTextStyle(item, 4, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+
+          <picker-view-column v-if="columnCount > 5" class="i-picker__column">
+            <view
+              v-for="(item, itemIndex) in column5"
+              :key="item.value"
+              :class="itemClass(item, 5, itemIndex)"
+              :style="itemStyle"
+            >
+              <text
+                :class="itemTextClass(item, 5, itemIndex)"
+                :style="itemTextStyle(item, 5, itemIndex)"
+              >
+                {{ item.text }}
+              </text>
+            </view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-picker' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Picker，并保留旧版 options/value 写法。
+ * - modelValue: 当前选中项的 value；多列时为 value 数组，支持 v-model 默认值。
+ * - show: 是否展示 picker 弹层。
+ * - showToolbar: 是否显示顶部取消/标题/确认操作栏。
+ * - title: 顶部标题。
+ * - columns: 选择器数据；单列为一维数组，多列为二维数组，选项结构为 { text, value, disabled }。
+ * - loading: 是否显示加载中状态。
+ * - itemHeight: 每个滚轮选项行高度，会同步给 picker-view 选中框。
+ * - cancelText/confirmText: 取消和确认按钮文字。
+ * - cancelColor/confirmColor: 取消和确认按钮颜色。
+ * - visibleItemCount: 每列可见选项数量，用于计算滚轮内容高度。
+ * - closeOnMask: 点击遮罩是否关闭。
+ * - defaultIndex: 默认选中索引；单列为数字，多列为数字数组。
+ * - immediateChange: 选择选项时是否立即同步 modelValue；关闭时仅 confirm 同步。
+ * - round: 弹层顶部圆角。
+ * - showInput: 是否显示输入框触发器；组件也支持 trigger/default 插槽自定义触发器。
+ * - showDefaultValue: 没有 modelValue 时是否按 defaultIndex 展示默认值。
+ * - options/value: 旧版参数兼容。
+ * - disabled: 是否禁用触发和选择。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number, Array],
+    default: '',
+  },
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  showToolbar: {
+    type: Boolean,
+    default: true,
+  },
+  title: {
+    type: String,
+    default: '',
+  },
+  columns: {
+    type: Array,
+    default: () => [],
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  itemHeight: {
+    type: [String, Number],
+    default: 44,
+  },
+  cancelText: {
+    type: String,
+    default: '取消',
+  },
+  confirmText: {
+    type: String,
+    default: '确认',
+  },
+  cancelColor: {
+    type: String,
+    default: '#909193',
+  },
+  confirmColor: {
+    type: String,
+    default: '#3c9cff',
+  },
+  visibleItemCount: {
+    type: [String, Number],
+    default: 5,
+  },
+  closeOnMask: { type: Boolean, default: true },
+  defaultIndex: {
+    type: [Number, Array],
+    default: 0,
+  },
+  immediateChange: {
+    type: Boolean,
+    default: false,
+  },
+  round: {
+    type: [String, Number],
+    default: 16,
+  },
+  showInput: {
+    type: Boolean,
+    default: true,
+  },
+  showDefaultValue: {
+    type: Boolean,
+    default: true,
+  },
+  options: {
+    type: Array,
+    default: () => ['Apple', 'Orange', 'Banana'],
+  },
+  value: {
+    type: [String, Number],
+    default: '',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发弹层状态、选择变化和确认结果。
+ * - open: 弹层打开时触发。
+ * - close: 弹层关闭时触发。
+ * - cancel: 点击取消时触发，参数为当前选择事件对象。
+ * - change: 选择项变化时触发，参数包含 index、indexs、columnIndex、value、values。
+ * - confirm: 点击确认时触发，参数包含 indexs、value、values。
+ * - clear: 兼容旧版清空事件。
+ * - update:value: 兼容旧版 value 同步。
+ * - update:modelValue: 同步 v-model。
+ * - update:show: 同步 show 弹层状态。
+ */
+const emit = defineEmits([
+  'open',
+  'close',
+  'cancel',
+  'change',
+  'confirm',
+  'clear',
+  'update:value',
+  'update:modelValue',
+  'update:show',
+])
+
+
+
+const opened = ref(props.show)
+const currentIndexs = ref([])
+
+const normalizedColumns = computed(() => {
+  const source = props.columns.length > 0 ? props.columns : props.options
+  if (source.length == 0) return []
+
+  const first = source[0]
+  if (isArray(first)) {
+    const result = []
+    for (let i = 0; i < source.length; i++) result.push(normalizeColumn(source[i]))
+    return result
+  }
+
+  return [normalizeColumn(source)]
+})
+
+const displayText = computed(() => {
+  const items = selectedItems()
+  if (items.length == 0) return '请选择'
+
+  const texts = []
+  for (let i = 0; i < items.length; i++) texts.push(items[i].text)
+  return texts.join(' / ')
+})
+
+const displayTextClass = computed(() => {
+  return selectedItems().length == 0
+    ? 'i-picker__input-text i-picker__input-text--placeholder'
+    : 'i-picker__input-text'
+})
+
+const columnCount = computed(() => {
+  return normalizedColumns.value.length
+})
+
+const column0 = computed(() => columnAt(0))
+const column1 = computed(() => columnAt(1))
+const column2 = computed(() => columnAt(2))
+const column3 = computed(() => columnAt(3))
+const column4 = computed(() => columnAt(4))
+const column5 = computed(() => columnAt(5))
+
+const columnsStyle = computed(() => {
+  const height = itemHeightNumber() * visibleCountNumber()
+  return 'width:100%;height:' + String(height) + 'px;'
+})
+
+const indicatorStyle = computed(() => {
+  return (
+    'height:' +
+    formatSize(props.itemHeight) +
+    ';background-color:transparent;border-top:1px solid #eef0f4;border-bottom:1px solid #eef0f4;'
+  )
+})
+
+const itemStyle = computed(() => {
+  return 'height:' + formatSize(props.itemHeight) + ';'
+})
+
+const panelStyle = computed(() => {
+  const radius = formatSize(props.round)
+  return 'border-radius:' + radius + ' ' + radius + ' 0 0;'
+})
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (opened.value == nextValue) return
+    opened.value = nextValue
+    if (nextValue) {
+      syncIndexs()
+      emit('open')
+    } else {
+      emit('close')
+    }
+  },
+)
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncIndexs()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    syncIndexs()
+  },
+)
+
+watch(
+  () => props.columns,
+  () => {
+    syncIndexs()
+  },
+)
+
+watch(
+  () => props.defaultIndex,
+  () => {
+    syncIndexs()
+  },
+)
+
+syncIndexs()
+
+function openByTrigger() {
+  if (props.disabled) return
+  open()
+}
+
+function open() {
+  if (opened.value) return
+  syncIndexs()
+  opened.value = true
+  emit('open')
+  emit('update:show', true)
+}
+
+function close() {
+  if (!opened.value) return
+  opened.value = false
+  emit('close')
+  emit('update:show', false)
+}
+
+function cancel() {
+  emit('cancel', buildChangeEvent(0, selectedIndexAt(0)))
+  close()
+}
+
+function confirm() {
+  const event = buildConfirmEvent()
+  emit('confirm', event)
+  emitSelectedValue()
+  close()
+}
+
+function clear() {
+  currentIndexs.value = []
+  emit('clear')
+  emit('change', buildChangeEvent(0, -1))
+  emit('update:value', '')
+  emit('update:modelValue', '')
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  close()
+}
+
+function handlePickerChange(event) {
+  if (props.disabled || props.loading) return
+
+  const values = event.detail.value
+  const nextIndexs = []
+  let changedColumnIndex = 0
+
+  for (let i = 0; i < normalizedColumns.value.length; i++) {
+    const column = normalizedColumns.value[i]
+    const oldIndex = selectedIndexAt(i)
+    let nextIndex = 0
+
+    if (values.length > i) nextIndex = Number(values[i])
+    if (nextIndex < 0) nextIndex = 0
+    if (nextIndex >= column.length) nextIndex = column.length - 1
+
+    if (column.length > 0 && column[nextIndex].disabled) nextIndex = oldIndex
+    if (oldIndex != nextIndex) changedColumnIndex = i
+
+    nextIndexs.push(nextIndex)
+  }
+
+  currentIndexs.value = nextIndexs
+
+  const eventValue = buildChangeEvent(
+    changedColumnIndex,
+    selectedIndexAt(changedColumnIndex),
+  )
+  emit('change', eventValue)
+  if (props.immediateChange) emitSelectedValue()
+}
+
+function emitSelectedValue() {
+  const value = selectedValue()
+  emit('update:modelValue', value)
+  emit('update:value', isArray(value) ? '' : value)
+}
+
+function syncIndexs() {
+  const columns = normalizedColumns.value
+  const result = []
+  const value = activeModelValue()
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i]
+    const targetValue = columnTargetValue(value, i)
+    let index = -1
+    if (targetValue != null && String(targetValue).length > 0) {
+      index = findValueIndex(column, targetValue)
+    }
+
+    if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
+      index = defaultIndexAt(i)
+    }
+
+    if (index < 0) index = 0
+    if (index >= column.length) index = column.length - 1
+    result.push(index)
+  }
+
+  currentIndexs.value = result
+}
+
+function activeModelValue() {
+  if (hasModelValue()) return props.modelValue
+  if (String(props.value).length > 0) return props.value
+  return null
+}
+
+function hasModelValue() {
+  if (isArray(props.modelValue)) return props.modelValue.length > 0
+  return String(props.modelValue).length > 0
+}
+
+function columnTargetValue(value, columnIndex) {
+  if (value == null) return null
+  if (isArray(value)) return value.length > columnIndex ? value[columnIndex] : null
+  return columnIndex == 0 ? value : null
+}
+
+function defaultIndexAt(columnIndex) {
+  if (isArray(props.defaultIndex)) {
+    if (props.defaultIndex.length > columnIndex) return Number(props.defaultIndex[columnIndex])
+    return 0
+  }
+  return columnIndex == 0 ? Number(props.defaultIndex) : 0
+}
+
+function findValueIndex(column, value) {
+  for (let i = 0; i < column.length; i++) {
+    if (String(column[i].value) == String(value)) return i
+  }
+  return -1
+}
+
+function selectedItems() {
+  const result = []
+  const columns = normalizedColumns.value
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i]
+    const index = selectedIndexAt(i)
+    if (index >= 0 && index < column.length) result.push(column[index])
+  }
+
+  return result
+}
+
+function selectedValue() {
+  const items = selectedItems()
+  if (items.length == 0) return ''
+  if (items.length == 1) return items[0].value
+
+  const values = []
+  for (let i = 0; i < items.length; i++) values.push(items[i].value)
+  return values
+}
+
+function selectedIndexAt(columnIndex) {
+  if (currentIndexs.value.length <= columnIndex) return 0
+  return Number(currentIndexs.value[columnIndex])
+}
+
+function buildChangeEvent(columnIndex, index) {
+  return {
+    index,
+    indexs: currentIndexs.value,
+    columnIndex,
+    value: pickerValuePayload(),
+    values: selectedItems(),
+  }
+}
+
+function buildConfirmEvent() {
+  return {
+    indexs: currentIndexs.value,
+    value: pickerValuePayload(),
+    values: selectedItems(),
+  }
+}
+
+function pickerValuePayload() {
+  const items = selectedItems()
+  if (items.length == 1) return items[0]
+  return items
+}
+
+function columnAt(index) {
+  if (index < 0 || index >= normalizedColumns.value.length) return []
+  return normalizedColumns.value[index]
+}
+
+function normalizeColumn(list) {
+  const result = []
+  for (let i = 0; i < list.length; i++) result.push(normalizeItem(list[i]))
+  return result
+}
+
+function normalizeItem(item) {
+  if (item != null && typeof item == 'object') {
+    const text = item.text != null ? String(item.text) : String(item.value)
+    const value = item.value != null ? item.value : text
+    return {
+      text,
+      value,
+      disabled: item.disabled == true,
+    }
+  }
+
+  return {
+    text: String(item),
+    value: item,
+    disabled: false,
+  }
+}
+
+function itemClass(item, columnIndex, itemIndex) {
+  const classes = ['i-picker__item']
+  if (selectedIndexAt(columnIndex) == itemIndex) classes.push('i-picker__item--active')
+  if (item.disabled) classes.push('i-picker__item--disabled')
+  return classes.join(' ')
+}
+
+function itemTextClass(item, columnIndex, itemIndex) {
+  return selectedIndexAt(columnIndex) == itemIndex
+    ? 'i-picker__item-text i-picker__item-text--active'
+    : 'i-picker__item-text'
+}
+
+function itemTextStyle(item, columnIndex, itemIndex) {
+  let style = 'line-height:' + formatSize(props.itemHeight) + ';color:#606266;'
+  if (selectedIndexAt(columnIndex) == itemIndex) {
+    style = style + 'color:#111827;'
+  }
+  return style
+}
+
+function isArray(value) {
+  return Object.prototype.toString.call(value) == '[object Array]'
+}
+
+function visibleCountNumber() {
+  const count = Number(props.visibleItemCount)
+  if (isNaN(count) || count <= 0) return 5
+  return count
+}
+
+function itemHeightNumber() {
+  const height = Number(props.itemHeight)
+  if (isNaN(height) || height <= 0) return 44
+  return height
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  open,
+  close,
+  clear,
+  getIndexs() {
+    return currentIndexs.value
+  },
+  getValues() {
+    return selectedItems()
+  },
+  getColumns() {
+    return normalizedColumns.value
+  },
+  getColumnValues(columnIndex) {
+    if (columnIndex < 0 || columnIndex >= normalizedColumns.value.length) return []
+    return normalizedColumns.value[columnIndex]
+  },
+  setColumnValues(columnIndex, values) {
+    // columns 是外部受控数据，组件只提供兼容方法入口，不直接修改 props。
+    emit('change', {
+      index: selectedIndexAt(columnIndex),
+      indexs: currentIndexs.value,
+      columnIndex,
+      value: values,
+      values,
+    })
+  },
+})
+</script>
+
+<style>
+.i-picker {
+  width: 100%;
+}
+
+.i-picker__trigger {
+  width: 100%;
+}
+
+.i-picker__input {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-picker__input-text {
+  flex: 1;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-picker__input-text--placeholder {
+  color: #909193;
+}
+
+.i-picker__arrow {
+  width: 20px;
+  color: #909193;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: right;
+  transform: rotate(90deg);
+}
+
+.i-picker__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 150;
+  background-color: rgba(0, 0, 0, 0.42);
+  justify-content: flex-end;
+}
+
+.i-picker__panel {
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.i-picker__toolbar {
+  height: 48px;
+  padding: 0 16px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.i-picker__cancel,
+.i-picker__confirm {
+  width: 64px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-picker__confirm {
+  text-align: right;
+}
+
+.i-picker__title {
+  flex: 1;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.i-picker__loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48px;
+  bottom: 0;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.78);
+  align-items: center;
+  justify-content: center;
+}
+
+.i-picker__loading-text {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-picker__columns {
+  width: 100%;
+}
+
+.i-picker__column {
+  flex: 1;
+  height: 100%;
+}
+
+.i-picker__item {
+  width: 100%;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-picker__item--active {
+  background-color: transparent;
+}
+
+.i-picker__item--disabled {
+  opacity: 0.42;
+}
+
+.i-picker__item-text {
+  color: #303133;
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-picker__item-text--active {
+  color: #111827;
+  font-weight: 700;
+}
+</style>

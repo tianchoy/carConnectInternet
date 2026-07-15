@@ -19,7 +19,7 @@
 		</cover-view>
 	</cover-view>
 
-	<uv-picker showPicker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker>
+	<!-- <uv-picker showPicker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker> -->
 </template>
 
 <script lang="uts" setup>

@@ -1,0 +1,443 @@
+<template>
+  <view class="i-search" :style="wrapStyle" @click="handleDisabledClick">
+    <slot name="label">
+      <text v-if="label.length > 0" class="i-search__label">{{ label }}</text>
+    </slot>
+    <view
+      v-if="searchIcon !== false"
+      class="i-search__icon"
+      :style="iconStyle"
+      @click.stop="clickIcon"
+    >
+      <view
+        v-if="isSearchIcon"
+        class="i-search__icon-circle"
+        :style="iconCircleStyle"
+      ></view>
+      <view
+        v-if="isSearchIcon"
+        class="i-search__icon-handle"
+        :style="iconHandleStyle"
+      ></view>
+      <text
+        v-if="!isSearchIcon"
+        class="i-search__icon-text"
+        :style="iconTextStyle"
+      >
+        {{ iconText }}
+      </text>
+    </view>
+    <input
+      class="i-search__field"
+      :style="fieldStyle"
+      :value="current"
+      :placeholder="placeholder"
+      :placeholder-style="'color:' + placeholderColor + ';'"
+      :disabled="disabled"
+      :focus="focus"
+      :maxlength="Number(maxlength)"
+      @input="handleInput"
+      @confirm="handleSearch"
+      @focus="handleFocus"
+      @blur="handleBlur"
+    />
+    <text
+      v-if="clearEnabled && current.length > 0 && !disabled"
+      class="i-search__clear"
+      @click.stop="clear"
+    >
+      ×
+    </text>
+    <slot name="right"></slot>
+    <view
+      v-if="showAction"
+      class="i-search__action"
+      :style="actionStyle"
+      @click="custom"
+    >
+      <slot name="action">
+        <text class="i-search__action-text">{{ actionText }}</text>
+      </slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-search' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Search，提供搜索输入框和右侧操作。
+ * - modelValue/value: 搜索框内容，支持 v-model 和旧版 value。
+ * - shape: 搜索框形状，round 为胶囊，square 为圆角矩形。
+ * - bgColor: 搜索框背景颜色。
+ * - placeholder: 占位文字。
+ * - clearabled/clearable: 是否显示清除按钮。
+ * - focus: 是否自动聚焦。
+ * - showAction/actionText/actionStyle: 是否显示右侧操作和其文案/样式。
+ * - inputAlign/inputStyle: 输入文字对齐和输入框样式。
+ * - disabled: 是否禁用输入框；禁用时点击会触发 click。
+ * - borderColor: 边框颜色，transparent 表示无可见边框。
+ * - searchIconColor/searchIconSize/searchIcon: 左侧图标颜色、大小和内容。
+ * - color/placeholderColor: 输入文字和占位颜色。
+ * - margin: 组件外边距。
+ * - animation: 右侧控件点击后是否自动隐藏。
+ * - maxlength/height/label: 最大输入长度、高度、左侧文字。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  value: {
+    type: [String, Number],
+    default: '',
+  },
+  shape: {
+    type: String,
+    default: 'round',
+  },
+  bgColor: {
+    type: String,
+    default: '#f2f2f2',
+  },
+  placeholder: {
+    type: String,
+    default: '请输入关键字',
+  },
+  clearabled: {
+    type: Boolean,
+    default: true,
+  },
+  clearable: {
+    type: Boolean,
+    default: true,
+  },
+  focus: {
+    type: Boolean,
+    default: false,
+  },
+  showAction: {
+    type: Boolean,
+    default: true,
+  },
+  actionStyle: {
+    type: String,
+    default: '',
+  },
+  actionText: {
+    type: String,
+    default: '搜索',
+  },
+  inputAlign: {
+    type: String,
+    default: 'left',
+  },
+  inputStyle: {
+    type: String,
+    default: '',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  borderColor: {
+    type: String,
+    default: 'transparent',
+  },
+  searchIconColor: {
+    type: String,
+    default: '#909399',
+  },
+  searchIconSize: {
+    type: [String, Number],
+    default: '18px',
+  },
+  color: {
+    type: String,
+    default: '#606266',
+  },
+  placeholderColor: {
+    type: String,
+    default: '#909399',
+  },
+  searchIcon: {
+    type: [String, Boolean],
+    default: 'search',
+  },
+  margin: {
+    type: String,
+    default: '0',
+  },
+  animation: {
+    type: Boolean,
+    default: false,
+  },
+  maxlength: {
+    type: [String, Number],
+    default: -1,
+  },
+  height: {
+    type: [String, Number],
+    default: 64,
+  },
+  label: {
+    type: [String, Number],
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：覆盖输入、搜索、右侧控件和图标点击。
+ * - update:modelValue/update:value: 同步输入值。
+ * - input/change: 输入内容变化时触发。
+ * - search: 键盘搜索或确认时触发。
+ * - custom: 点击右侧控件时触发。
+ * - blur/focus: 输入框失焦/聚焦时触发。
+ * - clear: 清空内容时触发。
+ * - click: disabled 为 true 时点击输入框触发。
+ * - clickIcon: 点击左侧图标时触发。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'input',
+  'change',
+  'search',
+  'custom',
+  'blur',
+  'focus',
+  'clear',
+  'click',
+  'clickIcon',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const current = ref(initialValue())
+const actionVisible = ref(props.showAction)
+
+const clearEnabled = computed(() => {
+  return props.clearabled || props.clearable
+})
+
+const iconText = computed(() => {
+  if (String(props.searchIcon) == 'scan') return '▣'
+  return String(props.searchIcon)
+})
+
+const isSearchIcon = computed(() => {
+  return String(props.searchIcon) == 'search' || String(props.searchIcon).length == 0
+})
+
+const wrapStyle = computed(() => {
+  const height = formatSize(props.height)
+  const radius = props.shape == 'square' ? '8px' : height
+  let style =
+    'height:' +
+    height +
+    ';border-radius:' +
+    radius +
+    ';background-color:' +
+    bgColor.value +
+    ';margin:' +
+    props.margin +
+    ';'
+  if (props.borderColor != 'transparent') {
+    style +=
+      'border-width:1px;border-style:solid;border-color:' +
+      props.borderColor +
+      ';'
+  }
+  return style
+})
+
+const fieldStyle = computed(() => {
+  return (
+    'color:' +
+    props.color +
+    ';text-align:' +
+    props.inputAlign +
+    ';' +
+    props.inputStyle
+  )
+})
+
+const iconStyle = computed(() => {
+  const size = formatSize(props.searchIconSize)
+  return (
+    'width:' +
+    size +
+    ';height:' +
+    size +
+    ';'
+  )
+})
+
+const iconCircleStyle = computed(() => {
+  return 'border-color:' + props.searchIconColor + ';'
+})
+
+const iconHandleStyle = computed(() => {
+  return 'background-color:' + props.searchIconColor + ';'
+})
+
+const iconTextStyle = computed(() => {
+  return 'color:' + props.searchIconColor + ';font-size:' + formatSize(props.searchIconSize) + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+watch(
+  () => props.showAction,
+  (nextValue) => {
+    actionVisible.value = nextValue
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return String(props.modelValue)
+  return String(props.value)
+}
+
+function handleInput(event) {
+  const nextValue = String(event.detail.value)
+  current.value = nextValue
+  emitValue(nextValue)
+}
+
+function emitValue(value) {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('input', value)
+  emit('change', value)
+}
+
+function handleSearch() {
+  emit('search', current.value)
+}
+
+function custom() {
+  emit('custom', current.value)
+  if (props.animation) actionVisible.value = false
+}
+
+function handleFocus(event) {
+  emit('focus', event)
+}
+
+function handleBlur(event) {
+  emit('blur', event)
+}
+
+function clear() {
+  current.value = ''
+  emitValue('')
+  emit('clear')
+}
+
+function handleDisabledClick() {
+  if (props.disabled) emit('click')
+}
+
+function clickIcon() {
+  emit('clickIcon')
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
+  return text + 'rpx'
+}
+</script>
+
+<style>
+.i-search {
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.i-search__label {
+  margin-right: 8px;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-search__icon {
+  margin-right: 8px;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.i-search__icon-circle {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 8px;
+}
+
+.i-search__icon-handle {
+  position: absolute;
+  right: 1px;
+  bottom: 2px;
+  width: 7px;
+  height: 2px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.i-search__icon-text {
+  line-height: 20px;
+}
+
+.i-search__field {
+  flex: 1;
+  height: 100%;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.i-search__clear {
+  margin-left: 8px;
+  color: #c0c4cc;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.i-search__action {
+  margin-left: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.i-search__action-text {
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+</style>

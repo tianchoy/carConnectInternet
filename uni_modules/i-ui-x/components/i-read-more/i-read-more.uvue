@@ -1,0 +1,102 @@
+<template>
+  <view class="i-card"
+    ><text
+      :class="expanded ? 'i-content' : 'i-content i-content--collapsed'"
+      >{{ text }}</text
+    ><view class="i-btn" @click="toggle"
+      ><text class="i-btn-text">{{
+        expanded ? "收起" : "阅读全文"
+      }}</text></view
+    ></view
+  >
+</template>
+<script setup lang="uts">
+import { ref } from 'vue'
+
+defineOptions({ name: 'i-read-more' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - text: 主要展示文本。
+ */
+const props = defineProps({
+  text: {
+    type: String,
+    default:
+      '这是一段较长的内容，用于测试阅读更多组件。组件会在折叠和展开之间切换，并向外派发 change 事件，页面可以拿到当前状态。',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ * - open: 组件打开或展开时触发。
+ * - close: 组件关闭或收起时触发。
+ */
+const emit = defineEmits(['change', 'open', 'close'])
+
+const expanded = ref(false)
+
+function toggle() {
+  expanded.value = !expanded.value
+  emit('change', expanded.value)
+  emit(expanded.value ? 'open' : 'close')
+}
+</script>
+<style>
+.i-card {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+.i-content {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+.i-content--collapsed {
+  max-height: 44px;
+  overflow: hidden;
+}
+</style>

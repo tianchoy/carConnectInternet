@@ -2,12 +2,12 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 if (!Array) {
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  _easycom_uv_icon_1();
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  _easycom_i_icon_1();
 }
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 if (!Math) {
-  _easycom_uv_icon();
+  _easycom_i_icon();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "custom-navBar",
@@ -91,21 +91,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, __props.showCapsule ? common_vendor.e({
         j: __props.isIcon
       }, __props.isIcon ? {
-        k: common_vendor.p({
+        k: common_vendor.o(_ctx.toDeviceList, "b6"),
+        l: common_vendor.p({
           name: __props.Icon,
-          size: "26",
-          color: __props.iconColor,
+          fontSize: "20",
           class: "data-v-11b89787"
         })
       } : {
-        l: common_vendor.t(__props.rightText)
+        m: common_vendor.t(__props.rightText)
       }, {
-        m: common_vendor.o(($event) => {
+        n: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
         }, "c4")
       }) : {}, {
-        n: "200rpx",
-        o: common_vendor.s(__props.isShowStyle ? {
+        o: "200rpx",
+        p: common_vendor.s(__props.isShowStyle ? {
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor,
           position: "fixed",
@@ -117,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: common_vendor.unref(navBarHeight) + "px",
           background: __props.backgroundColor
         }),
-        p: common_vendor.s({
+        q: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         })

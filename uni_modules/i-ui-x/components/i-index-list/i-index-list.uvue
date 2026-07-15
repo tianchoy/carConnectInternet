@@ -1,0 +1,392 @@
+<template>
+  <view class="i-index-list" :style="'background-color:' + bgColor">
+    <scroll-view
+      class="i-index-list__content"
+      :style="contentStyle"
+      scroll-y
+      :scroll-into-view="scrollIntoView"
+      :scroll-with-animation="true"
+      :show-scrollbar="showScrollbar"
+    >
+      <view
+        v-for="(group, groupIndex) in groups"
+        :id="'i-index-list-group-' + String(groupIndex)"
+        :key="String(groupIndex) + '-' + getGroupTitle(group, groupIndex)"
+        class="i-index-list__group"
+      >
+        <view
+          v-if="showIndexTitle"
+          class="i-index-list__group-title"
+          :style="groupTitleStyle"
+        >
+          <text class="i-index-list__group-title-text">
+            {{ getGroupTitle(group, groupIndex) }}
+          </text>
+        </view>
+        <view
+          v-for="(item, itemIndex) in getGroupItems(group)"
+          :key="String(itemIndex) + '-' + getItemText(item)"
+          class="i-index-list__item"
+          @click="selectItem(group, groupIndex, item, itemIndex)"
+        >
+          <text class="i-index-list__item-text">{{ getItemText(item) }}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view
+      v-if="showIndexBar"
+      :id="barId"
+      class="i-index-list__bar"
+      @touchstart="handleBarTouchStart"
+      @touchmove="handleBarTouchMove"
+    >
+      <text
+        v-for="(group, groupIndex) in groups"
+        :key="'bar-' + String(groupIndex)"
+        :class="
+          activeIndex == groupIndex
+            ? 'i-index-list__bar-text i-index-list__bar-text--active'
+            : 'i-index-list__bar-text'
+        "
+        :style="activeIndex == groupIndex ? 'color:' + activeColor : ''"
+        @tap="selectGroup(groupIndex)"
+        @click="selectGroup(groupIndex)"
+      >
+        {{ getGroupTitle(group, groupIndex) }}
+      </text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-index-list' })
+
+/**
+ * Props 说明：索引列表数据与展示配置。
+ * - list: 分组数据；对象支持 title/name/index、items/children。
+ * - letters: 兼容旧用法的分组标题数组。
+ * - itemsA/itemsB/itemsS: 兼容旧用法的 A/B/S 分组数据。
+ * - activeColor: 右侧索引选中颜色。
+ * - bgColor: 容器背景色。
+ * - sticky: 是否启用分组标题 sticky 效果。
+ * - showIndexBar: 是否显示右侧索引栏。
+ * - showIndexTitle: 是否显示每组标题。
+ * - showScrollbar: 是否显示滚动条。
+ * - height: 列表高度。
+ * - scrollIntoView: 点击右侧索引时内部会设置该值，让 scroll-view 滚到对应分组。
+ */
+const props = defineProps({
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  letters: {
+    type: Array,
+    default() {
+      return ['A', 'B', 'S']
+    },
+  },
+  itemsA: {
+    type: Array,
+    default() {
+      return ['安徽', '澳门']
+    },
+  },
+  itemsB: {
+    type: Array,
+    default() {
+      return ['北京', '保定']
+    },
+  },
+  itemsS: {
+    type: Array,
+    default() {
+      return ['上海', '深圳']
+    },
+  },
+  activeColor: { type: String, default: '#2979ff' },
+  bgColor: { type: String, default: '#ffffff' },
+  sticky: { type: Boolean, default: true },
+  showIndexBar: { type: Boolean, default: true },
+  showIndexTitle: { type: Boolean, default: true },
+  showScrollbar: { type: Boolean, default: false },
+  height: { type: [String, Number], default: '360' },
+})
+
+/**
+ * Emits 说明：索引和列表项选择事件。
+ * - select: 选择列表项时触发，返回 { groupIndex, itemIndex, index, item, text }。
+ * - change: 点击右侧索引切换分组时触发，返回 { groupIndex, index }。
+ * - click: 点击列表项时触发，参数同 select。
+ */
+const emit = defineEmits(['select', 'change', 'click'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const activeIndex = ref(0)
+const scrollIntoView = ref('')
+const barId = 'i-index-list-bar-' + String(Math.round(Math.random() * 1000000))
+const barTop = ref(0)
+const barHeight = ref(0)
+
+const groups = computed(() => {
+  if (props.list.length > 0) return props.list
+  const result = []
+  for (let i = 0; i < props.letters.length; i++) {
+    const title = String(props.letters[i])
+    let items = props.itemsA
+    if (title == 'B') items = props.itemsB
+    if (title == 'S') items = props.itemsS
+    result.push({
+      title,
+      items,
+    })
+  }
+  return result
+})
+
+const groupTitleStyle = computed(() => {
+  let style = 'background-color:#f5f7fb;'
+  if (props.sticky) {
+    style += 'position:sticky;top:0;z-index:1;'
+  }
+  return style
+})
+
+const contentStyle = computed(() => {
+  return 'height:' + formatSize(props.height) + ';'
+})
+
+function getValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  return String(item)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function getGroupTitle(group, index) {
+  const title = getValue(group, 'title')
+  if (title.length > 0) return title
+  const name = getValue(group, 'name')
+  if (name.length > 0) return name
+  const indexText = getValue(group, 'index')
+  if (indexText.length > 0) return indexText
+  return String(index + 1)
+}
+
+function getGroupItems(group) {
+  if (group == null) return []
+  if (typeof group == 'object') {
+    const items = group['items']
+    if (Array.isArray(items)) return items
+    const children = group['children']
+    if (Array.isArray(children)) return children
+  }
+  return []
+}
+
+function getItemText(item) {
+  const name = getValue(item, 'name')
+  if (name.length > 0) return name
+  const text = getValue(item, 'text')
+  if (text.length > 0) return text
+  return String(item)
+}
+
+function selectGroup(groupIndex) {
+  switchGroup(groupIndex, true)
+}
+
+function switchGroup(groupIndex, forceEmit) {
+  if (groups.value.length == 0) return
+  let nextIndex = groupIndex
+  if (nextIndex < 0) nextIndex = 0
+  if (nextIndex >= groups.value.length) nextIndex = groups.value.length - 1
+  if (!forceEmit && activeIndex.value == nextIndex) return
+  activeIndex.value = nextIndex
+  scrollIntoView.value = 'i-index-list-group-' + String(nextIndex)
+  emit('change', {
+    groupIndex: nextIndex,
+    index: getGroupTitle(groups.value[nextIndex], nextIndex),
+  })
+}
+
+function handleBarTouchStart(event) {
+  if (groups.value.length == 0) return
+  setBarRectFromEventTarget(event)
+  if (barHeight.value > 0) {
+    updateGroupByTouch(event)
+    return
+  }
+  refreshBarRect(event, true)
+}
+
+function handleBarTouchMove(event) {
+  if (groups.value.length == 0) return
+  if (barHeight.value > 0) {
+    updateGroupByTouch(event)
+    return
+  }
+  refreshBarRect(event, true)
+}
+
+function refreshBarRect(event, shouldUpdate) {
+  setBarRectFromEventTarget(event)
+  if (barHeight.value > 0) {
+    if (shouldUpdate) updateGroupByTouch(event)
+    return
+  }
+  uni
+    .createSelectorQuery()
+    .select('#' + barId)
+    .boundingClientRect((rect) => {
+      if (rect != null) {
+        barTop.value = normalizeRectPoint(rect.top, rect.y)
+        barHeight.value = Number(rect.height)
+      }
+      if (shouldUpdate) updateGroupByTouch(event)
+    })
+    .exec()
+}
+
+function setBarRectFromEventTarget(event) {
+  const target = event.currentTarget
+  if (
+    target != null &&
+    target.getBoundingClientRect != null &&
+    typeof target.getBoundingClientRect == 'function'
+  ) {
+    const rect = target.getBoundingClientRect()
+    barTop.value = normalizeRectPoint(rect.top, rect.y)
+    barHeight.value = Number(rect.height)
+  }
+}
+
+function updateGroupByTouch(event) {
+  const y = readTouchY(event)
+  if (isNaN(y) || barHeight.value <= 0 || groups.value.length == 0) return
+
+  const letterHeight = 20
+  const totalLetterHeight = groups.value.length * letterHeight
+  const startOffset = Math.max(0, (barHeight.value - totalLetterHeight) / 2)
+  const relativeY = y - barTop.value - startOffset
+  let nextIndex = Math.floor(relativeY / letterHeight)
+
+  if (nextIndex < 0) nextIndex = 0
+  if (nextIndex >= groups.value.length) nextIndex = groups.value.length - 1
+  switchGroup(nextIndex, false)
+}
+
+function readTouchY(event) {
+  let point = null
+  if (event.touches != null && event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return NaN
+  return Number(point.clientY)
+}
+
+function normalizeRectPoint(first, fallback) {
+  const firstValue = Number(first)
+  if (!isNaN(firstValue)) return firstValue
+  const fallbackValue = Number(fallback)
+  if (!isNaN(fallbackValue)) return fallbackValue
+  return 0
+}
+
+function selectItem(group, groupIndex, item, itemIndex) {
+  const payload = {
+    groupIndex,
+    itemIndex,
+    index: getGroupTitle(group, groupIndex),
+    item,
+    text: getItemText(item),
+  }
+  emit('click', payload)
+  emit('select', payload)
+}
+</script>
+
+<style>
+.i-index-list {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.i-index-list__content {
+  position: relative;
+  z-index: 1;
+  height: 360px;
+}
+
+.i-index-list__group-title {
+  min-height: 32px;
+  padding: 0 46px 0 14px;
+  justify-content: center;
+}
+
+.i-index-list__group-title-text {
+  color: #909399;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.i-index-list__item {
+  min-height: 44px;
+  padding: 0 48px 0 16px;
+  justify-content: center;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #ebeef5;
+  background-color: #ffffff;
+}
+
+.i-index-list__item-text {
+  color: #303133;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-index-list__bar {
+  position: absolute;
+  right: 6px;
+  top: 18px;
+  bottom: 18px;
+  z-index: 20;
+  width: 30px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-index-list__bar-text {
+  width: 24px;
+  height: 20px;
+  color: #606266;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.i-index-list__bar-text--active {
+  font-weight: 700;
+}
+</style>

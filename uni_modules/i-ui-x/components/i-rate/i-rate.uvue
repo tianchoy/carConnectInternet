@@ -1,0 +1,214 @@
+<template>
+  <view class="i-rate">
+    <text
+      v-for="item in countList"
+      :key="item"
+      class="i-rate__star"
+      :style="starStyle(item)"
+      @click="select(item)"
+    >
+      {{ starText(item) }}
+    </text>
+    <slot></slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-rate' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Rate，用于星级评分。
+ * - value/modelValue: 当前评分值，支持整数和半星值。
+ * - count: 最多可选的星星数量。
+ * - disabled: 禁用后不可操作，并使用 disabledColor 展示。
+ * - readonly: 只读展示，不响应点击。
+ * - size: 星星大小，单位 px。
+ * - inactiveColor/activeColor/disabledColor: 未选中、选中、禁用颜色。
+ * - gutter: 星星间距。
+ * - minCount: 最少选中的数量。
+ * - allowHalf: 是否允许半星；点击当前星可在半星和整星之间切换。
+ * - activeIcon/inactiveIcon: 图标名称，内置支持 star、heart，也可直接传字符。
+ * - touchable: 是否允许用户操作；UniAppX 内置 text 方案中等同点击开关。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  value: {
+    type: [String, Number],
+    default: 1,
+  },
+  count: {
+    type: [String, Number],
+    default: 5,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  size: {
+    type: [String, Number],
+    default: 16,
+  },
+  inactiveColor: {
+    type: String,
+    default: '#b2b2b2',
+  },
+  activeColor: {
+    type: String,
+    default: '#FA3534',
+  },
+  disabledColor: {
+    type: String,
+    default: '#c8c9cc',
+  },
+  gutter: {
+    type: [String, Number],
+    default: 4,
+  },
+  minCount: {
+    type: [String, Number],
+    default: 1,
+  },
+  allowHalf: {
+    type: Boolean,
+    default: false,
+  },
+  activeIcon: {
+    type: String,
+    default: 'star-fill',
+  },
+  inactiveIcon: {
+    type: String,
+    default: 'star',
+  },
+  touchable: {
+    type: Boolean,
+    default: true,
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
+  showText: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：评分改变时同步外部值。
+ * - change: 用户选择评分时触发，参数为评分值。
+ * - update:value/update:modelValue: 双向绑定同步。
+ */
+const emit = defineEmits(['change', 'update:value', 'update:modelValue'])
+
+const countNumber = computed(() => {
+  const value = Number(props.count)
+  return value > 0 ? value : 5
+})
+
+const current = ref(normalizeValue(initialValue()))
+
+const countList = computed(() => {
+  const list = []
+  for (let i = 1; i <= countNumber.value; i++) list.push(i)
+  return list
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = normalizeValue(initialValue())
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = normalizeValue(initialValue())
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return props.modelValue
+  return props.value
+}
+
+function select(value) {
+  if (props.disabled || props.readonly || !props.touchable) return
+  let nextValue = Number(value)
+  if (props.allowHalf && Math.ceil(current.value) == value && current.value == value) {
+    nextValue = value - 0.5
+  }
+  nextValue = normalizeValue(nextValue)
+  current.value = nextValue
+  emit('change', nextValue)
+  emit('update:value', nextValue)
+  emit('update:modelValue', nextValue)
+}
+
+function normalizeValue(value) {
+  let nextValue = Number(value)
+  if (isNaN(nextValue)) nextValue = Number(props.minCount)
+  const minValue = Number(props.minCount)
+  if (nextValue < minValue) nextValue = minValue
+  if (nextValue > countNumber.value) nextValue = countNumber.value
+  if (!props.allowHalf) nextValue = Math.round(nextValue)
+  return nextValue
+}
+
+function starStyle(index) {
+  const color = props.disabled
+    ? props.disabledColor
+    : index <= current.value
+      ? props.activeColor
+      : props.inactiveColor
+  return (
+    'color:' +
+    color +
+    ';font-size:' +
+    formatSize(props.size) +
+    ';line-height:' +
+    formatSize(Number(props.size) + 4) +
+    ';margin-right:' +
+    formatSize(props.gutter) +
+    ';'
+  )
+}
+
+function starText(index) {
+  if (props.showText && index > countNumber.value) return String(current.value)
+  const active = index <= current.value
+  const half = props.allowHalf && current.value + 0.5 == index
+  const iconName = active || half ? props.activeIcon : props.inactiveIcon
+  if (props.icon.length > 0) return props.icon
+  if (iconName.indexOf('heart') >= 0) return active || half ? '♥' : '♡'
+  if (half) return '★'
+  return active ? '★' : '☆'
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-rate {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-rate__star {
+  text-align: center;
+}
+</style>

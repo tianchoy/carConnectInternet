@@ -1,0 +1,128 @@
+<template>
+  <view class="i-card" @click="restart">
+    <text class="i-muted">{{ title }}</text>
+    <text class="i-count">{{ display }}</text>
+    <view class="i-btn" @click.stop="restart"
+      ><text class="i-btn-text">重新计数</text></view
+    >
+  </view>
+</template>
+<script setup lang="uts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+defineOptions({ name: 'i-count-to' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - startVal: 数字动画起始值。
+ * - endVal: 数字动画结束值。
+ * - duration: 自动关闭或动画持续时间，单位通常为毫秒。
+ * - decimals: 小数位数。
+ * - title: 主标题文本，用于组件顶部或主要说明位置。
+ */
+const props = defineProps({
+  startVal: { type: Number, default: 0 },
+  endVal: { type: Number, default: 2026 },
+  duration: { type: Number, default: 1200 },
+  decimals: { type: Number, default: 0 },
+  title: { type: String, default: '数字滚动' },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ * - end: 流程结束时触发。
+ */
+const emit = defineEmits(['click', 'change', 'end'])
+
+const current = ref(props.startVal)
+const timer = ref(0)
+
+const display = computed(() => {
+  return Number(current.value).toFixed(props.decimals)
+})
+
+onMounted(() => {
+  restart()
+})
+
+onUnmounted(() => {
+  clearInterval(timer.value)
+})
+
+function restart() {
+  clearInterval(timer.value)
+  current.value = props.startVal
+  emit('click', current.value)
+  const frames = Math.max(1, Math.round(props.duration / 40))
+  let frame = 0
+  timer.value = setInterval(() => {
+    frame = frame + 1
+    const progress = frame / frames
+    current.value = props.startVal + (props.endVal - props.startVal) * Math.min(1, progress)
+    emit('change', current.value)
+    if (frame >= frames) {
+      clearInterval(timer.value)
+      current.value = props.endVal
+      emit('end', current.value)
+    }
+  }, 40)
+}
+</script>
+<style>
+.i-card {
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+
+.i-count {
+  margin-top: 4px;
+  color: #2979ff;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 38px;
+}
+</style>

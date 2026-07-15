@@ -1,0 +1,872 @@
+<template>
+  <view class="i-cropper" :style="wrapStyle">
+    <view
+      :id="viewportId"
+      class="i-cropper__stage"
+      :style="stageStyle"
+      @touchstart="handleStageTouchStart"
+      @touchmove="handleStageTouchMove"
+      @touchend="handleStageTouchEnd"
+    >
+      <image
+        v-if="currentSrc.length > 0"
+        class="i-cropper__image"
+        :src="currentSrc"
+        mode="aspectFit"
+        :style="imageStyle"
+        @load="handleLoad"
+        @error="handleError"
+      ></image>
+      <view v-else class="i-cropper__empty" @click="chooseImage">
+        <text class="i-cropper__empty-icon">+</text>
+        <text class="i-cropper__empty-text">选择图片</text>
+      </view>
+
+      <view v-if="currentSrc.length > 0" class="i-cropper__mask" :style="maskStyle"></view>
+      <view
+        v-if="currentSrc.length > 0"
+        class="i-cropper__box"
+        :style="cropBoxStyle"
+        @touchstart.stop="handleCropTouchStart"
+        @touchmove.stop="handleCropTouchMove"
+        @touchend.stop="handleCropTouchEnd"
+      >
+        <view v-if="showGrid" class="i-cropper__grid">
+          <view class="i-cropper__grid-line i-cropper__grid-line--v1"></view>
+          <view class="i-cropper__grid-line i-cropper__grid-line--v2"></view>
+          <view class="i-cropper__grid-line i-cropper__grid-line--h1"></view>
+          <view class="i-cropper__grid-line i-cropper__grid-line--h2"></view>
+        </view>
+        <view
+          v-if="resizable"
+          class="i-cropper__handle i-cropper__handle--lt"
+          @touchstart.stop="handleResizeStart('lt', $event)"
+          @touchmove.stop="handleResizeMove"
+          @touchend.stop="handleResizeEnd"
+        >
+          <view class="i-cropper__handle-dot"></view>
+        </view>
+        <view
+          v-if="resizable"
+          class="i-cropper__handle i-cropper__handle--rt"
+          @touchstart.stop="handleResizeStart('rt', $event)"
+          @touchmove.stop="handleResizeMove"
+          @touchend.stop="handleResizeEnd"
+        >
+          <view class="i-cropper__handle-dot"></view>
+        </view>
+        <view
+          v-if="resizable"
+          class="i-cropper__handle i-cropper__handle--lb"
+          @touchstart.stop="handleResizeStart('lb', $event)"
+          @touchmove.stop="handleResizeMove"
+          @touchend.stop="handleResizeEnd"
+        >
+          <view class="i-cropper__handle-dot"></view>
+        </view>
+        <view
+          v-if="resizable"
+          class="i-cropper__handle i-cropper__handle--rb"
+          @touchstart.stop="handleResizeStart('rb', $event)"
+          @touchmove.stop="handleResizeMove"
+          @touchend.stop="handleResizeEnd"
+        >
+          <view class="i-cropper__handle-dot"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="i-cropper__control">
+      <text class="i-cropper__label">缩放 {{ Math.round(scale * 100) }}%</text>
+      <slider
+        class="i-cropper__slider"
+        :min="Number(minScale * 100)"
+        :max="Number(maxScale * 100)"
+        :step="1"
+        :value="Number(scale * 100)"
+        :disabled="disabled"
+        activeColor="#1989fa"
+        backgroundColor="#eef0f4"
+        @changing="handleScaleChanging"
+        @change="handleScaleChange"
+      />
+    </view>
+
+    <view v-if="showToolbar" class="i-cropper__toolbar">
+      <view class="i-cropper__button" @click="chooseImage">
+        <text class="i-cropper__button-text">选择</text>
+      </view>
+      <view class="i-cropper__button" @click="rotateLeft">
+        <text class="i-cropper__button-text">左转</text>
+      </view>
+      <view class="i-cropper__button" @click="rotateRight">
+        <text class="i-cropper__button-text">右转</text>
+      </view>
+      <view class="i-cropper__button" @click="toggleFlipX">
+        <text class="i-cropper__button-text">翻转</text>
+      </view>
+      <view class="i-cropper__button i-cropper__button--plain" @click="reset">
+        <text class="i-cropper__button-text">重置</text>
+      </view>
+    </view>
+
+    <view class="i-cropper__footer">
+      <view class="i-cropper__action i-cropper__action--cancel" @click="cancel">
+        <text class="i-cropper__action-text i-cropper__action-text--cancel">取消</text>
+      </view>
+      <view class="i-cropper__action i-cropper__action--confirm" @click="confirm">
+        <text class="i-cropper__action-text i-cropper__action-text--confirm">确认裁剪</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-cropper' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x image cropper 的裁剪配置，并补充交互控制。
+ * - src: 待裁剪图片地址，支持网络、本地和相对路径。
+ * - cropWidth/cropHeight: 裁剪框宽高，单位 px；裁剪后的输出会按平台能力处理。
+ * - compress: 压缩质量，0 - 1；chooseImage 原生裁剪时会转换为 0 - 100。
+ * - viewportWidth/viewportHeight: 裁剪面板宽高，单位 px。
+ * - minScale/maxScale/initScale: 图片缩放范围和初始缩放。
+ * - movable/resizable: 是否允许移动裁剪框和拖动四角缩放裁剪框。
+ * - showGrid/showToolbar: 是否显示九宫格辅助线和工具栏。
+ * - borderColor/maskColor/bgColor/round: 裁剪区域视觉样式。
+ * - disabled: 禁用后阻止选择、拖动、缩放、确认等操作。
+ */
+const props = defineProps({
+  src: {
+    type: String,
+    default: '',
+  },
+  cropWidth: {
+    type: Number,
+    default: 300,
+  },
+  cropHeight: {
+    type: Number,
+    default: 300,
+  },
+  width: {
+    type: Number,
+    default: 0,
+  },
+  height: {
+    type: Number,
+    default: 0,
+  },
+  compress: {
+    type: Number,
+    default: 1,
+  },
+  viewportWidth: {
+    type: Number,
+    default: 320,
+  },
+  viewportHeight: {
+    type: Number,
+    default: 360,
+  },
+  minScale: {
+    type: Number,
+    default: 0.5,
+  },
+  maxScale: {
+    type: Number,
+    default: 3,
+  },
+  initScale: {
+    type: Number,
+    default: 1,
+  },
+  movable: {
+    type: Boolean,
+    default: true,
+  },
+  resizable: {
+    type: Boolean,
+    default: true,
+  },
+  showGrid: {
+    type: Boolean,
+    default: true,
+  },
+  showToolbar: {
+    type: Boolean,
+    default: true,
+  },
+  borderColor: {
+    type: String,
+    default: '#1989fa',
+  },
+  maskColor: {
+    type: String,
+    default: 'rgba(0,0,0,0.42)',
+  },
+  bgColor: {
+    type: String,
+    default: '#111827',
+  },
+  round: {
+    type: Number,
+    default: 8,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+/**
+ * Emits 说明：裁剪器向页面同步状态。
+ * - confirm: 点击确认时触发，参数为裁剪结果路径；Web 预览下可能回退为当前 src。
+ * - cancel: 点击取消时触发。
+ * - change: 图片、缩放、旋转、翻转、裁剪框变化时触发，参数为 JSON 字符串。
+ * - update:src: 选择图片后同步当前图片地址。
+ * - load/error: 原生 image 加载事件透传。
+ */
+const emit = defineEmits(['confirm', 'cancel', 'change', 'update:src', 'load', 'error'])
+
+
+const cropperBgColor = computed(() => {
+  return props.bgColor
+})
+const viewportId =
+  'i-cropper-stage-' + String(Date.now()) + '-' + String(Math.round(Math.random() * 100000))
+const currentSrc = ref(props.src)
+const scale = ref(props.initScale)
+const rotate = ref(0)
+const flipX = ref(false)
+const imageX = ref(0)
+const imageY = ref(0)
+const cropX = ref(0)
+const cropY = ref(0)
+const cropBoxWidth = ref(initialCropWidth())
+const cropBoxHeight = ref(initialCropHeight())
+const dragMode = ref('')
+const startTouchX = ref(0)
+const startTouchY = ref(0)
+const startImageX = ref(0)
+const startImageY = ref(0)
+const startCropX = ref(0)
+const startCropY = ref(0)
+const startCropWidth = ref(0)
+const startCropHeight = ref(0)
+const startScale = ref(1)
+const startPinchDistance = ref(0)
+const startPinchCenterX = ref(0)
+const startPinchCenterY = ref(0)
+const lastOutput = ref('')
+
+const wrapStyle = computed(() => {
+  return 'border-radius:' + String(props.round) + 'px;background-color:#ffffff;'
+})
+
+const stageStyle = computed(() => {
+  return (
+    'width:' +
+    String(props.viewportWidth) +
+    'px;' +
+    'height:' +
+    String(props.viewportHeight) +
+    'px;background-color:' +
+    cropperBgColor.value +
+    ';border-radius:' +
+    String(props.round) +
+    'px;'
+  )
+})
+
+const maskStyle = computed(() => {
+  return 'background-color:' + props.maskColor + ';'
+})
+
+const imageStyle = computed(() => {
+  const flipScale = flipX.value ? -1 : 1
+  return (
+    'transform:translate(' +
+    String(imageX.value) +
+    'px,' +
+    String(imageY.value) +
+    'px) scale(' +
+    String(scale.value * flipScale) +
+    ',' +
+    String(scale.value) +
+    ') rotate(' +
+    String(rotate.value) +
+    'deg);'
+  )
+})
+
+const cropBoxStyle = computed(() => {
+  return (
+    'left:' +
+    String(cropX.value) +
+    'px;top:' +
+    String(cropY.value) +
+    'px;width:' +
+    String(cropBoxWidth.value) +
+    'px;height:' +
+    String(cropBoxHeight.value) +
+    'px;border-color:' +
+    props.borderColor +
+    ';'
+  )
+})
+
+watch(
+  () => props.src,
+  (nextValue) => {
+    currentSrc.value = nextValue
+    emitChange()
+  },
+)
+
+watch(
+  () => props.cropWidth,
+  () => {
+    cropBoxWidth.value = initialCropWidth()
+    centerCropBox()
+    emitChange()
+  },
+)
+
+watch(
+  () => props.cropHeight,
+  () => {
+    cropBoxHeight.value = initialCropHeight()
+    centerCropBox()
+    emitChange()
+  },
+)
+
+centerCropBox()
+
+function initialCropWidth(): number {
+  if (props.width > 0) return props.width
+  return clamp(props.cropWidth, 60, props.viewportWidth)
+}
+
+function initialCropHeight(): number {
+  if (props.height > 0) return props.height
+  return clamp(props.cropHeight, 60, props.viewportHeight)
+}
+
+function centerCropBox() {
+  cropX.value = Math.round((props.viewportWidth - cropBoxWidth.value) / 2)
+  cropY.value = Math.round((props.viewportHeight - cropBoxHeight.value) / 2)
+}
+
+function chooseImage() {
+  if (props.disabled) return
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    crop: {
+      width: Math.round(cropBoxWidth.value),
+      height: Math.round(cropBoxHeight.value),
+      quality: compressQuality(),
+      resize: true,
+    },
+    success: (res) => {
+      if (res.tempFilePaths.length == 0) return
+      currentSrc.value = res.tempFilePaths[0]
+      lastOutput.value = currentSrc.value
+      emit('update:src', currentSrc.value)
+      resetTransform()
+      emitChange()
+    },
+    fail: (error) => {
+      emit('error', error)
+    },
+  })
+}
+
+function confirm() {
+  if (props.disabled) return
+  emit('confirm', buildCropResult())
+}
+
+function cancel() {
+  emit('cancel')
+}
+
+function reset() {
+  if (props.disabled) return
+  resetTransform()
+  cropBoxWidth.value = initialCropWidth()
+  cropBoxHeight.value = initialCropHeight()
+  centerCropBox()
+  emitChange()
+}
+
+function resetTransform() {
+  scale.value = props.initScale
+  rotate.value = 0
+  flipX.value = false
+  imageX.value = 0
+  imageY.value = 0
+}
+
+function rotateLeft() {
+  if (props.disabled) return
+  rotate.value = rotate.value - 90
+  emitChange()
+}
+
+function rotateRight() {
+  if (props.disabled) return
+  rotate.value = rotate.value + 90
+  emitChange()
+}
+
+function toggleFlipX() {
+  if (props.disabled) return
+  flipX.value = !flipX.value
+  emitChange()
+}
+
+function handleScaleChanging(event) {
+  updateScale(Number(event.detail.value))
+}
+
+function handleScaleChange(event) {
+  updateScale(Number(event.detail.value))
+}
+
+function updateScale(value: number) {
+  if (props.disabled) return
+  scale.value = clamp(value / 100, props.minScale, props.maxScale)
+  emitChange()
+}
+
+function handleStageTouchStart(event) {
+  if (props.disabled) return
+  if (event.touches.length == 0) return
+  if (event.touches.length >= 2) {
+    beginImagePinch(event)
+    return
+  }
+  dragMode.value = 'image'
+  startTouchX.value = Number(event.touches[0].clientX)
+  startTouchY.value = Number(event.touches[0].clientY)
+  startImageX.value = imageX.value
+  startImageY.value = imageY.value
+}
+
+function handleStageTouchMove(event) {
+  if (props.disabled) return
+  if (dragMode.value == 'image-pinch') {
+    updateImagePinch(event)
+    return
+  }
+  if (dragMode.value != 'image') return
+  if (event.touches.length == 0) return
+  const deltaX = Number(event.touches[0].clientX) - startTouchX.value
+  const deltaY = Number(event.touches[0].clientY) - startTouchY.value
+  imageX.value = startImageX.value + deltaX
+  imageY.value = startImageY.value + deltaY
+  emitChange()
+}
+
+function handleStageTouchEnd() {
+  dragMode.value = ''
+}
+
+function handleCropTouchStart(event) {
+  if (props.disabled) return
+  if (event.touches.length == 0) return
+  if (event.touches.length >= 2) {
+    beginImagePinch(event)
+    return
+  }
+  if (!props.movable) return
+  dragMode.value = 'crop'
+  startTouchX.value = Number(event.touches[0].clientX)
+  startTouchY.value = Number(event.touches[0].clientY)
+  startCropX.value = cropX.value
+  startCropY.value = cropY.value
+}
+
+function handleCropTouchMove(event) {
+  if (props.disabled) return
+  if (dragMode.value == 'image-pinch') {
+    updateImagePinch(event)
+    return
+  }
+  if (dragMode.value != 'crop') return
+  if (event.touches.length == 0) return
+  const deltaX = Number(event.touches[0].clientX) - startTouchX.value
+  const deltaY = Number(event.touches[0].clientY) - startTouchY.value
+  cropX.value = clamp(startCropX.value + deltaX, 0, props.viewportWidth - cropBoxWidth.value)
+  cropY.value = clamp(startCropY.value + deltaY, 0, props.viewportHeight - cropBoxHeight.value)
+  emitChange()
+}
+
+function handleCropTouchEnd() {
+  dragMode.value = ''
+}
+
+function handleResizeStart(corner, event) {
+  if (props.disabled || !props.resizable) return
+  if (event.touches.length == 0) return
+  dragMode.value = String(corner)
+  startTouchX.value = Number(event.touches[0].clientX)
+  startTouchY.value = Number(event.touches[0].clientY)
+  startCropX.value = cropX.value
+  startCropY.value = cropY.value
+  startCropWidth.value = cropBoxWidth.value
+  startCropHeight.value = cropBoxHeight.value
+}
+
+function handleResizeMove(event) {
+  if (props.disabled || dragMode.value.length == 0) return
+  if (event.touches.length == 0) return
+  const deltaX = Number(event.touches[0].clientX) - startTouchX.value
+  const deltaY = Number(event.touches[0].clientY) - startTouchY.value
+  resizeCropBox(dragMode.value, deltaX, deltaY)
+  emitChange()
+}
+
+function handleResizeEnd() {
+  dragMode.value = ''
+}
+
+function beginImagePinch(event) {
+  const points = readTwoTouches(event)
+  if (points.length == 0) return
+  dragMode.value = 'image-pinch'
+  startPinchDistance.value = points[0]
+  startPinchCenterX.value = points[1]
+  startPinchCenterY.value = points[2]
+  startScale.value = scale.value
+  startImageX.value = imageX.value
+  startImageY.value = imageY.value
+}
+
+function updateImagePinch(event) {
+  if (dragMode.value != 'image-pinch') return
+  const points = readTwoTouches(event)
+  if (points.length == 0 || startPinchDistance.value <= 0) return
+  const nextScale = clamp(
+    startScale.value * (points[0] / startPinchDistance.value),
+    props.minScale,
+    props.maxScale,
+  )
+  scale.value = Math.round(nextScale * 1000) / 1000
+  imageX.value = startImageX.value + (points[1] - startPinchCenterX.value)
+  imageY.value = startImageY.value + (points[2] - startPinchCenterY.value)
+  emitChange()
+}
+
+function readTwoTouches(event) {
+  if (event.touches == null || event.touches.length < 2) return []
+  const firstX = Number(event.touches[0].clientX)
+  const firstY = Number(event.touches[0].clientY)
+  const secondX = Number(event.touches[1].clientX)
+  const secondY = Number(event.touches[1].clientY)
+  const deltaX = secondX - firstX
+  const deltaY = secondY - firstY
+  return [
+    Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+    (firstX + secondX) / 2,
+    (firstY + secondY) / 2,
+  ]
+}
+
+function resizeCropBox(corner: string, deltaX: number, deltaY: number) {
+  let nextX = startCropX.value
+  let nextY = startCropY.value
+  let nextWidth = startCropWidth.value
+  let nextHeight = startCropHeight.value
+  if (corner.indexOf('r') >= 0) nextWidth = startCropWidth.value + deltaX
+  if (corner.indexOf('b') >= 0) nextHeight = startCropHeight.value + deltaY
+  if (corner.indexOf('l') >= 0) {
+    nextWidth = startCropWidth.value - deltaX
+    nextX = startCropX.value + deltaX
+  }
+  if (corner.indexOf('t') >= 0) {
+    nextHeight = startCropHeight.value - deltaY
+    nextY = startCropY.value + deltaY
+  }
+  nextWidth = clamp(nextWidth, 60, props.viewportWidth)
+  nextHeight = clamp(nextHeight, 60, props.viewportHeight)
+  nextX = clamp(nextX, 0, props.viewportWidth - nextWidth)
+  nextY = clamp(nextY, 0, props.viewportHeight - nextHeight)
+  cropBoxWidth.value = Math.round(nextWidth)
+  cropBoxHeight.value = Math.round(nextHeight)
+  cropX.value = Math.round(nextX)
+  cropY.value = Math.round(nextY)
+}
+
+function handleLoad(event) {
+  emit('load', event)
+}
+
+function handleError(event) {
+  emit('error', event)
+}
+
+function emitChange() {
+  emit('change', buildCropResult())
+}
+
+function buildCropResult(): string {
+  return JSON.stringify({
+    output: lastOutput.value.length > 0 ? lastOutput.value : currentSrc.value,
+    src: currentSrc.value,
+    cropWidth: cropBoxWidth.value,
+    cropHeight: cropBoxHeight.value,
+    x: cropX.value,
+    y: cropY.value,
+    viewportWidth: props.viewportWidth,
+    viewportHeight: props.viewportHeight,
+    imageX: imageX.value,
+    imageY: imageY.value,
+    scale: scale.value,
+    rotate: rotate.value,
+    flipX: flipX.value,
+    compress: props.compress,
+  })
+}
+
+function compressQuality(): number {
+  if (props.compress <= 1) return Math.round(clamp(props.compress, 0, 1) * 100)
+  return Math.round(clamp(props.compress, 0, 100))
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (value < min) return min
+  if (value > max) return max
+  return value
+}
+
+defineExpose({
+  chooseImage,
+  confirm,
+  cancel,
+  reset,
+  rotateLeft,
+  rotateRight,
+  toggleFlipX,
+})
+</script>
+
+<style>
+.i-cropper {
+  padding: 14px;
+}
+
+.i-cropper__stage {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-cropper__image {
+  width: 100%;
+  height: 100%;
+}
+
+.i-cropper__empty {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-cropper__empty-icon {
+  color: #ffffff;
+  font-size: 34px;
+  line-height: 40px;
+}
+
+.i-cropper__empty-text {
+  margin-top: 6px;
+  color: #d1d5db;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-cropper__mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.22);
+}
+
+.i-cropper__box {
+  position: absolute;
+  border-width: 3px;
+  border-style: solid;
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.85), 0 0 18px rgba(0, 0, 0, 0.32);
+}
+
+.i-cropper__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.i-cropper__grid-line {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+.i-cropper__grid-line--v1 {
+  left: 33.33%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.i-cropper__grid-line--v2 {
+  left: 66.66%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.i-cropper__grid-line--h1 {
+  left: 0;
+  right: 0;
+  top: 33.33%;
+  height: 1px;
+}
+
+.i-cropper__grid-line--h2 {
+  left: 0;
+  right: 0;
+  top: 66.66%;
+  height: 1px;
+}
+
+.i-cropper__handle {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 42px;
+  background-color: rgba(25, 137, 250, 0.16);
+  align-items: center;
+  justify-content: center;
+}
+
+.i-cropper__handle-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ffffff;
+  background-color: #1989fa;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.32);
+}
+
+.i-cropper__handle--lt {
+  left: -21px;
+  top: -21px;
+}
+
+.i-cropper__handle--rt {
+  right: -21px;
+  top: -21px;
+}
+
+.i-cropper__handle--lb {
+  left: -21px;
+  bottom: -21px;
+}
+
+.i-cropper__handle--rb {
+  right: -21px;
+  bottom: -21px;
+}
+
+.i-cropper__control {
+  margin-top: 12px;
+}
+
+.i-cropper__label {
+  color: #606266;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-cropper__slider {
+  margin-top: 4px;
+}
+
+.i-cropper__toolbar,
+.i-cropper__footer {
+  margin-top: 10px;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.i-cropper__button {
+  height: 34px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-cropper__button--plain {
+  background-color: #f5f7fa;
+}
+
+.i-cropper__button-text {
+  color: #1989fa;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.i-cropper__footer {
+  flex-wrap: nowrap;
+}
+
+.i-cropper__action {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-cropper__action--cancel {
+  margin-right: 10px;
+  background-color: #f5f7fa;
+}
+
+.i-cropper__action--confirm {
+  background-color: #1989fa;
+}
+
+.i-cropper__action-text {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.i-cropper__action-text--cancel {
+  color: #606266;
+}
+
+.i-cropper__action-text--confirm {
+  color: #ffffff;
+}
+</style>

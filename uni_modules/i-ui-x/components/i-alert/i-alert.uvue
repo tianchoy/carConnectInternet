@@ -1,0 +1,283 @@
+<template>
+  <view
+    v-if="visible"
+    :class="alertClass"
+    @click="handleClick"
+  >
+    <view v-if="showIcon || hasIconSlot" class="i-alert__icon-wrap">
+      <slot name="icon">
+        <text class="i-alert__icon" :style="alertTextColorStyle">{{ iconText }}</text>
+      </slot>
+    </view>
+
+    <view :class="contentClass">
+      <view class="i-alert__title-wrap">
+        <slot name="title">
+          <text class="i-alert__title" :style="fontStyle">
+            {{ title }}
+          </text>
+        </slot>
+      </view>
+      <view v-if="description.length > 0 || hasDescriptionSlot" class="i-alert__desc-wrap">
+        <slot name="description">
+          <text class="i-alert__description" :style="descriptionStyle">
+            {{ description }}
+          </text>
+        </slot>
+      </view>
+    </view>
+
+    <view v-if="closable" class="i-alert__close" @click="handleClose">
+      <text class="i-alert__close-text" :style="alertTextColorStyle">×</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, useSlots } from 'vue'
+
+defineOptions({ name: 'i-alert' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对照 Alert 警告提示文档。
+ * - title: 标题文字，作为提示的主要内容。
+ * - type: 预设主题颜色，常用值为 success、warning、info、error。
+ * - description: 辅助性文字，字号和颜色弱于 title。
+ * - closable: 是否显示右侧关闭按钮，点击后隐藏当前提示。
+ * - showIcon: 是否显示左侧辅助图标。
+ * - effect: 警告提示的深浅色调；light 为浅色，dark 为深色，plain 为镂空样式。
+ * - center: 文字是否居中。
+ * - fontSize: 标题字体大小，数字会自动补 px。
+ */
+const props = defineProps({
+  title: { type: String, default: '' },
+  type: { type: String, default: 'warning' },
+  description: { type: String, default: '' },
+  closable: { type: Boolean, default: false },
+  showIcon: { type: Boolean, default: false },
+  effect: { type: String, default: 'light' },
+  center: { type: Boolean, default: false },
+  fontSize: { type: [String, Number], default: 14 },
+})
+
+/**
+ * Emits 说明：对照 DCloud uni-app x Alert 文档事件。
+ * - click: 点击组件主体时触发。
+ * - close: 点击关闭按钮时触发。
+ */
+const emit = defineEmits(['click', 'close'])
+
+const slots = useSlots()
+const visible = ref(true)
+
+const hasIconSlot = computed(() => slots['icon'] != null)
+const hasDescriptionSlot = computed(() => slots['description'] != null)
+
+const alertClass = computed(() => {
+  const type = normalizeType(props.type)
+  const effect = normalizeEffect(props.effect)
+  const classes = [
+    'i-alert',
+    'i-alert--' + type,
+    'i-alert--' + effect,
+    'i-alert--' + type + '-' + effect,
+  ]
+  if (props.center) classes.push('i-alert--center')
+  return classes.join(' ')
+})
+
+const contentClass = computed(() => {
+  const classes = ['i-alert__content']
+  if (props.center) classes.push('i-alert__content--center')
+  return classes.join(' ')
+})
+
+const iconText = computed(() => {
+  const type = normalizeType(props.type)
+  if (type == 'success') return '✓'
+  if (type == 'error') return '×'
+  if (type == 'info') return 'i'
+  return '!'
+})
+
+const fontStyle = computed(() => {
+  return 'font-size:' + formatSize(props.fontSize) + ';' + alertTextColorStyle.value
+})
+
+const descriptionStyle = computed(() => {
+  const size = Number(props.fontSize)
+  if (isNaN(size)) return alertTextColorStyle.value
+  const nextSize = size > 12 ? size - 1 : size
+  return 'font-size:' + String(nextSize) + 'px;' + alertTextColorStyle.value
+})
+
+const alertTextColorStyle = computed(() => {
+  return 'color:' + alertTextColor() + ';'
+})
+
+function alertTextColor(): string {
+  const effect = normalizeEffect(props.effect)
+  if (effect == 'dark') return '#ffffff'
+  const type = normalizeType(props.type)
+  if (type == 'success') return '#67c23a'
+  if (type == 'info') return '#909399'
+  if (type == 'error') return '#f56c6c'
+  return '#e6a23c'
+}
+
+function normalizeType(value) {
+  if (value == 'danger') return 'error'
+  if (value == 'primary') return 'info'
+  if (value == 'success' || value == 'warning' || value == 'info' || value == 'error') {
+    return value
+  }
+  return 'warning'
+}
+
+function normalizeEffect(value) {
+  if (value == 'dark' || value == 'plain') return value
+  return 'light'
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function handleClick() {
+  emit('click')
+}
+
+function handleClose() {
+  visible.value = false
+  emit('close')
+}
+</script>
+
+<style>
+.i-alert {
+  padding: 10px 12px;
+  border-radius: 4px;
+  flex-direction: row;
+  align-items: flex-start;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.i-alert--center {
+  align-items: center;
+}
+
+.i-alert__content--center {
+  align-items: center;
+}
+
+.i-alert__icon-wrap {
+  width: 22px;
+  margin-right: 8px;
+  align-items: center;
+}
+
+.i-alert__icon {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.i-alert__content {
+  flex: 1;
+}
+
+.i-alert__title-wrap {
+  min-height: 22px;
+}
+
+.i-alert__title {
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.i-alert__desc-wrap {
+  margin-top: 4px;
+}
+
+.i-alert__description {
+  line-height: 20px;
+}
+
+.i-alert__close {
+  width: 28px;
+  min-height: 24px;
+  margin-left: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-alert__close-text {
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.i-alert--success-light {
+  background-color: #f0f9eb;
+  border-color: #e1f3d8;
+}
+
+.i-alert--warning-light {
+  background-color: #fdf6ec;
+  border-color: #faecd8;
+}
+
+.i-alert--info-light {
+  background-color: #f4f4f5;
+  border-color: #e9e9eb;
+}
+
+.i-alert--error-light {
+  background-color: #fef0f0;
+  border-color: #fde2e2;
+}
+
+.i-alert--success-dark {
+  background-color: #67c23a;
+  border-color: #67c23a;
+}
+
+.i-alert--warning-dark {
+  background-color: #e6a23c;
+  border-color: #e6a23c;
+}
+
+.i-alert--info-dark {
+  background-color: #909399;
+  border-color: #909399;
+}
+
+.i-alert--error-dark {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+.i-alert--success-plain {
+  background-color: #ffffff;
+  border-color: #67c23a;
+}
+
+.i-alert--warning-plain {
+  background-color: #ffffff;
+  border-color: #e6a23c;
+}
+
+.i-alert--info-plain {
+  background-color: #ffffff;
+  border-color: #909399;
+}
+
+.i-alert--error-plain {
+  background-color: #ffffff;
+  border-color: #f56c6c;
+}
+</style>

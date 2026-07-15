@@ -1,0 +1,495 @@
+<template>
+  <view :class="wrapClass">
+    <view
+      v-if="opened && placement == 'top'"
+      class="i-select__list i-select__list--top"
+      :style="listStyle"
+    >
+      <view v-if="dataList.length == 0" class="i-select__empty">
+        <text class="i-select__empty-text">{{ emptyText }}</text>
+      </view>
+      <view
+        v-for="(item, index) in dataList"
+        :key="optionKey(item, index)"
+        :class="optionClass(item)"
+        @click="selectOption(item)"
+      >
+        <text :class="optionTextClass(item)">{{ optionText(item) }}</text>
+      </view>
+    </view>
+
+    <view class="i-select__trigger" :style="triggerStyle" @click="toggle">
+      <text v-if="label.length > 0" class="i-select__label">{{ label }}</text>
+      <slot>
+        <text :class="valueClass" :style="inputStyleText">
+          {{ selectedText.length > 0 ? selectedText : placeholder }}
+        </text>
+      </slot>
+      <text
+        v-if="clearable && hasValue && !disabled"
+        class="i-select__clear"
+        @click.stop="clear"
+      >
+        ×
+      </text>
+      <view
+        v-if="showArrow"
+        :class="
+          opened
+            ? 'i-select__arrow i-select__arrow--open'
+            : 'i-select__arrow'
+        "
+      ></view>
+    </view>
+
+    <view
+      v-if="opened && placement != 'top'"
+      class="i-select__list i-select__list--bottom"
+      :style="listStyle"
+    >
+      <view v-if="dataList.length == 0" class="i-select__empty">
+        <text class="i-select__empty-text">{{ emptyText }}</text>
+      </view>
+      <view
+        v-for="(item, index) in dataList"
+        :key="optionKey(item, index)"
+        :class="optionClass(item)"
+        @click="selectOption(item)"
+      >
+        <text :class="optionTextClass(item)">{{ optionText(item) }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-select' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Select，提供本地数据下拉选择能力。
+ * - modelValue/value: 当前选中的值，支持 v-model 和旧版 value 写法。
+ * - list/options: 选项数据，推荐 { text, value, disabled } 结构；options 为旧版别名。
+ * - block: 是否块级显示，占满父容器宽度。
+ * - height: 下拉列表高度，超出后可滚动。
+ * - clearable: 是否显示清除按钮。
+ * - emptyText: 无数据时显示的文字。
+ * - placeholder: 未选择时的占位文字。
+ * - bgColor: 选择器背景颜色。
+ * - round: 圆角尺寸。
+ * - borderColor: 边框颜色。
+ * - disabled: 是否禁用选择器。
+ * - disabledColor: 禁用时背景颜色。
+ * - wrap: 选中文本是否允许换行。
+ * - placement: 下拉弹出位置，bottom 或 top。
+ * - align: 选中文本对齐方式，left、center、right。
+ * - showArrow: 是否显示右侧箭头。
+ * - border: 边框类型，surround、bottom、none。
+ * - label: 左侧标题，兼容参考示例。
+ * - inputStyle/placeholderStyle/customStyle: 字符串样式入口。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  value: {
+    type: [String, Number],
+    default: '',
+  },
+  list: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  options: {
+    type: Array,
+    default() {
+      return ['Vue', 'UniAppX', 'Harmony']
+    },
+  },
+  block: {
+    type: Boolean,
+    default: false,
+  },
+  height: {
+    type: [String, Number],
+    default: '',
+  },
+  clearable: {
+    type: Boolean,
+    default: true,
+  },
+  emptyText: {
+    type: String,
+    default: '暂无数据',
+  },
+  placeholder: {
+    type: String,
+    default: '请选择',
+  },
+  placeholderStyle: {
+    type: String,
+    default: '',
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  round: {
+    type: [String, Number],
+    default: 8,
+  },
+  borderColor: {
+    type: String,
+    default: '#dcdfe6',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  disabledColor: {
+    type: String,
+    default: '#f5f7fa',
+  },
+  wrap: {
+    type: Boolean,
+    default: false,
+  },
+  placement: {
+    type: String,
+    default: 'bottom',
+  },
+  align: {
+    type: String,
+    default: 'left',
+  },
+  showArrow: {
+    type: Boolean,
+    default: true,
+  },
+  border: {
+    type: String,
+    default: 'surround',
+  },
+  inputStyle: {
+    type: String,
+    default: '',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：同步选中值和下拉状态。
+ * - update:modelValue: 更新 v-model 值时触发。
+ * - update:value: 兼容旧版 value 双向绑定。
+ * - change: 选中发生变化时触发，参数为选中 value。
+ * - open/close: 下拉列表展开或收起时触发。
+ * - clear: 点击清除按钮时触发。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'change',
+  'open',
+  'close',
+  'clear',
+])
+
+
+const selectBgColor = computed(() => {
+  return props.bgColor
+})
+const opened = ref(false)
+const current = ref(initialValue())
+
+const dataList = computed(() => {
+  return props.list.length > 0 ? props.list : props.options
+})
+
+const hasValue = computed(() => String(current.value).length > 0)
+
+const selectedText = computed(() => {
+  for (let i = 0; i < dataList.value.length; i++) {
+    const item = dataList.value[i]
+    if (String(optionValue(item)) == String(current.value)) return optionText(item)
+  }
+  return String(current.value)
+})
+
+const wrapClass = computed(() => {
+  const classes = ['i-select']
+  if (props.block) classes.push('i-select--block')
+  if (props.disabled) classes.push('i-select--disabled')
+  return classes.join(' ')
+})
+
+const valueClass = computed(() => {
+  const classes = ['i-select__value']
+  if (!hasValue.value) classes.push('i-select__value--placeholder')
+  if (props.wrap) classes.push('i-select__value--wrap')
+  if (props.align == 'center') classes.push('i-select__value--center')
+  if (props.align == 'right') classes.push('i-select__value--right')
+  return classes.join(' ')
+})
+
+const triggerStyle = computed(() => {
+  let style =
+    'background-color:' +
+    (props.disabled ? props.disabledColor : selectBgColor.value) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';'
+  if (props.border == 'surround') {
+    style +=
+      'border-width:1px;border-style:solid;border-color:' +
+      props.borderColor +
+      ';'
+  }
+  if (props.border == 'bottom') {
+    style +=
+      'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:' +
+      props.borderColor +
+      ';'
+  }
+  return style + props.customStyle
+})
+
+const inputStyleText = computed(() => {
+  if (!hasValue.value && props.placeholderStyle.length > 0) {
+    return props.placeholderStyle + props.inputStyle
+  }
+  return props.inputStyle
+})
+
+const listStyle = computed(() => {
+  if (String(props.height).length == 0) return ''
+  return 'max-height:' + formatSize(props.height) + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return props.modelValue
+  return props.value
+}
+
+function toggle() {
+  if (props.disabled) return
+  opened.value = !opened.value
+  emit(opened.value ? 'open' : 'close')
+}
+
+function selectOption(item) {
+  if (optionDisabled(item)) return
+  const nextValue = optionValue(item)
+  current.value = nextValue
+  opened.value = false
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+  emit('change', nextValue)
+  emit('close')
+}
+
+function clear() {
+  current.value = ''
+  emit('update:modelValue', '')
+  emit('update:value', '')
+  emit('clear')
+  emit('change', '')
+}
+
+function optionText(item) {
+  if (typeof item == 'object') {
+    const value = item['text']
+    if (value != null) return String(value)
+  }
+  return String(item)
+}
+
+function optionValue(item) {
+  if (typeof item == 'object') {
+    const value = item['value']
+    if (value != null) return value
+  }
+  return item
+}
+
+function optionDisabled(item) {
+  if (typeof item == 'object') {
+    const value = item['disabled']
+    return value == true
+  }
+  return false
+}
+
+function optionKey(item, index) {
+  return String(optionValue(item)) + '-' + String(index)
+}
+
+function optionClass(item) {
+  const classes = ['i-select__item']
+  if (optionDisabled(item)) classes.push('i-select__item--disabled')
+  return classes.join(' ')
+}
+
+function optionTextClass(item) {
+  const classes = ['i-select__item-text']
+  if (String(optionValue(item)) == String(current.value)) {
+    classes.push('i-select__item-text--active')
+  }
+  return classes.join(' ')
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-select {
+  position: relative;
+}
+
+.i-select--block {
+  width: 100%;
+}
+
+.i-select--disabled {
+  opacity: 0.72;
+}
+
+.i-select__trigger {
+  min-height: 44px;
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-select__label {
+  margin-right: 10px;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-select__value {
+  flex: 1;
+  color: #303133;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-select__value--placeholder {
+  color: #909399;
+}
+
+.i-select__value--wrap {
+  white-space: normal;
+}
+
+.i-select__value--center {
+  text-align: center;
+}
+
+.i-select__value--right {
+  text-align: right;
+}
+
+.i-select__arrow {
+  width: 8px;
+  height: 8px;
+  margin-left: 8px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-right-color: #909399;
+  border-bottom-color: #909399;
+  transform: rotate(45deg);
+}
+
+.i-select__arrow--open {
+  transform: rotate(225deg);
+}
+
+.i-select__clear {
+  margin-left: 8px;
+  color: #c0c4cc;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.i-select__list {
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+}
+
+.i-select__list--top {
+  margin-bottom: 8px;
+}
+
+.i-select__list--bottom {
+  margin-top: 8px;
+}
+
+.i-select__item {
+  min-height: 40px;
+  padding: 0 12px;
+  justify-content: center;
+}
+
+.i-select__item--disabled {
+  opacity: 0.42;
+}
+
+.i-select__item-text {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-select__item-text--active {
+  color: #2979ff;
+  font-weight: 600;
+}
+
+.i-select__empty {
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-select__empty-text {
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+}
+</style>

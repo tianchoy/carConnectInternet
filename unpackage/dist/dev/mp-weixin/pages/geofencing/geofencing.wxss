@@ -200,7 +200,6 @@
   color: #999;
 }
 .container .edit-dialog {
-  width: 600rpx;
   background-color: #fff;
   border-radius: 16rpx;
   overflow: hidden;

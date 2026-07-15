@@ -1,0 +1,141 @@
+## 0.2.1（2026-06-18）
+demo增加蓝牙组件演示
+## 0.2.0（2026-06-03）
+给示例页面添加滚动容器
+优化(i-ui-x): 更新组件库日志与文档
+修复(页面样式): 移除冗余的页面高度样式
+## 0.1.2（2026-06-02）
+- 优化(i-slider-menu): 修复侧边菜单收起态图标左右间距不一致的问题，并同步优化首页与示例页的自定义菜单收起态居中。
+- 修复(i-color-picker): 光谱面板改为 App-UVUE 更稳定的色块矩阵绘制，解决 iOS 模拟器中光谱区域空白的问题。
+- 优化(i-upload): 修复 `gutter` 未实际影响缩略图与上传按钮间距的问题，并优化上传区域、缩略图边框和删除按钮样式。
+- 优化(i-slider-menu): 新增内容区滚到底后继续上滑推动页面滚动的能力，并在首页和 SliderMenu demo 中接入。
+- 优化(样式): 统一页面容器高度为100%并清理冗余样式
+- 优化(组件): 修复多组件样式兼容问题，移除不必要的gap和display属性
+- 优化(蓝牙插件): 完善i-ble插件类型定义和导出配置
+- 优化(UI组件): 修复i-ui-x组件的动画和样式兼容问题
+# Changelog
+
+## 0.1.1（2026-06-02）
+- Restored the focused placeholder dot/line breathing effect in `i-code` with an App iOS-friendly UTS timer animation.
+- Restored App iOS-friendly loading animations for `i-icon` spin, `i-loading`, `i-button`, and `i-toast` by driving rotation through UTS timers instead of unsupported CSS keyframes.
+- Fixed `i-button` text rendering on App iOS by using a UniAppX `view` root for normal buttons while keeping native `button` rendering for `openType` and `formType` platform capabilities.
+- Split `i-qrcode` and `ix-table` out of `i-ui-x` into independent uni_modules component plugins.
+- Removed `i-qrcode` and `ix-table` from the aggregate component source directory and updated the aggregate readme scope.
+## 0.1.0
+
+- Renamed the plugin package and directory to `i-ui-x`, including package metadata, documentation, static asset paths, and project guidance.
+- Audited public component APIs before release: removed non-functional compatibility props/events, deleted the residual `i-canvas` component, synced demo Props playground/API tabs, and added real behavior for retained props such as QRCode `level`, Input `inputmode`, Textarea `showCount`, Pagination `inactiveColor`, Radio `placement`, Checkbox `plain`, SliderButton `doneText`, NumberBox `iconSize`, Picker `showInput`, Upload `uploadIconColor`, and Swiper `textColor`.
+- Fixed `i-badge` clipping by reserving safe badge space, moving markers inside the component bounds, enlarging numeric badge height, and aligning the Badge demo position controls with the supported API.
+- Renamed all public component prefixes `i-*`, including component directories, `.uvue` filenames, demo usage, API docs, and example code.
+- Hardened demo API tabs by switching `i-api-doc` usage to the explicit `names` prop, keeping `components` as a compatibility alias, and adding exposed Methods documentation for components with public methods.
+- Simplified high-frequency public props across components: background color props consistently use `bgColor`, `closeOnClickOverlay` was replaced by `closeOnMask`, `safeAreaInsetTop` was replaced by `safeTop`, and `safeAreaInsetBottom` was replaced by `safeBottom`; demos, API docs, and component prop definitions now use only the clearer names.
+- Added initial UniAppX component plugin structure.
+- Added base components: `i-color`, `i-icon`, `i-image`, `i-button`, `i-text`, `i-row`, `i-col`, `i-cell`, `i-badge`, `i-tag`, `i-loading`, and `i-loading-page`.
+- Added a dedicated demo page for each base component.
+- Added form components: `i-form`, `i-form-item`, `i-calendar`, `i-keyboard`, `i-cascader`, `i-picker`, `i-datetime-picker`, `i-color-picker`, `i-select`, `i-rate`, `i-search`, `i-number-box`, `i-upload`, `i-input`, `i-textarea`, `i-checkbox`, `i-radio`, `i-switch`, `i-slider`, `i-album`, and `i-slider-button`.
+- Added a dedicated demo page for each form component.
+- Implemented interactive form behavior for value updates, picking, clearing, confirmation, basic validation, simulated upload, and live demo results.
+- Expanded `i-button` according to DCloud uni-app x official guidance for button props/events and UniAppX native button capabilities.
+- Expanded base components with practical props/events: `i-color`, `i-icon`, `i-image`, `i-text`, `i-row`, `i-col`, `i-cell`, `i-alert`, `i-badge`, `i-tag`, `i-loading`, and `i-loading-page`.
+- Updated base component demo pages to show live event/value feedback.
+- Added data components: `i-circle-progress`, `i-amount`, `i-line-progress`, `ix-table`, `i-countdown`, and `i-count-to`.
+- Added feedback components: `i-popover`, `i-action-sheet`, `i-toast`, `i-notice-bar`, `i-notify`, `i-swipe-action`, `i-collapse`, `i-popup`, `i-modal`, `i-curtain`, and `i-float-panel`.
+- Added layout components: `i-divider`, `i-line`, `i-gap`, `i-safe-bottom`, `i-card`, `i-section`, `i-skeleton`, `i-sticky`, `i-grid`, `i-list`, `i-waterfall`, and `i-empty`.
+- Added navigation components: `i-navbar`, `i-tabbar`, `i-tabs`, `i-subsection`, `i-index-list`, `i-steps`, `i-steps-item`, `i-dropdown`, `i-pagination`, `i-back-top`, and `i-link`.
+- Added other components: `i-signature`, `i-code`, `i-qrcode`, `i-cropper`, `i-avatar`, `i-read-more`, `i-watermark`, `i-load-more`, and `i-link`, plus compatibility demos for earlier experimental components.
+- Added a dedicated second-level demo page for each new data, feedback, layout, navigation, and other component.
+- Registered all new demo pages in `pages.json` and added them to the component index page.
+- Removed the standalone StepsItem demo entry; `i-steps-item` remains available through the Steps examples.
+- Replaced the first-pass generic display shell for data, feedback, layout, navigation, and other components with component-specific behavior, state changes, and event payloads.
+- Rebuilt `i-qrcode` as a real QRCode generator with byte-mode encoding, automatic version selection, Reed-Solomon error correction, QR function patterns, status overlays, refresh/error/change events, and a richer demo page.
+- Added missing other-group demos for Canvas, Signature, Cropper, and Watermark.
+- Reworked `i-signature` based on DCloud uni-app x signature board-style usage with size/background/stroke props, line-count checking, clear/getImage methods, and richer direct/modal demos.
+- Fixed `i-signature` first-stroke coordinate measurement and modal usage by avoiding unmeasured absolute touch coordinates, suppressing duplicate click fallback, and exposing `resize` for popup layout recalculation.
+- Removed the deprecated other-group demos and components for `i-status-bar`, `i-parse`, `i-keyboard-shortcuts`, `i-drag`, and `i-transition`.
+- Reworked `i-color-picker` into a visual picker with color panel, hue/alpha controls, HEX input, recommended swatches, popup demo usage, and full props playground controls.
+- Added `i-color-picker` selection modes for RGB sliders, spectrum panel, and recommended color cards while keeping the existing recommended color palette.
+- Redesigned `i-color-picker` spectrum mode as a single HSL color field with large segmented mode tabs and a draggable selection indicator.
+- Redesigned `i-color-picker` color-card mode as a grey-scale and hue matrix with a dedicated transparency control.
+- Aligned core component styling with the local I UI X theme: semantic colors, border colors, radius, input focus states, tags, badges, cells, buttons, alerts, cards, and feedback overlays.
+- Reworked `i-popup`, `i-modal`, `i-toast`, and `i-notify` into controlled display components driven by `show`, with demo pages providing explicit trigger buttons and props playground controls.
+- Reworked `i-grid` based on DCloud uni-app x grid: configurable columns, item height, item/background colors, width, icon/text colors and sizes, border toggles, border color, radius, link hover state, and object-based icon/text items.
+- Reworked `i-cell` based on DCloud uni-app x cell: card/plain modes, avatar/icon area, title/desc/right label, bottom border controls, link/url behavior, spacing props, slots, and a full props playground.
+- Reworked the `i-color` demo against Element Plus Color: primary, Light, Dark, and Disabled color modes can be adjusted through the color-picker popup, and `i-color` now supports a disabled state.
+- Reworked `i-icon` based on DCloud uni-app x icon: Remix Icon `name`/`code` rendering, local icon font asset, image URL mode, color, rotation, spin animation, and compatibility with the previous semantic circle style.
+- Reworked `i-image` based on DCloud uni-app x official guidance for image behavior: native `mode`, `shape` square/circle, `round`, `fade`, `duration`, `lazyLoad`, `previewSrcList`, `previewIndex`, `showMenuByLongpress`, `loadingIcon`, `errorIcon`, `showLoading`, `showError`, `webp`, `bgColor`, `customStyle`, loading/error slots, and a focused demo page.
+- Fixed `i-image` preview by replacing the platform-only preview call with a built-in full-screen preview layer, including close and previous/next controls.
+- Added `i-code-demo` and wired all component demo pages with Element Plus-style per-example "view code / copy code" source blocks.
+- Split component demo routes into UniAppX subpackages by group: base components, form, data, feedback, layout, navigation, and other.
+- Reworked `i-row` and `i-col` against Element Plus Layout: 24-grid spans, row gutter, justify/align options, offset, push, pull, and a richer Layout demo page.
+- Reworked `i-badge` based on DCloud uni-app x badge: default dot mode, label/count priority, maxCount, position/offset, theme colors, font color/size, and a richer demo page.
+- Reworked `i-tag` based on DCloud uni-app x tag: added skin variants, icon rendering, custom size/radius/border/background/gradient/shadow props, and a richer demo page while keeping existing plain/closable compatibility.
+- Reworked `i-loading` based on DCloud uni-app x loading: spinning Remix Icon, default slot text, `label`, `icon`, `iconSize`, `textSize`, `hideText`, semantic color handling, vertical default layout, and an updated interactive demo.
+- Updated `i-loading-page` to default hidden and fixed its props playground so switching tabs does not open a blocking full-screen loader; manual previews now include an explicit close action.
+- Added a WeChat Mini Program timeout fallback for `i-color-picker` spectrum panel measurements, so rejected `getBoundingClientRectAsync` calls fall back to selector queries.
+- Fixed `i-icon` WeChat Mini Program font loading by avoiding local `@font-face` paths and using an HTTPS Remix Icon font source for MP-WEIXIN.
+- Reworked `i-calendar` based on DCloud uni-app x official guidance for calendar behavior: default date, single/multiple/range modes, inline or popup display, min/max date limits, theme color, confirm/close events, and a richer interactive demo.
+- Reworked `i-form` and `i-form-item` based on DCloud uni-app x form usage: added `modelValue`/`rules`, label layout props, realtime valid status, submit/validate payloads, exposed validation methods, and refreshed the Form demo with form-style examples plus props controls.
+- Added `i-form` failed-field auto scrolling through `errorAutoPage`, `scrollOffsetTop`, `scrollDuration`, `scroll-to-error`, and `i-form-item` generated scroll ids; the form demo now uses a root `scroll-view` with `scroll-into-view` for reliable UniAppX page scrolling.
+- Reworked `i-code` based on DCloud uni-app x code input usage: added `modelValue`, `maxlength`, `autoFocus`, `useSysKeyborad`, size, skin, placeholder, color props, system/external keyboard modes, confirm/change/click events, exposed input methods, and rebuilt the CodeInput demo with examples plus full props playground.
+- Added a breathing animation to the focused `i-code` placeholder dot or line so only the center input marker animates while input is active.
+- Reworked `i-cropper` based on DCloud uni-app x image cropper usage: added `cropWidth`, `cropHeight`, `compress`, `src`, choose-image crop fallback, move/resize/zoom/rotate/flip interactions, confirm/cancel events, exposed control methods, and rebuilt the Cropper demo with examples plus full props playground.
+- Added two-finger image zoom and confirm-time crop preview payloads to `i-cropper`, and updated the ImageResizer demo to render the confirmed cropped preview.
+- Made the `i-cropper` resize controls more visible with larger corner touch targets, blue control dots, white outlines, stronger crop borders, and clearer grid lines.
+- Reworked `i-swiper` based on DCloud uni-app x swiper usage: added `modelValue`, width/height, animation timing, exposed-edge/card modes, vertical mode, custom dot controls, autoplay/loop/last-view behavior, item/last-view/dot slots, change/click/dragLastEnd events, and rebuilt the Swiper demo with examples plus full props playground.
+- Reworked `i-keyboard` based on DCloud uni-app x number keyboard: popup trigger, `modelShow`, `maxLen`, `max`, decimal/integer modes, password display, hold confirmation, themed button/background/font colors, and a richer props playground.
+- Reworked `i-cascader` based on DCloud uni-app x cascader: tree `list`, unlimited single-select levels, disabled items, custom header slot, `modelValue` sync, change/cellClick/confirm events, and a full props playground.
+- Added popup mode to `i-cascader` with trigger field, controlled `show`, bottom sheet header actions, overlay closing, confirm/cancel/open/close events, and demo/props playground coverage.
+- Tuned `i-cascader` column width for mobile popup visibility and exposed `columnWidth` so third-level selections remain readable.
+- Hid the `i-cascader` current-level button in popup mode and uses the header confirm action.
+- Added automatic horizontal scrolling to `i-cascader` so newly revealed child columns stay visible while earlier columns remain available through manual scrolling.
+- Removed the `i-cascader` selected check mark and current-level button from the option rows; active rows now rely on highlight styling only.
+- Reworked `i-picker` based on DCloud uni-app x official guidance for picker behavior: native wheel scrolling with `picker-view`, popup `show`, single/multi `columns`, single-column `defaultIndex`, `v-model` default value, loading, toolbar labels/colors, input/custom trigger, and full change/confirm/cancel/open/close events.
+- Reworked `i-datetime-picker` based on DCloud uni-app x official guidance for date-time picker behavior: popup `show`, `v-model`, datetime/date/time/year-month modes, `minDate`/`maxDate` timestamp limits, time-only hour/minute limits, toolbar labels/colors, and confirm/change/cancel/open/close events.
+- Reworked the DCloud uni-app x form component run from `i-select` through `i-slider-button`: Select, Rate, Search, NumberBox, Upload, Input, Textarea, Checkbox, Radio, Switch, Slider, Album, and SliderButton now expose the main documented props, events, and practical slots while keeping existing `value` aliases for demos.
+- Reworked feedback/navigation entries based on DCloud uni-app x official component guidance: `i-popover`, `i-action-sheet`, `i-tabs`, `i-dropdown`, `i-tabbar`, and `i-subsection` now have component-specific props/events/slots, and added `i-alert` and `i-fab` demo entries.
+- Updated `i-code-demo` so every demo source title can be clicked to copy its implementation code.
+- Added `i-demo-title` and replaced demo page headings so clicking the page title copies the title text, including custom nav-style demo titles.
+- Added `i-api-doc` and updated every tabbed demo page with a third `API` tab that lists the related component Props, Events, and Slots.
+- Added `i-prop-radio` and replaced enum-style Props playground controls with `i-radio` button options across demo pages.
+- Reworked `i-popover` strictly according to DCloud uni-app x official guidance for popover behavior: content popover props, `content` slot, `show`/`hide` methods, cleaned menu-style events, and rebuilt the demo examples plus full props playground.
+- Reworked `i-action-sheet` strictly according to DCloud uni-app x official guidance for action sheet behavior: documented action/open capability props, default/trigger slots, select/close/open-type events, methods, cleaned unrelated events, and rebuilt demos plus full props playground.
+- Reworked `i-alert` strictly according to DCloud uni-app x official guidance for alert behavior: documented type/effect/icon/close/title/description props, icon/title/description slots, click/close events, and rebuilt demos plus full props playground.
+- Reworked `i-toast` strictly according to DCloud uni-app x official guidance for toast behavior: method-driven `open/close/primary/success/error/warning/showLoading`, documented props, mask/position/loading/fill behavior, and rebuilt demos plus full props playground.
+- Reworked `i-notify` strictly according to DCloud uni-app x official guidance for notify behavior: controlled `show`, documented props, icon slot, open/close events, method-driven theme helpers, and rebuilt demos plus full props playground.
+- Reworked `i-notice-bar` strictly according to DCloud uni-app x official guidance for notice bar behavior: documented row/column modes, step/link/closable behavior, color/background/radius/font/touch/jump props, click/close events, and rebuilt demos plus full props playground.
+- Reworked `i-swipe-action` strictly according to DCloud uni-app x official guidance for swipe action behavior: documented parent/item props, left/right action slots, open/close methods, change events, and rebuilt demos plus full props playground.
+- Reworked `i-collapse` strictly according to DCloud uni-app x official guidance for collapse behavior: documented parent/item props, open/close/change methods/events, item title/icon/value slots, cleaned generic demo events, and rebuilt demos plus full props playground.
+- Reworked `i-popup` strictly according to DCloud uni-app x official guidance for popup behavior: documented directions, overlay/opacity/style, close icon settings, safe area, dimensions, trigger/header slots, before/open/close events, swipe-close props, and rebuilt demos plus full props playground.
+- Redesigned `i-popup` based on DCloud uni-app x drawer: added `position`, drawer size, title/close/footer controls, bg/contentTop/title/footer slots, overlay fade plus directional slide animations, lazy content display, offset controls, confirm/cancel events, and refreshed the Popup demo.
+- Added `i-slider-menu` based on DCloud uni-app x side menu: left/right side menu positions, collapsible menu toggle, selected `modelValue` syncing, scroll/default content modes, menu/item/toggle/default slots, full props playground, navigation route, and home grid entry.
+- Enhanced `i-slider-menu` scroll mode so right-side content scrolling updates the active menu item and scrolls the side menu to keep the active item visible.
+- Reworked `i-modal` strictly according to DCloud uni-app x official guidance for modal behavior: documented title/content/button/async-close/width/round/zoom props, default and confirmButton slots, open/close methods, confirm/cancel/close events, and rebuilt demos plus full props playground.
+- Enhanced `i-modal` with duration-driven mask fade and content zoom open/close animations, plus a dedicated animation demo based on DCloud uni-app x modal behavior.
+- Reworked `i-curtain` strictly according to DCloud uni-app x official guidance for curtain behavior: documented show, close icon placement, overlay, safe-area, dimensions and style props, default/close slots, open/close events, and rebuilt demos plus full props playground.
+- Reworked `i-float-panel` strictly according to DCloud uni-app x official guidance for float panel behavior: documented height, anchors, draggable content, overlay, safe area, animation, scrollable and z-index props, handle/default slots, move/change events, `toAnchor` method, and rebuilt demos plus full props playground.
+- Reworked `i-divider`, `i-line`, and `i-gap` strictly according to DCloud uni-app x official layout guidance: cleaned generic props/events, covered documented props/slots/events, rebuilt demos with per-example source blocks, full props playgrounds, and verified H5 build output.
+- Reworked `i-safe-bottom` as a UniAppX safe-area spacer because the the SafeBottom behavior is implemented according to UniAppX safe-area needs: removed visible placeholder text and generic events, added safe-area toggle, rebuilt demos plus props playground, and verified H5 build output.
+- Fixed `i-popover` trigger rendering for UniAppX/WeChat MP demos, added stable triangle arrows with spacing for all directions, and kept position demos compact in one horizontal row.
+- Added `i-popover` `arrowOffset` to control triangle arrow placement, with dedicated demo coverage and props playground control.
+- Added `i-popover` `closeOnClickOutside` to optionally close the bubble when users tap outside the popover.
+- Refined `i-action-sheet` visual styling against the reference image, added action item icon rendering, and updated the custom style demo with disabled/color/no-icon examples.
+- Fixed feedback component polish issues: Toast icon/text row layout and edge positioning, NoticeBar horizontal scrolling and link arrow display, Notify top positioning and custom examples, SwipeAction hidden action backgrounds, Collapse accordion demo state and arrow styling, Curtain close hit area, and FloatPanel live drag movement.
+- Updated `i-notice-bar` to default to no side icons, refreshed demos around closable notices, and implemented real vertical rolling with translated text rows.
+- Fixed `i-swipe-action-item` initial left action width measurement so right-swipe demos reveal both Edit and Delete actions on the first drag.
+- Reworked `ix-table` based on DCloud uni-app x table: added object `list`/`columns` data, horizontal and fixed-height scrolling, sortable headers, row checkboxes, merged cells, local cell styling, refresh events, and rebuilt the Table demo with per-example source blocks plus full props playground coverage.
+- Fixed `i-swipe-action-item` double-sided rows so only the active swipe direction's action background is visible.
+- Added explicit `leftWidth` and `rightWidth` controls to `i-swipe-action-item` so single-action rows do not leave extra blank space while swiping.
+- Updated `i-float-panel` dragging to resize the panel height directly and pause inner scrolling while dragging, improving finger-follow behavior on UniAppX targets.
+- Updated the FloatPanel demo to disable inner scrolling in drag-first examples and avoid heavy move-event rendering, so the panel tracks drag gestures more smoothly.
+- Reworked the FloatPanel demo examples to share one stable panel instance and remove demo-pane move re-rendering, matching the responsive drag behavior of the props playground.
+- Expanded layout components after `i-safe-bottom`: `i-card`, `i-section`, `i-list`, `i-waterfall`, `i-empty`, `i-index-list`, `i-steps`, `i-steps-item`, `i-navbar`, `i-pagination`, `i-back-top`, and `i-link` now expose practical configurable props/events instead of placeholder shells.
+- Rebuilt layout and navigation demo pages for Card, Section, Skeleton, Sticky, List, Waterfall, Empty, Navbar, Tabbar, Tabs, Subsection, IndexList, Steps, StepsItem, Dropdown, Fab, Pagination, BackTop, and Link with per-example implementation code and complete props playground controls.
+- Improved `i-sticky` H5 behavior with measured fixed positioning, expanded the Sticky demo content, and offset the demo sticky bar below the navigation title so the effect is visible while scrolling.
+- Fixed `i-sticky` to implement real top and bottom sticky modes, added `position`, `offsetBottom`, `index`, `fixed`, and `unfixed`, and refreshed the demo with both absorb-top and absorb-bottom examples plus props controls.
+- Hardened `i-sticky` measurement for mini program and real-device rendering by retrying empty selector results, recalculating after scroll/offset changes, and falling back to full-width fixed layout when width is not yet available.
+- Replaced `i-sticky` viewport measurement with `uni.getWindowInfo()` to avoid the WeChat Mini Program `wx.getSystemInfoSync` deprecation warning.
+- Scoped `i-sticky` selector queries to the component instance so mini program demos can measure internal nodes and enter the fixed state correctly.
+- Refined navigation components based on DCloud uni-app x official navigation guidance: Navbar adds safe-area, autoBack and leftClick/rightClick aliases; Tabbar adds sizing, safe-area, badge/dot and z-index controls; Tabs now supports disabled/badge/dot items and scroll-into-view; Dropdown keeps its menu bar clickable while open and exposes z-index; IndexList right index now scrolls to groups; Pagination limits visible numeric buttons; BackTop now defaults hidden until scroll threshold and its demo uses real page scrolling.
+- Polished navigation demos after mobile visual checks: enlarged Tabbar icons and fixed dot clipping, made Tabs truly horizontally scrollable with top-right badges, padded IndexList rows so the index rail no longer covers content and expanded demo data, improved Dropdown overlay/menu layering and arrow styling, and added Fab outside-click collapse control with softer action shadows.
+- Reworked `i-dropdown` and its demo based on DCloud uni-app x dropdown menu: added `modelValue`, `position`, `offsetTop`, `height`, `width`, `color`, `hidnMask`, menu `keyName/icon/activeIcon/isBtn/render/contentText/closeText` data, fixed-mode open-state top placement, free content panels, documented change payloads, and complete props playground coverage.
+- Reworked `i-fab` based on DCloud uni-app x floating button: replaced the old expandable action menu model with draggable fixed float button behavior, offset presets, adsorption, boundary thresholds, width/height/round/bgColor controls, slot/default icon content, click/longpress/change/update:offset events, and a reference-style demo.

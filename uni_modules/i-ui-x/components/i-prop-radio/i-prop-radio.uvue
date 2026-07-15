@@ -1,0 +1,137 @@
+<template>
+  <view class="i-prop-radio">
+    <view
+      v-for="item in optionList"
+      :key="item"
+      :class="
+        isActive(item)
+          ? 'i-prop-radio__chip i-prop-radio__chip--active'
+          : 'i-prop-radio__chip'
+      "
+      @click="select(optionValue(item))"
+    >
+      <text
+        :class="
+          isActive(item)
+            ? 'i-prop-radio__text i-prop-radio__text--active'
+            : 'i-prop-radio__text'
+        "
+        >{{ optionLabel(item) }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-prop-radio' })
+
+/**
+ * Props 说明：用于 demo Props 调试里的枚举值单选。
+ * - modelValue/value: 当前选中的枚举值。
+ * - options: 可选枚举值，使用英文逗号分隔，例如 primary,success,warning。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [String, Number, Boolean],
+    default: '',
+  },
+  value: {
+    type: [String, Number, Boolean],
+    default: '',
+  },
+  options: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：选择枚举值后同步给外层 demo。
+ * - change: 当前选择变化时触发，参数为选中的枚举值。
+ * - update:modelValue/update:value: 支持 v-model 和 value 双向同步。
+ */
+const emit = defineEmits(['change', 'update:modelValue', 'update:value'])
+
+const currentValue = computed(() => {
+  if (String(props.modelValue).length > 0) return props.modelValue
+  return props.value
+})
+
+const optionList = computed(() => {
+  const source = props.options.split(',')
+  const result = []
+  for (let i = 0; i < source.length; i++) {
+    const item = source[i].trim()
+    if (item.length > 0) result.push(item)
+  }
+  return result
+})
+
+function select(value: any) {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('change', value)
+}
+
+function isActive(item: string): boolean {
+  return String(optionValue(item)) == String(currentValue.value)
+}
+
+function optionValue(item: string): string {
+  if (item == '__empty__') return ''
+  return item
+}
+
+function optionLabel(item: string): string {
+  if (item == '__empty__') return 'none'
+  return item
+}
+</script>
+
+<style>
+.i-prop-radio {
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.i-prop-radio__chip {
+  min-width: 52px;
+  height: 32px;
+  margin-left: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #edf1f7;
+  background-color: #f7f8fa;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.i-prop-radio__chip--active {
+  border-color: #3c9cff;
+  background-color: #ecf5ff;
+}
+
+.i-prop-radio__text {
+  color: #606266;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.i-prop-radio__text--active {
+  color: #1989fa;
+  font-weight: 600;
+}
+</style>

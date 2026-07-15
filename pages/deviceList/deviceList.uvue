@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<custom-navBar title="全部设备" :show-back="true" backgroundColor="#f1f1f1" textColor="#333" :showCapsule="true"
-			:isIcon="true" @capsuleClick="showWhat" Icon="grid" :iconColor="iconColor">
+			:isIcon="true" @capsuleClick="showWhat" Icon="/static/maps.png" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%"

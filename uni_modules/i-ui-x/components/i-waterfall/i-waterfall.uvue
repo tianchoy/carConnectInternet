@@ -1,0 +1,272 @@
+<template>
+  <view class="i-waterfall" :style="wrapStyle">
+    <view class="i-waterfall__column" :style="leftColumnStyle">
+      <view
+        v-for="(item, index) in leftItems"
+        :key="'left-' + String(index) + '-' + getItemTitle(item)"
+        class="i-waterfall__item"
+        :style="itemStyle"
+        @click="select(item, index * 2)"
+      >
+        <image
+          v-if="getItemImage(item).length > 0"
+          class="i-waterfall__image"
+          :style="imageStyle"
+          :src="getItemImage(item)"
+          mode="widthFix"
+        ></image>
+        <text class="i-waterfall__title">{{ getItemTitle(item) }}</text>
+        <text v-if="getItemDesc(item).length > 0" class="i-waterfall__desc">
+          {{ getItemDesc(item) }}
+        </text>
+      </view>
+    </view>
+
+    <view v-if="columnCount >= 2" class="i-waterfall__column" :style="rightColumnStyle">
+      <view
+        v-for="(item, index) in rightItems"
+        :key="'right-' + String(index) + '-' + getItemTitle(item)"
+        class="i-waterfall__item"
+        :style="itemStyle"
+        @click="select(item, index * 2 + 1)"
+      >
+        <image
+          v-if="getItemImage(item).length > 0"
+          class="i-waterfall__image"
+          :style="imageStyle"
+          :src="getItemImage(item)"
+          mode="widthFix"
+        ></image>
+        <text class="i-waterfall__title">{{ getItemTitle(item) }}</text>
+        <text v-if="getItemDesc(item).length > 0" class="i-waterfall__desc">
+          {{ getItemDesc(item) }}
+        </text>
+      </view>
+    </view>
+
+    <view v-if="showMore" class="i-waterfall__more" @click="loadMore">
+      <text class="i-waterfall__more-text">{{ moreText }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-waterfall' })
+
+/**
+ * Props 说明：瀑布流数据与外观配置。
+ * - items: 数据源；对象项支持 title/name/text、desc/description、image/url 字段。
+ * - columns: 瀑布流列数，目前支持 1 或 2，默认 2。
+ * - gap: 列间距和卡片间距，数字会自动转为 px。
+ * - bgColor: 容器背景色。
+ * - itemBgColor: 卡片背景色。
+ * - radius: 卡片圆角。
+ * - imageHeight: 图片固定高度；为空时使用 widthFix。
+ * - showMore: 是否显示底部加载更多按钮。
+ * - moreText: 加载更多按钮文案。
+ * - titleKey: 自定义标题字段名。
+ * - descKey: 自定义描述字段名。
+ * - imageKey: 自定义图片字段名。
+ */
+const props = defineProps({
+  items: {
+    type: Array,
+    default() {
+      return [
+        { title: '春日上新', desc: '轻盈色彩搭配', image: '' },
+        { title: '通勤套装', desc: '简洁有层次', image: '' },
+        { title: '城市漫游', desc: '舒适出行', image: '' },
+        { title: '周末灵感', desc: '小物和穿搭', image: '' },
+      ]
+    },
+  },
+  columns: { type: Number, default: 2 },
+  gap: { type: [String, Number], default: 10 },
+  bgColor: { type: String, default: 'transparent' },
+  itemBgColor: { type: String, default: '#ffffff' },
+  radius: { type: [String, Number], default: 8 },
+  imageHeight: { type: [String, Number], default: '' },
+  showMore: { type: Boolean, default: false },
+  moreText: { type: String, default: '加载更多' },
+  titleKey: { type: String, default: 'title' },
+  descKey: { type: String, default: 'desc' },
+  imageKey: { type: String, default: 'image' },
+})
+
+/**
+ * Emits 说明：瀑布流交互事件。
+ * - select: 点击卡片时触发，返回 { index, item, title }。
+ * - change: 当前选中卡片变化时触发，参数同 select。
+ * - click: 点击卡片时触发，参数同 select。
+ * - loadmore: 点击加载更多时触发。
+ */
+const emit = defineEmits(['select', 'change', 'click', 'loadmore'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const columnCount = computed(() => {
+  return props.columns <= 1 ? 1 : 2
+})
+
+const leftItems = computed(() => {
+  const list = []
+  for (let i = 0; i < props.items.length; i++) {
+    if (columnCount.value == 1 || i % 2 == 0) list.push(props.items[i])
+  }
+  return list
+})
+
+const rightItems = computed(() => {
+  const list = []
+  if (columnCount.value == 1) return list
+  for (let i = 0; i < props.items.length; i++) {
+    if (i % 2 == 1) list.push(props.items[i])
+  }
+  return list
+})
+
+const wrapStyle = computed(() => {
+  return 'background-color:' + bgColor.value + ';'
+})
+
+const leftColumnStyle = computed(() => {
+  if (columnCount.value <= 1) return ''
+  return 'margin-right:' + formatSize(props.gap) + ';'
+})
+
+const rightColumnStyle = computed(() => {
+  return ''
+})
+
+const itemStyle = computed(() => {
+  return (
+    'margin-bottom:' +
+    formatSize(props.gap) +
+    ';background-color:' +
+    props.itemBgColor +
+    ';border-radius:' +
+    formatSize(props.radius) +
+    ';'
+  )
+})
+
+const imageStyle = computed(() => {
+  if (String(props.imageHeight).length == 0) return ''
+  return 'height:' + formatSize(props.imageHeight) + ';'
+})
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.length == 0) return ''
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function getValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  if (keyName == props.titleKey || keyName == 'title' || keyName == 'name' || keyName == 'text') {
+    return String(item)
+  }
+  return ''
+}
+
+function getItemTitle(item) {
+  let value = getValue(item, props.titleKey)
+  if (value.length > 0) return value
+  value = getValue(item, 'name')
+  if (value.length > 0) return value
+  value = getValue(item, 'text')
+  if (value.length > 0) return value
+  return String(item)
+}
+
+function getItemDesc(item) {
+  const value = getValue(item, props.descKey)
+  if (value.length > 0) return value
+  return getValue(item, 'description')
+}
+
+function getItemImage(item) {
+  const value = getValue(item, props.imageKey)
+  if (value.length > 0) return value
+  return getValue(item, 'url')
+}
+
+function select(item, index) {
+  const payload = {
+    index,
+    item,
+    title: getItemTitle(item),
+  }
+  emit('click', payload)
+  emit('select', payload)
+  emit('change', payload)
+}
+
+function loadMore() {
+  emit('loadmore')
+}
+</script>
+
+<style>
+.i-waterfall {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.i-waterfall__column {
+  flex: 1;
+}
+
+.i-waterfall__item {
+  overflow: hidden;
+  padding-bottom: 10px;
+}
+
+.i-waterfall__image {
+  width: 100%;
+  min-height: 96px;
+  background-color: #f2f3f5;
+}
+
+.i-waterfall__title {
+  margin-top: 10px;
+  padding: 0 10px;
+  color: #303133;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.i-waterfall__desc {
+  margin-top: 4px;
+  padding: 0 10px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-waterfall__more {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 8px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-waterfall__more-text {
+  color: #2979ff;
+  font-size: 13px;
+  font-weight: 600;
+}
+</style>

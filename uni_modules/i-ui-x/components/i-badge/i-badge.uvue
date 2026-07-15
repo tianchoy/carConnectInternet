@@ -1,0 +1,371 @@
+<template>
+  <view :class="rootClass">
+    <slot></slot>
+    <view
+      v-if="showBadge && dot"
+      :class="badgeClass"
+      :style="badgeStyle"
+      @click="handleClick"
+    ></view>
+    <view
+      v-else-if="showBadge"
+      :class="badgeClass"
+      :style="badgeStyle"
+      @click="handleClick"
+    >
+      <text class="i-badge__text" :style="badgeTextStyle">{{
+        displayValue
+      }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-badge' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x badge 的角标能力。
+ * - label: 文本角标，优先级最高。
+ * - count: 数字角标，优先级低于 label。
+ * - dot: 是否显示点角标，优先级低于 label/count。
+ * - maxCount: 数字大于此值时显示 +。
+ * - position: 位置，支持 right、left、bottomLeft、bottomRight、top、bottom。
+ * - offset: 偏移量，格式为 [x, y]。
+ * - bgColor/fontColor/fontSize: 背景色、文字色、文字大小。
+ * - value/type/max/color: 兼容旧版 i-badge 写法。
+ */
+const props = defineProps({
+  label: {
+    type: String,
+    default: '',
+  },
+  count: {
+    type: Number,
+    default: 0,
+  },
+  value: {
+    type: [String, Number],
+    default: '',
+  },
+  type: {
+    type: String,
+    default: 'danger',
+  },
+  dot: {
+    type: Boolean,
+    default: true,
+  },
+  maxCount: {
+    type: Number,
+    default: 99,
+  },
+  max: {
+    type: Number,
+    default: 99,
+  },
+  position: {
+    type: String,
+    default: 'right',
+  },
+  offset: {
+    type: Array,
+    default() {
+      return [0, 0]
+    },
+  },
+  fontSize: {
+    type: [String, Number],
+    default: '9',
+  },
+  showZero: {
+    type: Boolean,
+    default: false,
+  },
+  hidden: {
+    type: Boolean,
+    default: false,
+  },
+  bgColor: {
+    type: String,
+    default: 'error',
+  },
+  fontColor: {
+    type: String,
+    default: 'white',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ */
+const emit = defineEmits(['click'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const showBadge = computed(() => {
+  if (props.hidden) return false
+  if (props.label.length > 0) return true
+  if (hasNumberValue()) {
+    if (effectiveCount() == 0 && !props.showZero) return props.dot
+    return true
+  }
+  return props.dot
+})
+
+const displayValue = computed(() => {
+  if (props.label.length > 0) return props.label
+  const value = effectiveCount()
+  const max = getMaxCount()
+  if (value > max) return max + '+'
+  return String(value)
+})
+
+const dot = computed(() => {
+  if (props.label.length > 0) return false
+  if (hasNumberValue()) {
+    if (effectiveCount() == 0 && !props.showZero) return props.dot
+    return false
+  }
+  return props.dot
+})
+
+const rootClass = computed(() => {
+  const classes = ['i-badge']
+  const position = normalizePosition(props.position)
+  classes.push('i-badge--' + position)
+  if (dot.value) classes.push('i-badge--dot')
+  if (position == 'left' || position == 'bottomLeft') classes.push('i-badge--left-space')
+  if (dot.value && (position == 'left' || position == 'bottomLeft')) {
+    classes.push('i-badge--dot-left-space')
+  }
+  if (dot.value && (position == 'bottomLeft' || position == 'bottomRight' || position == 'bottom')) {
+    classes.push('i-badge--dot-bottom')
+  }
+  if (dot.value && position == 'top') classes.push('i-badge--dot-top')
+  return classes.join(' ')
+})
+
+const badgeClass = computed(() => {
+  const classes = ['i-badge__mark', 'i-badge__mark--' + normalizeTheme(effectiveBgColor())]
+  if (dot.value) classes.push('i-badge__mark--dot')
+  classes.push('i-badge__mark--' + normalizePosition(props.position))
+  return classes.join(' ')
+})
+
+const badgeStyle = computed(() => {
+  let style = positionStyle()
+  const bgColor = parseColor(effectiveBgColor())
+  if (bgColor.length > 0) style = style + 'background-color:' + bgColor + ';'
+  return style
+})
+
+const badgeTextStyle = computed(() => {
+  return 'color:' + parseColor(effectiveFontColor()) + ';font-size:' + formatSize(props.fontSize) + ';'
+})
+
+function handleClick() {
+  emit('click', {
+    label: props.label,
+    count: effectiveCount(),
+    value: displayValue.value,
+    dot: dot.value,
+    position: props.position,
+  })
+}
+
+function hasNumberValue() {
+  return String(props.value).length > 0 || props.count > 0 || props.showZero
+}
+
+function effectiveCount() {
+  if (String(props.value).length > 0) return Number(props.value)
+  return props.count
+}
+
+function getMaxCount() {
+  if (props.maxCount != 99) return props.maxCount
+  return props.max
+}
+
+function effectiveBgColor() {
+  if (bgColor.value.length > 0) return bgColor.value
+  return props.type
+}
+
+function effectiveFontColor() {
+  if (props.color.length > 0) return props.color
+  return props.fontColor
+}
+
+function normalizeTheme(value: string): string {
+  const text = String(value)
+  if (text == 'danger') return 'error'
+  if (
+    text == 'error' ||
+    text == 'primary' ||
+    text == 'success' ||
+    text == 'warning' ||
+    text == 'info'
+  )
+    return text
+  return 'custom'
+}
+
+function parseColor(value: string): string {
+  const text = String(value)
+  if (text == 'white') return '#ffffff'
+  if (text == 'black') return '#000000'
+  if (text == 'danger' || text == 'error') return '#f56c6c'
+  if (text == 'primary') return '#3c9cff'
+  if (text == 'success') return '#5ac725'
+  if (text == 'warning') return '#f9ae3d'
+  if (text == 'info') return '#909399'
+  return text
+}
+
+function normalizePosition(value: string): string {
+  const text = String(value)
+  if (text == 'rightTop') return 'right'
+  if (text == 'leftTop') return 'left'
+  if (text == 'rightBottom') return 'bottomRight'
+  if (text == 'leftBottom') return 'bottomLeft'
+  if (
+    text == 'left' ||
+    text == 'right' ||
+    text == 'bottomLeft' ||
+    text == 'bottomRight' ||
+    text == 'top' ||
+    text == 'bottom'
+  )
+    return text
+  return 'right'
+}
+
+function positionStyle() {
+  const x = getOffset(0)
+  const y = getOffset(1)
+  const position = normalizePosition(props.position)
+  const edge = 0
+  if (position == 'left') return 'left:' + (edge + x) + 'px;top:' + (edge + y) + 'px;'
+  if (position == 'bottomLeft') return 'left:' + (edge + x) + 'px;bottom:' + (edge - y) + 'px;'
+  if (position == 'bottomRight') return 'right:' + (edge - x) + 'px;bottom:' + (edge - y) + 'px;'
+  if (position == 'top') return 'left:50%;top:' + (edge + y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
+  if (position == 'bottom') return 'left:50%;bottom:' + (edge - y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
+  return 'right:' + (edge - x) + 'px;top:' + (edge + y) + 'px;'
+}
+
+function getOffset(index: number): number {
+  if (props.offset.length <= index) return 0
+  return Number(props.offset[index])
+}
+
+function formatSize(value: string | number): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-badge {
+  position: relative;
+  align-self: flex-start;
+  padding-top: 10px;
+  padding-right: 12px;
+  overflow: visible;
+}
+
+.i-badge--left-space {
+  padding-left: 12px;
+  padding-right: 0;
+}
+
+.i-badge--dot {
+  padding-top: 4px;
+  padding-right: 4px;
+}
+
+.i-badge--dot-left-space {
+  padding-left: 4px;
+  padding-right: 0;
+}
+
+.i-badge--bottomLeft,
+.i-badge--bottomRight,
+.i-badge--bottom {
+  padding-top: 0;
+  padding-bottom: 10px;
+}
+
+.i-badge--dot-bottom {
+  padding-bottom: 4px;
+}
+
+.i-badge--top {
+  padding-right: 0;
+}
+
+.i-badge--dot-top {
+  padding-right: 0;
+}
+
+.i-badge__mark {
+  position: absolute;
+  z-index: 2;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.i-badge__mark--dot {
+  width: 8px;
+  min-width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.i-badge__mark--danger {
+  background-color: #f56c6c;
+}
+
+.i-badge__mark--error {
+  background-color: #f56c6c;
+}
+
+.i-badge__mark--primary {
+  background-color: #3c9cff;
+}
+
+.i-badge__mark--success {
+  background-color: #5ac725;
+}
+
+.i-badge__mark--warning {
+  background-color: #f9ae3d;
+}
+
+.i-badge__mark--info {
+  background-color: #909399;
+}
+
+.i-badge__text {
+  color: #ffffff;
+  line-height: 20px;
+  white-space: nowrap;
+}
+</style>

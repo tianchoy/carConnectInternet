@@ -1,0 +1,684 @@
+<template>
+  <button
+    v-if="useNativeButton"
+    :class="buttonClass"
+    :style="buttonStyle"
+    :disabled="disabled || loading"
+    :form-type="formType"
+    :open-type="openType"
+    :app-parameter="appParameter"
+    :hover-class="computedHoverClass"
+    :hover-stop-propagation="hoverStopPropagation"
+    :hover-start-time="Number(hoverStartTime)"
+    :hover-stay-time="Number(hoverStayTime)"
+    :lang="lang"
+    :session-from="sessionFrom"
+    :send-message-title="sendMessageTitle"
+    :send-message-path="sendMessagePath"
+    :send-message-img="sendMessageImg"
+    :show-message-card="showMessageCard"
+    :data-name="dataName"
+    @click="handleClick"
+    @getphonenumber="handleGetPhoneNumber"
+    @getuserinfo="handleGetUserInfo"
+    @error="handleError"
+    @opensetting="handleOpenSetting"
+    @launchapp="handleLaunchApp"
+    @agreeprivacyauthorization="handleAgreePrivacyAuthorization"
+  >
+    <view class="i-button__inner">
+      <text v-if="loading" :class="loadingClass" :style="loadingStyle"></text>
+      <text
+        v-if="icon.length > 0 && iconPosition == 'left' && !loading"
+        :class="iconClass"
+        :style="iconStyle"
+        >{{ icon }}</text
+      >
+      <text
+        v-if="contentText.length > 0"
+        :class="textClass"
+        :style="textStyle"
+        >{{ contentText }}</text
+      >
+      <text v-else :class="textClass" :style="textStyle"><slot></slot></text>
+      <text
+        v-if="icon.length > 0 && iconPosition == 'right' && !loading"
+        :class="iconClass"
+        :style="iconStyle"
+        >{{ icon }}</text
+      >
+    </view>
+  </button>
+  <view
+    v-else
+    :class="buttonClass"
+    :style="buttonStyle"
+    :hover-class="computedHoverClass"
+    :hover-stop-propagation="hoverStopPropagation"
+    :hover-start-time="Number(hoverStartTime)"
+    :hover-stay-time="Number(hoverStayTime)"
+    :data-name="dataName"
+    @click="handleClick"
+  >
+    <view class="i-button__inner">
+      <text v-if="loading" :class="loadingClass" :style="loadingStyle"></text>
+      <text
+        v-if="icon.length > 0 && iconPosition == 'left' && !loading"
+        :class="iconClass"
+        :style="iconStyle"
+        >{{ icon }}</text
+      >
+      <text
+        v-if="contentText.length > 0"
+        :class="textClass"
+        :style="textStyle"
+        >{{ contentText }}</text
+      >
+      <text v-else :class="textClass" :style="textStyle"><slot></slot></text>
+      <text
+        v-if="icon.length > 0 && iconPosition == 'right' && !loading"
+        :class="iconClass"
+        :style="iconStyle"
+        >{{ icon }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+
+defineOptions({ name: 'i-button' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - hairline: 是否使用细边框。
+ * - type: 组件类型，用于切换视觉风格或语义状态。
+ * - size: 组件尺寸，通常影响宽高或字号。
+ * - block: block 配置项，用于控制组件展示或交互行为。
+ * - shape: 外形配置。
+ * - plain: 是否使用朴素样式。
+ * - disabled: 是否禁用交互；为 true 时阻止点击、选择或输入。
+ * - round: 是否使用圆形样式。
+ * - loading: 是否展示加载状态。
+ * - loadingMode: loadingMode 配置项，用于控制组件展示或交互行为。
+ * - loadingSize: loadingSize 配置项，用于控制组件展示或交互行为。
+ * - openType: 开放能力类型，用于透传平台按钮能力。
+ * - formType: 表单按钮类型，用于 submit 或 reset。
+ * - appParameter: appParameter 配置项，用于控制组件展示或交互行为。
+ * - hoverStopPropagation: hoverStopPropagation 配置项，用于控制组件展示或交互行为。
+ * - lang: lang 配置项，用于控制组件展示或交互行为。
+ * - sessionFrom: sessionFrom 配置项，用于控制组件展示或交互行为。
+ * - sendMessageTitle: sendMessageTitle 配置项，用于控制组件展示或交互行为。
+ * - sendMessagePath: sendMessagePath 配置项，用于控制组件展示或交互行为。
+ * - sendMessageImg: sendMessageImg 配置项，用于控制组件展示或交互行为。
+ * - showMessageCard: showMessageCard 配置项，用于控制组件展示或交互行为。
+ * - dataName: dataName 配置项，用于控制组件展示或交互行为。
+ * - throttleTime: throttleTime 配置项，用于控制组件展示或交互行为。
+ * - hoverStartTime: 按住后出现 hover 状态的延迟时间。
+ * - hoverStayTime: 松开后保留 hover 状态的时间。
+ * - hoverClass: 按下时的 hover 类名。
+ * - text: 主要展示文本。
+ * - icon: 图标文本或图标标识。
+ * - iconColor: iconColor 配置项，用于控制组件展示或交互行为。
+ * - iconPosition: iconPosition 配置项，用于控制组件展示或交互行为。
+ * - color: 文字、图标或线条颜色。
+ * - customStyle: customStyle 配置项，用于控制组件展示或交互行为。
+ */
+const props = defineProps({
+  hairline: {
+    type: Boolean,
+    default: true,
+  },
+  type: {
+    type: String,
+    default: 'default',
+  },
+  size: {
+    type: String,
+    default: 'normal',
+  },
+  block: {
+    type: Boolean,
+    default: false,
+  },
+  shape: {
+    type: String,
+    default: 'square',
+  },
+  plain: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  round: {
+    type: [String, Number],
+    default: '4px',
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  loadingMode: {
+    type: String,
+    default: 'spinner',
+  },
+  loadingSize: {
+    type: [String, Number],
+    default: 15,
+  },
+  openType: {
+    type: String,
+    default: '',
+  },
+  formType: {
+    type: String,
+    default: '',
+  },
+  appParameter: {
+    type: String,
+    default: '',
+  },
+  hoverStopPropagation: {
+    type: Boolean,
+    default: true,
+  },
+  lang: {
+    type: String,
+    default: 'en',
+  },
+  sessionFrom: {
+    type: String,
+    default: '',
+  },
+  sendMessageTitle: {
+    type: String,
+    default: '',
+  },
+  sendMessagePath: {
+    type: String,
+    default: '',
+  },
+  sendMessageImg: {
+    type: String,
+    default: '',
+  },
+  showMessageCard: {
+    type: Boolean,
+    default: false,
+  },
+  dataName: {
+    type: String,
+    default: '',
+  },
+  throttleTime: {
+    type: [String, Number],
+    default: 0,
+  },
+  hoverStartTime: {
+    type: [String, Number],
+    default: 0,
+  },
+  hoverStayTime: {
+    type: [String, Number],
+    default: 200,
+  },
+  hoverClass: {
+    type: String,
+    default: 'i-button--hover',
+  },
+  text: {
+    type: [String, Number],
+    default: '',
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
+  iconColor: {
+    type: String,
+    default: '',
+  },
+  iconPosition: {
+    type: String,
+    default: 'left',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - getphonenumber: 开放能力事件：获取手机号回调。
+ * - getuserinfo: 开放能力事件：获取用户信息回调。
+ * - error: 资源加载失败或平台能力调用失败时触发。
+ * - opensetting: 开放能力事件：打开设置页回调。
+ * - launchapp: 开放能力事件：打开 App 回调。
+ * - agreeprivacyauthorization: 开放能力事件：同意隐私授权回调。
+ */
+const emit = defineEmits([
+  'click',
+  'getphonenumber',
+  'getuserinfo',
+  'error',
+  'opensetting',
+  'launchapp',
+  'agreeprivacyauthorization',
+])
+
+const lastClickTime = ref(0)
+const loadingAngle = ref(0)
+let loadingTimer = 0
+
+const normalizedType = computed(() => {
+  if (props.type == 'danger') return 'error'
+  return props.type
+})
+
+const contentText = computed(() => {
+  return String(props.text).length > 0 ? String(props.text) : ''
+})
+
+const computedHoverClass = computed(() => {
+  if (props.disabled || props.loading) return 'none'
+  return props.hoverClass
+})
+
+const useNativeButton = computed(() => {
+  return props.openType.length > 0 || props.formType.length > 0
+})
+
+const buttonClass = computed(() => {
+  const classes = ['i-button', 'i-button--' + normalizedType.value, 'i-button--' + props.size]
+  if (props.block) classes.push('i-button--block')
+  if (props.plain) classes.push('i-button--plain')
+  if (props.plain) classes.push('i-button--plain-' + normalizedType.value)
+  if (props.hairline && props.plain) classes.push('i-button--hairline')
+  if (props.shape == 'circle') classes.push('i-button--circle')
+  if (props.disabled) classes.push('i-button--disabled')
+  if (props.loading) classes.push('i-button--loading')
+  return classes.join(' ')
+})
+
+const textClass = computed(() => {
+  const classes = ['i-button__text']
+  if (props.size == 'small' || props.size == 'mini') classes.push('i-button__text--small')
+  if (normalizedType.value == 'default') classes.push('i-button__text--default')
+  if (props.plain) classes.push('i-button__text--plain-' + normalizedType.value)
+  if (props.color.length > 0 && props.plain) classes.push('i-button__text--custom')
+  if (props.disabled) classes.push('i-button__text--disabled')
+  if (props.loading) classes.push('i-button__text--loading')
+  return classes.join(' ')
+})
+
+const iconClass = computed(() => {
+  const classes = ['i-button__icon']
+  if (props.iconPosition == 'right') classes.push('i-button__icon--right')
+  return classes.join(' ')
+})
+
+const loadingClass = computed(() => {
+  const classes = ['i-button__loading']
+  if (props.loadingMode == 'circle') classes.push('i-button__loading--circle')
+  if (normalizedType.value == 'default' || props.plain) classes.push('i-button__loading--muted')
+  if (props.plain) classes.push('i-button__loading--plain-' + normalizedType.value)
+  return classes.join(' ')
+})
+
+const buttonStyle = computed(() => {
+  let style = ''
+  if (props.shape != 'circle') style = style + 'border-radius:' + formatSize(props.round) + ';'
+  if (props.color.length > 0) {
+    if (props.plain) {
+      style = style + 'background-color:transparent;border-color:' + props.color + ';'
+    } else {
+      style = style + 'background:' + props.color + ';border-color:transparent;'
+    }
+  }
+  if (props.customStyle.length > 0) style = style + props.customStyle
+  return style
+})
+
+const textStyle = computed(() => {
+  if (props.color.length > 0 && props.plain) return 'color:' + props.color + ';'
+  return ''
+})
+
+const iconStyle = computed(() => {
+  if (props.iconColor.length > 0) return 'color:' + props.iconColor + ';'
+  if (props.color.length > 0 && props.plain) return 'color:' + props.color + ';'
+  return ''
+})
+
+const loadingStyle = computed(() => {
+  const size = formatSize(props.loadingSize)
+  return (
+    'width:' +
+    size +
+    ';height:' +
+    size +
+    ';transform:rotate(' +
+    String(loadingAngle.value) +
+    'deg);'
+  )
+})
+
+watch(
+  () => props.loading,
+  (nextValue) => {
+    if (nextValue) {
+      startLoading()
+    } else {
+      stopLoading()
+    }
+  },
+)
+
+onMounted(() => {
+  if (props.loading) startLoading()
+})
+
+onUnmounted(() => {
+  stopLoading()
+})
+
+function startLoading() {
+  if (loadingTimer > 0) return
+  loadingTimer = setInterval(() => {
+    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
+  }, 50)
+}
+
+function stopLoading() {
+  if (loadingTimer > 0) {
+    clearInterval(loadingTimer)
+    loadingTimer = 0
+  }
+  loadingAngle.value = 0
+}
+
+function normalizeAngle(value: number): number {
+  let angle = value % 360
+  if (angle < 0) angle = angle + 360
+  return angle
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function canClick() {
+  if (props.disabled || props.loading) return false
+  const wait = Number(props.throttleTime)
+  if (wait <= 0) return true
+  const now = Date.now()
+  if (now - lastClickTime.value < wait) return false
+  lastClickTime.value = now
+  return true
+}
+
+function handleClick(event) {
+  if (!canClick()) return
+  emit('click', event)
+}
+
+function handleGetPhoneNumber(event) {
+  emit('getphonenumber', event)
+}
+
+function handleGetUserInfo(event) {
+  emit('getuserinfo', event)
+}
+
+function handleError(event) {
+  emit('error', event)
+}
+
+function handleOpenSetting(event) {
+  emit('opensetting', event)
+}
+
+function handleLaunchApp(event) {
+  emit('launchapp', event)
+}
+
+function handleAgreePrivacyAuthorization(event) {
+  emit('agreeprivacyauthorization', event)
+}
+</script>
+
+<style>
+.i-button {
+  display: flex;
+  height: 44px;
+  min-width: 86px;
+  padding: 0 18px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  background-color: #f4f4f5;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin: 0;
+  overflow: hidden;
+}
+
+.i-button__inner {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-button--block {
+  width: 100%;
+}
+
+.i-button--large {
+  height: 50px;
+  min-width: 108px;
+  padding: 0 22px;
+}
+
+.i-button--normal {
+  height: 44px;
+}
+
+.i-button--small {
+  height: 36px;
+  min-width: 72px;
+  padding: 0 14px;
+}
+
+.i-button--mini {
+  height: 30px;
+  min-width: 58px;
+  padding: 0 10px;
+}
+
+.i-button--circle {
+  border-radius: 999px;
+}
+
+.i-button--primary {
+  background-color: #3c9cff;
+}
+
+.i-button--success {
+  background-color: #5ac725;
+}
+
+.i-button--warning {
+  background-color: #f9ae3d;
+}
+
+.i-button--error {
+  background-color: #f56c6c;
+}
+
+.i-button--info {
+  background-color: #909399;
+}
+
+.i-button--default {
+  background-color: #f4f4f5;
+  border-color: #dadbde;
+}
+
+.i-button--plain {
+  background-color: #ffffff;
+  border-color: #dadbde;
+}
+
+.i-button--plain-primary {
+  border-color: #3c9cff;
+  background-color: #ffffff;
+}
+
+.i-button--plain-success {
+  border-color: #5ac725;
+  background-color: #ffffff;
+}
+
+.i-button--plain-warning {
+  border-color: #f9ae3d;
+  background-color: #ffffff;
+}
+
+.i-button--plain-error {
+  border-color: #f56c6c;
+  background-color: #ffffff;
+}
+
+.i-button--plain-info {
+  border-color: #909399;
+  background-color: #ffffff;
+}
+
+.i-button--hairline {
+  border-width: 0.5px;
+}
+
+.i-button--disabled {
+  opacity: 0.6;
+}
+
+.i-button--loading {
+  opacity: 0.9;
+}
+
+.i-button--hover {
+  opacity: 0.86;
+}
+
+.i-button__text {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.i-button__text--small {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.i-button__text--default {
+  color: #303133;
+}
+
+.i-button__text--plain-primary {
+  color: #3c9cff;
+}
+
+.i-button__text--plain-success {
+  color: #5ac725;
+}
+
+.i-button__text--plain-warning {
+  color: #f9ae3d;
+}
+
+.i-button__text--plain-error {
+  color: #f56c6c;
+}
+
+.i-button__text--plain-info {
+  color: #909399;
+}
+
+.i-button__text--plain-default {
+  color: #303133;
+}
+
+.i-button__text--disabled {
+  opacity: 0.9;
+}
+
+.i-button__icon {
+  margin-right: 6px;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.i-button__icon--right {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+.i-button__loading {
+  margin-right: 6px;
+  border-radius: 999px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.45);
+  border-top-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.i-button__loading--circle {
+  border-radius: 999px;
+}
+
+.i-button__text--loading {
+  opacity: 0.96;
+}
+
+.i-button__loading--muted {
+  border-color: rgba(48, 49, 51, 0.18);
+  border-top-color: #606266;
+}
+
+.i-button__loading--plain-primary {
+  border-top-color: #3c9cff;
+}
+
+.i-button__loading--plain-success {
+  border-top-color: #5ac725;
+}
+
+.i-button__loading--plain-warning {
+  border-top-color: #f9ae3d;
+}
+
+.i-button__loading--plain-error {
+  border-top-color: #f56c6c;
+}
+
+.i-button__loading--plain-info {
+  border-top-color: #909399;
+}
+</style>

@@ -1,32 +1,38 @@
 <template>
-  <uv-popup ref="popupRef" :title="title" mode="bottom" :safeAreaInsetBottom="safeAreaInsetBottom">
+  <i-popup
+    :show="visible"
+    :title="title"
+    mode="bottom"
+    :safeBottom="safeAreaInsetBottom"
+    showClose
+    @close="close"
+    @click="handlePopupClick"
+  >
     <view class="icon-selector">
-      <uv-grid :col="col">
-        <uv-grid-item 
-          v-for="(item, index) in iconList" 
-          :key="index" 
-          @click="handleSelect(item)"
-        >
-          <uv-icon 
-            :customStyle="{ paddingTop: '20rpx' }" 
-            :name="item.img" 
-            :size="iconSize"
-          ></uv-icon>
-          <text class="grid-text">{{ item.title }}</text>
-        </uv-grid-item>
-      </uv-grid>
+      
+			  <i-grid
+				:items="iconList"
+				:col="4"
+				itemHeight="88"
+				round="8"
+				:imageSize="30"
+				iconColor="#3c9cff"
+				textColor="#606266"
+				:showBorder="true"
+				@click="handleSelect($event)"
+			></i-grid>
     </view>
-  </uv-popup>
+  </i-popup>
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 interface Props {
   title?: string
   col?: number
   iconSize?: number
-  safeAreaInsetBottom?: boolean
+  safeAreaInsetBottom?: boolean,
 }
 
 interface Emits {
@@ -35,52 +41,65 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   title: '请选择图标',
-  col: 5,
-  iconSize: 50,
+  col: 4,
+  iconSize: 40,
   safeAreaInsetBottom: true
 })
 
 const emit = defineEmits<Emits>()
 
-// 在组件内部定义完整的图标列表
+// 弹窗显示状态
+const visible = ref(false)
+
+// 图标列表
 const iconList = [
-  { name: 'car', title: '轿车', img: '/static/cars/online/car.png' },
-  { name: 'bus', title: '公交车', img: '/static/cars/online/bus.png' },
-  { name: 'bike', title: '自行车', img: '/static/cars/online/bike.png' },
-  { name: 'moto', title: '摩托车', img: '/static/cars/online/moto.png' },
-  { name: 'diandong', title: '电动车', img: '/static/cars/online/diandong.png' },
-  { name: 'huoche', title: '货车', img: '/static/cars/online/huoche.png' },
-  { name: 'sanlun', title: '三轮车', img: '/static/cars/online/sanlun.png' },
-  { name: 'tuola', title: '拖拉机', img: '/static/cars/online/tuola.png' },
-  { name: 'suv', title: '越野车', img: '/static/cars/online/suv.png' },
-  { name: 'baby', title: '婴儿车', img: '/static/cars/online/baby.png' },
-  { name: 'tank', title: '坦克', img: '/static/cars/online/tank.png' },
-  { name: 'zhuangjia', title: '装甲车', img: '/static/cars/online/zhuangjia.png' },
-  { name: 'wajue', title: '挖掘机', img: '/static/cars/online/wajue.png' },
-  { name: 'plan', title: '飞机', img: '/static/cars/online/plan.png' },
-  { name: 'walk', title: '步行', img: '/static/cars/online/walk.png' },
-  { name: 'muma', title: '木马', img: '/static/cars/online/muma.png' },
-  { name: 'hangmu', title: '航母', img: '/static/cars/online/hangmu.png' },
-  { name: 'junjian', title: '军舰', img: '/static/cars/online/junjian.png' },
-  { name: 'tuiche', title: '手推车', img: '/static/cars/online/tuiche.png' },
-  { name: 'train', title: '火车', img: '/static/cars/online/train.png' },
+  { name: 'car', text: '轿车', image: '/static/cars/online/car.png' },
+  { name: 'suv', text: '越野车', image: '/static/cars/online/suv.png' },
+  { name: 'bus', text: '公交车', image: '/static/cars/online/bus.png' },
+  { name: 'huoche', text: '货车', image: '/static/cars/online/huoche.png' },
+  { name: 'train', text: '火车', image: '/static/cars/online/train.png' },
+  { name: 'diandong', text: '电动车', image: '/static/cars/online/diandong.png' },
+  { name: 'moto', text: '摩托车', image: '/static/cars/online/moto.png' },
+  { name: 'bike', text: '自行车', image: '/static/cars/online/bike.png' },
+  { name: 'sanlun', text: '三轮车', image: '/static/cars/online/sanlun.png' },
+  { name: 'tuola', text: '拖拉机', image: '/static/cars/online/tuola.png' },
+  { name: 'wajue', text: '挖掘机', image: '/static/cars/online/wajue.png' },
+  { name: 'tuiche', text: '手推车', image: '/static/cars/online/tuiche.png' },  
+  { name: 'baby', text: '婴儿车', image: '/static/cars/online/baby.png' },
+  { name: 'muma', text: '木马', image: '/static/cars/online/muma.png' },
+  { name: 'tank', text: '坦克', image: '/static/cars/online/tank.png' },
+  { name: 'zhuangjia', text: '装甲车', image: '/static/cars/online/zhuangjia.png' },
+  { name: 'plan', text: '飞机', image: '/static/cars/online/plan.png' },
+  { name: 'hangmu', text: '航母', image: '/static/cars/online/hangmu.png' },
+  { name: 'junjian', text: '军舰', image: '/static/cars/online/junjian.png' },
+  { name: 'walk', text: '步行', image: '/static/cars/online/walk.png' },
 ]
 
-const popupRef = ref(null)
+// 每个宫格宽度（根据列数计算百分比）
+const itemWidth = computed(() => {
+  const cols = props.col > 0 ? props.col : 4
+  return (100 / cols) + '%'
+})
 
 // 选择图标处理函数
 const handleSelect = (item: any) => {
+  console.log('选择的图标:', item)
   emit('select', item)
   close()
 }
 
+// 弹窗点击处理
+const handlePopupClick = () => {
+  console.log('Popup clicked')
+}
+
 // 公开的方法
 const open = () => {
-  popupRef.value?.open()
+  visible.value = true
 }
 
 const close = () => {
-  popupRef.value?.close()
+  visible.value = false
 }
 
 // 根据图标名称获取图标信息
@@ -99,13 +118,61 @@ defineExpose({
 
 <style lang="scss" scoped>
 .icon-selector {
-  padding: 20rpx;
+  padding: 20rpx 20rpx 40rpx;
   background-color: #fff;
+  min-height: 50%;
+  overflow-y: auto;
   
-  .grid-text {
-    margin-top: 10rpx;
-    font-size: 20rpx;
-    color: #333;
+  .icon-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+    .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20rpx 10rpx;
+      width: 25%;
+      height: 100%;
+      transition: all 0.3s ease;
+      
+      &:active {
+        transform: scale(0.95);
+        background-color: #f5f5f5;
+      }
+      
+      .icon-image {
+        width: 80rpx;
+        height: 80rpx;
+        margin-bottom: 10rpx;
+      }
+      
+      .grid-text {
+        font-size: 22rpx;
+        color: #333;
+        text-align: center;
+        line-height: 1.2;
+        margin-top: 8rpx;
+        font-weight: 400;
+      }
+    }
   }
+}
+
+// 自定义滚动条样式
+.icon-selector::-webkit-scrollbar {
+  width: 4px;
+}
+
+.icon-selector::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.icon-selector::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
 }
 </style>

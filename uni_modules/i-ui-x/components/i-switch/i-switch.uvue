@@ -1,0 +1,266 @@
+<template>
+  <view class="i-switch-wrap">
+    <text v-if="inactiveText.length > 0" class="i-switch__side-text">
+      {{ inactiveText }}
+    </text>
+    <view :class="switchClass" :style="switchStyle" @click="toggle">
+      <text v-if="loading" class="i-switch__loading" :style="loadingStyle">
+        {{ loadingMode == "spinner" ? "..." : loadingIcon }}
+      </text>
+      <view class="i-switch__thumb" :style="thumbStyle"></view>
+    </view>
+    <text v-if="activeText.length > 0" class="i-switch__side-text">
+      {{ activeText }}
+    </text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-switch' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Switch，用于开关选择。
+ * - modelValue/value: 当前绑定值。
+ * - loading: 是否加载中，加载时不可切换。
+ * - disabled: 是否禁用。
+ * - shape: 开关形状，round 或 square。
+ * - size: 开关高度，单位 rpx/px。
+ * - width: 固定宽度，为 0 时按 size 自动计算。
+ * - activeColor/inactiveColor: 打开和关闭背景色。
+ * - activeValue/inactiveValue: 打开和关闭对应的真实值。
+ * - asyncChange: 是否异步变更，开启后只触发 change，不主动切换内部值。
+ * - space: 圆点与外边框距离。
+ * - textSpace/activeText/inactiveText: 两侧文字和间距。
+ * - loadingMode/loadingSize/loadingIcon: 加载状态展示。
+ */
+const props = defineProps({
+  modelValue: {
+    type: [Boolean, String, Number],
+    default: '',
+  },
+  value: {
+    type: [Boolean, String, Number],
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  shape: {
+    type: String,
+    default: 'round',
+  },
+  size: {
+    type: [String, Number],
+    default: '26px',
+  },
+  width: {
+    type: [String, Number],
+    default: 0,
+  },
+  activeColor: {
+    type: String,
+    default: '#2979ff',
+  },
+  inactiveColor: {
+    type: String,
+    default: '#dcdfe6',
+  },
+  activeValue: {
+    type: [Boolean, String, Number],
+    default: true,
+  },
+  inactiveValue: {
+    type: [Boolean, String, Number],
+    default: false,
+  },
+  asyncChange: {
+    type: Boolean,
+    default: false,
+  },
+  space: {
+    type: [String, Number],
+    default: '2px',
+  },
+  textSpace: {
+    type: [String, Number],
+    default: 8,
+  },
+  activeText: {
+    type: String,
+    default: '',
+  },
+  inactiveText: {
+    type: String,
+    default: '',
+  },
+  loadingMode: {
+    type: String,
+    default: 'spinner',
+  },
+  loadingSize: {
+    type: [String, Number],
+    default: 15,
+  },
+  loadingIcon: {
+    type: String,
+    default: 'loading',
+  },
+})
+
+/**
+ * Emits 说明：切换开关值。
+ * - update:modelValue/update:value: 同步开关值。
+ * - change: 打开或关闭时触发，参数为 activeValue 或 inactiveValue。
+ */
+const emit = defineEmits(['update:modelValue', 'update:value', 'change'])
+
+const current = ref(initialValue())
+
+const checked = computed(() => {
+  return String(current.value) == String(props.activeValue)
+})
+
+const switchClass = computed(() => {
+  const classes = ['i-switch']
+  if (checked.value) classes.push('i-switch--checked')
+  if (props.disabled || props.loading) classes.push('i-switch--disabled')
+  if (props.shape == 'square') classes.push('i-switch--square')
+  return classes.join(' ')
+})
+
+const switchStyle = computed(() => {
+  const height = numericSize(props.size, 26)
+  const width = numericSize(props.width, 0) > 0 ? numericSize(props.width, 0) : height * 2
+  return (
+    'width:' +
+    formatSize(width) +
+    ';height:' +
+    formatSize(height) +
+    ';padding:' +
+    formatSize(props.space) +
+    ';border-radius:' +
+    (props.shape == 'square' ? '4px' : formatSize(height)) +
+    ';background-color:' +
+    (checked.value ? props.activeColor : props.inactiveColor) +
+    ';margin-left:' +
+    formatSize(props.textSpace) +
+    ';margin-right:' +
+    formatSize(props.textSpace) +
+    ';'
+  )
+})
+
+const thumbStyle = computed(() => {
+  const height = numericSize(props.size, 26)
+  const space = numericSize(props.space, 2)
+  const thumb = height - space * 2
+  const width = numericSize(props.width, 0) > 0 ? numericSize(props.width, 0) : height * 2
+  const offset = checked.value ? width - thumb - space * 2 : 0
+  return (
+    'width:' +
+    formatSize(thumb) +
+    ';height:' +
+    formatSize(thumb) +
+    ';border-radius:' +
+    (props.shape == 'square' ? '3px' : formatSize(thumb)) +
+    ';margin-left:' +
+    formatSize(offset) +
+    ';'
+  )
+})
+
+const loadingStyle = computed(() => {
+  return 'font-size:' + formatSize(props.loadingSize) + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    current.value = initialValue()
+  },
+)
+
+function initialValue() {
+  if (String(props.modelValue).length > 0) return props.modelValue
+  return props.value
+}
+
+function toggle() {
+  if (props.disabled || props.loading) return
+  const nextValue = checked.value ? props.inactiveValue : props.activeValue
+  if (!props.asyncChange) current.value = nextValue
+  emit('change', nextValue)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function numericSize(value, fallback) {
+  const text = String(value).replace('px', '').replace('rpx', '').replace('%', '')
+  const numberValue = Number(text)
+  if (isNaN(numberValue)) return fallback
+  return numberValue
+}
+</script>
+
+<style>
+.i-switch-wrap {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-switch {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  background-color: #ffffff;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.i-switch--disabled {
+  opacity: 0.55;
+}
+
+.i-switch__thumb {
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.i-switch__loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #909399;
+  line-height: 18px;
+}
+
+.i-switch__side-text {
+  color: #606266;
+  font-size: 13px;
+  line-height: 20px;
+}
+</style>

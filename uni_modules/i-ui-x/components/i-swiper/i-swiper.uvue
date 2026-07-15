@@ -1,0 +1,505 @@
+<template>
+  <view class="i-swiper-wrap" :style="wrapStyle">
+    <swiper
+      class="i-swiper"
+      :style="swiperStyle"
+      :current="currentIndex"
+      :autoplay="autoPlayEnabled"
+      :interval="playInterval"
+      :duration="animationDuration"
+      :circular="loop"
+      :vertical="vertical"
+      :previous-margin="sideMargin"
+      :next-margin="sideMargin"
+      :indicator-dots="false"
+      @change="handleChange"
+      @transition="handleTransition"
+      @animationfinish="handleAnimationFinish"
+    >
+      <swiper-item v-for="(item, index) in items" :key="index">
+        <view
+          :class="itemClass(index)"
+          :style="itemStyle(index)"
+          @click="handleClick(index)"
+        >
+          <slot name="item" :item="item" :index="index">
+            <image
+              v-if="isImageItem(item)"
+              class="i-swiper__image"
+              :src="String(item)"
+              mode="aspectFill"
+            ></image>
+            <view v-else class="i-swiper__content">
+              <text class="i-swiper__title" :style="contentTitleStyle">
+                {{ itemTitle(item, index) }}
+              </text>
+              <text class="i-swiper__desc" :style="contentDescStyle">
+                {{ itemDesc(item, index) }}
+              </text>
+            </view>
+          </slot>
+        </view>
+      </swiper-item>
+
+      <swiper-item v-if="showLastView">
+        <view class="i-swiper__item i-swiper__item--last" @click="handleLastClick">
+          <slot name="lastView">
+            <text class="i-swiper__last-title">已经到底了</text>
+            <text class="i-swiper__last-desc">释放后会触发 dragLastEnd</text>
+          </slot>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <slot
+      v-if="showDot && vertical"
+      name="dotV"
+      :current="currentIndex"
+      :len="items.length"
+    >
+      <view class="i-swiper__dots i-swiper__dots--vertical" :style="dotWrapStyle">
+        <view
+          v-for="(_, index) in items"
+          :key="index"
+          :class="dotClass(index)"
+          :style="dotStyle(index)"
+          @click="to(index)"
+        ></view>
+      </view>
+    </slot>
+
+    <slot
+      v-if="showDot && !vertical"
+      name="dot"
+      :current="currentIndex"
+      :len="items.length"
+    >
+      <view class="i-swiper__dots" :style="dotWrapStyle">
+        <view
+          v-for="(_, index) in items"
+          :key="index"
+          :class="dotClass(index)"
+          :style="dotStyle(index)"
+          @click="to(index)"
+        ></view>
+      </view>
+    </slot>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-swiper' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x swiper，并用 UniAppX 原生 swiper 保证跨端稳定。
+ * - modelValue/value/current: 当前播放索引，支持 v-model。
+ * - items: 轮播数据；字符串可作为标题或图片地址，图片地址会自动用 image 展示。
+ * - width/height: 轮播宽高，height 必填语义，数字字符串默认补 px。
+ * - animationDuration/duration: 切换动画时间和自动轮播间隔。
+ * - spaceOffset/space/model: 露边、间隙和展示模式；space/card/spaceIn/spaceOnly 会应用露边样式。
+ * - vertical/round: 纵向轮播和圆角。
+ * - dotColor/dotActiveColor/dotOffset/dotSize/showDot: 自定义指示点。
+ * - autoPlay/autoplay/interval: 自动播放配置，兼容旧 autoplay/interval。
+ * - loop/circular: 是否循环，兼容旧 circular。
+ * - showLastView/showScalAni: 是否显示最后视图和当前项缩放动效。
+ */
+const props = defineProps({
+  modelValue: { type: Number, default: 0 },
+  value: { type: Number, default: -1 },
+  current: { type: Number, default: -1 },
+  items: {
+    type: Array,
+    default() {
+      return [
+        'https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni-app.png',
+        '品质物流',
+        '智慧调度',
+      ]
+    },
+  },
+  width: { type: String, default: 'auto' },
+  height: { type: String, default: '150' },
+  animationDuration: { type: Number, default: 350 },
+  spaceOffset: { type: Number, default: 0 },
+  space: { type: Number, default: 0 },
+  model: { type: String, default: '' },
+  duration: { type: Number, default: 5000 },
+  interval: { type: Number, default: 0 },
+  vertical: { type: Boolean, default: false },
+  round: { type: String, default: '10' },
+  dotColor: { type: String, default: 'rgba(255,255,255,0.5)' },
+  dotActiveColor: { type: String, default: 'rgba(255,255,255,1)' },
+  dotOffset: { type: String, default: '15' },
+  dotSize: { type: String, default: '6' },
+  showDot: { type: Boolean, default: true },
+  autoPlay: { type: Boolean, default: true },
+  autoplay: { type: Boolean, default: false },
+  loop: { type: Boolean, default: true },
+  circular: { type: Boolean, default: false },
+  showLastView: { type: Boolean, default: false },
+  showScalAni: { type: Boolean, default: false },
+  bgColor: { type: String, default: '#1989fa' },
+  textColor: { type: String, default: '#ffffff' },
+})
+
+/**
+ * Emits 说明：轮播交互事件。
+ * - update:modelValue/update:value: 当前索引同步。
+ * - change: 索引变化时触发。
+ * - click: 点击轮播项时触发当前索引。
+ * - dragLastEnd: 进入最后视图或最后视图被点击时触发。
+ * - transition/animationfinish: 原生 swiper 事件透传。
+ */
+const emit = defineEmits([
+  'update:modelValue',
+  'update:value',
+  'change',
+  'click',
+  'dragLastEnd',
+  'transition',
+  'animationfinish',
+])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const currentIndex = ref(initialIndex())
+
+const autoPlayEnabled = computed(() => {
+  return props.autoPlay || props.autoplay
+})
+
+const loop = computed(() => {
+  return props.loop || props.circular
+})
+
+const playInterval = computed(() => {
+  if (props.interval > 0) return props.interval
+  return props.duration
+})
+
+const sideMargin = computed(() => {
+  if (props.spaceOffset <= 0) return '0px'
+  return String(props.spaceOffset) + 'px'
+})
+
+const wrapStyle = computed(() => {
+  let style = ''
+  if (props.width != 'auto') style += 'width:' + formatSize(props.width) + ';'
+  style += 'border-radius:' + formatSize(props.round) + ';'
+  return style
+})
+
+const swiperStyle = computed(() => {
+  return 'height:' + formatSize(props.height) + ';border-radius:' + formatSize(props.round) + ';'
+})
+
+const dotWrapStyle = computed(() => {
+  if (props.vertical) {
+    return 'right:' + formatSize(props.dotOffset) + ';'
+  }
+  return 'bottom:' + formatSize(props.dotOffset) + ';'
+})
+
+const contentTitleStyle = computed(() => {
+  return 'color:' + props.textColor + ';'
+})
+
+const contentDescStyle = computed(() => {
+  return 'color:' + props.textColor + ';opacity:0.78;'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncExternalIndex()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    syncExternalIndex()
+  },
+)
+
+watch(
+  () => props.current,
+  () => {
+    syncExternalIndex()
+  },
+)
+
+function initialIndex(): number {
+  if (props.current >= 0) return normalizeIndex(props.current)
+  if (props.value >= 0) return normalizeIndex(props.value)
+  return normalizeIndex(props.modelValue)
+}
+
+function syncExternalIndex() {
+  currentIndex.value = initialIndex()
+}
+
+function handleChange(event) {
+  const nextIndex = Number(event.detail.current)
+  if (props.showLastView && nextIndex >= props.items.length) {
+    emit('dragLastEnd')
+    return
+  }
+  setCurrent(nextIndex)
+}
+
+function handleTransition(event) {
+  emit('transition', event)
+}
+
+function handleAnimationFinish(event) {
+  emit('animationfinish', event)
+}
+
+function handleClick(index) {
+  emit('click', index)
+}
+
+function handleLastClick() {
+  emit('dragLastEnd')
+}
+
+function setCurrent(index: number) {
+  const nextIndex = normalizeIndex(index)
+  currentIndex.value = nextIndex
+  emit('update:modelValue', nextIndex)
+  emit('update:value', nextIndex)
+  emit('change', nextIndex)
+}
+
+function to(index: number) {
+  setCurrent(index)
+}
+
+function next() {
+  if (props.items.length == 0) return
+  if (currentIndex.value >= props.items.length - 1) {
+    if (loop.value) {
+      setCurrent(0)
+    } else {
+      emit('dragLastEnd')
+    }
+  } else {
+    setCurrent(currentIndex.value + 1)
+  }
+}
+
+function prev() {
+  if (props.items.length == 0) return
+  if (currentIndex.value <= 0) {
+    setCurrent(loop.value ? props.items.length - 1 : 0)
+  } else {
+    setCurrent(currentIndex.value - 1)
+  }
+}
+
+function normalizeIndex(index: number): number {
+  if (props.items.length == 0) return 0
+  if (index < 0) return 0
+  if (index >= props.items.length) return props.items.length - 1
+  return index
+}
+
+function itemClass(index) {
+  const classes = ['i-swiper__item']
+  if (index == currentIndex.value) classes.push('i-swiper__item--active')
+  if (props.model.length > 0) classes.push('i-swiper__item--' + props.model)
+  return classes.join(' ')
+}
+
+function itemStyle(index) {
+  let style =
+    'height:' +
+    formatSize(props.height) +
+    ';margin-left:' +
+    itemGap(index) +
+    ';margin-right:' +
+    itemGap(index) +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';background-color:' +
+    itemColor(index) +
+    ';'
+  if (props.showScalAni && index != currentIndex.value) {
+    style += 'transform:scale(0.92);opacity:0.86;'
+  }
+  return style
+}
+
+function itemGap(index): string {
+  if (props.space <= 0) return '0px'
+  if (props.model.length == 0) return '0px'
+  return String(Math.round(props.space / 2)) + 'px'
+}
+
+function itemColor(index): string {
+  const colors = ['#1989fa', '#16a34a', '#7c3aed', '#f59e0b', '#ef4444']
+  return colors[index % colors.length]
+}
+
+function dotClass(index) {
+  const classes = ['i-swiper__dot']
+  if (props.vertical) classes.push('i-swiper__dot--vertical')
+  if (index == currentIndex.value) classes.push('i-swiper__dot--active')
+  return classes.join(' ')
+}
+
+function dotStyle(index) {
+  const width = index == currentIndex.value ? Number(props.dotSize) * 3 : Number(props.dotSize)
+  return (
+    'width:' +
+    formatSize(String(width)) +
+    ';height:' +
+    formatSize(props.dotSize) +
+    ';border-radius:' +
+    formatSize(props.dotSize) +
+    ';background-color:' +
+    (index == currentIndex.value ? props.dotActiveColor : props.dotColor) +
+    ';'
+  )
+}
+
+function isImageItem(item): boolean {
+  const text = String(item)
+  return (
+    text.indexOf('http://') == 0 ||
+    text.indexOf('https://') == 0 ||
+    text.indexOf('/') == 0 ||
+    text.indexOf('.png') > 0 ||
+    text.indexOf('.jpg') > 0 ||
+    text.indexOf('.jpeg') > 0 ||
+    text.indexOf('.webp') > 0
+  )
+}
+
+function itemTitle(item, index): string {
+  const text = String(item)
+  if (text.length > 0) return text
+  return 'Swiper ' + String(index + 1)
+}
+
+function itemDesc(item, index): string {
+  return '第 ' + String(index + 1) + ' 张'
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('vh') >= 0 || text.indexOf('vw') >= 0) {
+    const numberValue = Number(text.replace('vh', '').replace('vw', ''))
+    return (isNaN(numberValue) ? 0 : numberValue) + 'px'
+  }
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+defineExpose({
+  to,
+  next,
+  prev,
+  pushAdd: next,
+  delItem: prev,
+  swiperClick: handleClick,
+})
+</script>
+
+<style>
+.i-swiper-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.i-swiper {
+  overflow: hidden;
+}
+
+.i-swiper__item {
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-swiper__image {
+  width: 100%;
+  height: 100%;
+}
+
+.i-swiper__content {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-swiper__title {
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.i-swiper__desc {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.i-swiper__item--last {
+  background-color: #f5f7fa;
+}
+
+.i-swiper__last-title {
+  color: #303133;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.i-swiper__last-desc {
+  margin-top: 6px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-swiper__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-swiper__dots--vertical {
+  left: auto;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  height: auto;
+  flex-direction: column;
+}
+
+.i-swiper__dot {
+  margin: 0 3px;
+}
+
+.i-swiper__dot--vertical {
+  margin: 3px 0;
+}
+</style>

@@ -1,0 +1,486 @@
+<template>
+  <view
+    :class="cellClass"
+    :style="cellStyle"
+    :hover-class="canClick ? 'i-cell--hover' : 'none'"
+    @click="handleClick"
+  >
+    <view v-if="hasAvatar" class="i-cell__avatar" :style="avatarStyle">
+      <slot name="avatar" :icon="icon">
+        <i-icon
+          v-if="icon.length > 0"
+          :name="icon"
+          :fontSize="iconSize"
+          :color="resolvedIconColor"
+        ></i-icon>
+      </slot>
+    </view>
+
+    <view class="i-cell__body">
+      <slot>
+        <view class="i-cell__title-row">
+          <text v-if="required" class="i-cell__required">*</text>
+          <text class="i-cell__title" :style="titleStyle">{{ title }}</text>
+        </view>
+      </slot>
+      <slot name="desc" :desc="descText">
+        <text
+          v-if="descText.length > 0"
+          class="i-cell__desc"
+          :style="descStyle"
+        >
+          {{ descText }}
+        </text>
+      </slot>
+    </view>
+
+    <view class="i-cell__right" :style="rightStyle">
+      <slot name="label" :label="rightText">
+        <text
+          v-if="rightText.length > 0"
+          class="i-cell__label"
+          :style="labelStyle"
+        >
+          {{ rightText }}
+        </text>
+      </slot>
+      <slot name="right"></slot>
+      <i-icon
+        v-if="showArrow"
+        name="arrow-right-line"
+        :fontSize="16"
+        :color="linkColor"
+      ></i-icon>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-cell' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x cell 列表组件设计，并保留旧版 i-cell 的常用参数。
+ * - icon: 左侧图标名、图片地址或普通文本；会交给 i-icon 渲染。
+ * - avatarRound: 左侧图标/头像区域圆角，默认 8px。
+ * - color: 单元格背景主题色，默认 white。
+ * - darkColor: 暗黑模式背景色，当前通过 CSS 变量透传给样式。
+ * - iconColor: 左侧图标颜色，空值时使用主题蓝色。
+ * - title: 标题文本。
+ * - titleColor: 标题颜色。
+ * - darkTitleColor: 暗黑模式标题颜色，当前通过 CSS 变量透传给样式。
+ * - titleSize: 标题字号。
+ * - iconSize: 左侧图标字号/尺寸。
+ * - label: cell 语义中的右侧文本；兼容旧版时，当 value 有值时 label 会作为描述文本。
+ * - labelColor: 右侧文本颜色。
+ * - darklabelColor: 暗黑模式右侧文本颜色，当前通过 CSS 变量透传给样式。
+ * - labelSize: 右侧文本字号。
+ * - desc: 标题下方描述文本。
+ * - value: 旧版右侧值别名；优先级高于 label，用于兼容已写页面。
+ * - showBottomBorder: 是否显示底部边线。
+ * - bottomBorderInsert: 底部边线是否左侧缩进，常用于非卡片列表。
+ * - bottomBorderColor: 底部边线颜色。
+ * - link: 是否显示链接态和右侧箭头。
+ * - linkColor: 右侧箭头颜色。
+ * - url: 跳转地址；存在时自动进入链接态，点击优先 navigateTo，失败后 switchTab。
+ * - card: 是否使用卡片模式。
+ * - round: 卡片圆角。
+ * - leftSize: 左侧图标区域宽高。
+ * - minHeight: 最小高度；传 auto 时保持内容自然高度。
+ * - disabled: 是否禁用点击和跳转。
+ * - padding: 内间距数组，支持 [x]、[x,x]、[x,x,x]、[x,x,x,x]。
+ * - margin: 外间距数组，格式同 padding。
+ * - rightWidth: 右侧 label 区域宽度；使用 right 插槽时可按自身内容覆盖。
+ * - arrow/clickable/isLink: 旧版链接态参数，继续兼容。
+ * - required/name: 旧版必填星号和点击 payload 标识。
+ * - customStyle: 追加根节点样式。
+ */
+const props = defineProps({
+  icon: {
+    type: String,
+    default: '',
+  },
+  avatarRound: {
+    type: String,
+    default: '8',
+  },
+  color: {
+    type: String,
+    default: 'white',
+  },
+  darkColor: {
+    type: String,
+    default: '',
+  },
+  iconColor: {
+    type: String,
+    default: '',
+  },
+  title: {
+    type: String,
+    default: '标题',
+  },
+  titleColor: {
+    type: String,
+    default: 'black',
+  },
+  darkTitleColor: {
+    type: String,
+    default: 'white',
+  },
+  titleSize: {
+    type: String,
+    default: '16',
+  },
+  iconSize: {
+    type: String,
+    default: '24',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  labelColor: {
+    type: String,
+    default: '#bfbfbf',
+  },
+  darklabelColor: {
+    type: String,
+    default: '',
+  },
+  labelSize: {
+    type: String,
+    default: '13',
+  },
+  desc: {
+    type: String,
+    default: '',
+  },
+  value: {
+    type: String,
+    default: '',
+  },
+  showBottomBorder: {
+    type: Boolean,
+    default: true,
+  },
+  bottomBorderInsert: {
+    type: Boolean,
+    default: false,
+  },
+  bottomBorderColor: {
+    type: String,
+    default: '',
+  },
+  link: {
+    type: Boolean,
+    default: true,
+  },
+  linkColor: {
+    type: String,
+    default: '#bfbfbf',
+  },
+  url: {
+    type: String,
+    default: '',
+  },
+  card: {
+    type: Boolean,
+    default: true,
+  },
+  round: {
+    type: String,
+    default: '',
+  },
+  leftSize: {
+    type: String,
+    default: '32',
+  },
+  minHeight: {
+    type: String,
+    default: '55',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  padding: {
+    type: Array,
+    default: () => ['12', '0'],
+  },
+  margin: {
+    type: Array,
+    default: () => [],
+  },
+  rightWidth: {
+    type: String,
+    default: '100',
+  },
+  arrow: {
+    type: Boolean,
+    default: false,
+  },
+  clickable: {
+    type: Boolean,
+    default: false,
+  },
+  isLink: {
+    type: Boolean,
+    default: false,
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  name: {
+    type: String,
+    default: '',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发点击结果。
+ * - click: 点击可交互单元格时触发，参数包含 name、title、value、label、desc、url。
+ * - update:show: 对齐 cell 事件命名；点击时派发 false，便于外层弹层/面板关闭。
+ */
+const emit = defineEmits(['click', 'update:show'])
+
+const hasAvatar = computed(() => {
+  return props.icon.length > 0
+})
+
+const showArrow = computed(() => {
+  if (props.disabled) return false
+  if (props.arrow || props.isLink || props.clickable) return true
+  if (props.url.length > 0) return true
+  return props.link
+})
+
+const canClick = computed(() => {
+  if (props.disabled) return false
+  return props.clickable || props.isLink || props.arrow || props.link || props.url.length > 0
+})
+
+const rightText = computed(() => {
+  if (props.value.length > 0) return props.value
+  return props.label
+})
+
+const descText = computed(() => {
+  if (props.desc.length > 0) return props.desc
+  if (props.value.length > 0) return props.label
+  return ''
+})
+
+const resolvedIconColor = computed(() => {
+  if (props.iconColor.length > 0) return props.iconColor
+  return '#2979ff'
+})
+
+const cellClass = computed(() => {
+  const classes = ['i-cell']
+  if (props.card) classes.push('i-cell--card')
+  else classes.push('i-cell--plain')
+  if (canClick.value) classes.push('i-cell--clickable')
+  if (props.disabled) classes.push('i-cell--disabled')
+  if (props.showBottomBorder) classes.push('i-cell--border')
+  if (props.bottomBorderInsert) classes.push('i-cell--border-insert')
+  return classes.join(' ')
+})
+
+const cellStyle = computed(() => {
+  let style = ''
+  if (props.minHeight != 'auto') style = style + 'min-height:' + formatSize(props.minHeight) + ';'
+  style = style + 'background-color:' + normalizeColor(props.color) + ';'
+  style = style + 'padding:' + spacingValue(props.padding, ['12', '0']) + ';'
+  if (props.margin.length > 0) style = style + 'margin:' + spacingValue(props.margin, []) + ';'
+  if (props.card) style = style + 'border-radius:' + formatSize(cardRound.value) + ';'
+  if (props.showBottomBorder) {
+    const borderColor = props.bottomBorderColor.length > 0 ? props.bottomBorderColor : '#eef0f4'
+    style = style + 'border-bottom-color:' + borderColor + ';'
+  }
+  if (props.customStyle.length > 0) style = style + props.customStyle
+  return style
+})
+
+const cardRound = computed(() => {
+  if (props.round.length > 0) return props.round
+  return '8'
+})
+
+const avatarStyle = computed(() => {
+  const size = formatSize(props.leftSize)
+  return 'width:' + size + ';height:' + size + ';border-radius:' + formatSize(props.avatarRound) + ';'
+})
+
+const titleStyle = computed(() => {
+  return 'font-size:' + formatSize(props.titleSize) + ';color:' + normalizeColor(props.titleColor) + ';'
+})
+
+const descStyle = computed(() => {
+  return 'font-size:12px;color:#909399;'
+})
+
+const labelStyle = computed(() => {
+  return 'font-size:' + formatSize(props.labelSize) + ';color:' + normalizeColor(props.labelColor) + ';'
+})
+
+const rightStyle = computed(() => {
+  return 'width:' + formatSize(props.rightWidth) + ';'
+})
+
+function formatSize(value): string {
+  const text = String(value)
+  if (
+    text == 'auto' ||
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0 ||
+    text.indexOf('rem') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function normalizeColor(value): string {
+  if (value == 'white') return '#ffffff'
+  if (value == 'black') return '#303133'
+  if (value == 'primary') return '#2979ff'
+  if (value == 'success') return '#19be6b'
+  if (value == 'warning') return '#ff9900'
+  if (value == 'danger') return '#fa3534'
+  if (value == 'info') return '#909399'
+  return value
+}
+
+function spacingValue(value, fallback): string {
+  const source = value.length > 0 ? value : fallback
+  if (source.length == 0) return '0px'
+  if (source.length == 1) return formatSize(source[0])
+  if (source.length == 2) return formatSize(source[1]) + ' ' + formatSize(source[0])
+  if (source.length == 3) {
+    return formatSize(source[1]) + ' ' + formatSize(source[2]) + ' ' + formatSize(source[0])
+  }
+  return (
+    formatSize(source[1]) +
+    ' ' +
+    formatSize(source[2]) +
+    ' ' +
+    formatSize(source[3]) +
+    ' ' +
+    formatSize(source[0])
+  )
+}
+
+function handleClick() {
+  if (!canClick.value) return
+
+  const payload = {
+    name: props.name,
+    title: props.title,
+    value: rightText.value,
+    label: props.label,
+    desc: descText.value,
+    url: props.url,
+  }
+  emit('click', payload)
+  emit('update:show', false)
+
+  if (props.url.length == 0) return
+  uni.navigateTo({
+    url: props.url,
+    fail: () => {
+      uni.switchTab({
+        url: props.url,
+      })
+    },
+  })
+}
+</script>
+
+<style>
+.i-cell {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.i-cell--plain {
+  border-radius: 0;
+}
+
+.i-cell--hover {
+  background-color: #f5f7fa;
+}
+
+.i-cell--disabled {
+  opacity: 0.45;
+}
+
+.i-cell--border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+}
+
+.i-cell--card {
+  margin-top: 8px;
+}
+
+.i-cell__avatar {
+  margin-right: 10px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.i-cell__body {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.i-cell__title-row {
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-cell__required {
+  margin-right: 4px;
+  color: #fa3534;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-cell__title {
+  flex: 1;
+  line-height: 22px;
+}
+
+.i-cell__desc {
+  margin-top: 3px;
+  line-height: 18px;
+}
+
+.i-cell__right {
+  margin-left: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.i-cell__label {
+  flex: 1;
+  line-height: 20px;
+  text-align: right;
+}
+</style>

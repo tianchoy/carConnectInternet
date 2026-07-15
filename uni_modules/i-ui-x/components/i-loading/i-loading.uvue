@@ -1,0 +1,188 @@
+<template>
+  <view v-if="show" :class="wrapClass" :style="customStyle">
+    <i-icon
+      :name="icon"
+      :fontSize="resolvedIconSize"
+      :color="resolvedIconColor"
+      :spin="true"
+      :duration="duration"
+    ></i-icon>
+    <text v-if="!hideText" :class="textClass" :style="textStyle"
+      ><slot>{{ contentText }}</slot></text
+    >
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-loading' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - color: 图标颜色，支持语义色或 CSS 颜色值。
+ * - textColor: 文字颜色，支持语义色或 CSS 颜色值。
+ * - textSize: 文字大小。
+ * - iconSize: 图标大小。
+ * - vertical: 是否垂直排列。
+ * - icon: Remix Icon 图标名。
+ * - hideText: 隐藏加载文本。
+ * - label: 加载文本，不传时默认显示“加载中...”。
+ * - show: 控制组件是否显示，适用于弹层、遮罩、提示等可见状态。
+ * - text/type/size: 兼容旧版 i-loading API。
+ */
+const props = defineProps({
+  color: {
+    type: String,
+    default: '#8b8b8b',
+  },
+  textColor: {
+    type: String,
+    default: '#8b8b8b',
+  },
+  textSize: {
+    type: [String, Number],
+    default: '12',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: '21',
+  },
+  vertical: {
+    type: Boolean,
+    default: true,
+  },
+  icon: {
+    type: String,
+    default: 'loader-line',
+  },
+  hideText: {
+    type: Boolean,
+    default: false,
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  show: {
+    type: Boolean,
+    default: true,
+  },
+  text: {
+    type: String,
+    default: '',
+  },
+  type: {
+    type: String,
+    default: '',
+  },
+  size: {
+    type: [String, Number],
+    default: '',
+  },
+  duration: {
+    type: Number,
+    default: 1200,
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+const emit = defineEmits([])
+
+const wrapClass = computed(() => {
+  const classes = ['i-loading']
+  if (props.vertical) classes.push('i-loading--vertical')
+  return classes.join(' ')
+})
+
+const textClass = computed(() => {
+  const classes = ['i-loading__text']
+  if (props.vertical) classes.push('i-loading__text--vertical')
+  return classes.join(' ')
+})
+
+const contentText = computed(() => {
+  if (props.label.length > 0) return props.label
+  if (props.text.length > 0) return props.text
+  return '加载中...'
+})
+
+const resolvedIconSize = computed(() => {
+  const size = String(props.size)
+  if (size == 'mini') return '16'
+  if (size == 'normal') return '21'
+  if (size == 'large') return '30'
+  if (size.length > 0) return size
+  return String(props.iconSize)
+})
+
+const resolvedTextSize = computed(() => {
+  return formatSize(props.textSize)
+})
+
+const resolvedIconColor = computed(() => {
+  if (props.color.length > 0) return resolveColor(props.color)
+  if (props.type.length > 0) return resolveColor(props.type)
+  return '#8b8b8b'
+})
+
+const textStyle = computed(() => {
+  let style = 'font-size:' + resolvedTextSize.value + ';'
+  const textColor = props.textColor.length > 0 ? props.textColor : props.color
+  if (textColor.length > 0) {
+    style = style + 'color:' + resolveColor(textColor) + ';'
+  } else if (props.type.length > 0) {
+    style = style + 'color:' + resolveColor(props.type) + ';'
+  }
+  return style
+})
+
+function resolveColor(value): string {
+  if (value == 'primary') return '#2979ff'
+  if (value == 'success') return '#19be6b'
+  if (value == 'warning') return '#ff9900'
+  if (value == 'danger' || value == 'error') return '#fa3534'
+  if (value == 'info') return '#909399'
+  return value
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('rem') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-loading {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-loading--vertical {
+  flex-direction: column;
+}
+
+.i-loading__text--vertical {
+  margin-left: 0;
+  margin-top: 8px;
+}
+
+.i-loading__text {
+  margin-left: 8px;
+  color: #8b8b8b;
+  font-size: 12px;
+  line-height: 18px;
+}
+</style>

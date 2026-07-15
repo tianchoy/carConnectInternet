@@ -1,0 +1,316 @@
+<template>
+  <view v-if="visible" class="i-notice-bar" :style="noticeStyle" @click="handleClick">
+    <text v-if="icon != ''" class="i-notice-bar__icon" :style="textStyle">
+      {{ iconText }}
+    </text>
+    <view class="i-notice-bar__content">
+      <view
+        v-if="direction == 'column'"
+        class="i-notice-bar__column"
+      >
+        <view class="i-notice-bar__column-track" :style="columnTrackStyle">
+          <text
+            v-for="(item, index) in textList"
+            :key="String(index) + item"
+            class="i-notice-bar__column-text"
+            :style="textStyle"
+          >
+            {{ item }}
+          </text>
+        </view>
+      </view>
+      <scroll-view
+        v-else
+        class="i-notice-bar__row"
+        :scroll-x="!disableTouch"
+        :show-scrollbar="false"
+      >
+        <text
+          :class="
+            step
+              ? 'i-notice-bar__text i-notice-bar__text--step'
+              : 'i-notice-bar__text i-notice-bar__text--scroll'
+          "
+          :style="rowTextStyle"
+        >
+          {{ displayText }}
+        </text>
+      </scroll-view>
+    </view>
+    <text
+      v-if="mode == 'link'"
+      class="i-notice-bar__action"
+      :style="textStyle"
+    >
+      ›
+    </text>
+    <text
+      v-if="mode == 'closable'"
+      class="i-notice-bar__action"
+      :style="textStyle"
+      @click.stop="handleClose"
+    >
+      x
+    </text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-notice-bar' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 NoticeBar 文档。
+ * - text: 公告内容数组；row 模式会横向显示，column 模式会按当前索引显示。
+ * - direction: 滚动方向，row 为横向滚动，column 为纵向轮播。
+ * - step: row 模式是否以步进形态展示，开启后内容不做无限动画，仅保留横向可滚动。
+ * - icon: 左侧图标名称；为空时不显示左侧图标。
+ * - mode: 通告模式，link 显示右箭头，closable 显示关闭按钮。
+ * - color: 文案和图标颜色。
+ * - bgColor: 通知栏背景色。
+ * - round: 圆角值，支持数字或带单位字符串。
+ * - speed: 横向滚动速度，数值越大动画越快；受 UniAppX 端能力限制，这里映射为动画周期。
+ * - fontSize: 文案字号，支持数字或带单位字符串。
+ * - fontWeight: 是否加粗。
+ * - disableTouch: 是否禁用横向触摸滚动。
+ * - duration: column 模式每条公告停留时间，单位 ms。
+ * - url: 点击通知栏跳转的页面路径。
+ * - linkType: 页面跳转方式，支持 navigateTo、redirectTo、reLaunch、switchTab。
+ */
+const props = defineProps({
+  text: {
+    type: Array,
+    default() {
+      return ['DCloud uni-app x NoticeBar 滚动通知']
+    },
+  },
+  direction: { type: String, default: 'row' },
+  step: { type: Boolean, default: false },
+  icon: { type: String, default: '' },
+  mode: { type: String, default: '' },
+  color: { type: String, default: '#f9ae3d' },
+  bgColor: { type: String, default: '#fdf6ec' },
+  round: { type: [String, Number], default: '' },
+  speed: { type: [String, Number], default: 50 },
+  fontSize: { type: [String, Number], default: 14 },
+  fontWeight: { type: Boolean, default: false },
+  disableTouch: { type: Boolean, default: false },
+  duration: { type: [String, Number], default: 2000 },
+  url: { type: String, default: '' },
+  linkType: { type: String, default: 'navigateTo' },
+})
+
+/**
+ * Emits 说明：对齐文档事件。
+ * - click: 点击通告文字或通知栏时触发，参数为当前显示的公告文本。
+ * - close: mode 为 closable 时点击关闭图标触发。
+ */
+const emit = defineEmits(['click', 'close'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const visible = ref(true)
+const currentIndex = ref(0)
+const timer = ref(0)
+
+function addUnit(value: any): string {
+  if (typeof value == 'number') return value.toString() + 'px'
+  const str = value == null ? '' : value.toString()
+  if (str == '') return ''
+  const unitReg = new RegExp('[a-zA-Z%]+$')
+  return unitReg.test(str) ? str : str + 'px'
+}
+
+function toNumber(value: any, fallback: number): number {
+  if (typeof value == 'number') return value
+  const parsed = parseFloat(value == null ? '' : value.toString())
+  return isNaN(parsed) ? fallback : parsed
+}
+
+function getTextList(): string[] {
+  return props.text as string[]
+}
+
+const textList = computed(() => {
+  return getTextList()
+})
+
+const displayText = computed(() => {
+  return textList.value.join('    ')
+})
+
+const currentText = computed(() => {
+  const list = textList.value
+  if (list.length == 0) return ''
+  const index = currentIndex.value >= list.length ? 0 : currentIndex.value
+  return list[index]
+})
+
+const iconText = computed(() => {
+  if (props.icon == 'volume') return '!'
+  if (props.icon == 'bell') return '!'
+  if (props.icon == 'info') return 'i'
+  return props.icon
+})
+
+const noticeStyle = computed(() => {
+  const styles: string[] = [
+    'background-color:' + bgColor.value,
+  ]
+  const radius = addUnit(props.round)
+  if (radius != '') styles.push('border-radius:' + radius)
+  return styles.join(';')
+})
+
+const textStyle = computed(() => {
+  return [
+    'color:' + props.color,
+    'font-size:' + addUnit(props.fontSize),
+    'font-weight:' + (props.fontWeight ? '700' : '400'),
+  ].join(';')
+})
+
+const rowTextStyle = computed(() => {
+  return textStyle.value
+})
+
+const columnTrackStyle = computed(() => {
+  return (
+    'transform:translateY(-' +
+    String(currentIndex.value * 40) +
+    'px);transition-duration:260ms;'
+  )
+})
+
+function stopTimer() {
+  if (timer.value != 0) {
+    clearInterval(timer.value)
+    timer.value = 0
+  }
+}
+
+function startTimer() {
+  stopTimer()
+  if (props.direction != 'column') return
+  const list = textList.value
+  if (list.length < 2) return
+  timer.value = setInterval(() => {
+    currentIndex.value = (currentIndex.value + 1) % list.length
+  }, toNumber(props.duration, 2000))
+}
+
+function navigateByType() {
+  if (props.url == '') return
+  if (props.linkType == 'redirectTo') {
+    uni.redirectTo({ url: props.url })
+    return
+  }
+  if (props.linkType == 'reLaunch') {
+    uni.reLaunch({ url: props.url })
+    return
+  }
+  if (props.linkType == 'switchTab') {
+    uni.switchTab({ url: props.url })
+    return
+  }
+  uni.navigateTo({ url: props.url })
+}
+
+function handleClick() {
+  emit('click', currentText.value)
+  navigateByType()
+}
+
+function handleClose() {
+  visible.value = false
+  emit('close')
+}
+
+watch(
+  () => props.direction,
+  () => {
+    startTimer()
+  },
+)
+
+watch(
+  () => props.duration,
+  () => {
+    startTimer()
+  },
+)
+
+watch(
+  () => props.text,
+  () => {
+    currentIndex.value = 0
+    startTimer()
+  },
+)
+
+onMounted(() => {
+  startTimer()
+})
+
+onUnmounted(() => {
+  stopTimer()
+})
+</script>
+
+<style>
+.i-notice-bar {
+  min-height: 40px;
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+}
+.i-notice-bar__icon {
+  width: 22px;
+  text-align: center;
+  line-height: 20px;
+}
+.i-notice-bar__content {
+  flex: 1;
+  height: 40px;
+  justify-content: center;
+  overflow: hidden;
+}
+.i-notice-bar__row {
+  width: 100%;
+  height: 40px;
+  white-space: nowrap;
+}
+.i-notice-bar__column {
+  height: 40px;
+  overflow: hidden;
+}
+.i-notice-bar__column-track {
+  width: 100%;
+  transition-property: transform;
+  transition-timing-function: ease;
+}
+.i-notice-bar__column-text {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+}
+.i-notice-bar__text {
+  width: 100%;
+  line-height: 40px;
+}
+.i-notice-bar__text--scroll {
+  padding-right: 24px;
+}
+.i-notice-bar__text--step {
+  padding-right: 24px;
+}
+.i-notice-bar__action {
+  width: 24px;
+  text-align: right;
+  line-height: 40px;
+}
+</style>

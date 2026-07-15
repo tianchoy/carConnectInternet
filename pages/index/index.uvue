@@ -14,13 +14,13 @@
                         <view class="exit" @click="handleExit" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
-                        <uv-icon name="reload" size="25" @click="handleReload"></uv-icon>
-                        <uv-icon name="grid-fill" size="25"  @click="toDeviceList"></uv-icon>
-                        <uv-icon name="plus-circle" size="25" @click="toAdd"></uv-icon>
+                        <i-icon name="/static/reload.png" fontSize="20" @click="handleReload"></i-icon>
+                        <i-icon name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
+                        <i-icon name="/static/addNew.png" fontSize="20" @click="toAdd"></i-icon>
                     </view>
                 </view> 
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
-                    <uv-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percentage="safeDeviceDetail.deviceStatus.batteryPercent" height="20rpx" activeColor="#19be6b" inactiveColor="#999"></uv-line-progress>
+                    <i-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percent="safeDeviceDetail.deviceStatus.batteryPercent"></i-line-progress>
                     <view class="info" v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
                     <view class="info" v-if="safeDeviceDetail.deviceStatus.voltage">电压: {{safeDeviceDetail.deviceStatus.voltage}}V</view>
                 </view>
@@ -97,7 +97,7 @@
                                 <text class="item-desc">查看设备更多详情</text>
                             </view>
                         </view>
-                        <uv-icon name="arrow-right"></uv-icon>
+                        <i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
                     </view>
                     <view class="device-item" @click="toFindCar">
                         <view class="item-label">
@@ -107,7 +107,7 @@
                                 <text class="item-desc">点击立即寻找车辆位置</text>
                             </view>
                         </view>
-                        <uv-icon name="arrow-right"></uv-icon>
+                        <i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
                     </view>
                     <view class="device-item" @click="toFence">
                         <view class="item-label">
@@ -117,7 +117,7 @@
                                 <text class="item-desc">点击去设置或者查看电子围栏</text>
                             </view>
                         </view>
-                        <uv-icon name="arrow-right"></uv-icon>
+                        <i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
                     </view>
                 </view>
                 <view class="service">
@@ -143,19 +143,22 @@
                 </view>
             </view>
         </view>
-        <uv-picker 
-            ref="picker" 
-            color="#333" 
-            activeColor="#ea7312" 
-            :columns="pickerColumns" 
-            keyName="displayName"
-            @confirm="confirm">
-        </uv-picker>
+        <i-picker
+            v-if="showPicker"
+            :key="pickerKey"
+            :show="showPicker"
+            :columns="pickerColumns"
+            :defaultIndex="pickerDefaultIndex"
+            :visibleItemCount="5"
+            @confirm="handleConfirm"
+            @cancel="closePicker"
+            @close="closePicker"
+        ></i-picker>
     </view>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, } from 'vue';
+import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -165,14 +168,18 @@ const { nowTime, todayZero } = getTodayZeroTime()
 
 interface Device {
     name: string,
+    deviceName: string,
     value: string,
+    imei: string,
     deptId: string,
     deviceId: string,
     iccid: string,
     simMerchant: string,
     connectionStatus: string,
     carType: string,
-    plateNo: string
+    plateNo: string,
+    latitude: number,
+    longitude: number
 }
 
 //// 响应式数据
@@ -188,7 +195,10 @@ const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
 const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
-const picker = ref(null)
+// picker 相关变量
+const showPicker = ref(false)
+const pickerDefaultIndex = ref<number[]>([0])
+const pickerKey = ref(0)
 const currentCarImei = ref('')
 const currentCarDeptId = ref('')
 const currentCarDeviceId = ref('')
@@ -213,7 +223,7 @@ const lastUpdateTime = ref('--:--:--')
 // 本地存储key
 const STORAGE_KEYS = {
     SELECTED_DEVICE: 'selected_device_info',
-    SELECTED_DEVICE_INDEX: 'selected_device_index'  // 新增：保存选中的设备索引
+    SELECTED_DEVICE_INDEX: 'selected_device_index'
 }
 
 // 计算属性 
@@ -229,14 +239,19 @@ const safeDeviceDetail = computed(() => {
     }
 })
 
-// 处理车辆列表显示
+// 处理车辆列表显示 - 返回字符串数组
 const pickerColumns = computed(() => {
-    return [deviceList.value.map(device => ({
-        ...device,
-        displayName: `${device.name} (${device.connectionStatus === 'online' ? '在线' : '离线' })`,
-        name: device.name
-    }))]
+    return [deviceList.value.map(device => {
+        const displayName = device.deviceName || device.name || device.imei || '未命名设备'
+        const statusText = device.connectionStatus === 'online' ? '在线' : '离线'
+        return `${displayName} (${statusText})`
+    })]
 })
+
+// 关闭 picker
+const closePicker = () => {
+    showPicker.value = false
+}
 
 // 初始化尺寸数据
 const initDimensions = () => {
@@ -261,8 +276,9 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const saveSelectedDevice = (device: Device) => {
     try {
         const deviceInfo = {
-            name: device.name,
-            imei: device.value,
+            name: device.deviceName || device.name || device.imei,
+            deviceName: device.deviceName || device.name || device.imei,
+            imei: device.imei || device.value,
             deptId: device.deptId,
             deviceId: device.deviceId,
             iccid: device.iccid,
@@ -283,7 +299,6 @@ const getSavedSelectedDevice = () => {
     try {
         const savedDevice = uni.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE)
         if (savedDevice && savedDevice.imei) {
-            console.log('获取保存设备成功:', savedDevice)
             return savedDevice
         }
     } catch (error) {
@@ -335,8 +350,9 @@ const clearSavedSelectedDeviceIndex = () => {
 
 // 根据保存的设备信息设置当前车辆
 const setCurrentCarFromSavedDevice = (savedDevice: any) => {
-    currentCarName.value = savedDevice.name
-    currentCarImei.value = savedDevice.value
+    const deviceName = savedDevice.deviceName || savedDevice.name || '未命名设备'
+    currentCarName.value = deviceName
+    currentCarImei.value = savedDevice.imei || savedDevice.value
     currentCarDeptId.value = savedDevice.deptId
     currentCarDeviceId.value = savedDevice.deviceId
     currentCarIccId.value = savedDevice.iccid
@@ -348,7 +364,7 @@ const setCurrentCarFromSavedDevice = (savedDevice: any) => {
     center.longitude = savedDevice.longitude
 }
 
-// 处理选择车辆
+// 处理选择车辆 - 打开 picker
 const handlePicker = () => {
     if (deviceList.value.length === 0) {
         uni.showToast({
@@ -357,34 +373,114 @@ const handlePicker = () => {
         })
         return
     }
-    // 打开 picker
-    picker.value?.open()
-    // 获取缓存的索引并设置选中项
+    
+    // 更新 picker 的 key 强制刷新
+    pickerKey.value++
+    
+    // 设置默认选中索引
     const savedIndex = getSavedSelectedDeviceIndex()
     if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-        // 确保 picker 已经完全打开
-        setTimeout(() => {
-            picker.value?.setIndexs([savedIndex], true)
-            console.log('设置 picker 选中索引:', savedIndex)
-        }, 100)
+        pickerDefaultIndex.value = [savedIndex]
     } else {
+        // 根据当前选中的设备查找索引
         const currentIndex = deviceList.value.findIndex(
-            device => device.value === currentCarImei.value
+            device => device.imei === currentCarImei.value || device.deviceId === currentCarDeviceId.value
         )
         if (currentIndex !== -1) {
-            setTimeout(() => {
-                picker.value?.setIndexs([currentIndex], true)
-                console.log('根据当前设备设置 picker 选中索引:', currentIndex)
-            }, 100)
+            pickerDefaultIndex.value = [currentIndex]
+        } else {
+            pickerDefaultIndex.value = [0]
         }
     }
+    
+    // 延迟打开 picker，确保数据更新完成
+    nextTick(() => {
+        showPicker.value = true
+    })
 }
 
 // 处理选择车辆确认
-const confirm = async (e: any) => {
-    const selectedDevice = e.value[0]
-    currentCarName.value = selectedDevice.name
-    currentCarImei.value = selectedDevice.value
+const handleConfirm = (e: any) => {
+    
+    // 关闭 picker
+    showPicker.value = false
+    
+    // 获取选中的索引 - 从 indexs 字段获取
+    let selectedIndex = -1
+    
+    // 1. 从 e.indexs 获取（i-picker 返回的索引数组）
+    if (e && e.indexs && Array.isArray(e.indexs) && e.indexs.length > 0) {
+        selectedIndex = e.indexs[0]
+    }
+    // 2. 从 e.index 获取（兼容其他格式）
+    else if (e && e.index !== undefined && e.index !== null) {
+        selectedIndex = typeof e.index === 'number' ? e.index : parseInt(e.index)
+    }
+    // 3. 从 e.detail 获取
+    else if (e && e.detail) {
+        if (e.detail.indexs && Array.isArray(e.detail.indexs) && e.detail.indexs.length > 0) {
+            selectedIndex = e.detail.indexs[0]
+        } else if (e.detail.index !== undefined) {
+            selectedIndex = e.detail.index
+        }
+    }
+    // 4. 从 e.value 对象中尝试获取
+    else if (e && e.value && typeof e.value === 'object') {
+        // 如果 value 是对象，尝试通过 text 匹配设备
+        const text = e.value.text || e.value.value
+        if (text && typeof text === 'string') {
+            const matchedDevice = deviceList.value.find((device) => {
+                const displayName = device.deviceName || device.name || device.imei || '未命名设备'
+                const statusText = device.connectionStatus === 'online' ? '在线' : '离线'
+                const fullDisplay = `${displayName} (${statusText})`
+                return fullDisplay === text
+            })
+            if (matchedDevice) {
+                selectedIndex = deviceList.value.indexOf(matchedDevice)
+            }
+        }
+    }
+    
+    // 如果索引无效，使用当前设备
+    if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
+        console.warn('无法解析选中的索引，使用当前设备')
+        const currentIndex = deviceList.value.findIndex(
+            device => device.imei === currentCarImei.value || device.deviceId === currentCarDeviceId.value
+        )
+        if (currentIndex !== -1) {
+            selectedIndex = currentIndex
+            console.log('使用当前设备索引:', selectedIndex)
+        } else {
+            selectedIndex = 0
+            console.log('使用默认索引: 0')
+        }
+    }
+    
+    const selectedDevice = deviceList.value[selectedIndex]
+    if (!selectedDevice) {
+        uni.showToast({
+            title: '选择设备失败',
+            icon: 'none'
+        })
+        return
+    }
+    
+    // 检查是否选择了不同的设备
+    if (selectedDevice.imei === currentCarImei.value && selectedDevice.deviceId === currentCarDeviceId.value) {
+        console.log('选择的设备与当前设备相同，不重复加载')
+        return
+    }
+    
+    console.log('最终选中的设备:', selectedDevice)
+    console.log('设备名称:', selectedDevice.deviceName || selectedDevice.name)
+    console.log('设备 IMEI:', selectedDevice.imei)
+    console.log('选中的索引:', selectedIndex)
+    console.log('============================================')
+    
+    // 更新当前选中的设备
+    const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
+    currentCarName.value = deviceName
+    currentCarImei.value = selectedDevice.imei || selectedDevice.value
     currentCarDeptId.value = selectedDevice.deptId
     currentCarDeviceId.value = selectedDevice.deviceId
     currentCarIccId.value = selectedDevice.iccid
@@ -395,16 +491,10 @@ const confirm = async (e: any) => {
     center.latitude = selectedDevice.latitude
     center.longitude = selectedDevice.longitude
 
-    // 查找选中的索引
-    const selectedIndex = deviceList.value.findIndex(
-        device => device.deviceId === selectedDevice.deviceId
-    );
-    
     // 保存选中索引到缓存
     if (selectedIndex !== -1) {
         saveSelectedDeviceIndex(selectedIndex)
-        // 设置 picker 选中项
-        picker.value?.setIndexs([selectedIndex], true);
+        pickerDefaultIndex.value = [selectedIndex]
     }
     
     // 保存选中的设备信息
@@ -415,20 +505,31 @@ const confirm = async (e: any) => {
         mask: true
     })
     
+    // 加载新设备数据
+    loadDeviceData(selectedDevice)
+}
+
+// 加载设备数据
+const loadDeviceData = async (device: Device) => {
+    console.log('开始加载设备数据:', device)
     try {
-        await loadDeviceDetail(selectedDevice.deviceId);
+        await loadDeviceDetail(device.deviceId);
         await loadDevicePos({
-            deviceId: selectedDevice.deviceId,
-            deviceids: selectedDevice.value
+            deviceId: device.deviceId,
+            deviceids: device.imei || device.value
         })
         await loadTrackPos({
-            imei: selectedDevice.value,
+            imei: device.imei || device.value,
             startTime: formatTimes(todayZero),
             endTime: formatTimes(nowTime),
             minParkTime: 120,
             withStop: false,
             withPos: false,
             withTrip: true,
+        })
+        uni.showToast({
+            title: '切换成功',
+            icon: 'success'
         })
     } catch (error) {
         console.error('切换车辆失败', error)
@@ -443,7 +544,6 @@ const confirm = async (e: any) => {
 
 // 加载车辆列表
 const loadDeviceList = async () => {
-    
     try {
         const res = await getUserDeviceList({
             pageSize: 1000
@@ -452,8 +552,10 @@ const loadDeviceList = async () => {
         if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
             userDeviceList.value = res.data
             deviceList.value = res.data.list.map((item: any) => ({ 
-                name: item.deviceName || item.imei, 
+                name: item.deviceName || item.imei || '未命名设备',
+                deviceName: item.deviceName || item.imei || '未命名设备',
                 value: item.imei,
+                imei: item.imei,
                 deptId: item.companyId,
                 deviceId: item.deviceId,
                 iccid: item.iccid,
@@ -464,52 +566,72 @@ const loadDeviceList = async () => {
                 latitude: item.latitude,
                 longitude: item.longitude,
             }))
+            
             // 获取保存的设备
             const savedDevice = getSavedSelectedDevice()
             const savedIndex = getSavedSelectedDeviceIndex()
             
             let selectedDevice = null
+            let selectedIdx = -1
             
             // 优先使用保存的索引
             if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
                 selectedDevice = deviceList.value[savedIndex]
+                selectedIdx = savedIndex
             }
             
             // 如果索引无效或设备不存在，尝试使用保存的设备信息
             if (!selectedDevice && savedDevice && savedDevice.imei) {
-                selectedDevice = deviceList.value.find(device => device.value === savedDevice.imei)
+                selectedDevice = deviceList.value.find(device => 
+                    device.imei === savedDevice.imei || 
+                    device.value === savedDevice.imei
+                )
                 if (selectedDevice) {
-                    console.log('使用保存的设备信息选择设备:', selectedDevice?.name)
+                    selectedIdx = deviceList.value.indexOf(selectedDevice)
                 } else {
                     // 保存的设备已被删除，清除保存记录
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
-                    console.log('保存的设备已不存在，使用第一个设备')
                 }
             }
             
             // 如果没有保存的设备或保存的设备无效，使用第一个设备
             if (!selectedDevice && deviceList.value.length > 0) {
                 selectedDevice = deviceList.value[0]
+                selectedIdx = 0
                 // 保存第一个设备作为默认选中
                 saveSelectedDevice(selectedDevice)
                 saveSelectedDeviceIndex(0)
-                console.log('使用第一个设备作为默认:', selectedDevice?.name)
+                console.log('使用第一个设备作为默认:', selectedDevice?.deviceName)
             }
             
             if (selectedDevice) {
-                setCurrentCarFromSavedDevice(selectedDevice)
+                // 设置当前车辆信息
+                const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
+                currentCarName.value = deviceName
+                currentCarImei.value = selectedDevice.imei || selectedDevice.value
+                currentCarDeptId.value = selectedDevice.deptId
+                currentCarDeviceId.value = selectedDevice.deviceId
+                currentCarIccId.value = selectedDevice.iccid
+                currentCarSimMerchant.value = selectedDevice.simMerchant
+                currentCarConnectionStatus.value = selectedDevice.connectionStatus
+                currentCarCarType.value = selectedDevice.carType
+                currentCarPlateNo.value = selectedDevice.plateNo
+                center.latitude = selectedDevice.latitude
+                center.longitude = selectedDevice.longitude
+                
+                // 设置 picker 默认索引
+                if (selectedIdx !== -1) {
+                    pickerDefaultIndex.value = [selectedIdx]
+                }
                 
                 await loadDeviceDetail(selectedDevice.deviceId);
-
-                console.log('加载车辆详情:',selectedDevice)
-                
                 await loadDevicePos({
                     deviceId: selectedDevice.deviceId,
-                    deviceids: selectedDevice.value
+                    deviceids: selectedDevice.imei || selectedDevice.value
                 })
                 await loadTrackPos({
-                    imei: selectedDevice.value,
+                    imei: selectedDevice.imei || selectedDevice.value,
                     startTime: formatTimes(todayZero),
                     endTime: formatTimes(nowTime),
                     minParkTime: 120,
@@ -520,7 +642,7 @@ const loadDeviceList = async () => {
             }
         } else {
             uni.showToast({
-                title: res.msg + '暂无车辆数据',
+                title: res.msg || '暂无车辆数据',
                 icon: 'none'
             })
         }
@@ -597,7 +719,6 @@ const totalTrips = computed(() => {
 // 处理行程数据
 const processTripData = async (data : any) => {
     if (data.trips && data.trips.length > 0) {
-        // 遍历所有行程，获取地址
         const processedTrips = await Promise.all(
             data.trips.map(async (trip : any) => {
                 return {
@@ -608,7 +729,6 @@ const processTripData = async (data : any) => {
 
         tripData.value = processedTrips;
 
-        // 计算总里程和平均速度
         let totalDistance = 0;
         let totalDuration = 0;
         let totalAvgSpeed = 0;
@@ -636,7 +756,6 @@ const loadDevicePos = async (data: any) => {
         if (res.code == 0 && res.data && res.data.length > 0) {
             devicePosInfo.value = res.data[0]
             
-            // 确保经纬度是数字类型
             const lat = Number(res.data[0].latitude);
             const lng = Number(res.data[0].longitude);
 
@@ -649,7 +768,6 @@ const loadDevicePos = async (data: any) => {
                 return false;
             }
 
-            // 同步进行坐标转换
             let convertedCoord;
             try {
                 convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -658,15 +776,12 @@ const loadDevicePos = async (data: any) => {
                 convertedCoord = { lat: lat, lng: lng };
             }
 
-            // 强制更新中心点
             center.latitude = convertedCoord.lat;
             center.longitude = convertedCoord.lng;
             isMapReady.value = true
 
-            // 等待一小段时间确保地图更新
             await delay(100);
 
-            // 更新设备标记
             const deviceMarker = createMarker(
                 1,
                 convertedCoord.lat,
@@ -675,7 +790,6 @@ const loadDevicePos = async (data: any) => {
                 currentCarName.value
             );
             
-            // 强制响应式更新标记点
             markers.value = [];
             await delay(50);
             markers.value = [deviceMarker];
@@ -686,7 +800,7 @@ const loadDevicePos = async (data: any) => {
             console.warn('获取设备位置失败:', res.msg)
             isMapReady.value = false
             uni.showToast({
-                title: res.msg + '获取位置失败',
+                title: res.msg || '获取位置失败',
                 icon: 'none'
             })
             return false
@@ -744,7 +858,6 @@ const refreshLocation = async () => {
 
 // 跳转轨迹详情
 const toRecordDetail = () => {
-    // 检查是否登录
     if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude
@@ -754,7 +867,6 @@ const toRecordDetail = () => {
 // 跳转全部设备 
 const toDeviceList = () => {
     console.log('toDeviceList')
-    // 检查是否登录
     if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/deviceList/deviceList?userDeviceList=' + JSON.stringify(userDeviceList.value),
@@ -788,7 +900,6 @@ const createMarker = (id: number, lat: number, lng: number, type: string, title?
 
 // 跳转设备详情
 const toDeviceDetail = (e: any) => {
-    // 检查是否登录
     if (!isLogin()) return 
     if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
         uni.showToast({
@@ -812,7 +923,6 @@ const toAdd = () => {
 
 // 跳转消息中心
 const toMsgCenter = () => {
-    // 检查是否登录
     if (!isLogin()) return 
     uni.switchTab({
         url: '/pages/message/message',
@@ -821,7 +931,6 @@ const toMsgCenter = () => {
 
 // 跳转查找车辆
 const toFindCar = () => {
-    // 检查是否登录
     if (!isLogin()) return 
     uni.openLocation({
         latitude: center.latitude,
@@ -846,7 +955,6 @@ const toFindCar = () => {
 
 // 跳转围栏
 const toFence = () => {
-    // 检查是否登录
     if (!isLogin()) return 
     uni.navigateTo({
         url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
@@ -867,30 +975,23 @@ const contactCustomerService = () => {
 // 支付
 const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
-    // 检查是否登录
     if (!isLogin()) return 
     if(simMerchant.toLowerCase() == 'zddx'){
-        iccid = iccid.substring(0,iccid.length-1) //电信卡
+        iccid = iccid.substring(0,iccid.length-1)
     }
-    // iccid = iccid.substring(0,iccid.length-1)
     
     console.log(iccid)
-    // 设置需要刷新的标志
     needRefresh.value = true
     
-    //拉起半屏小程序
     wx.openEmbeddedMiniProgram({
         appId: 'wx1d647f2cfdc089e6',
         path: '/pages/home/userSimRecharge?iccid=' + iccid,
         envVersion: 'release',
         success(res) {
-            // 打开成功
             console.log('打开小程序成功', res)
         },
         fail(res) {
-            // 打开失败
             console.log('打开小程序失败', res)
-            // 如果打开失败，取消刷新标志
             needRefresh.value = false
             uni.showToast({
                 title: '打开支付页面失败',
@@ -909,21 +1010,18 @@ const gotoLogin = () => {
 
 // 解绑设备
 const unbindDevice = async () => {
-    // 检查是否登录
     if (!isLogin()) return 
     uni.showModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',
         success: async (res) => {
             if (res.confirm) {
-                // 确认解绑
                 const res = await delDevice(currentCarImei.value)
                 if (res.code == 0) {
                     uni.showToast({
                         title: '解绑成功',
                         icon: 'success'
                     })
-                    // 如果是当前设备，清除保存信息并重新加载
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
                 } else {
@@ -940,17 +1038,14 @@ const unbindDevice = async () => {
 
 // 退出登录
 const handleExit = () => {
-     // 检查是否登录
     if (!isLogin()) return 
     uni.showModal({
         title: '退出登录',
         content: '确定退出登录吗？',
         success: async (res) => {
             if (res.confirm) {
-                // 确认退出登录
                 const res = await logout()
                 if(res.code == 0){
-                    // 退出登录时清除保存的设备信息
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
                     uni.removeStorageSync('token')
@@ -997,11 +1092,9 @@ const isLogin = (): boolean => {
 
 // 刷新设备列表
 const handleReload = () => {
-    // 检查是否登录
     if (!isLogin()) return 
     loadDeviceList()
 }
-
 
 // 页面加载
 onLoad(() => {

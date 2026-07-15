@@ -1,0 +1,224 @@
+<template>
+  <view :class="itemClass">
+    <view :class="headClass" @click="toggle">
+      <view v-if="icon.length > 0" class="i-collapse-item__icon">
+        <slot name="icon">
+          <text class="i-collapse-item__icon-text">{{ icon }}</text>
+        </slot>
+      </view>
+      <view class="i-collapse-item__title-wrap">
+        <slot name="title">
+          <text :class="titleClass">{{ title }}</text>
+        </slot>
+        <text v-if="label.length > 0" class="i-collapse-item__label">
+          {{ label }}
+        </text>
+      </view>
+      <slot name="value">
+        <text v-if="value.length > 0" class="i-collapse-item__value">
+          {{ value }}
+        </text>
+      </slot>
+      <text v-if="isLink" :class="arrowClass">›</text>
+    </view>
+    <view v-if="opened" class="i-collapse-item__body" :style="bodyStyle">
+      <slot></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-collapse-item' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 CollapseItem 文档。
+ * - title: 面板标题。
+ * - value: 标题右侧内容。
+ * - label: 标题下方描述。
+ * - disabled: 是否禁用当前面板。
+ * - isLink: 是否显示右侧箭头。
+ * - clickable: 是否开启点击反馈；禁用时点击无效。
+ * - border: 是否显示底部分割线。
+ * - align: 标题对齐方式，可取 left / center / right。
+ * - name: 面板唯一标识，便于父级受控时识别。
+ * - icon: 标题左侧图标文本或符号，也可通过 icon 插槽自定义。
+ * - duration: 内容展开动画时长，单位 ms。
+ */
+const props = defineProps({
+  title: { type: String, default: '' },
+  value: { type: String, default: '' },
+  label: { type: String, default: '' },
+  disabled: { type: Boolean, default: false },
+  isLink: { type: Boolean, default: true },
+  clickable: { type: Boolean, default: true },
+  border: { type: Boolean, default: true },
+  align: { type: String, default: 'left' },
+  name: { type: [String, Number], default: '' },
+  icon: { type: String, default: '' },
+  duration: { type: Number, default: 300 },
+})
+
+/**
+ * Emits 说明：对齐文档事件。
+ * - change: 当前面板展开状态变化时触发。
+ * - open: 当前面板展开时触发。
+ * - close: 当前面板收起时触发。
+ */
+const emit = defineEmits(['change', 'open', 'close'])
+
+const opened = ref(false)
+
+const itemClass = computed(() => {
+  const classes = ['i-collapse-item']
+  if (props.border) classes.push('i-collapse-item--border')
+  if (opened.value) classes.push('i-collapse-item--active')
+  return classes.join(' ')
+})
+
+const headClass = computed(() => {
+  const classes = ['i-collapse-item__head']
+  if (props.disabled) classes.push('i-collapse-item__head--disabled')
+  if (props.clickable && !props.disabled) classes.push('i-collapse-item__head--clickable')
+  if (props.align == 'center') classes.push('i-collapse-item__head--center')
+  if (props.align == 'right') classes.push('i-collapse-item__head--right')
+  return classes.join(' ')
+})
+
+const titleClass = computed(() => {
+  const classes = ['i-collapse-item__title']
+  if (props.disabled) classes.push('i-collapse-item__title--disabled')
+  return classes.join(' ')
+})
+
+const arrowClass = computed(() => {
+  const classes = ['i-collapse-item__arrow']
+  if (opened.value) classes.push('i-collapse-item__arrow--active')
+  if (props.disabled) classes.push('i-collapse-item__arrow--disabled')
+  return classes.join(' ')
+})
+
+const bodyStyle = computed(() => {
+  return ''
+})
+
+function toggle() {
+  if (props.disabled || !props.clickable) return
+  if (opened.value) {
+    close()
+  } else {
+    open()
+  }
+}
+
+function open() {
+  if (props.disabled) return
+  opened.value = true
+  emitState('open')
+}
+
+function close() {
+  opened.value = false
+  emitState('close')
+}
+
+function emitState(name: string) {
+  const payload = {
+    name: props.name,
+    open: opened.value,
+  }
+  emit('change', payload)
+  if (name == 'open') {
+    emit('open', props.name)
+  } else {
+    emit('close', props.name)
+  }
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-collapse-item {
+  overflow: hidden;
+  background-color: #ffffff;
+}
+.i-collapse-item--border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #ebeef5;
+}
+.i-collapse-item__head {
+  min-height: 48px;
+  padding: 0 14px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-collapse-item__head--disabled {
+  opacity: 0.55;
+}
+.i-collapse-item__head--center {
+  justify-content: center;
+}
+.i-collapse-item__head--right {
+  justify-content: flex-end;
+}
+.i-collapse-item__icon {
+  width: 22px;
+  margin-right: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.i-collapse-item__icon-text {
+  color: #909399;
+  font-size: 15px;
+  line-height: 20px;
+}
+.i-collapse-item__title-wrap {
+  flex: 1;
+  justify-content: center;
+}
+.i-collapse-item__title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-collapse-item__title--disabled {
+  color: #c0c4cc;
+}
+.i-collapse-item__label {
+  margin-top: 2px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-collapse-item__value {
+  margin-left: 10px;
+  color: #909399;
+  font-size: 13px;
+  line-height: 20px;
+}
+.i-collapse-item__arrow {
+  width: 22px;
+  margin-left: 4px;
+  color: #909399;
+  font-size: 22px;
+  line-height: 22px;
+  text-align: center;
+  transform: rotate(0deg);
+}
+.i-collapse-item__arrow--active {
+  transform: rotate(90deg);
+}
+.i-collapse-item__arrow--disabled {
+  color: #c0c4cc;
+}
+.i-collapse-item__body {
+  padding: 0 14px 14px 14px;
+}
+</style>

@@ -1,0 +1,351 @@
+<template>
+  <view class="i-grid" :style="gridStyle">
+    <view
+      v-for="(item, index) in items"
+      :key="String(index) + '-' + getItemText(item)"
+      :class="
+        selected == index
+          ? 'i-grid__item i-grid__item--active'
+          : 'i-grid__item'
+      "
+      :style="getItemStyle(index, item)"
+      :hover-class="isLink ? 'i-grid__item--hover' : 'none'"
+      @click="select(item, index)"
+    >
+      <!-- 支持图片图标 -->
+      <image
+        v-if="getItemImage(item).length > 0"
+        class="i-grid__image"
+        :src="getItemImage(item)"
+        :style="getImageStyle(item)"
+        mode="aspectFit"
+      />
+      <!-- 支持文字图标（如字体图标） -->
+      <text
+        v-else-if="getItemIcon(item).length > 0"
+        class="i-grid__icon"
+        :style="getIconStyle(item)"
+        >{{ getItemIcon(item) }}</text
+      >
+      <text class="i-grid__text" :style="getTextStyle(item)">{{
+        getItemText(item)
+      }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+
+defineOptions({ name: 'i-grid' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - items: 宫格数据源；支持字符串数组，也支持对象数组，对象可提供 text、icon、image、name、iconColor、textColor、bgColor、url 等字段。
+ *   - name: 项目唯一标识，用于事件回调中识别具体项目（可选）
+ *   - icon: 字体图标名称（如：''）
+ *   - image: 图片图标URL（如：'/static/icon.png'），优先级高于 icon
+ * - col: 每行显示几列，依据 DCloud uni-app x 宫格规范的 col；常用 2、3、4、5。
+ * - itemHeight: 每个宫格项目高度，数字会自动转为 px。
+ * - itemBgColor: 统一设置每个宫格项目背景色；单个 item.bgColor 优先级更高。
+ * - bgColor: 整体宫格背景色。
+ * - width: 整体宫格宽度，例如 auto、100%、320px。
+ * - iconColor: 统一图标颜色；单个 item.iconColor 优先级更高。
+ * - textColor: 统一文字颜色；单个 item.textColor 优先级更高。
+ * - fontSize: 文字大小，数字会自动转为 px。
+ * - iconSize: 图标大小，数字会自动转为 px。
+ * - imageSize: 图片图标大小，数字会自动转为 px（宽高一致）。
+ * - showBorder: 是否显示宫格分割线。
+ * - borderColor: 分割线颜色。
+ * - round: 整体圆角，数字会自动转为 px。
+ * - isLink: 是否开启点击反馈效果。
+ */
+const props = defineProps({
+  items: {
+    type: Array,
+    default() {
+      return ['首页', '分类', '购物车', '我的', '优惠券', '设置']
+    },
+  },
+  col: {
+    type: Number,
+    default: 3,
+  },
+  itemHeight: {
+    type: [String, Number],
+    default: '70',
+  },
+  itemBgColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  bgColor: {
+    type: String,
+    default: 'transparent',
+  },
+  width: {
+    type: String,
+    default: 'auto',
+  },
+  iconColor: {
+    type: String,
+    default: '#333333',
+  },
+  textColor: {
+    type: String,
+    default: '#888888',
+  },
+  fontSize: {
+    type: [String, Number],
+    default: '13',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: '25',
+  },
+  imageSize: {
+    type: [String, Number],
+    default: '40',
+  },
+  showBorder: {
+    type: Boolean,
+    default: true,
+  },
+  borderColor: {
+    type: String,
+    default: '#f5f5f5',
+  },
+  round: {
+    type: [String, Number],
+    default: '0',
+  },
+  isLink: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - select: 点击某个宫格项目时触发，参数包含 index、text、name、icon、image、url。
+ * - change: 选中项变化时触发，参数同 select。
+ * - click: 点击某个宫格项目时触发，参数同 select。
+ * - loadmore: 保留的加载更多事件，便于列表型场景扩展。
+ */
+const emit = defineEmits(['select', 'change', 'click', 'loadmore'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const selected = ref(-1)
+
+const gridStyle = computed(() => {
+  return (
+    'width:' +
+    props.width +
+    ';background-color:' +
+    bgColor.value +
+    ';border-radius:' +
+    formatSize(props.round) +
+    ';'
+  )
+})
+
+function formatSize(value) {
+  const text = String(value)
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0 ||
+    text == 'auto'
+  )
+    return text
+  return text + 'px'
+}
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  return ''
+}
+
+function getItemText(item) {
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  return String(item)
+}
+
+function getItemIcon(item) {
+  return itemValue(item, 'icon')
+}
+
+function getItemImage(item) {
+  return itemValue(item, 'image')
+}
+
+function getItemName(item) {
+  return itemValue(item, 'name')
+}
+
+function getItemBgColor(item) {
+  const color = itemValue(item, 'bgColor')
+  if (color.length > 0) return color
+  return props.itemBgColor
+}
+
+function getItemIconColor(item) {
+  const color = itemValue(item, 'iconColor')
+  if (color.length > 0) return color
+  return props.iconColor
+}
+
+function getItemTextColor(item) {
+  const color = itemValue(item, 'textColor')
+  if (color.length > 0) return color
+  return props.textColor
+}
+
+function getItemUrl(item) {
+  return itemValue(item, 'url')
+}
+
+function getColumns() {
+  if (props.col <= 1) return 1
+  if (props.col >= 6) return 6
+  return props.col
+}
+
+function getRows() {
+  const columns = getColumns()
+  return Math.ceil(props.items.length / columns)
+}
+
+function getItemWidth() {
+  const columns = getColumns()
+  if (columns == 1) return '100%'
+  if (columns == 2) return '50%'
+  if (columns == 3) return '33.3333%'
+  if (columns == 4) return '25%'
+  if (columns == 5) return '20%'
+  return '16.6667%'
+}
+
+function getItemStyle(index, item) {
+  const columns = getColumns()
+  const row = Math.floor(index / columns)
+  const colIndex = index % columns
+  let style =
+    'width:' +
+    getItemWidth() +
+    ';height:' +
+    formatSize(props.itemHeight) +
+    ';background-color:' +
+    getItemBgColor(item) +
+    ';'
+  if (props.showBorder) {
+    if (colIndex < columns - 1) {
+      style =
+        style +
+        'border-right-width:1px;border-right-style:solid;border-right-color:' +
+        props.borderColor +
+        ';'
+    }
+    if (row < getRows() - 1) {
+      style =
+        style +
+        'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:' +
+        props.borderColor +
+        ';'
+    }
+  }
+  return style
+}
+
+function getIconStyle(item) {
+  return (
+    'color:' +
+    getItemIconColor(item) +
+    ';font-size:' +
+    formatSize(props.iconSize) +
+    ';line-height:' +
+    formatSize(props.iconSize) +
+    ';'
+  )
+}
+
+function getImageStyle(item) {
+  const size = formatSize(props.imageSize)
+  return 'width:' + size + ';height:' + size + ';'
+}
+
+function getTextStyle(item) {
+  return 'color:' + getItemTextColor(item) + ';font-size:' + formatSize(props.fontSize) + ';'
+}
+
+function buildPayload(item, index) {
+  return {
+    index,
+    name: getItemName(item),
+    text: getItemText(item),
+    icon: getItemIcon(item),
+    image: getItemImage(item),
+    url: getItemUrl(item),
+  }
+}
+
+function select(item, index) {
+  selected.value = index
+  const payload = buildPayload(item, index)
+  emit('select', payload)
+  emit('change', payload)
+  emit('click', payload)
+}
+
+function loadMore() {
+  emit('loadmore', props.items.length)
+}
+</script>
+
+<style>
+.i-grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.i-grid__item {
+  box-sizing: border-box;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-grid__item--hover {
+  background-color: #f3f4f6;
+}
+
+.i-grid__item--active {
+  background-color: #ecf5ff;
+}
+
+.i-grid__image {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.i-grid__icon {
+  margin-bottom: 8px;
+  text-align: center;
+  lines: 1;
+}
+
+.i-grid__text {
+  line-height: 18px;
+  text-align: center;
+  lines: 1;
+}
+</style>

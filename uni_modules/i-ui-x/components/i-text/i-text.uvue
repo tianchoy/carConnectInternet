@@ -1,0 +1,134 @@
+<template>
+  <text :class="textClass" :style="textStyle" @click="handleClick">
+    {{ contentText }}<slot></slot>
+  </text>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({ name: 'i-text' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - type: 组件类型，用于切换视觉风格或语义状态。
+ * - size: 组件尺寸，通常影响宽高或字号。
+ * - bold: bold 配置项，用于控制组件展示或交互行为。
+ * - block: block 配置项，用于控制组件展示或交互行为。
+ * - text: 主要展示文本。
+ * - color: 文字、图标或线条颜色。
+ * - customStyle: customStyle 配置项，用于控制组件展示或交互行为。
+ * - decoration: decoration 配置项，用于控制组件展示或交互行为。
+ */
+const props = defineProps({
+  type: {
+    type: String,
+    default: 'main',
+  },
+  size: {
+    type: String,
+    default: 'normal',
+  },
+  bold: {
+    type: Boolean,
+    default: false,
+  },
+  block: {
+    type: Boolean,
+    default: false,
+  },
+  text: {
+    type: [String, Number],
+    default: '',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+  decoration: {
+    type: String,
+    default: 'none',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ */
+const emit = defineEmits(['click'])
+
+const contentText = computed(() => {
+  return String(props.text)
+})
+
+const textClass = computed(() => {
+  const classes = ['i-text', 'i-text--' + props.type, 'i-text--' + props.size]
+  if (props.bold) classes.push('i-text--bold')
+  if (props.block) classes.push('i-text--block')
+  return classes.join(' ')
+})
+
+const textStyle = computed(() => {
+  let style = props.customStyle
+  if (props.color.length > 0) style = style + 'color:' + props.color + ';'
+  if (props.decoration != 'none') style = style + 'text-decoration:' + props.decoration + ';'
+  return style
+})
+
+function handleClick() {
+  emit('click', contentText.value)
+}
+</script>
+
+<style>
+.i-text {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-text--block {
+}
+
+.i-text--mini {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-text--normal {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-text--large {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.i-text--main {
+  color: #303133;
+}
+
+.i-text--muted {
+  color: #909399;
+}
+
+.i-text--primary {
+  color: #2979ff;
+}
+
+.i-text--success {
+  color: #19be6b;
+}
+
+.i-text--danger {
+  color: #fa3534;
+}
+
+.i-text--bold {
+  font-weight: 700;
+}
+</style>

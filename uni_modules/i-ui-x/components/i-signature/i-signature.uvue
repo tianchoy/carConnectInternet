@@ -1,0 +1,609 @@
+<template>
+  <view class="i-signature" :style="rootStyle">
+    <view
+      :id="boardId"
+      class="i-signature__board"
+      :style="boardStyle"
+      @touchstart.stop.prevent="handleTouchStart"
+      @touchmove.stop.prevent="handleTouchMove"
+      @touchend.stop="handleTouchEnd"
+      @touchcancel.stop="handleTouchEnd"
+      @click="handleClick"
+    >
+      <view
+        v-for="(point, index) in points"
+        :key="point + '-' + String(index)"
+        class="i-signature__point"
+        :style="pointStyle(point)"
+      ></view>
+      <text v-if="points.length == 0" class="i-signature__placeholder">
+        在这里签名
+      </text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-signature' })
+
+const boardId = 'i-signature-' + String(Math.round(Math.random() * 1000000))
+
+/**
+ * Props 说明：依据 DCloud uni-app x signature board 签名板。
+ * - width: 签名板宽度，支持任意 CSS 单位；默认 100%。
+ * - height: 签名板高度，支持任意 CSS 单位；默认 150px。
+ * - bgColor: 签名板背景颜色；默认透明。
+ * - strokeColor: 画笔颜色；支持 primary/success/warning/error/info 或具体颜色值。
+ * - strokeWidth: 画笔粗细，单位 px；数值越大笔迹越粗。
+ */
+const props = defineProps({
+  width: { type: String, default: '100%' },
+  height: { type: String, default: '150' },
+  bgColor: { type: String, default: 'rgba(0,0,0,0)' },
+  strokeColor: { type: String, default: 'primary' },
+  strokeWidth: { type: Number, default: 8 },
+})
+
+/**
+ * Emits 说明：组件向外派发签名状态。
+ * - change: 笔迹变化时触发，返回当前笔画数量。
+ * - clear: 调用 clear 或点击清除后触发。
+ * - confirm: 兼容旧版签名确认事件，返回 getImage 同结构数据。
+ */
+const emit = defineEmits(['change', 'clear', 'confirm'])
+
+
+const signatureBgColor = computed(() => {
+  return props.bgColor
+})
+const points = ref<string[]>([])
+const pendingPoints = ref<string[]>([])
+const lineCount = ref(0)
+const drawing = ref(false)
+const lastPoint = ref('')
+const suppressClick = ref(false)
+const rectLeft = ref(0)
+const rectTop = ref(0)
+const rectWidth = ref(0)
+const rectHeight = ref(0)
+
+const rootStyle = computed(() => {
+  return 'width:' + formatSize(props.width) + ';'
+})
+
+const boardStyle = computed(() => {
+  return (
+    'height:' +
+    formatSize(props.height) +
+    ';background-color:' +
+    normalizeColor(signatureBgColor.value) +
+    ';'
+  )
+})
+
+function handleTouchStart(event) {
+  const touch = firstTouch(event)
+  if (touch == null) return
+  const snapshot = snapshotPoint(touch)
+  suppressClick.value = true
+  refreshBoardRect(event, touch, false, true)
+  const point = localPoint(event, touch)
+  drawing.value = true
+  lineCount.value = lineCount.value + 1
+  lastPoint.value = ''
+  pendingPoints.value = []
+  if (point.length == 0) {
+    queuePendingPoint(snapshot, true)
+    refreshBoardRect(event, snapshot, true, true)
+    return
+  }
+  addPoint(pointX(point), pointY(point), true)
+}
+
+function handleTouchMove(event) {
+  if (!drawing.value) return
+  const touch = firstTouch(event)
+  if (touch == null) return
+  const snapshot = snapshotPoint(touch)
+  const point = localPoint(event, touch)
+  if (point.length == 0 || pendingPoints.value.length > 0) {
+    queuePendingPoint(snapshot, false)
+    refreshBoardRect(event, snapshot, true, false)
+    return
+  }
+  addPoint(pointX(point), pointY(point), lastPoint.value.length == 0)
+}
+
+function handleTouchEnd() {
+  drawing.value = false
+  lastPoint.value = ''
+  pendingPoints.value = []
+}
+
+function handleClick(event) {
+  if (suppressClick.value) {
+    suppressClick.value = false
+    return
+  }
+  refreshBoardRect(event, event, false, true)
+  const point = localPoint(event, event)
+  if (point.length == 0) return
+  lineCount.value = lineCount.value + 1
+  addPoint(pointX(point), pointY(point), true)
+  lastPoint.value = ''
+}
+
+function addPoint(x, y, isStart) {
+  const boardWidth = usableWidth()
+  const boardHeight = usableHeight()
+  const nextX = clamp(Number(x), 0, boardWidth)
+  const nextY = clamp(Number(y), 0, boardHeight)
+  if (!isStart && lastPoint.value.length > 0) {
+    addInterpolatedPoints(nextX, nextY)
+  }
+  const point = buildPoint(nextX, nextY)
+  points.value.push(point)
+  lastPoint.value = point
+  emit('change', lineCount.value)
+}
+
+function addInterpolatedPoints(nextX, nextY) {
+  const prevX = pointX(lastPoint.value)
+  const prevY = pointY(lastPoint.value)
+  const dx = nextX - prevX
+  const dy = nextY - prevY
+  const distance = Math.sqrt(dx * dx + dy * dy)
+  const step = Math.max(2, props.strokeWidth / 2)
+  const count = Math.floor(distance / step)
+  for (let i = 1; i < count; i++) {
+    const ratio = i / count
+    points.value.push(buildPoint(prevX + dx * ratio, prevY + dy * ratio))
+  }
+}
+
+function firstTouch(event) {
+  if (event.touches != null && event.touches.length > 0) return event.touches[0]
+  if (event.changedTouches != null && event.changedTouches.length > 0) {
+    return event.changedTouches[0]
+  }
+  return null
+}
+
+function localPoint(event, point): string {
+  const rect = getBoardRect(event)
+  const width = rect[2] <= 0 ? usableWidth() : rect[2]
+  const height = rect[3] <= 0 ? usableHeight() : rect[3]
+  let x = readPointValue(point, 'offsetX')
+  let y = readPointValue(point, 'offsetY')
+  if (isLocalPoint(x, y, width, height)) return buildPoint(x, y)
+
+  x = readPointValue(point, 'x')
+  y = readPointValue(point, 'y')
+  if (isLocalPoint(x, y, width, height)) return buildPoint(x, y)
+
+  if (!hasUsableRect(rect)) return ''
+
+  x = readPointValue(point, 'clientX')
+  y = readPointValue(point, 'clientY')
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+
+  x = readPointValue(point, 'pageX')
+  y = readPointValue(point, 'pageY')
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+
+  x = readPointValue(point, 'x')
+  y = readPointValue(point, 'y')
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+  return ''
+}
+
+function getBoardRect(event) {
+  if (rectWidth.value > 0 && rectHeight.value > 0) {
+    return [rectLeft.value, rectTop.value, rectWidth.value, rectHeight.value]
+  }
+  const target = event.currentTarget
+  if (
+    target != null &&
+    target.getBoundingClientRect != null &&
+    typeof target.getBoundingClientRect == 'function'
+  ) {
+    const rect = target.getBoundingClientRect()
+    setBoardRect(rect)
+    return [
+      normalizeRectPoint(rect.left, rect.x),
+      normalizeRectPoint(rect.top, rect.y),
+      Number(rect.width),
+      Number(rect.height),
+    ]
+  }
+  return [NaN, NaN, usableWidth(), usableHeight()]
+}
+
+function refreshBoardRect(event, point, shouldUpdate, isStart) {
+  let element = null
+  if (uni.getElementById != null && typeof uni.getElementById == 'function') {
+    element = uni.getElementById(boardId)
+  }
+  if (
+    element != null &&
+    element.getBoundingClientRect != null &&
+    typeof element.getBoundingClientRect == 'function'
+  ) {
+    const rect = element.getBoundingClientRect()
+    setBoardRect(rect)
+    if (shouldUpdate) addPointAfterMeasure(event, point, isStart)
+    return
+  }
+  if (
+    element != null &&
+    element.getBoundingClientRectAsync != null &&
+    typeof element.getBoundingClientRectAsync == 'function'
+  ) {
+    element
+      .getBoundingClientRectAsync()
+      .then((rect) => {
+        setBoardRect(rect)
+        if (shouldUpdate) addPointAfterMeasure(event, point, isStart)
+      })
+      .catch(() => {
+        refreshBoardRectBySelector(event, point, shouldUpdate, isStart)
+      })
+    return
+  }
+  refreshBoardRectBySelector(event, point, shouldUpdate, isStart)
+}
+
+function refreshBoardRectBySelector(event = null, point = null, shouldUpdate = false, isStart = false) {
+  uni
+    .createSelectorQuery()
+    .select('#' + boardId)
+    .boundingClientRect((rect) => {
+      setBoardRect(rect)
+      if (shouldUpdate && event != null && point != null) {
+        addPointAfterMeasure(event, point, isStart)
+      }
+    })
+    .exec()
+}
+
+function addPointAfterMeasure(event, point, isStart) {
+  if (pendingPoints.value.length > 0) {
+    processPendingPoints()
+    return
+  }
+  const nextPoint =
+    typeof point == 'string' ? localPointFromSnapshot(point) : localPoint(event, point)
+  if (nextPoint.length == 0) return
+  addPoint(pointX(nextPoint), pointY(nextPoint), isStart)
+}
+
+function queuePendingPoint(snapshot, isStart) {
+  if (snapshot.length == 0) return
+  pendingPoints.value.push((isStart ? '1|' : '0|') + snapshot)
+}
+
+function processPendingPoints() {
+  if (rectWidth.value <= 0 || rectHeight.value <= 0) return
+  const list = pendingPoints.value.slice(0)
+  pendingPoints.value = []
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    const isStart = item.substring(0, 2) == '1|'
+    const snapshot = item.substring(2)
+    const nextPoint = localPointFromSnapshot(snapshot)
+    if (nextPoint.length > 0) {
+      addPoint(
+        pointX(nextPoint),
+        pointY(nextPoint),
+        isStart || lastPoint.value.length == 0,
+      )
+    }
+  }
+}
+
+function setBoardRect(rect) {
+  if (rect == null) return
+  rectLeft.value = normalizeRectPoint(rect.left, rect.x)
+  rectTop.value = normalizeRectPoint(rect.top, rect.y)
+  rectWidth.value = Number(rect.width)
+  rectHeight.value = Number(rect.height)
+}
+
+function clear() {
+  points.value = []
+  lineCount.value = 0
+  drawing.value = false
+  lastPoint.value = ''
+  emit('clear')
+  emit('change', 0)
+}
+
+function resize() {
+  rectWidth.value = 0
+  rectHeight.value = 0
+  refreshBoardRectBySelector()
+}
+
+function getLineCount(): number {
+  return lineCount.value
+}
+
+function getImage() {
+  const payload = buildImagePayload('')
+  if (points.value.length == 0) {
+    payload.error = 'empty'
+    return Promise.resolve(payload)
+  }
+  payload.src = buildSvgDataUrl()
+  return Promise.resolve(payload)
+}
+
+function confirm() {
+  const payload = buildImagePayload(points.value.length == 0 ? '' : buildSvgDataUrl())
+  if (points.value.length == 0) payload.error = 'empty'
+  emit('confirm', payload)
+  return payload
+}
+
+function buildImagePayload(src) {
+  return {
+    src,
+    width: usableWidth(),
+    height: usableHeight(),
+    error: '',
+  }
+}
+
+function buildSvgDataUrl(): string {
+  const width = usableWidth()
+  const height = usableHeight()
+  let svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' +
+    String(width) +
+    '" height="' +
+    String(height) +
+    '" viewBox="0 0 ' +
+    String(width) +
+    ' ' +
+    String(height) +
+    '">'
+  const bg = normalizeColor(signatureBgColor.value)
+  if (bg.length > 0 && bg != 'rgba(0,0,0,0)' && bg != 'transparent') {
+    svg =
+      svg +
+      '<rect width="100%" height="100%" fill="' +
+      escapeSvg(bg) +
+      '"/>'
+  }
+  const color = escapeSvg(normalizeColor(props.strokeColor))
+  const radius = Math.max(1, props.strokeWidth / 2)
+  for (let i = 0; i < points.value.length; i++) {
+    const point = points.value[i]
+    svg =
+      svg +
+      '<circle cx="' +
+      String(pointX(point)) +
+      '" cy="' +
+      String(pointY(point)) +
+      '" r="' +
+      String(radius) +
+      '" fill="' +
+      color +
+      '"/>'
+  }
+  svg = svg + '</svg>'
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+}
+
+function pointStyle(point): string {
+  const size = Math.max(2, Number(props.strokeWidth))
+  const radius = size / 2
+  return (
+    'width:' +
+    String(size) +
+    'px;height:' +
+    String(size) +
+    'px;left:' +
+    String(pointX(point) - radius) +
+    'px;top:' +
+    String(pointY(point) - radius) +
+    'px;background-color:' +
+    normalizeColor(props.strokeColor) +
+    ';'
+  )
+}
+
+function buildPoint(x, y): string {
+  return String(Math.round(Number(x))) + ',' + String(Math.round(Number(y)))
+}
+
+function pointX(point): number {
+  return Number(String(point).split(',')[0])
+}
+
+function pointY(point): number {
+  return Number(String(point).split(',')[1])
+}
+
+function readPointValue(point, keyName): number {
+  if (point == null) return NaN
+  const value = point[keyName]
+  if (value == null) return NaN
+  return Number(value)
+}
+
+function snapshotPoint(point): string {
+  if (point == null) return ''
+  return (
+    stringifyNumber(readPointValue(point, 'offsetX')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'offsetY')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'clientX')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'clientY')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'pageX')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'pageY')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'x')) +
+    ',' +
+    stringifyNumber(readPointValue(point, 'y'))
+  )
+}
+
+function localPointFromSnapshot(snapshot): string {
+  const rect = [rectLeft.value, rectTop.value, rectWidth.value, rectHeight.value]
+  const width = rectWidth.value <= 0 ? usableWidth() : rectWidth.value
+  const height = rectHeight.value <= 0 ? usableHeight() : rectHeight.value
+  let x = snapshotValue(snapshot, 0)
+  let y = snapshotValue(snapshot, 1)
+  if (isLocalPoint(x, y, width, height)) return buildPoint(x, y)
+
+  x = snapshotValue(snapshot, 6)
+  y = snapshotValue(snapshot, 7)
+  if (isLocalPoint(x, y, width, height)) return buildPoint(x, y)
+
+  if (!hasUsableRect(rect)) return ''
+
+  x = snapshotValue(snapshot, 2)
+  y = snapshotValue(snapshot, 3)
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+
+  x = snapshotValue(snapshot, 4)
+  y = snapshotValue(snapshot, 5)
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+
+  x = snapshotValue(snapshot, 6)
+  y = snapshotValue(snapshot, 7)
+  if (isAbsolutePoint(x, y)) return buildPoint(x - rect[0], y - rect[1])
+  return ''
+}
+
+function snapshotValue(snapshot, index): number {
+  const list = String(snapshot).split(',')
+  if (index < 0 || index >= list.length) return NaN
+  return Number(list[index])
+}
+
+function stringifyNumber(value): string {
+  if (isNaN(Number(value))) return 'NaN'
+  return String(Number(value))
+}
+
+function isLocalPoint(x, y, width, height): boolean {
+  if (isNaN(x) || isNaN(y)) return false
+  return x >= 0 && y >= 0 && x <= width && y <= height
+}
+
+function isAbsolutePoint(x, y): boolean {
+  if (isNaN(x) || isNaN(y)) return false
+  return x >= 0 && y >= 0
+}
+
+function hasUsableRect(rect): boolean {
+  if (rect == null) return false
+  if (isNaN(Number(rect[0])) || isNaN(Number(rect[1]))) return false
+  return Number(rect[2]) > 0 && Number(rect[3]) > 0
+}
+
+function usableWidth(): number {
+  if (rectWidth.value > 0) return Math.round(rectWidth.value)
+  const value = numericSize(props.width)
+  if (value > 0 && props.width.indexOf('%') < 0) return Math.round(value)
+  return 320
+}
+
+function usableHeight(): number {
+  if (rectHeight.value > 0) return Math.round(rectHeight.value)
+  const value = numericSize(props.height)
+  if (value > 0) return Math.round(value)
+  return 150
+}
+
+function normalizeRectPoint(first, fallback): number {
+  const firstValue = Number(first)
+  if (!isNaN(firstValue)) return firstValue
+  const fallbackValue = Number(fallback)
+  if (!isNaN(fallbackValue)) return fallbackValue
+  return 0
+}
+
+function numericSize(value): number {
+  const text = String(value)
+  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function normalizeColor(value): string {
+  if (value == 'primary') return '#2979ff'
+  if (value == 'success') return '#19be6b'
+  if (value == 'warning') return '#ff9900'
+  if (value == 'error') return '#fa3534'
+  if (value == 'info') return '#909399'
+  return String(value)
+}
+
+function escapeSvg(value): string {
+  return String(value).replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;')
+}
+
+function clamp(value, min, max): number {
+  if (value < min) return min
+  if (value > max) return max
+  return value
+}
+
+defineExpose({
+  clear,
+  resize,
+  getLineCount,
+  getImage,
+  confirm,
+})
+</script>
+
+<style>
+.i-signature {
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.i-signature__board {
+  position: relative;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e5e7eb;
+  border-radius: 10px;
+}
+
+.i-signature__point {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.i-signature__placeholder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  color: #c0c4cc;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+  transform: translateY(-50%);
+}
+</style>

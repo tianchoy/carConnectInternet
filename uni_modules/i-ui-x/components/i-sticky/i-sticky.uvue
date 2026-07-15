@@ -1,0 +1,286 @@
+<template>
+  <view :id="stickyId" class="i-sticky__placeholder" :style="placeholderStyle">
+    <view class="i-sticky" :style="stickyStyle">
+      <slot></slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-sticky' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Sticky，并补充吸底能力。
+ * - scrollTop: 页面滚动距离，由页面 onPageScroll 传入，用于外部判断粘性状态。
+ * - position: 粘性位置，top 表示吸顶，bottom 表示吸底。
+ * - offsetTop: 吸顶时与顶部的距离。
+ * - offsetBottom: 吸底时与底部的距离。
+ * - customNavHeight: 自定义导航栏高度，会叠加到 offsetTop。
+ * - disabled: 是否禁用吸顶。
+ * - bgColor: 组件背景颜色。
+ * - zIndex: 吸顶时的层级。
+ * - index: 自定义标识，fixed/unfixed 事件会原样返回。
+ */
+const props = defineProps({
+  scrollTop: { type: Number, default: 0 },
+  position: { type: String, default: 'top' },
+  offsetTop: { type: [String, Number], default: 0 },
+  offsetBottom: { type: [String, Number], default: 0 },
+  customNavHeight: { type: [String, Number], default: 0 },
+  disabled: { type: Boolean, default: false },
+  bgColor: { type: String, default: '#ffffff' },
+  zIndex: { type: [String, Number], default: '' },
+  index: { type: [String, Number], default: '' },
+})
+
+/**
+ * Emits 说明：
+ * - fixed: 组件进入吸顶或吸底固定状态时触发，参数为 index。
+ * - unfixed: 组件离开固定状态、回到正常文档流时触发，参数为 index。
+ */
+const emit = defineEmits(['fixed', 'unfixed'])
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const instance = getCurrentInstance()
+const stickyId = 'i-sticky-' + String(Math.floor(Math.random() * 1000000))
+const stickyTop = ref(0)
+const stickyLeft = ref(0)
+const stickyWidth = ref(0)
+const stickyHeight = ref(0)
+const viewportHeight = ref(0)
+const hasMeasured = ref(false)
+const internalScrollTop = ref(0)
+const lastFixed = ref(false)
+const measureCount = ref(0)
+const lastMeasuredScrollTop = ref(-1)
+
+const currentScrollTop = computed(() => {
+  return Math.max(props.scrollTop, internalScrollTop.value)
+})
+
+const isBottom = computed(() => {
+  return props.position == 'bottom'
+})
+
+const fixedTop = computed(() => {
+  return numericSize(props.offsetTop) + numericSize(props.customNavHeight)
+})
+
+const fixedBottom = computed(() => {
+  return numericSize(props.offsetBottom)
+})
+
+const fixed = computed(() => {
+  if (props.disabled || !hasMeasured.value) return false
+  if (isBottom.value) {
+    const viewportBottom = currentScrollTop.value + viewportHeight.value - fixedBottom.value
+    return viewportBottom <= stickyTop.value + stickyHeight.value
+  }
+  return currentScrollTop.value + fixedTop.value >= stickyTop.value
+})
+
+const placeholderStyle = computed(() => {
+  if (!fixed.value || stickyHeight.value <= 0) return ''
+  return 'height:' + String(stickyHeight.value) + 'px;'
+})
+
+const stickyStyle = computed(() => {
+  let style = 'background-color:' + bgColor.value + ';box-sizing:border-box;'
+  if (fixed.value) {
+    style = style + 'position:fixed;'
+    if (stickyWidth.value > 0) {
+      style =
+        style +
+        'left:' +
+        String(stickyLeft.value) +
+        'px;width:' +
+        String(stickyWidth.value) +
+        'px;'
+    } else {
+      style = style + 'left:0;right:0;width:100%;'
+    }
+    if (isBottom.value) {
+      style = style + 'bottom:' + String(fixedBottom.value) + 'px;'
+    } else {
+      style = style + 'top:' + String(fixedTop.value) + 'px;'
+    }
+  } else if (!props.disabled) {
+    style = style + 'position:relative;'
+  }
+  if (String(props.zIndex).length > 0) {
+    style = style + 'z-index:' + String(props.zIndex) + ';'
+  }
+  return style
+})
+
+function refreshRect() {
+  if (typeof document != 'undefined') {
+    const element = document.getElementById(stickyId)
+    if (element != null) {
+      setRect(element.getBoundingClientRect())
+      return
+    }
+  }
+  if (uni.createSelectorQuery == null) return
+  const query = uni.createSelectorQuery()
+  if (instance != null && instance.proxy != null && query.in != null) {
+    query.in(instance.proxy)
+  }
+  query
+    .select('#' + stickyId)
+    .boundingClientRect((rect) => {
+      setRect(rect)
+    })
+    .exec()
+}
+
+function setRect(rect) {
+  if (rect == null) {
+    hasMeasured.value = false
+    scheduleMeasureRetry()
+    return
+  }
+  const realRect = Array.isArray(rect) ? rect[0] : rect
+  if (realRect == null) {
+    hasMeasured.value = false
+    scheduleMeasureRetry()
+    return
+  }
+  const rectTop = normalizeRectValue(realRect.top, realRect.y, 0)
+  const rectLeft = normalizeRectValue(realRect.left, realRect.x, 0)
+  const rectWidth = normalizeRectValue(realRect.width, 0, 0)
+  const rectHeight = normalizeRectValue(realRect.height, 0, 0)
+  if (rectHeight <= 0) {
+    hasMeasured.value = false
+    scheduleMeasureRetry()
+    return
+  }
+  stickyTop.value = rectTop + currentScrollTop.value
+  stickyLeft.value = rectLeft
+  stickyWidth.value = rectWidth
+  stickyHeight.value = rectHeight
+  hasMeasured.value = true
+  lastMeasuredScrollTop.value = currentScrollTop.value
+  measureCount.value = 0
+}
+
+function scheduleMeasure() {
+  nextTick(() => {
+    refreshViewportHeight()
+    updateWindowScrollTop()
+    refreshRect()
+  })
+}
+
+function scheduleMeasureRetry() {
+  if (measureCount.value >= 12) return
+  measureCount.value = measureCount.value + 1
+  setTimeout(() => {
+    scheduleMeasure()
+  }, 80)
+}
+
+function refreshViewportHeight() {
+  if (typeof window != 'undefined') {
+    viewportHeight.value = Number(window.innerHeight)
+    return
+  }
+  const info = uni.getWindowInfo()
+  viewportHeight.value = Number(info.windowHeight)
+}
+
+function updateWindowScrollTop() {
+  if (typeof window == 'undefined') return
+  internalScrollTop.value = Number(window.scrollY)
+  refreshViewportHeight()
+  if (shouldReMeasure()) {
+    scheduleMeasure()
+  }
+}
+
+function numericSize(value): number {
+  const text = String(value)
+  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function normalizeRectValue(first, second, fallback): number {
+  const firstValue = Number(first)
+  if (!isNaN(firstValue)) return firstValue
+  const secondValue = Number(second)
+  if (!isNaN(secondValue)) return secondValue
+  return fallback
+}
+
+watch(
+  () => fixed.value,
+  (value) => {
+    if (value == lastFixed.value) return
+    lastFixed.value = value
+    emit(value ? 'fixed' : 'unfixed', props.index)
+  }
+)
+
+watch(
+  () => [props.disabled, props.position],
+  () => {
+    measureCount.value = 0
+    lastMeasuredScrollTop.value = -1
+    scheduleMeasure()
+  }
+)
+
+watch(
+  () => [
+    props.scrollTop,
+    props.offsetTop,
+    props.offsetBottom,
+    props.customNavHeight,
+  ],
+  () => {
+    refreshViewportHeight()
+    if (shouldReMeasure()) {
+      scheduleMeasure()
+    }
+  }
+)
+
+function shouldReMeasure(): boolean {
+  if (!hasMeasured.value) return true
+  if (stickyHeight.value <= 0) return true
+  if (stickyWidth.value <= 0) return true
+  return Math.abs(currentScrollTop.value - lastMeasuredScrollTop.value) > 120
+}
+
+onMounted(() => {
+  scheduleMeasure()
+  if (typeof window != 'undefined') {
+    window.addEventListener('scroll', updateWindowScrollTop)
+    window.addEventListener('resize', refreshViewportHeight)
+  }
+})
+
+onUnmounted(() => {
+  if (typeof window != 'undefined') {
+    window.removeEventListener('scroll', updateWindowScrollTop)
+    window.removeEventListener('resize', refreshViewportHeight)
+  }
+})
+</script>
+
+<style>
+.i-sticky__placeholder {
+  width: 100%;
+  overflow: visible;
+}
+.i-sticky {
+  width: 100%;
+  overflow: visible;
+}
+</style>

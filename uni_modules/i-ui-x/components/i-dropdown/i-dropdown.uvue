@@ -1,0 +1,685 @@
+<template>
+  <view class="i-dropdown" :style="wrapStyle">
+    <view v-if="position == 'fixed' && activeIndex >= 0" class="i-dropdown__placeholder" :style="placeholderStyle"></view>
+
+    <view class="i-dropdown__bar" :style="barStyle">
+      <view
+        v-for="(menu, menuIndex) in menus"
+        :key="String(menuIndex) + '-' + getMenuTitle(menu, menuIndex)"
+        :class="getMenuClass(menu, menuIndex)"
+        @click="toggle(menuIndex)"
+      >
+        <view class="i-dropdown__menu-inner">
+          <text
+            v-if="getMenuPrefiicon(menu).length > 0"
+            class="i-dropdown__menu-prefix"
+            :style="getMenuTextStyle(menu, menuIndex)"
+          >
+            {{ getMenuPrefiicon(menu) }}
+          </text>
+          <text
+            :class="getMenuTextClass(menuIndex)"
+            :style="getMenuTextStyle(menu, menuIndex)"
+          >
+            {{ getMenuLabel(menu, menuIndex) }}
+          </text>
+          <text class="i-dropdown__arrow" :style="getMenuTextStyle(menu, menuIndex)">
+            {{ getMenuArrow(menu, menuIndex) }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <view
+      v-if="activeIndex >= 0 && !hidnMask"
+      class="i-dropdown__mask"
+      :style="maskStyle"
+      @click="handleOverlayClick"
+    ></view>
+
+    <view v-if="activeIndex >= 0" class="i-dropdown__panel" :style="panelStyle">
+      <view v-if="activeOptions.length > 0" class="i-dropdown__options">
+        <view
+          v-for="(option, optionIndex) in activeOptions"
+          :key="String(optionIndex) + '-' + getOptionText(option)"
+          :class="getOptionClass(option)"
+          @click="select(option, optionIndex)"
+        >
+          <text v-if="getOptionIcon(option).length > 0" class="i-dropdown__option-icon" :style="getOptionTextStyle(option)">
+            {{ getOptionIcon(option) }}
+          </text>
+          <text :class="getOptionTextClass(option)" :style="getOptionTextStyle(option)">
+            {{ getOptionText(option) }}
+          </text>
+          <text v-if="isOptionActive(option)" class="i-dropdown__check" :style="'color:' + activeFontColorValue + ';'">
+            ✓
+          </text>
+        </view>
+      </view>
+
+      <view v-if="activeOptions.length == 0 && activeContentText.length > 0" class="i-dropdown__content">
+        <text class="i-dropdown__content-text">{{ activeContentText }}</text>
+        <view v-if="activeCloseText.length > 0" class="i-dropdown__close-button" @click="closePanel">
+          <text class="i-dropdown__close-text">{{ activeCloseText }}</text>
+        </view>
+      </view>
+
+      <view v-if="activeOptions.length == 0 && activeContentText.length == 0" class="i-dropdown__slot">
+        <slot></slot>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-dropdown' })
+
+/**
+ * Props 说明：依据 DCloud uni-app x dropdown menu / dropdown item，并兼容本项目已有数据式用法。
+ * - modelValue: 当前展开菜单索引；-1 表示关闭，可用 v-model 控制打开和关闭。
+ * - value: 当前选中值；单菜单可传字符串，多菜单可用逗号分隔，兼容旧用法。
+ * - menus: 菜单数组；每项支持 title、keyName、icon、activeIcon、fontColor、activeFontColor、isBtn、color、render、options、contentText、closeText。
+ * - items: 单菜单 options 兼容别名；未传 menus 时自动生成一个菜单。
+ * - position: 菜单栏位置；static 为普通布局，fixed 为固定在页面顶部。
+ * - offsetTop: fixed 模式下距离顶部的偏移，支持数字、px、rpx 等字符串。
+ * - height: 菜单栏高度，支持数字、px、rpx。
+ * - width: 菜单宽度；auto 表示占满可用宽度，也可传 320px / 80%。
+ * - color: 菜单栏背景色，等同 dropdown menu 的 color。
+ * - activeColor: 选中菜单和选项颜色，兼容旧用法。
+ * - inactiveColor: 未选中文字颜色，兼容旧用法。
+ * - bgColor: 菜单栏背景色旧别名；color 为空时使用。
+ * - closeOnMask: 点击遮罩是否关闭菜单。
+ * - zIndex: 遮罩、面板和菜单栏层级。
+ * - hidnMask: 是否隐藏遮罩；沿用 dropdown menu 文档中的拼写。
+ * - disabled: 是否整体禁用。
+ */
+const props = defineProps({
+  modelValue: { type: Number, default: -1 },
+  value: { type: [String, Number], default: '' },
+  menus: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  items: {
+    type: Array,
+    default() {
+      return ['全部', '最新', '销量', '价格']
+    },
+  },
+  position: { type: String, default: 'static' },
+  offsetTop: { type: [String, Number], default: '0' },
+  height: { type: [String, Number], default: '44' },
+  width: { type: String, default: 'auto' },
+  color: { type: String, default: 'white' },
+  activeColor: { type: String, default: '#2979ff' },
+  inactiveColor: { type: String, default: '#333333' },
+  bgColor: { type: String, default: '' },
+  closeOnMask: { type: Boolean, default: true },
+  zIndex: { type: [String, Number], default: 88 },
+  hidnMask: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
+})
+
+/**
+ * Emits 说明：菜单打开、关闭、选项选择和受控值同步。
+ * - change: 切换菜单时触发，参数为 index、keyName、status；选择选项时也会追加 option payload 便于业务使用。
+ * - update:modelValue: 同步当前展开索引，-1 为关闭。
+ * - update:value: 同步当前选中值，多菜单用逗号拼接。
+ * - open: 打开菜单时触发，返回 { index, keyName }。
+ * - close: 关闭菜单时触发，返回关闭前的索引。
+ * - select: 选择选项时触发，返回 { menuIndex, optionIndex, text, value, keyName, item }。
+ * - click: 点击菜单栏时触发，返回 { index, keyName }。
+ */
+const emit = defineEmits([
+  'change',
+  'update:modelValue',
+  'update:value',
+  'open',
+  'close',
+  'select',
+  'click',
+])
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const selectedValues = ref(splitValue())
+const activeIndex = ref(props.modelValue)
+const buttonActiveIndex = ref(-1)
+
+const menus = computed(() => {
+  if (props.menus.length > 0) return props.menus
+  return [
+    {
+      title: '筛选',
+      keyName: 'filter',
+      options: props.items,
+    },
+  ]
+})
+
+const activeOptions = computed(() => {
+  if (activeIndex.value < 0) return []
+  const menu = menus.value[activeIndex.value]
+  if (menu == null) return []
+  if (typeof menu == 'object') {
+    const options = menu['options']
+    if (Array.isArray(options)) return options
+  }
+  return []
+})
+
+const activeContentText = computed(() => {
+  const menu = getActiveMenu()
+  const contentText = itemValue(menu, 'contentText')
+  if (contentText.length > 0) return contentText
+  return itemValue(menu, 'description')
+})
+
+const activeCloseText = computed(() => {
+  const menu = getActiveMenu()
+  const closeText = itemValue(menu, 'closeText')
+  if (closeText.length > 0) return closeText
+  return itemValue(menu, 'buttonText')
+})
+
+const activeFontColorValue = computed(() => {
+  const menu = getActiveMenu()
+  const menuActiveColor = itemValue(menu, 'activeFontColor')
+  if (menuActiveColor.length > 0) return menuActiveColor
+  return props.activeColor
+})
+
+const barBackgroundColor = computed(() => {
+  if (props.color.length > 0) return props.color
+  if (bgColor.value.length > 0) return bgColor.value
+  return '#ffffff'
+})
+
+const resolvedHeight = computed(() => formatSize(props.height))
+
+const placeholderStyle = computed(() => {
+  return 'height:' + resolvedHeight.value + ';'
+})
+
+const wrapStyle = computed(() => {
+  if (props.position == 'fixed') {
+    return 'width:' + formatWidth(props.width) + ';'
+  }
+  return 'width:' + formatWidth(props.width) + ';z-index:' + String(Number(props.zIndex) + 2) + ';'
+})
+
+const barStyle = computed(() => {
+  let style = 'height:' + resolvedHeight.value + ';background-color:' + barBackgroundColor.value + ';z-index:' + String(Number(props.zIndex) + 2) + ';'
+  if (props.position == 'fixed' && activeIndex.value >= 0) {
+    style += 'position:fixed;left:0;right:0;top:' + formatSize(props.offsetTop) + ';width:' + formatWidth(props.width) + ';'
+  }
+  return style
+})
+
+const maskStyle = computed(() => {
+  let style = 'z-index:' + String(Number(props.zIndex)) + ';'
+  if (props.position == 'fixed') {
+    style += 'position:fixed;top:' + calcPanelTop() + ';'
+  } else {
+    style += 'position:absolute;top:' + resolvedHeight.value + ';'
+  }
+  return style
+})
+
+const panelStyle = computed(() => {
+  const menu = getActiveMenu()
+  const panelColor = itemValue(menu, 'color')
+  let style = 'z-index:' + String(Number(props.zIndex) + 1) + ';background-color:' + (panelColor.length > 0 ? panelColor : '#ffffff') + ';'
+  if (props.position == 'fixed') {
+    style += 'position:fixed;top:' + calcPanelTop() + ';left:0;right:0;width:' + formatWidth(props.width) + ';'
+  } else {
+    style += 'position:absolute;top:' + resolvedHeight.value + ';left:0;right:0;'
+  }
+  return style
+})
+
+watch(
+  () => props.value,
+  () => {
+    selectedValues.value = splitValue()
+  },
+)
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    activeIndex.value = value
+  },
+)
+
+function splitValue() {
+  const text = String(props.value)
+  if (text.length == 0) return []
+  return text.split(',')
+}
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  if (keyName == 'title' || keyName == 'text' || keyName == 'name' || keyName == 'value') {
+    return String(item)
+  }
+  return ''
+}
+
+function getActiveMenu() {
+  if (activeIndex.value < 0) return null
+  return menus.value[activeIndex.value]
+}
+
+function getMenuTitle(menu, index) {
+  const title = itemValue(menu, 'title')
+  if (title.length > 0) return title
+  return '菜单' + String(index + 1)
+}
+
+function getMenuKeyName(menu, index) {
+  const keyName = itemValue(menu, 'keyName')
+  if (keyName.length > 0) return keyName
+  return String(index)
+}
+
+function getMenuOptions(menu) {
+  if (menu == null) return []
+  if (typeof menu == 'object') {
+    const options = menu['options']
+    if (Array.isArray(options)) return options
+  }
+  return []
+}
+
+function getMenuLabel(menu, index) {
+  const value = selectedValues.value[index]
+  if (value != null && String(value).length > 0) {
+    const options = getMenuOptions(menu)
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i]
+      if (getOptionValue(option) == String(value)) return getOptionText(option)
+    }
+  }
+  return getMenuTitle(menu, index)
+}
+
+function getMenuPrefiicon(menu) {
+  const icon = itemValue(menu, 'prefiicon')
+  if (icon.length > 0) return icon
+  return ''
+}
+
+function getMenuArrow(menu, index) {
+  if (itemValue(menu, 'isBtn') == 'true') {
+    const icon = itemValue(menu, activeIndex.value == index || buttonActiveIndex.value == index ? 'activeIcon' : 'icon')
+    return iconText(icon, '')
+  }
+  const activeIcon = itemValue(menu, 'activeIcon')
+  const icon = itemValue(menu, 'icon')
+  if (activeIndex.value == index && activeIcon.length > 0) return iconText(activeIcon, '▴')
+  if (icon.length > 0) return iconText(icon, '▾')
+  return activeIndex.value == index ? '▴' : '▾'
+}
+
+function getMenuClass(menu, index) {
+  let className = 'i-dropdown__menu'
+  if (props.disabled) className += ' i-dropdown__menu--disabled'
+  if (activeIndex.value == index || buttonActiveIndex.value == index) className += ' i-dropdown__menu--active'
+  if (itemValue(menu, 'isBtn') == 'true') className += ' i-dropdown__menu--button'
+  return className
+}
+
+function getMenuTextClass(index) {
+  return activeIndex.value == index || buttonActiveIndex.value == index
+    ? 'i-dropdown__menu-text i-dropdown__menu-text--active'
+    : 'i-dropdown__menu-text'
+}
+
+function getMenuTextStyle(menu, index) {
+  const fontColor = itemValue(menu, 'fontColor')
+  const activeFontColor = itemValue(menu, 'activeFontColor')
+  let color = props.inactiveColor
+  if (fontColor.length > 0) color = fontColor
+  if (activeIndex.value == index || buttonActiveIndex.value == index) {
+    color = activeFontColor.length > 0 ? activeFontColor : props.activeColor
+  }
+  return 'color:' + color + ';'
+}
+
+function getOptionText(option) {
+  const name = itemValue(option, 'name')
+  if (name.length > 0) return name
+  const text = itemValue(option, 'text')
+  if (text.length > 0) return text
+  return itemValue(option, 'title')
+}
+
+function getOptionValue(option) {
+  const value = itemValue(option, 'value')
+  if (value.length > 0) return value
+  return getOptionText(option)
+}
+
+function getOptionIcon(option) {
+  const icon = itemValue(option, 'icon')
+  if (icon.length == 0) return ''
+  return iconText(icon, icon)
+}
+
+function getOptionClass(option) {
+  let className = 'i-dropdown__option'
+  if (isOptionActive(option)) className += ' i-dropdown__option--active'
+  if (itemValue(option, 'disabled') == 'true') className += ' i-dropdown__option--disabled'
+  return className
+}
+
+function getOptionTextClass(option) {
+  return isOptionActive(option)
+    ? 'i-dropdown__option-text i-dropdown__option-text--active'
+    : 'i-dropdown__option-text'
+}
+
+function getOptionTextStyle(option) {
+  if (itemValue(option, 'disabled') == 'true') return 'color:#c8c9cc;'
+  return 'color:' + (isOptionActive(option) ? activeFontColorValue.value : props.inactiveColor) + ';'
+}
+
+function isOptionActive(option) {
+  if (activeIndex.value < 0) return false
+  const value = selectedValues.value[activeIndex.value]
+  return String(value) == getOptionValue(option)
+}
+
+function toggle(index) {
+  if (props.disabled) return
+  const menu = menus.value[index]
+  const keyName = getMenuKeyName(menu, index)
+  emit('click', { index, keyName })
+
+  if (itemValue(menu, 'isBtn') == 'true') {
+    if (activeIndex.value >= 0) close(false)
+    buttonActiveIndex.value = index
+    emit('change', index, keyName, true)
+    return
+  }
+
+  if (activeIndex.value == index) {
+    close()
+    return
+  }
+  buttonActiveIndex.value = -1
+  activeIndex.value = index
+  emit('update:modelValue', index)
+  emit('open', { index, keyName })
+  emit('change', index, keyName, true)
+}
+
+function close(emitChangeEvent = true) {
+  if (activeIndex.value < 0) return
+  const closedIndex = activeIndex.value
+  const menu = menus.value[closedIndex]
+  const keyName = getMenuKeyName(menu, closedIndex)
+  activeIndex.value = -1
+  emit('update:modelValue', -1)
+  emit('close', closedIndex)
+  if (emitChangeEvent) emit('change', closedIndex, keyName, false)
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  close()
+}
+
+function closePanel() {
+  close()
+}
+
+function select(option, optionIndex) {
+  if (activeIndex.value < 0) return
+  if (itemValue(option, 'disabled') == 'true') return
+
+  const menuIndex = activeIndex.value
+  const menu = menus.value[menuIndex]
+  const keyName = getMenuKeyName(menu, menuIndex)
+  const values = selectedValues.value.slice(0)
+  values[menuIndex] = getOptionValue(option)
+  selectedValues.value = values
+
+  const payload = {
+    menuIndex,
+    optionIndex,
+    text: getOptionText(option),
+    value: getOptionValue(option),
+    keyName,
+    item: option,
+  }
+  emit('select', payload)
+  emit('change', menuIndex, keyName, false, payload)
+  emit('update:value', values.join(','))
+  close(false)
+}
+
+function calcPanelTop() {
+  return 'calc(' + formatSize(props.offsetTop) + ' + ' + resolvedHeight.value + ')'
+}
+
+function formatWidth(value) {
+  if (value == 'auto') return '100%'
+  return value
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function iconText(icon, fallback) {
+  if (icon == 'arrow-down-s-fill' || icon == 'arrow-down' || icon == 'down') return '▾'
+  if (icon == 'arrow-up-s-fill' || icon == 'arrow-up' || icon == 'up') return '▴'
+  if (icon == 'check' || icon == 'checkbox-circle-fill') return '✓'
+  if (icon == 'filter' || icon == 'equalizer-line') return '筛'
+  if (icon == 'sort' || icon == 'sort-desc') return '↕'
+  if (icon == 'sort-asc') return '↕'
+  if (icon == 'price') return '¥'
+  if (icon.length == 0) return fallback
+  return icon
+}
+
+defineExpose({ close, open: toggle })
+</script>
+
+<style>
+.i-dropdown {
+  position: relative;
+  overflow: visible;
+}
+
+.i-dropdown__placeholder {
+  width: 100%;
+}
+
+.i-dropdown__bar {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 0;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef0f4;
+}
+
+.i-dropdown__menu {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  padding: 0 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.i-dropdown__menu-inner {
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-dropdown__menu--button {
+  background-color: transparent;
+}
+
+.i-dropdown__menu--disabled {
+  opacity: 0.55;
+}
+
+.i-dropdown__menu-text {
+  max-width: 86px;
+  color: #333333;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-dropdown__menu-text--active {
+  color: #2979ff;
+}
+
+.i-dropdown__menu-prefix {
+  width: 16px;
+  height: 22px;
+  margin-right: 3px;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-dropdown__arrow {
+  width: 14px;
+  height: 22px;
+  margin-left: 3px;
+  color: #909193;
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.i-dropdown__mask {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 9999px;
+  background-color: rgba(0, 0, 0, 0.38);
+}
+
+.i-dropdown__panel {
+  overflow: hidden;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #eef0f4;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.i-dropdown__options {
+  background-color: #ffffff;
+}
+
+.i-dropdown__option {
+  min-height: 48px;
+  padding: 0 18px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #f2f3f5;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.i-dropdown__option--active {
+  background-color: #f4f9ff;
+}
+
+.i-dropdown__option--disabled {
+  opacity: 0.6;
+}
+
+.i-dropdown__option-icon {
+  width: 22px;
+  margin-right: 8px;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.i-dropdown__option-text {
+  flex: 1;
+  color: #333333;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.i-dropdown__option-text--active {
+  color: #2979ff;
+  font-weight: 600;
+}
+
+.i-dropdown__check {
+  margin-left: 10px;
+  color: #2979ff;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.i-dropdown__slot {
+  min-height: 96px;
+  padding: 14px;
+  background-color: #ffffff;
+}
+
+.i-dropdown__content {
+  padding: 14px;
+  background-color: #ffffff;
+}
+
+.i-dropdown__content-text {
+  color: #111827;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.i-dropdown__close-button {
+  height: 40px;
+  margin-top: 32px;
+  border-radius: 6px;
+  background-color: #1296f7;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-dropdown__close-text {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 20px;
+}
+</style>

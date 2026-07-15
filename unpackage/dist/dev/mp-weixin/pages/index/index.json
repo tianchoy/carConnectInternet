@@ -1,8 +1,8 @@
 {
   "navigationBarTitleText": "车联网",
   "usingComponents": {
-    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-line-progress": "../../uni_modules/uv-line-progress/components/uv-line-progress/uv-line-progress",
-    "uv-picker": "../../uni_modules/uv-picker/components/uv-picker/uv-picker"
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-line-progress": "../../uni_modules/i-ui-x/components/i-line-progress/i-line-progress",
+    "i-picker": "../../uni_modules/i-ui-x/components/i-picker/i-picker"
   }
 }

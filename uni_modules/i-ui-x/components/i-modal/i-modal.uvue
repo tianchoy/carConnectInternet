@@ -1,0 +1,414 @@
+<template>
+  <view v-if="opened" class="i-modal__mask" :style="maskStyle" @click="handleOverlayClick">
+    <view :class="modalClass" :style="modalStyle" @click.stop="">
+      <view v-if="closeable" class="i-modal__close" @click="closeByIcon">
+        <text class="i-modal__close-text">×</text>
+      </view>
+
+      <text v-if="title.length > 0" class="i-modal__title">{{ title }}</text>
+
+      <view class="i-modal__content-wrap">
+        <slot>
+          <text class="i-modal__content">{{ content }}</text>
+        </slot>
+      </view>
+
+      <view class="i-modal__footer" :class="buttonModel == 'button' ? 'i-modal__footer--button' : ''">
+        <view v-if="buttonReverse" class="i-modal__footer-inner">
+          <slot name="confirmButton">
+            <view
+              v-if="showConfirmButton"
+              :class="confirmButtonClass"
+              :style="confirmButtonStyle"
+              @click="confirm"
+            >
+              <text class="i-modal__confirm-text" :style="confirmTextStyle">
+                {{ loading ? '...' : confirmText }}
+              </text>
+            </view>
+          </slot>
+          <view
+            v-if="showCancelButton"
+            :class="cancelButtonClass"
+            :style="cancelButtonStyle"
+            @click="cancel"
+          >
+            <text class="i-modal__cancel-text" :style="cancelTextStyle">
+              {{ cancelText }}
+            </text>
+          </view>
+        </view>
+        <view v-else class="i-modal__footer-inner">
+          <view
+            v-if="showCancelButton"
+            :class="cancelButtonClass"
+            :style="cancelButtonStyle"
+            @click="cancel"
+          >
+            <text class="i-modal__cancel-text" :style="cancelTextStyle">
+              {{ cancelText }}
+            </text>
+          </view>
+          <slot name="confirmButton">
+            <view
+              v-if="showConfirmButton"
+              :class="confirmButtonClass"
+              :style="confirmButtonStyle"
+              @click="confirm"
+            >
+              <text class="i-modal__confirm-text" :style="confirmTextStyle">
+                {{ loading ? '...' : confirmText }}
+              </text>
+            </view>
+          </slot>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch } from 'vue'
+
+defineOptions({ name: 'i-modal' })
+
+/**
+ * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Modal 文档。
+ * - show: 是否显示模态框。
+ * - title: 标题内容。
+ * - content: 模态框内容；传入默认 slot 时此参数作为兜底内容。
+ * - confirmText: 确认按钮文字。
+ * - cancelText: 取消按钮文字。
+ * - showConfirmButton: 是否显示确认按钮。
+ * - showCancelButton: 是否显示取消按钮。
+ * - confirmColor: 确认按钮文字或 loading 颜色。
+ * - cancelColor: 取消按钮文字颜色。
+ * - duration: 弹窗动画过渡时间。
+ * - buttonReverse: 是否对调确认和取消按钮位置。
+ * - zoom: 是否开启缩放模式。
+ * - zIndex: 弹出层 z-index。
+ * - asyncClose: 是否异步关闭，只对确认按钮有效。
+ * - closeable: 是否显示右上角关闭图标。
+ * - closeOnMask: 是否允许点击遮罩关闭 Modal。
+ * - negativeTop: 往上偏移的值，避免和键盘重合。
+ * - width: modal 宽度，不支持百分比。
+ * - confirmButtonShape: 确认按钮形状，保留文档 API。
+ * - round: 设置圆角值。
+ * - buttonModel: 按钮模式，可取 text / button。
+ * - buttonRadius: 按钮圆角，仅 button 模式有效。
+ * - confirmBgColor: 确认按钮背景色，仅 button 模式有效。
+ * - cancelBgColor: 取消按钮背景色，仅 button 模式有效。
+ * - customStyle: 自定义面板样式，支持字符串。
+ */
+const props = defineProps({
+  show: { type: Boolean, default: false },
+  title: { type: String, default: '' },
+  content: { type: String, default: '' },
+  confirmText: { type: String, default: '确认' },
+  cancelText: { type: String, default: '取消' },
+  showConfirmButton: { type: Boolean, default: true },
+  showCancelButton: { type: Boolean, default: false },
+  confirmColor: { type: String, default: '#2979ff' },
+  cancelColor: { type: String, default: '#606266' },
+  duration: { type: [String, Number], default: 200 },
+  buttonReverse: { type: Boolean, default: false },
+  zoom: { type: Boolean, default: true },
+  zIndex: { type: [String, Number], default: 10075 },
+  asyncClose: { type: Boolean, default: false },
+  closeable: { type: Boolean, default: false },
+  closeOnMask: { type: Boolean, default: false },
+  negativeTop: { type: [String, Number], default: 0 },
+  width: { type: [String, Number], default: '320px' },
+  confirmButtonShape: { type: String, default: '100px' },
+  round: { type: [String, Number], default: '6px' },
+  buttonModel: { type: String, default: 'text' },
+  buttonRadius: { type: String, default: '100px' },
+  confirmBgColor: { type: String, default: '' },
+  cancelBgColor: { type: String, default: '' },
+  customStyle: { type: [String, Object], default: '' },
+})
+
+/**
+ * Emits 说明：严格保留 Modal 文档事件，并补充 update:show 便于受控。
+ * - confirm: 点击确认按钮时触发。
+ * - cancel: 点击取消按钮时触发。
+ * - close: 点击遮罩或关闭图标关闭时触发。
+ * - update:show: 同步 show 可见状态。
+ */
+const emit = defineEmits(['confirm', 'cancel', 'close', 'update:show'])
+
+
+
+const opened = ref(props.show)
+const active = ref(props.show)
+const loading = ref(false)
+let closeTimer = 0
+
+const maskStyle = computed(() => {
+  return (
+    'z-index:' +
+    String(props.zIndex) +
+    ';opacity:' +
+    (active.value ? '1' : '0') +
+    ';transition-duration:' +
+    formatMs(props.duration) +
+    ';'
+  )
+})
+
+const modalClass = computed(() => {
+  const classes = ['i-modal']
+  return classes.join(' ')
+})
+
+const modalStyle = computed(() => {
+  let style = 'width:' + formatSize(props.width) + ';'
+  style = style + 'border-radius:' + formatSize(props.round) + ';'
+  style = style + 'transition-duration:' + formatMs(props.duration) + ';'
+  const top = formatSize(props.negativeTop)
+  const scaleValue = props.zoom ? (active.value ? '1' : '0.86') : '1'
+  const translateValue = top != '0px' ? '-' + top : '0px'
+  style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
+  style = style + 'transform:translateY(' + translateValue + ') scale(' + scaleValue + ');'
+  style = style + stringifyStyle(props.customStyle)
+  return style
+})
+
+const confirmButtonClass = computed(() => {
+  const classes = ['i-modal__button', 'i-modal__button--confirm']
+  if (props.buttonModel == 'button') classes.push('i-modal__button--model-button')
+  if (props.confirmButtonShape == 'square') classes.push('i-modal__button--square')
+  return classes.join(' ')
+})
+
+const cancelButtonClass = computed(() => {
+  const classes = ['i-modal__button', 'i-modal__button--cancel']
+  if (props.buttonModel == 'button') classes.push('i-modal__button--model-button')
+  return classes.join(' ')
+})
+
+const confirmTextStyle = computed(() => {
+  return 'color:' + props.confirmColor + ';'
+})
+
+const cancelTextStyle = computed(() => {
+  return 'color:' + props.cancelColor + ';'
+})
+
+const confirmButtonStyle = computed(() => {
+  if (props.buttonModel != 'button') return ''
+  let style = 'border-radius:' + formatSize(props.buttonRadius) + ';'
+  if (props.confirmBgColor.length > 0) style = style + 'background-color:' + props.confirmBgColor + ';'
+  return style
+})
+
+const cancelButtonStyle = computed(() => {
+  if (props.buttonModel != 'button') return ''
+  let style = 'border-radius:' + formatSize(props.buttonRadius) + ';'
+  if (props.cancelBgColor.length > 0) style = style + 'background-color:' + props.cancelBgColor + ';'
+  return style
+})
+
+watch(
+  () => props.show,
+  (nextValue) => {
+    if (nextValue) {
+      openPanel()
+    } else {
+      closePanel(false)
+    }
+  },
+)
+
+function open() {
+  openPanel()
+  emit('update:show', true)
+}
+
+function close() {
+  closePanel(true)
+}
+
+function openPanel() {
+  clearCloseTimer()
+  opened.value = true
+  setTimeout(() => {
+    active.value = true
+  }, 20)
+}
+
+function closePanel(shouldEmitUpdate: boolean) {
+  clearCloseTimer()
+  active.value = false
+  loading.value = false
+  closeTimer = setTimeout(() => {
+    opened.value = false
+    closeTimer = 0
+    if (shouldEmitUpdate) emit('update:show', false)
+  }, animationDuration())
+}
+
+function clearCloseTimer() {
+  if (closeTimer > 0) {
+    clearTimeout(closeTimer)
+    closeTimer = 0
+  }
+}
+
+function animationDuration(): number {
+  const text = String(props.duration)
+  if (text.indexOf('ms') >= 0) return Number(text.replace('ms', ''))
+  if (text.indexOf('s') >= 0) return Number(text.replace('s', '')) * 1000
+  const duration = Number(text)
+  if (isNaN(duration)) return 200
+  return duration
+}
+
+function confirm() {
+  if (loading.value) return
+  emit('confirm')
+  if (props.asyncClose) {
+    loading.value = true
+    return
+  }
+  close()
+}
+
+function cancel() {
+  emit('cancel')
+  closePanel(true)
+}
+
+function closeByIcon() {
+  emit('close')
+  closePanel(true)
+}
+
+function handleOverlayClick() {
+  if (!props.closeOnMask) return
+  emit('close')
+  closePanel(true)
+}
+
+function formatMs(value): string {
+  const text = String(value)
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function stringifyStyle(value): string {
+  if (value == null) return ''
+  const text = String(value)
+  if (text == '[object Object]' || text.length == 0) return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+defineExpose({
+  open,
+  close,
+})
+</script>
+
+<style>
+.i-modal__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+.i-modal {
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.i-modal__close {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+}
+.i-modal__close-text {
+  color: #909399;
+  font-size: 22px;
+  line-height: 30px;
+}
+.i-modal__title {
+  padding: 22px 22px 8px;
+  color: #303133;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+}
+.i-modal__content-wrap {
+  min-height: 52px;
+  padding: 8px 22px 22px;
+  align-items: center;
+  justify-content: center;
+}
+.i-modal__content {
+  color: #606266;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+.i-modal__footer {
+  min-height: 48px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #f3f4f6;
+}
+.i-modal__footer--button {
+  padding: 10px 14px 14px;
+  border-top-width: 0;
+}
+.i-modal__footer-inner {
+  flex-direction: row;
+}
+.i-modal__button {
+  flex: 1;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+}
+.i-modal__button--cancel {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: #f3f4f6;
+}
+.i-modal__button--model-button {
+  height: 40px;
+  margin: 0 5px;
+  border-right-width: 0;
+  background-color: #f5f7fb;
+}
+.i-modal__button--square {
+  border-radius: 4px;
+}
+.i-modal__confirm-text,
+.i-modal__cancel-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+</style>

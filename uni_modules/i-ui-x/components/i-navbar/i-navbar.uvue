@@ -1,0 +1,206 @@
+<template>
+  <view>
+    <view :class="fixed ? 'i-navbar i-navbar--fixed' : 'i-navbar'" :style="navbarStyle">
+      <view v-if="props.safeTop" class="i-navbar__safe" :style="safeAreaStyle"></view>
+      <view class="i-navbar__inner" :style="innerStyle">
+      <view class="i-navbar__side i-navbar__left" @click="handleLeftClick">
+        <slot name="left">
+          <text v-if="leftIcon.length > 0" class="i-navbar__icon" :style="leftIconStyle">{{ leftIcon }}</text>
+          <text class="i-navbar__side-text" :style="sideStyle">{{ leftText }}</text>
+        </slot>
+      </view>
+      <view class="i-navbar__center" @click="emit('click', title)">
+        <slot name="title">
+          <text v-if="title.length > 0" class="i-navbar__title" :style="computedTitleStyle">
+            {{ title }}
+          </text>
+        </slot>
+      </view>
+      <view class="i-navbar__side i-navbar__right" @click="handleRightClick">
+        <slot name="right">
+          <text class="i-navbar__side-text" :style="sideStyle">{{ rightText }}</text>
+          <text v-if="rightIcon.length > 0" class="i-navbar__icon" :style="rightIconStyle">{{ rightIcon }}</text>
+        </slot>
+      </view>
+      </view>
+    </view>
+    <view v-if="fixed && placeholder" :style="placeholderStyle"></view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-navbar' })
+
+/**
+ * Props 说明：参考 Navbar 导航栏。
+ * - title: 中间标题。
+ * - leftText/rightText: 左右区域文字。
+ * - leftIcon/rightIcon: 左右区域图标文本。
+ * - bgColor/titleColor/textColor: 背景和文字颜色。
+ * - leftIconColor/rightIconColor: 左右图标颜色，未设置时跟随 textColor。
+ * - leftIconSize/rightIconSize: 左右图标字号。
+ * - titleWidth: 标题最大宽度，超出后单行省略。
+ * - titleStyle: 标题补充样式字符串。
+ * - height: 导航栏内容高度，不包含顶部安全区。
+ * - safeTop: 是否叠加状态栏安全区高度。
+ * - autoBack: 点击左侧是否自动返回上一页。
+ * - border: 是否显示底部边线。
+ * - fixed/placeholder: 是否固定顶部及是否占位。
+ * - zIndex: 固定层级。
+ */
+const props = defineProps({
+  title: { type: String, default: '' },
+  leftText: { type: String, default: '' },
+  rightText: { type: String, default: '更多' },
+  leftIcon: { type: String, default: '‹' },
+  rightIcon: { type: String, default: '' },
+  bgColor: { type: String, default: '#ffffff' },
+  titleColor: { type: String, default: '#303133' },
+  textColor: { type: String, default: '#2979ff' },
+  leftIconColor: { type: String, default: '' },
+  rightIconColor: { type: String, default: '' },
+  leftIconSize: { type: [String, Number], default: 22 },
+  rightIconSize: { type: [String, Number], default: 20 },
+  titleWidth: { type: [String, Number], default: '400rpx' },
+  titleStyle: { type: String, default: '' },
+  height: { type: [String, Number], default: 44 },
+  safeTop: { type: Boolean, default: true },
+  autoBack: { type: Boolean, default: false },
+  border: { type: Boolean, default: false },
+  fixed: { type: Boolean, default: true },
+  placeholder: { type: Boolean, default: false },
+  zIndex: { type: [String, Number], default: 100 },
+})
+
+/**
+ * Emits 说明：
+ * - left/leftClick: 点击左侧区域时触发，leftClick 兼容 DCloud uni-app x 事件命名。
+ * - right/rightClick: 点击右侧区域时触发，rightClick 兼容 DCloud uni-app x 事件命名。
+ * - click: 点击标题区域时触发，返回 title。
+ */
+const emit = defineEmits(['left', 'right', 'leftClick', 'rightClick', 'click'])
+
+
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const statusBarHeight = ref(getStatusBarHeight())
+
+const navbarStyle = computed(() => {
+  let style = 'background-color:' + bgColor.value + ';z-index:' + String(props.zIndex) + ';'
+  if (props.border) style += 'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#ebeef5;'
+  return style
+})
+const innerStyle = computed(() => 'height:' + formatSize(props.height) + ';')
+const safeAreaStyle = computed(() => 'height:' + String(statusBarHeight.value) + 'px;')
+const placeholderStyle = computed(() => {
+  return 'height:' + String(numericSize(props.height) + (props.safeTop ? statusBarHeight.value : 0)) + 'px;'
+})
+const computedTitleStyle = computed(() => {
+  return (
+    'color:' +
+    props.titleColor +
+    ';max-width:' +
+    formatSize(props.titleWidth) +
+    ';' +
+    props.titleStyle
+  )
+})
+const sideStyle = computed(() => 'color:' + props.textColor + ';')
+const leftIconStyle = computed(() => {
+  const color = props.leftIconColor.length > 0 ? props.leftIconColor : props.textColor
+  return 'color:' + color + ';font-size:' + formatSize(props.leftIconSize) + ';'
+})
+const rightIconStyle = computed(() => {
+  const color = props.rightIconColor.length > 0 ? props.rightIconColor : props.textColor
+  return 'color:' + color + ';font-size:' + formatSize(props.rightIconSize) + ';'
+})
+
+function handleLeftClick() {
+  emit('left')
+  emit('leftClick')
+  if (!props.autoBack) return
+  uni.navigateBack({ delta: 1 })
+}
+
+function handleRightClick() {
+  emit('right')
+  emit('rightClick')
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function numericSize(value): number {
+  const text = String(value)
+  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
+  if (isNaN(numberValue)) return 0
+  return numberValue
+}
+
+function getStatusBarHeight(): number {
+  if (uni.getWindowInfo != null) {
+    const info = uni.getWindowInfo()
+    return Number(info.statusBarHeight)
+  }
+  return 0
+}
+</script>
+
+<style>
+.i-navbar {
+  width: 100%;
+  box-sizing: border-box;
+}
+.i-navbar--fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+.i-navbar__inner {
+  padding: 0 12px;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+}
+.i-navbar__side {
+  width: 86px;
+  height: 100%;
+  flex-direction: row;
+  align-items: center;
+}
+.i-navbar__right {
+  justify-content: flex-end;
+}
+.i-navbar__center {
+  flex: 1;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.i-navbar__title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.i-navbar__side-text,
+.i-navbar__icon {
+  font-size: 13px;
+  line-height: 20px;
+}
+.i-navbar__icon {
+  line-height: 24px;
+}
+</style>

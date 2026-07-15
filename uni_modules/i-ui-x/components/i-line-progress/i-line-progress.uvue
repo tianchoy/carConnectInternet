@@ -1,0 +1,135 @@
+<template>
+  <view class="i-card" @click="emitClick">
+    <view
+      class="i-track"
+      :style="'height:' + height + 'px;background-color:' + inactiveColor"
+    >
+      <view
+        class="i-fill"
+        :style="'width:' + normalized + '%;background-color:' + activeColor"
+      ></view>
+    </view>
+    <view class="i-row i-head">
+      <text class="i-title">{{ title }}</text>
+      <text v-if="showText" class="i-muted">{{ normalized }}%</text>
+    </view>
+  </view>
+</template>
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+
+defineOptions({ name: 'i-line-progress' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - percent: 进度百分比，范围通常为 0 到 100。
+ * - title: 主标题文本，用于组件顶部或主要说明位置。
+ * - activeColor: 激活态颜色。
+ * - inactiveColor: 未激活态颜色。
+ * - height: 组件高度，单位为 px。
+ * - showText: showText 配置项，用于控制组件展示或交互行为。
+ */
+const props = defineProps({
+  percent: { type: Number, default: 45 },
+  title: { type: String, default: '' },
+  activeColor: { type: String, default: '#19be6b' },
+  inactiveColor: { type: String, default: '#ebeef5' },
+  height: { type: Number, default: 8 },
+  showText: { type: Boolean, default: true },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - change: 状态或值变化时触发，参数为最新状态或值。
+ * - update:percent: 同步进度百分比。
+ */
+const emit = defineEmits(['click', 'change', 'update:percent'])
+
+const current = ref(props.percent)
+
+const normalized = computed(() => {
+  if (current.value < 0) return 0
+  if (current.value > 100) return 100
+  return Math.round(current.value)
+})
+
+watch(
+  () => props.percent,
+  (nextValue) => {
+    current.value = nextValue
+  },
+)
+
+function step(delta) {
+  current.value = Math.min(100, Math.max(0, current.value + delta))
+  emit('change', current.value)
+  emit('update:percent', current.value)
+}
+
+function emitClick() {
+  emit('click', current.value)
+}
+</script>
+<style>
+  .i-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+.i-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.i-muted {
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.i-btn {
+  min-height: 34px;
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background-color: #ecf5ff;
+  align-items: center;
+  justify-content: center;
+}
+.i-btn--plain {
+  background-color: #f5f7fa;
+}
+.i-btn--danger {
+  background-color: #fef0f0;
+}
+.i-btn-text {
+  color: #2979ff;
+  font-size: 13px;
+  line-height: 18px;
+}
+.i-danger {
+  color: #f56c6c;
+}
+
+.i-head {
+  justify-content: space-between;
+}
+.i-track {
+  border-radius: 999px;
+  flex: 1;
+  margin-right: 5px;
+  overflow: hidden;
+}
+.i-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+</style>

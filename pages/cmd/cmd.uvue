@@ -31,11 +31,13 @@
 			<view class="param-form">
 				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
 					<text class="section-title">{{ param.label }}</text>
-					<uv-input v-if="param.type == 'input'" class="param-input" v-model="paramValues[index]"
+					<i-input v-if="param.type == 'input'" class="param-input" v-model="paramValues[index]"
 						:placeholder="'请输入' + param.label" placeholder-class="placeholder" />
-					<uv-input v-if="param.type == 'number'" class="param-input" type="number"
+
+					<i-input v-if="param.type == 'number'" class="param-input" type="number"
 						v-model="paramValues[index]" :placeholder="'请输入' + param.label" placeholder-class="placeholder"
 						:maxlength="param.max" />
+
 					<view v-if="param.type == 'radio'" class="radio-group">
 						<view v-for="item in param.items" :key="'radio_' + item.value" class="radio-item"
 							@click="selectRadio(index, item.value)">
@@ -47,9 +49,7 @@
 						</view>
 					</view>
 				</view>
-				<uv-button type="primary" class="submit-btn" :disabled="!isFormValid" @click="sendCommand">
-					发送指令
-				</uv-button>
+				<i-button type="primary" text="发送指令" class="submit-btn" :disabled="!isFormValid" @click="sendCommand"></i-button>
 			</view>
 		</view>
 		<view class="section" v-if="commandRecords">

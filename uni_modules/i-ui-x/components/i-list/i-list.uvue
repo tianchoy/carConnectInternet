@@ -1,0 +1,167 @@
+<template>
+  <view class="i-list" :style="wrapStyle">
+    <text v-if="showTitle" class="i-list__title">{{ title }}</text>
+    <view class="i-list__body">
+      <view
+        v-for="(item, index) in items"
+        :key="String(index) + '-' + getItemTitle(item)"
+        :class="selected == index ? 'i-list__item i-list__item--active' : 'i-list__item'"
+        :style="getItemStyle(index)"
+        @click="select(item, index)"
+      >
+        <view class="i-list__main">
+          <text class="i-list__item-title" :style="getTitleStyle(index)">{{ getItemTitle(item) }}</text>
+          <text v-if="getItemDesc(item).length > 0" class="i-list__item-desc">{{ getItemDesc(item) }}</text>
+        </view>
+        <text v-if="rightIcon.length > 0" class="i-list__right">{{ rightIcon }}</text>
+      </view>
+    </view>
+    <view v-if="showLoadMore" class="i-list__load" @click="loadMore">
+      <text class="i-list__load-text">{{ loadMoreText }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-list' })
+
+/**
+ * Props 说明：列表展示组件。
+ * - items: 列表数据源，支持字符串或对象。
+ * - title: 顶部标题。
+ * - showTitle: 是否显示标题。
+ * - titleKey: 对象项标题字段名。
+ * - descKey: 对象项描述字段名。
+ * - border: 是否显示分割线。
+ * - clickable: 是否允许点击选择。
+ * - activeColor: 选中项文字颜色。
+ * - itemBgColor: 列表项背景色。
+ * - rightIcon: 右侧箭头/图标文本，空字符串隐藏。
+ * - showLoadMore: 是否显示加载更多按钮。
+ * - loadMoreText: 加载更多按钮文字。
+ */
+const props = defineProps({
+  items: { type: Array, default() { return ['项目一', '项目二', '项目三'] } },
+  title: { type: String, default: '列表' },
+  showTitle: { type: Boolean, default: true },
+  titleKey: { type: String, default: 'title' },
+  descKey: { type: String, default: 'description' },
+  border: { type: Boolean, default: true },
+  clickable: { type: Boolean, default: true },
+  activeColor: { type: String, default: '#2979ff' },
+  itemBgColor: { type: String, default: '#ffffff' },
+  rightIcon: { type: String, default: '›' },
+  showLoadMore: { type: Boolean, default: true },
+  loadMoreText: { type: String, default: '加载更多' },
+})
+
+/**
+ * Emits 说明：
+ * - click/select/change: 点击列表项时触发，返回 { index, title, item }。
+ * - loadmore: 点击加载更多时触发，返回当前 items 数量。
+ */
+const emit = defineEmits(['click', 'select', 'change', 'loadmore'])
+const selected = ref(-1)
+
+const wrapStyle = computed(() => 'background-color:#ffffff;')
+
+function itemValue(item, keyName) {
+  if (item == null) return ''
+  if (typeof item == 'object') {
+    const value = item[keyName]
+    if (value == null) return ''
+    return String(value)
+  }
+  return String(item)
+}
+
+function getItemTitle(item) {
+  const title = itemValue(item, props.titleKey)
+  if (title.length > 0) return title
+  return String(item)
+}
+
+function getItemDesc(item) {
+  return itemValue(item, props.descKey)
+}
+
+function getItemStyle(index) {
+  let style = 'background-color:' + props.itemBgColor + ';'
+  if (props.border && index < props.items.length - 1) {
+    style += 'border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#ebeef5;'
+  }
+  return style
+}
+
+function getTitleStyle(index) {
+  return selected.value == index ? 'color:' + props.activeColor + ';' : ''
+}
+
+function select(item, index) {
+  if (!props.clickable) return
+  selected.value = index
+  const payload = { index, title: getItemTitle(item), item }
+  emit('click', payload)
+  emit('select', payload)
+  emit('change', payload)
+}
+
+function loadMore() {
+  emit('loadmore', props.items.length)
+}
+</script>
+
+<style>
+.i-list {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.i-list__title {
+  padding: 14px 14px 4px;
+  color: #303133;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.i-list__body {
+  margin-top: 4px;
+}
+.i-list__item {
+  min-height: 52px;
+  padding: 8px 14px;
+  flex-direction: row;
+  align-items: center;
+}
+.i-list__main {
+  flex: 1;
+}
+.i-list__item-title {
+  color: #303133;
+  font-size: 14px;
+  line-height: 20px;
+}
+.i-list__item-desc {
+  margin-top: 2px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+.i-list__right {
+  margin-left: 12px;
+  color: #c0c4cc;
+  font-size: 20px;
+  line-height: 20px;
+}
+.i-list__load {
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+}
+.i-list__load-text {
+  color: #2979ff;
+  font-size: 13px;
+}
+</style>

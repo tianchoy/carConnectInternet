@@ -1,1 +1,0 @@
-{"version":3,"file":"index.uts","sourceRoot":"","sources":["uni_modules/lime-picker/index.uts"],"names":[],"mappings":"AAAA,cAAc;AACd,cAAc,4BAA4B,CAAA;AAE1C,MAAM,MAAM,WAAW,GAAG,GAAG,CAAC,CAAA,kBAAkB","sourcesContent":["// @ts-nocheck\r\nexport * from './components/l-picker/type'\r\n\r\nexport type PickerValue = any;//string | number;"]}

@@ -3,109 +3,76 @@
 		<custom-navBar title="添加设备" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="content">
-			<uv-form labelPosition="left" :model="carInfo" :rules="rules" ref="formRef">
-				<uv-form-item label="设备名称" labelWidth="150rpx" prop="deviceName" borderBottom>
-					<uv-input border="none" v-model="carInfo.deviceName" placeholder="请输入设备名称">
-					</uv-input>
-				</uv-form-item>
-				<uv-form-item label="*设备ID" labelWidth="150rpx" prop="imei" borderBottom>
-					<uv-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
+			<i-form 
+				labelPosition="left" 
+				:modelValue="carInfo" 
+				:rules="rules" 
+				ref="formRef"
+				labelDirection="horizontal"
+				watchValidStatus
+				@update:modelValid="formValid = $event"
+			>
+				<i-form-item label="设备名称" name="deviceName"  labelDirection="horizontal">
+					<i-input border="none" v-model="carInfo.deviceName" placeholder="请输入设备名称">
+					</i-input>
+				</i-form-item>
+				
+				<i-form-item label="*设备ID" name="imei"  labelDirection="horizontal">
+					<i-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
 						<template v-slot:suffix>
-							<uv-icon name="scan" size="25" @click="scanCode"></uv-icon>
+							<i-icon name="/static/sancode.png" fontSize="20" @click="scanCode"></i-icon>
 						</template>
-					</uv-input>
-				</uv-form-item>
-				<uv-form-item label="车标" labelWidth="150rpx" prop="deviceType" borderBottom
-					@click="deviceTypeSelectFun">
-					<uv-input border="none" v-model="carInfo.deviceTypeValue" disabled disabledColor="#fff"
-						placeholder="请选择设备图标(必选)" suffixIcon="arrow-down">
-					</uv-input>
-				</uv-form-item>
-				<!-- <uv-form-item label="*设备类型" labelWidth="150rpx" prop="deviceType" borderBottom
-					@click="deviceTypeSelectFun">
-					<uv-input border="none" v-model="carInfo.deviceType" disabled disabledColor="#fff"
-						placeholder="请选择设备类型(必选)" suffixIcon="arrow-down">
-					</uv-input>
-				</uv-form-item>
-				<uv-form-item label="车牌号" labelWidth="150rpx" prop="plateNo" borderBottom>
-					<car-number-input @numberInputResult="handlePlateNumberChange" :defaultStr="'京A'" />
-				</uv-form-item> -->
-				<!-- <uv-action-sheet ref="deviceTypeSelect" :actions="actions" title="请选择设备类型"
-					@select="deviceTypeSelectsFun" :loading="actions.length === 0">
-				</uv-action-sheet> -->
-				<!-- <uv-popup ref="deviceTypeSelect" title="请选择图标" mode="bottom">
-					<uv-grid :col="5">
-						<uv-grid-item v-for="(item,index) in IconList" :key="index" @click="selectIcon(item)">
-							<uv-icon :customStyle="{paddingTop:20+'rpx'}" :name="item.img" :size="50"></uv-icon>
-							<text class="grid-text">{{item.title}}</text>
-						</uv-grid-item>
-					</uv-grid>
-				</uv-popup> -->
-				<carIcons ref="deviceTypeSelect"  @select="selectIcon"></carIcons>
-			</uv-form>
+					</i-input>
+				</i-form-item>
+				
+				<i-form-item label="车标" name="deviceType" labelDirection="horizontal">
+					<view class="car-type-selector" @click="deviceTypeSelectFun">
+						<text class="clickable" :class="{ 'placeholder': !carInfo.deviceTypeValue }">
+							{{ carInfo.deviceTypeValue || '请选择设备图标(必选)' }}
+						</text>
+					</view>
+				</i-form-item>
+				<carIcons ref="deviceTypeSelect" @select="selectIcon"></carIcons>
+			</i-form>
 		</view>
-		<uv-button class="btn" type="primary" @click="submit" :loading="loading">提交</uv-button>
+		<view class="btn">
+			<i-button  type="primary" @click="submit" :loading="loading">提交</i-button>
+		</view>
+		
 	</view>
 </template>
 
 <script setup lang="ts">
-	import { ref, onUnmount } from 'vue'
+	import { ref } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
 	import carIcons from '../../components/car-icons/car-icons.uvue'
 
-
 	interface FormData {
-		deviceName : string
-		imei : string
-		deviceType : string
-		deviceTypeValue : string
-		plateNo : string
-		carType : string
+		deviceName: string
+		imei: string
+		deviceType: string
+		deviceTypeValue: string
+		plateNo: string
+		carType: string
 	}
 
-	const formRef = ref(null)
-	const deviceTypeSelect = ref(null)
+	const formRef = ref<any>(null)
+	const deviceTypeSelect = ref<any>(null)
 	const loading = ref(false)
+	const formValid = ref(false)
+	
 	const carInfo = ref<FormData>({
 		deviceName: '',
 		imei: '',
 		deviceType: '',
 		deviceTypeValue: '',
 		plateNo: '',
-		carType : ''
+		carType: ''
 	})
 
-	const actions = ref([])
+	const actions = ref<any[]>([])
 
-	// 车牌号
-	const handlePlateNumberChange = (e : string) => {
-		console.log(e)
-		carInfo.value.plateNo = e
-	}
-	
-	// 扫码功能
-	const scanCode = () => {
-		uni.navigateTo({
-			url:'/pages/scancode/scancode'
-		})
-	}
-
-	// 扫码结果事件处理
-	const handleScanResult = (data: { result: string }) => {
-		console.log('接收到扫码结果:', data.result)
-		//检查长度是15位，取后11位，并在前面 补零0 ，若为 11 位，则直接补 0
-		if (data.result.length === 15) {
-			carInfo.value.imei = '0' + data.result.slice(4,15)
-		} else if (data.result.length === 11) {
-			carInfo.value.imei = '0' + data.result
-		} else {
-			uni.showToast({
-				title: '请输入正确的设备ID',
-				icon: 'none'
-			})
-		}
-	}
-
+	// ===== 表单验证规则 =====
 	const rules = {
 		imei: [
 			{
@@ -129,101 +96,191 @@
 		]
 	}
 
-	const selectIcon = (item) => {
-		console.log(item.name);
+	// ===== 核心功能函数 =====
+
+	// 扫码功能
+	const scanCode = () => {
+		uni.navigateTo({
+			url: '/pages/scancode/scancode'
+		})
+	}
+
+	// 扫码结果事件处理
+	const handleScanResult = (data: { result: string }) => {
+		console.log('接收到扫码结果:', data.result)
+		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
+		if (data.result.length === 15) {
+			carInfo.value.imei = '0' + data.result.slice(4, 15)
+		} else if (data.result.length === 11) {
+			carInfo.value.imei = '0' + data.result
+		} else {
+			uni.showToast({
+				title: '请输入正确的设备ID',
+				icon: 'none'
+			})
+		}
+	}
+
+	// 选择车标
+	const selectIcon = (item: any) => {
+		console.log(item.name)
 		carInfo.value.deviceType = item.name
-		carInfo.value.deviceTypeValue = item.title
+		carInfo.value.deviceTypeValue = item.text
 		deviceTypeSelect.value?.close()
 	}
 
-	const deviceTypeSelectFun = async () => {
-		// 如果还没有加载过数据
-		// if (actions.value.length === 0) {
-		// 	uni.showLoading({
-		// 		title: '加载中...'
-		// 	})
-		// 	try {
-		// 		await loadCarTypeData()
-		// 	} finally {
-		// 		uni.hideLoading()
-		// 	}
-		// }
-		// // 确保有数据后再打开选择器
-		// if (actions.value.length > 0) {
-		// 	deviceTypeSelect.value?.open()
-		// }
+	// 打开车标选择器
+	const deviceTypeSelectFun = () => {
 		deviceTypeSelect.value?.open()
-	}
-
-	const deviceTypeSelectsFun = (e) => {
-		carInfo.value.deviceType = e.name
-		carInfo.value.deviceTypeValue = e.value
 	}
 
 	// 刷新首页设备列表的方法
 	const refreshDeviceList = () => {
 		uni.$emit('refreshDeviceList')
-		console.log('已触发首页设备列表刷新')
 	}
 
-	const submit = () => {
-		formRef.value?.validate().then(async () => {
-			loading.value = true
+	// ===== 表单验证 - 封装为 Promise =====
+	const validateForm = (): Promise<boolean> => {
+		return new Promise((resolve, reject) => {
+			console.log('开始验证表单, formRef.value:', formRef.value)
+			
+			if (!formRef.value) {
+				console.error('表单实例为空')
+				reject(new Error('表单实例不存在'))
+				return
+			}
+			
+			// 检查是否有 validate 方法
+			if (typeof formRef.value.validate !== 'function') {
+				console.error('validate 方法不存在')
+				reject(new Error('表单验证方法不存在'))
+				return
+			}
+			
 			try {
-				const submitData = {
-					deviceName: carInfo.value.deviceName,
-					imei: carInfo.value.imei,
-					carType: carInfo.value.deviceType,
-					// plateNo: carInfo.value.plateNo
-				}
-
-				console.log(submitData)
-
-				const res = await addDevice(submitData)
-
-				if (res.code == 0) {
-					uni.showToast({
-						title: '添加成功',
-						icon: 'success'
+				const result = formRef.value.validate()
+				console.log('validate 返回:', result)
+				
+				// 如果返回的是 Promise
+				if (result && typeof result.then === 'function') {
+					result.then((valid: boolean) => {
+						console.log('validate Promise 结果:', valid)
+						if (valid) {
+							resolve(true)
+						} else {
+							reject(new Error('表单验证失败'))
+						}
+					}).catch((err: any) => {
+						console.error('validate Promise 错误:', err)
+						reject(err)
 					})
-
-					uni.setStorageSync('needRefreshHome', true)
-
-					// 添加成功后触发首页刷新
-					refreshDeviceList()
-
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 1500)
-				} else {
-					uni.showToast({
-						title: res.msg || '添加失败',
-						icon: 'none',
-						duration: 2000
-					})
+					return
 				}
+				
+				// 如果返回的是 boolean
+				if (typeof result === 'boolean') {
+					if (result) {
+						resolve(true)
+					} else {
+						reject(new Error('表单验证失败'))
+					}
+					return
+				}
+				
+				// 如果使用回调方式
+				formRef.value.validate((valid: boolean, errors?: any[]) => {
+					console.log('validate 回调结果:', valid, errors)
+					if (valid) {
+						resolve(true)
+					} else {
+						reject(errors || new Error('表单验证失败'))
+					}
+				})
+				
 			} catch (error) {
-				console.error('添加设备错误:', error)
+				console.error('验证执行异常:', error)
+				reject(error)
+			}
+		})
+	}
+
+	// ===== 提交表单 =====
+	const submit = async () => {
+		console.log('=== 开始提交设备 ===')
+		
+		try {
+			// 表单验证
+			await validateForm()
+			console.log('✅ 表单验证通过')
+			
+			loading.value = true
+			uni.showLoading({
+				title: '添加中...',
+				mask: true
+			})
+			
+			const submitData = {
+				deviceName: carInfo.value.deviceName,
+				imei: carInfo.value.imei,
+				carType: carInfo.value.deviceType,
+				// plateNo: carInfo.value.plateNo
+			}
+
+			console.log('📤 提交数据:', submitData)
+
+			const res = await addDevice(submitData)
+			console.log('✅ 添加设备返回:', res)
+
+			uni.hideLoading()
+			loading.value = false
+
+			if (res.code == 0) {
+				uni.showToast({
+					title: '添加成功',
+					icon: 'success'
+				})
+
+				uni.setStorageSync('needRefreshHome', true)
+				
+				// 添加成功后触发首页刷新
+				refreshDeviceList()
+
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 1500)
+			} else {
+				uni.showToast({
+					title: res.msg || '添加失败',
+					icon: 'none',
+					duration: 2000
+				})
+			}
+		} catch (error: any) {
+			console.error('❌ 添加设备失败:', error)
+			uni.hideLoading()
+			loading.value = false
+			
+			// 判断是验证错误还是接口错误
+			if (error && error.message) {
+				uni.showToast({
+					title: error.message || '请检查表单',
+					icon: 'none'
+				})
+			} else {
 				uni.showToast({
 					title: '请求失败，请稍后重试',
 					icon: 'none'
 				})
-			} finally {
-				loading.value = false
 			}
-		}).catch((errors) => {
-			console.error('验证错误:', errors)
-			uni.showToast({
-				title: '请检查表单',
-				icon: 'none'
-			})
-		})
+		}
 	}
 
+	// ===== 生命周期 =====
 	onLoad(() => {
 		// loadCarTypeData()
 		// 注册扫码结果事件监听
 		uni.$on('scanCodeResult', handleScanResult)
+		console.log('formRef 初始值:', formRef.value)
 	})
 
 	onUnload(() => {
@@ -231,14 +288,14 @@
 		uni.$off('scanCodeResult', handleScanResult)
 	})
 
+	// ===== 加载车辆类型（注释掉，如需使用请取消注释） =====
 	// const loadCarTypeData = async () => {
 	// 	try {
 	// 		const res = await getCarType()
 	// 		if (res.msg == 'success') {
-	// 			// 转换数据结构，匹配组件需要的格式
 	// 			actions.value = res.data.map(item => ({
-	// 				name: item.typeName,  // 显示的名称
-	// 				value: item.id.toString()  // 实际值
+	// 				name: item.typeName,
+	// 				value: item.id.toString()
 	// 			}))
 	// 		} else {
 	// 			uni.showToast({
@@ -268,9 +325,15 @@
 			border-radius: 20rpx;
 		}
 
-		.grid-text{
+		.grid-text {
 			margin-top: 10rpx;
 			font-size: 20rpx;
+		}
+
+		.clickable{
+			margin-top: 10px;
+			color:#999;
+			font-size: 28rpx;
 		}
 
 		.btn {
@@ -324,6 +387,12 @@
 			height: 13px;
 			width: 30px;
 			z-index: 9;
+		}
+
+		:deep(.i-form-item){
+			padding:5rpx 10rpx;
+			border-radius: 0;
+			border-bottom: 1px solid #99999924;
 		}
 	}
 </style>

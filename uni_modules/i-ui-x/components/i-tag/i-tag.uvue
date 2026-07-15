@@ -1,0 +1,501 @@
+<template>
+  <view :class="tagClass" :style="tagStyle" @click.stop="handleClick">
+    <i-icon
+      v-if="icon.length > 0"
+      class="i-tag__icon"
+      :name="icon"
+      :fontSize="computedIconSize"
+      :color="computedTextColor"
+    ></i-icon>
+    <text v-if="contentText.length > 0" :class="textClass" :style="textStyle">{{
+      contentText
+    }}</text>
+    <text v-else :class="textClass" :style="textStyle"><slot></slot></text>
+    <text
+      v-if="closable"
+      :class="closeClass"
+      :style="closeStyle"
+      @click="handleClose"
+      >{{ closeText }}</text
+    >
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+
+defineOptions({ name: 'i-tag' })
+
+/**
+ * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+ * - type: 组件类型，用于切换视觉风格或语义状态。
+ * - plain: 是否使用朴素样式。
+ * - skin: 样式风格，可选 normal / thin / outlined / text / dashed。
+ * - round: 是否使用圆形样式。
+ * - text: 主要展示文本。
+ * - size: 组件尺寸，通常影响宽高或字号。
+ * - width: 标签宽度。
+ * - height: 标签高度；传入后优先于 size。
+ * - closable: closable 配置项，用于控制组件展示或交互行为。
+ * - disabled: 是否禁用交互；为 true 时阻止点击、选择或输入。
+ * - icon: 左侧图标名称，复用 i-icon。
+ * - iconSize: 图标尺寸。
+ * - fontSize: 文本字号。
+ * - color: 文字、图标或线条颜色。
+ * - fontColor: 文本颜色。
+ * - bgColor: 背景颜色。
+ * - borderColor: 边框颜色。
+ * - borderWidth: 边框宽度。
+ * - linear: 背景渐变数组，如 ['to right', '#FFEB3A', '#4DEF8E']。
+ * - shadow: 阴影，传 none 关闭，传数组可自定义。
+ * - customStyle: 自定义外层样式。
+ */
+const props = defineProps({
+  type: {
+    type: String,
+    default: 'primary',
+  },
+  plain: {
+    type: Boolean,
+    default: false,
+  },
+  skin: {
+    type: String,
+    default: 'normal',
+  },
+  round: {
+    type: [Boolean, String, Number],
+    default: false,
+  },
+  text: {
+    type: [String, Number],
+    default: '',
+  },
+  size: {
+    type: String,
+    default: 'normal',
+  },
+  width: {
+    type: [String, Number],
+    default: '',
+  },
+  height: {
+    type: [String, Number],
+    default: '',
+  },
+  closable: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: '',
+  },
+  fontSize: {
+    type: [String, Number],
+    default: '',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+  fontColor: {
+    type: String,
+    default: '',
+  },
+  bgColor: {
+    type: String,
+    default: '',
+  },
+  borderColor: {
+    type: String,
+    default: '',
+  },
+  borderWidth: {
+    type: [String, Number],
+    default: 1,
+  },
+  linear: {
+    type: Array,
+    default: () => [] as string[],
+  },
+  shadow: {
+    type: [String, Number, Array],
+    default: '',
+  },
+  closeIcon: {
+    type: String,
+    default: 'x',
+  },
+  customStyle: {
+    type: String,
+    default: '',
+  },
+})
+
+/**
+ * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+ * - click: 点击组件时触发，用于响应用户主动操作。
+ * - close: 组件关闭或收起时触发。
+ */
+const emit = defineEmits(['click', 'close'])
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const closeClicking = ref(false)
+
+const contentText = computed(() => {
+  return String(props.text)
+})
+
+const normalizedType = computed(() => {
+  if (props.type == 'danger') return 'error'
+  if (props.type == 'warn') return 'warning'
+  return props.type
+})
+
+const normalizedSkin = computed(() => {
+  if (props.plain) return 'outlined'
+  if (props.skin == 'outline') return 'outlined'
+  if (props.skin == 'light') return 'thin'
+  if (props.skin == 'plain') return 'outlined'
+  return props.skin
+})
+
+const themeColor = computed(() => {
+  if (props.color.length > 0) return props.color
+  if (normalizedType.value == 'primary') return '#3c9cff'
+  if (normalizedType.value == 'success') return '#5ac725'
+  if (normalizedType.value == 'warning') return '#f9ae3d'
+  if (normalizedType.value == 'error') return '#f56c6c'
+  if (normalizedType.value == 'info') return '#909399'
+  return '#303133'
+})
+
+const computedTextColor = computed(() => {
+  if (props.fontColor.length > 0) return props.fontColor
+  if (props.color.length > 0 && normalizedSkin.value == 'normal') return '#ffffff'
+  if (normalizedSkin.value == 'normal' && bgColor.value.length == 0 && props.linear.length == 0) {
+    return '#ffffff'
+  }
+  return themeColor.value
+})
+
+const computedIconSize = computed(() => {
+  if (String(props.iconSize).length > 0) return props.iconSize
+  if (String(props.fontSize).length > 0) return props.fontSize
+  if (props.size == 'xs' || props.size == 'mini') return 11
+  if (props.size == 's' || props.size == 'small') return 12
+  if (props.size == 'g' || props.size == 'large') return 15
+  return 13
+})
+
+const closeText = computed(() => {
+  if (props.closeIcon == 'close' || props.closeIcon == 'close-line') return 'x'
+  return props.closeIcon
+})
+
+const tagClass = computed(() => {
+  const classes = [
+    'i-tag',
+    'i-tag--' + normalizedType.value,
+    'i-tag--' + normalizedSize.value,
+    'i-tag--' + normalizedSkin.value,
+  ]
+  classes.push('i-tag--' + normalizedSkin.value + '-' + normalizedType.value)
+  if (isRound.value) classes.push('i-tag--round')
+  if (props.disabled) classes.push('i-tag--disabled')
+  return classes.join(' ')
+})
+
+const textClass = computed(() => {
+  const classes = ['i-tag__text']
+  if (normalizedSize.value == 'xs') classes.push('i-tag__text--xs')
+  if (normalizedSize.value == 'large') classes.push('i-tag__text--large')
+  return classes.join(' ')
+})
+
+const closeClass = computed(() => {
+  const classes = ['i-tag__close']
+  if (normalizedSize.value == 'xs') classes.push('i-tag__close--xs')
+  return classes.join(' ')
+})
+
+const tagStyle = computed(() => {
+  let style = ''
+  if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  if (props.borderWidth != 1) style = style + 'border-width:' + formatSize(props.borderWidth) + ';'
+  if (isCustomRound.value) style = style + 'border-radius:' + formatSize(props.round) + ';'
+  if (props.linear.length >= 3) {
+    style =
+      style +
+      'background:linear-gradient(' +
+      String(props.linear[0]) +
+      ',' +
+      String(props.linear[1]) +
+      ',' +
+      String(props.linear[2]) +
+      ');border-color:transparent;'
+  } else if (bgColor.value.length > 0) {
+    style = style + 'background-color:' + bgColor.value + ';'
+    if (normalizedSkin.value == 'normal' && props.borderColor.length == 0) {
+      style = style + 'border-color:' + bgColor.value + ';'
+    }
+  }
+  if (props.borderColor.length > 0) style = style + 'border-color:' + props.borderColor + ';'
+  if (shadowStyle.value.length > 0) style = style + shadowStyle.value
+  if (props.customStyle.length > 0) style = style + props.customStyle
+  return style
+})
+
+const textStyle = computed(() => {
+  let style = 'color:' + computedTextColor.value + ';'
+  if (String(props.fontSize).length > 0) {
+    style = style + 'font-size:' + formatSize(props.fontSize) + ';'
+  }
+  return style
+})
+
+const closeStyle = computed(() => {
+  return 'color:' + computedTextColor.value + ';'
+})
+
+const normalizedSize = computed(() => {
+  if (props.size == 'xs' || props.size == 'mini') return 'xs'
+  if (props.size == 's' || props.size == 'small') return 'small'
+  if (props.size == 'm' || props.size == 'normal' || props.size == 'n') return 'normal'
+  if (props.size == 'g' || props.size == 'large') return 'large'
+  return props.size
+})
+
+const isCustomRound = computed(() => {
+  if (typeof props.round == 'boolean') return false
+  return String(props.round).length > 0
+})
+
+const isRound = computed(() => {
+  if (typeof props.round == 'boolean') return props.round
+  return String(props.round).length > 0
+})
+
+const shadowStyle = computed(() => {
+  const value = props.shadow
+  const text = String(value)
+  if (text.length == 0 || text == 'none') return ''
+  if (Array.isArray(value) && value.length >= 4) {
+    return (
+      'box-shadow:' +
+      formatSize(value[0]) +
+      ' ' +
+      formatSize(value[1]) +
+      ' ' +
+      formatSize(value[2]) +
+      ' ' +
+      String(value[3]) +
+      ';'
+    )
+  }
+  return 'box-shadow:0 ' + formatSize(value) + ' ' + formatSize(Number(value) * 2) + ' rgba(0,0,0,0.12);'
+})
+
+function handleClick() {
+  if (closeClicking.value) {
+    closeClicking.value = false
+    return
+  }
+  if (props.disabled) return
+  emit('click', contentText.value)
+}
+
+function handleClose() {
+  if (props.disabled) return
+  closeClicking.value = true
+  emit('close', contentText.value)
+  setTimeout(() => {
+    closeClicking.value = false
+  }, 0)
+}
+
+function formatSize(value): string {
+  const text = String(value)
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('rem') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+</script>
+
+<style>
+.i-tag {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #3c9cff;
+  overflow: hidden;
+}
+
+.i-tag--round {
+  border-radius: 999px;
+}
+
+.i-tag--xs {
+  height: 20px;
+  padding: 0 7px;
+}
+
+.i-tag--small {
+  height: 22px;
+  padding: 0 8px;
+}
+
+.i-tag--large {
+  height: 34px;
+  padding: 0 12px;
+}
+
+.i-tag--disabled {
+  opacity: 0.5;
+}
+
+.i-tag--primary {
+  background-color: #3c9cff;
+  border-color: #3c9cff;
+}
+
+.i-tag--success {
+  background-color: #5ac725;
+  border-color: #5ac725;
+}
+
+.i-tag--warning {
+  background-color: #f9ae3d;
+  border-color: #f9ae3d;
+}
+
+.i-tag--error {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+.i-tag--info {
+  background-color: #909399;
+  border-color: #909399;
+}
+
+.i-tag--thin {
+  background-color: #ecf5ff;
+  border-color: #ecf5ff;
+}
+
+.i-tag--thin-success {
+  background-color: #f0f9eb;
+  border-color: #f0f9eb;
+}
+
+.i-tag--thin-warning {
+  background-color: #fdf6ec;
+  border-color: #fdf6ec;
+}
+
+.i-tag--thin-error {
+  background-color: #fef0f0;
+  border-color: #fef0f0;
+}
+
+.i-tag--thin-info {
+  background-color: #f4f4f5;
+  border-color: #f4f4f5;
+}
+
+.i-tag--outlined,
+.i-tag--dashed,
+.i-tag--text {
+  background-color: #ffffff;
+}
+
+.i-tag--outlined-primary,
+.i-tag--dashed-primary {
+  border-color: #3c9cff;
+}
+
+.i-tag--outlined-success,
+.i-tag--dashed-success {
+  border-color: #5ac725;
+}
+
+.i-tag--outlined-warning,
+.i-tag--dashed-warning {
+  border-color: #f9ae3d;
+}
+
+.i-tag--outlined-error,
+.i-tag--dashed-error {
+  border-color: #f56c6c;
+}
+
+.i-tag--outlined-info,
+.i-tag--dashed-info {
+  border-color: #909399;
+}
+
+.i-tag--dashed {
+  border-style: dashed;
+}
+
+.i-tag--text {
+  border-color: transparent;
+}
+
+.i-tag__text {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.i-tag__text--xs {
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.i-tag__text--large {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.i-tag__icon {
+  margin-right: 4px;
+}
+
+.i-tag__close {
+  margin-left: 5px;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.i-tag__close--xs {
+  font-size: 12px;
+  line-height: 16px;
+}
+</style>
