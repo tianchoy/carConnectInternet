@@ -1,5 +1,3 @@
-# 忽略 api 文件夹
-api/
 
 # 小程序相关
 node_modules/
