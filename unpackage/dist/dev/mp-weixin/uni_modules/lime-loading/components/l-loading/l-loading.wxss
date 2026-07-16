@@ -48,7 +48,7 @@
   position: relative;
   flex-direction: row;
   align-items: center;
-  color: var(--l-loading-color, #3283ff);
+  color: var(--l-loading-color, var(--l-primary-color, #3283ff));
 }
 .l-loading--ball {
   display: inline-flex;
@@ -60,7 +60,7 @@
   transform-style: preserve-3d;
 }
 .l-loading--ball .l-loading__ball:before {
-  background-color: #3283ff;
+  background-color: var(--l-primary-color, #3283ff);
   left: 0%;
   animation-name: l-ball-before;
 }
@@ -128,19 +128,19 @@
   content: " ";
 }
 .l-loading__text {
-  margin-left: var(--l-spacer-xs, 16rpx);
-  color: var(--l-loading-text-color, var(--l-text-color-3, rgba(0, 0, 0, 0.45)));
+  margin-left: var(--l-spacer-xs, 8px);
+  color: var(--l-loading-text-color, var(--l-text-color-3, #00000073));
   font-size: var(--l-loading-font-size, var(--l-font-size, 14px));
 }
 .l-loading.is-vertical {
   flex-direction: column;
 }
 .l-loading.is-vertical .l-loading__text {
-  margin: var(--l-spacer-tn, 8rpx) 0 0;
+  margin: var(--l-spacer-tn, 4px) 0 0;
 }
 .l-loading__ball, .l-loading__circular, .l-loading__spinner {
-  width: var(--l-loading-size, 40rpx);
-  height: var(--l-loading-size, 40rpx);
+  width: var(--l-loading-size, 20px);
+  height: var(--l-loading-size, 20px);
 }
 @keyframes l-circular {
 0% {

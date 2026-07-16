@@ -3,17 +3,17 @@ const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_car_number_input_1 = common_vendor.resolveComponent("car-number-input");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_icon_1 + _easycom_car_number_input_1)();
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_icon_1 + _easycom_car_number_input_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_input = () => "../../../uni_modules/uv-input/components/uv-input/uv-input.js";
-const _easycom_uv_icon = () => "../../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_i_input = () => "../../../uni_modules/i-ui-x/components/i-input/i-input.js";
+const _easycom_i_icon = () => "../../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_car_number_input = () => "../../../uni_modules/car-number-input/components/car-number-input/car-number-input.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_icon + _easycom_car_number_input + common_vendor.unref(carIcons))();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_icon + _easycom_car_number_input + common_vendor.unref(carIcons))();
 }
 const carIcons = () => "../../../components/car-icons/car-icons.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -35,7 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectIcon = (item = null) => {
       var _a;
       editInfo.value.carType = item.name;
-      editInfo.value.carTypeValue = item.title;
+      editInfo.value.carTypeValue = item.text;
       (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.close();
     };
     const deviceTypeSelectFun = () => {
@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePlateNumberChange = (e) => {
-      console.log(e.length);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:86", e.length);
       editInfo.value.plateNo = e;
     };
     const formattedPlateNo = common_vendor.computed(() => {
@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         carInfo.value = common_vendor.UTS.JSON.parse(common_vendor.UTS.JSON.stringify(editInfo.value));
         isEditing.value = false;
         const res = yield api_request.editDeviceInfo(data);
-        console.log(res);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:128", res);
         common_vendor.index.showToast({
           title: "保存成功",
           icon: "success"
@@ -90,18 +90,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isEditing.value = false;
     };
     common_vendor.onLoad((option) => {
-      console.log("option", option);
+      common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:141", "option", option);
       if (option.deviceId != null) {
         deviceId.value = option.deviceId;
         loadCarListData();
       } else {
-        console.error("deviceId is null");
+        common_vendor.index.__f__("error", "at pages/userCenter/carDetail/carDetail.uvue:147", "deviceId is null");
       }
     });
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getDeviceDetail(deviceId.value);
-        console.log(res.data);
+        common_vendor.index.__f__("log", "at pages/userCenter/carDetail/carDetail.uvue:153", res.data);
         if (res.msg == "success") {
           carInfo.value = res.data;
         } else {
@@ -122,7 +122,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: true,
           isIcon: true,
-          Icon: "edit-pen",
+          Icon: "/static/edit-pen.png",
           class: "data-v-36223569"
         }),
         c: common_vendor.t(common_vendor.unref(carInfo).deviceId),
@@ -132,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         f: common_vendor.o(($event) => {
           return common_vendor.unref(editInfo).deviceName = $event;
-        }, "be"),
+        }, "f3"),
         g: common_vendor.p({
           border: "surround",
           inputAlign: "right",
@@ -146,17 +146,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         j: common_vendor.t(common_vendor.unref(editInfo).carTypeValue || "请选择图标"),
         k: common_vendor.p({
-          name: "arrow-down",
-          size: "18",
+          name: "/static/xiangxia.png",
+          fontSize: "15",
           class: "data-v-36223569"
         }),
-        l: common_vendor.o(deviceTypeSelectFun, "1e")
+        l: common_vendor.o(deviceTypeSelectFun, "a1")
       }, {
         m: !common_vendor.unref(isEditing)
       }, !common_vendor.unref(isEditing) ? {
         n: common_vendor.t(common_vendor.unref(carInfo).plateNo)
       } : {
-        o: common_vendor.o(handlePlateNumberChange, "28"),
+        o: common_vendor.o(handlePlateNumberChange, "76"),
         p: common_vendor.p({
           defaultStr: common_vendor.unref(formattedPlateNo),
           class: "data-v-36223569"
@@ -168,7 +168,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         s: common_vendor.o(($event) => {
           return common_vendor.unref(editInfo).carVin = $event;
-        }, "d4"),
+        }, "58"),
         t: common_vendor.p({
           border: "surround",
           inputAlign: "right",
@@ -182,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         x: common_vendor.o(($event) => {
           return common_vendor.unref(editInfo).engineNum = $event;
-        }, "b2"),
+        }, "be"),
         y: common_vendor.p({
           border: "surround",
           inputAlign: "right",
@@ -192,13 +192,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         z: common_vendor.unref(isEditing)
       }, common_vendor.unref(isEditing) ? {
-        A: common_vendor.o(saveChanges, "8e"),
-        B: common_vendor.o(cancelEdit, "23")
+        A: common_vendor.o(saveChanges, "ec"),
+        B: common_vendor.o(cancelEdit, "48")
       } : {}, {
         C: common_vendor.sr(deviceTypeSelect, "36223569-6", {
           "k": "deviceTypeSelect"
         }),
-        D: common_vendor.o(selectIcon, "b2"),
+        D: common_vendor.o(selectIcon, "ec"),
         E: common_vendor.p({
           class: "r data-v-36223569"
         }),
@@ -213,3 +213,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-36223569"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/carDetail/carDetail.js.map

@@ -155,7 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rememberPassword.value = true;
         }
       } catch (error) {
-        console.error("加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:171", "加载保存的账号密码失败:", error);
       }
     };
     const filterNonLatin = (e = null) => {
@@ -167,21 +167,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      console.log("设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:189", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       return new Promise((resolve, reject) => {
-        console.log("开始验证表单, formRef.value:", formRef.value);
+        common_vendor.index.__f__("log", "at pages/login/login.uvue:195", "开始验证表单, formRef.value:", formRef.value);
         if (!formRef.value) {
-          console.error("表单实例为空");
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:198", "表单实例为空");
           reject(new Error("表单实例不存在"));
           return null;
         }
         if (typeof formRef.value.validate !== "function") {
-          console.error("validate 方法不存在，尝试使用其他方法");
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:205", "validate 方法不存在，尝试使用其他方法");
           if (typeof formRef.value.validateForm === "function") {
             formRef.value.validateForm((valid) => {
-              console.log("validateForm 验证结果:", valid);
+              common_vendor.index.__f__("log", "at pages/login/login.uvue:209", "validateForm 验证结果:", valid);
               if (valid) {
                 resolve(true);
               } else {
@@ -195,17 +195,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         try {
           const result = formRef.value.validate();
-          console.log("validate 同步返回:", result);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:225", "validate 同步返回:", result);
           if (result && typeof result.then === "function") {
             result.then((valid) => {
-              console.log("validate Promise 结果:", valid);
+              common_vendor.index.__f__("log", "at pages/login/login.uvue:230", "validate Promise 结果:", valid);
               if (valid) {
                 resolve(true);
               } else {
                 reject(new Error("表单验证失败"));
               }
             }).catch((err = null) => {
-              console.error("validate Promise 错误:", err);
+              common_vendor.index.__f__("error", "at pages/login/login.uvue:237", "validate Promise 错误:", err);
               reject(err);
             });
             return null;
@@ -219,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return null;
           }
           formRef.value.validate((valid, errors = null) => {
-            console.log("validate 回调结果:", valid, errors);
+            common_vendor.index.__f__("log", "at pages/login/login.uvue:255", "validate 回调结果:", valid, errors);
             if (valid) {
               resolve(true);
             } else {
@@ -227,7 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           });
         } catch (error) {
-          console.error("验证执行异常:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:264", "验证执行异常:", error);
           reject(error);
         }
       });
@@ -303,7 +303,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }, 500);
         } catch (error) {
-          console.error("微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:354", "微信登录失败:", error);
           common_vendor.index.showToast({
             title: "微信登录失败",
             icon: "none"
@@ -323,24 +323,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          console.log("准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:377", "准备验证表单...");
           yield validateForm();
-          console.log("✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:379", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          console.log("📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:388", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          console.log("🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:398", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          console.log("✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:400", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (res && res.data && res.data.token) {
@@ -362,7 +362,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          console.error("❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:427", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -401,12 +401,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      console.log("pswLogin 初始值:", pswLogin.value);
-      console.log("formRef 初始值:", formRef.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:474", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:475", "formRef 初始值:", formRef.value);
       setTimeout(() => {
-        console.log("延迟检查 formRef.value:", formRef.value);
+        common_vendor.index.__f__("log", "at pages/login/login.uvue:479", "延迟检查 formRef.value:", formRef.value);
         if (formRef.value) {
-          console.log("formRef 的方法:", Object.keys(formRef.value));
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:481", "formRef 的方法:", Object.keys(formRef.value));
         }
       }, 500);
     });
@@ -515,3 +515,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-27a30816"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/login/login.js.map

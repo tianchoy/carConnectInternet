@@ -1,0 +1,285 @@
+<template>
+	<view class="l-picker-view" :style="[styles]" :key="isInitialized">
+		<view class="l-picker-view__toolbar" v-if="cancelBtn != null || title != null || confirmBtn != null">
+			<text class="l-picker-view__cancel" :style="[cancelStyle]" v-if="cancelBtn != null"
+				@click="onCancel">{{cancelBtn}}</text>
+			<text class="l-picker-view__title" :style="[titleStyle]" v-if="title != null">{{title}}</text>
+			<text class="l-picker-view__confirm" :style="[confirmStyle]" v-if="confirmBtn != null"
+				@click="onConfirm">{{confirmBtn}}</text>
+		</view>
+		<slot name="header"></slot>
+		<view class="l-picker-view__main" :style="[groupHeight != null ? { height:  groupHeight}: {}]">
+			<view v-if="isEmpty" class="l-picker-view__empty">
+				<slot name="empty"></slot>
+			</view>
+			
+			<view class="l-picker-view__indicator" v-if="!isEmpty"></view>
+			<picker-view class="l-picker-view__group" :style="{ opacity: columns.length > 0 ? 1 : 0 }"
+				:mask-style="platformMaskStyles.common" :indicator-style="indicatorStyles"
+				mask-class="l-picker-view__mask" :value="innerIndex" @change="handlePick">
+				<picker-view-column class="l-picker-view__wrapper" v-for="(column, columnIndex) in columns"
+					:key="columnIndex">
+					<!-- #ifdef APP-IOS || APP-ANDROID -->
+					<view ref="drawRef" :style="{height: optionHeight * column.length}"></view>
+					<!-- #endif -->
+					<!-- #ifdef APP-HARMONY -->
+					<view :style="{height: optionHeight * column.length}">
+						<view ref="drawRef" style="height: 1000000px;">
+							<template v-for="(item, itemIndex) in column" :key="item.value">
+								<text v-if="itemIndex < 0" style="opacity: 0;">{{item.label}}</text>
+							</template>
+						</view>
+					</view>
+					<!-- #endif -->
+					<!-- #ifndef APP -->
+					<text class="l-picker-view__group-item" v-for="(item, itemIndex) in column"
+						:class="{'l-picker-view__group-item--active': curIndex.length > columnIndex && curIndex[columnIndex] == itemIndex}"
+						:key="item.value">{{item.label}}</text>
+					<!-- #endif -->
+				</picker-view-column>
+			</picker-view>
+		</view>
+		<slot name="footer" />
+		<view class="l-picker-view__loading" ref="loadingRef" v-if="loading"
+			:style="[loadingMaskColor != null ? {background: loadingMaskColor}: {}]">
+			<l-loading :size="loadingSize" :color="loadingColor"></l-loading>
+		</view>
+	</view>
+</template>
+<script setup lang="ts">
+	/**
+	 * PickerView 选择器视图组件
+	 * @description 整合了 Picker 和 PickerItem 的功能，无需使用子组件即可完成多列选择
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-picker
+	 * 
+	 * @property {string} cancelBtn 取消按钮文字
+	 * @property {string | UTSJSONObject} cancelStyle 取消按钮样式
+	 * @property {string} confirmBtn 确定按钮文字
+	 * @property {string | UTSJSONObject} confirmStyle 确定按钮样式
+	 * @property {string} title 标题文字
+	 * @property {string | UTSJSONObject} titleStyle 标题样式
+	 * @property {UTSJSONObject} keys 字段别名配置（例：{value: 'id', label: 'name'}）
+	 * @property {PickerColumn[]} columns 选择器列数据（必填）
+	 * @property {PickerValue[]} modelValue 选中值（支持v-model）
+	 * @property {PickerValue[]} defaultValue 默认选中值
+	 * @property {PickerValue[]} value 选中值（兼容旧版）
+	 * @property {boolean} loading 是否显示加载状态
+	 * @property {string} loadingColor 加载图标颜色
+	 * @property {string} loadingMaskColor 加载遮罩颜色
+	 * @property {string} loadingSize 加载图标尺寸
+	 * @property {string} itemHeight 选项行高度
+	 * @property {string} itemColor 选项文字颜色
+	 * @property {string} itemFontSize 选项字体大小
+	 * @property {string} itemActiveColor 选中项颜色
+	 * @property {string} indicatorStyle 指示器样式
+	 * @property {string[]} maskColors 遮罩颜色
+	 * @property {string} bgColor 背景颜色
+	 * @property {string} groupHeight 选项组高度
+	 * @property {string} radius 圆角半径
+	 * @property {boolean} resetIndex 是否重置选中索引
+	 * 
+	 * @event {Function} confirm 点击确定时触发（事件参数：PickerConfirmEvent）
+	 * @event {Function} cancel 点击取消时触发
+	 * @event {Function} change 值变化时触发（事件参数：PickerPickEvent）
+	 * @event {Function} column-change 列数据变化时触发（事件参数：PickerChangeInfo）
+	 */
+	import type { PickerProps, PickerColumn, PickerValue, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '../l-picker/type';
+	import { usePickerView } from './usePickerView';
+	import { usePickerMask } from '../l-picker-item/usePickerMask';
+	import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
+	// #ifdef APP-ANDROID || APP-IOS  || APP-HARMONY
+	import { type PickerCanvasConfig, PickerCanvasRenderer } from '../l-picker-item/PickerRenderer.uts'
+	// #endif
+	const props = withDefaults(defineProps<PickerProps>(), {
+		columns: [] as PickerColumn[],
+		loading: false,
+		resetIndex: false,
+		loadingSize: '32px'
+	})
+	const emit = defineEmits(['change', 'cancel', 'pick', 'confirm', 'update:modelValue']);
+	const themeMode = inject('limeConfigProviderTheme', computed(() => 'light'))
+	// 使用 usePickerView 钩子获取组件所需的状态和方法
+	const {
+		// 计算属性
+		modelValue,
+		isEmpty,
+		innerIndex,
+		curIndex,
+
+		// 方法
+		handlePick,
+		onCancel,
+		onConfirm,
+		getSelectedOptions
+	} = usePickerView(props);
+
+	// 平台特定样式计算属性
+	const isInitialized = ref(false)
+	const isDarkMode = computed(() : boolean => themeMode.value == 'dark')
+	const { platformMaskStyles } = usePickerMask(
+		computed(() : string | null => props?.bgColor),
+		isDarkMode,
+		computed(() : string[] | null => props?.maskColors),
+		isInitialized,
+	);
+
+	// 样式计算属性
+	const styles = computed(() : Map<string, any> => {
+		const style = new Map<string, any>()
+		if (props.bgColor != null) {
+			style.set('--l-picker-bg-color', props.bgColor!)
+		}
+		if (props.radius != null) {
+			style.set('--l-picker-border-radius', props.radius!)
+		}
+		if (props.itemColor != null) {
+			style.set('--l-picker-item-color', props.itemColor!)
+		}
+		if (props.itemFontSize != null) {
+			style.set('--l-picker-item-font-size', props.itemFontSize!)
+		}
+		if (props.itemHeight != null) {
+			style.set('--l-picker-item-height', props.itemHeight!)
+		}
+		if (props.itemActiveColor != null) {
+			style.set('--l-picker-item-active-color', props.itemActiveColor!)
+		}
+		if (props.itemActiveFontWeight != null) {
+			style.set('--l-picker-item-active-font-weight', props.itemActiveFontWeight!)
+		}
+		return style
+	});
+
+	const optionHeight = computed(() : number => {
+		return unitConvert(props.itemHeight ?? 50)
+	})
+
+	const indicatorStyles = computed(() : string => {
+		let style = `height: ${optionHeight.value}px;border-bottom-color: transparent;`
+		return style + (isInitialized.value ? `border-top-color: rgba(0,0,0,0.001);` : `border-top-color: transparent;`)
+	})
+
+
+	// #ifdef APP-ANDROID || APP-IOS  || APP-HARMONY
+	// 绘制相关逻辑
+	const drawRef = ref<UniElement[]>([])
+	const optionWidth = ref(0)
+	
+	const updateItemStyle = () => {
+		drawRef.value.forEach((el, columnIndex) => {
+			if(columnIndex > curIndex.value.length - 1) return
+			const ctx = el.getDrawableContext()!
+			const itemHeight = optionHeight.value;
+			const itemWidth = optionWidth.value
+			const fontSize = unitConvert(props.itemFontSize ?? 16);
+			const itemActiveFontWeight = props.itemActiveFontWeight ?? 700;
+			const x = itemWidth / 2;
+			const color = props.itemColor ?? (isDarkMode.value ? `rgba(255,255,255,0.88)` : 'rgba(0,0,0,0.88)');
+			const itemActiveColor = props.itemActiveColor ?? (isDarkMode.value ? `rgba(255,255,255,0.88)` : 'rgba(0,0,0,0.88)');
+			
+			const curItemIndex = curIndex.value[columnIndex]
+			ctx.reset();
+			// 设置绘图上下文
+			ctx.font = `${fontSize}px`;
+			ctx.textAlign = 'center';
+			// ctx.textBaseline = 'middle'; // 使用中间基线实现垂直居中
+			ctx.lineWidth = 0.5;
+			
+			// 绘制所有选项
+			props.columns[columnIndex].forEach((item, index) => {
+				let offset = 0.4
+				// #ifdef APP-IOS
+				offset = 0.55
+				// #endif
+				const y = itemHeight * index + fontSize + (itemHeight - fontSize) * offset;
+				const isActive = index == curItemIndex && itemActiveFontWeight > 600;
+				ctx.fillStyle = isActive ? itemActiveColor : color;
+				ctx.strokeStyle = isActive ? itemActiveColor : color;
+			
+				ctx.fillText(item.label, x, y);
+			
+				if (isActive) {
+					// #ifdef APP-IOS || APP-HARMONY
+					// ctx.strokeText(item.label, x, y);
+					ctx.fillText(item.label, x - 0.2, y);
+					ctx.fillText(item.label, x + 0.2, y);
+					ctx.fillText(item.label, x, y - 0.2);
+					ctx.fillText(item.label, x, y + 0.2);
+					// #endif
+					// #ifndef APP-IOS|| APP-HARMONY
+					ctx.strokeText(item.label, x, y);
+					// #endif
+				}
+			});
+			ctx.update();
+		})
+	}
+	
+	
+	let timerId: null|number = null
+	let renderCount = 0
+	
+	watchEffect(()=> {
+		
+		const columns = props.columns;
+		const draw = drawRef.value;
+		const dark = isDarkMode.value;
+		const index = curIndex.value;  // 这会跟踪 curIndex.value 的变化
+		
+		if(optionWidth.value == 0 || index.length == 0 || draw.length == 0 || columns.length == 0 || drawRef.value.length == 0) return
+		updateItemStyle()
+		
+		if(renderCount > 2) return
+		if(timerId != null) {
+			clearTimeout(timerId!)
+		}
+		timerId = setTimeout(()=> {
+			updateItemStyle()
+			// 鸿蒙可能首次会画出不出
+			renderCount++
+		},50)
+	})
+	
+	
+	// 或者在 watchEffect 中处理
+	let timer:number|null = null
+	const getBoundingClientRect = (el: UniElement) => {
+		requestAnimationFrame(() => {
+			el?.getBoundingClientRectAsync()?.then(res => {
+				optionWidth.value = res.width
+			})
+		})
+	}
+	const resizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
+		getBoundingClientRect(drawRef.value[0])
+	})
+	watch(():UniElement[] => drawRef.value, (els: UniElement[])=> {
+		els.forEach(el=> {
+			resizeObserver.observe(el)
+			// #ifdef APP-IOS
+			getBoundingClientRect(el)
+			// #endif
+		})
+	},{deep: true})
+	
+	// #endif
+	
+	// #ifdef APP-IOS
+	onMounted(() => {
+		nextTick(() => {
+			setTimeout(() => {
+				isInitialized.value = true
+			}, 400)
+		})
+	})
+	// #endif
+	
+	// 暴露方法给外部使用
+	defineExpose({
+		confirm: onConfirm,
+		getSelectedOptions
+	});
+</script>
+<style lang="scss">
+	@import './index.scss';
+</style>

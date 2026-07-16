@@ -17,7 +17,7 @@
 		<view class="tools-panel">
 			<view class="Datetime-box">
 				<view class="date-box">
-					<uv-icon name="calendar" size="25"></uv-icon>
+					<i-icon name="/static/rili.png" fontSize="15"></i-icon>
 					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
 					<text>至</text>
 					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
@@ -28,9 +28,9 @@
 					{{isPlaying ? '暂停':'播放' }}
 				</view>
 				<view class="slider">
-					<uv-slider v-model="playbackSpeed" backgroundColor="#f5f5f5" activeColor="#1890FF" min="1" max="10"
-						@change="setPlaybackSpeed" block-color="#1890FF">
-					</uv-slider>
+					<i-slider v-model="playbackSpeed"  :min="1" :max="10"
+						@change="setPlaybackSpeed">
+					</i-slider>
 				</view>
 				<text class="speed-label">{{playbackSpeed}}x</text>
 			</view>
@@ -64,8 +64,13 @@
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
+	type TrackPoint = {
+		latitude : number;
+		longitude : number;
+	}
+
 	type polyData = {
-		points : Array<{ latitude : number; longitude : number }>;
+		points : Array<TrackPoint>;
 		color : string;
 		width : number;
 		arrowLine : boolean;
@@ -690,9 +695,6 @@
 				.slider {
 					flex: 1;
 					padding: 0 20rpx 0 30rpx;
-					overflow: unset;
-				}
-				.uv-slider{
 					overflow: unset;
 				}
 

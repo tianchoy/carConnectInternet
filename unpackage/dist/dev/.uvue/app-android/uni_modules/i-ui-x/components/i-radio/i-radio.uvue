@@ -1,0 +1,235 @@
+import { computed } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'i-radio',
+    name: 'i-radio',
+    props: {
+        name: {
+            type: [String, Number, Boolean],
+            default: '',
+        },
+        modelValue: {
+            type: [String, Number, Boolean],
+            default: '',
+        },
+        value: {
+            type: [String, Number, Boolean],
+            default: '',
+        },
+        checked: {
+            type: Boolean,
+            default: false,
+        },
+        shape: {
+            type: String,
+            default: 'circle',
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        activeColor: {
+            type: String,
+            default: '#2979ff',
+        },
+        inactiveColor: {
+            type: String,
+            default: '#dcdfe6',
+        },
+        size: {
+            type: [String, Number],
+            default: 20,
+        },
+        placement: {
+            type: String,
+            default: 'row',
+        },
+        label: {
+            type: String,
+            default: '',
+        },
+        labelColor: {
+            type: String,
+            default: '#303133',
+        },
+        labelSize: {
+            type: [String, Number],
+            default: 14,
+        },
+        labelDisabled: {
+            type: Boolean,
+            default: false,
+        },
+        iconColor: {
+            type: String,
+            default: '#ffffff',
+        },
+        iconSize: {
+            type: [String, Number],
+            default: 14,
+        },
+        borderBottom: {
+            type: Boolean,
+            default: false,
+        },
+        iconPlacement: {
+            type: String,
+            default: 'left',
+        },
+        activeLabelColor: {
+            type: String,
+            default: '',
+        },
+    },
+    emits: ['change', 'update:modelValue', 'update:value', 'update:checked'],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        /**
+         * Props 说明：依据 DCloud uni-app x 官方规范 Radio，单个组件也支持 v-model 判断选中。
+         * - name: 单选项标识符。
+         * - modelValue/value: 当前选中的值。
+         * - checked: 单项选中状态，兼容旧版。
+         * - shape: 外观形状，circle、square、dot、check、button。
+         * - disabled: 是否禁用。
+         * - activeColor/inactiveColor/iconColor/activeLabelColor: 选中、未选中、图标和选中文字颜色。
+         * - size/iconSize/labelSize: 尺寸。
+         * - placement/iconPlacement/borderBottom: 布局。
+         * - label/labelColor/labelDisabled: 文本和文本点击禁用。
+         */
+        const props = __props;
+        /**
+         * Emits 说明：单选状态变化。
+         * - change: 当前 radio 被选中时触发，参数为 name。
+         * - update:modelValue/update:value: 同步选中的 name。
+         * - update:checked: 同步单项 checked 状态。
+         */
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        const checked = computed((): boolean => {
+            if (props.checked)
+                return true;
+            const value = String(props.modelValue).length > 0 ? props.modelValue : props.value;
+            return String(value) == String(props.name);
+        });
+        const wrapClass = computed((): string => {
+            const classes = ['i-radio'];
+            if (props.placement == 'column')
+                classes.push('i-radio--column');
+            if (props.iconPlacement == 'right')
+                classes.push('i-radio--right');
+            if (props.shape == 'button')
+                classes.push('i-radio--button');
+            if (checked.value)
+                classes.push('i-radio--checked');
+            if (props.shape == 'button' && checked.value)
+                classes.push('i-radio--button-checked');
+            if (props.disabled)
+                classes.push('i-radio--disabled');
+            if (props.borderBottom)
+                classes.push('i-radio--border');
+            return classes.join(' ');
+        });
+        const labelClass = computed((): string => {
+            const classes = ['i-radio__label'];
+            if (props.placement == 'column')
+                classes.push('i-radio__label--column');
+            if (props.shape == 'button')
+                classes.push('i-radio__label--button');
+            return classes.join(' ');
+        });
+        const boxStyle = computed((): string => {
+            const circle = props.shape == 'circle' || props.shape == 'dot';
+            return ('width:' +
+                formatSize(props.size) +
+                ';height:' +
+                formatSize(props.size) +
+                ';border-radius:' +
+                (circle ? formatSize(props.size) : '4px') +
+                ';border-color:' +
+                (checked.value ? props.activeColor : props.inactiveColor) +
+                ';background-color:' +
+                (checked.value && props.shape == 'check' ? props.activeColor : 'transparent') +
+                ';');
+        });
+        const dotStyle = computed((): string => {
+            const fontSize = props.shape == 'check' ? formatSize(Number(props.iconSize) + 2) : formatSize(props.iconSize);
+            return ('background-color:' +
+                props.activeColor +
+                ';color:' +
+                props.iconColor +
+                ';font-size:' +
+                fontSize +
+                ';');
+        });
+        const labelStyle = computed((): string => {
+            let color = props.labelColor;
+            if (checked.value && props.activeLabelColor.length > 0)
+                color = props.activeLabelColor;
+            return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';';
+        });
+        function select() {
+            if (props.disabled)
+                return;
+            emit('change', props.name);
+            emit('update:modelValue', props.name);
+            emit('update:value', props.name);
+            emit('update:checked', true);
+        }
+        function selectByLabel() {
+            if (props.labelDisabled)
+                return;
+            select();
+        }
+        function formatSize(value): string {
+            const text = String(value);
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
+            }
+            return text + 'px';
+        }
+        return (): any | null => {
+            return _cE("view", _uM({
+                class: _nC(wrapClass.value),
+                onClick: select
+            }), [
+                renderSlot(_ctx.$slots, "icon", _uM({ checked: checked.value }), (): any[] => [
+                    _ctx.shape != 'button'
+                        ? _cE("view", _uM({
+                            key: 0,
+                            class: "i-radio__box",
+                            style: _nS(boxStyle.value)
+                        }), [
+                            isTrue(checked.value && _ctx.shape != 'check')
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "i-radio__dot",
+                                    style: _nS(dotStyle.value)
+                                }), null, 4 /* STYLE */)
+                                : _cC("v-if", true),
+                            isTrue(checked.value && _ctx.shape == 'check')
+                                ? _cE("text", _uM({
+                                    key: 1,
+                                    class: "i-radio__check",
+                                    style: _nS(dotStyle.value)
+                                }), "✓", 4 /* STYLE */)
+                                : _cC("v-if", true)
+                        ], 4 /* STYLE */)
+                        : _cC("v-if", true)
+                ]),
+                renderSlot(_ctx.$slots, "default", _uM({ checked: checked.value }), (): any[] => [
+                    _cE("text", _uM({
+                        class: _nC(labelClass.value),
+                        style: _nS(labelStyle.value),
+                        onClick: withModifiers(selectByLabel, ["stop"])
+                    }), _tD(_ctx.label), 7 /* TEXT, CLASS, STYLE */)
+                ])
+            ], 2 /* CLASS */);
+        };
+    }
+});
+export default __sfc__;
+export type IRadioComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIRadioIRadioStyles = [_uM([["i-radio", _pS(_uM([["minHeight", 32], ["flexDirection", "row"], ["alignItems", "center"]]))], ["i-radio--right", _pS(_uM([["flexDirection", "row-reverse"], ["justifyContent", "space-between"]]))], ["i-radio--column", _pS(_uM([["flexDirection", "column"], ["alignItems", "flex-start"]]))], ["i-radio__label--column", _pS(_uM([["marginLeft", 0], ["marginTop", 6]]))], ["i-radio--button", _pS(_uM([["minWidth", 64], ["minHeight", 34], ["paddingTop", 7], ["paddingRight", 12], ["paddingBottom", 7], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dcdfe6"], ["borderRightColor", "#dcdfe6"], ["borderBottomColor", "#dcdfe6"], ["borderLeftColor", "#dcdfe6"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-radio--button-checked", _pS(_uM([["borderTopColor", "#2979ff"], ["borderRightColor", "#2979ff"], ["borderBottomColor", "#2979ff"], ["borderLeftColor", "#2979ff"], ["backgroundColor", "#ecf5ff"]]))], ["i-radio--disabled", _pS(_uM([["opacity", 0.5]]))], ["i-radio--border", _pS(_uM([["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef0f4"]]))], ["i-radio__box", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-radio__dot", _pS(_uM([["width", 10], ["height", 10], ["borderTopLeftRadius", 5], ["borderTopRightRadius", 5], ["borderBottomRightRadius", 5], ["borderBottomLeftRadius", 5]]))], ["i-radio__check", _pS(_uM([["lineHeight", "20px"], ["fontWeight", 700]]))], ["i-radio__label", _pS(_uM([["marginLeft", 8], ["lineHeight", "22px"]]))], ["i-radio__label--button", _pS(_uM([["marginLeft", 0], ["textAlign", "center"]]))]])];
+//# sourceMappingURL=i-radio.uvue.map

@@ -74,6 +74,7 @@ export function findOptionByValue(
 	value : PickerValue,
 	fields : KeysType,
 ) : UTSJSONObject | null {
+	if(options.length == 0) return null
 	const index = options.findIndex((option) : boolean => option[fields.value] == value);
 	const enabledIndex = findIndexOfEnabledOption(options, index);
 	return options[enabledIndex];

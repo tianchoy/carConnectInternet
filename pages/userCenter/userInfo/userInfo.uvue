@@ -11,7 +11,6 @@
 					<text>账号</text>
 					<view class="right">
 						<text class="info">{{userInfo.id}}</text>
-						<!-- <uv-icon name="arrow-right" size="18"></uv-icon> -->
 					</view>
 				</view>
 				<view class="item">
@@ -39,7 +38,7 @@
 			<view class="list" @click="editPassword" v-if="userInfo.type == 1">
 				<view class="item">
 					<text>修改密码</text>
-					<uv-icon name="arrow-right" size="18"></uv-icon>
+					<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 				</view>
 			</view>
 			<view class="footer">
@@ -69,11 +68,15 @@
 		if (options.userInfo) {
 			try {
 				const parsedInfo = JSON.parse(decodeURIComponent(options.userInfo)) as UTSJSONObject
+				const userId = parsedInfo.getString("userId")
+				const mobile = parsedInfo.getString("mobile")
+				const type = parsedInfo.getNumber("type")
+				const createTime = parsedInfo.getString("createTime")
 				userInfo.value = {
-					id: parsedInfo.getString("userId") || "",
-					mobile: parsedInfo.getString("mobile") || "",
-					type: parsedInfo.getNumber("type") || 0,
-					createTime: parsedInfo.getString("createTime") || ""
+					id: userId != null ? userId : "",
+					mobile: mobile != null ? mobile : "",
+					type: type != null ? type : 0,
+					createTime: createTime != null ? createTime : ""
 				}
 				console.log("用户信息:", userInfo.value)
 			} catch (e) {

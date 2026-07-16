@@ -16,15 +16,15 @@
 				</view>
 			</view>
 			<view class="demo-block card">
-				<text class="demo-block__title-text">时分秒</text>
+				<text class="demo-block__title-text">时分秒:{{time}}</text>
 				<view class="demo-block__body">
-					<l-date-time-picker confirm-btn="确认" cancel-btn="取消" title="选择时间" :mode="8|16|32"></l-date-time-picker>
+					<l-date-time-picker v-model="time" confirm-btn="确认" cancel-btn="取消" title="选择时间" :mode="8|16|32"></l-date-time-picker>
 				</view>
 			</view>
 			<view class="demo-block card">
 				<text class="demo-block__title-text">完整的时间</text>
 				<view class="demo-block__body">
-					<l-date-time-picker confirm-btn="确认" cancel-btn="取消" title="选择日期" :mode="1|2|4|8|16|32"></l-date-time-picker>
+					<l-date-time-picker confirm-btn="确认" cancel-btn="取消" title="选择日期" :mode="1|2|4|8|16"></l-date-time-picker>
 				</view>
 			</view>
 			<view class="demo-block card">
@@ -78,18 +78,42 @@
 					</l-date-time-picker>
 				</view>
 			</view>
+			<view class="demo-block card">
+				<text class="demo-block__title-text">配合弹窗-{{value2}}</text>
+				<view class="demo-block__body">
+					<button type="primary" @click="showTime = true">打开</button>
+					<l-popup position="bottom" v-model="showTime">
+						<l-date-time-picker v-model="value2" cancel-btn="取消" confirm-btn="确认" :confirmStyle="confirmStyle" :mode="7" :end="endTime" :show-unit="false" @confirm="onConfirm2"></l-date-time-picker>
+					</l-popup>
+				</view>
+			</view>
+			
+			
 		</view>
 	</view>
 </template>
 
 <script lang="uts" setup>
-	import { DateTimePickerColumnItem, DateTimePickerColumn, TimeModeValues } from '@/uni_modules/lime-date-time-picker'
+	import type { DateTimePickerColumnItem, DateTimePickerColumn, TimeModeValues } from '@/uni_modules/lime-date-time-picker'
 	
+	
+	const confirmStyle = 'padding: 2px 40px;text-align:center;'
+	const endTime = new Date().getTime();
+	
+	const showTime = ref<boolean>(false);
+	
+	
+	const time = ref('')
 	const value = ref('2024-05-02')
+	const value2 = ref('2024-05-02')
 
 	
 	const onConfirm = (value: string) => {
 		console.log('onConfirm', value)
+	}
+	const onConfirm2 = (value: string) => {
+		showTime.value = false
+		console.log('onConfirm2', value)
 	}
 	const onChange = (value: string) => {
 		console.log('onChange', value)
@@ -109,6 +133,10 @@
 </script>
 
 <style lang="scss">
+	$card-bg-color: var(--doc-card-bg-color, white);
+	// $page-bg-color: var(--doc-page-bg-color, #f5f5f5);
+	$title-color: var(--doc-title-color, #000000E6);
+	$summary-color: var(--doc-summary-color, #00000099);
 	.btn {
 		margin-bottom: 20rpx;
 		margin-right: 20rpx;
@@ -130,7 +158,7 @@
 			margin-top: 8px;
 
 			&-text {
-				color: rgba(0, 0, 0, 0.6);
+				color: $summary-color;
 				font-weight: 400;
 				font-size: 14px;
 				line-height: 16px;
@@ -138,7 +166,7 @@
 				margin-left: 5px;
 
 				&.large {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 18px;
 					font-weight: 700;
 					line-height: 26px;
@@ -146,7 +174,7 @@
 				}
 
 				&.ultra {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 24px;
 					font-weight: 700;
 					line-height: 32px;
@@ -156,7 +184,7 @@
 		}
 
 		&__desc-text {
-			color: rgba(0, 0, 0, 0.6);
+			color: $summary-color;
 			margin: 8px 16px 0 0;
 			font-size: 14px;
 			line-height: 22px;

@@ -1,0 +1,129 @@
+import { computed } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'i-empty',
+name: 'i-empty',
+  props: {
+  icon: { type: String, default: '∅' },
+  image: { type: String, default: '' },
+  text: { type: String, default: '暂无数据' },
+  description: { type: String, default: '可以点击按钮重新加载。' },
+  buttonText: { type: String, default: '重新加载' },
+  showButton: { type: Boolean, default: true },
+  iconSize: { type: [String, Number], default: 42 },
+  iconColor: { type: String, default: '#c0c4cc' },
+  textColor: { type: String, default: '#303133' },
+  descriptionColor: { type: String, default: '#909399' },
+  buttonColor: { type: String, default: '#2979ff' },
+  buttonTextColor: { type: String, default: '#ffffff' },
+  padding: { type: [String, Number], default: '28px 16px' },
+  bgColor: { type: String, default: '#ffffff' },
+},
+  emits: ['click', 'retry'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+/**
+ * Props 说明：参考 Empty 空状态。
+ * - icon: 图标文本。
+ * - image: 图片路径，存在时优先显示图片。
+ * - text: 主提示文案。
+ * - description: 辅助说明文案。
+ * - buttonText: 操作按钮文字。
+ * - showButton: 是否显示默认操作按钮。
+ * - iconSize/iconColor/textColor/descriptionColor/buttonColor/buttonTextColor: 样式控制。
+ * - padding/bgColor: 容器间距和背景色。
+ */
+const props = __props
+
+/**
+ * Emits 说明：
+ * - click: 点击空状态整体时触发。
+ * - retry: 点击默认按钮时触发。
+ */
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+
+const bgColor = computed(() => {
+  return props.bgColor
+})
+const wrapStyle = computed(() => 'padding:' + formatBoxSize(props.padding) + ';background-color:' + bgColor.value + ';')
+const iconStyle = computed(() => 'font-size:' + formatSize(props.iconSize) + ';color:' + props.iconColor + ';')
+const textStyle = computed(() => 'color:' + props.textColor + ';')
+const descStyle = computed(() => 'color:' + props.descriptionColor + ';')
+const buttonStyle = computed(() => 'background-color:' + props.buttonColor + ';')
+const buttonTextStyle = computed(() => 'color:' + props.buttonTextColor + ';')
+
+function formatBoxSize(value): string {
+  const text = String(value)
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+function formatSize(value): string {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: "i-empty",
+    style: _nS(wrapStyle.value),
+    onClick: () => {emit('click')}
+  }), [
+    renderSlot(_ctx.$slots, "image", {}, (): any[] => [
+      _ctx.image.length > 0
+        ? _cE("image", _uM({
+            key: 0,
+            class: "i-empty__image",
+            src: _ctx.image,
+            mode: "aspectFit"
+          }), null, 8 /* PROPS */, ["src"])
+        : _cE("text", _uM({
+            key: 1,
+            class: "i-empty__icon",
+            style: _nS(iconStyle.value)
+          }), _tD(_ctx.icon), 5 /* TEXT, STYLE */)
+    ]),
+    _cE("text", _uM({
+      class: "i-empty__text",
+      style: _nS(textStyle.value)
+    }), _tD(_ctx.text), 5 /* TEXT, STYLE */),
+    _ctx.description.length > 0
+      ? _cE("text", _uM({
+          key: 0,
+          class: "i-empty__desc",
+          style: _nS(descStyle.value)
+        }), _tD(_ctx.description), 5 /* TEXT, STYLE */)
+      : _cC("v-if", true),
+    renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+      isTrue(_ctx.showButton)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "i-empty__button",
+            style: _nS(buttonStyle.value),
+            onClick: withModifiers(() => {emit('retry')}, ["stop"])
+          }), [
+            _cE("text", _uM({
+              class: "i-empty__button-text",
+              style: _nS(buttonTextStyle.value)
+            }), _tD(_ctx.buttonText), 5 /* TEXT, STYLE */)
+          ], 12 /* STYLE, PROPS */, ["onClick"])
+        : _cC("v-if", true)
+    ])
+  ], 12 /* STYLE, PROPS */, ["onClick"])
+}
+}
+
+})
+export default __sfc__
+export type IEmptyComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIEmptyIEmptyStyles = [_uM([["i-empty", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["alignItems", "center"]]))], ["i-empty__image", _pS(_uM([["width", 110], ["height", 110]]))], ["i-empty__icon", _pS(_uM([["lineHeight", "52px"]]))], ["i-empty__text", _pS(_uM([["marginTop", 8], ["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-empty__desc", _pS(_uM([["marginTop", 4], ["fontSize", 12], ["lineHeight", "18px"], ["textAlign", "center"]]))], ["i-empty__button", _pS(_uM([["minWidth", 96], ["height", 36], ["marginTop", 14], ["paddingTop", 0], ["paddingRight", 14], ["paddingBottom", 0], ["paddingLeft", 14], ["borderTopLeftRadius", 18], ["borderTopRightRadius", 18], ["borderBottomRightRadius", 18], ["borderBottomLeftRadius", 18], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-empty__button-text", _pS(_uM([["fontSize", 13], ["lineHeight", "18px"]]))]])]

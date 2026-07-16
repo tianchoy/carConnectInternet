@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_limePicker_components_lPicker_utils = require("./utils.js");
+const uni_modules_limeShared_arrayEqual_index = require("../../../lime-shared/arrayEqual/index.js");
+const uni_modules_limeShared_assignAtIndex_index = require("../../../lime-shared/assignAtIndex/index.js");
 if (!Array) {
   const _easycom_l_picker_item_1 = common_vendor.resolveComponent("l-picker-item");
   const _easycom_l_loading_1 = common_vendor.resolveComponent("l-loading");
@@ -28,30 +29,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     loading: { type: Boolean, default: false },
     loadingColor: {},
     loadingMaskColor: {},
-    loadingSize: { default: "64rpx" },
+    loadingSize: { default: "32px" },
     itemHeight: {},
     itemColor: {},
     itemFontSize: {},
     itemActiveColor: {},
     itemActiveFontWeight: {},
     indicatorStyle: {},
+    maskColors: {},
     bgColor: {},
     groupHeight: {},
     radius: {},
     resetIndex: { type: Boolean, default: false }
   },
-  emits: ["change", "cancel", "pick", "confirm", "update:modelValue", "update:value"],
+  emits: ["change", "cancel", "pick", "confirm", "update:modelValue"],
   setup(__props, _a) {
     var _b, _c, _d;
-    var __emit = _a.emit;
+    var __expose = _a.expose, __emit = _a.emit;
     const emit = __emit;
     const props = __props;
     const pickerItemInstanceArray = common_vendor.reactive([]);
-    const ohosShow = common_vendor.ref(0);
     const modelValue = common_vendor.ref((_d = (_c = (_b = props.value) !== null && _b !== void 0 ? _b : props.modelValue) !== null && _c !== void 0 ? _c : props.defaultValue) !== null && _d !== void 0 ? _d : []);
     const pickerValue = common_vendor.computed({
       set(value) {
-        if (value.join("") == modelValue.value.join(""))
+        if (uni_modules_limeShared_arrayEqual_index.arrayEqual(value, modelValue.value))
           return null;
         modelValue.value = value;
         emit("update:modelValue", value);
@@ -103,9 +104,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const updateItems = (item, index, column) => {
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curIndexArray.value, column, index);
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curValueArray.value, column, item.value);
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curItemArray, column, item);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curIndexArray.value, column, index);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curValueArray.value, column, item.value);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curItemArray, column, item);
     };
     const updatePickerItems = () => {
       const _indexs = [];
@@ -119,9 +120,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const item = child.options[index];
         _indexs.push(index);
         _values.push(item.value);
-        uni_modules_limePicker_components_lPicker_utils.pushAt(curItemArray, column, item);
+        uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curItemArray, column, item);
       });
-      if (curIndexArray.value.join("") == _indexs.join(""))
+      if (uni_modules_limeShared_arrayEqual_index.arrayEqual(curValueArray.value, _values) && uni_modules_limeShared_arrayEqual_index.arrayEqual(curIndexArray.value, _indexs))
         return null;
       curIndexArray.value = _indexs;
       curValueArray.value = _values;
@@ -130,9 +131,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onPick = (item, index, column) => {
       if (curIndexArray.value[column] == index)
         return null;
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curIndexArray.value, column, index);
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curValueArray.value, column, item.value);
-      uni_modules_limePicker_components_lPicker_utils.pushAt(curItemArray, column, item);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curIndexArray.value, column, index);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curValueArray.value, column, item.value);
+      uni_modules_limeShared_assignAtIndex_index.assignAtIndex(curItemArray, column, item);
       const obj = {
         values: curValueArray.value,
         column,
@@ -145,13 +146,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       updatePickerItems();
       emit("cancel", e);
     };
-    const onConfirm = (e) => {
+    const onConfirm = () => {
       const values = [...curValueArray.value];
       const indexs = [...curIndexArray.value];
       const items = curItemArray.map((item) => {
         return common_vendor.toRaw(item);
       });
-      if (pickerValue.value.join("") != values.join("")) {
+      if (!uni_modules_limeShared_arrayEqual_index.arrayEqual(pickerValue.value, values)) {
         pickerValue.value = values;
       }
       const obj = {
@@ -162,9 +163,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       emit("confirm", obj);
     };
     const stopPickerValue = common_vendor.watch(pickerValue, () => {
-      if (pickerValue.value.join("") == curValueArray.value.join(""))
+      if (uni_modules_limeShared_arrayEqual_index.arrayEqual(pickerValue.value, curValueArray.value))
         return null;
-      curValueArray.value = pickerValue.value.map((item = null) => {
+      curValueArray.value = pickerValue.value.map((item) => {
         return item;
       });
       updatePickerItems();
@@ -174,7 +175,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     common_vendor.onMounted(() => {
       common_vendor.nextTick$1(() => {
-        if (pickerValue.value.join("") != curValueArray.value.join("") && pickerValue.value.length > 0) {
+        if (!uni_modules_limeShared_arrayEqual_index.arrayEqual(pickerValue.value, curValueArray.value) && pickerValue.value.length > 0) {
           curValueArray.value = [...pickerValue.value];
           updatePickerItems();
         }
@@ -183,6 +184,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onBeforeUnmount(() => {
       stopPickerValue();
       stopColumns();
+    });
+    __expose({
+      confirm: onConfirm,
+      getSelectedOptions: () => {
+        const values = [...curValueArray.value];
+        const indexs = [...curIndexArray.value];
+        const items = curItemArray.map((item) => {
+          return common_vendor.toRaw(item);
+        });
+        if (!uni_modules_limeShared_arrayEqual_index.arrayEqual(pickerValue.value, values)) {
+          pickerValue.value = values;
+        }
+        const obj = {
+          values,
+          indexs,
+          items
+        };
+        return obj;
+      }
     });
     common_vendor.provide("limePicker", props);
     common_vendor.provide("limePickerOnPick", onPick);
@@ -197,23 +217,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: _ctx.cancelBtn != null
       }, _ctx.cancelBtn != null ? {
         c: common_vendor.t(_ctx.cancelBtn),
-        d: common_vendor.unref(ohosShow),
-        e: common_vendor.s(_ctx.cancelStyle ?? ""),
-        f: common_vendor.o(onCancel, "c1")
+        d: common_vendor.s(_ctx.cancelStyle ?? {}),
+        e: common_vendor.o(onCancel, "fd")
       } : {}, {
-        g: common_vendor.t(_ctx.title),
-        h: common_vendor.unref(ohosShow),
-        i: common_vendor.s(_ctx.titleStyle ?? ""),
-        j: _ctx.confirmBtn != null
+        f: common_vendor.t(_ctx.title),
+        g: common_vendor.s(_ctx.titleStyle ?? {}),
+        h: _ctx.confirmBtn != null
       }, _ctx.confirmBtn != null ? {
-        k: common_vendor.t(_ctx.confirmBtn),
-        l: common_vendor.unref(ohosShow),
-        m: common_vendor.s(_ctx.confirmStyle ?? ""),
-        n: common_vendor.o(onConfirm, "c1")
-      } : {}, {
-        o: common_vendor.unref(ohosShow)
-      }) : {}, {
-        p: common_vendor.f(props.columns, (options, i, i0) => {
+        i: common_vendor.t(_ctx.confirmBtn),
+        j: common_vendor.s(_ctx.confirmStyle ?? {}),
+        k: common_vendor.o(onConfirm, "68")
+      } : {}) : {}, {
+        l: common_vendor.f(props.columns, (options, i, i0) => {
           return {
             a: i,
             b: "070619bb-0-" + i0,
@@ -224,32 +239,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             })
           };
         }),
-        q: common_vendor.unref(isEmpty)
+        m: common_vendor.unref(isEmpty)
       }, common_vendor.unref(isEmpty) ? {} : {}, {
-        r: common_vendor.s(_ctx.groupHeight != null ? {
+        n: !common_vendor.unref(isEmpty)
+      }, !common_vendor.unref(isEmpty) ? {
+        o: common_vendor.s(_ctx.indicatorStyle ?? "")
+      } : {}, {
+        p: common_vendor.s(_ctx.groupHeight != null ? {
           height: _ctx.groupHeight
         } : {}),
-        s: _ctx.loading
+        q: _ctx.loading
       }, _ctx.loading ? {
-        t: common_vendor.p({
+        r: common_vendor.p({
           size: _ctx.loadingSize,
           color: _ctx.loadingColor
         }),
-        v: common_vendor.sei("r0-070619bb", "view", "loadingRef"),
-        w: common_vendor.s(_ctx.loadingMaskColor != null ? {
+        s: common_vendor.sei("r0-070619bb", "view", "loadingRef"),
+        t: common_vendor.s(_ctx.loadingMaskColor != null ? {
           background: _ctx.loadingMaskColor
         } : {})
       } : {}, {
-        x: common_vendor.sei(common_vendor.gei(_ctx, "", "r1-070619bb"), "view", "pickerRef"),
-        y: common_vendor.s(common_vendor.unref(styles)),
-        z: common_vendor.s({
+        v: common_vendor.sei(common_vendor.gei(_ctx, "", "r1-070619bb"), "view", "pickerRef"),
+        w: common_vendor.s(common_vendor.unref(styles)),
+        x: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-picker/components/l-picker/l-picker.js.map

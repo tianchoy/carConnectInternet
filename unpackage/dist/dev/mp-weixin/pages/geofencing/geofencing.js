@@ -11,11 +11,8 @@ if (!Array) {
   const _easycom_i_popup_1 = common_vendor.resolveComponent("i-popup");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
   const _easycom_i_radio_1 = common_vendor.resolveComponent("i-radio");
-  const _component_i_radio_group = common_vendor.resolveComponent("i-radio-group");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_switch_1 = common_vendor.resolveComponent("uv-switch");
-  const _easycom_uv_popup_1 = common_vendor.resolveComponent("uv-popup");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_popup_1 + _easycom_i_input_1 + _easycom_i_radio_1 + _component_i_radio_group + _easycom_uv_icon_1 + _easycom_uv_switch_1 + _easycom_uv_popup_1)();
+  const _easycom_i_switch_1 = common_vendor.resolveComponent("i-switch");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_popup_1 + _easycom_i_input_1 + _easycom_i_radio_1 + _easycom_i_switch_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
@@ -24,11 +21,9 @@ const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-
 const _easycom_i_popup = () => "../../uni_modules/i-ui-x/components/i-popup/i-popup.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_i_radio = () => "../../uni_modules/i-ui-x/components/i-radio/i-radio.js";
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_switch = () => "../../uni_modules/uv-switch/components/uv-switch/uv-switch.js";
-const _easycom_uv_popup = () => "../../uni_modules/uv-popup/components/uv-popup/uv-popup.js";
+const _easycom_i_switch = () => "../../uni_modules/i-ui-x/components/i-switch/i-switch.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_popup + _easycom_i_input + _easycom_i_radio + _easycom_uv_icon + _easycom_uv_switch + _easycom_uv_popup)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_popup + _easycom_i_input + _easycom_i_radio + _easycom_i_switch)();
 }
 class Coordinate extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -84,6 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const fencesPopup = common_vendor.ref(null);
     const editDialogPopup = common_vendor.ref(null);
     const editingFence = common_vendor.ref(null);
+    const alarmTypeOptions = ["0", "1", "2", "3"];
     const fenceForm = common_vendor.reactive(new common_vendor.UTSJSONObject({
       name: "",
       alarmType: "1"
@@ -188,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           });
         } catch (err) {
-          console.error("获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:349", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "获取车辆位置失败",
             icon: "none"
@@ -218,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           renderFencesOnMap();
         } catch (error) {
-          console.error("加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:381", "加载围栏列表失败:", error);
           common_vendor.index.showToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -312,7 +308,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const _b = common_vendor.__read(centerStr.trim().split(" ").map(Number), 2), lat = _b[0], lng = _b[1];
         const radius = Number(radiusStr.trim());
         if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-          console.error("无效的圆形围栏数据:", circleStr);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:506", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -322,7 +318,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         });
       } catch (error) {
-        console.error("解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:519", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     };
@@ -432,12 +428,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       updateMapDisplay();
     };
     const editFence = (fence = null) => {
-      var _a;
+      var _a, _b;
       editingFence.value = fence;
       fenceForm.name = fence.name;
-      fenceForm.alarmType = fence.alarmType.toString();
-      drawingMode.value = getFenceType(fence);
-      (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.open();
+      const alarmType = String((_a = fence.alarmType) !== null && _a !== void 0 ? _a : "");
+      fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : "1";
+      const fenceType = getFenceType(fence);
+      drawingMode.value = fenceType;
+      if (fenceType === "circle") {
+        const circleData = parseCircle(fence.area);
+        if (circleData) {
+          circleCenter.value = {
+            latitude: circleData.latitude,
+            longitude: circleData.longitude
+          };
+          circleRadius.value = circleData.radius;
+          points.value = [];
+        }
+      } else {
+        const fencePoints = parsePolygon(fence.area);
+        if (fencePoints.length >= 3) {
+          points.value = fencePoints;
+          circleCenter.value = null;
+          circleRadius.value = 0;
+        }
+      }
+      updateMapDisplay();
+      (_b = editDialogPopup.value) === null || _b === void 0 ? null : _b.open();
     };
     const deleteFence = (id = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -466,7 +483,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                   }
                 } catch (error) {
-                  console.error("删除围栏失败:", error);
+                  common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:709", "删除围栏失败:", error);
                   common_vendor.index.showToast({ title: "删除失败", icon: "none" });
                 }
               }
@@ -477,49 +494,79 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const saveFence = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         if (!fenceForm.name) {
           common_vendor.index.showToast({ title: "请输入围栏名称", icon: "none" });
           return Promise.resolve(null);
         }
         let area = "";
-        if (drawingMode.value === "polygon" && points.value.length < 3) {
-          common_vendor.index.showToast({ title: "请绘制有效的围栏区域", icon: "none" });
-          return Promise.resolve(null);
-        } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
-          common_vendor.index.showToast({ title: "请绘制有效的圆形围栏", icon: "none" });
+        if (editingFence.value) {
+          if (drawingMode.value === "polygon" && points.value.length >= 3) {
+            area = generatePolygonString(points.value);
+          } else if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
+            area = generateCircleString(circleCenter.value, circleRadius.value);
+          } else {
+            area = editingFence.value.area;
+          }
+        } else {
+          if (drawingMode.value === "polygon" && points.value.length < 3) {
+            common_vendor.index.showToast({ title: "请绘制有效的围栏区域（至少3个顶点）", icon: "none" });
+            return Promise.resolve(null);
+          } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
+            common_vendor.index.showToast({ title: "请绘制有效的圆形围栏", icon: "none" });
+            return Promise.resolve(null);
+          }
+          if (drawingMode.value === "polygon") {
+            area = generatePolygonString(points.value);
+          } else if (drawingMode.value === "circle" && circleCenter.value) {
+            area = generateCircleString(circleCenter.value, circleRadius.value);
+          }
+        }
+        if (!area) {
+          common_vendor.index.showToast({ title: "围栏数据无效，请重新绘制", icon: "none" });
           return Promise.resolve(null);
         }
-        if (drawingMode.value === "polygon") {
-          area = generatePolygonString(points.value);
-        } else if (drawingMode.value === "circle" && circleCenter.value) {
-          area = generateCircleString(circleCenter.value, circleRadius.value);
+        if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
+          common_vendor.index.showToast({ title: "请选择有效的告警类型", icon: "none" });
+          return Promise.resolve(null);
         }
         const fenceData = new common_vendor.UTSJSONObject({
           name: fenceForm.name,
           area,
-          alarmType: parseInt(fenceForm.alarmType),
+          alarmType: Number(fenceForm.alarmType),
           type: drawingMode.value
         });
         try {
           let result = null;
           if (editingFence.value) {
+            common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "更新中..." }));
             result = yield api_request.updateGeofence(new common_vendor.UTSJSONObject(Object.assign({ id: editingFence.value.id }, fenceData)));
           } else {
+            common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "保存中..." }));
             result = yield api_request.addGeofence(fenceData);
           }
+          common_vendor.index.hideLoading();
           if (result.code === 0) {
-            common_vendor.index.showToast({ title: "保存成功" });
+            common_vendor.index.showToast({ title: editingFence.value ? "更新成功" : "保存成功" });
             (_a = editDialogPopup.value) === null || _a === void 0 ? null : _a.close();
+            const tempFence = editingFence.value;
             editingFence.value = null;
             isDrawing.value = false;
-            loadGeofenceList();
+            points.value = [];
+            circleCenter.value = null;
+            circleRadius.value = 0;
+            yield loadGeofenceList();
+            if (tempFence) {
+              selectedFence.value = null;
+              (_b = showFenceModal.value) === null || _b === void 0 ? null : _b.close();
+            }
           } else {
-            common_vendor.index.showToast({ title: "保存失败", icon: "none" });
+            common_vendor.index.showToast({ title: result.msg || "保存失败", icon: "none" });
           }
         } catch (error) {
-          console.error("保存围栏失败:", error);
-          common_vendor.index.showToast({ title: "保存失败", icon: "none" });
+          common_vendor.index.hideLoading();
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:810", "保存围栏失败:", error);
+          common_vendor.index.showToast({ title: "保存失败，请重试", icon: "none" });
         }
       });
     };
@@ -666,7 +713,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
-          console.error("设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:978", "设备绑定操作失败:", error);
           common_vendor.index.showToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -972,11 +1019,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         Q: drawingMode.value === "circle"
       }, drawingMode.value === "circle" ? {
-        R: common_vendor.t(circleRadius.value.toFixed(2) || 0)
+        R: common_vendor.t(circleRadius.value.toFixed(2))
       } : {}, {
         S: common_vendor.o(($event) => {
           return fencesPopup.value.close();
-        }, "df"),
+        }, "c1"),
         T: common_vendor.p({
           name: "/static/close.png",
           fontSize: "15"
@@ -1010,60 +1057,73 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         Z: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
         aa: common_vendor.o(($event) => {
           return fenceForm.name = $event;
-        }, "3e"),
+        }, "99"),
         ab: common_vendor.p({
           placeholder: "请输入围栏名称",
           border: "surround",
           modelValue: fenceForm.name
         }),
-        ac: common_vendor.p({
-          name: "0"
-        }),
+        ac: common_vendor.o(($event) => {
+          return fenceForm.alarmType = $event;
+        }, "ee"),
         ad: common_vendor.p({
-          name: "1"
+          name: "0",
+          iconPlacement: "left",
+          modelValue: fenceForm.alarmType
         }),
-        ae: common_vendor.p({
-          name: "2"
-        }),
+        ae: common_vendor.o(($event) => {
+          return fenceForm.alarmType = $event;
+        }, "11"),
         af: common_vendor.p({
-          name: "3"
+          name: "1",
+          iconPlacement: "left",
+          modelValue: fenceForm.alarmType
         }),
         ag: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "80"),
+        }, "bd"),
         ah: common_vendor.p({
+          name: "2",
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
         ai: common_vendor.o(($event) => {
+          return fenceForm.alarmType = $event;
+        }, "80"),
+        aj: common_vendor.p({
+          name: "3",
+          iconPlacement: "left",
+          modelValue: fenceForm.alarmType
+        }),
+        ak: common_vendor.o(($event) => {
           return editDialogPopup.value.close();
-        }, "93"),
-        aj: common_vendor.o(saveFence, "45"),
-        ak: common_vendor.p({
+        }, "d3"),
+        al: common_vendor.o(saveFence, "1b"),
+        am: common_vendor.p({
           type: "primary"
         }),
-        al: common_vendor.sr(editDialogPopup, "45be0509-16", {
+        an: common_vendor.sr(editDialogPopup, "45be0509-16", {
           "k": "editDialogPopup"
         }),
-        am: common_vendor.p({
+        ao: common_vendor.p({
           mode: "center",
           round: "10",
           class: "r"
         }),
-        an: common_vendor.t(currentFenceName.value),
-        ao: common_vendor.o(closeDeviceDialog, "f5"),
-        ap: common_vendor.p({
+        ap: common_vendor.t(currentFenceName.value),
+        aq: common_vendor.o(closeDeviceDialog, "70"),
+        ar: common_vendor.p({
           name: "close"
         }),
-        aq: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
-        ar: common_vendor.o(($event) => {
-          return switchTab("bind");
-        }, "8d"),
-        as: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
+        as: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
         at: common_vendor.o(($event) => {
+          return switchTab("bind");
+        }, "cf"),
+        av: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
+        aw: common_vendor.o(($event) => {
           return switchTab("unbind");
-        }, "34"),
-        av: common_vendor.f(deviceList.value, (device, k0, i0) => {
+        }, "12"),
+        ax: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(device.deviceName || device.plateNo),
             b: device.connectionStatus
@@ -1073,7 +1133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => {
               return toggleDeviceBinding(device.imei, $event);
             }, device.imei),
-            e: "45be0509-27-" + i0 + ",45be0509-25",
+            e: "45be0509-26-" + i0 + ",45be0509-24",
             f: common_vendor.p({
               ["model-value"]: isDeviceBound(device.imei),
               disabled: loading.value || loadingMore.value,
@@ -1082,32 +1142,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: device.imei
           });
         }),
-        aw: deviceList.value.length === 0 && !loading.value
+        ay: deviceList.value.length === 0 && !loading.value
       }, deviceList.value.length === 0 && !loading.value ? {
-        ax: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
+        az: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       } : {}, {
-        ay: loadingMore.value
+        aA: loadingMore.value
       }, loadingMore.value ? {} : {}, {
-        az: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
+        aB: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
       }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
-        aA: scrollTop.value,
-        aB: common_vendor.o(handleLoadMore, "fd"),
-        aC: common_vendor.sr(deviceDialogPopup, "45be0509-25", {
+        aC: scrollTop.value,
+        aD: common_vendor.o(handleLoadMore, "15"),
+        aE: common_vendor.sr(deviceDialogPopup, "45be0509-24", {
           "k": "deviceDialogPopup"
         }),
-        aD: common_vendor.p({
+        aF: common_vendor.p({
           mode: "bottom",
           round: "10",
           ["mask-click-able"]: false,
           class: "r"
         }),
-        aE: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        aF: `${_ctx.u_s_b_h}px`,
-        aG: `${_ctx.u_s_a_i_b}px`,
-        aH: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        aG: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        aH: `${_ctx.u_s_b_h}px`,
+        aI: `${_ctx.u_s_a_i_b}px`,
+        aJ: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/geofencing/geofencing.js.map

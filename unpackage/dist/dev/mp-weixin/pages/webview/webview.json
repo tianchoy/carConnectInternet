@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "",
   "usingComponents": {
-    "uv-empty": "../../uni_modules/uv-empty/components/uv-empty/uv-empty"
+    "i-empty": "../../uni_modules/i-ui-x/components/i-empty/i-empty"
   }
 }

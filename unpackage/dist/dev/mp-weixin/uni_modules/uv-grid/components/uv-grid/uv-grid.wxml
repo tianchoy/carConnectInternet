@@ -1,1 +1,0 @@
-<view ref="uv-grid" style="{{b + ';' + c + ';' + (virtualHostStyle || '')}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" class="{{['uv-grid', 'data-v-fb64a415', d]}}" hidden="{{virtualHostHidden || false}}"><slot/></view><wxs src="/common/uniView.wxs" module="uV"/>

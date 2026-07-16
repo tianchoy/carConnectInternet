@@ -256,17 +256,7 @@ const closePicker = () => {
 // 初始化尺寸数据
 const initDimensions = () => {
     const systemInfo = uni.getSystemInfoSync();
-    statusBarHeight.value = systemInfo.statusBarHeight || 20;
-    try {
-        const menuRect = uni.getMenuButtonBoundingClientRect();
-        if (menuRect) {
-            menuButtonInfo.value = menuRect;
-            const gap = menuRect.top - statusBarHeight.value;
-            navBarHeight.value = gap * 2 + menuRect.height + 4;
-        }
-    } catch (e) {
-        console.warn('胶囊按钮信息获取失败', e);
-    }
+    statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
 }
 
 // 延迟函数
@@ -983,14 +973,15 @@ const toPay = (iccid : string,simMerchant : string) => {
     console.log(iccid)
     needRefresh.value = true
     
-    wx.openEmbeddedMiniProgram({
+    //#ifdef MP-WEIXIN
+    uni.openEmbeddedMiniProgram({
         appId: 'wx1d647f2cfdc089e6',
         path: '/pages/home/userSimRecharge?iccid=' + iccid,
         envVersion: 'release',
-        success(res) {
+        success(res: any) {
             console.log('打开小程序成功', res)
         },
-        fail(res) {
+        fail(res: any) {
             console.log('打开小程序失败', res)
             needRefresh.value = false
             uni.showToast({
@@ -999,6 +990,15 @@ const toPay = (iccid : string,simMerchant : string) => {
             })
         }
     })
+    //#endif
+
+    //#ifndef MP-WEIXIN
+    needRefresh.value = false
+    uni.showToast({
+        title: '请在微信小程序中完成充值',
+        icon: 'none'
+    })
+    //#endif
 }
 
 // 跳转登录页

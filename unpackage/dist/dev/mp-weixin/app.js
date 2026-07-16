@@ -6,7 +6,6 @@ if (!Math) {
   "./pages/message/message.js";
   "./pages/userCenter/userCenter.js";
   "./pages/login/login.js";
-  "./pages/signUp/signUp.js";
   "./pages/carInfoDetail/carInfoDetail.js";
   "./pages/addCar/addCar.js";
   "./pages/playBack/playBack.js";
@@ -21,7 +20,6 @@ if (!Math) {
   "./pages/geofencing/geofencing.js";
   "./pages/scancode/scancode.js";
   "./pages/userCenter/payDeviceList/payDeviceList.js";
-  "./pages/userCenter/renewal/renewal.js";
   "./pages/cmd/cmd.js";
   "./pages/webview/webview.js";
   "./pages/deviceList/deviceList.js";
@@ -32,16 +30,16 @@ function checkForUpdates() {
     updateManager = common_vendor.index.getUpdateManager();
     if (updateManager) {
       updateManager.onCheckForUpdate((res = null) => {
-        console.log("检查更新结果:", res);
+        common_vendor.index.__f__("log", "at App.uvue:18", "检查更新结果:", res);
         if (res.hasUpdate) {
-          console.log("发现新版本，正在后台下载...");
+          common_vendor.index.__f__("log", "at App.uvue:21", "发现新版本，正在后台下载...");
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
           }));
         }
       });
       updateManager.onUpdateReady(() => {
-        console.log("新版本下载完成");
+        common_vendor.index.__f__("log", "at App.uvue:30", "新版本下载完成");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
@@ -56,7 +54,7 @@ function checkForUpdates() {
         }));
       });
       updateManager.onUpdateFailed(() => {
-        console.error("新版本下载失败");
+        common_vendor.index.__f__("error", "at App.uvue:50", "新版本下载失败");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
@@ -76,17 +74,17 @@ function checkForUpdates() {
 }
 const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
-    console.log("App onLaunch");
+    common_vendor.index.__f__("log", "at App.uvue:75", "App onLaunch");
     checkForUpdates();
   },
   onShow: function() {
-    console.log("App Show");
+    common_vendor.index.__f__("log", "at App.uvue:80", "App Show");
   },
   onHide: function() {
-    console.log("App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:83", "App Hide");
   },
   onExit: function() {
-    console.log("App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:104", "App Exit");
   }
 });
 function createApp() {
@@ -97,3 +95,4 @@ function createApp() {
 }
 createApp().app.mount("#app");
 exports.createApp = createApp;
+//# sourceMappingURL=../.sourcemap/mp-weixin/app.js.map

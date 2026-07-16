@@ -1,0 +1,208 @@
+import { computed } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'i-form-item',
+name: 'i-form-item',
+  props: {
+  name: {
+    type: String,
+    default: '',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+  error: {
+    type: String,
+    default: '',
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  scrollId: {
+    type: String,
+    default: '',
+  },
+  scrollIdPrefix: {
+    type: String,
+    default: 'i-form-item-',
+  },
+  labelWidth: {
+    type: [String, Number],
+    default: '100px',
+  },
+  labelDirection: {
+    type: String,
+    default: 'vertical',
+  },
+  labelFontColor: {
+    type: String,
+    default: '#303133',
+  },
+  labelFontSize: {
+    type: [String, Number],
+    default: '14px',
+  },
+  showLabel: {
+    type: Boolean,
+    default: true,
+  },
+  errorAlign: {
+    type: String,
+    default: 'left',
+  },
+},
+  emits: [],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+/**
+ * Props 说明：依据 DCloud uni-app x form item，用于承载单个字段。
+ * - name: 字段名称，用于外部 rules/modelValue 对应。
+ * - label: 说明标签文本。
+ * - hint/error: 底部提示或错误信息，error 优先。
+ * - required: 是否显示必填星号。
+ * - scrollId/scrollIdPrefix: 校验失败滚动定位用 id，默认由 name 自动生成。
+ * - labelWidth: 横向表单标签宽度。
+ * - labelDirection: 标签方向，horizontal 横向，vertical 纵向。
+ * - labelFontColor/labelFontSize: 标签颜色和字号。
+ * - showLabel: 是否显示标签。
+ * - errorAlign: 底部错误/提示对齐方式，left、center、right。
+ */
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const itemId = computed(() => {
+  if (props.scrollId.length > 0) return props.scrollId
+  if (props.name.length == 0) return ''
+  return props.scrollIdPrefix + normalizeIdName(props.name)
+})
+
+const itemClass = computed(() => {
+  const classes = ['i-form-item']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item--horizontal')
+  return classes.join(' ')
+})
+
+const headerClass = computed(() => {
+  const classes = ['i-form-item__header']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item__header--horizontal')
+  return classes.join(' ')
+})
+
+const contentClass = computed(() => {
+  const classes = ['i-form-item__content']
+  if (props.labelDirection == 'horizontal') classes.push('i-form-item__content--horizontal')
+  return classes.join(' ')
+})
+
+const headerStyle = computed(() => {
+  if (props.labelDirection != 'horizontal') return ''
+  return 'width:' + formatSize(props.labelWidth) + ';'
+})
+
+const labelStyle = computed(() => {
+  return (
+    'color:' +
+    props.labelFontColor +
+    ';font-size:' +
+    formatSize(props.labelFontSize) +
+    ';'
+  )
+})
+
+const footerStyle = computed(() => {
+  return 'text-align:' + props.errorAlign + ';'
+})
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function normalizeIdName(name) {
+  const text = String(name)
+  let result = ''
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    const char = text.charAt(i)
+    const isNumber = code >= 48 && code <= 57
+    const isUpper = code >= 65 && code <= 90
+    const isLower = code >= 97 && code <= 122
+    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
+      result = result + char
+    } else {
+      result = result + '-'
+    }
+  }
+  return result
+}
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    id: itemId.value,
+    class: _nC(itemClass.value)
+  }), [
+    isTrue(_ctx.showLabel)
+      ? _cE("view", _uM({
+          key: 0,
+          class: _nC(headerClass.value),
+          style: _nS(headerStyle.value)
+        }), [
+          isTrue(_ctx.required)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "i-form-item__required"
+              }), "*")
+            : _cC("v-if", true),
+          _cE("text", _uM({
+            class: "i-form-item__label",
+            style: _nS(labelStyle.value)
+          }), _tD(_ctx.label), 5 /* TEXT, STYLE */)
+        ], 6 /* CLASS, STYLE */)
+      : _cC("v-if", true),
+    _cE("view", _uM({ class: "i-form-item__body" }), [
+      _cE("view", _uM({
+        class: _nC(contentClass.value)
+      }), [
+        renderSlot(_ctx.$slots, "default")
+      ], 2 /* CLASS */),
+      _ctx.error.length > 0
+        ? _cE("text", _uM({
+            key: 0,
+            class: "i-form-item__error",
+            style: _nS(footerStyle.value)
+          }), _tD(_ctx.error), 5 /* TEXT, STYLE */)
+        : _ctx.hint.length > 0
+          ? _cE("text", _uM({
+              key: 1,
+              class: "i-form-item__hint",
+              style: _nS(footerStyle.value)
+            }), _tD(_ctx.hint), 5 /* TEXT, STYLE */)
+          : _cC("v-if", true)
+    ])
+  ], 10 /* CLASS, PROPS */, ["id"])
+}
+}
+
+})
+export default __sfc__
+export type IFormItemComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIFormItemIFormItemStyles = [_uM([["i-form-item", _pS(_uM([["paddingTop", 12], ["paddingRight", 14], ["paddingBottom", 12], ["paddingLeft", 14], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["backgroundColor", "#ffffff"]]))], ["i-form-item--horizontal", _pS(_uM([["flexDirection", "row"], ["alignItems", "flex-start"]]))], ["i-form-item__header", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"]]))], ["i-form-item__header--horizontal", _pS(_uM([["minHeight", 40]]))], ["i-form-item__required", _pS(_uM([["marginRight", 4], ["color", "#fa3534"], ["fontSize", 14], ["lineHeight", "22px"]]))], ["i-form-item__label", _pS(_uM([["color", "#303133"], ["fontSize", 14], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-form-item__content", _pS(_uM([["marginTop", 8]]))], ["i-form-item__content--horizontal", _pS(_uM([["marginTop", 0]]))], ["i-form-item__body", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["i-form-item__hint", _pS(_uM([["marginTop", 6], ["color", "#909399"], ["fontSize", 12], ["lineHeight", "18px"]]))], ["i-form-item__error", _pS(_uM([["marginTop", 6], ["color", "#fa3534"], ["fontSize", 12], ["lineHeight", "18px"]]))]])]

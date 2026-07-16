@@ -4,7 +4,6 @@
     "pages/message/message",
     "pages/userCenter/userCenter",
     "pages/login/login",
-    "pages/signUp/signUp",
     "pages/carInfoDetail/carInfoDetail",
     "pages/addCar/addCar",
     "pages/playBack/playBack",
@@ -19,7 +18,6 @@
     "pages/geofencing/geofencing",
     "pages/scancode/scancode",
     "pages/userCenter/payDeviceList/payDeviceList",
-    "pages/userCenter/renewal/renewal",
     "pages/cmd/cmd",
     "pages/webview/webview",
     "pages/deviceList/deviceList"

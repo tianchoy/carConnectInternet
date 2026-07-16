@@ -32,7 +32,11 @@
 		imei : string,
 		status: number,
 		companyId:string,
-		deviceName : string
+		deviceName : string,
+		deviceId : string,
+		iccid:string,
+		simMerchant:string,
+		connectionStatus:string
 	}
 	const props = defineProps<{
 		lists : DeviceItem[]
@@ -56,16 +60,17 @@
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		
+		//#ifdef MP-WEIXIN
 		//拉起半屏小程序
-		wx.openEmbeddedMiniProgram({
+		uni.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
 			path: '/pages/home/userSimRecharge?iccid=' + iccid,
 			envVersion: 'release',
-			success(res) {
+			success(res: any) {
 				// 打开成功
 				console.log('打开小程序成功', res)
 			},
-			fail(res) {
+			fail(res: any) {
 				// 打开失败
 				console.log('打开小程序失败', res)
 				// 如果打开失败，取消刷新标志
@@ -76,6 +81,16 @@
 				})
 			}
 		})
+		
+		//#endif
+
+		//#ifndef MP-WEIXIN
+		needRefresh.value = false
+		uni.showToast({
+			title: '请在微信小程序中完成充值',
+			icon: 'none'
+		})
+		//#endif
 	}
 	// 解绑设备
 	const unbindDevice = (imei : string) => {

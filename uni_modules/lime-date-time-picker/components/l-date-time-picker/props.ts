@@ -107,6 +107,10 @@ export default {
 		type: String,
 		default: null
 	},
+	renderLabel: {
+		type: Function,
+		default: null
+	},
 	showUnit: {
 		type: Boolean,
 		default: true
@@ -130,4 +134,7 @@ export default {
 		type: Number,
 		default: 59
 	},
+	maskColors: {
+		type: Array,
+	}
 }

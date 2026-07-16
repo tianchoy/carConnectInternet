@@ -1,0 +1,13 @@
+// utils/formatTime.uts
+/** 时间戳格式化 yyyy-MM-dd HH:mm:ss */
+export function formatTimes(timestamp: number): string {
+    const d = new Date(timestamp);
+    const y = d.getFullYear();
+    const m = (d.getMonth() + 1).toString(10).padStart(2, '0');
+    const day = d.getDate().toString(10).padStart(2, '0');
+    const h = d.getHours().toString(10).padStart(2, '0');
+    const mi = d.getMinutes().toString(10).padStart(2, '0');
+    const s = d.getSeconds().toString(10).padStart(2, '0');
+    return `${y}-${m}-${day} ${h}:${mi}:${s}`;
+}
+//# sourceMappingURL=formateTime.uts.map

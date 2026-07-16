@@ -37,7 +37,7 @@
 	 * @event {Function} after-leave 离开动画完成后触发
 	 */
 	import { computed, defineComponent} from '@/uni_modules/lime-shared/vue';
-	import { useTransition, UseTransitionOptions } from '@/uni_modules/lime-transition';
+	import { useTransition, type UseTransitionOptions } from '@/uni_modules/lime-transition';
 	import transitionsProps from './props';
 	
 	export default defineComponent({

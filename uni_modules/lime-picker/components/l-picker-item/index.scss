@@ -1,18 +1,24 @@
 @import '~@/uni_modules/lime-style/index.scss';
-$prefix: l !default;
+/* #ifdef  uniVersion >= 4.75 */ 
+$use-css-var: true;
+/* #endif */
+
 $item: #{$prefix}-picker-item;
 
-$picker-group-height: create-var(picker-group-height, 400rpx);
+$picker-group-height: create-var(picker-group-height, 200px);
 $picker-indicator-bg-color: create-var(picker-indicator-bg-color, $fill-4);
-$picker-indicator-border-radius: create-var(picker-indicator-border-radius, 12rpx);
+$picker-indicator-border-radius: create-var(picker-indicator-border-radius, 6px);
 
 $picker-item-height: create-var(picker-item-height, 50px);
 $picker-item-active-color: create-var(picker-item-active-color, $text-color-1);
 $picker-item-active-font-weight: create-var(picker-item-active-font-weight, 700);
 $picker-item-color: create-var(picker-item-color, $text-color-1);
 $picker-item-font-size: create-var(picker-item-font-size, $font-size-md);
+$picker-mask-top-color: create-var(picker-mask-top-color, white);
+$picker-mask-bottom-color: create-var(picker-mask-bottom-color, rgba(36, 36, 36, 0));
 
-/* #ifndef APP-ANDROID || APP-IOS  || APP-HARMONY */
+
+/* #ifndef UNI-APP-X && APP */
 :host {
 	flex: 1;
 	display: flex;
@@ -21,6 +27,14 @@ $picker-item-font-size: create-var(picker-item-font-size, $font-size-md);
 
 
 .#{$item} {
+	/* #ifndef UNI-APP-X && APP */
+	// uniapp x鸿蒙这个设置导致选中项下边黑影
+	&__mask {
+		background-image:
+			linear-gradient(180deg, $picker-mask-top-color, $picker-mask-bottom-color),
+			linear-gradient(0deg,   $picker-mask-top-color, $picker-mask-bottom-color)
+	}
+	/* #endif */
 	&__group {
 		/* #ifdef WEB */
 		:deep(.uni-picker-view-content) {
@@ -29,12 +43,13 @@ $picker-item-font-size: create-var(picker-item-font-size, $font-size-md);
 		}
 		/* #endif */
 		flex: 1;
+		
 		// height: $picker-group-height;
 		&-item {
 			height: $picker-item-height;
 			line-height: $picker-item-height;
 			text-align: center;
-			/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
+			/* #ifndef UNI-APP-X && APP */
 			display: flex;
 			justify-content: center;
 			/* #endif */
@@ -51,18 +66,13 @@ $picker-item-font-size: create-var(picker-item-font-size, $font-size-md);
 			}
 		}
 	}
+	&__wrapper {
+		width: 100%;
+		// background-color: red;
+	}
 	&__indicator {
-	    // position: absolute;
-	    left: 0rpx;
-	    right: 0rpx;
-		
-		width: auto;
+		/* #ifndef UNI-APP-X && APP */
 		height: $picker-item-height;
-	    // top: 144rpx;
-	    pointer-events: none;
-	    background-color: $picker-indicator-bg-color;
-	    // border-radius: $picker-indicator-border-radius;
-		/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
 		&:after,&:before{
 			display: none;
 		}

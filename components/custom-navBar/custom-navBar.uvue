@@ -23,8 +23,8 @@
       right: 200+'rpx',
     }">
 			<view class="capsule-item">
-				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-					<i-icon :name="Icon" v-if="isIcon"  fontSize="20"  @click="toDeviceList"></i-icon>
+				<view v-if="showCapsule" @click="handleCapsuleClick">
+					<i-icon :name="Icon" v-if="isIcon"  fontSize="20"></i-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
 			</view>
@@ -62,18 +62,11 @@
 	// 初始化尺寸数据
 	const initDimensions = () => {
 		const systemInfo = uni.getSystemInfoSync();
-		statusBarHeight.value = systemInfo.statusBarHeight || 20;
+		statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
+	};
 
-		try {
-			const menuRect = uni.getMenuButtonBoundingClientRect();
-			if (menuRect) {
-				menuButtonInfo.value = menuRect;
-				const gap = menuRect.top - statusBarHeight.value;
-				navBarHeight.value = gap * 2 + menuRect.height + 4;
-			}
-		} catch (e) {
-			console.warn('胶囊按钮信息获取失败', e);
-		}
+	const handleCapsuleClick = () => {
+		emit('capsuleClick', 'menu');
 	};
 
 	// 返回按钮处理

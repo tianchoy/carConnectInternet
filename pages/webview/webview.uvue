@@ -8,10 +8,7 @@
 			@error="handleError"
 		></web-view>
 		<view v-else class="error-page">
-			<uv-empty 
-				text="页面加载失败"
-				:image="emptyImage"
-			></uv-empty>
+			<i-empty text="页面加载失败" :showButton="false" description="" :image="emptyImage"></i-empty>
 			<button class="back-btn" @click="goBack">返回上一页</button>
 		</view>
 	</view>

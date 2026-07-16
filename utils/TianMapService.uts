@@ -1,4 +1,29 @@
 // 天地图道路规划服务
+type RouteOptions = {
+    retryCount?: number
+}
+
+type RouteRequest = {
+    startLng: number
+    startLat: number
+    endLng: number
+    endLat: number
+    id?: string
+}
+
+type RouteDistanceResult = {
+    id?: string
+    startLng: number
+    startLat: number
+    endLng: number
+    endLat: number
+    distance: number
+    type: string
+    straightDistance: number
+    roadDistance: number
+    error?: string
+}
+
 export class TianMapService {
     // 从环境变量获取API密钥，避免硬编码
     static readonly API_KEY =  "1e3374be3d63de65d44dbfdc7b311afb"
@@ -17,7 +42,7 @@ export class TianMapService {
         startLat: number, 
         endLng: number, 
         endLat: number,
-        options: { retryCount?: number } = {}
+        options: RouteOptions = {}
     ): Promise<number> {
         const { retryCount = 0 } = options
         
@@ -174,22 +199,8 @@ export class TianMapService {
 
     // 批量计算多个路径的距离
     static async getBatchRouteDistances(
-        routes: Array<{
-            startLng: number;
-            startLat: number;
-            endLng: number;
-            endLat: number;
-            id?: string; // 可选的标识符
-        }>
-    ): Promise<Array<{
-        id?: string;
-        startLng: number;
-        startLat: number;
-        endLng: number;
-        endLat: number;
-        distance: number;
-        type: 'road' | 'straight'; // 距离类型
-    }>> {
+        routes: Array<RouteRequest>
+    ): Promise<Array<RouteDistanceResult>> {
         const results = []
         
         for (const route of routes) {

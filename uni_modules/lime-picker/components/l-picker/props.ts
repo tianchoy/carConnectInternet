@@ -8,7 +8,7 @@ export default {
 		default: null
 	},
 	cancelStyle: {
-		type:[String, Object],
+		type: [String, Object],
 		default: null
 	},
 	/**
@@ -79,8 +79,7 @@ export default {
 		default: '64rpx'
 	},
 	itemHeight: {
-		type: String,
-		default: ''
+		type: String
 	},
 	itemColor: {
 		type: String,
@@ -94,20 +93,23 @@ export default {
 		type: String,
 		default: ''
 	},
-
+	itemActiveFontWeight: {
+		type: Number,
+		default: null
+	},
 	indicatorStyle: {
 		type: String,
 		default: ''
 	},
-	bgColor:{
+	bgColor: {
 		type: String,
 		default: null
 	},
-	groupHeight:{
+	groupHeight: {
 		type: String,
 		default: ''
 	},
-	radius:{
+	radius: {
 		type: String,
 		default: null
 	},
@@ -117,5 +119,8 @@ export default {
 	resetIndex: {
 		type: Boolean,
 		default: false
+	},
+	maskColors: {
+		type: Array,
 	}
 }

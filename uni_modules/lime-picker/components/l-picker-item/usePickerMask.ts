@@ -1,0 +1,86 @@
+// @ts-nocheck
+// #ifndef UNI-APP-X
+import { computed, ComputedRef, Ref } from '@/uni_modules/lime-shared/vue';
+// #endif
+export type MaskConfig = {
+	maskStartColor : string;
+	maskEndColor : string;
+};
+
+export type PlatformMaskStyles = {
+	common : string;
+	top : string;
+	bottom : string;
+};
+export type UsePickerMaskReturn = {
+	maskConfig : ComputedRef<MaskConfig>;
+	platformMaskStyles : ComputedRef<PlatformMaskStyles>;
+}
+
+/**
+ * 生成 Picker 组件顶部与底部的渐变遮罩样式（完全响应式）
+ *
+ * @param backgroundColorRef - 背景色 ref 或 computed（可为 null）
+ * @param isDarkModeRef      - 是否暗色模式（响应式）
+ * @param maskColorsRef      - 自定义遮罩颜色 [start, end]（响应式）
+ * @param isInitializedRef   - 是否已初始化（响应式）
+ */
+export const usePickerMask = (
+	backgroundColorRef :  ComputedRef<string | null>,
+	isDarkModeRef :ComputedRef<boolean>,
+	maskColorsRef :ComputedRef<string[] | null>,
+	isInitializedRef : Ref<boolean>
+) : UsePickerMaskReturn => {
+	const maskConfig = computed<MaskConfig>(() => {
+		const bgColor = backgroundColorRef.value;
+		const isDark = isDarkModeRef.value;
+		const maskColors = maskColorsRef?.value;
+
+		// 优先使用用户提供的 maskColors
+		if (maskColors != null && maskColors.length >= 1) {
+			const maskStartColor = maskColors![0]
+			const maskEndColor = maskColors!.length > 1 ? maskColors[1] : 'rgba(0,0,0,0)'
+			return {
+				maskStartColor,
+				maskEndColor
+			} as MaskConfig
+		}
+
+		const bg = bgColor ?? (isDark ? '#242424' : '#ffffff');
+		const endColor = isDark
+			? 'rgba(36, 36, 36, 0)'
+			: 'rgba(255, 255, 255, 0)';
+
+		return {
+			maskStartColor: bg,
+			maskEndColor: endColor
+		} as MaskConfig
+	});
+
+	const platformMaskStyles = computed<PlatformMaskStyles>(() => {
+		const { maskStartColor, maskEndColor } = maskConfig.value;
+
+		const clean = (str : string) => str.replace(/\s+/g, ' ').trim();
+
+		return {
+			common: backgroundColorRef.value == null && !isDarkModeRef.value
+				? clean(`background-image:
+					linear-gradient(180deg, ${maskStartColor}, ${maskEndColor}),
+					linear-gradient(0deg, ${maskStartColor}, ${maskEndColor})`)
+				: '',
+			// #ifndef APP-IOS
+			top: `background-image: linear-gradient(to bottom, ${maskStartColor}, ${maskEndColor})`,
+			bottom: `background-image: linear-gradient(to top, ${maskStartColor}, ${maskEndColor})`,
+			// #endif
+			// #ifdef APP-IOS
+			top: isInitializedRef.value ? 'background-color: rgba(0,0,0,0)' : '',
+			bottom: isInitializedRef.value ? 'background-color: rgba(0,0,0,0)' : ''
+			// #endif
+		} as PlatformMaskStyles
+	});
+
+	return {
+		maskConfig,
+		platformMaskStyles
+	} as UsePickerMaskReturn
+};

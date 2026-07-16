@@ -5,12 +5,12 @@
 		<view class="tools-panel">
 			<view class="Datetime-box">
 				<view class="date-box">
-					<uv-icon name="calendar" size="25"></uv-icon>
+					<i-icon name="/static/rili.png" fontSize="15"></i-icon>
 					<text class="Date" @click="showPicker('start')">{{startTime}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('start')" size="13"></uv-icon>
+					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('start')"></i-icon>
 					<text style="padding: 0 10rpx;">至</text>
 					<text class="Date" @click="showPicker('end')">{{endTime}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('end')" size="13"></uv-icon>
+					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('end')"></i-icon>
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
@@ -23,7 +23,7 @@
 			<text>设备名称</text>
 		</view> -->
 		<view class="content-box">
-			<uv-empty v-if="sortedCarStopDetail.length == 0" mode="data" text="当前时间暂无停车数据"></uv-empty>
+			<i-empty text="当前时间暂无停车数据" :showButton="false" description="" v-if="sortedCarStopDetail.length == 0" ></i-empty>
 			<view class="content" v-else v-for="(item,index) in sortedCarStopDetail" :key="index">
 				<view class="item">
 					<image class="icons" mode="aspectFit" src="/static/startTime.png" />

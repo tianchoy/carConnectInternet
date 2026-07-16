@@ -1,11 +1,10 @@
 // 定义类型
 type RequestOptions = {
-    url: string
+    url?: string
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'HEAD'
     data?: any
-    header?: Record<string, string>
+    header?: UTSJSONObject | null
     showLoading?: boolean
-    [key: string]: any
 }
 
 type HttpResponse<T = any> = {
@@ -17,6 +16,17 @@ type HttpResponse<T = any> = {
 type HttpError = {
     statusCode: number
     message: string
+    data?: any
+}
+
+type RequestResult = {
+    statusCode: number
+    data: any
+    errMsg?: string
+}
+
+type RequestFailure = {
+    errMsg?: string
     data?: any
 }
 
@@ -59,9 +69,20 @@ function handleTokenExpired(): void {
 // 请求拦截器
 function requestInterceptor(config: RequestOptions): RequestOptions {
     const token = uni.getStorageSync('token')
-    if (token) {
-        config.header = config.header || {}
-        config.header['token'] = `${token}`
+    if (token != null && token.toString().length > 0) {
+        //#ifdef MP-WEIXIN
+        if (config.header == null) {
+            config.header = {}
+        }
+        config.header['token'] = token.toString()
+        //#endif
+
+        //#ifndef MP-WEIXIN
+        if (config.header == null) {
+            config.header = new UTSJSONObject()
+        }
+        config.header!.set('token', token.toString())
+        //#endif
     }
     
     // 显示加载中
@@ -76,26 +97,8 @@ function requestInterceptor(config: RequestOptions): RequestOptions {
 }
 
 // 响应拦截器
-function responseInterceptor(response: any, config: RequestOptions): any {
-    // 隐藏加载中
-    // if (config.showLoading !== false) {
-    //     uni.hideLoading()
-    // }
-    
-    // 处理 HTTP 状态码
-    const statusCode = response.statusCode
-    
-    if (statusCode === 200) {
-        return response.data
-    } else {
-        // 创建统一的错误对象
-        const error: HttpError = {
-            statusCode: statusCode,
-            message: response.errMsg || `请求失败: ${statusCode}`,
-            data: response.data
-        }
-        throw error
-    }
+function responseInterceptor(response: RequestSuccess<any>, config: RequestOptions): any {
+    return response.data!
 }
 
 // 错误处理
@@ -108,7 +111,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
     console.log('请求错误详情:', error)
     
     // 处理错误状态码
-    if (error.statusCode) {
+    if (error.statusCode != 0) {
         switch (error.statusCode) {
             case 401:
                 handleTokenExpired()
@@ -133,7 +136,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
                 break
             default:
                 uni.showToast({
-                    title: error.message || `请求错误: ${error.statusCode}`,
+                    title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
                     icon: 'none'
                 })
         }
@@ -148,41 +151,50 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
 
 // 封装uni.request
 function request<T = any>(options: RequestOptions): Promise<T> {
+    const requestUrl = options.url != null ? options.url! : ''
+
     // 合并配置
     const config: RequestOptions = {
-        ...options,
-        url: options.url,
-        method: options.method || 'GET',
-        data: options.data || {},
-        header: options.header || {},
-        showLoading: options.showLoading !== false,
+        url: requestUrl,
+        method: options.method != null ? options.method : 'GET',
+        data: options.data != null ? options.data : {},
+        header: options.header != null ? options.header : new UTSJSONObject(),
+        showLoading: options.showLoading !== false
     }
     
     // 处理完整URL
-    if (!config.url.startsWith('http')) {
-        config.url = BASE_URL + config.url
+    if (!config.url!.startsWith('http')) {
+        config.url = BASE_URL + config.url!
     }
     
     // 请求拦截
     const processedConfig = requestInterceptor(config)
     
     return new Promise<T>((resolve, reject) => {
-        uni.request({
-            ...processedConfig,
-            success: (res: any) => {
-                try {
+        uni.request<any>({
+            url: processedConfig.url!,
+            method: processedConfig.method,
+            data: processedConfig.data,
+            header: processedConfig.header,
+            success: (res: RequestSuccess<any>) => {
+                const statusCode = res.statusCode
+                if (statusCode === 200) {
                     const data = responseInterceptor(res, processedConfig)
                     resolve(data as T)
-                } catch (error) {
-                    // 确保错误被正确捕获和处理
-                    errorHandler(error as HttpError, processedConfig)
-                    reject(error)
+                } else {
+                    const httpError: HttpError = {
+                        statusCode: statusCode,
+                        message: `请求失败: ${statusCode}`,
+                        data: res.data
+                    }
+                    errorHandler(httpError, processedConfig)
+                    reject(httpError)
                 }
             },
-            fail: (error: any) => {
+            fail: (error: RequestFail) => {
                 const httpError: HttpError = {
                     statusCode: 0,
-                    message: error.errMsg || '网络请求失败',
+                    message: error.errMsg != null ? error.errMsg : '网络请求失败',
                     data: error
                 }
                 errorHandler(httpError, processedConfig)
@@ -193,113 +205,112 @@ function request<T = any>(options: RequestOptions): Promise<T> {
 }
 
 // 封装常用方法
-const http = {
-    get<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
-        return request<T>({
-            ...options,
-            url,
-            data,
-            method: 'GET',
-        })
-    },
-    
-    post<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
-        return request<T>({
-            ...options,
-            url,
-            data,
-            method: 'POST',
-            
-        })
-    },
-    
-    put<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
-        return request<T>({
-            ...options,
-            url,
-            data,
-            method: 'PUT',
-            ...options
-        })
-    },
-    
-    delete<T = any>(url: string, data: any = {}, options: RequestOptions = {}): Promise<T> {
-        return request<T>({
-            ...options,
-            url,
-            data,
-            method: 'DELETE',
-
-        })
-    },
-    
-    upload<T = any>(url: string, filePath: string, name: string = 'file', formData: any = {}, options: RequestOptions = {}): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            // 处理完整URL
-            const fullUrl = url.startsWith('http') ? url : BASE_URL + url
-            
-            // 添加token到header
-            const token = uni.getStorageSync('token')
-            const header = options.header || {}
-            if (token) {
-                header['token'] = `${token}`
-            }
-            
-            // 显示加载中
-            if (options.showLoading !== false) {
-                uni.showLoading({
-                    title: '上传中...',
-                    mask: true
-                })
-            }
-            
-            uni.uploadFile({
-                url: fullUrl,
-                filePath,
-                name,
-                formData,
-                header,
-                success: (res: any) => {
-                    // 隐藏加载中
-                    if (options.showLoading !== false) {
-                        uni.hideLoading()
-                    }
-                    
-                    if (res.statusCode === 200) {
-                        try {
-                            // 尝试解析返回的数据
-                            const data = JSON.parse(res.data)
-                            resolve(data as T)
-                        } catch (e) {
-                            resolve(res.data as T)
-                        }
-                    } else {
-                        const error: HttpError = {
-                            statusCode: res.statusCode,
-                            message: '文件上传失败',
-                            data: res.data
-                        }
-                        errorHandler(error, options)
-                        reject(error)
-                    }
-                },
-                fail: (error: any) => {
-                    // 隐藏加载中
-                    if (options.showLoading !== false) {
-                        uni.hideLoading()
-                    }
-                    
-                    const httpError: HttpError = {
-                        statusCode: 0,
-                        message: error.errMsg || '文件上传失败',
-                        data: error
-                    }
-                    errorHandler(httpError, options)
-                    reject(httpError)
-                }
-            })
-        })
-    }
+export function get<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
+    return request<T>({
+        url: url,
+        method: 'GET',
+        data: data,
+        header: options.header,
+        showLoading: options.showLoading
+    })
 }
 
-export default http
+export function post<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
+    return request<T>({
+        url: url,
+        method: 'POST',
+        data: data,
+        header: options.header,
+        showLoading: options.showLoading
+    })
+}
+
+export function put<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
+    return request<T>({
+        url: url,
+        method: 'PUT',
+        data: data,
+        header: options.header,
+        showLoading: options.showLoading
+    })
+}
+
+export function remove<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
+    return request<T>({
+        url: url,
+        method: 'DELETE',
+        data: data,
+        header: options.header,
+        showLoading: options.showLoading
+    })
+}
+
+export function upload<T = any>(url: string, filePath: string, name: string = 'file', formData: UTSJSONObject = {} as UTSJSONObject, options: RequestOptions = {} as RequestOptions): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        // 处理完整URL
+        const fullUrl = url.startsWith('http') ? url : BASE_URL + url
+
+        // 添加token到header
+        const token = uni.getStorageSync('token')
+        const header = options.header != null ? options.header : new UTSJSONObject()
+        if (token != null && token.toString().length > 0) {
+            //#ifdef MP-WEIXIN
+            header['token'] = token.toString()
+            //#endif
+
+            //#ifndef MP-WEIXIN
+            header.set('token', token.toString())
+            //#endif
+        }
+
+        if (options.showLoading !== false) {
+            uni.showLoading({
+                title: '上传中...',
+                mask: true
+            })
+        }
+
+        uni.uploadFile({
+            url: fullUrl,
+            filePath: filePath,
+            name: name,
+            formData: formData,
+            header: header,
+            success: (res) => {
+                if (options.showLoading !== false) {
+                    uni.hideLoading()
+                }
+
+                if (res.statusCode === 200) {
+                    try {
+                        const data = JSON.parse(res.data)
+                        resolve(data as T)
+                    } catch (e) {
+                        resolve(res.data as T)
+                    }
+                } else {
+                    const error: HttpError = {
+                        statusCode: res.statusCode,
+                        message: '文件上传失败',
+                        data: res.data
+                    }
+                    errorHandler(error, options)
+                    reject(error)
+                }
+            },
+            fail: (error) => {
+                if (options.showLoading !== false) {
+                    uni.hideLoading()
+                }
+
+                const httpError: HttpError = {
+                    statusCode: 0,
+                    message: error.errMsg != null ? error.errMsg : '文件上传失败',
+                    data: error
+                }
+                errorHandler(httpError, options)
+                reject(httpError)
+            }
+        })
+    })
+}

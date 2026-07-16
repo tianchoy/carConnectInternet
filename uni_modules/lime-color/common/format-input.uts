@@ -111,7 +111,7 @@ function inputToRGB(color : any) : LColorInfo {
 	if (typeof color == 'string') {
 		_color = stringInputToObject(color as string);
 	} else if(typeof color == 'object'){
-		_color = JSON.parse(JSON.stringify(color)) as UTSJSONObject
+		_color = JSON.parse<UTSJSONObject>(JSON.stringify(color)) as UTSJSONObject
 	} else {
 		// _color = {} as UTSJSONObject
 	}

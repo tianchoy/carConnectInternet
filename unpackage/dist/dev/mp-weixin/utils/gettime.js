@@ -10,3 +10,4 @@ function getTodayZeroTime() {
   });
 }
 exports.getTodayZeroTime = getTodayZeroTime;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/gettime.js.map

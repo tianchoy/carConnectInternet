@@ -40,6 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     itemFontSize: {},
     itemActiveColor: {},
     indicatorStyle: {},
+    maskColors: {},
     bgColor: {},
     groupHeight: {},
     radius: {},
@@ -51,13 +52,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   emits: ["change", "cancel", "confirm", "pick", "update:modelValue", "update:value"],
   setup(__props, _a) {
-    var _b, _c, _d;
+    var _b;
     var __emit = _a.emit;
     const emit = __emit;
     const props = __props;
-    let defaultValue = (_d = (_c = (_b = props.value) !== null && _b !== void 0 ? _b : props.defaultValue) !== null && _c !== void 0 ? _c : props.defaultValue) !== null && _d !== void 0 ? _d : Date.now();
+    let defaultValue = (_b = uni_modules_limeDateTimePicker_components_lDateTimePicker_utils.coalesce(props.value, props.modelValue, props.defaultValue)) !== null && _b !== void 0 ? _b : Date.now();
     const innerValue = common_vendor.computed({
-      set(value = null) {
+      set(value) {
         if (defaultValue == value)
           return null;
         defaultValue = value;
@@ -66,15 +67,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         emit("update:value", value);
       },
       get() {
-        var _a2, _b2;
-        const value = (_b2 = (_a2 = props.value) !== null && _a2 !== void 0 ? _a2 : props.modelValue) !== null && _b2 !== void 0 ? _b2 : defaultValue;
-        return typeof value == "string" && value.length == 0 ? Date.now() : value;
+        var _a2;
+        return (_a2 = uni_modules_limeDateTimePicker_components_lDateTimePicker_utils.coalesce(props.value, props.modelValue)) !== null && _a2 !== void 0 ? _a2 : defaultValue;
       }
     });
     const meaningColumn = uni_modules_limeDateTimePicker_components_lDateTimePicker_utils.getMeaningColumn(props.mode);
     const isTimeMode = ["hour", "minute", "second"].includes(meaningColumn[0]);
     const normalize = (val = null, defaultDay) => {
-      return val != null && uni_modules_limeDayuts_common_index.dayuts(val).isValid() ? uni_modules_limeDayuts_common_index.dayuts(val) : defaultDay;
+      return val != "" && val != null && uni_modules_limeDayuts_common_index.dayuts(val).isValid() ? uni_modules_limeDayuts_common_index.dayuts(val) : defaultDay;
     };
     const start = common_vendor.computed(() => {
       return normalize(props.start, uni_modules_limeDayuts_common_index.dayuts().subtract(10, "year"));
@@ -92,9 +92,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return val;
     };
     const calcDate = (currentValue = null) => {
-      if (isTimeMode) {
-        const dateStr = uni_modules_limeDayuts_common_index.dayuts(start.value).format("YYYY-MM-DD");
-        currentValue = `${dateStr} ${currentValue}`;
+      if (meaningColumn.length == 1 && meaningColumn[0] == "year") {
+        if (currentValue != null) {
+          if (typeof currentValue == "string") {
+            const yearNum = parseInt(currentValue);
+            if (!isNaN(yearNum) && yearNum > 1e3) {
+              return rationalize(uni_modules_limeDayuts_common_index.dayuts().year(yearNum).startOf("year"));
+            }
+          }
+        }
+      }
+      if (isTimeMode && typeof currentValue == "string") {
+        let format = "YYYY-MM-DD";
+        let space = " ";
+        const hasHour = meaningColumn.includes("hour");
+        const hasMinute = meaningColumn.includes("minute");
+        const hasSecond = meaningColumn.includes("second");
+        if (!hasHour && hasMinute) {
+          format += " HH";
+          space = ":";
+        } else if (!hasHour && !hasMinute && hasSecond) {
+          format += " HH:mm";
+          space = ":";
+        }
+        const dateStr = uni_modules_limeDayuts_common_index.dayuts(start.value).format(format);
+        currentValue = `${dateStr}${space}${currentValue}`;
       }
       return currentValue != null && uni_modules_limeDayuts_common_index.dayuts(currentValue).isValid() ? rationalize(uni_modules_limeDayuts_common_index.dayuts(currentValue)) : start.value;
     };
@@ -119,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       };
       const _a2 = common_vendor.__read(getDate(curDate.value), 5), curYear = _a2[0], curMonth = _a2[1], curDay = _a2[2], curHour = _a2[3], curMinute = _a2[4];
       const _b2 = common_vendor.__read(getDate(start.value), 6), minYear = _b2[0], minMonth = _b2[1], minDay = _b2[2], minHour = _b2[3], minMinute = _b2[4], minSecond = _b2[5];
-      const _c2 = common_vendor.__read(getDate(end.value), 6), maxYear = _c2[0], maxMonth = _c2[1], maxDay = _c2[2], maxHour = _c2[3], maxMinute = _c2[4], maxSecond = _c2[5];
+      const _c = common_vendor.__read(getDate(end.value), 6), maxYear = _c[0], maxMonth = _c[1], maxDay = _c[2], maxHour = _c[3], maxMinute = _c[4], maxSecond = _c[5];
       const isInMinYear = curYear == minYear;
       const isInMaxYear = curYear == maxYear;
       const isInMinMonth = isInMinYear && curMonth == minMonth;
@@ -192,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onConfirm = (_a2) => {
       var values = _a2.values;
       let cur = curDate.value;
-      values.forEach((item = null, index) => {
+      values.forEach((item, index) => {
         const type = meaningColumn[index];
         cur = cur.set(type, parseInt(`${item}`, 10));
       });
@@ -213,7 +235,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const onChange = (values) => {
       let cur = curDate.value;
-      values.forEach((item = null, index) => {
+      values.forEach((item, index) => {
         const type = meaningColumn[index];
         cur = cur.set(type, parseInt(`${item}`, 10));
       });
@@ -221,20 +243,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const curValue = curDate.value.format(innterFormat.value);
       innerValue.value = curValue;
     };
-    const stop = common_vendor.watch(innerValue, (val = null) => {
+    const stop = common_vendor.watch(innerValue, (val) => {
       curDate.value = calcDate(val);
     });
     common_vendor.onBeforeUnmount(() => {
       stop();
+      columnCache.clear();
     });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.o(onConfirm, "c2"),
-        c: common_vendor.o(onCancel, "1c"),
-        d: common_vendor.o(onChange, "7d"),
-        e: common_vendor.o(onPick, "c6"),
+        b: common_vendor.o(onConfirm, "5d"),
+        c: common_vendor.o(onCancel, "86"),
+        d: common_vendor.o(onChange, "59"),
+        e: common_vendor.o(onPick, "2b"),
         f: common_vendor.p({
           title: _ctx.title,
           titleStyle: _ctx.titleStyle,
@@ -252,6 +275,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius: _ctx.radius,
           value: common_vendor.unref(valueOfPicker),
           columns: common_vendor.unref(columns),
+          maskColors: _ctx.maskColors,
           id: common_vendor.gei(_ctx, "")
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
@@ -261,3 +285,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js.map

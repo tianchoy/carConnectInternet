@@ -10,6 +10,29 @@ const _easycom_i_popup = () => "../../uni_modules/i-ui-x/components/i-popup/i-po
 if (!Math) {
   (_easycom_i_grid + _easycom_i_popup)();
 }
+class CarIconItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          text: { type: String, optional: false },
+          image: { type: String, optional: false }
+        };
+      },
+      name: "CarIconItem"
+    };
+  }
+  constructor(options, metadata = CarIconItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.text = this.__props__.text;
+    this.image = this.__props__.image;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "car-icons",
   props: {
@@ -25,44 +48,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const emit = __emit;
     const visible = common_vendor.ref(false);
     const iconList = [
-      new common_vendor.UTSJSONObject({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
-      new common_vendor.UTSJSONObject({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
-      new common_vendor.UTSJSONObject({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
-      new common_vendor.UTSJSONObject({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
-      new common_vendor.UTSJSONObject({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
-      new common_vendor.UTSJSONObject({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
-      new common_vendor.UTSJSONObject({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
-      new common_vendor.UTSJSONObject({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
-      new common_vendor.UTSJSONObject({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
-      new common_vendor.UTSJSONObject({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
-      new common_vendor.UTSJSONObject({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
-      new common_vendor.UTSJSONObject({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
-      new common_vendor.UTSJSONObject({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
-      new common_vendor.UTSJSONObject({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
-      new common_vendor.UTSJSONObject({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
-      new common_vendor.UTSJSONObject({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
-      new common_vendor.UTSJSONObject({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
-      new common_vendor.UTSJSONObject({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
-      new common_vendor.UTSJSONObject({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
-      new common_vendor.UTSJSONObject({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
+      new CarIconItem({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
+      new CarIconItem({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
+      new CarIconItem({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
+      new CarIconItem({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
+      new CarIconItem({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
+      new CarIconItem({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
+      new CarIconItem({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
+      new CarIconItem({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
+      new CarIconItem({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
+      new CarIconItem({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
+      new CarIconItem({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
+      new CarIconItem({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
+      new CarIconItem({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
+      new CarIconItem({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
+      new CarIconItem({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
+      new CarIconItem({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
+      new CarIconItem({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
+      new CarIconItem({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
+      new CarIconItem({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
+      new CarIconItem({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
     ];
     common_vendor.computed(() => {
       const cols = props.col > 0 ? props.col : 4;
       return 100 / cols + "%";
     });
+    const close = () => {
+      visible.value = false;
+    };
     const handleSelect = (item = null) => {
-      console.log("选择的图标:", item);
-      emit("select", item);
+      const selected = item;
+      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:97", "选择的图标:", selected);
+      emit("select", selected);
       close();
     };
     const handlePopupClick = () => {
-      console.log("Popup clicked");
+      common_vendor.index.__f__("log", "at components/car-icons/car-icons.uvue:104", "Popup clicked");
     };
     const open = () => {
       visible.value = true;
-    };
-    const close = () => {
-      visible.value = false;
     };
     const getIconByName = (name) => {
       return common_vendor.UTS.arrayFind(iconList, (item) => {
@@ -112,3 +136,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a1ffb157"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/car-icons/car-icons.js.map

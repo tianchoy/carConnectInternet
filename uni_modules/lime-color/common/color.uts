@@ -168,7 +168,8 @@ export class TinyColor {
 	 */
 	toHsv() : HSVA {
 		const hsv = rgbToHsv(this.r, this.g, this.b);
-		return { h: hsv.h * 360, s: hsv.s, v: hsv.v, a: this.a } as HSVA;
+		
+		return { h: Math.round(hsv.h * 360), s: hsv.s, v: hsv.v, a: this.a } as HSVA;
 	}
 
 	/**
@@ -189,7 +190,7 @@ export class TinyColor {
 	 */
 	toHsb() : HSBA {
 		const hsv = rgbToHsv(this.r, this.g, this.b);
-		return { h: hsv.h * 360, s: hsv.s, b: hsv.v, a: this.a } as HSBA;
+		return { h: Math.round(hsv.h * 360), s: hsv.s, b: hsv.v, a: this.a } as HSBA;
 	}
 	/**
 	 * 将当前颜色对象转换为CSS风格的HSB或HSVA字符串
@@ -202,7 +203,7 @@ export class TinyColor {
 		const b = Math.round(hsb.b * 100);
 		return this.a == 1
 			? `hsb(${h}, ${s}%, ${b}%)`
-			: `hsva(${h}, ${s}%, ${b}%, ${this.roundA})`;
+			: `hsba(${h}, ${s}%, ${b}%, ${this.roundA})`;
 	}
 	/**
 	 * 将当前颜色转换为 HSL（色相、饱和度、明度）颜色空间。

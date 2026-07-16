@@ -1,8 +1,15 @@
 // @ts-nocheck
-import { TimeModeValues } from './type';
+import type { TimeModeValues } from './type';
 import { MODE_NAMES, MODE_MAP, MODE_YEAR, MODE_MONTH, MODE_DATE, MODE_HOUR, MODE_MINUTE, MODE_SECOND } from './constant'
 
-
+export function coalesce<T>(...values:(T|null)[]) : T | null {
+	for (let value of values) {
+		if(value == null) continue;
+		if(typeof value == 'string' && value == '') continue;
+		return value
+	}
+	return null
+}
 /**
  * 根据给定的模式返回具有意义的时间列数组。
  * @param {number} mode - 表示时间模式的位掩码。
@@ -11,22 +18,36 @@ import { MODE_NAMES, MODE_MAP, MODE_YEAR, MODE_MONTH, MODE_DATE, MODE_HOUR, MODE
 export function getMeaningColumn(mode : any) : TimeModeValues[] {
 	// 初始化结果数组
 	const res : TimeModeValues[] = [];
-	
-	let _mode:number = 0;
-	if(typeof mode == 'string') {
-		MODE_MAP.forEach((value, key) => {
-			if((mode as string).includes(key)) {
-				_mode = _mode | value;
-			}
-		})
-	} else if(typeof mode == 'number') {
+
+	let _mode : number = 0;
+	if (typeof mode == 'string') {
+		// 处理字符串形式的位掩码
+		if (mode.includes('|') && /\d/.test(mode)) {
+			// 如果是 "1|2|3" 这种格式，按位或运算
+			const bits = mode.split('|').map((bit):number => parseInt(bit.trim()));
+			_mode = bits.reduce((result, bit) => result | bit, 0);
+		} else {
+			// 如果是模式名称字符串，如 "year-month-date"
+			MODE_MAP.forEach((value, key) => {
+				if ((mode as string).includes(key)) {
+					_mode = _mode | value;
+				}
+			});
+		}
+		// MODE_MAP.forEach((value, key) => {
+		// 	console.log('key', key)
+		// 	if ((mode as string).includes(key)) {
+		// 		_mode = _mode | value;
+		// 	}
+		// })
+	} else if (typeof mode == 'number') {
 		_mode = mode as number
 	}
-	
-	if(_mode <= 0) {
+
+	if (_mode <= 0) {
 		return res
 	}
-	
+
 
 	// 定义对应的位掩码数组
 	const modeBitmasks = [MODE_YEAR, MODE_MONTH, MODE_DATE, MODE_HOUR, MODE_MINUTE, MODE_SECOND];

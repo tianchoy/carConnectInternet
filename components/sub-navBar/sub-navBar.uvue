@@ -5,7 +5,7 @@
 				<cover-view>{{ currentTime }}</cover-view>
 				<cover-view v-if="!showPickerTime">刷新一次位置</cover-view>
 			</cover-view>
-			<cover-image v-if="showPickerTime" class="down_icon" src="/static/down_icon.png"></cover-image>
+			<!-- <cover-image v-if="showPickerTime" class="down_icon" src="/static/down_icon.png"></cover-image> -->
 		</cover-view>
 		<cover-view class="slot" v-else></cover-view>
 		<cover-view class="car-box">
@@ -23,6 +23,14 @@
 </template>
 
 <script lang="uts" setup>
+	type PickerItem = {
+		label : string;
+		value : string;
+	};
+
+	type PickerConfirmEvent = {
+		value : Array<PickerItem>;
+	};
 	const props = defineProps({
 		showTime: {
 			type: Boolean,
@@ -53,17 +61,17 @@
 			default: "在线",
 		},
 		times: {
-			type: Array as PropType<Array<Array<{ label : string; value : string }>>>,
+			type: Array as PropType<Array<Array<PickerItem>>>,
 			default: () => [[]], // 默认值调整为二维数组
 		},
 		cars: {
-			type: Array as PropType<Array<Array<{ label : string; value : string }>>>,
+			type: Array as PropType<Array<Array<PickerItem>>>,
 			default: () => [[]], // 默认值调整为二维数组
 		},
 	});
 
 	// 选择器相关
-	const columns = ref<Array<Array<{ label : string; value : string }>>>([]);
+	const columns = ref<Array<Array<PickerItem>>>([]);
 	const picker = ref(null);
 	const currentPickerType = ref("");
 
@@ -71,16 +79,14 @@
 	const handleTime = () => {
 		columns.value = props.times; // 直接使用 props.times（已经是二维数组）
 		currentPickerType.value = "time";
-		picker.value?.open();
 	};
 
 	const handleCar = () => {
 		columns.value = props.cars; // 直接使用 props.cars（已经是二维数组）
 		currentPickerType.value = "car";
-		picker.value?.open();
 	};
 
-	const confirm = (e : { value : Array<{ label : string; value : string }> }) => {
+	const confirm = (e : PickerConfirmEvent) => {
 		const selected = e.value[0];
 
 		if (currentPickerType.value === "time") {

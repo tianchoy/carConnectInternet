@@ -3,17 +3,15 @@ const common_vendor = require("../../common/vendor.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_avatar_1 = common_vendor.resolveComponent("uv-avatar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_badge_1 = common_vendor.resolveComponent("uv-badge");
-  (_easycom_custom_navBar_1 + _easycom_uv_avatar_1 + _easycom_uv_icon_1 + _easycom_uv_badge_1)();
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_badge_1 = common_vendor.resolveComponent("i-badge");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_i_badge_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_avatar = () => "../../uni_modules/uv-avatar/components/uv-avatar/uv-avatar.js";
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_badge = () => "../../uni_modules/uv-badge/components/uv-badge/uv-badge.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_i_badge = () => "../../uni_modules/i-ui-x/components/i-badge/i-badge.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_avatar + _easycom_uv_icon + _easycom_uv_badge)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_i_badge)();
 }
 const buttonWidth = 120;
 const buttonHeight = 200;
@@ -44,20 +42,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } else {
         Login.value = false;
       }
-      try {
-        const accountInfo = common_vendor.wx$1.getAccountInfoSync();
-        const appVersion = accountInfo.miniProgram.version;
-        version.value = appVersion;
-      } catch (error) {
-        console.error("获取版本号失败:", error);
-      }
+      const accountInfo = common_vendor.wx$1.getAccountInfoSync();
+      const appVersion = accountInfo.miniProgram.version;
+      version.value = appVersion;
     });
     const contactCustomerService = () => {
       common_vendor.index.openCustomerServiceChat(new common_vendor.UTSJSONObject({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          console.log(res);
+          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:98", res);
         }
       }));
     };
@@ -128,46 +122,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false
         }),
         b: common_vendor.p({
-          src: "/static/avatar.png",
-          shape: "circle"
+          name: "/static/avatar.png",
+          fontSize: "40"
         }),
         c: common_vendor.unref(Login)
       }, common_vendor.unref(Login) ? {
         d: common_vendor.t(common_vendor.unref(userInfo).mobile)
       } : {}, {
         e: common_vendor.p({
-          name: "arrow-right",
-          size: "16"
+          name: "/static/arrow-right.png",
+          fontSize: "15"
         }),
         f: common_vendor.o(userInfoDetail, "0c"),
         g: common_vendor.unref(Login)
       }, common_vendor.unref(Login) ? {
         h: common_vendor.p({
-          numberType: "overflow",
-          type: "error",
-          max: "99",
-          value: common_vendor.unref(carsnumber)
+          type: "danger",
+          maxCount: "99",
+          count: common_vendor.unref(carsnumber)
         }),
         i: common_vendor.p({
-          name: "arrow-right",
-          size: "16"
+          name: "/static/arrow-right.png",
+          fontSize: "15"
         }),
-        j: common_vendor.o(carList, "0b"),
-        k: common_vendor.o(platformRenewal, "7f")
+        j: common_vendor.o(carList, "66"),
+        k: common_vendor.o(platformRenewal, "57")
       } : {}, {
         l: common_vendor.unref(version)
       }, common_vendor.unref(version) ? {
         m: common_vendor.t(common_vendor.unref(version))
       } : {}, {
         n: common_vendor.p({
-          name: "server-man",
-          size: "50",
-          color: "primary"
+          name: "/static/server-man.png",
+          fontSize: "20"
         }),
-        o: common_vendor.o(contactCustomerService, "45"),
+        o: common_vendor.o(contactCustomerService, "f1"),
         p: common_vendor.unref(moveX),
         q: common_vendor.unref(moveY),
-        r: common_vendor.o(onMoveChange, "49"),
+        r: common_vendor.o(onMoveChange, "ee"),
         s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         t: `${_ctx.u_s_b_h}px`,
         v: `${_ctx.u_s_a_i_b}px`,
@@ -178,3 +170,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/userCenter/userCenter.js.map

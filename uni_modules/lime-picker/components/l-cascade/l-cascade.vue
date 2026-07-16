@@ -1,5 +1,6 @@
 <template>
 	<l-picker
+		ref="pickerRef"
 		v-model="innerValue"
 		:cancelBtn="cancelBtn" 
 		:cancelStyle="cancelStyle" 
@@ -55,6 +56,7 @@
 	 * @property {string} itemFontSize 选项文字大小（默认：16px）
 	 * @property {string} itemActiveColor 选中项高亮颜色（默认：主题色）
 	 * @property {string} indicatorStyle 指示器样式（支持CSS字符串）
+	 * @property {string[]} maskColors 遮罩颜色
 	 * @property {string} bgColor 背景颜色（默认：#ffffff）
 	 * @property {string} groupHeight 选项组高度（默认：240px）
 	 * @property {string} radius 圆角半径（支持CSS单位）
@@ -63,8 +65,9 @@
 	 * @event {Function} cancel 点击关闭时触发
 	 * @event {Function} confirm 点击确定时触发（返回最终选中值）
 	 */
-	import { defineComponent, ref, computed} from '@/uni_modules/lime-shared/vue';
-	import { PickerValue, PickerColumn, PickerColumnItem, PickerPickEvent} from '../l-picker/type';
+	import { defineComponent, ref, computed, watch} from '@/uni_modules/lime-shared/vue';
+	import { arrayEqual } from '@/uni_modules/lime-shared/arrayEqual'
+	import type { PickerValue, PickerColumn, PickerColumnItem, PickerPickEvent} from '../l-picker/type';
 	import { CascadeProps } from './type';
 	import { parseKeys, formatCascadeColumns } from './utils';
 	import cascadeProps from '../l-picker/props';
@@ -72,23 +75,22 @@
 		name: 'l-cascade', 
 		props:cascadeProps,
 		emits: ['change', 'cancel', 'pick', 'confirm', 'update:modelValue', 'update:value', 'input'],
-		setup(props, {emit}) {
-			type UTSJSONObject = Record<string, any>
+		setup(props, {emit, expose}) {
 			
 			const keys = parseKeys(props.keys)
-			const curValueArray = ref(props.value || props.modelValue || props.defaultValue||[]);
-			const innerValue = computed({
-				set(value: PickerValue[]) {
-					curValueArray.value = value;
-					emit('update:modelValue', value)
-					// #ifdef VUE2
-					emit('input', value)
-					// #endif
-				},
-				get(): PickerValue[]{
-					return props.value || props.modelValue || curValueArray.value
-				}
-			} as WritableComputedOptions<PickerValue[]>)
+			const innerValue = ref<PickerValue[]>(props.value ?? props.modelValue ?? props.defaultValue ?? []);
+			// const innerValue = computed({
+			// 	set(value: PickerValue[]) {
+			// 		curValueArray.value = value;
+			// 		emit('update:modelValue', value)
+			// 		// #ifdef VUE2
+			// 		emit('input', value)
+			// 		// #endif
+			// 	},
+			// 	get(): PickerValue[]{
+			// 		return props.value || props.modelValue || curValueArray.value
+			// 	}
+			// } as WritableComputedOptions<PickerValue[]>)
 			
 			
 			const innerColumns = computed((): PickerColumn[] => {
@@ -97,6 +99,10 @@
 			
 			const onPick = ({values, column, index} : PickerPickEvent) => {
 				innerValue.value = values
+				emit('update:modelValue', innerValue.value)
+				// #ifdef VUE2
+				emit('input', innerValue.value)
+				// #endif
 			}
 			
 			const onConfirm = (options: PickerConfirmEvent) => {
@@ -106,12 +112,36 @@
 				emit('cancel')
 			}
 			
+			watch(():PickerValue []|null =>  props.value ?? props.modelValue, (value: PickerValue[]|null)=> {
+				if(arrayEqual(value ?? [], innerValue.value)) return
+				innerValue.value = value ?? []
+			})
+			
+			
+			const pickerRef = ref<ComponentPublicInstance|null>(null)
+			const confirm = () => {
+				pickerRef.value?.confirm()
+			}
+			const getSelectedOptions = ():PickerConfirmEvent => {
+				return pickerRef.value!.getSelectedOptions()
+			}
+			// #ifdef VUE3
+			expose({
+				confirm,
+				getSelectedOptions
+			})
+			// #endif
+			
 			return {
 				innerValue,
 				innerColumns,
 				onPick,
 				onConfirm,
-				onCancel
+				onCancel,
+				// #ifdef VUE2
+				confirm,
+				getSelectedOptions
+				// #endif
 			}
 		}
 	})

@@ -3,19 +3,19 @@ const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_input_1 = common_vendor.resolveComponent("uv-input");
-  const _easycom_uv_form_item_1 = common_vendor.resolveComponent("uv-form-item");
-  const _easycom_uv_form_1 = common_vendor.resolveComponent("uv-form");
-  const _easycom_uv_button_1 = common_vendor.resolveComponent("uv-button");
-  (_easycom_custom_navBar_1 + _easycom_uv_input_1 + _easycom_uv_form_item_1 + _easycom_uv_form_1 + _easycom_uv_button_1)();
+  const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
+  const _easycom_i_form_item_1 = common_vendor.resolveComponent("i-form-item");
+  const _easycom_i_form_1 = common_vendor.resolveComponent("i-form");
+  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_form_1 + _easycom_i_button_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_input = () => "../../../uni_modules/uv-input/components/uv-input/uv-input.js";
-const _easycom_uv_form_item = () => "../../../uni_modules/uv-form/components/uv-form-item/uv-form-item.js";
-const _easycom_uv_form = () => "../../../uni_modules/uv-form/components/uv-form/uv-form.js";
-const _easycom_uv_button = () => "../../../uni_modules/uv-button/components/uv-button/uv-button.js";
+const _easycom_i_input = () => "../../../uni_modules/i-ui-x/components/i-input/i-input.js";
+const _easycom_i_form_item = () => "../../../uni_modules/i-ui-x/components/i-form-item/i-form-item.js";
+const _easycom_i_form = () => "../../../uni_modules/i-ui-x/components/i-form/i-form.js";
+const _easycom_i_button = () => "../../../uni_modules/i-ui-x/components/i-button/i-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_input + _easycom_uv_form_item + _easycom_uv_form + _easycom_uv_button)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_form + _easycom_i_button)();
 }
 class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -121,14 +121,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo) {
         try {
           const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          console.log(parsedInfo);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", parsedInfo);
+          const userId = parsedInfo.getString("userId");
+          const mobile = parsedInfo.getString("mobile");
           userInfo.value = {
-            id: parsedInfo.getString("userId") || "",
-            mobile: parsedInfo.getString("mobile") || ""
+            id: userId != null ? userId : "",
+            mobile: mobile != null ? mobile : ""
           };
-          console.log("用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:134", "用户信息:", userInfo.value);
         } catch (e) {
-          console.error("解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:136", "解析用户信息失败:", e);
         }
       }
     });
@@ -144,7 +146,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return common_vendor.unref(formData).password = $event;
-        }, "41"),
+        }, "1d"),
         c: common_vendor.p({
           placeholder: "请输入原密码",
           border: "none",
@@ -155,13 +157,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.p({
           label: "原密码",
+          labelDirection: "horizontal",
           labelWidth: "80",
-          prop: "password",
+          name: "password",
           borderBottom: true
         }),
         e: common_vendor.o(($event) => {
           return common_vendor.unref(formData).newPassword = $event;
-        }, "0f"),
+        }, "05"),
         f: common_vendor.p({
           placeholder: "请输入新密码",
           border: "none",
@@ -172,13 +175,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.p({
           label: "新密码",
+          labelDirection: "horizontal",
           labelWidth: "80",
-          prop: "newPassword",
+          name: "newPassword",
           borderBottom: true
         }),
         h: common_vendor.o(($event) => {
           return common_vendor.unref(formData).confirmPassword = $event;
-        }, "b4"),
+        }, "5f"),
         i: common_vendor.p({
           placeholder: "请再次输入新密码",
           border: "none",
@@ -189,19 +193,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.p({
           label: "确认密码",
+          labelDirection: "horizontal",
           labelWidth: "80",
-          prop: "confirmPassword"
+          name: "confirmPassword"
         }),
         k: common_vendor.sr(formRef, "be57f4b4-1", {
           "k": "formRef"
         }),
         l: common_vendor.p({
-          labelPosition: "left",
-          model: common_vendor.unref(formData),
+          modelValue: common_vendor.unref(formData),
           rules,
           class: "r"
         }),
-        m: common_vendor.o(handleSubmit, "d6"),
+        m: common_vendor.o(handleSubmit, "19"),
         n: common_vendor.p({
           type: "primary",
           text: "提交修改"
@@ -216,3 +220,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/editPassword/editPassword.js.map

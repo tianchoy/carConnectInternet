@@ -4,6 +4,11 @@
  * 坐标转换工具类
  * 提供WGS84与腾讯地图坐标系之间的高精度转换
  */
+type Coordinate = {
+    lat: number
+    lng: number
+}
+
 class CoordTransform {
     
     // 定义常量
@@ -17,7 +22,7 @@ class CoordTransform {
      * @param wgLon WGS84经度
      * @returns 腾讯地图坐标系 { lat: number, lng: number }
      */
-    static wgs84ToTencent(wgLat: number, wgLon: number): { lat: number, lng: number } {
+    static wgs84ToTencent(wgLat: number, wgLon: number): Coordinate {
         // 如果坐标在国外，直接返回
         if (!this.isInChina(wgLon, wgLat)) {
             return { lat: wgLat, lng: wgLon }
@@ -35,9 +40,9 @@ class CoordTransform {
         const mgLat = wgLat + dLat
         const mgLng = wgLon + dLng
         
-        return { 
-            lat: Number(mgLat.toFixed(6)), 
-            lng: Number(mgLng.toFixed(6))
+        return {
+            lat: parseFloat(mgLat.toFixed(6)),
+            lng: parseFloat(mgLng.toFixed(6))
         }
     }
     
@@ -47,7 +52,7 @@ class CoordTransform {
      * @param tcLon 腾讯地图经度
      * @returns WGS84坐标系 { lat: number, lng: number }
      */
-    static tencentToWgs84(tcLat: number, tcLon: number): { lat: number, lng: number } {
+    static tencentToWgs84(tcLat: number, tcLon: number): Coordinate {
         // 如果坐标在国外，直接返回
         if (!this.isInChina(tcLon, tcLat)) {
             return { lat: tcLat, lng: tcLon }
@@ -72,8 +77,8 @@ class CoordTransform {
         }
         
         return {
-            lat: Number(wgsLat.toFixed(6)),
-            lng: Number(wgsLng.toFixed(6))
+            lat: parseFloat(wgsLat.toFixed(6)),
+            lng: parseFloat(wgsLng.toFixed(6))
         }
     }
     
@@ -87,17 +92,24 @@ class CoordTransform {
         if (!Array.isArray(devices)) return []
         
         return devices.map(device => {
-            if (!device) return device
-            
-            const lat = Number(device.latitude)
-            const lng = Number(device.longitude)
+            if (device == null) return device
+
+            const item = device as UTSJSONObject
+            const latitude = item['latitude']
+            const longitude = item['longitude']
+            if (latitude == null || longitude == null) {
+                return device
+            }
+
+            const lat = parseFloat(latitude.toString())
+            const lng = parseFloat(longitude.toString())
             
             if (isNaN(lat) || isNaN(lng)) {
                 console.warn('设备经纬度无效', device)
                 return device
             }
             
-            let converted
+            let converted: Coordinate = { lat: lat, lng: lng }
             if (targetSystem === 'tencent') {
                 // WGS84转腾讯地图
                 converted = this.wgs84ToTencent(lat, lng)
@@ -106,13 +118,11 @@ class CoordTransform {
                 converted = this.tencentToWgs84(lat, lng)
             }
             
-            return {
-                ...device,
-                latitude: converted.lat,
-                longitude: converted.lng,
-                originalLatitude: lat, // 保留原始坐标
-                originalLongitude: lng
-            }
+            item['latitude'] = converted.lat
+            item['longitude'] = converted.lng
+            item['originalLatitude'] = lat
+            item['originalLongitude'] = lng
+            return item
         })
     }
     
@@ -124,7 +134,7 @@ class CoordTransform {
      * @param toSystem 目标坐标系 'tencent' | 'wgs84'
      * @returns 转换后的坐标 { lat: number, lng: number }
      */
-    static convertCoordinate(lat: number, lng: number, fromSystem: string = 'wgs84', toSystem: string = 'tencent'): { lat: number, lng: number } {
+    static convertCoordinate(lat: number, lng: number, fromSystem: string = 'wgs84', toSystem: string = 'tencent'): Coordinate {
         if (fromSystem === 'wgs84' && toSystem === 'tencent') {
             return this.wgs84ToTencent(lat, lng)
         } else if (fromSystem === 'tencent' && toSystem === 'wgs84') {

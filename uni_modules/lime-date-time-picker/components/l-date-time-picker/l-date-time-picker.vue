@@ -16,6 +16,7 @@
 		:radius="radius" 
 		:value="valueOfPicker" 
 		:columns="columns"
+		:maskColors="maskColors"
 		@confirm="onConfirm" 
 		@cancel="onCancel" 
 		@change="onChange" 
@@ -24,12 +25,61 @@
 </template>
 <script lang="ts">
 	// @ts-nocheck
+	/**
+	 * DateTimePicker 日期时间选择器
+	 * @description 日期时间选择器组件，支持多种时间模式选择和自定义配置
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-data-picker
+	 * 
+	 * @property {string} cancelBtn 取消按钮文字
+	 * @property {string | object} cancelStyle 取消按钮样式
+	 * @property {string} confirmBtn 确定按钮文字
+	 * @property {string | object} confirmStyle 确定按钮样式
+	 * @property {'zh' | 'tc' | 'en' | 'ja' | 'ko' | 'ru'} customLocale 组件国际化语言
+	 * @property {string|number} end 最大可选时间（默认当前时间+10年）
+	 * @property {string|number} start 最小可选时间（默认当前时间-10年）
+	 * @property {object} steps 时间间隔步数（例：{ minute: 5 }）
+	 * @property {string} title 标题文字
+	 * @property {string | object} titleStyle 标题样式
+	 * @property {string|number} value 选中值（支持v-model）
+	 * @property {string|number} defaultValue 默认选中值
+	 * @property {string|number} modelValue 模型值（支持v-model）
+	 * @property {string} format 时间格式（使用day.js格式）
+	 * @property {number} mode 时间选择模式（位运算组合）
+	 * @value 1 年模式
+	 * @value 2 月模式
+	 * @value 4 日模式
+	 * @value 8 时模式
+	 * @value 16 分模式
+	 * @value 32 秒模式
+	 * @example 1 | 2 组合年月选择
+	 * @property {(type: TimeModeValues, columns: DateTimePickerColumn) => DateTimePickerColumn} customFilter 自定义过滤函数
+	 * @property {(type: string, value: string) => string} renderLabel 自定义标签渲染
+	 * @property {boolean} showUnit 是否显示时间单位
+	 * @property {string} itemHeight 选项高度
+	 * @property {string} itemColor 选项文字颜色
+	 * @property {string} itemFontSize 选项字体大小
+	 * @property {string} itemActiveColor 选中项颜色
+	 * @property {string} indicatorStyle 指示器样式
+	 * @property {string[]} maskColors 遮罩颜色
+	 * @property {string} bgColor 背景颜色
+	 * @property {string} groupHeight 选项组高度
+	 * @property {string} radius 圆角半径
+	 * @property {boolean} resetIndex 是否重置选项索引
+	 * @property {number} minHour 最小小时数
+	 * @property {number} maxHour 最大小时数
+	 * @property {number} minMinute 最小分钟数
+	 * @property {number} maxMinute 最大分钟数
+	 * 
+	 * @event {Function} confirm 点击确定时触发
+	 * @event {Function} cancel 点击取消时触发
+	 * @event {Function} change 值变化时触发
+	 */
 	import { defineComponent, computed, ref, watch, onBeforeUnmount} from '@/uni_modules/lime-shared/vue';
-	import { DateTimePickerProps, DateValue, DateTimePickerColumn, TimeModeValues, DateTimePickerColumnItem } from './type';
-	import { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '@/uni_modules/lime-picker';
-	import { getMeaningColumn } from './utils';
+	import type { DateTimePickerProps, DateValue, DateTimePickerColumn, TimeModeValues, DateTimePickerColumnItem } from './type';
+	import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '@/uni_modules/lime-picker';
+	import { getMeaningColumn, coalesce } from './utils';
 	import { DEFAULT_FORMAT, MODE_NAMES, FORMAT_MAP, UNIT_MAP } from './constant';
-	import { dayuts, Dayuts, DayutsUnit} from '@/uni_modules/lime-dayuts'
+	import { dayuts, type Dayuts, type DayutsUnit} from '@/uni_modules/lime-dayuts'
 	import { clamp } from '@/uni_modules/lime-shared/clamp'
 	import dataTimePickerProps from './props';
 	export default defineComponent({
@@ -38,7 +88,8 @@
 		emits: ['change', 'cancel', 'confirm', 'pick', 'update:modelValue', 'update:value','input'],
 		setup(props, {emit}) {
 			// 默认值
-			let defaultValue : DateValue = props.value ?? props.defaultValue ?? props.defaultValue ?? Date.now()
+			let defaultValue : DateValue = coalesce(props.value, props.modelValue, props.defaultValue) || Date.now()
+			// let defaultValue : DateValue = props.value || props.modelValue || props.defaultValue || Date.now()
 			const innerValue = computed({
 				set(value : DateValue) {
 					if(defaultValue == value) return
@@ -51,15 +102,16 @@
 					// #endif
 				},
 				get() : DateValue {
-					const value = props.value ?? props.modelValue ?? defaultValue
-					return typeof value == 'string' && value.length == 0 ? Date.now() : value
+					return coalesce(props.value, props.modelValue) || defaultValue
+					// const value = props.value || props.modelValue || defaultValue
+					// return typeof value == 'string' && value.length == 0 ? Date.now() : value
 					// return props.value ?? props.modelValue ?? defaultValue
 				}
 			} as WritableComputedOptions<DateValue>)
 			
 			const meaningColumn = getMeaningColumn(props.mode);
 			const isTimeMode = ['hour', 'minute', 'second'].includes(meaningColumn[0]);
-			const normalize = (val : DateValue | null, defaultDay : Dayuts) : Dayuts => val != null && dayuts(val).isValid() ? dayuts(val) : defaultDay;
+			const normalize = (val : DateValue | null, defaultDay : Dayuts) : Dayuts => val && dayuts(val).isValid() ? dayuts(val) : defaultDay;
 			const start = computed(() : Dayuts => normalize(props.start as DateValue | null, dayuts().subtract(10, 'year')));
 			const end = computed(() : Dayuts => normalize(props.end as DateValue | null, dayuts().add(10, 'year')));
 			const rationalize = (val : Dayuts) : Dayuts => {
@@ -69,9 +121,35 @@
 				return val;
 			};
 			const calcDate = (currentValue : DateValue | null) : Dayuts => {
-				if (isTimeMode) {
-					const dateStr = dayuts(start.value).format('YYYY-MM-DD');
-					currentValue = `${dateStr} ${currentValue}`;
+				if(meaningColumn.length == 1 && meaningColumn[0] == 'year') {
+					if(currentValue) {
+						if (typeof currentValue == 'string') {
+							// 尝试解析纯年份字符串
+							const yearNum = parseInt(currentValue);
+							if (!isNaN(yearNum) && yearNum > 1000) {
+								return rationalize(dayuts().year(yearNum).startOf('year'));
+							}
+						}
+					}
+				}
+				if (isTimeMode && (typeof currentValue == 'string')) {
+					let format = 'YYYY-MM-DD' 
+					let space = ' '
+					const hasHour = meaningColumn.includes("hour")
+					const hasMinute = meaningColumn.includes("minute")
+					const hasSecond = meaningColumn.includes("second")
+					
+					if(!hasHour && hasMinute) {
+						format += ' HH'
+						space = ':'
+					}
+					else if(!hasHour && !hasMinute && hasSecond) {
+						format += ' HH:mm'
+						space = ':'
+					}
+					
+					const dateStr = dayuts(start.value).format(format);
+					currentValue = `${dateStr}${space}${currentValue}`;
 				}
 				return currentValue != null && dayuts(currentValue).isValid() ? rationalize(dayuts(currentValue)) : start.value;
 			};
@@ -116,12 +194,12 @@
 				    for (let i = lowerBound; i <= upperBound; i++) {
 				      const value = i;
 				      arr.push({
-				        label: props.renderLabel !=null ? props.renderLabel!(type, i) : `${value}${props.showUnit ? UNIT_MAP.get(type) : ''}`,
+				        label: props.renderLabel ? props.renderLabel!(type, i) : `${value}${props.showUnit ? UNIT_MAP.get(type) : ''}`,
 				        value: type == 'month' ? `${value - 1}` : value.toString(),
 				      } as DateTimePickerColumnItem);
 				    }
 				    
-					if(props.customFilter != null) {
+					if(props.customFilter) {
 						const _arr = props.customFilter!(type, arr)
 						ret.push(_arr) 
 						columnCache.set(cacheKey, _arr);
@@ -216,11 +294,14 @@
 				
 			}
 			const stop = watch(innerValue, (val : DateValue) => {
+				// 时间模式下，不重新计算日期，因为时间变化已由 onPick/onChange 处理
+				// if(isTimeMode) return
 				curDate.value = calcDate(val);
 			});
 			
 			onBeforeUnmount(()=>{
 				stop()
+				columnCache.clear()
 			})
 			
 			

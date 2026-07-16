@@ -1,0 +1,292 @@
+import { computed, ref, watch } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'i-checkbox',
+name: 'i-checkbox',
+  props: {
+  name: {
+    type: [String, Number],
+    default: '',
+  },
+  modelValue: {
+    type: [Array, Boolean, String, Number],
+    default: false,
+  },
+  value: {
+    type: [Array, Boolean, String, Number],
+    default: false,
+  },
+  checked: {
+    type: Boolean,
+    default: false,
+  },
+  shape: {
+    type: String,
+    default: 'square',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  activeColor: {
+    type: String,
+    default: '#2979ff',
+  },
+  inactiveColor: {
+    type: String,
+    default: '#dcdfe6',
+  },
+  size: {
+    type: [String, Number],
+    default: 20,
+  },
+  placement: {
+    type: String,
+    default: 'row',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  labelSize: {
+    type: [String, Number],
+    default: 14,
+  },
+  labelColor: {
+    type: String,
+    default: '#303133',
+  },
+  labelDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  iconColor: {
+    type: String,
+    default: '#ffffff',
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 14,
+  },
+  iconPlacement: {
+    type: String,
+    default: 'left',
+  },
+  borderBottom: {
+    type: Boolean,
+    default: false,
+  },
+  activeLabelColor: {
+    type: String,
+    default: '',
+  },
+  plain: {
+    type: Boolean,
+    default: true,
+  },
+},
+  emits: ['change', 'update:modelValue', 'update:value', 'update:checked'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+/**
+ * Props 说明：依据 DCloud uni-app x 官方规范 Checkbox，支持单个布尔值或数组多选。
+ * - name: 选项标识符，数组模式下用于判断是否选中。
+ * - modelValue/value: 绑定值；Array 表示多选，Boolean 表示单个开关。
+ * - checked: 单独控制选中状态。
+ * - shape: 外观形状，square、circle、check、button。
+ * - disabled: 是否禁用。
+ * - activeColor/inactiveColor/iconColor/activeLabelColor: 选中、未选中、图标和选中文字颜色。
+ * - size/iconSize/labelSize: 尺寸。
+ * - placement/iconPlacement/borderBottom/plain: 布局和按钮样式。
+ * - label/labelColor/labelDisabled: 文本和是否禁止点击文本。
+ */
+const props = __props
+
+/**
+ * Emits 说明：选中状态变化。
+ * - change: 复选框状态变化时触发，参数为最新绑定值。
+ * - update:modelValue/update:value: 同步绑定值。
+ * - update:checked: 同步单项 checked 状态。
+ */
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const internalChecked = ref(isChecked())
+
+const checked = computed(() => {
+  return internalChecked.value
+})
+
+const wrapClass = computed(() => {
+  const classes = ['i-checkbox']
+  if (props.placement == 'column') classes.push('i-checkbox--column')
+  if (props.iconPlacement == 'right') classes.push('i-checkbox--right')
+  if (props.shape == 'button') classes.push('i-checkbox--button')
+  if (props.plain && props.shape == 'button') classes.push('i-checkbox--plain')
+  if (checked.value) classes.push('i-checkbox--checked')
+  if (props.shape == 'button' && checked.value) classes.push('i-checkbox--button-checked')
+  if (props.shape == 'button' && props.plain && checked.value) {
+    classes.push('i-checkbox--button-plain-checked')
+  }
+  if (props.disabled) classes.push('i-checkbox--disabled')
+  if (props.borderBottom) classes.push('i-checkbox--border')
+  return classes.join(' ')
+})
+
+const labelClass = computed(() => {
+  const classes = ['i-checkbox__label']
+  if (props.shape == 'button') classes.push('i-checkbox__label--button')
+  return classes.join(' ')
+})
+
+const boxStyle = computed(() => {
+  return (
+    'width:' +
+    formatSize(props.size) +
+    ';height:' +
+    formatSize(props.size) +
+    ';border-radius:' +
+    (props.shape == 'circle' ? formatSize(props.size) : '4px') +
+    ';border-color:' +
+    (checked.value ? props.activeColor : props.inactiveColor) +
+    ';background-color:' +
+    (checked.value && props.shape != 'check' ? props.activeColor : 'transparent') +
+    ';'
+  )
+})
+
+const markStyle = computed(() => {
+  return 'color:' + props.iconColor + ';font-size:' + formatSize(props.iconSize) + ';'
+})
+
+const labelStyle = computed(() => {
+  let color = props.labelColor
+  if (checked.value && props.activeLabelColor.length > 0) color = props.activeLabelColor
+  return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';'
+})
+
+watch(
+  () => props.modelValue,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+watch(
+  () => props.value,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+watch(
+  () => props.checked,
+  () => {
+    internalChecked.value = isChecked()
+  },
+)
+
+function toggle() {
+  if (props.disabled) return
+  updateChecked(!checked.value)
+}
+
+function toggleByLabel() {
+  if (props.labelDisabled) return
+  toggle()
+}
+
+function updateChecked(nextChecked) {
+  const previousChecked = checked.value
+  internalChecked.value = nextChecked
+  const nextValue = buildValue(nextChecked, previousChecked)
+  emit('update:checked', nextChecked)
+  emit('update:modelValue', nextValue)
+  emit('update:value', nextValue)
+  emit('change', nextValue)
+}
+
+function isChecked() {
+  if (props.checked) return true
+  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      if (String(value[i]) == String(props.name)) return true
+    }
+    return false
+  }
+  if (typeof value == 'boolean') return value
+  return String(value) == String(props.name)
+}
+
+function buildValue(nextChecked, previousChecked) {
+  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
+  if (Array.isArray(value)) {
+    const list = value.slice(0)
+    const exists = previousChecked
+    if (nextChecked && !exists) list.push(props.name)
+    if (!nextChecked && exists) {
+      const nextList = []
+      for (let i = 0; i < list.length; i++) {
+        if (String(list[i]) != String(props.name)) nextList.push(list[i])
+      }
+      return nextList
+    }
+    return list
+  }
+  return nextChecked
+}
+
+function formatSize(value) {
+  const text = String(value)
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: _nC(wrapClass.value),
+    onClick: toggle
+  }), [
+    renderSlot(_ctx.$slots, "icon", _uM({ checked: checked.value }), (): any[] => [
+      _ctx.shape != 'button'
+        ? _cE("view", _uM({
+            key: 0,
+            class: "i-checkbox__box",
+            style: _nS(boxStyle.value)
+          }), [
+            isTrue(checked.value)
+              ? _cE("text", _uM({
+                  key: 0,
+                  class: "i-checkbox__mark",
+                  style: _nS(markStyle.value)
+                }), "✓", 4 /* STYLE */)
+              : _cC("v-if", true)
+          ], 4 /* STYLE */)
+        : _cC("v-if", true)
+    ]),
+    renderSlot(_ctx.$slots, "default", _uM({ checked: checked.value }), (): any[] => [
+      _cE("text", _uM({
+        class: _nC(labelClass.value),
+        style: _nS(labelStyle.value),
+        onClick: withModifiers(toggleByLabel, ["stop"])
+      }), _tD(_ctx.label), 7 /* TEXT, CLASS, STYLE */)
+    ])
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type ICheckboxComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsICheckboxICheckboxStyles = [_uM([["i-checkbox", _pS(_uM([["minHeight", 32], ["flexDirection", "row"], ["alignItems", "center"]]))], ["i-checkbox--right", _pS(_uM([["flexDirection", "row-reverse"], ["justifyContent", "space-between"]]))], ["i-checkbox--button", _pS(_uM([["minWidth", 64], ["minHeight", 34], ["paddingTop", 7], ["paddingRight", 12], ["paddingBottom", 7], ["paddingLeft", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dcdfe6"], ["borderRightColor", "#dcdfe6"], ["borderBottomColor", "#dcdfe6"], ["borderLeftColor", "#dcdfe6"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-checkbox--button-checked", _pS(_uM([["borderTopColor", "#2979ff"], ["borderRightColor", "#2979ff"], ["borderBottomColor", "#2979ff"], ["borderLeftColor", "#2979ff"], ["backgroundColor", "#ecf5ff"]]))], ["i-checkbox--button-plain-checked", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["i-checkbox--disabled", _pS(_uM([["opacity", 0.5]]))], ["i-checkbox--border", _pS(_uM([["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef0f4"]]))], ["i-checkbox__box", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-checkbox__mark", _pS(_uM([["lineHeight", "18px"]]))], ["i-checkbox__label", _pS(_uM([["marginLeft", 8], ["lineHeight", "22px"]]))], ["i-checkbox__label--button", _pS(_uM([["marginLeft", 0], ["textAlign", "center"]]))]])]

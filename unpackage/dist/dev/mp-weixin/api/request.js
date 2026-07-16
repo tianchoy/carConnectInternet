@@ -27,86 +27,86 @@ const cmdByMidUrl = "/command/cmdByMid";
 const cmdSendUrl = "/command/sendCmd";
 const cmdRecordByIdUrl = "/command/recordById?id=";
 const login = (data) => {
-  return api_http.http.post(loginUrl, data);
+  return api_http.post(loginUrl, data);
 };
 const logout = () => {
-  return api_http.http.post(logoutUrl);
+  return api_http.post(logoutUrl);
 };
 const sendCommand = (data) => {
-  return api_http.http.post(sendcmd, data);
+  return api_http.post(sendcmd, data);
 };
 const getDevicePos = (data) => {
-  return api_http.http.get(devicePos, data);
+  return api_http.get(devicePos, data);
 };
 const getTrackPos = (data) => {
-  return api_http.http.get(trackPos, data);
+  return api_http.get(trackPos, data);
 };
 const getUserInfo = () => {
-  return api_http.http.get(userinfo);
+  return api_http.get(userinfo);
 };
 const addDevice = (data) => {
-  return api_http.http.post(addDeviceUrl, data);
+  return api_http.post(addDeviceUrl, data);
 };
 const delDevice = (imei) => {
   const data = new common_vendor.UTSJSONObject({ imei });
-  return api_http.http.post(deleteDevice, data);
+  return api_http.post(deleteDevice, data);
 };
 const getUserDeviceList = (data) => {
-  return api_http.http.post(userDeviceList, data);
+  return api_http.post(userDeviceList, data);
 };
 const PostWechatlogin = (data) => {
-  return api_http.http.post(wechatLogin, data);
+  return api_http.post(wechatLogin, data);
 };
 const changePassWord = (data) => {
-  return api_http.http.post(changePSW, data);
+  return api_http.post(changePSW, data);
 };
-const getUserMsgList = () => {
-  return api_http.http.get(userMsgList);
+const getUserMsgList = (data = null) => {
+  return data != null ? api_http.get(userMsgList, data) : api_http.get(userMsgList);
 };
 const setMsgState = (msgId) => {
-  return api_http.http.get(`${msgState}${msgId}`);
+  return api_http.get(`${msgState}${msgId}`);
 };
 const editDeviceInfo = (data) => {
-  return api_http.http.put(updateDevice, data);
+  return api_http.put(updateDevice, data);
 };
 const getDeviceDetail = (deviceId) => {
-  return api_http.http.get(`${deviceDetail}${deviceId}`);
+  return api_http.get(`${deviceDetail}${deviceId}`);
 };
 const getGeofenceList = () => {
-  return api_http.http.get(getGeofence);
+  return api_http.get(getGeofence);
 };
 const addGeofence = (data) => {
-  return api_http.http.post(getGeofence, data);
+  return api_http.post(getGeofence, data);
 };
 const updateGeofence = (data) => {
-  return api_http.http.put(getGeofence, data);
+  return api_http.put(getGeofence, data);
 };
 const deleteGeofence = (id) => {
-  return api_http.http.delete(`${deleteGeo}${id}`);
+  return api_http.remove(`${deleteGeo}${id}`);
 };
 const getUnboundDevices = (params) => {
-  return api_http.http.get(unbindDeviceList, params);
+  return api_http.get(unbindDeviceList, params);
 };
 const getBoundDevices = (params) => {
-  return api_http.http.get(bindDeviceList, params);
+  return api_http.get(bindDeviceList, params);
 };
 const bindDevices = (data) => {
-  return api_http.http.post(bindGeofence, data);
+  return api_http.post(bindGeofence, data);
 };
 const unbindDevices = (data) => {
-  return api_http.http.delete(unbindGeofence, data);
+  return api_http.remove(unbindGeofence, data);
 };
 const getCmdAction = () => {
-  return api_http.http.get(cmdActionUrl);
+  return api_http.get(cmdActionUrl);
 };
 const getCmdByMid = (data) => {
-  return api_http.http.get(cmdByMidUrl, data);
+  return api_http.get(cmdByMidUrl, data);
 };
 const sendCmd = (data) => {
-  return api_http.http.post(cmdSendUrl, data);
+  return api_http.post(cmdSendUrl, data);
 };
 const getCmdRecordById = (id) => {
-  return api_http.http.get(`${cmdRecordByIdUrl}${id}`);
+  return api_http.get(`${cmdRecordByIdUrl}${id}`);
 };
 exports.PostWechatlogin = PostWechatlogin;
 exports.addDevice = addDevice;
@@ -135,3 +135,4 @@ exports.sendCommand = sendCommand;
 exports.setMsgState = setMsgState;
 exports.unbindDevices = unbindDevices;
 exports.updateGeofence = updateGeofence;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

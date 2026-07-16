@@ -356,3 +356,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   };
 } }));
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/i-ui-x/components/i-icon/i-icon.js.map

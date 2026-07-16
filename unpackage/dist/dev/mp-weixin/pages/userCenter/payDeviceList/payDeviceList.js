@@ -61,7 +61,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          console.error("加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:128", "加载车辆列表失败:", error);
           common_vendor.index.showToast({
             title: "加载失败，请重试",
             icon: "none"
@@ -78,17 +78,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      console.log(iccid);
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:150", iccid);
       needRefresh.value = true;
-      common_vendor.wx$1.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
+      common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          console.log("打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:160", "打开小程序成功", res);
         },
         fail(res = null) {
-          console.log("打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:163", "打开小程序失败", res);
           needRefresh.value = false;
           common_vendor.index.showToast({
             title: "打开支付页面失败",
@@ -152,3 +152,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-21a71356"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/payDeviceList/payDeviceList.js.map

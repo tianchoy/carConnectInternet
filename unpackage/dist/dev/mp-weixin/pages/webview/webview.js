@@ -1,12 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
-  const _easycom_uv_empty_1 = common_vendor.resolveComponent("uv-empty");
-  _easycom_uv_empty_1();
+  const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
+  _easycom_i_empty_1();
 }
-const _easycom_uv_empty = () => "../../uni_modules/uv-empty/components/uv-empty/uv-empty.js";
+const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
 if (!Math) {
-  _easycom_uv_empty();
+  _easycom_i_empty();
 }
 const emptyImage = "/static/empty.png";
 const _sfc_defineComponent = common_vendor.defineComponent({
@@ -14,7 +14,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
   setup(__props) {
     const webviewUrl = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      console.log("接收到的参数:", options);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:25", "接收到的参数:", options);
       if (options.url) {
         let decodedUrl = decodeURIComponent(options.url);
         if (!decodedUrl.startsWith("http://") && !decodedUrl.startsWith("https://")) {
@@ -48,22 +48,22 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       }
     };
     const handleLoad = (e = null) => {
-      console.log("网页加载成功", e);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:72", "网页加载成功", e);
       common_vendor.index.hideLoading();
     };
     const handleError = (e = null) => {
-      console.error("网页加载失败", e);
+      common_vendor.index.__f__("error", "at pages/webview/webview.uvue:78", "网页加载失败", e);
       common_vendor.index.showToast({
         title: "页面加载失败",
         icon: "none"
       });
     };
     const handleMessage = (e = null) => {
-      console.log("接收网页消息:", e.detail);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:87", "接收网页消息:", e.detail);
       const data = e.detail.data;
       if (data && data.length > 0) {
         const lastMessage = data[data.length - 1];
-        console.log("最后一条消息:", lastMessage);
+        common_vendor.index.__f__("log", "at pages/webview/webview.uvue:92", "最后一条消息:", lastMessage);
       }
     };
     const goBack = () => {
@@ -89,10 +89,12 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       } : {
         f: common_vendor.p({
           text: "页面加载失败",
+          showButton: false,
+          description: "",
           image: emptyImage,
           class: "data-v-fa7ac34d"
         }),
-        g: common_vendor.o(goBack, "a2")
+        g: common_vendor.o(goBack, "3f")
       }, {
         h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         i: `${_ctx.u_s_b_h}px`,
@@ -106,3 +108,4 @@ const _sfc_defineComponent = common_vendor.defineComponent({
 _sfc_defineComponent.__runtimeHooks = 2;
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_defineComponent, [["__scopeId", "data-v-fa7ac34d"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/webview/webview.js.map

@@ -221,7 +221,7 @@
 			const newLength = index + 1
 			const newArray = new Array(newLength)
 			for (let i = 0; i < newLength; i++) {
-				newArray[i] = paramValues.value[i] || ''
+				newArray[i] = i < paramValues.value.length ? paramValues.value[i] : ''
 			}
 			paramValues.value = newArray
 		}

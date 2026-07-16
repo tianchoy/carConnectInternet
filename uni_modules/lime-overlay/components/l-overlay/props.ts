@@ -13,7 +13,7 @@ export default {
 		default: true
 	},
 	bgColor: String,
-	lStyle: String,
+	lStyle: [String, Object],
 	lClass: String,
 	ariaLabel: String,
 	ariaRole: String,

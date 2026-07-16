@@ -50,6 +50,7 @@ export interface CascadeProps {
 	itemActiveColor?: string;
 	
 	indicatorStyle?: string;
+	maskColors?: string[];
 	bgColor?: string;
 	groupHeight?: string;
 	radius?: string;

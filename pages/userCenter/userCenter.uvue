@@ -5,22 +5,22 @@
 		<view class="user-info-box" @click="userInfoDetail">
 			<view class="userinfo">
 				<view>
-					<uv-avatar src="/static/avatar.png" shape="circle"></uv-avatar>
+					<i-icon name="/static/avatar.png" fontSize="40"></i-icon>
 				</view>
 				<view class="user-info">
 					<text v-if="Login">{{userInfo.mobile}}</text>
 					<text v-else>点击登录</text>
 				</view>
 			</view>
-			<uv-icon name="arrow-right" size="16"></uv-icon>
+			<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 		</view>
 		<view v-if="Login">
 			<view class="list" @click="carList">
 				<view class="left">
 					<text>我的车辆</text>
-					<text class="badge"><uv-badge numberType="overflow" type="error" max="99" :value="carsnumber"></uv-badge></text>
+					<text class="badge"><i-badge type="danger" maxCount="99" :count="carsnumber"></i-badge></text>
 				</view>
-				<uv-icon name="arrow-right" size="16"></uv-icon>
+				<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 			</view>
 			<view class="list" @click="platformRenewal">平台续费</view>
 			<!-- <view class="list" @click="productMall">产品商城</view> -->
@@ -34,13 +34,8 @@
 				:y="moveY"
 				@change="onMoveChange"
 			>
-				<!-- <button open-type="contact" class="contact-button-movable">
-					<uv-icon name="server-man" size="50" color="primary"></uv-icon>
-					<text class="contact-text">人工客服</text>
-					<text class="contact-text">08:00-24:00</text>
-				</button> -->
 				<view class="contact-button-movable" @click="contactCustomerService">
-					<uv-icon name="server-man" size="50" color="primary"></uv-icon>
+					<i-icon name="/static/server-man.png" fontSize="20"></i-icon>
 					<text class="contact-text">人工客服</text>
 					<text class="contact-text">08:00-24:00</text>
 				</view>
@@ -88,13 +83,11 @@
 		}
 		
 		// 获取小程序版本号
-		try {
-			const accountInfo = wx.getAccountInfoSync();
-			const appVersion = accountInfo.miniProgram.version; 
-			version.value = appVersion 
-		} catch (error) {
-			console.error('获取版本号失败:', error)
-		}
+		//#ifdef MP-WEIXIN
+		const accountInfo = wx.getAccountInfoSync();
+		const appVersion = accountInfo.miniProgram.version;
+		version.value = appVersion
+		//#endif
 	})
 
 	const contactCustomerService = () => {

@@ -30,14 +30,14 @@
   left: 0;
   width: 100%;
   bottom: 0;
-  background-color: var(--l-overlay-bg-color, rgba(0, 0, 0, 0.6));
-  transition-duration: var(--l-overlay-transition-duration, 300ms);
+  background-color: var(--l-overlay-bg-color, var(--l-bg-color-mask, rgba(0, 0, 0, 0.45)));
   transition-property: opacity;
   transition-timing-function: ease;
   z-index: var(--l-overlay-z-index, 998);
   opacity: 1;
   -webkit-backdrop-filter: blur(var(--l-overlay-blur, 4px));
           backdrop-filter: blur(var(--l-overlay-blur, 4px));
+  transition-duration: var(--l-overlay-transition-duration, 300ms);
 }
 .l-fade-enter {
   opacity: 0;

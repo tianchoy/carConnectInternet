@@ -117,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          console.error("获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:177", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "网络请求失败",
             icon: "none"
@@ -145,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
       markers.value = [marker];
       markerInitialized.value = true;
-      console.log("初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:209", "初始化标记点完成");
     };
     const calculateMapRotation = (direction) => {
       let rotation = direction;
@@ -170,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceids: imei.value
           });
           const res = yield api_request.getDevicePos(data);
-          console.log("222222");
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:238", "222222");
           if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
             const deviceData = res.data.find((item = null) => {
               return item.imei == imei.value;
@@ -206,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (err) {
-          console.error("获取跟踪位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:283", "获取跟踪位置失败:", err);
         }
       });
     };
@@ -391,7 +391,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadTrackData();
     };
     common_vendor.onHide(() => {
-      console.log("页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:556", "页面隐藏时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value) {
         clearInterval(trackingInterval.value);
@@ -406,7 +406,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isAnimating.value = false;
     });
     common_vendor.onUnmounted(() => {
-      console.log("页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:577", "页面卸载时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value) {
         clearInterval(trackingInterval.value);
@@ -460,3 +460,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/vehicleTracking/vehicleTracking.js.map

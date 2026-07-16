@@ -151,19 +151,16 @@
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		
-		//拉起半屏小程序
-		wx.openEmbeddedMiniProgram({
+		//#ifdef MP-WEIXIN
+		uni.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
 			path: '/pages/home/userSimRecharge?iccid=' + iccid,
 			envVersion: 'release',
-			success(res) {
-				// 打开成功
+			success(res: any) {
 				console.log('打开小程序成功', res)
 			},
-			fail(res) {
-				// 打开失败
+			fail(res: any) {
 				console.log('打开小程序失败', res)
-				// 如果打开失败，取消刷新标志
 				needRefresh.value = false
 				uni.showToast({
 					title: '打开支付页面失败',
@@ -171,6 +168,15 @@
 				})
 			}
 		})
+		//#endif
+
+		//#ifndef MP-WEIXIN
+		needRefresh.value = false
+		uni.showToast({
+			title: '请在微信小程序中完成充值',
+			icon: 'none'
+		})
+		//#endif
 	}
 
 	// 添加下拉刷新功能

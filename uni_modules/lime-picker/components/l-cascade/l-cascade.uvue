@@ -1,5 +1,6 @@
 <template>
 	<l-picker 
+		ref="pickerRef"
 		v-model="innerValue"
 		:cancelBtn="cancelBtn" 
 		:cancelStyle="cancelStyle" 
@@ -54,6 +55,7 @@
 	 * @property {string} itemFontSize 选项文字大小（默认：16px）
 	 * @property {string} itemActiveColor 选中项高亮颜色（默认：主题色）
 	 * @property {string} indicatorStyle 指示器样式（支持CSS字符串）
+	 * @property {string[]} maskColors 遮罩颜色
 	 * @property {string} bgColor 背景颜色（默认：#ffffff）
 	 * @property {string} groupHeight 选项组高度（默认：240px）
 	 * @property {string} radius 圆角半径（支持CSS单位）
@@ -62,10 +64,10 @@
 	 * @event {Function} cancel 点击关闭时触发
 	 * @event {Function} confirm 点击确定时触发（返回最终选中值）
 	 */
-	import { PickerValue, PickerColumn, PickerColumnItem, PickerPickEvent, PickerConfirmEvent } from '../l-picker/type';
-	import { CascadeProps } from './type';
+	import type { PickerValue, PickerColumn, PickerColumnItem, PickerPickEvent, PickerConfirmEvent } from '../l-picker/type';
+	import type { CascadeProps } from './type';
 	import { parseKeys, formatCascadeColumns } from './utils';
-	
+	import { arrayEqual } from '@/uni_modules/lime-shared/arrayEqual'
 	const emit = defineEmits(['change', 'cancel', 'pick', 'confirm', 'update:modelValue', 'update:value'])
 	const props = withDefaults(defineProps<CascadeProps>(), {
 		columns: [] as PickerColumnItem[],
@@ -90,8 +92,10 @@
 		return formatCascadeColumns(props.columns, keys, innerValue)
 	})
 
-	const onPick = ({ values, column, index } : PickerPickEvent) => {
+	const onPick = (options : PickerPickEvent) => {
+		const { values, column, index } = options
 		innerValue.value = [...values]
+		emit('update:modelValue', innerValue.value)
 	}
 	
 	const onConfirm = (options : PickerConfirmEvent) => {
@@ -101,10 +105,22 @@
 		emit('cancel')
 	}
 	
-	watchEffect(()=>{
-		emit('update:modelValue', innerValue.value)
+	watch(():PickerValue []|null =>  props.value ?? props.modelValue, (value: PickerValue[]|null)=> {
+		if(arrayEqual(value ?? [], innerValue.value)) return
+		innerValue.value = value ?? []
 	})
 	
+	
+	
+	const pickerRef = ref<ComponentPublicInstance|null>(null)
+	defineExpose({
+		confirm: () => {
+			pickerRef.value?.$callMethod('confirm')
+		},
+		getSelectedOptions: ():PickerConfirmEvent|null => {
+			return pickerRef.value?.$callMethod('getSelectedOptions') as PickerConfirmEvent|null
+		}
+	})
 	
 </script>
 

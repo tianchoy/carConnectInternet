@@ -1,3 +1,17 @@
+## 0.4.8（2026-03-05）
+- feat: 更新uniappx vue的实现
+## 0.4.7（2025-12-27）
+- feat: 增加`getWindowInfo`
+## 0.4.6（2025-12-26）
+- fix: 修复useVModel可选问题
+## 0.4.5（2025-12-10）
+- feat: 增加useVModel
+## 0.4.4（2025-12-07）
+- fix: 修复csstoobj uniappx安卓正则问题
+## 0.4.3（2025-12-02）
+- feat: 增加`arrayEqual`,`findLastIndex`
+## 0.4.2（2025-09-26）
+- feat: 增加`cssToObj`
 ## 0.4.1（2025-06-13）
 - fix：测试hbx4.71更新
 ## 0.4.0（2025-06-04）

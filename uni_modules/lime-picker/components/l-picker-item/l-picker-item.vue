@@ -2,7 +2,9 @@
 	<picker-view
 		class="l-picker-item__group" 
 		:style="{opacity: options.length > 0 ? 1 : 0}"
+		:mask-style="platformMaskStyles.common"
 		:indicator-style="indicatorStyles"
+		mask-class="l-picker-item__mask"
 		:value="innerIndex"
 		@change="handlePick"
 		indicator-class="l-picker-item__indicator">
@@ -34,6 +36,7 @@
 	import { clamp } from '@/uni_modules/lime-shared/clamp'
 	import type { PickerItemProps, ManageChildInList, OnPick, UpdateItems } from './type';
 	import type { PickerColumnItem, PickerValue } from '../l-picker/type';
+	import { usePickerMask }  from './usePickerMask'
 	
 	import pickerItemProps from './props';
 	
@@ -43,6 +46,9 @@
 		props: pickerItemProps,
 		setup(props, {expose}) {
 			const instance = getCurrentInstance()!;
+			const themeMode = inject('limeConfigProviderTheme', computed(()=> 'light'))
+			const isDarkMode = computed(() : boolean => themeMode.value == 'dark')
+			
 			const picker = inject<LPickerComponentPublicInstance|null>('limePicker', null);
 			const pickerItemInstanceArray = inject<Ref<LPickerItemComponentPublicInstance[]>|null>('limePickerItems', null);
 			const manageChildInList = inject<ManageChildInList|null>('limePickerManageChildInList', null);
@@ -55,27 +61,27 @@
 			const curValue = ref<PickerValue|null>(null);
 			const column = computed(() : number => props.column != -1 ? props.column : pickerItemInstanceArray?.value.indexOf(instance.proxy! as LPickerItemComponentPublicInstance) ?? props.column);
 			
-			const elementPosition = computed(() : boolean[] => {
-				const totalElements = pickerItemInstanceArray?.value.length || 0;
-				return [column.value == 0, column.value == totalElements - 1]
-			});
 			const innerIndex = computed(():number[] => [curIndex.value])
+			const { platformMaskStyles } = usePickerMask(
+				computed(() => picker?.bgColor),
+				isDarkMode,
+				computed(() => picker?.maskColors),
+				true,
+			);
+			
+			// const maskStyle = computed(()=>{
+			// 	if (isDarkMode.value) {
+			// 		return `background-image: 
+			// 			linear-gradient(180deg, #242424, rgba(36, 36, 36, 0)),
+			// 			linear-gradient(0deg,   #242424, rgba(36, 36, 36, 0))`
+			// 		}
+			// 		return "";
+			// })
 			
 			const indicatorStyles = computed(() : string => {
-				const [isFirst, isLast] = elementPosition.value
-				let style = ``
-				
-				if(isFirst) {
-					style+= 'border-top-left-radius:12rpx; border-bottom-left-radius:12rpx;'
-				}
-				if(isLast) {
-					style+= 'border-top-right-radius:12rpx; border-bottom-right-radius:12rpx;'
-				}
-				return `
-					${style}
-					height: ${picker?.itemHeight || '50px'};
-					background-color: rgba(0, 0, 0, 0.04); ${picker?.indicatorStyle}`
+				return `border-top-color: rgba(0,0,0,0);border-bottom-color: rgba(0,0,0,0);` + picker?.itemHeight ? `height: ${picker?.itemHeight ?? '50px'};`: ''
 			})
+			
 			const itemStyles = computed(()=>{
 				const style:Record<string, any> = {};
 				if(picker?.itemColor) {
@@ -183,12 +189,14 @@
 			// #endif
 			
 			return {
+				// maskStyle,
 				indicatorStyles,
 				innerIndex,
 				curIndex,
 				handlePick,
 				itemStyles,
 				itemActiveStyles,
+				platformMaskStyles,
 				// #ifdef VUE2
 				setIndex,
 				setValue,

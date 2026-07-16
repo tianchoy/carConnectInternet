@@ -58,9 +58,6 @@ function parseDate(cfg) {
   if (date instanceof Date)
     return date;
   try {
-    if (typeof date == "string" && /^\d+$/.test(date)) {
-      return new Date(parseInt(`${date}`.padEnd(13, "0")));
-    }
     if (typeof date == "string" && !/Z$/i.test(date)) {
       const d = date.match(uni_modules_limeDayuts_common_constant.REGEX_PARSE);
       const isNull = d == null;
@@ -704,3 +701,4 @@ function dayuts(date = null, format = null, locale = null) {
   });
 }
 exports.dayuts = dayuts;
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/uni_modules/lime-dayuts/common/index.js.map

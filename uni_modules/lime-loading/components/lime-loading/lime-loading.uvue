@@ -59,10 +59,15 @@
 	
 	setTimeout(()=>{
 		color.value = '#34c471'
-		animated.value = false
+		// animated.value = false
 	},2000)
 </script>
 <style lang="scss">
+	$card-bg-color: var(--doc-card-bg-color, white);
+	// $page-bg-color: var(--doc-page-bg-color, #f5f5f5);
+	$title-color: var(--doc-title-color, #000000E6);
+	$summary-color: var(--doc-summary-color, #00000099);
+	
 	.row {
 		display: flex;
 		flex-direction: row;
@@ -76,7 +81,9 @@
 		overflow: visible;
 		&.card{
 			padding: 30rpx;
-			background-color: white;
+			background-color: $card-bg-color;
+			transition-property: background-color;
+			// transition-duration: 300ms;
 			margin-bottom: 20rpx !important;
 		}
 		&__title {
@@ -84,20 +91,20 @@
 			margin-top: 8px;
 
 			&-text {
-				color: rgba(0, 0, 0, 0.6);
+				color: $summary-color;
 				font-weight: 400;
 				font-size: 14px;
 				line-height: 16px;
 
 				&.large {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 18px;
 					font-weight: 700;
 					line-height: 26px;
 				}
 
 				&.ultra {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 24px;
 					font-weight: 700;
 					line-height: 32px;
@@ -106,7 +113,7 @@
 		}
 
 		&__desc-text {
-			color: rgba(0, 0, 0, 0.6);
+			color: $summary-color;
 			margin: 8px 16px 0 0;
 			font-size: 14px;
 			line-height: 22px;

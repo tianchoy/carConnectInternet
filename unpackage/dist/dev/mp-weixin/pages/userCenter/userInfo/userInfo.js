@@ -3,13 +3,13 @@ const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  (_easycom_custom_navBar_1 + _easycom_uv_icon_1)();
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
-const _easycom_uv_icon = () => "../../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
+const _easycom_i_icon = () => "../../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_uv_icon)();
+  (_easycom_custom_navBar + _easycom_i_icon)();
 }
 class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -49,15 +49,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo) {
         try {
           const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
+          const userId = parsedInfo.getString("userId");
+          const mobile = parsedInfo.getString("mobile");
+          const type = parsedInfo.getNumber("type");
+          const createTime = parsedInfo.getString("createTime");
           userInfo.value = {
-            id: parsedInfo.getString("userId") || "",
-            mobile: parsedInfo.getString("mobile") || "",
-            type: parsedInfo.getNumber("type") || 0,
-            createTime: parsedInfo.getString("createTime") || ""
+            id: userId != null ? userId : "",
+            mobile: mobile != null ? mobile : "",
+            type: type != null ? type : 0,
+            createTime: createTime != null ? createTime : ""
           };
-          console.log("用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:81", "用户信息:", userInfo.value);
         } catch (e) {
-          console.error("解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:83", "解析用户信息失败:", e);
         }
       }
     });
@@ -100,12 +104,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.unref(userInfo).type == 1
       }, common_vendor.unref(userInfo).type == 1 ? {
         h: common_vendor.p({
-          name: "arrow-right",
-          size: "18"
+          name: "/static/arrow-right.png",
+          fontSize: "15"
         }),
-        i: common_vendor.o(editPassword, "cc")
+        i: common_vendor.o(editPassword, "1b")
       } : {}, {
-        j: common_vendor.o(logoutBtn, "cd"),
+        j: common_vendor.o(logoutBtn, "4e"),
         k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         l: `${_ctx.u_s_b_h}px`,
         m: `${_ctx.u_s_a_i_b}px`,
@@ -116,3 +120,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/userCenter/userInfo/userInfo.js.map

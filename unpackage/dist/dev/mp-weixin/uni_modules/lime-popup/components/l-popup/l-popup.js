@@ -4,13 +4,13 @@ const uni_modules_limeTransition_index = require("../../../lime-transition/index
 const uni_modules_limePopup_components_lPopup_utils = require("./utils.js");
 if (!Array) {
   const _easycom_l_overlay_1 = common_vendor.resolveComponent("l-overlay");
-  const _easycom_l_icon_1 = common_vendor.resolveComponent("l-icon");
-  (_easycom_l_overlay_1 + _easycom_l_icon_1)();
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  (_easycom_l_overlay_1 + _easycom_i_icon_1)();
 }
 const _easycom_l_overlay = () => "../../../lime-overlay/components/l-overlay/l-overlay.js";
-const _easycom_l_icon = () => "../../../lime-icon/components/l-icon/l-icon.js";
+const _easycom_i_icon = () => "../../../i-ui-x/components/i-icon/i-icon.js";
 if (!Math) {
-  (_easycom_l_overlay + _easycom_l_icon)();
+  (_easycom_l_overlay + _easycom_i_icon)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "l-popup",
@@ -133,10 +133,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: _ctx.closeable
       }, _ctx.closeable ? {
         f: common_vendor.p({
-          name: _ctx.closeIcon,
+          name: "close",
+          fontSize: "20",
           size: "27px",
-          color: _ctx.iconColor,
-          class: "l-popup__close-icon"
+          color: _ctx.iconColor
         }),
         g: common_vendor.o(handleClose, "e0")
       } : {}, {
@@ -157,3 +157,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-popup/components/l-popup/l-popup.js.map

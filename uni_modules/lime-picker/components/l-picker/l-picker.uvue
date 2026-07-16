@@ -1,25 +1,28 @@
 <template>
 	<view class="l-picker" :style="[styles]" ref="pickerRef">
-		<view class="l-picker__toolbar" :key="ohosShow" v-if="cancelBtn != null || title != null || confirmBtn != null">
-			<text class="l-picker__cancel" :key="ohosShow" :style="cancelStyle??''" v-if="cancelBtn != null"
-				@click="onCancel">{{cancelBtn}}</text>
-			<text class="l-picker__title" :key="ohosShow" :style="titleStyle??''">{{title}}</text>
-			<text class="l-picker__confirm" :key="ohosShow" :style="confirmStyle??''" v-if="confirmBtn != null"
-				@click="onConfirm">{{confirmBtn}}</text>
+		<view class="l-picker__toolbar" v-if="cancelBtn != null || title != null || confirmBtn != null">
+			<text class="l-picker__cancel" :style="[cancelStyle??{}]" v-if="cancelBtn != null" @click="onCancel">{{cancelBtn}}</text>
+			<!-- #ifdef APP-HARMONY -->
+			<text v-else class="l-picker__cancel"></text>
+			<!-- #endif -->
+			<text class="l-picker__title" :style="[titleStyle??{}]">{{title}}</text>
+			<text class="l-picker__confirm" :style="[confirmStyle??{}]" v-if="confirmBtn != null" @click="onConfirm">{{confirmBtn}}</text>
+			<!-- #ifdef APP-HARMONY -->
+			<text v-else class="l-picker__confirm"></text>
+			<!-- #endif -->
 		</view>
 		<slot name="header"></slot>
 		<view class="l-picker__main" :style="[groupHeight != null ? { height:  groupHeight}: {}]">
 			<slot>
-				<l-picker-item v-for="(options, i) in props.columns" :options="options" :key="i" :column="i"
-					:value="pickerValue.length > i ? pickerValue[i]: null"></l-picker-item>
+				<l-picker-item v-for="(options, i) in props.columns" :options="options" :key="i" :column="i" :value="pickerValue.length > i ? pickerValue[i]: null"></l-picker-item>
 			</slot>
 			<view class="l-picker__empty" v-if="isEmpty">
 				<slot name="empty"></slot>
 			</view>
+			<view class="l-picker__indicator" :style="indicatorStyle ?? ''" v-if="!isEmpty"></view>
 		</view>
 		<slot name="footer" />
-		<view class="l-picker__loading" ref="loadingRef" v-if="loading"
-			:style="[loadingMaskColor != null ? {background: loadingMaskColor}: {}]">
+		<view class="l-picker__loading" ref="loadingRef" v-if="loading" :style="[loadingMaskColor != null ? {background: loadingMaskColor}: {}]">
 			<!-- #ifndef APP -->
 			<l-loading :size="loadingSize" :color="loadingColor"></l-loading>
 			<!-- #endif -->
@@ -53,6 +56,7 @@
 	 * @property {string} itemFontSize 选项字体大小
 	 * @property {string} itemActiveColor 选中项颜色
 	 * @property {string} indicatorStyle 指示器样式
+	 * @property {string[]} maskColors 遮罩颜色
 	 * @property {string} bgColor 背景颜色
 	 * @property {string} groupHeight 选项组高度
 	 * @property {string} radius 圆角半径
@@ -63,25 +67,25 @@
 	 * @event {Function} change 值变化时触发（事件参数：PickerPickEvent）
 	 * @event {Function} column-change 列数据变化时触发（事件参数：PickerChangeInfo）
 	 */
-	import { PickerProps, PickerColumn, PickerValue, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from './type';
-	import { pushAt } from './utils';
+	import type { PickerProps, PickerColumn, PickerValue, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from './type';
+	import { arrayEqual } from '@/uni_modules/lime-shared/arrayEqual'
+	import { assignAtIndex } from '@/uni_modules/lime-shared/assignAtIndex'
 	import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
 	// #ifdef APP
 	import { useLoading } from '@/uni_modules/lime-loading'
 	// #endif
-	const emit = defineEmits(['change', 'cancel', 'pick', 'confirm', 'update:modelValue', 'update:value']);
+	const emit = defineEmits(['change', 'cancel', 'pick', 'confirm', 'update:modelValue']);
 	const props = withDefaults(defineProps<PickerProps>(), {
 		columns: [] as PickerColumn[],
 		loading: false,
 		resetIndex: false,
-		loadingSize: '64rpx'
+		loadingSize: '32px'
 	})
 	const pickerItemInstanceArray = reactive<LPickerItemComponentPublicInstance[]>([]);
-	const ohosShow = ref(0)
 	const modelValue = ref<PickerValue[]>(props.value ?? props.modelValue ?? props.defaultValue ?? [])
 	const pickerValue = computed({
 		set(value : PickerValue[]) {
-			if (value.join('') == modelValue.value.join('')) return
+			if (arrayEqual(value, modelValue.value)) return
 			modelValue.value = value;
 			emit('update:modelValue', value)
 			emit('change', value)
@@ -129,9 +133,9 @@
 	}
 
 	const updateItems = (item : PickerColumnItem, index : number, column : number) => {
-		pushAt(curIndexArray.value, column, index)
-		pushAt(curValueArray.value, column, item.value)
-		pushAt(curItemArray, column, item)
+		assignAtIndex(curIndexArray.value, column, index)
+		assignAtIndex(curValueArray.value, column, item.value)
+		assignAtIndex(curItemArray, column, item)
 	};
 	
 	const updatePickerItems = () => {
@@ -154,29 +158,19 @@
 			_indexs.push(index)
 			_values.push(item.value)
 
-			pushAt(curItemArray, column, item)
-			// pushAt(curIndexArray.value, column, index)
-			// pushAt(curValueArray.value, column, item.value)
-			// // 不能改变单向数据流, 只有值不存在时候才处理
-			// if(pickerValue.value.length == 0) {
-			// 	pickerValue.value = [...curValueArray.value]
-			// }
-			// if(pickerValue.value.join('') == curValueArray.value.join('')) return
-			// pickerValue.value = [...curValueArray.value]
+			assignAtIndex(curItemArray, column, item)
 		})
-		if (curIndexArray.value.join('') == _indexs.join('')) return
+		if (arrayEqual(curValueArray.value, _values) && arrayEqual(curIndexArray.value, _indexs)) return
 		curIndexArray.value = _indexs
 		curValueArray.value = _values
-		// if(pickerValue.value.length == 0) {
 		pickerValue.value = [...curValueArray.value]
-		// }
 	}
 
 	const onPick = (item : PickerColumnItem, index : number, column : number) => {
 		if (curIndexArray.value[column] == index) return
-		pushAt(curIndexArray.value, column, index)
-		pushAt(curValueArray.value, column, item.value)
-		pushAt(curItemArray, column, item)
+		assignAtIndex(curIndexArray.value, column, index)
+		assignAtIndex(curValueArray.value, column, item.value)
+		assignAtIndex(curItemArray, column, item)
 		const obj : PickerPickEvent = {
 			values: curValueArray.value,
 			column,
@@ -190,11 +184,11 @@
 		updatePickerItems()
 		emit('cancel', e)
 	}
-	const onConfirm = (e : UniPointerEvent) => {
+	const onConfirm = () => {
 		const values = [...curValueArray.value];
 		const indexs = [...curIndexArray.value];
 		const items = curItemArray.map((item) : PickerColumnItem => toRaw(item))
-		if (pickerValue.value.join('') != values.join('')) {
+		if (!arrayEqual(pickerValue.value, values)) {
 			pickerValue.value = values;
 		}
 		const obj : PickerConfirmEvent = {
@@ -205,56 +199,20 @@
 		emit('confirm', obj)
 	}
 	const stopPickerValue = watch(pickerValue, () => {
-		if (pickerValue.value.join('') == curValueArray.value.join('')) return
+		if (arrayEqual(pickerValue.value, curValueArray.value)) return
 		curValueArray.value = pickerValue.value.map((item : PickerValue) => item);
 		updatePickerItems()
 	})
 
 	const stopColumns = watch(realColumns, () => {
 		updatePickerItems()
-		// nextTick(() => {
-		// 	setTimeout(()=>{
-		// 		updatePickerItems()
-		// 	},2000)
-			
-		// })
 	})
-	
-	
-	// #ifdef APP-HARMONY
-	// 在弹窗中 文本没有样式，给它重绘
-	const pickerRef = ref<UniElement|null>(null)
-	const updateOhosKey = () =>{
-		requestAnimationFrame(()=>{
-			ohosShow.value++
-			setTimeout(()=>{
-				ohosShow.value++
-			},200)
-			pickerRef.value?.getBoundingClientRectAsync((res)=>{
-				ohosShow.value++
-			})
-		})
-	}
-	const resizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
-		nextTick(updateOhosKey)
-	}) 
-	
-	const stopWatch = watch(():UniElement|null => pickerRef.value, (el:UniElement|null) => {
-		if(el== null) return
-		nextTick(updateOhosKey)
-		resizeObserver.observe(el)
-	})
-	
-	onUnmounted(()=>{
-		stopWatch()
-		resizeObserver.disconnect()
-	})
-	// #endif
 	
 	onMounted(() => {
 		nextTick(() => {
-			
-			if (pickerValue.value.join('') != curValueArray.value.join('') && pickerValue.value.length > 0) {
+			if (
+				!arrayEqual(pickerValue.value, curValueArray.value) && 
+				pickerValue.value.length > 0) {
 				curValueArray.value = [...pickerValue.value]
 				updatePickerItems()
 			}
@@ -280,7 +238,26 @@
 		stopPickerValue()
 		stopColumns()
 	})
-
+	
+	
+	defineExpose({
+		confirm: onConfirm,
+		getSelectedOptions: (): PickerConfirmEvent => {
+			const values = [...curValueArray.value];
+			const indexs = [...curIndexArray.value];
+			const items = curItemArray.map((item) : PickerColumnItem => toRaw(item))
+			if (!arrayEqual(pickerValue.value, values)) {
+				pickerValue.value = values;
+			}
+			const obj : PickerConfirmEvent = {
+				values,
+				indexs,
+				items
+			}
+			return obj
+		}
+	})
+	
 	provide('limePicker', props)
 	provide('limePickerOnPick', onPick)
 	provide('limePickerUpdateItems', updateItems)

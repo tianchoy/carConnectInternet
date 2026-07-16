@@ -1,513 +1,574 @@
-# lime-shared 工具库
-- 本人插件的几个公共函数
-- 按需引入
+# LimeShared 常用函数库
+专为UI组件开发设计的轻量级工具集，提供高效便捷的辅助能力
 
-## 安装
-在插件市场导入即可
 
-## 文档
-[shared](https://limex.qcoon.cn/shared/overview.html)
+## 文档链接
+📚 组件详细文档请访问以下站点：
+- [常用函数库文档 - 站点1](https://limex.qcoon.cn/uts/shared.html)
+- [常用函数库文档 - 站点2](https://limeui.netlify.app/uts/shared.html)
+- [常用函数库文档 - 站点3](https://limeui.familyzone.top/uts/shared.html)
+
+
+## 安装方法
+1. 在uni-app插件市场中搜索并导入`lime-shared`
 
 ## 使用
-按需引入只会引入相关的方法，不要看着 插件函数列表多 而占空间，只要不引用不会被打包
+### addUnit 添加单位
+给一个值添加单位
 ```js
-import {getRect} from '@/uni_modules/lime-shared/getRect'
+import { addUnit } from '@/uni_modules/lime-shared/addUnit'
+```
+```js
+addUnit(100) // 输出: "100px"
+addUnit("200") // 输出: "200px"
+addUnit("300px") // 输出: "300px"（已经包含单位）
+addUnit() // 输出: undefined（值为 undefined）
+addUnit(null) // 输出: undefined（值为 null）
 ```
 
-## 目录
-+ [getRect](#api_getRect): 获取节点尺寸信息
-+ [addUnit](#api_addUnit): 将未带单位的数值添加px，如果有单位则返回原值
-+ [unitConvert](#api_unitConvert): 将带有rpx|px的字符转成number,若本身是number则直接返回
-+ [canIUseCanvas2d](#api_canIUseCanvas2d): 环境是否支持使用 canvas 2d
-+ [getCurrentPage](#api_getCurrentPage): 获取当前页
-+ [base64ToPath](#api_base64ToPath): 把base64的图片转成临时路径
-+ [pathToBase64](#api_pathToBase64): 把图片的临时路径转成base64
-+ [sleep](#api_sleep): async 内部程序等待一定时间后再执行
-+ [throttle](#api_throttle): 节流
-+ [debounce](#api_debounce): 防抖
-+ [random](#api_random): 返回指定范围的随机数
-+ [range](#api_range): 生成区间数组 
-+ [clamp](#api_clamp): 夹在min和max之间的数值 
-+ [floatAdd](#api_floatAdd): 返回两个浮点数相加的结果
-+ [fillZero](#api_fillZero): 补零，如果传入的是个位数则在前面补0
-+ [exif](#api_exif): 获取图片exif
-+ [selectComponent](#api_selectComponent): 获取页面或当前实例的指定组件
-+ [createAnimation](#api_createAnimation): uni.createAnimation
-+ [animation](#api_animation): 数值从一个值到另一个值的过渡
-+ [camelCase](#api_camelCase): 字符串转换为 camelCase 或 PascalCase 风格的命名约定
-+ [kebabCase](#api_kebabCase): 将字符串转换为指定连接符的命名约定
-+ [closest](#api_closest): 在给定数组中找到最接近目标数字的元素
-+ [shuffle](#api_shuffle): 将给定的数组打乱
-+ [merge](#api_merge): 深度合并两个对象
-+ [isBase64](#api_isBase64): 判断字符串是否为base64
-+ [isNumber](#api_isNumber): 检查一个值是否为数字类型
-+ [isNumeric](#api_isNumeric): 检查一个值是否为数字类型或表示数字的字符串
-+ [isString](#api_isString): 检查一个值是否为字符串类型
-+ [isIP](#api_isIP): 检查一个值是否为IP地址格式
-+ [composition-api](#api_composition-api): 为兼容vue2
-
-## Utils
-
-
-### getRect <a id="api_getRect"></a>
-- 返回节点尺寸信息
-
+### camelCase 转驼峰 
+将字符串转换为 camelCase 或 PascalCase 风格的命名约定
 ```js
-// 组件内需要传入上下文
-// 如果是nvue 则需要在节点上加与id或class同名的ref
-getRect('#id',this).then(res => {})
+import { camelCase } from '@/uni_modules/lime-shared/camelCase'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-
-### addUnit <a id="api_addUnit"></a> 
-- 将未带单位的数值添加px，如果有单位则返回原值
-
 ```js
-addUnit(10)
-// 10px
+// 基础用法
+camelCase('foo-bar-baz')        // 'fooBarBaz'
+camelCase('hello_world', true)   // 'HelloWorld'
+camelCase('data-MAP')            // 'dataMap'
+
+// 特殊分隔符处理
+camelCase('  spaced  words ')    // 'spacedWords'
+camelCase('mixed-separator_example') // 'mixedSeparatorExample'
+
+// 边缘情况
+camelCase('single')              // 'single'
+camelCase('', true)              // ''
+camelCase('alreadyCamelCase')    // 'alreadycamelcase'（注意：会强制转为全小写）
+
+// 包含数字
+camelCase('api-v2-version')      // 'apiV2Version'
+camelCase('item3', true)         // 'Item3'
+
+// 保留原始单词结构（首字母大写会被覆盖）
+camelCase('HTTP-Status-Code')    // 'httpStatusCode'
+camelCase('CSS-Module', true)    // 'CssModule'
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-
-### unitConvert <a id="api_unitConvert"></a>
-- 将带有rpx|px的字符转成number,若本身是number则直接返回
+### capitalizedAmount 金额转中文
+将金额转换为中文大写形式
 
 ```js
-unitConvert('10rpx') 
-// 5 设备不同 返回的值也不同
-unitConvert('10px') 
-// 10
-unitConvert(10) 
-// 10
+import { capitalizedAmount } from '@/uni_modules/lime-shared/capitalizedAmount'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-### canIUseCanvas2d <a id="api_canIUseCanvas2d"></a>
-- 环境是否支持使用 canvas 2d
 
 ```js
-canIUseCanvas2d()
-// 若支持返回 true 否则 false
+capitalizedAmount(123456789.12)  // "壹亿贰仟叁佰肆拾伍万陆仟柒佰捌拾玖元壹角贰分"
+capitalizedAmount(1004.5)        // "壹仟零肆元伍角"
+capitalizedAmount(0.45)          // "肆角伍分"
+capitalizedAmount(null)          // "不是有效的金额！"
+capitalizedAmount(10e11)         // "计算金额过大！"
+capitalizedAmount('12,345.6')    // "壹万贰仟叁佰肆拾伍元陆角整"
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
 
-
-
-### getCurrentPage <a id="api_getCurrentPage"></a>
-- 获取当前页
+### clamp 限制值
+限制值函数, 将一个值限制在指定的范围内
 
 ```js
-const page = getCurrentPage()
+import { clamp } from '@/uni_modules/lime-shared/clamp'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-### base64ToPath <a id="api_base64ToPath"></a>
-- 把base64的图片转成临时路径
 
 ```js
-base64ToPath(`xxxxx`).then(res => {})
+// 示例1：限制值在0和5之间，输入值10超出上限，返回上限5
+clamp(10, 0, 5);  // 输出：5
+
+// 示例2：限制值在-1和1之间，输入值-3低于下限，返回下限-1
+clamp(-3, -1, 1);  // 输出：-1
+
+// 示例3：限制值在5和10之间，输入值7在范围内，返回原值7
+clamp(7, 5, 10);  // 输出：7
+
+// 示例4：限制值在20和30之间，输入值15低于下限，返回下限20
+clamp(15, 20, 30);  // 输出：20
+
+// 示例5：限制值在0和100之间，输入值50在范围内，返回原值50
+clamp(50, 0, 100);  // 输出：50
+
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
 
 
-
-### pathToBase64 <a id="api_pathToBase64"></a>
-- 把图片的临时路径转成base64
+### closest 寻找接近值 
+寻找最接近的值函数, 在给定数组中找到最接近目标数字的元素。
 
 ```js
-pathToBase64(`xxxxx/xxx.png`).then(res => {})
+import { closest } from '@/uni_modules/lime-shared/closest'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
+```js
+// 示例1：在数组[1, 2, 3, 4, 5]中寻找最接近7的值，返回5
+closest([1, 2, 3, 4, 5], 7);  // 输出：5
+
+// 示例2：在数组[10, 20, 30, 40, 50]中寻找最接近25的值，返回30
+closest([10, 20, 30, 40, 50], 25);  // 输出：30
+
+// 示例3：在数组[-5, -3, -1, 0, 1, 3, 5]中寻找最接近-2的值，返回-1
+closest([-5, -3, -1, 0, 1, 3, 5], -2);  // 输出：-1
+
+// 示例4：在数组[100, 200, 300, 400]中寻找最接近150的值，返回100
+closest([100, 200, 300, 400], 150);  // 输出：100
+
+// 示例5：在数组[0.1, 0.5, 1.0, 1.5, 2.0]中寻找最接近0.8的值，返回0.5
+closest([0.1, 0.5, 1.0, 1.5, 2.0], 0.8);  // 输出：0.5
+
+```
 
 
-
-### sleep <a id="api_sleep"></a>
-- 睡眠，让 async 内部程序等待一定时间后再执行
+### exif 图片信息
+获取图片exif,不支持uniappx app
 
 ```js
-async next () => {
-	await sleep(300)
-	console.log('limeui');
-}
+import { exif } from '@/uni_modules/lime-shared/exif'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### throttle <a id="api_throttle"></a> 
-- 节流
-
-```js
-throttle((nama) => {console.log(nama)}, 200)('limeui');
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### debounce <a id="api_debounce"></a>
-- 防抖
-
-```js
-debounce((nama) => {console.log(nama)}, 200)('limeui');
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### random <a id="api_random"></a>
-- 返回指定范围的随机数
-
-```js
-random(1, 5);
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### range <a id="api_range"></a>
-- 生成区间数组
-
-```js
-range(0, 5)
-// [0,1,2,3,4,5]
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-### clamp <a id="api_clamp"></a>
-- 夹在min和max之间的数值，如小于min，返回min, 如大于max，返回max，否侧原值返回
-
-```js
-clamp(0, 10, -1)
-// 0
-clamp(0, 10, 11)
-// 10
-clamp(0, 10, 9)
-// 9
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-### floatAdd <a id="api_floatAdd"></a>
-- 返回两个浮点数相加的结果
-
-```js
-floatAdd(0.1, 0.2) // 0.3
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### fillZero <a id="api_fillZero"></a>
-- 补零，如果传入的是`个位数`则在前面补0
-
-```js
-fillZero(9);
-// 09
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### exif <a id="api_exif"></a>
-- 获取图片exif
-- 支持临时路径、base64
 
 ```js
 uni.chooseImage({
-	count: 1, //最多可以选择的图片张数
-	sizeType: "original",
-	success: (res) => {
-		exif.getData(res.tempFiles[0], function() {
-			let tagj = exif.getTag(this, "GPSLongitude");
-			let	Orientation = exif.getTag(this, 'Orientation');  
-			console.log(tagj, Orientation)
-		})
-	}
+    count: 1, //最多可以选择的图片张数
+    sizeType: "original",
+    success: (res) => {
+        exif.getData(res.tempFiles[0], function() {
+            let tagj = exif.getTag(this, "GPSLongitude");
+            let Orientation = exif.getTag(this, 'Orientation');  
+            console.log(tagj, Orientation)
+        })
+    }
 })
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | x                 | 
-
-
-### selectComponent <a id="api_selectComponent"></a>
-- 获取页面或当前实例的指定组件，会在页面或实例向所有的节点查找（包括子组件或子子组件）
-- 仅vue3，vue2没有测试过
+### fillZero 数字补0 
+在数字前填充零，返回字符串形式的结果
 
 ```js
-// 当前页面
-const page = getCurrentPage()
-selectComponent('.custom', {context: page}).then(res => {
-})
+import { fillZero } from '@/uni_modules/lime-shared/fillZero'
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | x                 | 
-
-
-
-### createAnimation <a id="api_createAnimation"></a>
-- 创建动画，与uni.createAnimation使用方法一致，只为了抹平nvue
-
-```html
-<view ref="ball" :animation="animationData"></view>
-```
-```js
-const ball = ref(null)
-const animation = createAnimation({
-  transformOrigin: "50% 50%",
-  duration: 1000,
-  timingFunction: "ease",
-  delay: 0
-})
-
-animation.scale(2,2).rotate(45).step()
-// nvue 无导出数据，这样写只为了平台一致，
-// nvue 需要把 ref 传入，其它平台不需要
-const animationData = animation.export(ball.value)
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-### camelCase <a id="api_camelCase"></a>
-- 将字符串转换为 camelCase 或 PascalCase 风格的命名约定
 
 ```js
-camelCase("hello world") // helloWorld
-camelCase("hello world", true) // HelloWorld
+// 示例1：将数字5填充到长度为2的字符串，返回"05"
+fillZero(5);  // 输出："05"
+
+// 示例2：将数字123填充到长度为5的字符串，返回"00123"
+fillZero(123, 5);  // 输出："00123"
+
+// 示例3：将数字9填充到默认长度2的字符串，返回"09"
+fillZero(9);  // 输出："09"
+
+// 示例4：将数字456填充到长度为3的字符串，由于数字本身长度大于3，返回原数字字符串"456"
+fillZero(456, 3);  // 输出："456"
+
+// 示例5：将数字0填充到长度为4的字符串，返回"0000"
+fillZero(0, 4);  // 输出："0000"
+
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
 
-
-### kebabCase <a id="api_kebabCase"></a>
-- 将字符串转换为指定连接符的命名约定
+### floatAdd 浮点数加法
+浮点数加法，返回两个浮点数相加的结果
 
 ```js
-kebabCase("helloWorld") // hello-world
-kebabCase("hello world_example") // hello-world-example
-kebabCase("helloWorld", "_") // hello_world
+import { floatAdd } from '@/uni_modules/lime-shared/floatAdd'
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-
-
-### closest <a id="api_closest"></a>
-- 在给定数组中找到最接近目标数字的元素
-
 ```js
-closest([1, 3, 5, 7, 9], 6) // 5
+// 示例1：正确相加两个浮点数，返回5.3
+floatAdd(2.1, 3.2);  // 输出：5.3
+
+// 示例2：相加一个整数和一个浮点数，返回12.02
+floatAdd(10, 2.02);  // 输出：12.02
+
+// 示例3：相加两个浮点数，其中一个有较多小数位，返回0.3333
+floatAdd(0.1111, 0.2222);  // 输出：0.3333
+
+// 示例4：传递非数字类型参数，将警告并返回NaN
+floatAdd('a' as any, 2.3);  // 输出：NaN，并控制台警告
+
+// 示例5：相加两个整数，返回100
+floatAdd(50, 50);  // 输出：100
+
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### shuffle <a id="api_shuffle"></a>
-- 在给定数组中找到最接近目标数字的元素
+### floatDiv 浮点数除法
+浮点数除法，除法函数，用于处理浮点数除法并保持精度。
 
 ```js
-shuffle([1, 3, 5, 7, 9]) 
+import { floatDiv } from '@/uni_modules/lime-shared/floatDiv'
 ```
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### merge <a id="api_merge"></a>
-- 深度合并两个对象
 
 ```js
-const original = { color: 'red' };
-const merged = merge({ ...original }, { color: 'blue', size: 'M' });
+// 假设 floatMul 函数已经定义，并且正确实现了浮点数乘法
 
-console.log('original', original);    // 输出: { color: 'red' } (保持不变)
-console.log('merged', merged);      // 输出: { color: 'red', size: 'M' }
+// 示例1：正确相除两个浮点数，返回2
+floatDiv(6, 3);  // 输出：2
+
+// 示例2：相除两个浮点数，其中一个有较多小数位，返回2.5
+floatDiv(5, 2);  // 输出：2.5
+
+// 示例3：传递非数字类型参数，将警告并返回NaN
+floatDiv('a' as any, 2);  // 输出：NaN，并控制台警告
+
+// 示例4：相除两个浮点数，其中一个为0，将返回Infinity
+floatDiv(10, 0);  // 输出：Infinity
+
+// 示例5：相除两个浮点数，返回0.6666666666666666
+floatDiv(2, 3);  // 输出：0.6666666666666666
+
+```
 
 
-type ColorType = {
-	color?: string,
-	size?: string,
+### floatMul 浮点数乘法
+浮点数乘法，用于处理浮点数乘法并保持精度。
+
+```js
+import { floatMul } from '@/uni_modules/lime-shared/floatMul'
+```
+
+```js
+// 示例1：正确相乘两个浮点数，返回8
+floatMul(2.0, 4.0);  // 输出：8
+
+// 示例2：相乘两个浮点数，其中一个有小数，返回7.5
+floatMul(3.0, 2.5);  // 输出：7.5
+
+// 示例3：传递非数字类型参数，将警告并返回NaN
+floatMul('a' as any, 2.0);  // 输出：NaN，并控制台警告
+
+// 示例4：相乘两个浮点数，其中一个为0，将返回0
+floatMul(0, 10.123);  // 输出：0
+
+// 示例5：相乘两个浮点数，返回0.333
+floatMul(1/3, 1);  // 输出：0.3333333333333333，但实际结果可能因精度问题而略有不同
+
+```
+
+
+### floatSub 浮点数减法
+浮点数减法，用于处理浮点数减法并保持精度。
+
+```js
+import { floatSub } from '@/uni_modules/lime-shared/floatSub'
+```
+
+```js
+// 示例1：正确相减两个浮点数，返回2
+floatSub(5.0, 3.0);  // 输出：2
+
+// 示例2：相减两个浮点数，其中一个有小数，返回0.5
+floatSub(3.5, 3.0);  // 输出：0.5
+
+// 示例3：传递非数字类型参数，将警告并返回NaN
+floatSub('a' as any, 2.0);  // 输出：NaN，并控制台警告
+
+// 示例4：相减两个浮点数，其中一个为0，将返回另一个数的相反数
+floatSub(0, 10.123);  // 输出：-10.123
+
+// 示例5：相减两个浮点数，返回-0.333
+floatSub(1.0, 4/3);  // 输出：-0.3333333333333333，但实际结果可能因精度问题而略有不同
+
+```
+
+
+### getRect 获取元素尺寸
+获取节点信息
+
+```js
+import { getRect, getAllRect } from '@/uni_modules/lime-shared/getRect'
+```
+
+```js
+
+ // * @param selector 选择器字符串
+ // * @param context ComponentInternalInstance 对象
+ // * @param node 是否获取node
+ // * @returns 包含节点信息的 Promise 对象
+ 
+getRect('#id', this).then((res:DOMRect) => {})
+getAllRect('#id', this).then((res:DOMRect) => {})
+```
+
+### isNumber 是否数值
+检查一个值是否为数字类型
+
+```js
+import { isNumber } from '@/uni_modules/lime-shared/isNumber'
+```
+
+
+```js
+// 示例1：检查数字42，返回true
+isNumber(42); // 输出：true
+
+// 示例2：检查字符串"42"，返回false，因为函数当前实现不处理字符串
+isNumber("42"); // 输出：false
+
+// 示例3：检查NaN，返回false
+isNumber(NaN); // 输出：false
+
+// 示例4：检查null，返回false
+isNumber(null); // 输出：false
+
+// 示例5：检查undefined，返回false
+isNumber(undefined); // 输出：false
+
+// 示例6：检查空字符串，返回false
+isNumber(""); // 输出：false
+
+// 示例7：检查包含数字的字符串"123abc"，返回false
+isNumber("123abc"); // 输出：false
+
+```
+
+
+### isNumeric 是否数值字符
+检查一个值是否为数字类型或表示数字的字符串
+
+```js
+import { isNumeric } from '@/uni_modules/lime-shared/isNumeric'
+```
+
+
+```js
+// 示例1：检查数字42，返回true
+isNumeric(42); // 输出：true
+
+// 示例2：检查字符串"42"，返回true
+isNumeric("42"); // 输出：true
+
+// 示例3：检查字符串"3.14"，返回true
+isNumeric("3.14"); // 输出：true
+
+// 示例4：检查负数字符串"-42"，返回true
+isNumeric("-42"); // 输出：true
+
+// 示例5：检查NaN，返回false
+isNumeric(NaN); // 输出：false
+
+// 示例6：检查null，返回false
+isNumeric(null); // 输出：false
+
+// 示例7：检查undefined，返回false
+isNumeric(undefined); // 输出：false
+
+// 示例8：检查空字符串，返回false
+isNumeric(""); // 输出：false
+
+// 示例9：检查包含数字的字符串"123abc"，返回false
+isNumeric("123abc"); // 输出：false
+
+// 示例10：检查只包含小数点的字符串".", 返回false
+isNumeric("."); // 输出：false
+
+// 示例11：检查只包含负号的字符串"-", 返回false
+isNumeric("-"); // 输出：false
+
+```
+
+
+
+### kebabCase 连字符格式
+将字符串转换为指定连接符的命名约定
+
+```js
+import { kebabCase } from '@/uni_modules/lime-shared/kebabCase'
+```
+
+
+```js
+// 示例1：将CamelCase字符串转换为连字符格式，默认分隔符为"-"
+kebabCase("camelCaseString"); // 输出：camel-case-string
+
+// 示例2：将PascalCase字符串转换为连字符格式，指定分隔符为"_"
+kebabCase("PascalCaseString", "_"); // 输出：pascal_case_string
+
+// 示例3：将字符串中已有的空格和下划线替换为连字符
+kebabCase("This is a test_string"); // 输出：this-is-a-test-string
+
+// 示例4：处理已经包含连字符的字符串，避免重复的连字符
+kebabCase("already-kabab-case"); // 输出：already-kabab-case
+
+// 示例5：处理字符串开头和结尾的连字符
+kebabCase("-start-end-"); // 输出：start-end
+
+// 示例6：处理全大写的字符串
+kebabCase("HTTPERROR404"); // 输出：http-error404
+
+```
+
+
+### raf 动画帧函数
+请求动画帧函数
+
+```js
+import { raf, cancelRaf, doubleRaf } from '@/uni_modules/lime-shared/raf'
+```
+
+```js
+// 示例1：使用 raf 函数在Web环境中请求动画帧
+raf(() => {
+  console.log('动画帧执行');
+});
+
+// 示例2：使用 cancelRaf 函数取消动画帧
+const frameId = raf(() => {
+  console.log('这个动画帧将被取消');
+});
+cancelRaf(frameId);
+
+// 示例3：使用 doubleRaf 函数实现双倍动画帧效果
+doubleRaf(() => {
+  console.log('双倍动画帧执行');
+});
+
+```
+
+
+### random 随机数
+生成一个指定范围内的随机数
+
+```js
+import { random } from '@/uni_modules/lime-shared/random'
+```
+
+
+```js
+// 示例1：生成一个介于0到100之间的随机整数
+random(0, 100); // 输出：一个0到100之间的随机整数
+
+// 示例2：生成一个介于50到100之间的随机整数
+random(50, 100); // 输出：一个50到100之间的随机整数
+
+// 示例3：生成一个介于0到1之间的随机数，并保留两位小数
+random(0, 1, 2); // 输出：一个0到1之间的随机数，例如0.12
+
+// 示例4：生成一个介于10到20之间的随机整数
+random(10, 20); // 输出：一个10到20之间的随机整数
+
+// 示例5：生成一个介于0到10之间的随机数，并保留一位小数
+random(0, 10, 1); // 输出：一个0到10之间的随机数，例如3.4
+
+```
+
+
+### range 范围数组
+生成一个数字范围的数组
+
+```js
+import { range } from '@/uni_modules/lime-shared/range'
+```
+
+
+```js
+// 示例1：生成一个从 0 到 9 的数组
+range(0, 10); // 输出：[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+// 示例2：生成一个从 1 到 10 的数组，步长为 2
+range(1, 11, 2); // 输出：[1, 3, 5, 7, 9]
+
+// 示例3：生成一个从 10 到 1 的数组，步长为 -1，从右侧开始填充
+range(10, 0, -1, true); // 输出：[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+
+// 示例4：生成一个从 0 到 5 的数组，步长为 1，从右侧开始填充
+range(0, 6, 1, true); // 输出：[5, 4, 3, 2, 1, 0]
+
+```
+
+
+### shuffle 数组洗牌
+随机化数组中元素的顺序，使用 Fisher-Yates 算法
+
+```js
+import { shuffle } from '@/uni_modules/lime-shared/shuffle'
+```
+
+```js
+// 示例1：对数字数组进行洗牌
+const numbers = [1, 2, 3, 4, 5];
+console.log(shuffle(numbers)); // 输出：[3, 1, 4, 5, 2] （示例输出，实际结果随机）
+
+// 示例2：对字符串数组进行洗牌
+const strings = ['apple', 'banana', 'cherry'];
+console.log(shuffle(strings)); // 输出：['banana', 'cherry', 'apple'] （示例输出，实际结果随机）
+
+// 示例3：对对象数组进行洗牌
+const objects = [{ id: 1 }, { id: 2 }, { id: 3 }];
+console.log(shuffle(objects)); // 输出：[{ id: 3 }, { id: 1 }, { id: 2 }] （示例输出，实际结果随机）
+
+```
+
+
+### sleep 延迟函数
+延迟指定时间后解析的 Promise
+
+```js
+import { sleep } from '@/uni_modules/lime-shared/sleep'
+```
+
+```js
+// 示例1：使用默认延迟时间（300毫秒）
+async function example1() {
+	console.log('开始延迟');
+	await sleep(); // 使用默认的300毫秒延迟
+	console.log('延迟结束');
 }
 
-const merged2 = merge({ color: 'red' } as ColorType, { color: 'blue', size: 'M' } as ColorType);
-console.log('merged2', merged2)
-```
+example1();
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
+// 示例2：指定延迟时间为1000毫秒（1秒）
+async function example2() {
+	console.log('开始1秒延迟');
+	await sleep(1000); // 指定1000毫秒延迟
+	console.log('1秒延迟结束');
+}
 
+example2();
 
+// 示例3：在异步函数中使用sleep来暂停执行
+async function example3() {
+	for (let i = 0; i < 5; i++) {
+		console.log(`计数：${i}`);
+		await sleep(500); // 每500毫秒打印一次计数
+	}
+}
 
-
-### isBase64 <a id="api_isBase64"></a>
-- 判断字符串是否为base64
-
-```js
-isBase64('xxxxx')
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### isNumber <a id="api_isNumber"></a>
--  检查一个值是否为数字类型
-
-```js
-isNumber('0') // false
-isNumber(0) // true
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-
-### isNumeric <a id="api_isNumeric"></a>
--  检查一个值是否为数字类型或表示数字的字符串
-
-```js
-isNumeric('0') // true
-isNumeric(0) // true
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-### isString <a id="api_isString"></a>
--  检查一个值是否为数字类型或表示数字的字符串
-
-```js
-isString('0') // true
-isString(0) // false
-```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
-
-### isIP <a id="api_isIP"></a>
--  检查一个值是否为IP地址格式，可以检测ipv4,ipv6
-
-```js
-console.log(isIP('192.168.1.1'));             // true
-console.log(isIP('2001:0db8:85a3:0000:0000:8a2e:0370:7334')); // true
-
-console.log(isIP('192.168.1.1', 4));             // true
-console.log(isIP('255.255.255.255', { version: 4 })); // true
-
-// 标准IPv6格式
-console.log(isIP('2001:0db8:85a3:0000:0000:8a2e:0370:7334', 6)); // true
-console.log(isIP('fe80::1%eth0', { version: 6 }));               // true（带区域标识）
+example3();
 
 ```
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | √                 | 
 
 
 
+### unitConvert 单位转数值
+单位转换函数，将字符串数字或带有单位的字符串转换为数字
 
-## composition-api <a id="api_composition-api"></a>
-- 因本人插件需要兼容vue2/vue3，故增加一个vue文件,代替条件编译
-- vue2需要在main.js加上这一段
 ```js
-// vue2
-import Vue from 'vue'
-import VueCompositionAPI from '@vue/composition-api'
-Vue.use(VueCompositionAPI)
+import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
 ```
 
 ```js
-//使用
-import {computed, onMounted, watch, reactive} from '@/uni_modules/lime-shared/vue'
-```
+// 示例1：将字符串数字'100'转换为数字100
+console.log(unitConvert('100')); // 输出：100
 
-##### 兼容性
-| uni-app      | uni-app x                      | 
-|------------|----------------------------------|
-| √     | x                 | 
+// 示例2：将带有'px'单位的字符串'20px'转换为数字20
+console.log(unitConvert('20px')); // 输出：20
+
+// 示例3：将带有'rpx'单位的字符串'100rpx'转换为像素值（需要uni.upx2px函数支持）
+console.log(unitConvert('100rpx')); // 输出：200，假设uni.upx2px返回2倍值
+
+// 示例4：将带有'%'单位的字符串'50%'转换为基于基准值200的像素值
+console.log(unitConvert('50%', 200)); // 输出：100
+
+// 示例5：传入null，返回0
+console.log(unitConvert(null)); // 输出：0
+
+// 示例6：传入undefined，返回0
+console.log(unitConvert(undefined)); // 输出：0
+
+// 示例7：传入数字10，直接返回10
+console.log(unitConvert(10)); // 输出：10
+```

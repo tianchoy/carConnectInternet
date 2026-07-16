@@ -1,32 +1,20 @@
 # lime-action-sheet 动作面板
-- 底部弹起的模态面板，包含与当前情境相关的多个选项，兼容uniapp/uniappx。
-- 插件依赖`lime-popup`,`lime-style`,`lime-shared`,`lime-icon`,`lime-overlay`,`lime-transition`,不喜勿下
 
-## 文档
-[action-sheet](https://limex.qcoon.cn/components/action-sheet.html)
+一个功能丰富的动作面板组件，用于展示一组与当前情境相关的操作选项。支持标题、取消按钮、自定义内容等多种配置，可用于分享、操作确认、筛选等多种场景。组件提供了丰富的自定义选项，可以满足各种复杂的交互需求。
 
-## 安装
-插件市场导入即可，首次导入可能需要重新编译
+> 插件依赖：`lime-shared`、`lime-style`
 
-如果你不是在市场导入的，而是在gitcode上拉取的，`uniappx app`需要手动在`pages.json`注册一下页面
-```json
-"pages": [
-	//...其它页面，
-	// 注册action-sheet页
-		{
-            "path": "uni_modules/lime-action-sheet/pages/index"
-        }
-    ]
-```
+## 文档链接
+📚 组件详细文档请访问以下站点：
+- [动作面板文档 - 站点1](https://limex.qcoon.cn/components/action-sheet.html)
+- [动作面板文档 - 站点2](https://limeui.netlify.app/components/action-sheet.html)
+- [动作面板文档 - 站点3](https://limeui.familyzone.top/components/action-sheet.html)
 
-**注意** 
-* 🔔 本插件依赖的[lime-svg](https://ext.dcloud.net.cn/plugin?id=18519)在 uniapp x app中是原生插件，如果购买(收费为5元)则需要自定义基座，才能使用！uniapp可忽略。
-* 🔔 不需要[lime-svg](https://ext.dcloud.net.cn/plugin?id=18519)在lime-icon代码中注释掉即可
+## 安装方法
+1. 在uni-app插件市场中搜索并导入`lime-action-sheet`
+2. 导入后可能需要重新编译项目
+3. 在页面中使用`l-action-sheet`组件
 
-```html
-// lime-icon/components/l-icon.uvue 第4行 注释掉即可。
-<!-- <l-svg class="l-icon" :class="classes" :style="styles" :color="color" :src="iconUrl" v-else :web="web" @error="imageError" @load="imageload" @click="$emit('click')"></l-svg> -->
-```
 
 ## 代码演示
 
@@ -67,7 +55,7 @@ const list = [
 	{ label: '选项二', icon: 'app'},
 	{ label: '选项三', icon: 'app'},
 ];
-const onSelect = (index:number) => {
+const onSelect = (index:number, item: UTSJSONObject) => {
    console.log('index', index)
 };
 ```
@@ -140,7 +128,7 @@ const actions = [
 通过`rowCol`属性设置每行列数，如`[4, 8]`表示第一行有4列，第二行有8列。超过4列时会出现滚动条。
 
 ```html
-<l-action-sheet v-model="show" :rowCol="[4, 8]" :list="grid" @select="select" cancelText="取消" description="这是一段描述信息"></l-action-sheet>
+<l-action-sheet v-model="show" :rowCol="[4, 8]" :list="grid" @select="select" cancel-text="取消" description="这是一段描述信息"></l-action-sheet>
 ```
 ```js
 const show = ref(false);
@@ -161,45 +149,40 @@ const grid = [
 ```
 
 
-
-### 查看示例
-- 导入后直接使用这个标签查看演示效果
-
-```html
-<!-- // 代码位于 uni_modules/lime-action-sheet/compoents/lime-action-sheet -->
-<lime-action-sheet />
-```
-
-
-### 插件标签
-- 默认 l-action-sheet 为 component
-- 默认 lime-action-sheet 为 demo
-
-### 关于vue2的使用方式
-- 插件使用了`composition-api`, 如果你希望在vue2中使用请按官方的教程[vue-composition-api](https://uniapp.dcloud.net.cn/tutorial/vue-composition-api.html)配置
-- 关键代码是: 在main.js中 在vue2部分加上这一段即可.
+## Vue2使用说明
+main.js中添加以下代码：
 ```js
-// vue2
+// vue2项目中使用
 import Vue from 'vue'
 import VueCompositionAPI from '@vue/composition-api'
 Vue.use(VueCompositionAPI)
 ```
 
+详细配置请参考官方文档：[Vue Composition API](https://uniapp.dcloud.net.cn/tutorial/vue-composition-api.html)
 
+## 插件标签说明
+`l-action-sheet` 为组件标签   
+`lime-action-sheet` 为演示标签
 
-## API
+## API文档
 
-### Props
+### Props 属性说明
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| v-model | 是否显示动作面板 | _boolean_ | `false` |
+| v-model | 是否显示动作面板（推荐） | _boolean_ | `false` |
+| visible | 是否显示动作面板（同义别名 | _boolean_ | `false` |
 | list | 面板选项列表 | _ActionSheetItem[]_ | `[]` |
 | title | 顶部标题 | _string_ | - |
 | cancel-text | 取消按钮文字 | _string_ | - |
 | align | 对齐方式，可选`center\|left` | _string_ | `center` |
 | description | 选项上方的描述信息 | _string_ | - |
-| safe-area-inset-bottom | 是否开启底部安全区适配,未实现 | _boolean_ | `true` |
+| overlay | 是否显示遮罩层 | _boolean_ | `true` |
+| safe-area-inset-bottom | 是否开启底部安全区适配 | _boolean_ | `true` |
+| rowCol | ​​横向排列的每行菜单项数量​​（例如 [4, 4]表示两行，每行最多 4 个选项） | _number[]_ | `-` |
+| bordered | 是否显示菜单项之间的边框/分割线 | _boolean_ | `true` |
+| closeable | 是否显示关闭图标 | _boolean_ | `true` |
+
 
 ### list 数据结构
 
@@ -216,55 +199,54 @@ Vue.use(VueCompositionAPI)
 | radius  | 选项图标圆角   | _string_                    |
 | disabled      | 是否为禁用状态           | _boolean_                   |
 
-### Events
+### Events 事件
 
 | 事件名 | 说明 | 回调参数 |
 | --- | --- | --- |
-| select | 点击选项时触发，禁用或加载状态下不会触发 | _index: number_ |
+| select | 点击选项时触发 | <em>(index: number, item: UTSJSONObject)</em> |
 | cancel | 点击取消按钮时触发 | - |
 
-### Slots
+### Slots 插槽
 
-| 名称 | 说明 | 参数 |
-| --- | --- | --- |
-| description | 自定义描述文案 | - |
-
+| 名称 | 说明 |
+| --- | --- |
+| default | 自定义面板内容 |
+| description | 自定义描述文案 |
+| title | 自定义标题栏 |
 
 ## 主题定制
 
-### 样式变量
+组件提供了以下CSS变量，可以通过自定义CSS变量来自定义组件样式：
 
-组件提供了下列 CSS 变量，可用于自定义样式，uvue app无效。
+| 变量名称 | 默认值 | 描述 |
+|---------|--------|------|
+| `--l-action-sheet-item-height` | `56px` | 选项项高度 |
+| `--l-action-sheet-font-size` | `$font-size-md` | 选项文字大小 |
+| `--l-action-sheet-color` | `$text-color-1` | 选项文字颜色 |
+| `--l-action-sheet-border-radius` | `$border-radius-lg` | 面板圆角半径 |
+| `--l-action-sheet-border-color` | `$border-color-2` | 边框颜色 |
+| `--l-action-sheet-hover-color` | `$gray-3` | 悬停背景色 |
+| `--l-action-sheet-item-disabled-color` | `$text-color-4` | 禁用选项颜色 |
+| `--l-action-sheet-gap-color` | `$bg-color-page` | 间隔区域背景色 |
+| `--l-action-sheet-cancel-bg-color` | `$bg-color-container` | 取消按钮背景色 |
+| `--l-action-sheet-title-font-size` | `18px` | 标题文字大小 |
+| `--l-action-sheet-title-color` | `$text-color-1` | 标题文字颜色 |
+| `--l-action-sheet-title-font-weight` | `700` | 标题字重 |
+| `--l-action-sheet-description-color` | `$text-color-3` | 描述文字颜色 |
+| `--l-action-sheet-description-font-size` | `$font-size` | 描述文字大小 |
+| `--l-action-sheet-image-size` | `48px` | 网格图片尺寸 |
+| `--l-action-sheet-image-bg-color` | `$fill-3` | 网格图片背景色 |
+| `--l-action-sheet-col-font-size` | `$font-size-sm` | 网格文字大小 |
+| `--l-action-sheet-col-icon-size` | `24px` | 网格图标大小 |
+| `--l-action-sheet-gap-height` | `$spacer-xs` | 间隔区域高度 |
+| `--l-action-sheet-title-padding` | `$spacer` | 标题内边距 |
+| `--l-action-sheet-close-btn-spacing` | `$spacer` | 关闭按钮边距 |
+| `--l-action-sheet-col-text-padding` | `$spacer-sm` | 网格文字上边距 |
 
-| 名称 | 默认值 | 描述 |
-| --- | --- | --- |
-| --l-action-sheet-item-height | _112rpx_ | - |
-| --l-action-sheet-item-disabled-color | _$text-color-4_ | - |
-| --l-action-sheet-hover-color | _$fill-3_ | - |
-| --l-action-sheet-gap-height | _16rpx_ | - |
-| --l-action-sheet-gap-color | _$bg-color-page_ | - |
-| --l-action-sheet-color | _text-color-1_ | - |
-| --l-action-sheet-border-radius | _$border-radius-lg_ | - |
-| --l-action-sheet-description-color | _$text-color-3_ | - |
-| --l-action-sheet-description-font-size | _$font-size-3_ | - |
-| --l-action-sheet-text-align | _center_ | - |
-| --l-action-sheet-font-size | _$font-size-md_ | - |
-| --l-action-sheet-cancel-height | _96rpx_ | - |
-| --l-action-sheet-cancel-color | _$text-color-1_ | - |
-| --l-action-sheet-image-size | _96rpx_ | - |
-| --l-action-sheet-image-bg-color | _$fill-3_ | - |
-| --l-action-sheet-icon-size | _48rpx_ | - |
-| --l-action-sheet-col-text-padding | _24rpx_ | - |
+## 支持与赞赏
 
+如果你觉得本插件解决了你的问题，可以考虑支持作者：
 
-## 常见问题
-插件包含一下[lime-svg](https://ext.dcloud.net.cn/plugin?id=18519)为收费插件。如果你不需要svg，可以在lime-icon里注释掉，lime-svg为APP原生插件，收费为1元，源码为5元。如果你需要svg，可以考虑一下购买。
-```html
-// lime-icon/components/l-icon.uvue 第4行 注释掉即可。
-<!-- <l-svg class="l-icon" :class="classes" :style="styles" :color="color" :src="iconUrl" v-else :web="web" @error="imageError" @load="imageload" @click="$emit('click')"></l-svg> -->
-```
-## 打赏
-
-如果你觉得本插件，解决了你的问题，赠人玫瑰，手留余香。  
-![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/alipay.png)
-![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/wpay.png)
+| 支付宝赞助 | 微信赞助 |
+|------------|------------|
+| ![支付宝赞赏码](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/alipay.png) | ![微信赞赏码](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/wpay.png) |

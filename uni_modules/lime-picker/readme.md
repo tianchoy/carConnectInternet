@@ -1,12 +1,19 @@
 # lime-picker 选择器
-- 用于一组预设数据中的选择。通常与弹出层组件配合使用。
-- 插件依赖`lime-style`,`lime-shared`,`lime-loading`不喜勿下
+一个功能丰富的选择器组件，用于在一组预设数据中进行选择，支持单列/多列选择、级联选择、多列联动、自定义样式、加载状态和空状态等功能。
 
-## 安装
-插件市场导入即可。首次导入可能需要重新编译
+> 插件依赖：`lime-style`、`lime-shared`、`lime-loading`
 
-## 文档
-[picker](https://limex.qcoon.cn/components/picker.html)
+## 文档链接
+📚 组件详细文档请访问以下站点：
+- [选择器文档 - 站点1](https://limex.qcoon.cn/components/picker.html)
+- [选择器文档 - 站点2](https://limeui.netlify.app/components/picker.html)
+- [选择器文档 - 站点3](https://limeui.familyzone.top/components/picker.html)
+
+## 安装方法
+1. 在uni-app插件市场中搜索并导入`lime-picker`
+2. 首次导入可能需要重新编译
+3. 在页面中使用`l-picker`组件（组件）或`lime-picker`（演示）
+
 
 ## 代码演示
 
@@ -37,7 +44,7 @@ Picker 组件可通过 `columns` 属性配置选项数据，或子组件`l-picke
 ```
 ```js
 // 非TS项目不需要引入类型
-import { PickerColumn, PickerConfirmEvent } from '@/uni_modules/lime-picker';
+import type { PickerColumn, PickerConfirmEvent } from '@/uni_modules/lime-picker';
 
 // 通过`l-picker-item`子组件时，数据结构为单数组
 // PickerColumn 
@@ -88,7 +95,7 @@ const onCancel = () => {console.log('取消')};
 </l-popup>
 ```
 ```js
-import { PickerColumn } from '@/uni_modules/lime-picker';
+import type { PickerColumn } from '@/uni_modules/lime-picker';
 const showPicker = ref(false)
 const cityOptions = [
 	[
@@ -116,7 +123,7 @@ const cityOptions = [
 </l-picker>
 ```
 ```js
-import { PickerColumn } from '@/uni_modules/lime-picker';
+import type { PickerColumn } from '@/uni_modules/lime-picker';
 const showPicker = ref(false)
 const years = [
 	{
@@ -163,7 +170,7 @@ const seasonColumns = [years, seasonOptions]
 </l-picker>
 ```
 ```js
-import { PickerColumn } from '@/uni_modules/lime-picker';
+import type { PickerColumn } from '@/uni_modules/lime-picker';
 const citys = ref<string[]>(['上海市'])
 const cityOptions = [
 	{
@@ -193,7 +200,7 @@ const cityOptions = [
 <l-picker loading cancel-btn="取消" confirm-btn="确定" :columns="cityOptions"></l-picker>
 ```
 ```js
-import { PickerColumn } from '@/uni_modules/lime-picker';
+import type { PickerColumn } from '@/uni_modules/lime-picker';
 const cityOptions = [
 	[
 		{
@@ -226,7 +233,7 @@ const cityOptions = [
 </l-picker>
 ```
 ```js
-import { PickerColumn } from '@/uni_modules/lime-picker';
+import type { PickerColumn } from '@/uni_modules/lime-picker';
 const cityOptions = [] as PickerColumn[]
 ```
 
@@ -241,7 +248,7 @@ const cityOptions = [] as PickerColumn[]
 </l-picker>
 ```
 ```js
-import { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '@/uni_modules/lime-picker';
+import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerPickEvent } from '@/uni_modules/lime-picker';
 const areaList = {
 	provinces: {
 		'110000': '北京市',
@@ -434,32 +441,30 @@ const onChange = ({values, column, index} : PickerPickEvent) => {
 	];
 ```
 
-### 查看示例
-- 导入后直接使用这个标签查看演示效果
+## 快速预览
+导入后直接使用这个标签查看演示效果
 
 ```html
 <!-- // 代码位于 uni_modules/lime-picker/compoents/lime-picker -->
 <lime-picker />
 ```
 
+## 插件标签说明
+- `l-picker`： 组件标签
+- `lime-picker`： 演示标签
 
-### 插件标签
-- 默认 l-picker 为 component
-- 默认 lime-picker 为 demo
 
-### 关于vue2的使用方式
-- 插件使用了`composition-api`, 如果你希望在vue2中使用请按官方的教程[vue-composition-api](https://uniapp.dcloud.net.cn/tutorial/vue-composition-api.html)配置
-- 关键代码是: 在main.js中 在vue2部分加上这一段即可
+## Vue2使用说明
+本插件使用了`composition-api`，请按照[官方教程](https://uniapp.dcloud.net.cn/tutorial/vue-composition-api.html)配置。
+
 ```js
-// vue2
+// main.js
 import Vue from 'vue'
 import VueCompositionAPI from '@vue/composition-api'
 Vue.use(VueCompositionAPI)
 ```
 
-
-
-## API
+## API 文档
 
 ### Picker Props
 
@@ -483,6 +488,7 @@ Vue.use(VueCompositionAPI)
 | itemFontSize | 每项文本字体大小 | _string_ | `` |
 | itemActiveColor | 每项文本选中颜色 | _string_ | `` |
 | indicatorStyle | 选择器中间选中框的样式 | _string_ | `` |
+| maskColors | 选择器遮罩颜色样式，`[开始颜色, 结束颜色]` | _string[]_ | `` |
 | bgColor | 选择器背景色 | _string_ | `` |
 | groupHeight | 选项组高度 | _string_ | `400rpx` |
 | radius | 圆角 | _string_ |  |
@@ -512,39 +518,56 @@ Vue.use(VueCompositionAPI)
 | footer | 底部 | __ |
 | empty | 空数据插槽 | __ |
 
+### 方法
+通过 ref 可以获取到 Picker 实例并调用实例方法: 
 
+| 方法名 | 说明                     | 返回值               |
+| ------ | ------------------------ | ---------------------- |
+| confirm | 停止惯性滚动并触发 `confirm` 事件 | __ |
+| getSelectedOptions | 获取当前选中的选项 | PickerConfirmEvent[] |
+
+```js
+// cascade 组件类型为 LCascadeComponentPublicInstance
+// picker  组件类型为 LPickerComponentPublicInstance
+const pickerRef = ref<LPickerComponentPublicInstance|null>(null)
+pickerRef.value?.confirm()
+const res =  pickerRef.value?.getSelectedOptions()
+```
 
 ## 主题定制
 
-### 样式变量
+组件提供了下列 CSS 变量，可用于自定义样式。
 
-组件提供了下列 CSS 变量，可用于自定义样式，uvue app无效。
+| 变量名 | 默认值 | 说明 |
+|--------|--------|------|
+| `--l-picker-border-radius` | `$border-radius-xl` | 选择器整体圆角 |
+| `--l-picker-bg-color` | `$bg-color-container` | 选择器背景色 |
+| `--l-picker-toolbar-height` | `58px` | 工具栏高度 |
+| `--l-picker-cancel-color` | `$text-color-2` | 取消按钮文字颜色 |
+| `--l-picker-confirm-color` | `$primary-color` | 确认按钮文字颜色 |
+| `--l-picker-button-font-size` | `$font-size-md` | 按钮文字大小 |
+| `--l-picker-title-font-size` | `18px` | 标题文字大小 |
+| `--l-picker-title-font-weight` | `700` | 标题文字粗细 |
+| `--l-picker-title-line-height` | `26px` | 标题行高 |
+| `--l-picker-title-color` | `$text-color-1` | 标题文字颜色 |
+| `--l-picker-group-height` | `200px` | 选择器内容区高度 |
+| `--l-picker-indicator-bg-color` | `$fill-4` | 选中指示器背景色 |
+| `--l-picker-indicator-border-radius` | `6px` | 选中指示器圆角 |
+| `--l-picker-indicator-margin` | `10px` | 选中指示器边距 |
+| `--l-picker-item-height` | `50px` | 每个选项高度 |
+| `--l-picker-item-color` | `$text-color-1` | 选项文字颜色 |
+| `--l-picker-item-active-color` | `$text-color-1` | 选中项文字颜色 |
+| `--l-picker-mask-top-color` | `white` | 遮罩开始颜色 |
+| `--l-picker-mask-bottom-color` | `white` | 遮罩结束颜色 |
+| `--l-picker-item-active-font-weight` | `700` | 选中项文字粗细 |
+| `--l-picker-item-font-size` | `$font-size-md` | 选项文字大小 |
+| `--l-picker-loading-mask-color` | `rgba(255,255,255,.9)` | 加载遮罩颜色 |
+| `--l-picker-loading-color` | `$primary-color` | 加载动画颜色 |
 
-| 名称                     | 默认值               | 描述 |
-| ------------------------ | -------------------- | ---- |
-| --l-picker-border-radius    | _24rpx_                  | -    |
-| --l-picker-bg-color | _$bg-color-container_ | -    |
-| --l-picker-toolbar-height | _116rpx_ | -    |
-| --l-picker-cancel-color | _text-color-2_ | -    |
-| --l-picker-confirm-color | _$primary-color_ | -    |
-| --l-picker-button-font-size | _32rpx_ | -    |
-| --l-picker-title-font-size | _36rpx_ | -    |
-| --l-picker-title-font-weight | _700_ | -    |
-| --l-picker-title-line-height | _52rpx_ | -    |
-| --l-picker-title-color | _$text-color-1_ | -    |
-| --l-picker-group-height | _400rpx_ | -    |
-| --l-picker-indicator-bg-color | _$fill-4_ | -    |
-| --l-picker-indicator-border-radius | _12rpx_ | -    |
-| --l-picker-item-height | _50px_ | -    |
-| --l-picker-item-color | _$text-color-1_ | -    |
-| --l-picker-item-active-color | _$text-color-1_ | -    |
-| --l-picker-item-active-color | _$text-color-1_ | -    |
-| --l-picker-loading-mask-color | _rgba(255,255,255,.9)_ | -    |
-| --l-picker-item-font-size | _$font-size-md_ | -    |
 
+## 支持与赞赏
 
-## 打赏
-
-如果你觉得本插件，解决了你的问题，赠人玫瑰，手留余香。  
-![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/alipay.png)
-![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/wpay.png)
+如果你觉得本插件解决了你的问题，可以考虑支持作者：
+| 支付宝赞助 | 微信赞助 |
+|------------|------------|
+| ![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/alipay.png) | ![](https://testingcf.jsdelivr.net/gh/liangei/image@1.9/wpay.png) |

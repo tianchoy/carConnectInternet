@@ -5,12 +5,12 @@
 		<view class="tools-panel">
 			<view class="Datetime-box">
 				<view class="date-box">
-					<uv-icon name="calendar" size="25"></uv-icon>
+					<i-icon name="/static/rili.png" fontSize="15"></i-icon>
 					<text class="Date" @click="showPicker('start')">{{formatDisplayTime(startTime)}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('start')" size="13"></uv-icon>
+					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('start')"></i-icon>
 					<text style="padding: 0 10rpx;">至</text>
 					<text class="Date" @click="showPicker('end')">{{formatDisplayTime(endTime)}}</text>
-					<uv-icon name="arrow-down" @click="showPicker('end')" size="13"></uv-icon>
+					<i-icon name="/static/xiangxia.png" fontSize="15" @click="showPicker('end')"></i-icon>
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
@@ -36,13 +36,13 @@
 		</view>
 
 		<view class="content">
-			<uv-empty v-if="groupedTrips.length == 0" mode="data" text="当前时间点暂无行程数据"></uv-empty>
+			<i-empty text="当前时间点暂无行程数据" :showButton="false" description="" v-if="groupedTrips.length == 0" ></i-empty>
 			<view v-else class="trip-list">
 				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
 					<view class="group-header">
 						<view class="group-header-title">
 							<text class="group-date">{{group.date}}</text>
-							<uv-tags :text="group.trips.length+'段'" type="success" size="mini"></uv-tags>
+							<i-tag :text="group.trips.length+'段'" type="success" size="small"></i-tag>
 						</view>
 						<text>里程 {{(group.totalDistance/1000).toFixed(2)}} km</text>
 					</view>
@@ -94,16 +94,20 @@
 
 		// 按日期分组
 		tripData.value.forEach(trip => {
-			const date = trip.startTime ? trip.startTime.split(' ')[0] : '未知日期'
+			const startTimeStr = trip.startTime != null ? trip.startTime.toString() : ''
+			const endTimeStr = trip.endTime != null ? trip.endTime.toString() : ''
+			const startTimeParts = startTimeStr.split(' ')
+			const endTimeParts = endTimeStr.split(' ')
+			const date = startTimeParts.length > 0 && startTimeParts[0].length > 0
+				? startTimeParts[0]
+				: '未知日期'
 			if (!tripsByDate[date]) {
 				tripsByDate[date] = []
 			}
 
 			// 为每个行程添加格式化后的时间
-			const startTimeStr = trip.startTime || ''
-			const endTimeStr = trip.endTime || ''
-			const startHour = startTimeStr.split(' ')[1] || ''
-			const endHour = endTimeStr.split(' ')[1] || ''
+			const startHour = startTimeParts.length > 1 ? startTimeParts[1] : ''
+			const endHour = endTimeParts.length > 1 ? endTimeParts[1] : ''
 
 			tripsByDate[date].push({
 				...trip,
@@ -447,23 +451,11 @@
 									width: 50rpx;
 									height: 50rpx;
 								}
-
-								.uv-text__value--main,
-								.uv-text__value--content {
-									width: 100%;
-									height: 5vh;
-									font-size: 24rpx !important;
-									line-height: unset !important;
-								}
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-	.uv-empty {
-		margin-bottom: 20rpx;
 	}
 </style>

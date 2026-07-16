@@ -84,12 +84,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
         type: "wgs84",
         success: (res) => {
-          console.log("获取位置成功:", res);
+          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:100", "获取位置成功:", res);
           userLocation.value.latitude = res.latitude;
           userLocation.value.longitude = res.longitude;
         },
         fail: (err) => {
-          console.log("获取位置失败:", err);
+          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:105", "获取位置失败:", err);
         }
       }));
     };
@@ -106,7 +106,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`
         });
       } else {
-        console.warn("未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:138", "未找到对应的设备信息", markerId);
       }
     };
     const updateMarkers = (devices = null) => {
@@ -177,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          console.error("获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:216", "获取设备列表失败:", err);
           common_vendor.index.showToast({
             title: "获取设备列表失败",
             icon: "none"
@@ -196,7 +196,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             zoomOnClick: true,
             gridSize: 60,
             complete: () => {
-              console.log("聚合初始化完成");
+              common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:236", "聚合初始化完成");
             }
           }));
         }
@@ -254,3 +254,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/deviceList/deviceList.js.map

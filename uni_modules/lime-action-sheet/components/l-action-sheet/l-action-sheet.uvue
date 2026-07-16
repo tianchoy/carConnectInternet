@@ -1,7 +1,20 @@
 <template>
-	<!-- #ifndef APP-ANDROID || APP-IOS || APP-HARMONY  -->
-	<l-popup v-model="innerValue" position="bottom">
-		<view class="l-action-sheet">
+	<l-popup v-model="innerValue" position="bottom" :safeAreaInsetBottom="safeAreaInsetBottom">
+		<view class="l-action-sheet" >
+			<view class="l-action-sheet__title" v-if="title.length > 0 || $slots['title'] != null">
+				<slot name="title"></slot>
+				<text class="l-action-sheet__title-text" v-if="title.length > 0">{{title}}</text>
+				<!-- <l-icon class="l-action-sheet__close-btn" 
+					l-style="position: absolute; top: 16px; right:16px"  
+					name="close" 
+					size="24px" 
+					aria-role="button" 
+					aria-label="关闭"
+					v-if="closeable"
+					@click="handleCancel">
+				</l-icon> -->
+				<text class="l-action-sheet__close-btn" v-if="closeable" @click="handleCancel">&#xE1EB</text>
+			</view>
 			<slot name="description">
 				<text class="l-action-sheet__description" 
 				:class="{'l-action-sheet__description--left': align == 'left'}"
@@ -19,14 +32,15 @@
 						v-for="(item, index) in actionItems" 
 						@click="handleSelected(item)"
 						:key="index">
-						<l-icon class="l-action-sheet__item-icon" 
+						<l-icon 
+							class="l-action-sheet__item-icon" 
 							v-if="item.icon != null" 
-							:color="item.iconColor ?? item.color"
+							:color="item.iconColor ?? item.color ?? iconColor"
 							:size="item.fontSize"
 							:name="item.icon" />
 						<text class="l-action-sheet__item-text" 
 							:style="[
-								item.color !=null ? 'color:' + item.color: '',
+								item.color !=null ? 'color:' + item.color : '',
 								item.fontSize !=null ? 'font-size:' + item.fontSize : '',
 							]">{{item.label}}</text>
 					</view>
@@ -34,7 +48,7 @@
 				<template v-else>
 					<scroll-view class="l-action-sheet__row" 
 						:scroll-x="true"
-						direction="horizontal"
+						 direction="horizontal"
 						:show-scrollbar="false"
 						:scroll-with-animation="true" 
 						:class="{
@@ -42,7 +56,9 @@
 						}"
 						v-for="(row, rowIndex) in actionRowCols" :key="'row' + rowIndex">
 						<!-- <view style="width: 1000px; height:20px; background: red"></view> -->
+						<!-- #ifndef APP -->
 						<view class="l-action-sheet__wrap">
+						<!-- #endif -->	
 							<view class="l-action-sheet__col"
 								:class="{
 									'l-action-sheet__item--disabled': item.disabled,
@@ -52,21 +68,21 @@
 								@click="handleSelected(item)"
 								:key="colIndex">
 								<image class="l-action-sheet__image" 
-								:style="[
-									'background: transparent',
-									item.radius != null ? 'border-radius:' + item.radius : '',
-								]"
-								v-if="item.icon != null && item.__isImage" :src="item.icon"></image>
+									:style="[
+										'background: transparent',
+										item.radius != null ? 'border-radius:' + item.radius : '',
+									]"
+									v-if="item.icon != null && item.__isImage" :src="item.icon"></image>
 								<view class="l-action-sheet__image l-action-sheet__image--center" 
-								:style="[
-									item.bgColor != null ? 'background:' + item.bgColor : '',
-									item.radius != null ? 'border-radius:' + item.radius : '',
-								]"
-								v-else-if="item.icon != null">
-									<l-icon class="l-action-sheet__col-icon"
-										:color="item.iconColor ?? item.color"
-										:size="item.fontSize"
-										:name="item.icon" />
+									:style="[
+										item.bgColor != null ? 'background:' + item.bgColor : '',
+										item.radius != null ? 'border-radius:' + item.radius : '',
+									]"
+									v-else-if="item.icon != null">
+										<l-icon class="l-action-sheet__col-icon"
+											:color="item.iconColor ?? item.color ?? iconColor"
+											:size="item.fontSize"
+											:name="item.icon" />
 								</view>
 								<text class="l-action-sheet__col-text" 
 									:style="[
@@ -74,7 +90,9 @@
 										item.fontSize !=null ? 'font-size:' + item.fontSize : '',
 									]">{{item.label}}</text>
 							</view>
+						<!-- #ifndef APP -->
 						</view>
+						<!-- #endif -->	
 					</scroll-view>
 				</template>
 			</view>
@@ -84,40 +102,86 @@
 			</view>
 		</view>
 	</l-popup>
+	<!-- #ifndef UNI-APP-X && APP  -->
 	<!-- #endif -->
 </template>
 <script lang="uts" setup>
-	import { ActionSheetProps, ActionSheetItem } from './type';
+	/**
+	 * ActionSheet 动作面板组件
+	 * @description 用于底部弹起的模态面板，提供多个选项供用户选择
+	 * <br>插件类型：LActionSheetComponentPublicInstance 
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-action-sheet
+	 * 
+	 * @property {boolean} visible 控制面板显示/隐藏（必填）
+	 * @property {UTSJSONObject[]} list 菜单项数据集合（必填）
+	 * @property {string} description 面板描述文字
+	 * @property {string} cancelText 取消按钮文本（必填）
+	 * @property {'center' | 'left'} align 菜单项对齐方式
+	 * @value center	居中
+	 * @value left	    居左
+	 * @property {boolean} overlay 是否显示遮罩层
+	 * @property {boolean} safeAreaInsetBottom 是否启用底部安全区域适配
+	 * @property {number[]} rowCol 骨架屏行/列配置（用于加载状态）
+	 * @property {boolean} bordered 是否显示菜单项分割线
+	 * @event {Function} select 选中触发
+	 * @event {Function} cancel 取消
+	 */
+
+	
+	import type{ ActionSheetProps, ActionSheetItem } from './type';
+	const themeVars = inject('limeConfigProviderThemeVars', computed(()=> ({})))
 	const instance = getCurrentInstance()!
 	const emit = defineEmits(['select', 'cancel'])
 	const props = withDefaults(defineProps<ActionSheetProps>(), {
 		visible: false,
-		safeAreaInsetBottom: false,
+		safeAreaInsetBottom: true,
 		list: [] as UTSJSONObject[],
 		type: 'list',
+		title: '',
 		description: '',
 		cancelText: '',
 		// count: 8,
 		align: 'center',
 		overlay: true,
 		duration: 300,
-		bordered: false
+		bordered: false,
+		closeable: true
 	})
 	
 	const modelValue = defineModel({type: Boolean})
-	const innerValue = computed({
-		set(value: boolean) {
-			modelValue.value = value;
-		},
-		get():boolean {
-			return props.visible || modelValue.value
-		}
-	} as WritableComputedOptions<boolean>) 
+	const innerValue = ref(props.visible || modelValue.value);
+	// 监听 props.visible 和 modelValue 的变化
+	watch([():boolean => props.visible, ():boolean => modelValue.value], ([visible, modelVal]:boolean[]) => {
+	  innerValue.value = visible || modelVal;
+	});
+	
+	// 监听 innerValue 的变化，更新 modelValue
+	watch(innerValue, (newValue:boolean) => {
+	  modelValue.value = newValue;
+	});
+	
+	// const innerValue = computed({
+	// 	set(value: boolean) {
+	// 		modelValue.value = value;
+	// 	},
+	// 	get():boolean {
+	// 		return props.visible || modelValue.value
+	// 	}
+	// } as WritableComputedOptions<boolean>) 
+	
 	
 	const isImage = (name: string|null):boolean => {
 		if(name == null) return false;
 		return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name)
 	}
+	const iconColor = computed(():string|null => {
+		// #ifdef APP
+		return `${themeVars.value['actionSheetColor'] ?? 'rgba(0,0,0,0.88)'}`
+		// #endif
+		// #ifndef APP
+		return null
+		// #endif
+	})
 	const actionItems = computed(():ActionSheetItem[] =>{
 		return props.list.map((it, index):ActionSheetItem => ({
 			label: it.getString('label') ?? '',
@@ -161,45 +225,47 @@
 	
 	const handleSelected = (item:ActionSheetItem) => {
 		if(item.disabled) return;
-		emit('select', item.__index);
+		emit('select', item.__index, props.list[item.__index]);
 		innerValue.value = false
 	}
 	const handleCancel = () =>{
 		innerValue.value = false
 		emit('cancel')
 	}
+	// #ifdef UNI-APP-X && APP 
 	
-	// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY 
-	const key = `action-sheet-${instance.uid}`
-	const stopWatch = watch(innerValue, (v:boolean)=>{
-		if(v) {
-			const obj = {
-				key: key,
-				description: props.description,
-				cancelText: props.cancelText,
-				align: props.align,
-				list: props.list,
-				rowCol: props.rowCol,
-				bordered: props.bordered,
-			}
-			uni.openDialogPage({
-				url: `/uni_modules/lime-action-sheet/pages/index?param=${JSON.stringify(obj)}`,
-			})
-		}
-	})
-	uni.$on(key, (index: number)=>{
-		if(index != -1) {
-			emit('select', index);
-		} else {
-			emit('cancel')
-		}
-		innerValue.value = false
-	})
+	// const key = `action-sheet-${instance.uid}`
+	// const stopWatch = watch(innerValue, (v:boolean)=>{
+	// 	if(v) {
+	// 		const obj = {
+	// 			key: key,
+	// 			description: props.description,
+	// 			cancelText: props.cancelText,
+	// 			align: props.align,
+	// 			list: props.list,
+	// 			rowCol: props.rowCol,
+	// 			bordered: props.bordered,
+	// 			closeable: props.closeable,
+	// 			title: props.title,
+	// 		}
+	// 		uni.openDialogPage({
+	// 			url: `/uni_modules/lime-action-sheet/pages/index?param=${JSON.stringify(obj)}`,
+	// 		})
+	// 	}
+	// })
+	// uni.$on(key, (index: number)=>{
+	// 	if(index != -1) {
+	// 		emit('select', index);
+	// 	} else {
+	// 		emit('cancel')
+	// 	}
+	// 	innerValue.value = false
+	// })
 	
-	onUnmounted(()=>{
-		uni.$off(key)
-		stopWatch()
-	})
+	// onUnmounted(()=>{
+	// 	uni.$off(key)
+	// 	stopWatch()
+	// })
 	// #endif
 </script>
 <style lang="scss">

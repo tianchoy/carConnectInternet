@@ -32,6 +32,12 @@
 	}
 </script>
 <style lang="scss">
+	$card-bg-color: var(--doc-card-bg-color, white);
+	// $page-bg-color: var(--doc-page-bg-color, #f5f5f5);
+	$title-color: var(--doc-title-color, #000000E6);
+	$summary-color: var(--doc-summary-color, #00000099);
+	
+	
 	.wrapper {
 	    display: flex;
 	    align-items: center;
@@ -42,7 +48,7 @@
 	.block {
 	    width: 120px;
 	    height: 120px;
-	    background-color: #fff;
+	    background-color: $card-bg-color;
 	}
 	.demo-block {
 		margin: 32px 20px 0;
@@ -51,19 +57,19 @@
 			margin: 0;
 			margin-top: 8px;
 			&-text {
-				color: rgba(0, 0, 0, 0.6);
+				color: $summary-color;
 				font-weight: 400;
 				font-size: 14px;
 				line-height: 16px;
 				
 				&.large {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 18px;
 					font-weight: 700;
 					line-height: 26px;
 				}
 				&.ultra {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 24px;
 					font-weight: 700;
 					line-height: 32px;
@@ -71,7 +77,7 @@
 			}
 		}
 		&__desc-text {
-			color: rgba(0, 0, 0, 0.6);
+			color: $summary-color;
 			margin: 8px 16px 0 0;
 			font-size: 14px;
 			line-height: 22px;

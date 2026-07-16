@@ -1,5 +1,26 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+class Coordinate extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          lat: { type: Number, optional: false },
+          lng: { type: Number, optional: false }
+        };
+      },
+      name: "Coordinate"
+    };
+  }
+  constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.lat = this.__props__.lat;
+    this.lng = this.__props__.lng;
+    delete this.__props__;
+  }
+}
 class CoordTransform {
   /**
    * WGS84转腾讯地图坐标系（GCJ02）
@@ -9,7 +30,7 @@ class CoordTransform {
    */
   static wgs84ToTencent(wgLat, wgLon) {
     if (!this.isInChina(wgLon, wgLat)) {
-      return { lat: wgLat, lng: wgLon };
+      return new Coordinate({ lat: wgLat, lng: wgLon });
     }
     let dLat = this.transformLat(wgLon - 105, wgLat - 35);
     let dLng = this.transformLng(wgLon - 105, wgLat - 35);
@@ -21,10 +42,10 @@ class CoordTransform {
     dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
     const mgLat = wgLat + dLat;
     const mgLng = wgLon + dLng;
-    return {
-      lat: Number(mgLat.toFixed(6)),
-      lng: Number(mgLng.toFixed(6))
-    };
+    return new Coordinate({
+      lat: parseFloat(mgLat.toFixed(6)),
+      lng: parseFloat(mgLng.toFixed(6))
+    });
   }
   /**
    * 腾讯地图坐标系转WGS84（使用高精度算法）
@@ -34,7 +55,7 @@ class CoordTransform {
    */
   static tencentToWgs84(tcLat, tcLon) {
     if (!this.isInChina(tcLon, tcLat)) {
-      return { lat: tcLat, lng: tcLon };
+      return new Coordinate({ lat: tcLat, lng: tcLon });
     }
     let wgsLat = tcLat;
     let wgsLng = tcLon;
@@ -48,10 +69,10 @@ class CoordTransform {
         break;
       }
     }
-    return {
-      lat: Number(wgsLat.toFixed(6)),
-      lng: Number(wgsLng.toFixed(6))
-    };
+    return new Coordinate({
+      lat: parseFloat(wgsLat.toFixed(6)),
+      lng: parseFloat(wgsLng.toFixed(6))
+    });
   }
   /**
    * 批量转换坐标（内部使用高精度转换）
@@ -63,21 +84,31 @@ class CoordTransform {
     if (!Array.isArray(devices))
       return [];
     return devices.map((device = null) => {
-      if (!device)
+      if (device == null)
         return device;
-      const lat = Number(device.latitude);
-      const lng = Number(device.longitude);
-      if (isNaN(lat) || isNaN(lng)) {
-        console.warn("设备经纬度无效", device);
+      const item = device;
+      const latitude = item["latitude"];
+      const longitude = item["longitude"];
+      if (latitude == null || longitude == null) {
         return device;
       }
-      let converted = null;
+      const lat = parseFloat(latitude.toString());
+      const lng = parseFloat(longitude.toString());
+      if (isNaN(lat) || isNaN(lng)) {
+        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:108", "设备经纬度无效", device);
+        return device;
+      }
+      let converted = new Coordinate({ lat, lng });
       if (targetSystem === "tencent") {
         converted = this.wgs84ToTencent(lat, lng);
       } else {
         converted = this.tencentToWgs84(lat, lng);
       }
-      return new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, device), { latitude: converted.lat, longitude: converted.lng, originalLatitude: lat, originalLongitude: lng }));
+      item["latitude"] = converted.lat;
+      item["longitude"] = converted.lng;
+      item["originalLatitude"] = lat;
+      item["originalLongitude"] = lng;
+      return item;
     });
   }
   /**
@@ -94,8 +125,8 @@ class CoordTransform {
     } else if (fromSystem === "tencent" && toSystem === "wgs84") {
       return this.tencentToWgs84(lat, lng);
     } else {
-      console.warn("不支持的坐标系转换", fromSystem, "->", toSystem);
-      return { lat, lng };
+      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:143", "不支持的坐标系转换", fromSystem, "->", toSystem);
+      return new Coordinate({ lat, lng });
     }
   }
   /**
@@ -128,3 +159,4 @@ CoordTransform.a = 6378245;
 CoordTransform.ee = 0.006693421622965943;
 CoordTransform.pi = 3.141592653589793;
 exports.CoordTransform = CoordTransform;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/coordTransform.js.map

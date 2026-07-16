@@ -7,20 +7,41 @@ if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _component_marker = common_vendor.resolveComponent("marker");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
-  const _easycom_uv_icon_1 = common_vendor.resolveComponent("uv-icon");
-  const _easycom_uv_slider_1 = common_vendor.resolveComponent("uv-slider");
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_slider_1 = common_vendor.resolveComponent("i-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _component_marker + _easycom_sub_navBar_1 + _easycom_uv_icon_1 + _easycom_uv_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  (_easycom_custom_navBar_1 + _component_marker + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
-const _easycom_uv_icon = () => "../../uni_modules/uv-icon/components/uv-icon/uv-icon.js";
-const _easycom_uv_slider = () => "../../uni_modules/uv-slider/components/uv-slider/uv-slider.js";
+const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_i_slider = () => "../../uni_modules/i-ui-x/components/i-slider/i-slider.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_uv_icon + _easycom_uv_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+}
+class TrackPoint extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          latitude: { type: Number, optional: false },
+          longitude: { type: Number, optional: false }
+        };
+      },
+      name: "TrackPoint"
+    };
+  }
+  constructor(options, metadata = TrackPoint.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.latitude = this.__props__.latitude;
+    this.longitude = this.__props__.longitude;
+    delete this.__props__;
+  }
 }
 class polyData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -391,7 +412,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = option.lng;
       sTime.value = option.startTime;
       eTime.value = option.endTime;
-      console.log(sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:481", sTime.value, eTime.value);
       if (sTime.value && eTime.value) {
         startTime.value = sTime.value;
         endTime.value = eTime.value;
@@ -549,37 +570,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: polyline.value,
         k: mapScale.value,
         l: common_vendor.p({
-          name: "calendar",
-          size: "25"
+          name: "/static/rili.png",
+          fontSize: "15"
         }),
         m: common_vendor.t(startTime.value),
         n: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "6b"),
+        }, "52"),
         o: common_vendor.t(endTime.value),
         p: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "50"),
+        }, "ad"),
         q: common_vendor.t(isPlaying.value ? "暂停" : "播放"),
-        r: common_vendor.o(togglePlayback, "00"),
-        s: common_vendor.o(setPlaybackSpeed, "27"),
+        r: common_vendor.o(togglePlayback, "9c"),
+        s: common_vendor.o(setPlaybackSpeed, "30"),
         t: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "b4"),
+        }, "a3"),
         v: common_vendor.p({
-          backgroundColor: "#f5f5f5",
-          activeColor: "#1890FF",
-          min: "1",
-          max: "10",
-          ["block-color"]: "#1890FF",
+          min: 1,
+          max: 10,
           modelValue: playbackSpeed.value
         }),
         w: common_vendor.t(playbackSpeed.value),
         x: common_vendor.t(currentTime.value),
         y: common_vendor.t(currentSpeed.value),
         z: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        A: common_vendor.o(onConfirm, "8e"),
-        B: common_vendor.o(onCancel, "66"),
+        A: common_vendor.o(onConfirm, "4d"),
+        B: common_vendor.o(onCancel, "e5"),
         C: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -588,7 +606,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         D: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "c1"),
+        }, "c4"),
         E: common_vendor.p({
           position: "bottom",
           closeable: false,
@@ -604,3 +622,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/playBack/playBack.js.map

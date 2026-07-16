@@ -17,7 +17,7 @@
 		<slot></slot>
 		<view class="l-popup__close" v-if="closeable" @click="handleClose">
 			<slot name="close-btn">
-				<l-icon class="l-popup__close-icon" :name="closeIcon" size="27px" :color="iconColor" />
+				<i-icon name="close"  fontSize="20" size="27px" :color="iconColor" />
 			</slot>
 		</view>
 	</view>
@@ -66,7 +66,7 @@
 	 * @event {Function} leave
 	 * @event {Function} after-leave
 	 */
-	import { useTransition, UseTransitionOptions, TransitionEmitStatus } from '@/uni_modules/lime-transition';
+	import { useTransition, type UseTransitionOptions, type TransitionEmitStatus } from '@/uni_modules/lime-transition';
 	import { convertRadius } from './utils'
 	import { PopupProps } from './type';
 	
@@ -100,6 +100,7 @@
 			// #endif
 		}
 	} as WritableComputedOptions<boolean>)
+	// const hosKey = ref(0)
 	const status = ref<TransitionEmitStatus>('before-enter')
 	const {inited, display, classes, finished} = useTransition({
 		defaultName: props.transitionName ?? 'popup-fade',
@@ -108,8 +109,13 @@
 			status.value = name
 			if(name == 'before-enter') {
 				emit('open')
+				
 			} else if(name == 'after-enter') {
 				emit('opened')
+				// setTimeout(()=>{
+				// 	if(hosKey.value > 0) return
+				// 	hosKey.value++
+				// },5)
 			} else if(name == 'before-leave') {
 				emit('close')
 			} else if(name == 'after-leave') {
@@ -137,10 +143,10 @@
 	
 	const styles = computed<Map<string,any>>(():Map<string,any> => {
 		const style = new Map<string,any>();
-		// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+		// #ifdef UNI-APP-X && APP
 		style.set('transition-duration', (['after-leave', 'before-enter'].includes(status.value) ? 0 : props.duration) + 'ms')
 		// #endif
-		// #ifndef APP-ANDROID || APP-IOS || APP-HARMONY
+		// #ifndef UNI-APP-X && APP
 		style.set('transition-duration', props.duration + 'ms')
 		// #endif
 		if (props.bgColor != null) {
@@ -201,6 +207,7 @@
 			popupRef.value?.style.setProperty('z-index', props.zIndex)
 		}
 	})
+	
 	// #endif
 </script>
 <style lang="scss">

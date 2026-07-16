@@ -1,14 +1,16 @@
 @import '~@/uni_modules/lime-style/index.scss';
 @import '~@/uni_modules/lime-style/mixins/hairline.scss';
-// $prefix: l !default;
-$pre: '--';
+/* #ifdef  uniVersion >= 4.75 */ 
+$use-css-var: true;
+/* #endif */
+
 $action-sheet: #{$prefix}-action-sheet;
 
-$action-sheet-item-height: create-var(action-sheet-item-height, 112rpx);
+$action-sheet-item-height: create-var(action-sheet-item-height, 56px);
 $action-sheet-item-disabled-color: create-var(action-sheet-item-disabled-color, $text-color-4);
-$action-sheet-hover-color: create-var(action-sheet-hover-color, $fill-3);
-$action-sheet-border-color: create-var(action-sheet-border-color, $border-color-1);
-$action-sheet-gap-height: create-var(action-sheet-gap-height, 16rpx);
+$action-sheet-hover-color: create-var(action-sheet-hover-color, $gray-3);
+$action-sheet-border-color: create-var(action-sheet-border-color, $border-color-2);
+$action-sheet-gap-height: create-var(action-sheet-gap-height, $spacer-xs);
 $action-sheet-gap-color: create-var(action-sheet-gap-color, $bg-color-page);
 $action-sheet-color: create-var(action-sheet-color, $text-color-1);
 $action-sheet-border-radius: create-var(action-sheet-border-radius, $border-radius-lg);
@@ -16,27 +18,40 @@ $action-sheet-description-color: create-var(action-sheet-description-color, $tex
 $action-sheet-description-font-size: create-var(action-sheet-description-font-size, $font-size);
 $action-sheet-text-align: create-var(action-sheet-text-align, center);
 $action-sheet-font-size: create-var(action-sheet-font-size, $font-size-md);
-$action-sheet-cancel-height: create-var(action-sheet-cancel-height, 96rpx);
+$action-sheet-cancel-height: create-var(action-sheet-cancel-height, 48px);
 $action-sheet-cancel-color: create-var(action-sheet-cancel-color, $text-color-1);
+$action-sheet-cancel-bg-color: create-var(action-sheet-cancel-bg-color, $bg-color-container);
 
-$action-sheet-image-size: create-var(action-sheet-image-size, 96rpx);
+$action-sheet-image-size: create-var(action-sheet-image-size, 48px);
 $action-sheet-image-bg-color: create-var(action-sheet-image-bg-color, $fill-3);
-$action-sheet-col-font-size: create-var(action-sheet-font-size, 24rpx);
-$action-sheet-col-icon-size: create-var(action-sheet-icon-size, 48rpx);
-$action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx);
+$action-sheet-col-font-size: create-var(action-sheet-col-font-size, $font-size-sm);
+$action-sheet-col-icon-size: create-var(action-sheet-icon-size, 24px);
+$action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, $spacer-sm);
+
+$action-sheet-title-font-size: create-var(action-sheet-title-font-size, 18px);
+$action-sheet-title-color: create-var(action-sheet-title-color, $text-color-1);
+$action-sheet-title-padding: create-var(action-sheet-title-padding, $spacer);
+
+
+$action-sheet-title-font-weight: create-var(action-sheet-title-font-weight, 700);
+$action-sheet-close-btn-font-size: create-var(action-sheet-close-btn-font-size, 20px);
+$action-sheet-close-btn-color: create-var(action-sheet-close-btn-color, $text-color-1);
+$action-sheet-close-btn-spacing: create-var(action-sheet-close-btn-spacing, $spacer);
+
+$action-sheet-description-line-height: create-var(action-sheet-description-line-height, 22px);
+$action-sheet-description-padding-x: create-var(action-sheet-description-padding-x, 16px);
+$action-sheet-description-padding-y: create-var(action-sheet-description-padding-y, 12px);
+
+$action-sheet-image-border-radius: create-var(action-sheet-image-border-radius, 99px);
 
 .#{$action-sheet} {
-	// position: fixed;
-	// bottom: 0;
-	// left: 0;
-	// right: 0;
 	
-	/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
+	/* #ifndef UNI-APP-X && APP */
 	color: $action-sheet-color;
 	/* #endif */
 	border-top-left-radius: $action-sheet-border-radius;
 	border-top-right-radius: $action-sheet-border-radius;
-	background-color: $bg-color-container;
+	// background-color: $bg-color-container;
 	
 	&--grid {
 	    // padding-top: 16rpx;
@@ -50,18 +65,19 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 		justify-content: center;
 		align-items: center;
 		flex-direction: row;
-		padding: 0 32rpx;
+		padding: 0 16px;
 		&-text {
 			color: $action-sheet-color;
 			font-size: $action-sheet-font-size;
+			margin-left: 8px;
+			margin-right: 8px;
 		}
 		&-icon {
 			/* #ifndef UNI-APP-X */
 			display: inline-flex;
 			/* #endif */
 			color: $action-sheet-color;
-			margin-right: 16rpx;
-			// font-size: $action-sheet-font-size !important;
+			// margin-right: 8px;
 			font-size: $action-sheet-font-size;
 		}
 		&--hover {
@@ -75,19 +91,15 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 		    // color: $action-sheet-item-disabled-color;
 		}
 		&--bordered {
-			/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
-			border-bottom: 0.8px solid $action-sheet-gap-color;
+			/* #ifdef UNI-APP-X && APP */
+			border-bottom-width: 0.5px;
+			border-bottom-style: solid;
+			border-bottom-color: $action-sheet-border-color;
 			/* #endif */
-			/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY */
+			/* #ifndef UNI-APP-X && APP */
 			&:before {
-				@include hairline-bottom($action-sheet-gap-color);
+				@include hairline-bottom($action-sheet-border-color);
 				transform: scaleY(0.8);
-				// position: absolute;
-				// content: '';
-				// left: 0;
-				// right: 0;
-				// height: 1px;
-				// background: $action-sheet-gap-color
 			}
 			/* #endif */
 		}
@@ -98,7 +110,7 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 	}
 	&__cancel {
 		display: flex;
-	    background-color: $bg-color-container;
+	    background-color: $action-sheet-cancel-bg-color;
 		
 		height: $action-sheet-cancel-height;
 		justify-content: center;
@@ -113,18 +125,50 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 			font-size: $action-sheet-font-size;
 		}
 	}
-			
+	&__title {
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    box-sizing: content-box;
+	    // padding: $action-sheet-title-padding;
+		@include padding($action-sheet-title-padding);
+		position: relative;
+		&-text {
+			font-size: $action-sheet-title-font-size;
+			font-weight: $action-sheet-title-font-weight;
+			color: $action-sheet-title-color;
+		}
+		/* #ifndef UNI-APP-X && APP */
+	    &:focus {
+	      outline: 0;
+	    }
+		/* #endif */
+	}
+	&__close-btn {
+		font-family: $prefix;
+	    position: absolute;
+	    top: $action-sheet-close-btn-spacing;
+	    right: $action-sheet-close-btn-spacing;
+		font-size: $action-sheet-close-btn-font-size;
+	    // margin: -24rpx;
+	    // padding: 24rpx;
+		 color: $action-sheet-close-btn-color;
+	}		
 	&__description {
 		/* #ifndef UNI-APP-X */
 		display: flex;
 		justify-content: center;
 		/* #endif */
 		color: $action-sheet-description-color;
-		line-height: 44rpx;
+		line-height: $action-sheet-description-line-height;
 		font-size: $action-sheet-description-font-size;
 		text-align: $action-sheet-text-align;
-		padding: 24rpx 32rpx;
-		border-bottom: 0.8px solid $action-sheet-gap-color;
+		// padding: 12px 16px;
+		@include padding($action-sheet-description-padding-y $action-sheet-description-padding-x);
+		// border-bottom: 0.8px solid $action-sheet-gap-color;
+		border-bottom-width: 0.5px;
+		border-bottom-style: solid;
+		border-bottom-color: $action-sheet-border-color;
 		
 		&--left {
 			text-align: left;
@@ -132,27 +176,34 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 	}
 	&__wrap {
 		display: flex;
-		padding-top: 32rpx;
-		padding-bottom: 32rpx;
-		white-space: nowrap;
+		padding-top: 16px;
+		padding-bottom: 16px;
+		
 		flex-direction: row;
 		flex-wrap: nowrap;
-		/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY  */
+		/* #ifndef UNI-APP-X && APP */
+		white-space: nowrap;
 		width: fit-content;
 		min-width: 100%;
 		/* #endif */
+		/* #ifdef UNI-APP-X && APP */
+		// min-width: 100%;
+		/* #endif */
 	}
 	&__row {
-		/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
-		padding-top: 32rpx;
-		padding-bottom: 32rpx;
+		
+		/* #ifdef UNI-APP-X && APP */
+		padding-top: 16px;
+		padding-bottom: 16px;
 		flex-direction: row;
 		/* #endif */
 		&--border {
-			/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY  */
-			border-top: 1rpx solid $action-sheet-gap-color;
+			/* #ifdef UNI-APP-X && APP */
+			border-top-width: 0.8px;
+			border-top-style: solid;
+			border-top-color: $action-sheet-border-color;
 			/* #endif */
-			/* #ifndef APP-ANDROID || APP-IOS || APP-HARMONY  */
+			/* #ifndef UNI-APP-X && APP */
 			position: relative;
 			&:before {
 				position: absolute;
@@ -160,7 +211,7 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 				left: 0;
 				right: 0;
 				height: 1px;
-				background: $action-sheet-gap-color
+				background: $action-sheet-border-color
 			}
 			/* #endif */
 		}
@@ -174,19 +225,17 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 		justify-content: center;
 		align-items: center;
 		// flex: 1;
-		&--evenly{
+		&--evenly {
 			flex: 1;
 		}
 		&-text {
-			/* #ifndef UNI-APP-X */
-			// display: flex;
-			/* #endif */
 			color: $action-sheet-color;
 			padding-top: $action-sheet-col-text-padding;
 			font-size: $action-sheet-col-font-size;
 		}
 		&-icon {
 			font-size: $action-sheet-col-icon-size;
+			color: $action-sheet-color;
 		}
 	}
 	
@@ -196,6 +245,7 @@ $action-sheet-col-text-padding: create-var(action-sheet-col-text-padding, 24rpx)
 		margin: 0 16px;
 		background-color: $action-sheet-image-bg-color;
 		border-radius: 99px;
+		// @include border-radius($action-sheet-image-border-radius);
 		/* #ifndef UNI-APP-X */
 		display: flex;
 		/* #endif */

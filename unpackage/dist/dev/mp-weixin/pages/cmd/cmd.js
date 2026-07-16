@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         return common_vendor.UTS.JSON.parse(selectedCommand.value.details);
       } catch (e) {
-        console.error("解析参数配置失败:", e);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:91", "解析参数配置失败:", e);
         return [];
       }
     });
@@ -46,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const sortByCmdNameLengthAndAlphabet = (data = null) => {
       if (!Array.isArray(data)) {
-        console.error("参数必须是一个数组");
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:108", "参数必须是一个数组");
         return [];
       }
       const sortedData = [...data];
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           loading.value = true;
           const response = yield api_request.getCmdAction();
-          console.log("加载指令类型响应:", response);
+          common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:136", "加载指令类型响应:", response);
           if (response.code == 0) {
             commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
           } else {
@@ -75,7 +75,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          console.error("加载指令类型出错:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:147", "加载指令类型出错:", error);
           common_vendor.index.showToast({
             title: "网络错误",
             icon: "none"
@@ -92,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         selectedCommand.value = null;
         paramValues.value = [];
         commandRecords.value = null;
-        console.log("选择指令类型:", typeId, typeof commandRecords.value);
+        common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:163", "选择指令类型:", typeId, typeof commandRecords.value);
         try {
           loading.value = true;
           const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({
@@ -108,7 +108,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          console.error("加载指令列表出错:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:181", "加载指令列表出错:", error);
           common_vendor.index.showToast({
             title: "网络错误",
             icon: "none"
@@ -135,7 +135,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return "";
           });
         } catch (e) {
-          console.error("初始化参数值失败:", e);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:211", "初始化参数值失败:", e);
           paramValues.value = [];
         }
       }
@@ -145,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const newLength = index + 1;
         const newArray = new Array(newLength);
         for (let i = 0; i < newLength; i++) {
-          newArray[i] = paramValues.value[i] || "";
+          newArray[i] = i < paramValues.value.length ? paramValues.value[i] : "";
         }
         paramValues.value = newArray;
       }
@@ -186,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
             setTimeout(() => {
               api_request.getCmdRecordById(response.data).then((recordResponse = null) => {
-                console.log("获取指令记录详情响应:", recordResponse);
+                common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:275", "获取指令记录详情响应:", recordResponse);
                 if (recordResponse.code == 0) {
                   commandRecords.value = recordResponse.data;
                 } else {
@@ -205,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          console.error("发送指令出错:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:295", "发送指令出错:", error);
           common_vendor.index.showToast({
             title: "网络错误",
             icon: "none"
@@ -328,3 +328,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-c4271740"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/cmd/cmd.js.map

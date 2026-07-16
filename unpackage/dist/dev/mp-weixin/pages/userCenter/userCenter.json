@@ -2,8 +2,7 @@
   "navigationBarTitleText": "我的",
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "uv-avatar": "../../uni_modules/uv-avatar/components/uv-avatar/uv-avatar",
-    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
-    "uv-badge": "../../uni_modules/uv-badge/components/uv-badge/uv-badge"
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-badge": "../../uni_modules/i-ui-x/components/i-badge/i-badge"
   }
 }

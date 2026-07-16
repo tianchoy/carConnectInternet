@@ -1,6 +1,13 @@
 <template>
-	<l-popup v-model="innerValue" position="bottom">
+	<l-popup v-model="innerValue" position="bottom" :safeAreaInsetBottom="safeAreaInsetBottom">
 		<view class="l-action-sheet">
+			<view class="l-action-sheet__title" v-if="title || $slots['title']">
+				<slot name="title"></slot>
+				<text class="l-action-sheet__title-text" v-if="title">{{title}}</text>
+				<view class="l-action-sheet__close-btn" v-if="closeable" @click="handleClose">
+					<l-icon name="close" size="24px" aria-role="button" aria-label="关闭"></l-icon>
+				</view>
+			</view>
 			<slot name="description">
 				<text class="l-action-sheet__description" 
 				:class="{'l-action-sheet__description--left': align == 'left'}"
@@ -89,6 +96,26 @@
 </template>
 <script lang="ts">
 	// @ts-nocheck
+	/**
+	 * ActionSheet 动作面板组件
+	 * @description 用于底部弹起的模态面板，提供多个选项供用户选择
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-action-sheet
+	 * 
+	 * @property {boolean} visible 控制面板显示/隐藏（必填）
+	 * @property {object[]} list 菜单项数据集合（必填）
+	 * @property {string} description 面板描述文字
+	 * @property {string} cancelText 取消按钮文本（必填）
+	 * @property {'center' | 'left'} align 菜单项对齐方式
+	 * @value center	居中
+	 * @value left	    居左
+	 * @property {boolean} overlay 是否显示遮罩层
+	 * @property {boolean} safeAreaInsetBottom 是否启用底部安全区域适配
+	 * @property {number[]} rowCol 骨架屏行/列配置（用于加载状态）
+	 * @property {boolean} bordered 是否显示菜单项分割线
+	 * @event {Function} select 选中触发
+	 * @event {Function} cancel 取消
+	 
+	 */
 	import {ref, defineComponent, computed } from '@/uni_modules/lime-shared/vue';
 	import actionSheetProps from './props';
 	
@@ -147,7 +174,7 @@
 			})
 			const handleSelected = (item:ActionSheetItem) => {
 				if(item.disabled) return;
-				emit('select', item.__index);
+				emit('select', item.__index, props.list[item.__index]);
 				innerValue.value = false
 			}
 			const handleCancel = () =>{

@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<custom-navBar title="车辆详情" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="true"
-			:isIcon="true" @capsuleClick="toggleEdit" Icon="edit-pen">
+			:isIcon="true" @capsuleClick="toggleEdit" Icon="/static/edit-pen.png">
 		</custom-navBar>
 		<view class="content">
 			<view class="list">
@@ -11,14 +11,14 @@
 			<view class="list">
 				<text class="title">设备名称</text>
 				<text class="info" v-if="!isEditing">{{carInfo.deviceName}}</text>
-				<uv-input v-else v-model="editInfo.deviceName" border="surround" inputAlign="right" class="input" />
+				<i-input v-else v-model="editInfo.deviceName" border="surround" inputAlign="right" class="input" />
 			</view>
 			<view class="list">
 				<text class="title">车标</text>
 				<text class="info" v-if="!isEditing">{{carTitle}}</text>
 				<view class="custom-icon" v-else @click="deviceTypeSelectFun">
 					<text>{{editInfo.carTypeValue || '请选择图标'}}</text>
-					<uv-icon name="arrow-down" size="18"></uv-icon>
+					<i-icon name="/static/xiangxia.png" fontSize="15"></i-icon>
 				</view>
 			</view>
 			<view class="list">
@@ -32,12 +32,12 @@
 			<view class="list">
 				<text class="title">车架号</text>
 				<text class="info" v-if="!isEditing">{{carInfo.carVin}}</text>
-				<uv-input v-else v-model="editInfo.carVin" border="surround" inputAlign="right" class="input" />
+				<i-input v-else v-model="editInfo.carVin" border="surround" inputAlign="right" class="input" />
 			</view>
 			<view class="list">
 				<text class="title">发动机号</text>
 				<text class="info" v-if="!isEditing">{{carInfo.engineNum}}</text>
-				<uv-input v-else v-model="editInfo.engineNum" border="surround" inputAlign="right" class="input" />
+				<i-input v-else v-model="editInfo.engineNum" border="surround" inputAlign="right" class="input" />
 			</view>
 		</view>
 		<view v-if="isEditing" class="button-group">
@@ -72,7 +72,7 @@
 	// 选择图标
 	const selectIcon = (item) => {
 		editInfo.value.carType = item.name
-		editInfo.value.carTypeValue = item.title
+		editInfo.value.carTypeValue = item.text
 		deviceTypeSelect.value?.close()
 	}
 	
@@ -190,6 +190,7 @@
 					padding: 10rpx;
 					border-radius: 8rpx;
 					width: 60%;
+					height: 25px;
 				}
 
 				.info {

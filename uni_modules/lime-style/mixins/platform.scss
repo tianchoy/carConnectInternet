@@ -1,7 +1,7 @@
-/* #ifdef APP-NVUE || APP-ANDROID || APP-IOS || APP-HARMONY */
+/* #ifdef APP-NVUE || UNI-APP-X && APP */
 $is-app: true;
 /* #endif */
-/* #ifndef APP-NVUE || APP-ANDROID || APP-IOS || APP-HARMONY */
+/* #ifndef APP-NVUE || UNI-APP-X && APP */
 $is-app: false;
 /* #endif */
 

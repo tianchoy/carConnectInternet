@@ -62,5 +62,13 @@ export default {
 	bordered: {
 		type: Boolean,
 		default: false,
-	}
+	},
+	title: {
+		type: String,
+		default: '' 
+	},
+	closeable: {
+		type: Boolean,
+		default: true,
+	},
 }

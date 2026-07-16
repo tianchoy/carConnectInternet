@@ -1,16 +1,19 @@
 <template>
-	<picker-view 
-		class="l-picker-item__group"
-		:style="{opacity: options.length > 0 ? 1 : 0}"
-		:indicator-style="indicatorStyles" 
-		:value="innerIndex" 
-		@change="handlePick"
+	<picker-view class="l-picker-item__group" :style="{opacity: options.length > 0 ? 1 : 0}" :mask-style="platformMaskStyles.common"
+		:mask-top-style="platformMaskStyles.top" :mask-bottom-style="platformMaskStyles.bottom" :indicator-style="indicatorStyles"
+		mask-class="l-picker-item__mask" :value="innerIndex" @change="handlePick"
 		indicator-class="l-picker-item__indicator">
 		<picker-view-column class="l-picker-item__wrapper">
-			<!-- #ifdef APP-ANDROID -->
-			<view ref="itemRef"></view>
+			<!-- #ifdef APP-ANDROID || APP-IOS -->
+			<view ref="itemRef" :style="[itemStyles]"></view>
 			<!-- #endif -->
-			<!-- #ifndef APP-ANDROID -->
+			<!-- #ifdef APP-HARMONY -->
+			<view :style="[itemStyles]">
+				<!-- 鸿蒙不使用canvas的原因是不能超长高度 -->
+				<view ref="itemRef" style="height: 1000000px"></view>
+			</view>
+			<!-- #endif -->
+			<!-- #ifndef APP-ANDROID || APP-IOS  || APP-HARMONY -->
 			<text class="l-picker-item__group-item" v-for="(item, i) in options"
 				:style="[itemStyles, curIndex == i ? itemActiveStyles: {}]"
 				:class="{'l-picker-item__group-item--active': curIndex == i}" :key="item.value">{{item.label}}</text>
@@ -32,8 +35,15 @@
 	 */
 	import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
 	import { clamp } from '@/uni_modules/lime-shared/clamp'
-	import { PickerItemProps, ManageChildInList, OnPick, UpdateItems } from './type';
-	import { PickerColumnItem, PickerValue } from '../l-picker/type';
+	import { usePickerMask }  from './usePickerMask'
+	import type { PickerItemProps, ManageChildInList, OnPick, UpdateItems } from './type';
+	import type { PickerColumnItem, PickerValue } from '../l-picker/type';
+	
+	// #ifdef APP-ANDROID || APP-IOS  || APP-HARMONY
+	import { type PickerCanvasConfig, PickerCanvasRenderer } from './PickerRenderer.uts'
+	// #endif
+	
+	const themeMode = inject('limeConfigProviderTheme', computed(() => 'light'))
 	const instance = getCurrentInstance()!;
 	const props = withDefaults(defineProps<PickerItemProps>(), {
 		options: [] as PickerColumnItem[],
@@ -53,41 +63,40 @@
 	// #ifndef WEB
 	const curIndex = ref(0)
 	// #endif
+	const isInitialized = ref(false)
 	const curValue = ref<PickerValue | null>(props.value);
-	const column = computed(() : number => props.column != -1 ? props.column : pickerItemInstanceArray?.indexOf(instance.proxy! as LPickerItemComponentPublicInstance) ?? props.column);
-
-	const elementPosition = computed(() : boolean[] => {
-		const totalElements = pickerItemInstanceArray?.length ?? 0;
-		return [column.value == 0, column.value == totalElements - 1]
-	});
 	const innerIndex = computed(() : number[] => [curIndex.value])
+	const isDarkMode = computed(() : boolean => themeMode.value == 'dark')
+	const column = computed(() : number => props.column != -1 ? props.column : pickerItemInstanceArray?.indexOf(instance.proxy! as LPickerItemComponentPublicInstance) ?? props.column);
+	const { platformMaskStyles } = usePickerMask(
+		computed(():string|null => picker?.bgColor),
+		isDarkMode,
+		computed(():string[]|null => picker?.maskColors),
+		isInitialized,
+	);
+
 	const indicatorStyles = computed(() : string => {
-		const [isFirst, isLast] = elementPosition.value
-		let style = ``
-		
-		if(isFirst) {
-			style+= 'border-top-left-radius:12rpx; border-bottom-left-radius:12rpx;'
-		}
-		if(isLast) {
-			style+= 'border-top-right-radius:12rpx; border-bottom-right-radius:12rpx;'
-		}
-		return `
-			${style}
-			height: ${picker?.itemHeight ?? '50px'};
-			background-color: rgba(0, 0, 0, 0.04); ${picker?.indicatorStyle}`
+		let style = `height: ${picker?.itemHeight ?? '50px'};border-bottom-color: transparent;`
+		return style + (isInitialized.value ? `border-top-color: rgba(0,0,0,0.001);` : `border-top-color: transparent;`)
 	})
+	
 	const itemStyles = computed(() : Map<string, any> => {
 		const style = new Map<string, any>();
+		// #ifndef APP-ANDROID || APP-IOS || APP-HARMONY
 		if (picker?.itemColor != null) {
 			style.set('color', picker.itemColor!)
 		}
 		if (picker?.itemFontSize != null) {
 			style.set('font-size', picker.itemFontSize!)
 		}
-		if(picker?.itemHeight != null) {
+		if (picker?.itemHeight != null) {
 			style.set('line-height', picker.itemHeight!)
 			style.set('height', picker.itemHeight!)
 		}
+		// #endif
+		// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+			style.set('height', unitConvert(picker?.itemHeight ?? 50) * props.options.length + 'px')
+		// #endif
 		return style
 	})
 	const itemActiveStyles = computed(() : Map<string, any> => {
@@ -110,15 +119,32 @@
 		return defaultIndex < 0 ? 0 : defaultIndex;
 	};
 
+	let lastCount = props.options.length
 	const setIndex = (index : number) => {
 		let lastIndex = curIndex.value
-		let _index = clamp(index, 0,  props.options.length - 1)
-		if(props.options.length > _index) {
+		let _index = clamp(index, 0, props.options.length - 1)
+		if (props.options.length > _index) {
+			// #ifndef APP-IOS
 			curIndex.value = _index;
 			curValue.value = props.options[_index].value
+			// #endif
+			// #ifdef APP-IOS 
+			if(props.options.length == lastCount) {
+				curIndex.value = _index;
+				curValue.value = props.options[_index].value
+			} else {
+				// ios 长度变化时可能会导致无法滚动到指定项
+				requestAnimationFrame(()=>{
+					curIndex.value = _index - 1;
+					curIndex.value = _index;
+					curValue.value = props.options[_index].value
+					lastCount = props.options.length
+				})
+			}
+			// #endif
 		}
 		// #ifdef WEB
-		if(lastIndex == _index || lastIndex == -1) return
+		if (lastIndex == _index || lastIndex == -1) return
 		if (instance.proxy!.$el) {
 			const childs = Array.from(instance.proxy!.$el.parentElement.children).slice(column.value + 1);
 			childs.forEach((child) => {
@@ -129,7 +155,8 @@
 			})
 		}
 		// #endif
-		
+
+
 	}
 	const setValue = (value : PickerValue | null) => {
 		if (value == curValue.value) return
@@ -139,17 +166,17 @@
 	}
 	const setOptions = () => { }
 	const setUpdateItems = () => {
-		const index = clamp(curIndex.value, 0,  props.options.length - 1)
+		const index = clamp(curIndex.value, 0, props.options.length - 1)
 		const curItem = props.options.length > index ? props.options[index] : null;
 		if (curItem == null) return
 		updateItems?.(curItem, index, column.value);
 	}
-	
+
 	const handlePick = (e : UniPickerViewChangeEvent) => {
-		if(props.options.length == 0) return
-		const index = clamp(e.detail.value[0], 0,  props.options.length - 1);
+		if (props.options.length == 0) return
+		const index = clamp(e.detail.value[0], 0, props.options.length - 1);
 		const curItem = props.options[index];
-		if(index == curIndex.value) return
+		if (index == curIndex.value) return
 		setIndex(index)
 		onPick?.(curItem, index, column.value);
 	}
@@ -159,68 +186,104 @@
 		setUpdateItems();
 	}, { immediate: true })
 
-	// #ifdef APP-ANDROID
+	// #ifdef APP-ANDROID || APP-IOS  || APP-HARMONY
 	const itemRef = ref<UniElement | null>(null)
+	// 在组件中使用
+	let canvasRenderer : PickerCanvasRenderer | null = null
+
+	// 提取配置的计算属性
+	const canvasWidth = ref<number>(0)
+	const canvasHeight = ref<number>(0)
+	const canvasConfig = computed(() : PickerCanvasConfig => ({
+		itemHeight: unitConvert(picker?.itemHeight ?? 50),
+		itemFontSize: unitConvert(picker?.itemFontSize ?? 16),
+		itemActiveFontWeight: picker?.itemActiveFontWeight,
+		itemColor: picker?.itemColor,
+		itemActiveColor: picker?.itemActiveColor,
+		canvasWidth: canvasWidth.value,
+		canvasHeight: canvasHeight.value
+	} as PickerCanvasConfig));
+
+
 	const updateItemStyle = () => {
-		if (itemRef.value != null) {
-			const ctx = itemRef.value!.getDrawableContext()!
-			const height = unitConvert(picker?.itemHeight ?? 50);
-			const fontSize = unitConvert(picker?.itemFontSize ?? '32rpx');
-			const rect = itemRef.value!.getBoundingClientRect()
-			const x = itemRef.value!.offsetWidth / 2;
-			const itemActiveFontWeight = picker?.itemActiveFontWeight ?? 700
-			itemRef.value!.style.setProperty('height', height * props.options.length);
-			ctx.reset()
-			ctx.fillStyle = picker?.itemActiveColor ?? 'rgba(0,0,0,0.88)';
-			ctx.font = `${fontSize}px`;
-			ctx.textAlign = 'center'
-			ctx.lineWidth = 0.5
-			
-			props.options.forEach((item, index) => {
-				const y = height * index + fontSize + (height - fontSize) * 0.4;  //(height - fontSize * 1.1)
-				ctx.fillText(item.label, x, y)
-				if (index == curIndex.value && itemActiveFontWeight > 600) {
-					ctx.strokeText(item.label, x, y)
-				}
-			})
-			ctx.update()
+		if (itemRef.value == null) return
+		if(canvasRenderer == null) {
+			canvasRenderer = new PickerCanvasRenderer(itemRef.value!);
 		}
+		canvasRenderer?.render(
+			props.options,
+			curIndex.value,
+			canvasConfig.value,
+			isDarkMode.value
+		);
 	}
-	// 防止更新后尺寸不对
-	watchEffect(()=> {
-		if(curIndex.value > 0){}
-		nextTick(updateItemStyle)
-	})
-	const stop = watch(() : PickerColumnItem[] => props.options, (v : PickerColumnItem[], o : PickerColumnItem[]) => {
-		nextTick(updateItemStyle)
-	})
-	
+
+	const getBoundingClientRect = () => {
+		requestAnimationFrame(() => {
+			itemRef.value?.getBoundingClientRectAsync()?.then(res => {
+				canvasWidth.value = res.width
+				canvasHeight.value = res.height
+			})
+		})
+	}
 	const resizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
-		updateItemStyle()
-	}) 
-	const stopWatch = watch(():UniElement|null => itemRef.value, (el:UniElement|null) => {
-		if(el== null) return
-		resizeObserver.observe(el)
+		getBoundingClientRect()
 	})
-	// onMounted(() => {
-	// 	nextTick(updateItemStyle)
-	// })
 	
+	let timerId: null|number = null
+	let renderCount = 0
+	const stopOptionsWatch = watch([()=> props.options, canvasHeight, isDarkMode, curIndex], () => {
+		if(canvasHeight.value == 0) return
+		updateItemStyle()
+		if(renderCount > 2) return
+		if(timerId != null) {
+			clearTimeout(timerId!)
+		}
+		timerId = setTimeout(()=> {
+			updateItemStyle()
+			// 鸿蒙可能首次会画出不出
+			renderCount++
+		},50)
+	});
+
+	const stopItemRefWatch = watch(() : UniElement | null => itemRef.value, (el : UniElement | null) => {
+		if (el == null) return
+		resizeObserver.observe(el)
+		// #ifdef APP-IOS
+		getBoundingClientRect()
+		// #endif
+	})
+	// #endif
+
+	// #ifdef APP-IOS
+	onMounted(() => {
+		nextTick(() => {
+			setTimeout(() => {
+				isInitialized.value = true
+			}, 400)
+		})
+	})
+	// #endif
+	// #ifdef APP-HARMONY
+	// 需要初始化后才会有动画
+	onMounted(() => {
+		nextTick(() => {
+			setTimeout(() => {
+				isInitialized.value = true
+			}, 50)
+		})
+	})
 	// #endif
 	onBeforeUnmount(() => {
 		manageChildInList?.(instance.proxy! as LPickerItemComponentPublicInstance, false)
-		
-		// #ifdef APP-ANDROID
-		stop()
-		stopWatch()
+		// #ifdef APP-ANDROID || APP-IOS  || APP-HARMONY
+		stopOptionsWatch()
+		stopItemRefWatch()
 		resizeObserver.disconnect()
+		canvasRenderer = null
 		// #endif
 	})
-	// onMounted(()=>{
-	// 	if(props.options.length > 0 && curIndex.value == -1) {
-	// 		curIndex.value = 0
-	// 	}
-	// })
+	
 	defineExpose({
 		setIndex,
 		setValue,

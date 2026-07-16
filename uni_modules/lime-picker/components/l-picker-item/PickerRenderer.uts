@@ -1,0 +1,187 @@
+// @ts-nocheck
+import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
+import type { PickerColumnItem, PickerValue } from '../l-picker/type';
+// #ifdef APP-ANDROID || APP-IOS
+type PickerCanvasElement = UniElement
+type PickerDrawableContext = DrawableContext
+// #endif
+// #ifdef APP-HARMONY
+type PickerCanvasElement = UniElement//UniCanvasElement
+type PickerDrawableContext = DrawableContext//CanvasRenderingContext2D
+// #endif
+
+
+export type PickerCanvasConfig = {
+	itemHeight : number;
+	itemFontSize : number;
+	itemActiveFontWeight ?: number;
+	itemColor ?: string;
+	itemActiveColor ?: string;
+	canvasWidth : number;
+	canvasHeight : number;
+}
+
+export class PickerCanvasRenderer {
+	// private canvas : PickerCanvasElement | null = null;
+	private ctx : PickerDrawableContext | null = null;
+	private dpr : number = 1;
+	private isInitialized : boolean = false;
+	private canvas : PickerCanvasElement
+	private lastWidth : number = 0;
+	private lastHeight : number = 0;
+	constructor(itemRef : PickerCanvasElement) {
+		this.canvas = itemRef
+		this.initCanvas();
+	}
+
+	private initCanvas() {
+		// #ifdef APP-ANDROID||APP-IOS || APP-HARMONY
+		// this.ctx = this.canvas.getDrawableContext();
+		this.isInitialized = true;
+		return
+		// #endif
+
+		// #ifdef APP-HARMONY
+		const rect = this.canvas.getBoundingClientRect()
+		// this.ctx = this.canvas.getContext('2d');
+		this.ctx = this.canvas.getDrawableContext();
+		this.dpr = uni.getDeviceInfo().devicePixelRatio ?? 1;
+		this.isInitialized = true;
+		// this.canvas.height = rect.height * this.dpr;
+		// this.canvas.width = rect.width * this.dpr;
+		// this.ctx.scale(this.dpr, this.dpr);
+		this.lastWidth = rect.width;
+		this.lastHeight = rect.height;
+		// #endif
+	}
+
+	private setupCanvas(width : number, height : number) {
+		// if (!this.isInitialized) return;
+		// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+		// this.canvas.style.setProperty('height', `${height}px`);
+		// this.ctx?.reset();
+		return
+		// #endif
+		
+		// #ifdef APP-HARMONY
+		if (this.lastWidth == width && this.lastHeight == height) return；
+		
+		this.lastWidth = width;
+		this.lastHeight = height;
+		// this.canvas.height = height * this.dpr;
+		// this.canvas.width = width * this.dpr;
+		// this.ctx?.setTransform(1, 0, 0, 1, 0, 0);
+		// this.ctx?.scale(this.dpr, this.dpr);
+		// #endif
+	}
+	clearRect(width : number = 1000, height : number = 100000) {
+		// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+		this.ctx?.reset();
+		return
+		// #endif
+		// #ifdef APP-HARMONY
+		this.ctx?.clearRect(0, 0, width, height);
+		// #endif
+	}
+	render(options : PickerColumnItem[], curIndex : number, config : PickerCanvasConfig, isDarkMode : boolean) {
+		// 安卓不能把ctx存在实例中？
+		// if(this.ctx == null) return
+		
+		const ctx = this.canvas.getDrawableContext()!
+		const itemHeight = config.itemHeight;
+		const fontSize = config.itemFontSize;
+		const canvasWidth = config.canvasWidth
+		const canvasHeight = config.canvasHeight 
+		// this.ctx = ctx
+		// 设置容器和Canvas尺寸
+		this.setupCanvas(canvasWidth, canvasHeight);
+		ctx.reset();
+		const x = canvasWidth / 2;
+		const itemActiveFontWeight = config?.itemActiveFontWeight ?? 700;
+
+		const color = config?.itemColor ?? (isDarkMode ? `rgba(255,255,255,0.88)` : 'rgba(0,0,0,0.88)');
+		const itemActiveColor = config?.itemActiveColor ?? (isDarkMode ? `rgba(255,255,255,0.88)` : 'rgba(0,0,0,0.88)');
+		
+		
+		// 设置绘图上下文
+		// #ifndef APP-HARMONY
+		ctx.font = `${fontSize}px`;
+		// #endif
+		// #ifdef APP-HARMONY
+		ctx.font = `${fontSize}px`;// sans-serif
+		// #endif
+		ctx.textAlign = 'center';
+		// ctx.textBaseline = 'middle'; // 使用中间基线实现垂直居中
+		ctx.lineWidth = 0.5;
+
+		// 清空画布
+		this.clearRect(canvasWidth, canvasHeight);
+
+		// 绘制所有选项
+		options.forEach((item, index) => {
+			// const y = itemHeight * index + (itemHeight + fontSize) / 2;
+			let offset = 0.4
+			// #ifdef APP-IOS
+			offset = 0.55
+			// #endif
+			const y = itemHeight * index + fontSize + (itemHeight - fontSize) * offset;
+			// const y = itemHeight * index + itemHeight / 2; // 垂直居中
+
+			const isActive = index == curIndex && itemActiveFontWeight > 600;
+			ctx.fillStyle = isActive ? itemActiveColor : color;
+			ctx.strokeStyle = isActive ? itemActiveColor : color;
+
+			ctx.fillText(item.label, x, y);
+
+			if (isActive) {
+				// #ifdef APP-IOS || APP-HARMONY
+				// ctx.strokeText(item.label, x, y);
+				ctx.fillText(item.label, x - 0.2, y);
+				ctx.fillText(item.label, x + 0.2, y);
+				ctx.fillText(item.label, x, y - 0.2);
+				ctx.fillText(item.label, x, y + 0.2);
+				// #endif
+				// #ifndef APP-IOS|| APP-HARMONY
+				ctx.strokeText(item.label, x, y);
+				// #endif
+			}
+		});
+
+		// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+		ctx.update();
+		// #endif
+	}
+
+	destroy() {
+		// this.canvas = null;
+		this.ctx = null;
+		this.isInitialized = false;
+	}
+}
+
+// // 在组件中使用
+// const canvasRenderer = ref<PickerCanvasRenderer | null>(null);
+
+// const updateItemStyle = () => {
+//     if (!itemRef.value) return;
+
+//     // 初始化渲染器（只初始化一次）
+//     if (!canvasRenderer.value) {
+//         canvasRenderer.value = new PickerCanvasRenderer(
+//             itemRef.value,
+//             isDarkMode.value,
+//             picker
+//         );
+//     }
+
+//     // 执行渲染
+//     canvasRenderer.value.render(props.options, curIndex.value);
+// };
+
+// // 在组件卸载时清理
+// onBeforeUnmount(() => {
+//     if (canvasRenderer.value) {
+//         canvasRenderer.value.destroy();
+//         canvasRenderer.value = null;
+//     }
+// });

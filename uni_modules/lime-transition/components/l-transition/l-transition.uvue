@@ -39,7 +39,7 @@
 	 */
 	
 	
-	import { useTransition, UseTransitionOptions, TransitionEmitStatus } from '@/uni_modules/lime-transition';
+	import { useTransition, type UseTransitionOptions, type TransitionEmitStatus } from '@/uni_modules/lime-transition';
 	import { TransitionProps } from './type';
 	
 	const emit = defineEmits(['before-enter', 'enter', 'after-enter', 'before-leave', 'leave', 'after-leave'])

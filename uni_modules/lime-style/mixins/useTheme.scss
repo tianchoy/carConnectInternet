@@ -3,12 +3,12 @@ $theme: light;
 
 @mixin use-theme($mode: null) {
 	@if $mode != null {
-		/* #ifndef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+		/* #ifndef UNI-APP-X && APP || APP-NVUE */
 		@media (prefers-color-scheme: $mode) {
 			@content;
 		}
 		/* #endif */
-		/* #ifdef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+		/* #ifdef UNI-APP-X && APP || APP-NVUE */
 		&.#{$mode} {
 			@content;
 		}
@@ -16,13 +16,13 @@ $theme: light;
 	} @else {
 		@each $mode in $limeThemes {
 			$theme: $mode !global;
-			/* #ifndef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+			/* #ifndef UNI-APP-X && APP || APP-NVUE */
 			@media (prefers-color-scheme: $mode) {
 				@content;
 			}
 			/* #endif */
 			
-			/* #ifdef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+			/* #ifdef UNI-APP-X && APP || APP-NVUE */
 			&.#{$mode} {
 				@content;
 			}
@@ -33,14 +33,14 @@ $theme: light;
 }
 
 @mixin theme-dark {
-	/* #ifndef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+	/* #ifndef UNI-APP-X && APP || APP-NVUE */
 	@media (prefers-color-scheme: dark) {
 		page {
 			@content;
 		}
 	}
 	/* #endif */
-	/* #ifdef APP-ANDROID || APP-IOS || APP-NVUE || APP-HARMONY */
+	/* #ifdef UNI-APP-X && APP || APP-NVUE */
 	.dark {
 		@content;
 	}

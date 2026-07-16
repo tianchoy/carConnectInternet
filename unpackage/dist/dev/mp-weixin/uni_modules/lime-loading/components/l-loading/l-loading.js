@@ -81,3 +81,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-loading/components/l-loading/l-loading.js.map

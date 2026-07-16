@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_limeShared_clamp_index = require("../../../lime-shared/clamp/index.js");
+const uni_modules_limePicker_components_lPickerItem_usePickerMask = require("./usePickerMask.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "l-picker-item",
   props: {
@@ -11,6 +12,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   setup(__props, _a) {
     var __expose = _a.expose;
+    const themeMode = common_vendor.inject("limeConfigProviderTheme", common_vendor.computed(() => {
+      return "light";
+    }));
     const instance = common_vendor.getCurrentInstance();
     const props = __props;
     const picker = common_vendor.inject("limePicker", null);
@@ -20,33 +24,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onPick = common_vendor.inject("limePickerOnPick", null);
     const updateItems = common_vendor.inject("limePickerUpdateItems", null);
     const curIndex = common_vendor.ref(0);
+    const isInitialized = common_vendor.ref(false);
     const curValue = common_vendor.ref(props.value);
+    const innerIndex = common_vendor.computed(() => {
+      return [curIndex.value];
+    });
+    const isDarkMode = common_vendor.computed(() => {
+      return themeMode.value == "dark";
+    });
     const column = common_vendor.computed(() => {
       var _a2;
       return props.column != -1 ? props.column : (_a2 = pickerItemInstanceArray === null || pickerItemInstanceArray === void 0 ? null : pickerItemInstanceArray.indexOf(instance.proxy)) !== null && _a2 !== void 0 ? _a2 : props.column;
     });
-    const elementPosition = common_vendor.computed(() => {
-      var _a2;
-      const totalElements = (_a2 = pickerItemInstanceArray === null || pickerItemInstanceArray === void 0 ? null : pickerItemInstanceArray.length) !== null && _a2 !== void 0 ? _a2 : 0;
-      return [column.value == 0, column.value == totalElements - 1];
-    });
-    const innerIndex = common_vendor.computed(() => {
-      return [curIndex.value];
-    });
+    const platformMaskStyles = uni_modules_limePicker_components_lPickerItem_usePickerMask.usePickerMask(common_vendor.computed(() => {
+      return picker === null || picker === void 0 ? null : picker.bgColor;
+    }), isDarkMode, common_vendor.computed(() => {
+      return picker === null || picker === void 0 ? null : picker.maskColors;
+    })).platformMaskStyles;
     const indicatorStyles = common_vendor.computed(() => {
       var _a2;
-      const _b = common_vendor.__read(elementPosition.value, 2), isFirst = _b[0], isLast = _b[1];
-      let style = ``;
-      if (isFirst) {
-        style += "border-top-left-radius:12rpx; border-bottom-left-radius:12rpx;";
-      }
-      if (isLast) {
-        style += "border-top-right-radius:12rpx; border-bottom-right-radius:12rpx;";
-      }
-      return `
-			${style}
-			height: ${(_a2 = picker === null || picker === void 0 ? null : picker.itemHeight) !== null && _a2 !== void 0 ? _a2 : "50px"};
-			background-color: rgba(0, 0, 0, 0.04); ${picker === null || picker === void 0 ? null : picker.indicatorStyle}`;
+      let style = `height: ${(_a2 = picker === null || picker === void 0 ? null : picker.itemHeight) !== null && _a2 !== void 0 ? _a2 : "50px"};border-bottom-color: transparent;`;
+      return style + (isInitialized.value ? `border-top-color: rgba(0,0,0,0.001);` : `border-top-color: transparent;`);
     });
     const itemStyles = common_vendor.computed(() => {
       const style = /* @__PURE__ */ new Map();
@@ -81,6 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return defaultIndex < 0 ? 0 : defaultIndex;
     };
+    props.options.length;
     const setIndex = (index) => {
       curIndex.value;
       let _index = uni_modules_limeShared_clamp_index.clamp(index, 0, props.options.length - 1);
@@ -149,13 +148,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        f: common_vendor.unref(indicatorStyles),
-        g: common_vendor.unref(innerIndex),
-        h: common_vendor.o(handlePick, "44"),
-        i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        f: common_vendor.unref(platformMaskStyles).common,
+        g: common_vendor.unref(platformMaskStyles).top,
+        h: common_vendor.unref(platformMaskStyles).bottom,
+        i: common_vendor.unref(indicatorStyles),
+        j: common_vendor.unref(innerIndex),
+        k: common_vendor.o(handlePick, "dc"),
+        l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/lime-picker/components/l-picker-item/l-picker-item.js.map

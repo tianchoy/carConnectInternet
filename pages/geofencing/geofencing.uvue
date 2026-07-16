@@ -68,7 +68,7 @@
 			<view class="status-info">
 				<text>围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
 				<text v-if="drawingMode === 'polygon'">顶点数量: {{ points.length }}</text>
-				<text v-if="drawingMode === 'circle'">半径: {{ circleRadius.toFixed(2) || 0 }}米</text>
+				<text v-if="drawingMode === 'circle'">半径: {{ circleRadius.toFixed(2) }}米</text>
 			</view>
 		</view>
 
@@ -105,12 +105,12 @@
 					<i-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></i-input>
 					<view class="radio-group">
 						<text class="label">告警类型:</text>
-						<i-radio-group v-model="fenceForm.alarmType" iconPlacement="left">
-							<i-radio name="0">不告警</i-radio>
-							<i-radio name="1">出入告警</i-radio>
-							<i-radio name="2">出告警</i-radio>
-							<i-radio name="3">入告警</i-radio>
-						</i-radio-group>
+						<view class="radio-options">
+							<i-radio v-model="fenceForm.alarmType" name="0" iconPlacement="left">不告警</i-radio>
+							<i-radio v-model="fenceForm.alarmType" name="1" iconPlacement="left">出入告警</i-radio>
+							<i-radio v-model="fenceForm.alarmType" name="2" iconPlacement="left">出告警</i-radio>
+							<i-radio v-model="fenceForm.alarmType" name="3" iconPlacement="left">入告警</i-radio>
+						</view>
 					</view>
 				</view>
 				<view class="dialog-actions">
@@ -119,11 +119,11 @@
 				</view>
 			</view>
 		</i-popup>
-		<uv-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
+		<i-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
 			<view class="device-dialog">
 				<view class="dialog-header">
 					<text>设备绑定 - {{ currentFenceName }}</text>
-					<uv-icon name="close" @click="closeDeviceDialog"></uv-icon>
+					<i-icon name="close" @click="closeDeviceDialog"></i-icon>
 				</view>
 				<view class="dialog-tabs">
 					<view :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="switchTab('bind')">
@@ -146,10 +146,10 @@
 							<text class="status"
 								v-if="device.connectionStatus">{{ device.connectionStatus === 'online' ? '在线' : '离线' }}</text>
 						</view>
-						<uv-switch :model-value="isDeviceBound(device.imei)"
+						<i-switch :model-value="isDeviceBound(device.imei)"
 							@change="toggleDeviceBinding(device.imei, $event)" :disabled="loading || loadingMore"
 							size="20">
-						</uv-switch>
+						</i-switch>
 					</view>
 					
 					<view v-if="deviceList.length === 0 && !loading" class="empty">
@@ -164,10 +164,10 @@
 				</scroll-view>
 				
 				<!-- <view class="dialog-actions">
-					<uv-button @click="deviceDialogPopup.close()">完成</uv-button>
+					<i-button @click="deviceDialogPopup.close()">完成</i-button>
 				</view> -->
 			</view>
-		</uv-popup>
+		</i-popup>
 	</view>
 </template>
 
@@ -216,6 +216,7 @@
 	const fencesPopup = ref(null)
 	const editDialogPopup = ref(null)
 	const editingFence = ref(null)
+	const alarmTypeOptions = ['0', '1', '2', '3']
 	const fenceForm = reactive({
 		name: '',
 		alarmType: '1'
@@ -639,13 +640,41 @@
 		updateMapDisplay()
 	}
 
-	// 编辑围栏
+	// 编辑围栏 - 修复版本
 	const editFence = (fence) => {
 		editingFence.value = fence
 		fenceForm.name = fence.name
-		fenceForm.alarmType = fence.alarmType.toString()
+		const alarmType = String(fence.alarmType ?? '')
+		fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : '1'
+		
 		// 设置当前绘制模式为围栏实际类型
-		drawingMode.value = getFenceType(fence)
+		const fenceType = getFenceType(fence)
+		drawingMode.value = fenceType
+		
+		// 【关键修复】恢复围栏数据到绘制状态
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(fence.area)
+			if (circleData) {
+				circleCenter.value = { 
+					latitude: circleData.latitude, 
+					longitude: circleData.longitude 
+				}
+				circleRadius.value = circleData.radius
+				points.value = [] // 清空多边形点
+			}
+		} else {
+			const fencePoints = parsePolygon(fence.area)
+			if (fencePoints.length >= 3) {
+				points.value = fencePoints
+				circleCenter.value = null
+				circleRadius.value = 0
+			}
+		}
+		
+		// 更新地图显示，让用户看到围栏
+		updateMapDisplay()
+		
+		// 打开编辑对话框
 		editDialogPopup.value?.open()
 	}
 
@@ -685,7 +714,7 @@
 		})
 	}
 
-	// 保存围栏
+	// 保存围栏 - 修复版本
 	const saveFence = async () => {
 		if (!fenceForm.name) {
 			uni.showToast({ title: '请输入围栏名称', icon: 'none' })
@@ -693,48 +722,93 @@
 		}
 
 		let area = ''
-		if (drawingMode.value === 'polygon' && points.value.length < 3) {
-			uni.showToast({ title: '请绘制有效的围栏区域', icon: 'none' })
-			return
-		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
-			uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+		
+		// 判断是新增还是编辑
+		if (editingFence.value) {
+			// 【编辑模式】优先使用新绘制的数据，如果没有则使用原有数据
+			if (drawingMode.value === 'polygon' && points.value.length >= 3) {
+				area = generatePolygonString(points.value)
+			} else if (drawingMode.value === 'circle' && circleCenter.value && circleRadius.value > 0) {
+				area = generateCircleString(circleCenter.value, circleRadius.value)
+			} else {
+				// 没有重新绘制，使用原有数据
+				area = editingFence.value.area
+			}
+		} else {
+			// 【新增模式】必须绘制
+			if (drawingMode.value === 'polygon' && points.value.length < 3) {
+				uni.showToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
+				return
+			} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
+				uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+				return
+			}
+
+			if (drawingMode.value === 'polygon') {
+				area = generatePolygonString(points.value)
+			} else if (drawingMode.value === 'circle' && circleCenter.value) {
+				area = generateCircleString(circleCenter.value, circleRadius.value)
+			}
+		}
+
+		if (!area) {
+			uni.showToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
 			return
 		}
 
-		// 根据绘制模式生成不同的区域字符串
-		if (drawingMode.value === 'polygon') {
-			area = generatePolygonString(points.value)
-		} else if (drawingMode.value === 'circle' && circleCenter.value) {
-			area = generateCircleString(circleCenter.value, circleRadius.value)
+		if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
+			uni.showToast({ title: '请选择有效的告警类型', icon: 'none' })
+			return
 		}
 
 		const fenceData = {
 			name: fenceForm.name,
 			area: area,
-			alarmType: parseInt(fenceForm.alarmType),
+			alarmType: Number(fenceForm.alarmType),
 			type: drawingMode.value
 		}
 
 		try {
 			let result
 			if (editingFence.value) {
+				// 更新围栏
+				uni.showLoading({ title: '更新中...' })
 				result = await updateGeofence({ id: editingFence.value.id, ...fenceData })
 			} else {
+				// 新增围栏
+				uni.showLoading({ title: '保存中...' })
 				result = await addGeofence(fenceData)
 			}
 
+			uni.hideLoading()
+
 			if (result.code === 0) {
-				uni.showToast({ title: '保存成功' })
+				uni.showToast({ title: editingFence.value ? '更新成功' : '保存成功' })
 				editDialogPopup.value?.close()
+				
+				// 重置状态
+				const tempFence = editingFence.value
 				editingFence.value = null
 				isDrawing.value = false
-				loadGeofenceList() // 重新加载围栏列表
+				points.value = []
+				circleCenter.value = null
+				circleRadius.value = 0
+				
+				// 重新加载围栏列表
+				await loadGeofenceList()
+				
+				// 如果是在编辑模式下关闭，取消选中状态
+				if (tempFence) {
+					selectedFence.value = null
+					showFenceModal.value?.close()
+				}
 			} else {
-				uni.showToast({ title: '保存失败', icon: 'none' })
+				uni.showToast({ title: result.msg || '保存失败', icon: 'none' })
 			}
 		} catch (error) {
+			uni.hideLoading()
 			console.error('保存围栏失败:', error)
-			uni.showToast({ title: '保存失败', icon: 'none' })
+			uni.showToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
 
@@ -756,7 +830,6 @@
 		scrollTop.value = 0
 	}
 
-	// 切换标签页
 	// 切换标签页
 	const switchTab = async (tab) => {
 		if (activeTab.value === tab) return
@@ -782,7 +855,7 @@
 			pageNum: 1,
 			pageSize: 10,
 			hasMore: true,
-			loadingMore: false
+				loadingMore: false
 		}
 		// 清空当前设备列表
 		if (activeTab.value === tabType) {
@@ -861,16 +934,15 @@
 	}
 
 	// 处理滚动到底部加载更多
-	// 处理滚动到底部加载更多
-const handleLoadMore = () => {
-	if (loadingMore.value || !hasMore.value) return
-	
-	if (activeTab.value === 'bind') {
-		loadBoundDevices(currentFenceId.value)
-	} else {
-		loadUnboundDevices()
+	const handleLoadMore = () => {
+		if (loadingMore.value || !hasMore.value) return
+		
+		if (activeTab.value === 'bind') {
+			loadBoundDevices(currentFenceId.value)
+		} else {
+			loadUnboundDevices()
+		}
 	}
-}
 
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei, bound) => {
@@ -914,18 +986,6 @@ const handleLoadMore = () => {
 	const isDeviceBound = (deviceImei) => {
 		return boundDevices.value.some(device => device.imei === deviceImei)
 	}
-
-	// 监听标签页切换
-	// watch(activeTab, async (newVal, oldVal) => {
-	// 	// 初始化新标签页的分页状态
-	// 	initPagination(newVal)
-	// 	// 加载新标签页数据
-	// 	if (newVal === 'bind') {
-	// 		await loadBoundDevices(currentFenceId.value)
-	// 	} else {
-	// 		await loadUnboundDevices()
-	// 	}
-	// })
 
 	/* 电子围栏绘制功能 */
 	// 设置绘制模式
@@ -1191,8 +1251,6 @@ const handleLoadMore = () => {
 				animation: pulse 1.5s infinite;
 			}
 
-
-
 			@keyframes pulse {
 				0% {
 					opacity: 0.7;
@@ -1234,7 +1292,7 @@ const handleLoadMore = () => {
 				flex-direction: row;
 				justify-content: space-between;
 
-				uv-button {
+				i-button {
 					flex: 1;
 					margin: 0 10rpx;
 				}
@@ -1268,7 +1326,7 @@ const handleLoadMore = () => {
 					align-items: center;
 					gap: 20rpx;
 
-					uv-button {
+					i-button {
 						flex: 1;
 						margin: 0 10rpx;
 					}
@@ -1282,7 +1340,7 @@ const handleLoadMore = () => {
 				align-items: center;
 				margin-bottom: 20rpx;
 
-				uv-button {
+				i-button {
 					flex: 1;
 					margin: 0 10rpx;
 				}
@@ -1394,7 +1452,14 @@ const handleLoadMore = () => {
 						font-weight: 500;
 					}
 
-					uv-radio {
+					.radio-options {
+						display: flex;
+						flex-direction: row;
+						flex-wrap: wrap;
+						align-items: center;
+					}
+
+					i-radio {
 						margin-right: 20rpx;
 						margin-bottom: 15rpx;
 					}
@@ -1408,7 +1473,7 @@ const handleLoadMore = () => {
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
 
-				uv-button {
+				i-button {
 					flex: 1;
 					margin: 0 10rpx;
 				}
@@ -1509,11 +1574,11 @@ const handleLoadMore = () => {
 			}
 		}
 
-		.uv-popup__content {
+		.i-popup__content {
 			border-radius: 20rpx;
 		}
 
-		.uv-grid-item {
+		.i-grid-item {
 			align-items: flex-start !important;
 			margin: 10rpx 0;
 		}

@@ -1,7 +1,7 @@
 @import '@/uni_modules/lime-style/index.scss';
 
 $loading-color: create-var(loading-color, $primary-color);
-$loading-size: create-var(loading-size, 40rpx);
+$loading-size: create-var(loading-size, 20px);
 $loading-text-color: create-var(loading-text-color, $text-color-3);
 $loading-font-size: create-var(loading-font-size, $font-size);
 

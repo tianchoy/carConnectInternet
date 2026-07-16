@@ -171,18 +171,23 @@ Vue.use(VueCompositionAPI)
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | v-model | 是否显示弹出层 | _boolean_ | `false` |
+| visible | 是否显示弹出层 | _boolean_ | `false` |
 | overlay | 是否显示遮罩层 | _boolean_ | `true` |
 | position | 弹出位置，可选值为 `top` `bottom` `right` `left` | _string_ | `center` |
-| duration | 动画时长，单位毫秒，设置为 0 可以禁用动画 | _number_ | `300` |
+| position | 弹出层内容区的动画名 | _string_ | `` |
+| transitionName | 动画时长，单位毫秒，设置为 0 可以禁用动画 | _number_ | `300` |
 | z-index | 将弹窗的 z-index 层级设置为一个固定值 | _number_ | `999` |
 | preventScrollThrough | 是否锁定背景滚动 | _boolean_ | `true` |
 | closeOnClickOverlay | 是否在点击遮罩层后关闭 | _boolean_ | `true` |
+| safeAreaInsetBottom | 适配底部安全区域 | _boolean_ | `true` |
+| safeAreaInsetTop | 适配顶部安全区域 | _boolean_ | `true` |
 | destroyOnClose | 关闭后是否销毁 | _boolean_ | `false` |
 | closeable | 是否显示关闭图标 | _boolean_ | `false` |
 | closeIcon | 关闭图标名称或图片链接，等同于 Icon 组件的 [name 属性](https://ext.dcloud.net.cn/plugin?id=14057) | _string_ | `cross` |
 | bgColor | 背景色 | _string_ | `-` |
 | iconColor | 图标色 | _string_ | `-` |
 | lStyle | 自定义样式 | _string\|object_ | `-` |
+| overlayStyle | 遮罩层自定义样式 | _string\|object_ | `-` |
 | radius | 圆角，可以是字符，数值，数组 | _string\|number\|Array\<string\|number\>_ | `-` |
 
 ### Events
@@ -211,9 +216,11 @@ Vue.use(VueCompositionAPI)
 
 | 名称                           | 默认值                               | 描述 |
 | ------------------------------ | ------------------------------------ | ---- |
-| --l-popup-bg-color         | _#fff_            | 弹出层背景颜色    |
-| --l-popup-close-icon-color         | _rgba(0,0,0,0.6)_            | 关闭图标颜色    |
-| --l-popup-border-radius        | _$border-radius_            | 弹出层边框圆角    |
+| `--l-popup-bg-color`              | _#fff_            | 弹出层背景颜色    |
+| `--l-popup-close-icon-color`      | _rgba(0,0,0,0.6)_            | 关闭图标颜色    |
+| `--l-popup-border-radius`        | _$border-radius_            | 弹出层边框圆角    |
+| `--l-overlay-bg-color` | `rgba(0, 0, 0, 0.6)` | 遮罩层的背景颜色和透明度 |
+| `--l-overlay-blur` | `4px` | 遮罩层的模糊效果程度 |
 
 ## 支持与赞赏
 

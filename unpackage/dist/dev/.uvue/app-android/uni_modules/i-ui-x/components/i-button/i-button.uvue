@@ -1,0 +1,500 @@
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'i-button',
+    name: 'i-button',
+    props: {
+        hairline: {
+            type: Boolean,
+            default: true,
+        },
+        type: {
+            type: String,
+            default: 'default',
+        },
+        size: {
+            type: String,
+            default: 'normal',
+        },
+        block: {
+            type: Boolean,
+            default: false,
+        },
+        shape: {
+            type: String,
+            default: 'square',
+        },
+        plain: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        round: {
+            type: [String, Number],
+            default: '4px',
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        loadingMode: {
+            type: String,
+            default: 'spinner',
+        },
+        loadingSize: {
+            type: [String, Number],
+            default: 15,
+        },
+        openType: {
+            type: String,
+            default: '',
+        },
+        formType: {
+            type: String,
+            default: '',
+        },
+        appParameter: {
+            type: String,
+            default: '',
+        },
+        hoverStopPropagation: {
+            type: Boolean,
+            default: true,
+        },
+        lang: {
+            type: String,
+            default: 'en',
+        },
+        sessionFrom: {
+            type: String,
+            default: '',
+        },
+        sendMessageTitle: {
+            type: String,
+            default: '',
+        },
+        sendMessagePath: {
+            type: String,
+            default: '',
+        },
+        sendMessageImg: {
+            type: String,
+            default: '',
+        },
+        showMessageCard: {
+            type: Boolean,
+            default: false,
+        },
+        dataName: {
+            type: String,
+            default: '',
+        },
+        throttleTime: {
+            type: [String, Number],
+            default: 0,
+        },
+        hoverStartTime: {
+            type: [String, Number],
+            default: 0,
+        },
+        hoverStayTime: {
+            type: [String, Number],
+            default: 200,
+        },
+        hoverClass: {
+            type: String,
+            default: 'i-button--hover',
+        },
+        text: {
+            type: [String, Number],
+            default: '',
+        },
+        icon: {
+            type: String,
+            default: '',
+        },
+        iconColor: {
+            type: String,
+            default: '',
+        },
+        iconPosition: {
+            type: String,
+            default: 'left',
+        },
+        color: {
+            type: String,
+            default: '',
+        },
+        customStyle: {
+            type: String,
+            default: '',
+        },
+    },
+    emits: [
+        'click',
+        'getphonenumber',
+        'getuserinfo',
+        'error',
+        'opensetting',
+        'launchapp',
+        'agreeprivacyauthorization',
+    ],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        /**
+         * Props 说明：外部传入的配置，用于控制组件展示、状态和行为。
+         * - hairline: 是否使用细边框。
+         * - type: 组件类型，用于切换视觉风格或语义状态。
+         * - size: 组件尺寸，通常影响宽高或字号。
+         * - block: block 配置项，用于控制组件展示或交互行为。
+         * - shape: 外形配置。
+         * - plain: 是否使用朴素样式。
+         * - disabled: 是否禁用交互；为 true 时阻止点击、选择或输入。
+         * - round: 是否使用圆形样式。
+         * - loading: 是否展示加载状态。
+         * - loadingMode: loadingMode 配置项，用于控制组件展示或交互行为。
+         * - loadingSize: loadingSize 配置项，用于控制组件展示或交互行为。
+         * - openType: 开放能力类型，用于透传平台按钮能力。
+         * - formType: 表单按钮类型，用于 submit 或 reset。
+         * - appParameter: appParameter 配置项，用于控制组件展示或交互行为。
+         * - hoverStopPropagation: hoverStopPropagation 配置项，用于控制组件展示或交互行为。
+         * - lang: lang 配置项，用于控制组件展示或交互行为。
+         * - sessionFrom: sessionFrom 配置项，用于控制组件展示或交互行为。
+         * - sendMessageTitle: sendMessageTitle 配置项，用于控制组件展示或交互行为。
+         * - sendMessagePath: sendMessagePath 配置项，用于控制组件展示或交互行为。
+         * - sendMessageImg: sendMessageImg 配置项，用于控制组件展示或交互行为。
+         * - showMessageCard: showMessageCard 配置项，用于控制组件展示或交互行为。
+         * - dataName: dataName 配置项，用于控制组件展示或交互行为。
+         * - throttleTime: throttleTime 配置项，用于控制组件展示或交互行为。
+         * - hoverStartTime: 按住后出现 hover 状态的延迟时间。
+         * - hoverStayTime: 松开后保留 hover 状态的时间。
+         * - hoverClass: 按下时的 hover 类名。
+         * - text: 主要展示文本。
+         * - icon: 图标文本或图标标识。
+         * - iconColor: iconColor 配置项，用于控制组件展示或交互行为。
+         * - iconPosition: iconPosition 配置项，用于控制组件展示或交互行为。
+         * - color: 文字、图标或线条颜色。
+         * - customStyle: customStyle 配置项，用于控制组件展示或交互行为。
+         */
+        const props = __props;
+        /**
+         * Emits 说明：组件向外派发的事件，用于页面监听交互结果或同步受控值。
+         * - click: 点击组件时触发，用于响应用户主动操作。
+         * - getphonenumber: 开放能力事件：获取手机号回调。
+         * - getuserinfo: 开放能力事件：获取用户信息回调。
+         * - error: 资源加载失败或平台能力调用失败时触发。
+         * - opensetting: 开放能力事件：打开设置页回调。
+         * - launchapp: 开放能力事件：打开 App 回调。
+         * - agreeprivacyauthorization: 开放能力事件：同意隐私授权回调。
+         */
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        const lastClickTime = ref(0);
+        const loadingAngle = ref(0);
+        let loadingTimer = 0;
+        const normalizedType = computed((): string => {
+            if (props.type == 'danger')
+                return 'error';
+            return props.type;
+        });
+        const contentText = computed((): string => {
+            return String(props.text).length > 0 ? String(props.text) : '';
+        });
+        const computedHoverClass = computed((): string => {
+            if (props.disabled || props.loading)
+                return 'none';
+            return props.hoverClass;
+        });
+        const useNativeButton = computed((): boolean => {
+            return props.openType.length > 0 || props.formType.length > 0;
+        });
+        const buttonClass = computed((): string => {
+            const classes = ['i-button', 'i-button--' + normalizedType.value, 'i-button--' + props.size];
+            if (props.block)
+                classes.push('i-button--block');
+            if (props.plain)
+                classes.push('i-button--plain');
+            if (props.plain)
+                classes.push('i-button--plain-' + normalizedType.value);
+            if (props.hairline && props.plain)
+                classes.push('i-button--hairline');
+            if (props.shape == 'circle')
+                classes.push('i-button--circle');
+            if (props.disabled)
+                classes.push('i-button--disabled');
+            if (props.loading)
+                classes.push('i-button--loading');
+            return classes.join(' ');
+        });
+        const textClass = computed((): string => {
+            const classes = ['i-button__text'];
+            if (props.size == 'small' || props.size == 'mini')
+                classes.push('i-button__text--small');
+            if (normalizedType.value == 'default')
+                classes.push('i-button__text--default');
+            if (props.plain)
+                classes.push('i-button__text--plain-' + normalizedType.value);
+            if (props.color.length > 0 && props.plain)
+                classes.push('i-button__text--custom');
+            if (props.disabled)
+                classes.push('i-button__text--disabled');
+            if (props.loading)
+                classes.push('i-button__text--loading');
+            return classes.join(' ');
+        });
+        const iconClass = computed((): string => {
+            const classes = ['i-button__icon'];
+            if (props.iconPosition == 'right')
+                classes.push('i-button__icon--right');
+            return classes.join(' ');
+        });
+        const loadingClass = computed((): string => {
+            const classes = ['i-button__loading'];
+            if (props.loadingMode == 'circle')
+                classes.push('i-button__loading--circle');
+            if (normalizedType.value == 'default' || props.plain)
+                classes.push('i-button__loading--muted');
+            if (props.plain)
+                classes.push('i-button__loading--plain-' + normalizedType.value);
+            return classes.join(' ');
+        });
+        const buttonStyle = computed((): string => {
+            let style = '';
+            if (props.shape != 'circle')
+                style = style + 'border-radius:' + formatSize(props.round) + ';';
+            if (props.color.length > 0) {
+                if (props.plain) {
+                    style = style + 'background-color:transparent;border-color:' + props.color + ';';
+                }
+                else {
+                    style = style + 'background:' + props.color + ';border-color:transparent;';
+                }
+            }
+            if (props.customStyle.length > 0)
+                style = style + props.customStyle;
+            return style;
+        });
+        const textStyle = computed((): string => {
+            if (props.color.length > 0 && props.plain)
+                return 'color:' + props.color + ';';
+            return '';
+        });
+        const iconStyle = computed((): string => {
+            if (props.iconColor.length > 0)
+                return 'color:' + props.iconColor + ';';
+            if (props.color.length > 0 && props.plain)
+                return 'color:' + props.color + ';';
+            return '';
+        });
+        const loadingStyle = computed((): string => {
+            const size = formatSize(props.loadingSize);
+            return ('width:' +
+                size +
+                ';height:' +
+                size +
+                ';transform:rotate(' +
+                String(loadingAngle.value) +
+                'deg);');
+        });
+        watch(() => props.loading, (nextValue) => {
+            if (nextValue) {
+                startLoading();
+            }
+            else {
+                stopLoading();
+            }
+        });
+        onMounted(() => {
+            if (props.loading)
+                startLoading();
+        });
+        onUnmounted(() => {
+            stopLoading();
+        });
+        function startLoading() {
+            if (loadingTimer > 0)
+                return;
+            loadingTimer = setInterval(() => {
+                loadingAngle.value = normalizeAngle(loadingAngle.value + 24);
+            }, 50);
+        }
+        function stopLoading() {
+            if (loadingTimer > 0) {
+                clearInterval(loadingTimer);
+                loadingTimer = 0;
+            }
+            loadingAngle.value = 0;
+        }
+        function normalizeAngle(value: number): number {
+            let angle = value % 360;
+            if (angle < 0)
+                angle = angle + 360;
+            return angle;
+        }
+        function formatSize(value): string {
+            const text = String(value);
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0)
+                return text;
+            return text + 'px';
+        }
+        function canClick(): boolean {
+            if (props.disabled || props.loading)
+                return false;
+            const wait = Number(props.throttleTime);
+            if (wait <= 0)
+                return true;
+            const now = Date.now();
+            if (now - lastClickTime.value < wait)
+                return false;
+            lastClickTime.value = now;
+            return true;
+        }
+        function handleClick(event) {
+            if (!canClick())
+                return;
+            emit('click', event);
+        }
+        function handleGetPhoneNumber(event) {
+            emit('getphonenumber', event);
+        }
+        function handleGetUserInfo(event) {
+            emit('getuserinfo', event);
+        }
+        function handleError(event) {
+            emit('error', event);
+        }
+        function handleOpenSetting(event) {
+            emit('opensetting', event);
+        }
+        function handleLaunchApp(event) {
+            emit('launchapp', event);
+        }
+        function handleAgreePrivacyAuthorization(event) {
+            emit('agreeprivacyauthorization', event);
+        }
+        return (): any | null => {
+            return isTrue(useNativeButton.value)
+                ? _cE("button", _uM({
+                    key: 0,
+                    class: _nC(buttonClass.value),
+                    style: _nS(buttonStyle.value),
+                    disabled: _ctx.disabled || _ctx.loading,
+                    "form-type": _ctx.formType,
+                    "open-type": _ctx.openType,
+                    "app-parameter": _ctx.appParameter,
+                    "hover-class": computedHoverClass.value,
+                    "hover-stop-propagation": _ctx.hoverStopPropagation,
+                    "hover-start-time": Number(_ctx.hoverStartTime),
+                    "hover-stay-time": Number(_ctx.hoverStayTime),
+                    lang: _ctx.lang,
+                    "session-from": _ctx.sessionFrom,
+                    "send-message-title": _ctx.sendMessageTitle,
+                    "send-message-path": _ctx.sendMessagePath,
+                    "send-message-img": _ctx.sendMessageImg,
+                    "show-message-card": _ctx.showMessageCard,
+                    "data-name": _ctx.dataName,
+                    onClick: handleClick,
+                    onGetphonenumber: handleGetPhoneNumber,
+                    onGetuserinfo: handleGetUserInfo,
+                    onError: handleError,
+                    onOpensetting: handleOpenSetting,
+                    onLaunchapp: handleLaunchApp,
+                    onAgreeprivacyauthorization: handleAgreePrivacyAuthorization
+                }), [
+                    _cE("view", _uM({ class: "i-button__inner" }), [
+                        isTrue(_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 0,
+                                class: _nC(loadingClass.value),
+                                style: _nS(loadingStyle.value)
+                            }), null, 6 /* CLASS, STYLE */)
+                            : _cC("v-if", true),
+                        isTrue(_ctx.icon.length > 0 && _ctx.iconPosition == 'left' && !_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 1,
+                                class: _nC(iconClass.value),
+                                style: _nS(iconStyle.value)
+                            }), _tD(_ctx.icon), 7 /* TEXT, CLASS, STYLE */)
+                            : _cC("v-if", true),
+                        contentText.value.length > 0
+                            ? _cE("text", _uM({
+                                key: 2,
+                                class: _nC(textClass.value),
+                                style: _nS(textStyle.value)
+                            }), _tD(contentText.value), 7 /* TEXT, CLASS, STYLE */)
+                            : _cE("text", _uM({
+                                key: 3,
+                                class: _nC(textClass.value),
+                                style: _nS(textStyle.value)
+                            }), [
+                                renderSlot(_ctx.$slots, "default")
+                            ], 6 /* CLASS, STYLE */),
+                        isTrue(_ctx.icon.length > 0 && _ctx.iconPosition == 'right' && !_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 4,
+                                class: _nC(iconClass.value),
+                                style: _nS(iconStyle.value)
+                            }), _tD(_ctx.icon), 7 /* TEXT, CLASS, STYLE */)
+                            : _cC("v-if", true)
+                    ])
+                ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["disabled", "form-type", "open-type", "app-parameter", "hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "data-name"])
+                : _cE("view", _uM({
+                    key: 1,
+                    class: _nC(buttonClass.value),
+                    style: _nS(buttonStyle.value),
+                    "hover-class": computedHoverClass.value,
+                    "hover-stop-propagation": _ctx.hoverStopPropagation,
+                    "hover-start-time": Number(_ctx.hoverStartTime),
+                    "hover-stay-time": Number(_ctx.hoverStayTime),
+                    "data-name": _ctx.dataName,
+                    onClick: handleClick
+                }), [
+                    _cE("view", _uM({ class: "i-button__inner" }), [
+                        isTrue(_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 0,
+                                class: _nC(loadingClass.value),
+                                style: _nS(loadingStyle.value)
+                            }), null, 6 /* CLASS, STYLE */)
+                            : _cC("v-if", true),
+                        isTrue(_ctx.icon.length > 0 && _ctx.iconPosition == 'left' && !_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 1,
+                                class: _nC(iconClass.value),
+                                style: _nS(iconStyle.value)
+                            }), _tD(_ctx.icon), 7 /* TEXT, CLASS, STYLE */)
+                            : _cC("v-if", true),
+                        contentText.value.length > 0
+                            ? _cE("text", _uM({
+                                key: 2,
+                                class: _nC(textClass.value),
+                                style: _nS(textStyle.value)
+                            }), _tD(contentText.value), 7 /* TEXT, CLASS, STYLE */)
+                            : _cE("text", _uM({
+                                key: 3,
+                                class: _nC(textClass.value),
+                                style: _nS(textStyle.value)
+                            }), [
+                                renderSlot(_ctx.$slots, "default")
+                            ], 6 /* CLASS, STYLE */),
+                        isTrue(_ctx.icon.length > 0 && _ctx.iconPosition == 'right' && !_ctx.loading)
+                            ? _cE("text", _uM({
+                                key: 4,
+                                class: _nC(iconClass.value),
+                                style: _nS(iconStyle.value)
+                            }), _tD(_ctx.icon), 7 /* TEXT, CLASS, STYLE */)
+                            : _cC("v-if", true)
+                    ])
+                ], 14 /* CLASS, STYLE, PROPS */, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]);
+        };
+    }
+});
+export default __sfc__;
+export type IButtonComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIButtonIButtonStyles = [_uM([["i-button", _pS(_uM([["display", "flex"], ["height", 44], ["minWidth", 86], ["paddingTop", 0], ["paddingRight", 18], ["paddingBottom", 0], ["paddingLeft", 18], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["backgroundColor", "#f4f4f5"], ["alignItems", "center"], ["justifyContent", "center"], ["flexDirection", "row"], ["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["overflow", "hidden"]]))], ["i-button__inner", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-button--block", _pS(_uM([["width", "100%"]]))], ["i-button--large", _pS(_uM([["height", 50], ["minWidth", 108], ["paddingTop", 0], ["paddingRight", 22], ["paddingBottom", 0], ["paddingLeft", 22]]))], ["i-button--normal", _pS(_uM([["height", 44]]))], ["i-button--small", _pS(_uM([["height", 36], ["minWidth", 72], ["paddingTop", 0], ["paddingRight", 14], ["paddingBottom", 0], ["paddingLeft", 14]]))], ["i-button--mini", _pS(_uM([["height", 30], ["minWidth", 58], ["paddingTop", 0], ["paddingRight", 10], ["paddingBottom", 0], ["paddingLeft", 10]]))], ["i-button--circle", _pS(_uM([["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))], ["i-button--primary", _pS(_uM([["backgroundColor", "#3c9cff"]]))], ["i-button--success", _pS(_uM([["backgroundColor", "#5ac725"]]))], ["i-button--warning", _pS(_uM([["backgroundColor", "#f9ae3d"]]))], ["i-button--error", _pS(_uM([["backgroundColor", "#f56c6c"]]))], ["i-button--info", _pS(_uM([["backgroundColor", "#909399"]]))], ["i-button--default", _pS(_uM([["backgroundColor", "#f4f4f5"], ["borderTopColor", "#dadbde"], ["borderRightColor", "#dadbde"], ["borderBottomColor", "#dadbde"], ["borderLeftColor", "#dadbde"]]))], ["i-button--plain", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopColor", "#dadbde"], ["borderRightColor", "#dadbde"], ["borderBottomColor", "#dadbde"], ["borderLeftColor", "#dadbde"]]))], ["i-button--plain-primary", _pS(_uM([["borderTopColor", "#3c9cff"], ["borderRightColor", "#3c9cff"], ["borderBottomColor", "#3c9cff"], ["borderLeftColor", "#3c9cff"], ["backgroundColor", "#ffffff"]]))], ["i-button--plain-success", _pS(_uM([["borderTopColor", "#5ac725"], ["borderRightColor", "#5ac725"], ["borderBottomColor", "#5ac725"], ["borderLeftColor", "#5ac725"], ["backgroundColor", "#ffffff"]]))], ["i-button--plain-warning", _pS(_uM([["borderTopColor", "#f9ae3d"], ["borderRightColor", "#f9ae3d"], ["borderBottomColor", "#f9ae3d"], ["borderLeftColor", "#f9ae3d"], ["backgroundColor", "#ffffff"]]))], ["i-button--plain-error", _pS(_uM([["borderTopColor", "#f56c6c"], ["borderRightColor", "#f56c6c"], ["borderBottomColor", "#f56c6c"], ["borderLeftColor", "#f56c6c"], ["backgroundColor", "#ffffff"]]))], ["i-button--plain-info", _pS(_uM([["borderTopColor", "#909399"], ["borderRightColor", "#909399"], ["borderBottomColor", "#909399"], ["borderLeftColor", "#909399"], ["backgroundColor", "#ffffff"]]))], ["i-button--hairline", _pS(_uM([["borderTopWidth", 0.5], ["borderRightWidth", 0.5], ["borderBottomWidth", 0.5], ["borderLeftWidth", 0.5]]))], ["i-button--disabled", _pS(_uM([["opacity", 0.6]]))], ["i-button--loading", _pS(_uM([["opacity", 0.9]]))], ["i-button--hover", _pS(_uM([["opacity", 0.86]]))], ["i-button__text", _pS(_uM([["color", "#ffffff"], ["fontSize", 15], ["fontWeight", 500], ["lineHeight", "22px"]]))], ["i-button__text--small", _pS(_uM([["fontSize", 13], ["lineHeight", "20px"]]))], ["i-button__text--default", _pS(_uM([["color", "#303133"]]))], ["i-button__text--plain-primary", _pS(_uM([["color", "#3c9cff"]]))], ["i-button__text--plain-success", _pS(_uM([["color", "#5ac725"]]))], ["i-button__text--plain-warning", _pS(_uM([["color", "#f9ae3d"]]))], ["i-button__text--plain-error", _pS(_uM([["color", "#f56c6c"]]))], ["i-button__text--plain-info", _pS(_uM([["color", "#909399"]]))], ["i-button__text--plain-default", _pS(_uM([["color", "#303133"]]))], ["i-button__text--disabled", _pS(_uM([["opacity", 0.9]]))], ["i-button__icon", _pS(_uM([["marginRight", 6], ["color", "#ffffff"], ["fontSize", 15], ["lineHeight", "22px"]]))], ["i-button__icon--right", _pS(_uM([["marginRight", 0], ["marginLeft", 6]]))], ["i-button__loading", _pS(_uM([["marginRight", 6], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["borderTopWidth", 2], ["borderRightWidth", 2], ["borderBottomWidth", 2], ["borderLeftWidth", 2], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#ffffff"], ["borderRightColor", "rgba(255,255,255,0.45)"], ["borderBottomColor", "rgba(255,255,255,0.45)"], ["borderLeftColor", "rgba(255,255,255,0.45)"], ["boxSizing", "border-box"]]))], ["i-button__loading--circle", _pS(_uM([["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999]]))], ["i-button__text--loading", _pS(_uM([["opacity", 0.96]]))], ["i-button__loading--muted", _pS(_uM([["borderTopColor", "#606266"], ["borderRightColor", "rgba(48,49,51,0.18)"], ["borderBottomColor", "rgba(48,49,51,0.18)"], ["borderLeftColor", "rgba(48,49,51,0.18)"]]))], ["i-button__loading--plain-primary", _pS(_uM([["borderTopColor", "#3c9cff"]]))], ["i-button__loading--plain-success", _pS(_uM([["borderTopColor", "#5ac725"]]))], ["i-button__loading--plain-warning", _pS(_uM([["borderTopColor", "#f9ae3d"]]))], ["i-button__loading--plain-error", _pS(_uM([["borderTopColor", "#f56c6c"]]))], ["i-button__loading--plain-info", _pS(_uM([["borderTopColor", "#909399"]]))]])];
+//# sourceMappingURL=i-button.uvue.map

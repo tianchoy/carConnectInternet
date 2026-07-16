@@ -1,0 +1,125 @@
+import { useTransition, type UseTransitionOptions, type TransitionEmitStatus } from '@/uni_modules/lime-transition';
+	import { OverlayProps } from './type';
+	// defineOptions({
+	// 	name:'l-overlay'	
+	// })
+	
+	
+const __sfc__ = defineComponent({
+  __name: 'l-overlay',
+  __props: OverlayProps,
+  props: {
+    ariaLabel: { type: String, required: true, default: '关闭' },
+    ariaRole: { type: String, required: true, default: 'button' },
+    lClass: { type: String, required: false },
+    bgColor: { type: String, required: false },
+    lStyle: { type: [String, UTSJSONObject], required: false },
+    duration: { type: Number, required: true, default: 300 },
+    preventScrollThrough: { type: Boolean, required: true, default: true },
+    visible: { type: Boolean, required: true, default: false },
+    zIndex: { type: Number, required: true, default: 998 }
+  },
+  emits: ['click', 'before-enter', 'enter', 'after-enter', 'before-leave', 'leave', 'after-leave'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	/**
+	 * Overlay 遮罩层组件
+	 * @description 用于创建模态遮罩层，通常配合弹窗、对话框等组件使用
+	 * <br>插件类型：LOverlayComponentPublicInstance 
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-overlay
+	 * 
+	 * @property {string} ariaLabel 无障碍访问标签（需语义化描述作用）
+	 * @property {string} ariaRole ARIA角色属性（默认：'presentation'）
+	 * @property {string} lClass 自定义类名（会覆盖默认样式）
+	 * @property {string} bgColor 背景颜色（默认：'rgba(0, 0, 0, 0.7)'）
+	 * @property {string} lStyle 自定义样式（最高优先级，支持CSS字符串）
+	 * @property {number} duration 背景过渡动画时长（单位：ms，默认：300）
+	 * @property {boolean} preventScrollThrough 阻止滚动穿透（默认：true）
+	 * @property {boolean} visible 是否显示遮罩层（支持v-model）
+	 * @property {number} zIndex 层级（默认：1000）
+	 * @event {Function} click 点击遮罩层时触发（常用于关闭操作）
+	 * @event {Function} before-enter
+	 * @event {Function} enter 
+	 * @event {Function} after-enter
+	 * @event {Function} before-leave
+	 * @event {Function} leave
+	 * @event {Function} after-leave
+	 */
+	const props = __props
+	
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+	
+	const {inited, display, classes, finished} = useTransition({
+		defaultName: 'fade',
+		appear: props.visible,
+		emits: (name:TransitionEmitStatus) => { emit(name) },
+		visible: (): boolean => props.visible,
+		duration: props.duration,
+	} as UseTransitionOptions)
+	
+	const styles = computed<Map<string,any>>(():Map<string,any> => {
+		const style = new Map<string,any>();
+		if (props.bgColor != null) {
+			style.set("background-color", props.bgColor!)
+		}
+		if (props.zIndex > 0) {
+			style.set("z-index", props.zIndex)
+		}
+
+
+
+
+
+
+		return style
+	})
+	
+	const noop = () => {}
+	const onClick = (event: UniPointerEvent) =>{
+		// event.stopPropagation()
+		emit('click', !props.visible)
+	}
+
+	const overlayRef = ref<UniElement|null>(null)
+	
+	watchEffect(()=>{
+		overlayRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if(!display.value){
+			overlayRef.value?.style.setProperty('display', "none")
+		} else {
+			overlayRef.value?.style.setProperty('display', "flex")
+		}
+	})
+
+	
+
+return (): any | null => {
+
+  return isTrue(unref(inited))
+    ? _cE("view", _uM({
+        key: 0,
+        class: _nC(["l-overlay", [_ctx.lClass, unref(classes)]]),
+        ref_key: "overlayRef",
+        ref: overlayRef,
+        style: _nS([unref(styles), _ctx.lStyle]),
+        onClick: withModifiers(onClick, ["stop"]),
+        onTouchmove: withModifiers(noop, ["stop"]),
+        onTransitionend: unref(finished),
+        "aria-role": _ctx.ariaRole,
+        "aria-label": _ctx.ariaLabel
+      }), [
+        renderSlot(_ctx.$slots, "default")
+      ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onTransitionend", "aria-role", "aria-label"])
+    : _cC("v-if", true)
+}
+}
+
+})
+export default __sfc__
+export type LOverlayComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesLimeOverlayComponentsLOverlayLOverlayStyles = [_uM([["l-overlay", _pS(_uM([["position", "fixed"], ["top", 0], ["left", 0], ["width", "100%"], ["bottom", 0], ["backgroundColor", "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))"], ["transitionProperty", "opacity"], ["transitionTimingFunction", "ease"], ["zIndex", "var(--l-overlay-z-index, 998)"], ["opacity", 1], ["transitionDuration", "300ms"]]))], ["l-fade-enter", _pS(_uM([["opacity", 0]]))], ["l-fade-leave-to", _pS(_uM([["opacity", 0]]))], ["@TRANSITION", _uM([["l-overlay", _uM([["property", "opacity"], ["timingFunction", "ease"], ["duration", "300ms"]])]])]])]

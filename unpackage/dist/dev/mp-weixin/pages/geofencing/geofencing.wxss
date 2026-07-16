@@ -88,7 +88,7 @@
   flex-direction: row;
   justify-content: space-between;
 }
-.container .fence-operations .fence-actions uv-button {
+.container .fence-operations .fence-actions i-button {
   flex: 1;
   margin: 0 10rpx;
 }
@@ -118,7 +118,7 @@
   align-items: center;
   gap: 20rpx;
 }
-.container .tools-panel .drawing-mode-selector .mode-buttons uv-button {
+.container .tools-panel .drawing-mode-selector .mode-buttons i-button {
   flex: 1;
   margin: 0 10rpx;
 }
@@ -129,7 +129,7 @@
   align-items: center;
   margin-bottom: 20rpx;
 }
-.container .tools-panel .tool-tag-item uv-button {
+.container .tools-panel .tool-tag-item i-button {
   flex: 1;
   margin: 0 10rpx;
 }
@@ -223,7 +223,13 @@
   font-size: 28rpx;
   font-weight: 500;
 }
-.container .edit-dialog .dialog-content .radio-group uv-radio {
+.container .edit-dialog .dialog-content .radio-group .radio-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.container .edit-dialog .dialog-content .radio-group i-radio {
   margin-right: 20rpx;
   margin-bottom: 15rpx;
 }
@@ -234,7 +240,7 @@
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
 }
-.container .edit-dialog .dialog-actions uv-button {
+.container .edit-dialog .dialog-actions i-button {
   flex: 1;
   margin: 0 10rpx;
 }
@@ -317,10 +323,10 @@
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
 }
-.container .uv-popup__content {
+.container .i-popup__content {
   border-radius: 20rpx;
 }
-.container .uv-grid-item {
+.container .i-grid-item {
   align-items: flex-start !important;
   margin: 10rpx 0;
 }

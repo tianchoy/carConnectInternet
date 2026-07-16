@@ -1,0 +1,354 @@
+import { computed, ref, watch } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'i-modal',
+    name: 'i-modal',
+    props: {
+        show: { type: Boolean, default: false },
+        title: { type: String, default: '' },
+        content: { type: String, default: '' },
+        confirmText: { type: String, default: '确认' },
+        cancelText: { type: String, default: '取消' },
+        showConfirmButton: { type: Boolean, default: true },
+        showCancelButton: { type: Boolean, default: false },
+        confirmColor: { type: String, default: '#2979ff' },
+        cancelColor: { type: String, default: '#606266' },
+        duration: { type: [String, Number], default: 200 },
+        buttonReverse: { type: Boolean, default: false },
+        zoom: { type: Boolean, default: true },
+        zIndex: { type: [String, Number], default: 10075 },
+        asyncClose: { type: Boolean, default: false },
+        closeable: { type: Boolean, default: false },
+        closeOnMask: { type: Boolean, default: false },
+        negativeTop: { type: [String, Number], default: 0 },
+        width: { type: [String, Number], default: '320px' },
+        confirmButtonShape: { type: String, default: '100px' },
+        round: { type: [String, Number], default: '6px' },
+        buttonModel: { type: String, default: 'text' },
+        buttonRadius: { type: String, default: '100px' },
+        confirmBgColor: { type: String, default: '' },
+        cancelBgColor: { type: String, default: '' },
+        customStyle: { type: [String, Object], default: '' },
+    },
+    emits: ['confirm', 'cancel', 'close', 'update:show'],
+    setup(__props, __setupCtx: SetupContext): () => any | null {
+        const __expose = __setupCtx.expose;
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        /**
+         * Props 说明：严格依据 DCloud uni-app x 官方规范对齐 Modal 文档。
+         * - show: 是否显示模态框。
+         * - title: 标题内容。
+         * - content: 模态框内容；传入默认 slot 时此参数作为兜底内容。
+         * - confirmText: 确认按钮文字。
+         * - cancelText: 取消按钮文字。
+         * - showConfirmButton: 是否显示确认按钮。
+         * - showCancelButton: 是否显示取消按钮。
+         * - confirmColor: 确认按钮文字或 loading 颜色。
+         * - cancelColor: 取消按钮文字颜色。
+         * - duration: 弹窗动画过渡时间。
+         * - buttonReverse: 是否对调确认和取消按钮位置。
+         * - zoom: 是否开启缩放模式。
+         * - zIndex: 弹出层 z-index。
+         * - asyncClose: 是否异步关闭，只对确认按钮有效。
+         * - closeable: 是否显示右上角关闭图标。
+         * - closeOnMask: 是否允许点击遮罩关闭 Modal。
+         * - negativeTop: 往上偏移的值，避免和键盘重合。
+         * - width: modal 宽度，不支持百分比。
+         * - confirmButtonShape: 确认按钮形状，保留文档 API。
+         * - round: 设置圆角值。
+         * - buttonModel: 按钮模式，可取 text / button。
+         * - buttonRadius: 按钮圆角，仅 button 模式有效。
+         * - confirmBgColor: 确认按钮背景色，仅 button 模式有效。
+         * - cancelBgColor: 取消按钮背景色，仅 button 模式有效。
+         * - customStyle: 自定义面板样式，支持字符串。
+         */
+        const props = __props;
+        /**
+         * Emits 说明：严格保留 Modal 文档事件，并补充 update:show 便于受控。
+         * - confirm: 点击确认按钮时触发。
+         * - cancel: 点击取消按钮时触发。
+         * - close: 点击遮罩或关闭图标关闭时触发。
+         * - update:show: 同步 show 可见状态。
+         */
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        const opened = ref(props.show);
+        const active = ref(props.show);
+        const loading = ref(false);
+        let closeTimer = 0;
+        const maskStyle = computed((): string => {
+            return ('z-index:' +
+                String(props.zIndex) +
+                ';opacity:' +
+                (active.value ? '1' : '0') +
+                ';transition-duration:' +
+                formatMs(props.duration) +
+                ';');
+        });
+        const modalClass = computed((): string => {
+            const classes = ['i-modal'];
+            return classes.join(' ');
+        });
+        const modalStyle = computed((): string => {
+            let style = 'width:' + formatSize(props.width) + ';';
+            style = style + 'border-radius:' + formatSize(props.round) + ';';
+            style = style + 'transition-duration:' + formatMs(props.duration) + ';';
+            const top = formatSize(props.negativeTop);
+            const scaleValue = props.zoom ? (active.value ? '1' : '0.86') : '1';
+            const translateValue = top != '0px' ? '-' + top : '0px';
+            style = style + 'opacity:' + (active.value ? '1' : '0') + ';';
+            style = style + 'transform:translateY(' + translateValue + ') scale(' + scaleValue + ');';
+            style = style + stringifyStyle(props.customStyle);
+            return style;
+        });
+        const confirmButtonClass = computed((): string => {
+            const classes = ['i-modal__button', 'i-modal__button--confirm'];
+            if (props.buttonModel == 'button')
+                classes.push('i-modal__button--model-button');
+            if (props.confirmButtonShape == 'square')
+                classes.push('i-modal__button--square');
+            return classes.join(' ');
+        });
+        const cancelButtonClass = computed((): string => {
+            const classes = ['i-modal__button', 'i-modal__button--cancel'];
+            if (props.buttonModel == 'button')
+                classes.push('i-modal__button--model-button');
+            return classes.join(' ');
+        });
+        const confirmTextStyle = computed((): string => {
+            return 'color:' + props.confirmColor + ';';
+        });
+        const cancelTextStyle = computed((): string => {
+            return 'color:' + props.cancelColor + ';';
+        });
+        const confirmButtonStyle = computed((): string => {
+            if (props.buttonModel != 'button')
+                return '';
+            let style = 'border-radius:' + formatSize(props.buttonRadius) + ';';
+            if (props.confirmBgColor.length > 0)
+                style = style + 'background-color:' + props.confirmBgColor + ';';
+            return style;
+        });
+        const cancelButtonStyle = computed((): string => {
+            if (props.buttonModel != 'button')
+                return '';
+            let style = 'border-radius:' + formatSize(props.buttonRadius) + ';';
+            if (props.cancelBgColor.length > 0)
+                style = style + 'background-color:' + props.cancelBgColor + ';';
+            return style;
+        });
+        watch(() => props.show, (nextValue) => {
+            if (nextValue) {
+                openPanel();
+            }
+            else {
+                closePanel(false);
+            }
+        });
+        function open() {
+            openPanel();
+            emit('update:show', true);
+        }
+        function close() {
+            closePanel(true);
+        }
+        function openPanel() {
+            clearCloseTimer();
+            opened.value = true;
+            setTimeout(() => {
+                active.value = true;
+            }, 20);
+        }
+        function closePanel(shouldEmitUpdate: boolean) {
+            clearCloseTimer();
+            active.value = false;
+            loading.value = false;
+            closeTimer = setTimeout(() => {
+                opened.value = false;
+                closeTimer = 0;
+                if (shouldEmitUpdate)
+                    emit('update:show', false);
+            }, animationDuration());
+        }
+        function clearCloseTimer() {
+            if (closeTimer > 0) {
+                clearTimeout(closeTimer);
+                closeTimer = 0;
+            }
+        }
+        function animationDuration(): number {
+            const text = String(props.duration);
+            if (text.indexOf('ms') >= 0)
+                return Number(text.replace('ms', ''));
+            if (text.indexOf('s') >= 0)
+                return Number(text.replace('s', '')) * 1000;
+            const duration = Number(text);
+            if (isNaN(duration))
+                return 200;
+            return duration;
+        }
+        function confirm() {
+            if (loading.value)
+                return;
+            emit('confirm');
+            if (props.asyncClose) {
+                loading.value = true;
+                return;
+            }
+            close();
+        }
+        function cancel() {
+            emit('cancel');
+            closePanel(true);
+        }
+        function closeByIcon() {
+            emit('close');
+            closePanel(true);
+        }
+        function handleOverlayClick() {
+            if (!props.closeOnMask)
+                return;
+            emit('close');
+            closePanel(true);
+        }
+        function formatMs(value): string {
+            const text = String(value);
+            if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0)
+                return text;
+            return text + 'ms';
+        }
+        function formatSize(value): string {
+            const text = String(value);
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
+            }
+            return text + 'px';
+        }
+        function stringifyStyle(value): string {
+            if (value == null)
+                return '';
+            const text = String(value);
+            if (text == '[object Object]' || text.length == 0)
+                return '';
+            return text.endsWith(';') ? text : text + ';';
+        }
+        __expose({
+            open,
+            close,
+        });
+        return (): any | null => {
+            return isTrue(opened.value)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "i-modal__mask",
+                    style: _nS(maskStyle.value),
+                    onClick: handleOverlayClick
+                }), [
+                    _cE("view", _uM({
+                        class: _nC(modalClass.value),
+                        style: _nS(modalStyle.value),
+                        onClick: withModifiers(() => { }, ["stop"])
+                    }), [
+                        isTrue(_ctx.closeable)
+                            ? _cE("view", _uM({
+                                key: 0,
+                                class: "i-modal__close",
+                                onClick: closeByIcon
+                            }), [
+                                _cE("text", _uM({ class: "i-modal__close-text" }), "×")
+                            ])
+                            : _cC("v-if", true),
+                        _ctx.title.length > 0
+                            ? _cE("text", _uM({
+                                key: 1,
+                                class: "i-modal__title"
+                            }), _tD(_ctx.title), 1 /* TEXT */)
+                            : _cC("v-if", true),
+                        _cE("view", _uM({ class: "i-modal__content-wrap" }), [
+                            renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+                                _cE("text", _uM({ class: "i-modal__content" }), _tD(_ctx.content), 1 /* TEXT */)
+                            ])
+                        ]),
+                        _cE("view", _uM({
+                            class: _nC(["i-modal__footer", _ctx.buttonModel == 'button' ? 'i-modal__footer--button' : ''])
+                        }), [
+                            isTrue(_ctx.buttonReverse)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "i-modal__footer-inner"
+                                }), [
+                                    renderSlot(_ctx.$slots, "confirmButton", {}, (): any[] => [
+                                        isTrue(_ctx.showConfirmButton)
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: _nC(confirmButtonClass.value),
+                                                style: _nS(confirmButtonStyle.value),
+                                                onClick: confirm
+                                            }), [
+                                                _cE("text", _uM({
+                                                    class: "i-modal__confirm-text",
+                                                    style: _nS(confirmTextStyle.value)
+                                                }), _tD(loading.value ? '...' : _ctx.confirmText), 5 /* TEXT, STYLE */)
+                                            ], 6 /* CLASS, STYLE */)
+                                            : _cC("v-if", true)
+                                    ]),
+                                    isTrue(_ctx.showCancelButton)
+                                        ? _cE("view", _uM({
+                                            key: 0,
+                                            class: _nC(cancelButtonClass.value),
+                                            style: _nS(cancelButtonStyle.value),
+                                            onClick: cancel
+                                        }), [
+                                            _cE("text", _uM({
+                                                class: "i-modal__cancel-text",
+                                                style: _nS(cancelTextStyle.value)
+                                            }), _tD(_ctx.cancelText), 5 /* TEXT, STYLE */)
+                                        ], 6 /* CLASS, STYLE */)
+                                        : _cC("v-if", true)
+                                ])
+                                : _cE("view", _uM({
+                                    key: 1,
+                                    class: "i-modal__footer-inner"
+                                }), [
+                                    isTrue(_ctx.showCancelButton)
+                                        ? _cE("view", _uM({
+                                            key: 0,
+                                            class: _nC(cancelButtonClass.value),
+                                            style: _nS(cancelButtonStyle.value),
+                                            onClick: cancel
+                                        }), [
+                                            _cE("text", _uM({
+                                                class: "i-modal__cancel-text",
+                                                style: _nS(cancelTextStyle.value)
+                                            }), _tD(_ctx.cancelText), 5 /* TEXT, STYLE */)
+                                        ], 6 /* CLASS, STYLE */)
+                                        : _cC("v-if", true),
+                                    renderSlot(_ctx.$slots, "confirmButton", {}, (): any[] => [
+                                        isTrue(_ctx.showConfirmButton)
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: _nC(confirmButtonClass.value),
+                                                style: _nS(confirmButtonStyle.value),
+                                                onClick: confirm
+                                            }), [
+                                                _cE("text", _uM({
+                                                    class: "i-modal__confirm-text",
+                                                    style: _nS(confirmTextStyle.value)
+                                                }), _tD(loading.value ? '...' : _ctx.confirmText), 5 /* TEXT, STYLE */)
+                                            ], 6 /* CLASS, STYLE */)
+                                            : _cC("v-if", true)
+                                    ])
+                                ])
+                        ], 2 /* CLASS */)
+                    ], 14 /* CLASS, STYLE, PROPS */, ["onClick"])
+                ], 4 /* STYLE */)
+                : _cC("v-if", true);
+        };
+    }
+});
+export default __sfc__;
+export type IModalComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIModalIModalStyles = [_uM([["i-modal__mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundColor", "rgba(0,0,0,0.5)"], ["alignItems", "center"], ["justifyContent", "center"], ["transitionProperty", "opacity"], ["transitionTimingFunction", "ease"]]))], ["i-modal", _pS(_uM([["position", "relative"], ["overflow", "hidden"], ["backgroundColor", "#ffffff"], ["transitionProperty", "transform,opacity"], ["transitionTimingFunction", "cubic-bezier(0.22,1,0.36,1)"]]))], ["i-modal__close", _pS(_uM([["position", "absolute"], ["right", 8], ["top", 8], ["zIndex", 2], ["width", 34], ["height", 34], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-modal__close-text", _pS(_uM([["color", "#909399"], ["fontSize", 22], ["lineHeight", "30px"]]))], ["i-modal__title", _pS(_uM([["paddingTop", 22], ["paddingRight", 22], ["paddingBottom", 8], ["paddingLeft", 22], ["color", "#303133"], ["fontSize", 17], ["fontWeight", 600], ["lineHeight", "24px"], ["textAlign", "center"]]))], ["i-modal__content-wrap", _pS(_uM([["minHeight", 52], ["paddingTop", 8], ["paddingRight", 22], ["paddingBottom", 22], ["paddingLeft", 22], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-modal__content", _pS(_uM([["color", "#606266"], ["fontSize", 14], ["lineHeight", "22px"], ["textAlign", "center"]]))], ["i-modal__footer", _pS(_uM([["minHeight", 48], ["borderTopWidth", 1], ["borderTopStyle", "solid"], ["borderTopColor", "#f3f4f6"]]))], ["i-modal__footer--button", _pS(_uM([["paddingTop", 10], ["paddingRight", 14], ["paddingBottom", 14], ["paddingLeft", 14], ["borderTopWidth", 0]]))], ["i-modal__footer-inner", _pS(_uM([["flexDirection", "row"]]))], ["i-modal__button", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["height", 48], ["alignItems", "center"], ["justifyContent", "center"]]))], ["i-modal__button--cancel", _pS(_uM([["borderRightWidth", 1], ["borderRightStyle", "solid"], ["borderRightColor", "#f3f4f6"]]))], ["i-modal__button--model-button", _pS(_uM([["height", 40], ["marginTop", 0], ["marginRight", 5], ["marginBottom", 0], ["marginLeft", 5], ["borderRightWidth", 0], ["backgroundColor", "#f5f7fb"]]))], ["i-modal__button--square", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["i-modal__confirm-text", _pS(_uM([["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["i-modal__cancel-text", _pS(_uM([["fontSize", 15], ["fontWeight", 600], ["lineHeight", "22px"]]))], ["@TRANSITION", _uM([["i-modal__mask", _uM([["property", "opacity"], ["timingFunction", "ease"]])], ["i-modal", _uM([["property", "transform,opacity"], ["timingFunction", "cubic-bezier(0.22,1,0.36,1)"]])]])]])];
+//# sourceMappingURL=i-modal.uvue.map

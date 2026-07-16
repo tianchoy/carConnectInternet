@@ -7,6 +7,7 @@
 			class="scroll-container"
 			refresher-enabled
 			:refresher-triggered="refresherTriggered"
+			:lower-threshold="100"
 			@refresherrefresh="onRefresherRefresh"
 			@scrolltolower="onScrollToLower">
 			
@@ -20,31 +21,36 @@
 					<text>有 {{newMessageCount}} 条新消息，点击查看</text>
 				</view>
 				
-				<uv-list v-for="(item,index) in msgList" :key="item.messageId || index">
-					<uv-list-item 
-						:title="getMessageTypeText(item.messageType) + ' - ' + item.createTime"
-						:note="item.content" 
-						@click="handleItemClick(item)" 
-						:clickable="true"
-						:show-badge="item.status == 1" 
-						:badge="{value: '未读'}">
-						<template #right>
-							<text class="time-text">{{formatTime(item.createTime)}}</text>
-						</template>
-					</uv-list-item>
-				</uv-list>
-				<uv-load-more :status="loadStatus" v-if="Login" />
+				<view
+					v-for="(item, index) in msgList"
+					:key="item.messageId || index"
+					class="message-item"
+					@click="handleItemClick(item)">
+					<view class="message-header">
+						<text class="message-title">{{ getMessageTypeText(item.messageType) + ' - ' + item.createTime }}</text>
+						<text class="time-text">{{ formatTime(item.createTime) }}</text>
+					</view>
+					<view class="message-content-row">
+						<text class="message-content">{{ item.content }}</text>
+						<text v-if="item.status == 1" class="unread-badge">未读</text>
+					</view>
+				</view>
+				<view v-if="Login" class="load-more">
+					<text v-if="loadStatus == 'loading'">加载中...</text>
+					<text v-else-if="loadStatus == 'nomore'">没有更多了</text>
+					<text v-else>上拉加载更多</text>
+				</view>
 			</view>
 		</scroll-view>
 		<!-- 登录提示 -->
 		
 		
-		<uv-modal 
+		<i-modal 
 			ref="modal" 
 			:title="getMessageTypeText(modalContent.messageType)"
 			:content="modalContent.content" 
 			@confirm="ReadIt">
-		</uv-modal>
+		</i-modal>
 	</view>
 </template>
 
@@ -331,14 +337,17 @@
 	}
 	
 	// 加载更多
-	const loadMore = () => {
+	const loadMore = async () => {
 		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value)
-		if (currPage.value < totalPage.value) {
-			currPage.value++
-			loadMsgList()
-		} else {
-			loadStatus.value = 'nomore'
+		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
+			if (currPage.value >= totalPage.value) {
+				loadStatus.value = 'nomore'
+			}
+			return
 		}
+
+		currPage.value++
+		await loadMsgList()
 	}
 	
 	// 处理消息点击
@@ -417,10 +426,50 @@
 			position: relative;
 			min-height: 100%;
 
-			.uv-list {
+			.message-item {
 				margin-bottom: 20rpx;
+				padding: 24rpx;
 				border-radius: 20rpx;
 				background-color: #fff;
+			}
+
+			.message-header,
+			.message-content-row {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.message-title {
+				flex: 1;
+				font-size: 30rpx;
+				color: #333;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
+
+			.message-content-row {
+				margin-top: 16rpx;
+			}
+
+			.message-content {
+				flex: 1;
+				font-size: 26rpx;
+				color: #666;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
+
+			.unread-badge {
+				margin-left: 16rpx;
+				padding: 4rpx 12rpx;
+				border-radius: 20rpx;
+				background-color: #f56c6c;
+				color: #fff;
+				font-size: 22rpx;
 			}
 			
 			.empty-state {
@@ -453,9 +502,11 @@
 				color: #999;
 			}
 			
-			.uv-load-more {
+			.load-more {
 				padding: 30rpx 0;
 				text-align: center;
+				color: #999;
+				font-size: 26rpx;
 			}
 		}
 	}

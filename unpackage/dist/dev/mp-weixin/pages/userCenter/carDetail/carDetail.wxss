@@ -52,6 +52,7 @@
   padding: 10rpx;
   border-radius: 8rpx;
   width: 60%;
+  height: 25px;
 }
 .container .content .list .info.data-v-36223569 {
   color: #333;

@@ -6,17 +6,20 @@
 			<view class="demo-block">
 				<text class="demo-block__title-text">基础用法{{show6}}</text>
 				<view class="demo-block__body">
-					<button @click="show1 = true">基础用法</button>
+					<button  style="margin-bottom:10px"  @click="show1 = true">基础用法</button>
 					<l-action-sheet  v-model="show1" :list="base" bordered></l-action-sheet>
-					<button @click="show2 = true">展示图标</button>
+					<button  style="margin-bottom:10px"  @click="show2 = true">展示图标</button>
 					<l-action-sheet  v-model="show2" :list="icon"></l-action-sheet>
-					<button @click="show3 = true">取消按钮</button>
+					<button  style="margin-bottom:10px"  @click="show3 = true">取消按钮</button>
 					<l-action-sheet  v-model="show3" :list="icon" cancelText="取消"></l-action-sheet>
-					<button @click="show4 = true">展示描述</button>
+					<button  style="margin-bottom:10px"  @click="show4 = true">展示描述</button>
 					<l-action-sheet  v-model="show4" :list="icon" cancelText="取消" description="这是一段描述信息"></l-action-sheet>
-					<button @click="show5 = true">禁用某项</button>
+					<button  style="margin-bottom:10px"  @click="show7 = true">标题</button>
+					<l-action-sheet  v-model="show7" :list="icon" cancelText="取消" title="标题"></l-action-sheet>
+					
+					<button  style="margin-bottom:10px"  @click="show5 = true">禁用某项</button>
 					<l-action-sheet  v-model="show5" :list="list" cancelText="取消" description="这是一段描述信息"></l-action-sheet>
-					<button @click="show6 = true">宫格型</button>
+					<button  style="margin-bottom:10px"  @click="show6 = true">宫格型</button>
 					<l-action-sheet v-model="show6" :rowCol="[4, 8]" :list="grid" @select="select" cancelText="取消" description="这是一段描述信息"></l-action-sheet>
 					
 				</view>	
@@ -32,6 +35,7 @@
 	const show4= ref(false)
 	const show5= ref(false)
 	const show6= ref(false)
+	const show7= ref(false)
 	const base = [
 		{ label: '选项一'},
 		{ label: '选项二' },
@@ -49,10 +53,10 @@
 		{ label: '选项三' },
 	]
 	const grid = [
-		{ label: '微信', icon: 'https://tdesign.gtimg.com/mobile/demos/wechat.png', radius: '0' },
-		{ label: '朋友圈', icon: 'https://tdesign.gtimg.com/mobile/demos/times.png', radius: '0' },
-		{ label: 'QQ', icon: 'https://tdesign.gtimg.com/mobile/demos/qq.png', radius: '0' },
-		{ label: '企业微信', icon: 'https://tdesign.gtimg.com/mobile/demos/wecom.png', radius: '0'},
+		{ label: '微信', icon: 'https://tdesign.gtimg.com/mobile/demos/wechat.png', radius: '0px' },
+		{ label: '朋友圈', icon: 'https://tdesign.gtimg.com/mobile/demos/times.png', radius: '0px' },
+		{ label: 'QQ', icon: 'https://tdesign.gtimg.com/mobile/demos/qq.png', radius: '0px' },
+		{ label: '企业微信', icon: 'https://tdesign.gtimg.com/mobile/demos/wecom.png', radius: '0px'},
 		{ label: '收藏', icon: 'share' },
 		{ label: '下载', icon: 'download' },
 		{ label: '编辑', icon: 'edit', disabled: true},
@@ -72,11 +76,15 @@
 </script>
 
 <style lang="scss" scoped>
+	$card-bg-color: var(--doc-card-bg-color, white);
+	// $page-bg-color: var(--doc-page-bg-color, #f5f5f5);
+	$title-color: var(--doc-title-color, #000000E6);
+	$summary-color: var(--doc-summary-color, #00000099);
 	.demo-block {
 		margin: 32px 10px 0;
 		// overflow: visible;
 		&.card{
-			background-color: white;
+			background-color: $card-bg-color;
 			padding: 30rpx;
 			margin-bottom: 20rpx;
 		}
@@ -84,19 +92,19 @@
 			margin: 0;
 			margin-top: 8px;
 			&-text {
-				color: rgba(0, 0, 0, 0.6);
+				color: $summary-color;
 				font-weight: 400;
 				font-size: 14px;
 				line-height: 16px;
 				display: flex;
 				&.large {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 18px;
 					font-weight: 700;
 					line-height: 26px;
 				}
 				&.ultra {
-					color: rgba(0, 0, 0, 0.9);
+					color: $title-color;
 					font-size: 24px;
 					font-weight: 700;
 					line-height: 32px;
@@ -104,7 +112,7 @@
 			}
 		}
 		&__desc-text {
-			color: rgba(0, 0, 0, 0.6);
+			color: $summary-color;
 			margin: 8px 16px 0 0;
 			font-size: 14px;
 			line-height: 22px;

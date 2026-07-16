@@ -20,14 +20,20 @@ function useTransition(options) {
   let isTransitionEnd = false;
   let isTransitioning = false;
   let timeoutId = -1;
+  let finishTimeoutId = -1;
   const emitEvent = (event) => {
     var _a2;
     (_a2 = options.emits) === null || _a2 === void 0 ? void 0 : _a2.call(options, event);
   };
   const finished = () => {
+    var _a2;
     if (isTransitionEnd)
       return;
     isTransitionEnd = true;
+    clearTimeout(finishTimeoutId);
+    if ((_a2 = options.removeClasses) !== null && _a2 !== void 0 ? _a2 : false) {
+      classes.value = "";
+    }
     emitEvent(`after-${status}`);
     if (display.value && !state.value) {
       display.value = false;
@@ -65,6 +71,9 @@ function useTransition(options) {
         const currentStatus = transitionQueue.value.shift();
         status = currentStatus;
         emitEvent(`before-${eventName}`);
+        yield sleep();
+        yield sleep();
+        yield sleep();
         yield sleep();
         yield sleep();
         if (status != currentStatus)
@@ -106,10 +115,14 @@ function useTransition(options) {
     performTransition("leave", "leave");
   };
   let init = false;
+  let lastState = null;
   common_vendor.watchEffect(() => {
     if (options.visible == null)
       return;
     state.value = options.visible();
+    if (lastState == state.value)
+      return;
+    lastState = state.value;
     if (!appear && !init) {
       init = true;
       return;
@@ -144,3 +157,4 @@ function useTransition(options) {
   };
 }
 exports.useTransition = useTransition;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/uni_modules/lime-transition/index.js.map

@@ -1,6 +1,20 @@
 <template>
 	<l-popup v-model="innerValue" position="bottom" @closed="onClose">
 		<view class="l-action-sheet">
+			<view class="l-action-sheet__title" v-if="title.length > 0 || $slots['title'] != null">
+				<slot name="title"></slot>
+				<text class="l-action-sheet__title-text" v-if="title.length > 0">{{title}}</text>
+				<!-- <l-icon class="l-action-sheet__close-btn" 
+					l-style="position: absolute; top: 16px; right:16px"  
+					name="close" 
+					size="24px" 
+					aria-role="button" 
+					aria-label="关闭"
+					v-if="closeable"
+					@click="handleCancel">
+				</l-icon> -->
+				<text class="l-action-sheet__close-btn" v-if="closeable" @click="handleCancel">&#xE1EB</text>
+			</view>
 			<slot name="description">
 				<text class="l-action-sheet__description" 
 				:class="{'l-action-sheet__description--left': align == 'left'}"
@@ -88,9 +102,11 @@
 	const instance = getCurrentInstance()!
 	const actionItems = shallowRef<ActionSheetItem[]>([]);
 	const description = shallowRef('')
+	const title = shallowRef('')
 	const cancelText = shallowRef('')
 	const align = shallowRef('center')
 	const bordered = shallowRef(false)
+	const closeable = shallowRef(false)
 	const overlay = shallowRef(true);
 	const rowCol = ref<number[]|null>(null);
 	
@@ -103,12 +119,13 @@
 		const param = JSON.parseObject(`${options['param'] ?? '{}'}`)!
 		parentKey.value = param.getString('key') ?? `action-sheet-1`; 
 		description.value = param.getString('description') ?? '';
+		title.value = param.getString('title') ?? '';
 		cancelText.value = param.getString('cancelText') ?? '';
 		align.value = param.getString('align') ?? 'center';
 		bordered.value = param.getBoolean('bordered') ?? false;
+		closeable.value = param.getBoolean('closeable') ?? true;
 		rowCol.value = param.getArray<number>('rowCol');
 		const list = param.getArray<UTSJSONObject>('list')
-		
 		const isImage = (name: string|null):boolean => {
 			if(name == null) return false;
 			return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name)

@@ -1,14 +1,13 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 if (!Array) {
-  const _easycom_l_icon_1 = common_vendor.resolveComponent("l-icon");
+  const _component_l_icon = common_vendor.resolveComponent("l-icon");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_l_icon_1 + _easycom_l_popup_1)();
+  (_component_l_icon + _easycom_l_popup_1)();
 }
-const _easycom_l_icon = () => "../../lime-icon/components/l-icon/l-icon.js";
 const _easycom_l_popup = () => "../../lime-popup/components/l-popup/l-popup.js";
 if (!Math) {
-  (_easycom_l_icon + _easycom_l_popup)();
+  _easycom_l_popup();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
@@ -16,22 +15,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const instance = common_vendor.getCurrentInstance();
     const actionItems = common_vendor.shallowRef([]);
     const description = common_vendor.shallowRef("");
+    const title = common_vendor.shallowRef("");
     const cancelText = common_vendor.shallowRef("");
     const align = common_vendor.shallowRef("center");
     const bordered = common_vendor.shallowRef(false);
+    const closeable = common_vendor.shallowRef(false);
     common_vendor.shallowRef(true);
     const rowCol = common_vendor.ref(null);
     const innerValue = common_vendor.ref(false);
     let selected = common_vendor.ref(-1);
     let parentKey = common_vendor.ref(`action-sheet-1`);
     common_vendor.onLoad((options) => {
-      var _a, _b, _c, _d, _g, _h, _j;
+      var _a, _b, _c, _d, _g, _h, _j, _k, _l;
       const param = common_vendor.UTS.JSON.parseObject(`${(_a = options["param"]) !== null && _a !== void 0 ? _a : "{}"}`);
       parentKey.value = (_b = param.getString("key")) !== null && _b !== void 0 ? _b : `action-sheet-1`;
       description.value = (_c = param.getString("description")) !== null && _c !== void 0 ? _c : "";
-      cancelText.value = (_d = param.getString("cancelText")) !== null && _d !== void 0 ? _d : "";
-      align.value = (_g = param.getString("align")) !== null && _g !== void 0 ? _g : "center";
-      bordered.value = (_h = param.getBoolean("bordered")) !== null && _h !== void 0 ? _h : false;
+      title.value = (_d = param.getString("title")) !== null && _d !== void 0 ? _d : "";
+      cancelText.value = (_g = param.getString("cancelText")) !== null && _g !== void 0 ? _g : "";
+      align.value = (_h = param.getString("align")) !== null && _h !== void 0 ? _h : "center";
+      bordered.value = (_j = param.getBoolean("bordered")) !== null && _j !== void 0 ? _j : false;
+      closeable.value = (_k = param.getBoolean("closeable")) !== null && _k !== void 0 ? _k : true;
       rowCol.value = param.getArray("rowCol");
       const list = param.getArray("list");
       const isImage = (name = null) => {
@@ -39,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return false;
         return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name);
       };
-      actionItems.value = (_j = list === null || list === void 0 ? null : list.map((it, index) => {
+      actionItems.value = (_l = list === null || list === void 0 ? null : list.map((it, index) => {
         var _a2, _b2, _c2;
         return {
           label: (_a2 = it.getString("label")) !== null && _a2 !== void 0 ? _a2 : "",
@@ -53,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           __index: index,
           __isImage: isImage(it.getString("icon"))
         };
-      })) !== null && _j !== void 0 ? _j : [];
+      })) !== null && _l !== void 0 ? _l : [];
       common_vendor.nextTick$1(() => {
         innerValue.value = true;
       });
@@ -96,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.closeDialogPage(new common_vendor.UTSJSONObject({
         dialogPage: instance.proxy.$page,
         fail(err) {
-          console.log("err", err);
+          common_vendor.index.__f__("log", "at uni_modules/lime-action-sheet/pages/index.uvue:189", "err", err);
         }
       }));
       common_vendor.index.$emit(parentKey.value, selected.value);
@@ -104,14 +107,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.unref(description).length > 0
-      }, common_vendor.unref(description).length > 0 ? {
-        b: common_vendor.t(common_vendor.unref(description)),
-        c: common_vendor.unref(align) == "left" ? 1 : ""
+        a: common_vendor.unref(title).length > 0 || _ctx.$slots["title"] != null
+      }, common_vendor.unref(title).length > 0 || _ctx.$slots["title"] != null ? common_vendor.e({
+        b: common_vendor.unref(title).length > 0
+      }, common_vendor.unref(title).length > 0 ? {
+        c: common_vendor.t(common_vendor.unref(title))
       } : {}, {
-        d: common_vendor.unref(rowCol) == null
+        d: common_vendor.unref(closeable)
+      }, common_vendor.unref(closeable) ? {
+        e: common_vendor.o(handleCancel, "2f")
+      } : {}) : {}, {
+        f: common_vendor.unref(description).length > 0
+      }, common_vendor.unref(description).length > 0 ? {
+        g: common_vendor.t(common_vendor.unref(description)),
+        h: common_vendor.unref(align) == "left" ? 1 : ""
+      } : {}, {
+        i: common_vendor.unref(rowCol) == null
       }, common_vendor.unref(rowCol) == null ? {
-        e: common_vendor.f(common_vendor.unref(actionItems), (item, index, i0) => {
+        j: common_vendor.f(common_vendor.unref(actionItems), (item, index, i0) => {
           return common_vendor.e({
             a: item.icon != null
           }, item.icon != null ? {
@@ -135,9 +148,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             k: index
           });
         }),
-        f: common_vendor.unref(align) == "left" ? 1 : ""
+        k: common_vendor.unref(align) == "left" ? 1 : ""
       } : {
-        g: common_vendor.f(common_vendor.unref(actionRowCols), (row, rowIndex, i0) => {
+        l: common_vendor.f(common_vendor.unref(actionRowCols), (row, rowIndex, i0) => {
           return {
             a: common_vendor.f(row, (item, colIndex, i1) => {
               return common_vendor.e({
@@ -173,27 +186,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }, {
-        h: common_vendor.unref(cancelText).length > 0
+        m: common_vendor.unref(cancelText).length > 0
       }, common_vendor.unref(cancelText).length > 0 ? {} : {}, {
-        i: common_vendor.unref(cancelText).length > 0
+        n: common_vendor.unref(cancelText).length > 0
       }, common_vendor.unref(cancelText).length > 0 ? {
-        j: common_vendor.t(common_vendor.unref(cancelText)),
-        k: common_vendor.o(handleCancel, "ad")
+        o: common_vendor.t(common_vendor.unref(cancelText)),
+        p: common_vendor.o(handleCancel, "47")
       } : {}, {
-        l: common_vendor.gei(_ctx, ""),
-        m: common_vendor.o(onClose, "5d"),
-        n: common_vendor.o(($event) => {
+        q: common_vendor.gei(_ctx, ""),
+        r: common_vendor.o(onClose, "5d"),
+        s: common_vendor.o(($event) => {
           return common_vendor.isRef(innerValue) ? innerValue.value = $event : null;
         }, "a2"),
-        o: common_vendor.p({
+        t: common_vendor.p({
           position: "bottom",
           modelValue: common_vendor.unref(innerValue),
           id: common_vendor.gei(_ctx, "")
         }),
-        p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/uni_modules/lime-action-sheet/pages/index.js.map

@@ -161,13 +161,3 @@
   width: 50rpx;
   height: 50rpx;
 }
-.container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--main,
-.container .content .trip-list .trip-group .trip-item .trip-content .trip-locations .uv-text__value--content {
-  width: 100%;
-  height: 5vh;
-  font-size: 24rpx !important;
-  line-height: unset !important;
-}
-.uv-empty {
-  margin-bottom: 20rpx;
-}

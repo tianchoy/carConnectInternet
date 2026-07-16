@@ -1,7 +1,7 @@
 {
   "id": "lime-picker",
   "displayName": "lime-picker 选择器",
-  "version": "0.2.8",
+  "version": "0.3.8",
   "description": "lime-picker 用于一组预设数据中的选择。支持单列选择、多列选择，兼容uniapp/uniappx",
   "keywords": [
     "lime-picker",
@@ -46,9 +46,9 @@
     "encrypt": [],
     "platforms": {
       "cloud": {
-        "tcb": "√",
-        "aliyun": "√",
-        "alipay": "√"
+        "tcb": "x",
+        "aliyun": "x",
+        "alipay": "x"
       },
       "client": {
         "uni-app": {
@@ -79,7 +79,8 @@
             "jd": "-",
             "harmony": "-",
             "qq": "-",
-            "lark": "-"
+            "lark": "-",
+            "xhs": "-"
           },
           "quickapp": {
             "huawei": "-",
