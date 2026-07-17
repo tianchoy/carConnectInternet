@@ -24,33 +24,33 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesGeofencingGeofencing
             val _cache = __ins.renderCache
-            val imei = ref(null)
-            val connectionStatus = ref(null)
-            val deptId = ref(null)
-            val carType = ref(null)
-            val deviceName = ref(null)
+            val imei = ref<String?>(null)
+            val connectionStatus = ref<String?>(null)
+            val deptId = ref<String?>(null)
+            val carType = ref<String?>(null)
+            val deviceName = ref<String?>(null)
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
             val mapScale = ref(15)
-            val markers = ref(_uA())
-            val carMarker = ref(null)
-            val circles = ref(_uA())
+            val markers = ref(_uA<UTSJSONObject>())
+            val carMarker = ref<UTSJSONObject?>(null)
+            val circles = ref(_uA<CircleOverlay>())
             val carInFence = ref(false)
             val isDrawing = ref(false)
             val drawingMode = ref("polygon")
-            val points = ref(_uA())
-            val polygons = ref(_uA())
-            val circleCenter = ref(null)
+            val points = ref(_uA<Coordinate__1>())
+            val polygons = ref(_uA<Any>())
+            val circleCenter = ref<Coordinate__1?>(null)
             val circleRadius = ref(0)
             val currentSpeed = ref(0)
             val currentAddress = ref("获取中...")
-            val currentCar = ref("京A12345")
+            val currentCar = ref<String?>("京A12345")
             val lastDirection = ref(0)
-            val showFenceModal = ref(null)
-            val fenceList = ref(_uA())
-            val selectedFence = ref(null)
-            val fencesPopup = ref(null)
-            val editDialogPopup = ref(null)
-            val editingFence = ref(null)
+            val showFenceModal = ref<UTSJSONObject?>(null)
+            val fenceList = ref(_uA<UTSJSONObject>())
+            val selectedFence = ref<UTSJSONObject?>(null)
+            val fencesPopup = ref<UTSJSONObject?>(null)
+            val editDialogPopup = ref<UTSJSONObject?>(null)
+            val editingFence = ref<UTSJSONObject?>(null)
             val alarmTypeOptions = _uA(
                 "0",
                 "1",
@@ -58,19 +58,15 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 "3"
             )
             val fenceForm = reactive(_uO("name" to "", "alarmType" to "1"))
-            val deviceDialogPopup = ref(null)
+            val deviceDialogPopup = ref<UTSJSONObject?>(null)
             val activeTab = ref("bind")
-            val deviceList = ref(_uA())
-            val boundDevices = ref(_uA())
+            val deviceList = ref(_uA<Any>())
+            val boundDevices = ref(_uA<Any>())
             val currentFenceName = ref("")
             val currentFenceId = ref("")
             val loading = ref(false)
             val scrollTop = ref(0)
-            val pagination = reactive(_uO("bind" to _uO("pageNum" to 1, "pageSize" to 10, "hasMore" to true, "loadingMore" to false), "unbind" to _uO("pageNum" to 1, "pageSize" to 10, "hasMore" to true, "loadingMore" to false)))
-            val currentPagination = computed(fun(){
-                return pagination[activeTab.value]
-            }
-            )
+            val pagination = reactive<Pagination>(Pagination(bind = PaginationState(pageNum = 1, pageSize = 10, hasMore = true, loadingMore = false), unbind = PaginationState(pageNum = 1, pageSize = 10, hasMore = true, loadingMore = false)))
             val canFinishDrawing = computed(fun(): Boolean {
                 if (drawingMode.value === "polygon") {
                     return points.value.length >= 3
@@ -80,80 +76,92 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return false
             }
             )
-            val loadingMore = computed(fun(){
-                return currentPagination.value.loadingMore
+            val loadingMore = computed(fun(): Boolean {
+                return if (activeTab.value === "bind") {
+                    pagination.bind.loadingMore
+                } else {
+                    pagination.unbind.loadingMore
+                }
             }
             )
-            val hasMore = computed(fun(){
-                return currentPagination.value.hasMore
-            }
-            )
-            onLoad(fun(option): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        connectionStatus.value = option["connectionStatus"]
-                        imei.value = option["imei"]
-                        currentCar.value = option["plateNo"]
-                        deptId.value = option["deptId"]
-                        carType.value = option["carType"]
-                        deviceName.value = option["deviceName"]
-                        await(loadInitialPosition())
-                        await(loadGeofenceList())
-                })
+            val hasMore = computed(fun(): Boolean {
+                return if (activeTab.value === "bind") {
+                    pagination.bind.hasMore
+                } else {
+                    pagination.unbind.hasMore
+                }
             }
             )
             val loadInitialPosition = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 295, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 307, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            res.data.forEach(fun(item): UTSPromise<Unit> {
-                                return wrapUTSPromise(suspend {
-                                        if (item.imei == imei.value) {
-                                            val deviceData = item
-                                            val convertedCoord = CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude))
-                                            center["latitude"] = convertedCoord.lat
-                                            center["longitude"] = convertedCoord.lng
-                                            val position: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("position", "pages/geofencing/geofencing.uvue", 309, 12), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng)
-                                            lastDirection.value = if (isTruthy(deviceData.direction)) {
-                                                deviceData.direction
-                                            } else {
-                                                0
-                                            }
-                                            carMarker.value = _uO("id" to 0, "latitude" to position["latitude"], "longitude" to position["longitude"], "iconPath" to getDeviceIcon(connectionStatus.value, carType.value), "width" to 25, "height" to 25, "rotate" to calculateMapRotation(lastDirection.value), "callout" to _uO("content" to (deviceName.value || "爱车位置"), "color" to if (connectionStatus.value == "online") {
-                                                "#fff"
-                                            } else {
-                                                "#666"
-                                            }
-                                            , "bgColor" to if (connectionStatus.value == "online") {
-                                                "#07C160"
-                                            } else {
-                                                "#ccc"
-                                            }
-                                            , "padding" to 5, "borderRadius" to 4, "display" to "ALWAYS"))
-                                            updateMarkers()
-                                            currentSpeed.value = if (isTruthy(deviceData.speed)) {
-                                                deviceData.speed
-                                            } else {
-                                                0
-                                            }
-                                            currentAddress.value = if (isTruthy(deviceData.positionUpdateTime)) {
-                                                "最后定位: " + deviceData.positionUpdateTime
-                                            } else {
-                                                "未知位置"
-                                            }
-                                            connectionStatus.value = if (isTruthy(deviceData.connectionStatus)) {
-                                                deviceData.connectionStatus
-                                            } else {
-                                                "unknown"
-                                            }
+                            res.data.forEach(fun(item){
+                                if (item["imei"] == imei.value) {
+                                    val deviceData = item
+                                    val convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(deviceData["latitude"].toString()), parseFloat(deviceData["longitude"].toString()))
+                                    center["latitude"] = convertedCoord.lat
+                                    center["longitude"] = convertedCoord.lng
+                                    val position: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("position", "pages/geofencing/geofencing.uvue", 321, 12), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng)
+                                    lastDirection.value = if (isTruthy(deviceData["direction"])) {
+                                        parseFloat(deviceData["direction"].toString())
+                                    } else {
+                                        0
+                                    }
+                                    carMarker.value = _uO("id" to 0, "latitude" to position["latitude"], "longitude" to position["longitude"], "iconPath" to getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()), "width" to 25, "height" to 25, "rotate" to if (lastDirection.value >= 360) {
+                                        lastDirection.value - 360
+                                    } else {
+                                        if (lastDirection.value < 0) {
+                                            lastDirection.value + 360
+                                        } else {
+                                            lastDirection.value
                                         }
-                                })
+                                    }
+                                    , "callout" to _uO("content" to if (isTruthy(deviceName.value)) {
+                                        deviceName.value
+                                    } else {
+                                        "爱车位置"
+                                    }
+                                    , "color" to if (connectionStatus.value == "online") {
+                                        "#fff"
+                                    } else {
+                                        "#666"
+                                    }
+                                    , "bgColor" to if (connectionStatus.value == "online") {
+                                        "#07C160"
+                                    } else {
+                                        "#ccc"
+                                    }
+                                    , "padding" to 5, "borderRadius" to 4, "display" to "ALWAYS"))
+                                    val marker = carMarker.value!!
+                                    if (marker != null) {
+                                        markers.value = _uA(
+                                            marker
+                                        )
+                                    }
+                                    currentSpeed.value = if (isTruthy(deviceData["speed"])) {
+                                        parseFloat(deviceData["speed"].toString())
+                                    } else {
+                                        0
+                                    }
+                                    currentAddress.value = if (isTruthy(deviceData["positionUpdateTime"])) {
+                                        "最后定位: " + deviceData["positionUpdateTime"]
+                                    } else {
+                                        "未知位置"
+                                    }
+                                    connectionStatus.value = if (isTruthy(deviceData["connectionStatus"])) {
+                                        deviceData["connectionStatus"].toString()
+                                    } else {
+                                        "unknown"
+                                    }
+                                }
                             }
                             )
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:349")
+                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:364")
                             uni_showToast(ShowToastOptions(title = "获取车辆位置失败", icon = "none"))
                         }
                          finally {
@@ -161,7 +169,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                 })
             }
-            val calculateMapRotation = fun(direction): Any {
+            fun gen_calculateMapRotation_fn(direction: Number): Number {
                 var rotation = direction
                 if (rotation >= 360) {
                     rotation -= 360
@@ -171,41 +179,99 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
                 return rotation
             }
-            val loadGeofenceList = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        try {
-                            val res = await(getGeofenceList())
-                            if (res.code === 0) {
-                                fenceList.value = if (isTruthy(res.data)) {
-                                    res.data
-                                } else {
-                                    _uA()
-                                }
-                            } else {
-                                uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
-                                fenceList.value = _uA()
-                            }
-                            renderFencesOnMap()
-                        }
-                         catch (error: Throwable) {
-                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:381")
-                            uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
-                            fenceList.value = _uA()
-                            renderFencesOnMap()
-                        }
-                })
-            }
-            val getFenceType = fun(fence): Any {
-                if (isTruthy(fence.type) && fence.type !== "null") {
-                    return fence.type
+            val calculateMapRotation = ::gen_calculateMapRotation_fn
+            fun gen_getFenceType_fn(fence: UTSJSONObject): String {
+                val type = fence.getString("type", "")
+                if (type != "" && type !== "null") {
+                    return type
                 }
-                if (isTruthy(fence.area) && isTruthy(fence.area.startsWith("CIRCLE"))) {
+                val area = fence.getString("area", "")
+                if (area.startsWith("CIRCLE")) {
                     return "circle"
-                } else if (isTruthy(fence.area) && isTruthy(fence.area.startsWith("POLYGON"))) {
+                } else if (area.startsWith("POLYGON")) {
                     return "polygon"
                 }
                 return "polygon"
             }
+            val getFenceType = ::gen_getFenceType_fn
+            fun gen_parsePolygon_fn(polygonStr: String): UTSArray<Coordinate__1> {
+                if (!(polygonStr != "")) {
+                    return _uA()
+                }
+                val coordStr = polygonStr.replace(UTSRegExp("POLYGON \\(\\(", ""), "").replace(UTSRegExp("\\)\\)", ""), "")
+                val coordPoints = coordStr.split(",")
+                return coordPoints.map(fun(point: String): Coordinate__1 {
+                    val values = point.trim().split(" ")
+                    val convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]))
+                    return Coordinate__1(latitude = convertedCoord.lat, longitude = convertedCoord.lng)
+                }
+                )
+            }
+            val parsePolygon = ::gen_parsePolygon_fn
+            fun gen_parseCircle_fn(circleStr: String): CircleData? {
+                if (!(circleStr != "") || !circleStr.startsWith("CIRCLE")) {
+                    return null
+                }
+                try {
+                    val coordStr = circleStr.replace(UTSRegExp("CIRCLE \\(", ""), "").replace(UTSRegExp("\\)", ""), "")
+                    val parts = coordStr.split(",")
+                    if (parts.length !== 2) {
+                        return null
+                    }
+                    val centerValues = parts[0].trim().split(" ")
+                    val lat = parseFloat(centerValues[0])
+                    val lng = parseFloat(centerValues[1])
+                    val radius = parseFloat(parts[1].trim())
+                    if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:424")
+                        return null
+                    }
+                    val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
+                    return CircleData(latitude = convertedCoord.lat, longitude = convertedCoord.lng, radius = radius)
+                }
+                 catch (error: Throwable) {
+                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:434")
+                    return null
+                }
+            }
+            val parseCircle = ::gen_parseCircle_fn
+            fun gen_updateMarkers_fn(): Unit {
+                val newMarkers: UTSArray<UTSJSONObject> = _uA()
+                if (isTruthy(carMarker.value)) {
+                    newMarkers.push(carMarker.value!!)
+                }
+                if (isDrawing.value) {
+                    if (drawingMode.value === "polygon") {
+                        points.value.forEach(fun(point, index){
+                            newMarkers.push(_uO("id" to (1000 + index), "latitude" to point.latitude, "longitude" to point.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to ("顶点" + (index + 1)), "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
+                        })
+                    } else if (drawingMode.value === "circle" && isTruthy(circleCenter.value)) {
+                        newMarkers.push(_uO("id" to 1000, "latitude" to circleCenter.value!!.latitude, "longitude" to circleCenter.value!!.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to "圆心", "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
+                    }
+                } else {
+                    val selected = selectedFence.value
+                    if (selected == null) {
+                        markers.value = newMarkers
+                        return
+                    }
+                    val fenceType = getFenceType(selected)
+                    val area = selected.getString("area", "")
+                    if (fenceType === "circle") {
+                        val circleData = parseCircle(area)
+                        if (circleData != null) {
+                            newMarkers.push(_uO("id" to 2000, "latitude" to circleData.latitude, "longitude" to circleData.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to "圆心", "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
+                        }
+                    } else {
+                        val fencePoints = parsePolygon(area)
+                        fencePoints.forEach(fun(point, index){
+                            newMarkers.push(_uO("id" to (2000 + index), "latitude" to point.latitude, "longitude" to point.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to ("顶点" + (index + 1)), "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
+                        }
+                        )
+                    }
+                }
+                markers.value = newMarkers
+            }
+            val updateMarkers = ::gen_updateMarkers_fn
             val renderFencesOnMap = fun(){
                 if (!(fenceList.value != null) || fenceList.value.length === 0) {
                     polygons.value = _uA()
@@ -213,24 +279,25 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     updateMarkers()
                     return
                 }
-                val fencePolygons = _uA()
-                val fenceCircles = _uA()
-                fenceList.value.forEach(fun(fence, index){
+                val fencePolygons: UTSArray<Any> = _uA()
+                val fenceCircles: UTSArray<CircleOverlay> = _uA()
+                var colorIndex: Number = 0
+                fenceList.value.forEach(fun(fence: UTSJSONObject){
                     val fenceType = getFenceType(fence)
                     if (fenceType === "circle") {
-                        val circleData = parseCircle(fence.area)
-                        if (isTruthy(circleData)) {
+                        val circleData = parseCircle(fence.getString("area", ""))
+                        if (circleData != null) {
                             val displayRadius = if (circleData.radius > 100000) {
                                 100000
                             } else {
                                 circleData.radius
                             }
-                            fenceCircles.push(_uO("id" to fence.id, "latitude" to circleData.latitude, "longitude" to circleData.longitude, "radius" to displayRadius, "strokeWidth" to 2, "strokeColor" to "#FF0000", "fillColor" to "rgba(255,0,0,0.2)", "zIndex" to 1, "centerMarker" to true))
+                            fenceCircles.push(CircleOverlay(id = fence.getNumber("id", 0), latitude = circleData.latitude, longitude = circleData.longitude, radius = displayRadius, strokeWidth = 2, strokeColor = "#FF0000", fillColor = "rgba(255,0,0,0.2)", zIndex = 1, centerMarker = true))
                         }
                     } else {
-                        val fencePoints = parsePolygon(fence.area)
+                        val fencePoints = parsePolygon(fence.getString("area", ""))
                         if (fencePoints.length >= 3) {
-                            fencePolygons.push(_uO("id" to fence.id, "points" to fencePoints, "strokeWidth" to 2, "strokeColor" to "#FF0000", "fillColor" to if (index === 0) {
+                            fencePolygons.push(_uO("id" to fence.getNumber("id", 0), "points" to fencePoints, "strokeWidth" to 2, "strokeColor" to "#FF0000", "fillColor" to if (colorIndex++ === 0) {
                                 "rgba(255,0,0,0.2)"
                             } else {
                                 "rgba(" + Math.floor(Math.random() * 200) + "," + Math.floor(Math.random() * 200) + "," + Math.floor(Math.random() * 200) + ",0.2)"
@@ -242,55 +309,64 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 )
                 polygons.value = fencePolygons
                 circles.value = fenceCircles
-                if (fenceCircles.length > 0 && !selectedFence.value) {
+                if (fenceCircles.length > 0 && !isTruthy(selectedFence.value)) {
                     val firstCircle = fenceCircles[0]
                     center["latitude"] = firstCircle.latitude
                     center["longitude"] = firstCircle.longitude
-                    mapScale.value = calculateZoomLevelFromRadius(firstCircle.radius)
+                    mapScale.value = if (firstCircle.radius > 50000) {
+                        8
+                    } else {
+                        if (firstCircle.radius > 20000) {
+                            9
+                        } else {
+                            if (firstCircle.radius > 10000) {
+                                10
+                            } else {
+                                if (firstCircle.radius > 5000) {
+                                    11
+                                } else {
+                                    if (firstCircle.radius > 2000) {
+                                        12
+                                    } else {
+                                        if (firstCircle.radius > 1000) {
+                                            13
+                                        } else {
+                                            if (firstCircle.radius > 500) {
+                                                14
+                                            } else {
+                                                if (firstCircle.radius > 200) {
+                                                    15
+                                                } else {
+                                                    16
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            val parsePolygon = fun(polygonStr): Any {
-                if (!isTruthy(polygonStr)) {
-                    return _uA()
-                }
-                val coordStr = polygonStr.replace(UTSRegExp("POLYGON \\(\\(", ""), "").replace(UTSRegExp("\\)\\)", ""), "")
-                val coordPoints = coordStr.split(",")
-                return coordPoints.map(fun(point): UTSJSONObject {
-                    val _point_trim_split_map = point.trim().split(" ").map(Number)
-                    val lat = _point_trim_split_map[0]
-                    val lng = _point_trim_split_map[1]
-                    val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-                    return _uO("latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng)
-                }
-                )
-            }
-            val parseCircle = fun(circleStr): UTSJSONObject? {
-                if (!isTruthy(circleStr) || !isTruthy(circleStr.startsWith("CIRCLE"))) {
-                    return null
-                }
-                try {
-                    val coordStr = circleStr.replace(UTSRegExp("CIRCLE \\(", ""), "").replace(UTSRegExp("\\)", ""), "")
-                    val parts = coordStr.split(",")
-                    if (parts.length !== 2) {
-                        return null
-                    }
-                    val centerStr = parts[0]
-                    val radiusStr = parts[1]
-                    val _centerStr_trim_split_map = centerStr.trim().split(" ").map(Number)
-                    val lat = _centerStr_trim_split_map[0]
-                    val lng = _centerStr_trim_split_map[1]
-                    val radius = Number(radiusStr.trim())
-                    if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:506")
-                        return null
-                    }
-                    val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-                    return _uO("latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng, "radius" to radius)
-                }
-                 catch (error: Throwable) {
-                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:519")
-                    return null
-                }
+            val loadGeofenceList = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        try {
+                            val res = await(getGeofenceList())
+                            if (res.code === 0) {
+                                fenceList.value = res.data
+                            } else {
+                                uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
+                                fenceList.value = _uA()
+                            }
+                            renderFencesOnMap()
+                        }
+                         catch (error: Throwable) {
+                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:598")
+                            uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
+                            fenceList.value = _uA()
+                            renderFencesOnMap()
+                        }
+                })
             }
             val generatePolygonString = fun(points): String {
                 val coords = points.map(fun(point): String {
@@ -399,7 +475,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 if (fenceType === "circle") {
                     val circleData = parseCircle(fence.area)
                     if (isTruthy(circleData)) {
-                        circleCenter.value = _uO("latitude" to circleData.latitude, "longitude" to circleData.longitude)
+                        circleCenter.value = Coordinate__1(latitude = circleData.latitude, longitude = circleData.longitude)
                         circleRadius.value = circleData.radius
                         points.value = _uA()
                     }
@@ -426,7 +502,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 if (fenceType === "circle") {
                     val circleData = parseCircle(fence.area)
                     if (isTruthy(circleData)) {
-                        circleCenter.value = _uO("latitude" to circleData.latitude, "longitude" to circleData.longitude)
+                        circleCenter.value = Coordinate__1(latitude = circleData.latitude, longitude = circleData.longitude)
                         circleRadius.value = circleData.radius
                         points.value = _uA()
                     }
@@ -465,7 +541,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                             }
                                         }
                                          catch (error: Throwable) {
-                                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:709")
+                                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:802")
                                             uni_showToast(ShowToastOptions(title = "删除失败", icon = "none"))
                                         }
                                     }
@@ -481,25 +557,25 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             return@w1
                         }
                         var area = ""
-                        if (editingFence.value) {
+                        if (isTruthy(editingFence.value)) {
                             if (drawingMode.value === "polygon" && points.value.length >= 3) {
                                 area = generatePolygonString(points.value)
-                            } else if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
+                            } else if (drawingMode.value === "circle" && isTruthy(circleCenter.value) && circleRadius.value > 0) {
                                 area = generateCircleString(circleCenter.value, circleRadius.value)
                             } else {
-                                area = editingFence.value!!.area
+                                area = editingFence.value!!["area"]
                             }
                         } else {
                             if (drawingMode.value === "polygon" && points.value.length < 3) {
                                 uni_showToast(ShowToastOptions(title = "请绘制有效的围栏区域（至少3个顶点）", icon = "none"))
                                 return@w1
-                            } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
+                            } else if (drawingMode.value === "circle" && (!isTruthy(circleCenter.value) || circleRadius.value <= 0)) {
                                 uni_showToast(ShowToastOptions(title = "请绘制有效的圆形围栏", icon = "none"))
                                 return@w1
                             }
                             if (drawingMode.value === "polygon") {
                                 area = generatePolygonString(points.value)
-                            } else if (drawingMode.value === "circle" && circleCenter.value) {
+                            } else if (drawingMode.value === "circle" && isTruthy(circleCenter.value)) {
                                 area = generateCircleString(circleCenter.value, circleRadius.value)
                             }
                         }
@@ -511,19 +587,19 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             uni_showToast(ShowToastOptions(title = "请选择有效的告警类型", icon = "none"))
                             return@w1
                         }
-                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 764, 9), "name" to fenceForm["name"], "area" to area, "alarmType" to Number(fenceForm["alarmType"]), "type" to drawingMode.value)
+                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 857, 9), "name" to fenceForm["name"], "area" to area, "alarmType" to Number(fenceForm["alarmType"]), "type" to drawingMode.value)
                         try {
                             var result
-                            if (editingFence.value) {
+                            if (isTruthy(editingFence.value)) {
                                 uni_showLoading(ShowLoadingOptions(title = "更新中..."))
-                                result = await(updateGeofence(UTSJSONObject.assign(_uO("id" to editingFence.value!!.id), fenceData)))
+                                result = await(updateGeofence(UTSJSONObject.assign(_uO("id" to editingFence.value!!["id"]), fenceData)))
                             } else {
                                 uni_showLoading(ShowLoadingOptions(title = "保存中..."))
                                 result = await(addGeofence(fenceData))
                             }
                             uni_hideLoading(null)
                             if (result.code === 0) {
-                                uni_showToast(ShowToastOptions(title = if (editingFence.value) {
+                                uni_showToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
                                     "更新成功"
                                 } else {
                                     "保存成功"
@@ -536,7 +612,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 circleCenter.value = null
                                 circleRadius.value = 0
                                 await(loadGeofenceList())
-                                if (tempFence) {
+                                if (isTruthy(tempFence)) {
                                     selectedFence.value = null
                                     showFenceModal.value?.close()
                                 }
@@ -551,7 +627,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:810")
+                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:903")
                             uni_showToast(ShowToastOptions(title = "保存失败，请重试", icon = "none"))
                         }
                 })
@@ -559,7 +635,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val showBindDevices = fun(fenceId): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         currentFenceId.value = fenceId
-                        currentFenceName.value = selectedFence.value.name
+                        currentFenceName.value = selectedFence.value["name"]
                         deviceDialogPopup.value?.open()
                         activeTab.value = "bind"
                         scrollTop.value = 0
@@ -595,7 +671,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val loadBoundDevices = fun(fenceId): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        val page = pagination["bind"]
+                        val page = pagination.bind
                         if (!page.hasMore || page.loadingMore) {
                             return@w1
                         }
@@ -603,7 +679,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         try {
                             val res = await(getBoundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize, "geoId" to fenceId)))
                             if (res.code === 0) {
-                                val dataList = if (isTruthy(res.data.list)) {
+                                val dataList = if (res.data.list != null) {
                                     res.data.list
                                 } else {
                                     _uA()
@@ -632,7 +708,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val loadUnboundDevices = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        val page = pagination["unbind"]
+                        val page = pagination.unbind
                         if (!page.hasMore || page.loadingMore) {
                             return@w1
                         }
@@ -640,7 +716,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         try {
                             val res = await(getUnboundDevices(_uO("pageNum" to page.pageNum, "pageSize" to page.pageSize)))
                             if (res.code === 0) {
-                                val dataList = if (isTruthy(res.data.list)) {
+                                val dataList = if (res.data.list != null) {
                                     res.data.list
                                 } else {
                                     _uA()
@@ -667,7 +743,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 })
             }
             val handleLoadMore = fun(){
-                if (isTruthy(loadingMore.value) || !isTruthy(hasMore.value)) {
+                if (loadingMore.value || !hasMore.value) {
                     return
                 }
                 if (activeTab.value === "bind") {
@@ -680,7 +756,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         loading.value = true
                         try {
-                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 951, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
+                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1044, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
                                 deviceImei
                             ))
                             var result
@@ -712,7 +788,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:978")
+                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:1071")
                             uni_showToast(ShowToastOptions(title = "操作失败", icon = "none"))
                         }
                          finally {
@@ -748,8 +824,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     if (drawingMode.value === "polygon") {
                         addNewPoint(e.detail.latitude, e.detail.longitude)
                     } else if (drawingMode.value === "circle") {
-                        if (!circleCenter.value) {
-                            circleCenter.value = _uO("latitude" to e.detail.latitude, "longitude" to e.detail.longitude)
+                        if (!isTruthy(circleCenter.value)) {
+                            circleCenter.value = Coordinate__1(latitude = e.detail.latitude, longitude = e.detail.longitude)
                             updateMapDisplay()
                         } else {
                             val radius = calculateDistance(circleCenter.value!!.latitude, circleCenter.value!!.longitude, e.detail.latitude, e.detail.longitude)
@@ -780,7 +856,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 if (drawingMode.value === "polygon" && points.value.length < 3) {
                     uni_showToast(ShowToastOptions(title = "至少需要3个顶点", icon = "none"))
                     return
-                } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
+                } else if (drawingMode.value === "circle" && (!isTruthy(circleCenter.value) || circleRadius.value <= 0)) {
                     uni_showToast(ShowToastOptions(title = "请设置有效的圆形围栏", icon = "none"))
                     return
                 }
@@ -792,36 +868,6 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
                 ) + "围栏" + (fenceList.value.length + 1)
                 editDialogPopup.value?.open()
-            }
-            val updateMarkers = fun(){
-                val newMarkers = _uA()
-                if (carMarker.value) {
-                    newMarkers.push(carMarker.value!!)
-                }
-                if (isDrawing.value) {
-                    if (drawingMode.value === "polygon") {
-                        points.value.forEach(fun(point, index){
-                            newMarkers.push(_uO("id" to (1000 + index), "latitude" to point.latitude, "longitude" to point.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to ("顶点" + (index + 1)), "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
-                        })
-                    } else if (drawingMode.value === "circle" && circleCenter.value) {
-                        newMarkers.push(_uO("id" to 1000, "latitude" to circleCenter.value!!.latitude, "longitude" to circleCenter.value!!.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to "圆心", "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
-                    }
-                } else if (selectedFence.value) {
-                    val fenceType = getFenceType(selectedFence.value)
-                    if (fenceType === "circle") {
-                        val circleData = parseCircle(selectedFence.value!!.area)
-                        if (isTruthy(circleData)) {
-                            newMarkers.push(_uO("id" to 2000, "latitude" to circleData.latitude, "longitude" to circleData.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to "圆心", "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
-                        }
-                    } else {
-                        val fencePoints = parsePolygon(selectedFence.value!!.area)
-                        fencePoints.forEach(fun(point, index){
-                            newMarkers.push(_uO("id" to (2000 + index), "latitude" to point.latitude, "longitude" to point.longitude, "iconPath" to "/static/marker.png", "width" to 32, "height" to 32, "callout" to _uO("content" to ("顶点" + (index + 1)), "display" to "ALWAYS"), "anchor" to _uO("x" to 0.5, "y" to 0.5)))
-                        }
-                        )
-                    }
-                }
-                markers.value = newMarkers
             }
             val updateFencePolygon = fun(){
                 if (drawingMode.value === "polygon") {
@@ -837,7 +883,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 }
             }
             val updateFenceCircle = fun(){
-                if (drawingMode.value === "circle" && circleCenter.value && circleRadius.value > 0) {
+                if (drawingMode.value === "circle" && isTruthy(circleCenter.value) && circleRadius.value > 0) {
                     circles.value = _uA(
                         _uO("latitude" to circleCenter.value!!.latitude, "longitude" to circleCenter.value!!.longitude, "radius" to circleRadius.value, "strokeWidth" to 2, "strokeColor" to "#FF0000", "fillColor" to "rgba(255,0,0,0.2)", "zIndex" to 1)
                     )
@@ -870,6 +916,17 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 updateMarkers()
                 renderFencesOnMap()
             }
+            onLoad(fun(option){
+                connectionStatus.value = option["connectionStatus"]
+                imei.value = option["imei"]
+                currentCar.value = option["plateNo"]
+                deptId.value = option["deptId"]
+                carType.value = option["carType"]
+                deviceName.value = option["deviceName"]
+                loadInitialPosition()
+                loadGeofenceList()
+            }
+            )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_sub_navBar = resolveEasyComponent("sub-navBar", GenComponentsSubNavBarSubNavBarClass)
@@ -922,7 +979,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             if (isTrue(selectedFence.value)) {
                                 _cE("view", _uM("key" to 0, "class" to "fence-operations"), _uA(
                                     _cE("view", _uM("class" to "fence-header"), _uA(
-                                        _cE("text", _uM("class" to "fence-name"), _tD(selectedFence.value.name), 1),
+                                        _cE("text", _uM("class" to "fence-name"), _tD(selectedFence.value["name"]), 1),
                                         _cV(_component_i_icon, _uM("name" to "close", "onClick" to fun(){
                                             selectedFence.value = null
                                             showFenceModal.value?.close()
@@ -941,7 +998,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                             "onClick"
                                         )),
                                         _cV(_component_i_button, _uM("size" to "small", "type" to "error", "onClick" to fun(){
-                                            deleteFence(selectedFence.value.id)
+                                            deleteFence(selectedFence.value["id"])
                                         }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                             return _uA(
                                                 "删除"
@@ -950,7 +1007,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                             "onClick"
                                         )),
                                         _cV(_component_i_button, _uM("size" to "small", "type" to "primary", "onClick" to fun(){
-                                            showBindDevices(selectedFence.value.id)
+                                            showBindDevices(selectedFence.value["id"])
                                         }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                             return _uA(
                                                 "绑定设备"
@@ -967,7 +1024,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     }
                     ), "_" to 1), 512),
                     _cE("view", _uM("class" to "tools-panel"), _uA(
-                        if (isTrue(!isDrawing.value && !selectedFence.value)) {
+                        if (isTrue(!isDrawing.value && !isTruthy(selectedFence.value))) {
                             _cE("view", _uM("key" to 0, "class" to "drawing-mode-selector"), _uA(
                                 _cE("view", _uM("class" to "mode-title"), "选择围栏类型:"),
                                 _cE("view", _uM("class" to "mode-buttons"), _uA(
@@ -985,7 +1042,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                         "type",
                                         "onClick"
                                     )),
-                                    _cV(_component_i_button, _uM("type" to if (drawingMode.value == "circle") {
+                                    _cV(_component_i_button, _uM("class" to "mode-button-spacing", "type" to if (drawingMode.value == "circle") {
                                         "success"
                                     } else {
                                         "default"
@@ -1074,20 +1131,20 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 )),
                                 _cE("scroll-view", _uM("class" to "list-content", "scroll-y" to ""), _uA(
                                     _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, fun(fence, __key, __index, _cached): Any {
-                                        return _cE("view", _uM("key" to fence.id, "class" to "fence-item", "onClick" to fun(){
+                                        return _cE("view", _uM("key" to fence["id"], "class" to "fence-item", "onClick" to fun(){
                                             selectFence(fence)
                                         }
                                         ), _uA(
                                             _cE("view", _uM("class" to "fence-info"), _uA(
-                                                _cE("text", _uM("class" to "name"), _tD(fence.name), 1),
+                                                _cE("text", _uM("class" to "name"), _tD(fence["name"]), 1),
                                                 _cE("text", _uM("class" to "type"), _tD(if (getFenceType(fence) === "circle") {
                                                     "圆形"
                                                 } else {
                                                     "多边形"
                                                 }
                                                 ), 1),
-                                                _cE("text", _uM("class" to "devices"), "绑定设备: " + _tD(if (isTruthy(fence.deviceCount)) {
-                                                    fence.deviceCount
+                                                _cE("text", _uM("class" to "devices"), "绑定设备: " + _tD(if (isTruthy(fence["deviceCount"])) {
+                                                    fence["deviceCount"]
                                                 } else {
                                                     0
                                                 }
@@ -1113,7 +1170,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         return _uA(
                             _cE("view", _uM("class" to "edit-dialog"), _uA(
                                 _cE("view", _uM("class" to "dialog-header"), _uA(
-                                    _cE("text", null, _tD(if (editingFence.value) {
+                                    _cE("text", null, _tD(if (isTruthy(editingFence.value)) {
                                         "编辑围栏"
                                     } else {
                                         "新增围栏"
@@ -1263,12 +1320,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                             _cV(_component_i_switch, _uM("model-value" to isDeviceBound(device.imei), "onChange" to fun(`$event`: Any){
                                                 toggleDeviceBinding(device.imei, `$event`)
                                             }
-                                            , "disabled" to if (loading.value) {
-                                                loading.value
-                                            } else {
-                                                loadingMore.value
-                                            }
-                                            , "size" to "20"), null, 8, _uA(
+                                            , "disabled" to (loading.value || loadingMore.value), "size" to "20"), null, 8, _uA(
                                                 "model-value",
                                                 "onChange",
                                                 "disabled"
@@ -1294,7 +1346,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                         _cC("v-if", true)
                                     }
                                     ,
-                                    if (isTrue(deviceList.value.length > 0 && !isTruthy(hasMore.value) && !isTruthy(loadingMore.value))) {
+                                    if (isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)) {
                                         _cE("view", _uM("key" to 2, "class" to "no-more"), " 暂无更多数据 ")
                                     } else {
                                         _cC("v-if", true)
@@ -1316,7 +1368,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "drag-hint" to _uM(".container .map-container " to _uM("position" to "absolute", "top" to "20rpx", "left" to 0, "right" to 0, "zIndex" to 100, "backgroundColor" to "rgba(255,255,255,0.9)", "paddingTop" to "16rpx", "paddingRight" to "16rpx", "paddingBottom" to "16rpx", "paddingLeft" to "16rpx", "textAlign" to "center", "fontSize" to "28rpx", "color" to "#00aa00", "fontWeight" to "bold", "boxShadow" to "0 4rpx 10rpx rgba(0, 0, 0, 0.1)", "animation" to "pulse 1.5s infinite")), "fence-operations" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "width" to "500rpx", "height" to "200rpx")), "fence-header" to _uM(".container .fence-operations " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "40rpx", "paddingBottom" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "fence-name" to _uM(".container .fence-operations .fence-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold")), "fence-actions" to _uM(".container .fence-operations " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "drawing-mode-selector" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx", "paddingBottom" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "mode-title" to _uM(".container .tools-panel .drawing-mode-selector " to _uM("fontSize" to "28rpx", "marginBottom" to "15rpx", "color" to "#333333", "fontWeight" to 500)), "mode-buttons" to _uM(".container .tools-panel .drawing-mode-selector " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "gap" to "20rpx")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "20rpx")), "status-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "column", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "fontSize" to "28rpx", "color" to "#333333", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee")), "fence-list" to _uM(".container " to _uM("backgroundColor" to "#ffffff")), "list-header" to _uM(".container .fence-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "title" to _uM(".container .fence-list .list-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold")), "list-content" to _uM(".container .fence-list " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")), "fence-item" to _uM(".container .fence-list .list-content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5", "backgroundColor:active" to "#f9f9f9")), "fence-info" to _uM(".container .fence-list .list-content .fence-item " to _uM("display" to "flex", "flexDirection" to "column", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "name" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "30rpx", "fontWeight" to 500, "marginBottom" to "8rpx"), ".container .device-dialog .device-list .device-item .device-info " to _uM("fontSize" to "30rpx", "marginBottom" to "8rpx")), "type" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "24rpx", "color" to "#2979ff", "marginBottom" to "8rpx")), "devices" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "24rpx", "color" to "#999999")), "empty" to _uM(".container .fence-list .list-content " to _uM("textAlign" to "center", "paddingTop" to "100rpx", "paddingRight" to 0, "paddingBottom" to "100rpx", "paddingLeft" to 0, "color" to "#999999"), ".container .device-dialog .device-list " to _uM("textAlign" to "center", "paddingTop" to "100rpx", "paddingRight" to 0, "paddingBottom" to "100rpx", "paddingLeft" to 0, "color" to "#999999")), "edit-dialog" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "overflow" to "hidden")), "dialog-header" to _uM(".container .edit-dialog " to _uM("paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "textAlign" to "center", "fontSize" to "32rpx", "fontWeight" to "bold", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee"), ".container .device-dialog " to _uM("display" to "flex", "justifyContent" to "space-between", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee", "fontSize" to "32rpx", "fontWeight" to "bold")), "dialog-content" to _uM(".container .edit-dialog " to _uM("paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "radio-group" to _uM(".container .edit-dialog .dialog-content " to _uM("marginTop" to "30rpx")), "label" to _uM(".container .edit-dialog .dialog-content .radio-group " to _uM("marginBottom" to "30rpx", "fontSize" to "28rpx", "fontWeight" to 500)), "radio-options" to _uM(".container .edit-dialog .dialog-content .radio-group " to _uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center")), "dialog-actions" to _uM(".container .edit-dialog " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee"), ".container .device-dialog " to _uM("paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee")), "device-dialog" to _uM(".container " to _uM("backgroundColor" to "#ffffff")), "dialog-tabs" to _uM(".container .device-dialog " to _uM("display" to "flex", "flexDirection" to "row", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "tab" to _uM(".container .device-dialog .dialog-tabs " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "textAlign" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "fontSize" to "28rpx"), ".container .device-dialog .dialog-tabs .active" to _uM("color" to "#2979ff", "borderBottomWidth" to "4rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#2979ff")), "device-list" to _uM(".container .device-dialog " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "boxSizing" to "border-box")), "device-item" to _uM(".container .device-dialog .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5")), "device-info" to _uM(".container .device-dialog .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "column")), "status" to _uM(".container .device-dialog .device-list .device-item .device-info " to _uM("fontSize" to "24rpx", "color" to "#999999")), "loading-tip" to _uM(".container .device-dialog .device-list " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "load-more-text" to _uM(".container .device-dialog .device-list .loading-tip " to _uM("fontSize" to "26rpx", "color" to "#999999")), "no-more" to _uM(".container .device-dialog .device-list " to _uM("textAlign" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0, "color" to "#999999", "fontSize" to "26rpx")), "i-popup__content" to _uM(".container " to _uM("borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "i-grid-item" to _uM(".container " to _uM("!alignItems" to "flex-start", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "10rpx", "marginLeft" to 0)))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "drag-hint" to _uM(".container .map-container " to _uM("position" to "absolute", "top" to "20rpx", "left" to 0, "right" to 0, "zIndex" to 100, "backgroundColor" to "rgba(255,255,255,0.9)", "paddingTop" to "16rpx", "paddingRight" to "16rpx", "paddingBottom" to "16rpx", "paddingLeft" to "16rpx", "textAlign" to "center", "fontSize" to "28rpx", "color" to "#00aa00", "fontWeight" to "bold", "boxShadow" to "0 4rpx 10rpx rgba(0, 0, 0, 0.1)")), "fence-operations" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "width" to "500rpx", "height" to "200rpx")), "fence-header" to _uM(".container .fence-operations " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "40rpx", "paddingBottom" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "fence-name" to _uM(".container .fence-operations .fence-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold")), "fence-actions" to _uM(".container .fence-operations " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "drawing-mode-selector" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx", "paddingBottom" to "20rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "mode-title" to _uM(".container .tools-panel .drawing-mode-selector " to _uM("fontSize" to "28rpx", "marginBottom" to "15rpx", "color" to "#333333", "fontWeight" to 500)), "mode-buttons" to _uM(".container .tools-panel .drawing-mode-selector " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center")), "mode-button-spacing" to _uM(".container .tools-panel .drawing-mode-selector .mode-buttons " to _uM("marginLeft" to "20rpx")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "20rpx")), "status-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "column", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "fontSize" to "28rpx", "color" to "#333333", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee")), "fence-list" to _uM(".container " to _uM("height" to "70%", "backgroundColor" to "#ffffff")), "list-header" to _uM(".container .fence-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "title" to _uM(".container .fence-list .list-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold")), "list-content" to _uM(".container .fence-list " to _uM("paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")), "fence-item" to _uM(".container .fence-list .list-content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5")), "fence-info" to _uM(".container .fence-list .list-content .fence-item " to _uM("display" to "flex", "flexDirection" to "column", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "name" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "30rpx", "fontWeight" to 500, "marginBottom" to "8rpx"), ".container .device-dialog .device-list .device-item .device-info " to _uM("fontSize" to "30rpx", "marginBottom" to "8rpx")), "type" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "24rpx", "color" to "#2979ff", "marginBottom" to "8rpx")), "devices" to _uM(".container .fence-list .list-content .fence-item .fence-info " to _uM("fontSize" to "24rpx", "color" to "#999999")), "empty" to _uM(".container .fence-list .list-content " to _uM("textAlign" to "center", "paddingTop" to "100rpx", "paddingRight" to 0, "paddingBottom" to "100rpx", "paddingLeft" to 0, "color" to "#999999"), ".container .device-dialog .device-list " to _uM("textAlign" to "center", "paddingTop" to "100rpx", "paddingRight" to 0, "paddingBottom" to "100rpx", "paddingLeft" to 0, "color" to "#999999")), "edit-dialog" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "overflow" to "hidden")), "dialog-header" to _uM(".container .edit-dialog " to _uM("paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "textAlign" to "center", "fontSize" to "32rpx", "fontWeight" to "bold", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee"), ".container .device-dialog " to _uM("display" to "flex", "justifyContent" to "space-between", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee", "fontSize" to "32rpx", "fontWeight" to "bold")), "dialog-content" to _uM(".container .edit-dialog " to _uM("paddingTop" to "30rpx", "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "radio-group" to _uM(".container .edit-dialog .dialog-content " to _uM("marginTop" to "30rpx")), "label" to _uM(".container .edit-dialog .dialog-content .radio-group " to _uM("marginBottom" to "30rpx", "fontSize" to "28rpx", "fontWeight" to 500)), "radio-options" to _uM(".container .edit-dialog .dialog-content .radio-group " to _uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center")), "dialog-actions" to _uM(".container .edit-dialog " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee"), ".container .device-dialog " to _uM("paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderTopWidth" to "1rpx", "borderTopStyle" to "solid", "borderTopColor" to "#eeeeee")), "device-dialog" to _uM(".container " to _uM("height" to "70%", "backgroundColor" to "#ffffff")), "dialog-tabs" to _uM(".container .device-dialog " to _uM("display" to "flex", "flexDirection" to "row", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#eeeeee")), "tab" to _uM(".container .device-dialog .dialog-tabs " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "textAlign" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "fontSize" to "28rpx"), ".container .device-dialog .dialog-tabs .active" to _uM("color" to "#2979ff", "borderBottomWidth" to "4rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#2979ff")), "device-list" to _uM(".container .device-dialog " to _uM("height" to "60%", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "boxSizing" to "border-box")), "device-item" to _uM(".container .device-dialog .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f5f5f5")), "device-info" to _uM(".container .device-dialog .device-list .device-item " to _uM("display" to "flex", "flexDirection" to "column")), "status" to _uM(".container .device-dialog .device-list .device-item .device-info " to _uM("fontSize" to "24rpx", "color" to "#999999")), "loading-tip" to _uM(".container .device-dialog .device-list " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "no-more" to _uM(".container .device-dialog .device-list " to _uM("textAlign" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0, "color" to "#999999", "fontSize" to "26rpx")), "i-popup__content" to _uM(".container " to _uM("borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "i-grid-item" to _uM(".container " to _uM("!alignItems" to "flex-start", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "10rpx", "marginLeft" to 0)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

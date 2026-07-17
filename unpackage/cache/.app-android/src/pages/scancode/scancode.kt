@@ -102,7 +102,7 @@ open class GenPagesScancodeScancode : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to 0, "paddingBottom" to 0, "paddingLeft" to 0)), "scan-code" to _pS(_uM("width" to "100%", "height" to "100%")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
+                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to 0, "paddingBottom" to 0, "paddingLeft" to 0)), "scan-code" to _pS(_uM("width" to "100%", "height" to "100%")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -107,9 +107,10 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
 
   return _cE("view", _uM({ class: "list-container" }), [
     props.lists.length != 0
-      ? _cE("view", _uM({
+      ? _cE("scroll-view", _uM({
           key: 0,
-          class: "content"
+          class: "content",
+          "scroll-y": ""
         }), [
           _cE(Fragment, null, RenderHelpers.renderList(props.lists, (item, index, __index, _cached): any => {
             return _cE("view", _uM({
@@ -121,6 +122,7 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                 _cE("view", _uM({ class: "car-number" }), [
                   _tD(item.deviceName) + " ",
                   _cV(_component_i_tag, _uM({
+                    class: "car-status-spacing",
                     size: "mini",
                     shape: "circle",
                     text: item.connectionStatus == 'online' ? '在线' : '离线',
@@ -134,6 +136,7 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                     onClick: withModifiers(() => {pay(item.iccid,item.simMerchant)}, ["stop"])
                   }), null, 8 /* PROPS */, ["onClick"]),
                   _cV(_component_i_tag, _uM({
+                    class: "device-tool-spacing",
                     text: "解绑",
                     type: "warning",
                     onClick: withModifiers(() => {unbindDevice(item.imei)}, ["stop"])
@@ -169,4 +172,4 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
 })
 export default __sfc__
 export type IndexListModeComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenComponentsIndexListModeIndexListModeStyles = [_uM([["list-container", _pS(_uM([["width", "100%"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["content", _uM([[".list-container ", _uM([["overflowY", "auto"]])]])], ["list-item", _uM([[".list-container .content ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"]])]])], ["title", _uM([[".list-container .content .list-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["car-number", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["fontSize", "35rpx"], ["marginRight", "20rpx"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["device-tools", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["alignItems", "center"], ["gap", "10rpx"]])]])], ["imei", _uM([[".list-container .content .list-item ", _uM([["color", "#cccccc"]])]])], ["empty", _uM([[".list-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["color", "#cccccc"]])]])]])]
+const GenComponentsIndexListModeIndexListModeStyles = [_uM([["list-container", _pS(_uM([["width", "100%"], ["height", "100%"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "20rpx"]]))], ["list-item", _uM([[".list-container .content ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"]])]])], ["title", _uM([[".list-container .content .list-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["car-number", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["fontSize", "35rpx"], ["fontWeight", "bold"], ["marginRight", "20rpx"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["car-status-spacing", _uM([[".list-container .content .list-item .title ", _uM([["marginLeft", "10rpx"]])]])], ["device-tool-spacing", _uM([[".list-container .content .list-item .title ", _uM([["marginLeft", "10rpx"]])]])], ["device-tools", _uM([[".list-container .content .list-item .title ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["alignItems", "center"]])]])], ["imei", _uM([[".list-container .content .list-item ", _uM([["color", "#cccccc"]])]])], ["empty", _uM([[".list-container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["color", "#cccccc"]])]])]])]

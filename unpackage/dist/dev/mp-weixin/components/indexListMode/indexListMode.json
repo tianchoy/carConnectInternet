@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "i-tag": "../../uni_modules/i-ui-x/components/i-tag/i-tag",
-    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal"
-  }
-}

@@ -61,7 +61,7 @@ open class GenPagesIndexIndex : BasePage {
             val deviceDetail = ref(_uO("deviceStatus" to _uO("batteryPercent" to 0, "voltage" to 0, "signalStrength" to 0), "connectionStatus" to "offline", "lastUpdateTime" to null))
             val markers = ref(_uA<Any>())
             val lastUpdateTime = ref("--:--:--")
-            val STORAGE_KEYS: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("STORAGE_KEYS", "pages/index/index.uvue", 224, 7), "SELECTED_DEVICE" to "selected_device_info", "SELECTED_DEVICE_INDEX" to "selected_device_index")
+            val STORAGE_KEYS: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("STORAGE_KEYS", "pages/index/index.uvue", 225, 7), "SELECTED_DEVICE" to "selected_device_info", "SELECTED_DEVICE_INDEX" to "selected_device_index")
             val safeDeviceDetail = computed(fun(): UTSJSONObject {
                 return _uO("deviceStatus" to _uO("batteryPercent" to ((deviceDetail.value?.get("deviceStatus") as UTSJSONObject)?.get("batteryPercent") ?: 0), "voltage" to ((deviceDetail.value?.get("deviceStatus") as UTSJSONObject)?.get("voltage") ?: 0), "signalStrength" to ((deviceDetail.value?.get("deviceStatus") as UTSJSONObject)?.get("signalStrength") ?: 0)), "connectionStatus" to (deviceDetail.value?.get("connectionStatus") ?: "offline"), "lastUpdateTime" to (deviceDetail.value?.get("lastUpdateTime") ?: null))
             }
@@ -112,7 +112,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val saveSelectedDevice = fun(device: Device){
                 try {
-                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 268, 15), "name" to if (device.deviceName != "") {
+                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 269, 15), "name" to if (device.deviceName != "") {
                         device.deviceName
                     } else {
                         if (device.name != "") {
@@ -137,10 +137,10 @@ open class GenPagesIndexIndex : BasePage {
                     }
                     , "deptId" to device.deptId, "deviceId" to device.deviceId, "iccid" to device.iccid, "simMerchant" to device.simMerchant, "connectionStatus" to device.connectionStatus, "carType" to device.carType, "plateNo" to device.plateNo)
                     uni_setStorageSync(STORAGE_KEYS["SELECTED_DEVICE"], deviceInfo)
-                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:281")
+                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:282")
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:283")
+                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:284")
                 }
             }
             val getSavedSelectedDevice = fun(): Any {
@@ -151,17 +151,17 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:295")
+                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:296")
                 }
                 return null
             }
             val clearSavedSelectedDevice = fun(){
                 try {
                     uni_removeStorageSync(STORAGE_KEYS["SELECTED_DEVICE"])
-                    console.log("清除保存设备成功", " at pages/index/index.uvue:304")
+                    console.log("清除保存设备成功", " at pages/index/index.uvue:305")
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:306")
+                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:307")
                 }
             }
             val saveSelectedDeviceIndex = fun(index: Number){
@@ -169,7 +169,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_setStorageSync(STORAGE_KEYS["SELECTED_DEVICE_INDEX"], index)
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:315")
+                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:316")
                 }
             }
             val getSavedSelectedDeviceIndex = fun(): Number? {
@@ -180,7 +180,7 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:327")
+                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:328")
                 }
                 return null
             }
@@ -189,7 +189,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_removeStorageSync(STORAGE_KEYS["SELECTED_DEVICE_INDEX"])
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:337")
+                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:338")
                 }
             }
             val handlePicker = fun(){
@@ -276,17 +276,17 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                 if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-                    console.warn("无法解析选中的索引，使用当前设备", " at pages/index/index.uvue:436")
+                    console.warn("无法解析选中的索引，使用当前设备", " at pages/index/index.uvue:437")
                     val currentIndex = deviceList.value.findIndex(fun(device): Boolean {
                         return device.imei === currentCarImei.value || device.deviceId === currentCarDeviceId.value
                     }
                     )
                     if (currentIndex !== -1) {
                         selectedIndex = currentIndex
-                        console.log("使用当前设备索引:", selectedIndex, " at pages/index/index.uvue:442")
+                        console.log("使用当前设备索引:", selectedIndex, " at pages/index/index.uvue:443")
                     } else {
                         selectedIndex = 0
-                        console.log("使用默认索引: 0", " at pages/index/index.uvue:445")
+                        console.log("使用默认索引: 0", " at pages/index/index.uvue:446")
                     }
                 }
                 val selectedDevice = deviceList.value[selectedIndex]
@@ -295,19 +295,19 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (selectedDevice.imei === currentCarImei.value && selectedDevice.deviceId === currentCarDeviceId.value) {
-                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:460")
+                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:461")
                     return
                 }
-                console.log("最终选中的设备:", selectedDevice, " at pages/index/index.uvue:464")
+                console.log("最终选中的设备:", selectedDevice, " at pages/index/index.uvue:465")
                 console.log("设备名称:", if (selectedDevice.deviceName != "") {
                     selectedDevice.deviceName
                 } else {
                     selectedDevice.name
                 }
-                , " at pages/index/index.uvue:465")
-                console.log("设备 IMEI:", selectedDevice.imei, " at pages/index/index.uvue:466")
-                console.log("选中的索引:", selectedIndex, " at pages/index/index.uvue:467")
-                console.log("============================================", " at pages/index/index.uvue:468")
+                , " at pages/index/index.uvue:466")
+                console.log("设备 IMEI:", selectedDevice.imei, " at pages/index/index.uvue:467")
+                console.log("选中的索引:", selectedIndex, " at pages/index/index.uvue:468")
+                console.log("============================================", " at pages/index/index.uvue:469")
                 val deviceName = if (selectedDevice.deviceName != "") {
                     selectedDevice.deviceName
                 } else {
@@ -344,7 +344,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDeviceData = fun(device: Device): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:504")
+                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:505")
                         try {
                             await(loadDeviceDetail(device.deviceId))
                             await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
@@ -362,7 +362,7 @@ open class GenPagesIndexIndex : BasePage {
                             uni_showToast(ShowToastOptions(title = "切换成功", icon = "success"))
                         }
                          catch (error: Throwable) {
-                            console.error("切换车辆失败", error, " at pages/index/index.uvue:525")
+                            console.error("切换车辆失败", error, " at pages/index/index.uvue:526")
                             uni_showToast(ShowToastOptions(title = "切换失败，请重试", icon = "none"))
                         }
                          finally {
@@ -374,7 +374,7 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val res = await(getUserDeviceList(_uO("pageSize" to 1000)))
-                            if (res.code == 0 && isTruthy(res.data) && isTruthy(res.data.list) && res.data.list.length > 0) {
+                            if (res.code == 0 && res.data != null && res.data.list != null && res.data.list.length > 0) {
                                 userDeviceList.value = res.data
                                 deviceList.value = res.data.list.map(fun(item: Any): UTSJSONObject {
                                     return (_uO("name" to if (isTruthy(item.deviceName)) {
@@ -420,7 +420,7 @@ open class GenPagesIndexIndex : BasePage {
                                     selectedIdx = 0
                                     saveSelectedDevice(selectedDevice)
                                     saveSelectedDeviceIndex(0)
-                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:595")
+                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:596")
                                 }
                                 if (selectedDevice) {
                                     val deviceName = if (isTruthy(selectedDevice.deviceName)) {
@@ -476,7 +476,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:640")
+                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:641")
                             uni_showToast(ShowToastOptions(title = "加载失败，请下拉重试", icon = "none"))
                         }
                 })
@@ -485,18 +485,18 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend {
                         try {
                             val res = await(getDeviceDetail(deviceId))
-                            if (res.code == 0 && isTruthy(res.data)) {
-                                deviceDetail.value = _uO("deviceStatus" to _uO("batteryPercent" to (res.data.deviceStatus?.batteryPercent ?: 0), "voltage" to (res.data.deviceStatus?.voltage ?: 0), "signalStrength" to (res.data.deviceStatus?.signalStrength ?: 0)), "connectionStatus" to (res.data.connectionStatus ?: "offline"), "lastUpdateTime" to (res.data.lastUpdateTime ?: null))
-                                if (isTruthy(res.data.lastUpdateTime)) {
-                                    val date = Date(res.data.lastUpdateTime)
+                            if (res.code == 0 && res.data != null) {
+                                deviceDetail.value = _uO("deviceStatus" to _uO("batteryPercent" to (res.data.deviceStatus?.batteryPercent ?: 0), "voltage" to (res.data.deviceStatus?.voltage ?: 0), "signalStrength" to (res.data.deviceStatus?.signalStrength ?: 0)), "connectionStatus" to (res.data["connectionStatus"] ?: "offline"), "lastUpdateTime" to (res.data["lastUpdateTime"] ?: null))
+                                if (isTruthy(res.data["lastUpdateTime"])) {
+                                    val date = Date(res.data["lastUpdateTime"])
                                     lastUpdateTime.value = "" + date.getHours().toString(10).padStart(2, "0") + ":" + date.getMinutes().toString(10).padStart(2, "0") + ":" + date.getSeconds().toString(10).padStart(2, "0")
                                 }
                             } else {
-                                console.warn("获取设备详情失败:", res.msg, " at pages/index/index.uvue:669")
+                                console.warn("获取设备详情失败:", res.msg, " at pages/index/index.uvue:670")
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:672")
+                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:673")
                         }
                 })
             }
@@ -518,7 +518,7 @@ open class GenPagesIndexIndex : BasePage {
                             uni_hideLoading(null)
                         }
                          catch (error: Throwable) {
-                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:700")
+                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:701")
                         }
                 })
             }
@@ -573,12 +573,12 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend w1@{
                         try {
                             val res = await(getDevicePos(data))
-                            if (res.code == 0 && isTruthy(res.data) && res.data.length > 0) {
+                            if (res.code == 0 && res.data != null && res.data.length > 0) {
                                 devicePosInfo.value = res.data[0]
-                                val lat = Number(res.data[0].latitude)
-                                val lng = Number(res.data[0].longitude)
+                                val lat = Number(res.data[0]["latitude"])
+                                val lng = Number(res.data[0]["longitude"])
                                 if (isNaN(lat) || isNaN(lng)) {
-                                    console.error("经纬度格式错误", res.data[0].latitude, res.data[0].longitude, " at pages/index/index.uvue:753")
+                                    console.error("经纬度格式错误", res.data[0]["latitude"], res.data[0]["longitude"], " at pages/index/index.uvue:754")
                                     uni_showToast(ShowToastOptions(title = "定位数据异常", icon = "none"))
                                     return@w1 false
                                 }
@@ -586,7 +586,7 @@ open class GenPagesIndexIndex : BasePage {
                                 try {
                                     convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
                                 } catch (transformError: Throwable) {
-                                    console.error("坐标转换失败:", transformError, " at pages/index/index.uvue:765")
+                                    console.error("坐标转换失败:", transformError, " at pages/index/index.uvue:766")
                                     convertedCoord = _uO("lat" to lat, "lng" to lng)
                                 }
                                 center["latitude"] = convertedCoord.lat
@@ -599,10 +599,10 @@ open class GenPagesIndexIndex : BasePage {
                                 markers.value = _uA(
                                     deviceMarker
                                 )
-                                console.log("标记点更新完成", " at pages/index/index.uvue:787")
+                                console.log("标记点更新完成", " at pages/index/index.uvue:788")
                                 return@w1 true
                             } else {
-                                console.warn("获取设备位置失败:", res.msg, " at pages/index/index.uvue:790")
+                                console.warn("获取设备位置失败:", res.msg, " at pages/index/index.uvue:791")
                                 isMapReady.value = false
                                 uni_showToast(ShowToastOptions(title = if (isTruthy(res.msg)) {
                                     res.msg
@@ -614,7 +614,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:799")
+                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:800")
                             uni_showToast(ShowToastOptions(title = "定位失败，请重试", icon = "none"))
                             return@w1 false
                         }
@@ -637,7 +637,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("刷新位置失败", error, " at pages/index/index.uvue:839")
+                            console.error("刷新位置失败", error, " at pages/index/index.uvue:840")
                             uni_showToast(ShowToastOptions(title = "刷新失败", icon = "none"))
                         }
                          finally {
@@ -652,7 +652,7 @@ open class GenPagesIndexIndex : BasePage {
                 uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center["latitude"] + "&lng=" + center["longitude"]))
             }
             val toDeviceList = fun(){
-                console.log("toDeviceList", " at pages/index/index.uvue:859")
+                console.log("toDeviceList", " at pages/index/index.uvue:860")
                 if (!isLogin()) {
                     return
                 }
@@ -661,7 +661,7 @@ open class GenPagesIndexIndex : BasePage {
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): UTSJSONObject {
                 val isOnline = safeDeviceDetail.value.connectionStatus === "online"
                 val iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
-                val marker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("marker", "pages/index/index.uvue", 870, 11), "id" to id, "latitude" to lat, "longitude" to lng, "width" to 30, "height" to 30, "iconPath" to iconPath, "callout" to _uO("content" to if (isTruthy(title)) {
+                val marker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("marker", "pages/index/index.uvue", 871, 11), "id" to id, "latitude" to lat, "longitude" to lng, "width" to 30, "height" to 30, "iconPath" to iconPath, "callout" to _uO("content" to if (isTruthy(title)) {
                     title
                 } else {
                     "爱车位置"
@@ -710,7 +710,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 , fail = fun(err){
                     uni_showToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                    console.error("调起地图失败:", err, " at pages/index/index.uvue:941")
+                    console.error("调起地图失败:", err, " at pages/index/index.uvue:942")
                 }
                 ))
             }
@@ -722,7 +722,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val contactCustomerService = fun(){
                 uni_openCustomerServiceChat(OpenCustomerServiceChatOptions(extInfo = _uO("url" to "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a"), corpId = "ww686122ec6a4db85a", success = fun(res) {
-                    console.log(res, " at pages/index/index.uvue:960")
+                    console.log(res, " at pages/index/index.uvue:961")
                 }
                 ))
             }
@@ -735,7 +735,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (simMerchant.toLowerCase() == "zddx") {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
-                console.log(iccid, " at pages/index/index.uvue:973")
+                console.log(iccid, " at pages/index/index.uvue:974")
                 needRefresh.value = true
                 needRefresh.value = false
                 uni_showToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))
@@ -824,12 +824,14 @@ open class GenPagesIndexIndex : BasePage {
                                     } else {
                                         _cE("text", _uM("key" to 1, "class" to "login", "onClick" to gotoLogin), "点击登录!")
                                     }
+                                    ,
+                                    _cV(_component_i_icon, _uM("name" to "/static/right-bottom.png", "fontSize" to "7"))
                                 )),
                                 _cE("view", _uM("class" to "nav-tools"), _uA(
                                     _cC("v-if", true),
                                     _cV(_component_i_icon, _uM("name" to "/static/reload.png", "fontSize" to "20", "onClick" to handleReload)),
-                                    _cV(_component_i_icon, _uM("name" to "/static/maps.png", "fontSize" to "20", "onClick" to toDeviceList)),
-                                    _cV(_component_i_icon, _uM("name" to "/static/addNew.png", "fontSize" to "20", "onClick" to toAdd))
+                                    _cV(_component_i_icon, _uM("class" to "nav-tool-spacing", "name" to "/static/maps.png", "fontSize" to "20", "onClick" to toDeviceList)),
+                                    _cV(_component_i_icon, _uM("class" to "nav-tool-spacing", "name" to "/static/addNew.png", "fontSize" to "20", "onClick" to toAdd))
                                 ))
                             )),
                             if (isTrue(if (safeDeviceDetail.value.deviceStatus.batteryPercent != 0) {
@@ -1012,7 +1014,7 @@ open class GenPagesIndexIndex : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("backgroundImage" to "linear-gradient(90deg, #E6F9E6, #E0F0FF)", "backgroundColor" to "rgba(0,0,0,0)", "paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "gap" to "20rpx", "zIndex" to 999)), "loading-text" to _uM(".container .loading-container " to _uM("fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "20rpx")), "current-car" to _uM(".container .top .device-car " to _uM("position" to "relative")), "car-id" to _uM(".container .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "30rpx", "position" to "relative", "content::after" to "\"\"", "position::after" to "absolute", "right::after" to 0, "bottom::after" to 0, "width::after" to 0, "height::after" to 0, "borderTopStyle::after" to "solid", "borderRightStyle::after" to "solid", "borderBottomStyle::after" to "solid", "borderLeftStyle::after" to "solid", "borderTopColor::after" to "rgba(0,0,0,0)", "borderRightColor::after" to "rgba(0,0,0,0)", "borderBottomColor::after" to "#000000", "borderLeftColor::after" to "rgba(0,0,0,0)", "borderTopWidth::after" to 0, "borderRightWidth::after" to 0, "borderBottomWidth::after" to 10, "borderLeftWidth::after" to 10)), "login" to _uM(".container .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "30rpx")), "nav-tools" to _uM(".container .top .device-car " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "gap" to "30rpx")), "exit" to _uM(".container .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "backgroundColor:active" to "rgba(0,0,0,0.15)", "transform:active" to "scale(0.95)")), "exit-icon" to _uM(".container .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "device-info" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "column", "gap" to "16rpx", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "width" to "50%")), "info" to _uM(".container .top .device-info " to _uM("fontSize" to "26rpx", "color" to "#333333")), "banner-image" to _uM(".container .top " to _uM("width" to "100%", "height" to "300rpx")), "car-state" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "gap" to "20rpx", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "gap" to "12rpx", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-label" to _uM(".container .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "state-value" to _uM(".container .top .car-state .state-item " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .top .car-state .state-item .online" to _uM("color" to "#07C160")), "map-box" to _uM(".container .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "map-header" to _uM(".container .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .content .map-box .map-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh" to _uM(".container .content .map-box .map-header " to _uM("fontSize" to "26rpx", "color" to "#07C160", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-container" to _uM(".container .content .map-box " to _uM("height" to "300rpx")), "mile-record" to _uM(".container .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .content .mile-record .record-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc" to _uM(".container .content .mile-record .record-header " to _uM("fontSize" to "26rpx", "color" to "#07C160", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "ring-container" to _uM(".container .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "30rpx", "paddingRight" to "20rpx", "paddingBottom" to "30rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .content .mile-record " to _uM("position" to "relative", "width" to "250rpx", "height" to "250rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center", "content::before" to "\"\"", "position::before" to "absolute", "width::before" to "100%", "height::before" to "100%", "borderTopLeftRadius::before" to "50%", "borderTopRightRadius::before" to "50%", "borderBottomRightRadius::before" to "50%", "borderBottomLeftRadius::before" to "50%", "borderTopWidth::before" to "4rpx", "borderRightWidth::before" to "4rpx", "borderBottomWidth::before" to "4rpx", "borderLeftWidth::before" to "4rpx", "borderTopStyle::before" to "solid", "borderRightStyle::before" to "solid", "borderBottomStyle::before" to "solid", "borderLeftStyle::before" to "solid", "borderTopColor::before" to "#D8E2F0", "borderRightColor::before" to "#D8E2F0", "borderBottomColor::before" to "#D8E2F0", "borderLeftColor::before" to "#D8E2F0", "boxSizing::before" to "border-box", "zIndex::before" to 1)), "ring-bg" to _uM(".container .content .mile-record " to _uM("position" to "absolute", "width" to "100%", "height" to "100%", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "zIndex" to 2, "boxSizing" to "border-box", "borderTopWidth" to "16rpx", "borderRightWidth" to "16rpx", "borderBottomWidth" to "16rpx", "borderLeftWidth" to "16rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "rgba(0,0,0,0)", "borderRightColor" to "rgba(0,0,0,0)", "borderBottomColor" to "rgba(0,0,0,0)", "borderLeftColor" to "rgba(0,0,0,0)"), ".container .content .mile-record .green" to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderLeftColor" to "#4cd964", "transform" to "rotate(135deg)"), ".container .content .mile-record .orange" to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderLeftColor" to "#ff9500", "transform" to "rotate(135deg)")), "ring-text" to _uM(".container .content .mile-record " to _uM("position" to "relative", "zIndex" to 10, "textAlign" to "center")), "num" to _uM(".container .content .mile-record " to _uM("fontSize" to "45rpx", "fontWeight" to "bold", "color" to "#333333")), "unit" to _uM(".container .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#666666", "marginLeft" to "8rpx", "textAlign" to "right")), "label" to _uM(".container .content .mile-record " to _uM("fontSize" to "25rpx", "color" to "#666666", "marginTop" to "12rpx")), "device-list" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "gap" to "30rpx")), "device-item" to _uM(".container .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .content .device-list .device-item " to _uM("fontSize" to "28rpx", "fontWeight" to 500, "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "gap" to "20rpx")), "icon" to _uM(".container .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "item-info" to _uM(".container .content .device-list .device-item .item-label " to _uM("fontWeight" to "normal")), "item-title" to _uM(".container .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .content .service .service-content .service-item " to _uM("fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc")), "service" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0", "marginBottom" to "30rpx")), "service-content" to _uM(".container .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center", "gap" to "10rpx")), "icon-image" to _uM(".container .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
+                return _uM("container" to _pS(_uM("backgroundImage" to "linear-gradient(90deg, #E6F9E6, #E0F0FF)", "backgroundColor" to "rgba(0,0,0,0)", "paddingTop" to 0, "paddingRight" to "30rpx", "paddingBottom" to "30rpx", "paddingLeft" to "30rpx")), "loading-container" to _uM(".container " to _uM("position" to "fixed", "top" to "50%", "left" to "50%", "transform" to "translate(-50%, -50%)", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "zIndex" to 999)), "loading-text" to _uM(".container .loading-container " to _uM("marginTop" to "20rpx", "fontSize" to "28rpx", "color" to "#666666")), "device-car" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "current-car" to _uM(".container .top .device-car " to _uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "alignItems" to "flex-end")), "car-id" to _uM(".container .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "position" to "relative", "marginRight" to "10rpx")), "login" to _uM(".container .top .device-car .current-car " to _uM("fontSize" to "36rpx", "fontWeight" to "bold", "color" to "#000000", "textAlign" to "center", "paddingRight" to "30rpx")), "nav-tools" to _uM(".container .top .device-car " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "nav-tool-spacing" to _uM(".container .top .device-car .nav-tools " to _uM("marginLeft" to "30rpx")), "exit" to _uM(".container .top .device-car .nav-tools " to _uM("display" to "flex", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "rgba(0,0,0,0.05)", "transitionProperty" to "all", "transitionDuration" to "0.2s", "transitionTimingFunction" to "ease", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%")), "exit-icon" to _uM(".container .top .device-car .nav-tools .exit " to _uM("width" to "40rpx", "height" to "40rpx")), "device-info" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "column", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx", "width" to "50%")), "info" to _uM(".container .top .device-info .info+" to _uM("marginTop" to "16rpx"), ".container .top .device-info " to _uM("fontSize" to "26rpx", "color" to "#333333")), "banner-image" to _uM(".container .top " to _uM("width" to "100%", "height" to "300rpx")), "car-state" to _uM(".container .top " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to 0, "paddingBottom" to "20rpx", "paddingLeft" to 0, "borderTopLeftRadius" to "16rpx", "borderTopRightRadius" to "16rpx", "borderBottomRightRadius" to "16rpx", "borderBottomLeftRadius" to "16rpx")), "state-item" to _uM(".container .top .car-state .state-item+" to _uM("marginLeft" to "20rpx"), ".container .top .car-state " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "flexDirection" to "column", "alignItems" to "center", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx")), "state-value" to _uM(".container .top .car-state .state-item " to _uM("marginTop" to "12rpx", "fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .top .car-state .state-item .online" to _uM("color" to "#07C160")), "state-label" to _uM(".container .top .car-state .state-item " to _uM("fontSize" to "24rpx", "color" to "#999999")), "map-box" to _uM(".container .content " to _uM("width" to "100%", "height" to "400rpx", "marginTop" to "10rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "map-header" to _uM(".container .content .map-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "map-title" to _uM(".container .content .map-box .map-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "map-refresh" to _uM(".container .content .map-box .map-header " to _uM("fontSize" to "26rpx", "color" to "#07C160", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "map-container" to _uM(".container .content .map-box " to _uM("height" to "300rpx")), "mile-record" to _uM(".container .content " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "display" to "flex", "flexDirection" to "column", "overflow" to "hidden", "boxShadow" to "0 4rpx 20rpx rgba(0, 0, 0, 0.08)")), "record-header" to _uM(".container .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0")), "record-title" to _uM(".container .content .mile-record .record-header " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333")), "record-desc" to _uM(".container .content .mile-record .record-header " to _uM("fontSize" to "26rpx", "color" to "#07C160", "paddingTop" to "8rpx", "paddingRight" to "16rpx", "paddingBottom" to "8rpx", "paddingLeft" to "16rpx", "backgroundImage" to "none", "backgroundColor" to "#f0f9f0", "borderTopLeftRadius" to "8rpx", "borderTopRightRadius" to "8rpx", "borderBottomRightRadius" to "8rpx", "borderBottomLeftRadius" to "8rpx")), "ring-container" to _uM(".container .content .mile-record " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "paddingTop" to "30rpx", "paddingRight" to "20rpx", "paddingBottom" to "30rpx", "paddingLeft" to "20rpx", "backgroundColor" to "#edf7ff", "borderTopLeftRadius" to "24rpx", "borderTopRightRadius" to "24rpx", "borderBottomRightRadius" to "24rpx", "borderBottomLeftRadius" to "24rpx", "marginTop" to "20rpx", "marginRight" to "20rpx", "marginBottom" to "20rpx", "marginLeft" to "20rpx")), "ring-item" to _uM(".container .content .mile-record " to _uM("position" to "relative", "width" to "250rpx", "height" to "250rpx", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "ring-bg" to _uM(".container .content .mile-record " to _uM("position" to "absolute", "width" to "100%", "height" to "100%", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "zIndex" to 2, "boxSizing" to "border-box", "borderTopWidth" to "16rpx", "borderRightWidth" to "16rpx", "borderBottomWidth" to "16rpx", "borderLeftWidth" to "16rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "rgba(0,0,0,0)", "borderRightColor" to "rgba(0,0,0,0)", "borderBottomColor" to "rgba(0,0,0,0)", "borderLeftColor" to "rgba(0,0,0,0)"), ".container .content .mile-record .green" to _uM("borderTopColor" to "#4cd964", "borderRightColor" to "#4cd964", "borderLeftColor" to "#4cd964", "transform" to "rotate(135deg)"), ".container .content .mile-record .orange" to _uM("borderTopColor" to "#ff9500", "borderRightColor" to "#ff9500", "borderLeftColor" to "#ff9500", "transform" to "rotate(135deg)")), "ring-text" to _uM(".container .content .mile-record " to _uM("position" to "relative", "zIndex" to 10, "textAlign" to "center")), "num" to _uM(".container .content .mile-record " to _uM("fontSize" to "45rpx", "fontWeight" to "bold", "color" to "#333333")), "unit" to _uM(".container .content .mile-record " to _uM("fontSize" to "20rpx", "color" to "#666666", "marginLeft" to "8rpx", "textAlign" to "right")), "label" to _uM(".container .content .mile-record " to _uM("fontSize" to "25rpx", "color" to "#666666", "marginTop" to "12rpx")), "device-list" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "column", "marginTop" to "40rpx", "marginRight" to 0, "marginBottom" to "40rpx", "marginLeft" to 0)), "device-item" to _uM(".container .content .device-list .device-item+" to _uM("marginTop" to "30rpx"), ".container .content .device-list " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx")), "item-label" to _uM(".container .content .device-list .device-item " to _uM("fontSize" to "28rpx", "fontWeight" to 500, "display" to "flex", "flexDirection" to "row", "alignItems" to "center")), "icon" to _uM(".container .content .device-list .device-item .item-label " to _uM("width" to "80rpx", "height" to "80rpx", "borderTopLeftRadius" to "50%", "borderTopRightRadius" to "50%", "borderBottomRightRadius" to "50%", "borderBottomLeftRadius" to "50%", "paddingTop" to "18rpx", "paddingRight" to "18rpx", "paddingBottom" to "18rpx", "paddingLeft" to "18rpx"), ".container .content .device-list .device-item .item-label .icon-device" to _uM("backgroundColor" to "#f0f9f0"), ".container .content .device-list .device-item .item-label .icon-car" to _uM("backgroundColor" to "#f3f8fb"), ".container .content .device-list .device-item .item-label .icon-fence" to _uM("backgroundColor" to "#f1f7f4")), "icon-image" to _uM(".container .content .device-list .device-item .item-label " to _uM("width" to "45rpx", "height" to "45rpx"), ".container .content .service .service-content .service-item " to _uM("width" to "60rpx", "height" to "60rpx")), "item-info" to _uM(".container .content .device-list .device-item .item-label " to _uM("marginLeft" to "20rpx", "fontWeight" to "normal")), "item-title" to _uM(".container .content .device-list .device-item .item-label .item-info " to _uM("fontSize" to "28rpx", "fontWeight" to "bold", "color" to "#333333"), ".container .content .service .service-content .service-item " to _uM("marginTop" to "10rpx", "fontSize" to "25rpx", "color" to "#222222")), "item-desc" to _uM(".container .content .device-list .device-item .item-label .item-info " to _uM("color" to "#cccccc")), "service" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "column", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff", "marginBottom" to "30rpx")), "service-header" to _uM(".container .content .service " to _uM("fontSize" to "32rpx", "fontWeight" to "bold", "color" to "#333333", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx", "borderBottomWidth" to "1rpx", "borderBottomStyle" to "solid", "borderBottomColor" to "#f0f0f0", "marginBottom" to "30rpx")), "service-content" to _uM(".container .content .service " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "30rpx", "paddingBottom" to "20rpx", "paddingLeft" to "30rpx")), "service-item" to _uM(".container .content .service .service-content " to _uM("display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "@TRANSITION" to _uM("exit" to _uM("property" to "all", "duration" to "0.2s", "timingFunction" to "ease")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

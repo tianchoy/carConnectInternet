@@ -535,7 +535,7 @@
 
 <style lang="scss" scoped>
 	.container {
-		height: 100vh;
+		height: 100%;
 		background-color: #fff;
 
 		.banner {
@@ -546,11 +546,6 @@
 			align-items: center;
 			height: 20%;
 
-			image {
-				height: 120rpx;
-				width: 120rpx;
-				margin-right: 20rpx;
-			}
 
 			.title {
 				font-size: 40rpx;
@@ -629,9 +624,6 @@
 			color: #fff !important;
 		}
 
-		.btn-text {
-			margin-left: 10px;
-		}
 
 		:deep(.i-form-item){
 			padding: 12px 0;

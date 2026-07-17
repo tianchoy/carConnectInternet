@@ -35,7 +35,7 @@
 			</view>
 		</view>
 
-		<view class="content">
+		<scroll-view class="content" scroll-y>
 			<i-empty text="当前时间点暂无行程数据" :showButton="false" description="" v-if="groupedTrips.length == 0" ></i-empty>
 			<view v-else class="trip-list">
 				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
@@ -60,7 +60,7 @@
 					</view>
 				</view>
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
@@ -299,7 +299,7 @@
 
 <style lang="scss">
 	.container {
-		height: 100vh;
+		height: 100%;
 		background-color: #f5f7fa;
 		padding-bottom: 20rpx;
 
@@ -362,9 +362,6 @@
 
 		.content {
 			margin: 0 20rpx;
-			max-height: calc(80vh - 200rpx);
-			overflow-y: auto;
-			-webkit-overflow-scrolling: touch;
 			background-color: #fff;
 			border-radius: 20rpx;
 
@@ -411,7 +408,7 @@
 						.trip-index {
 							display: flex;
 							flex-direction: row;
-							justify-content: start;
+							justify-content: flex-start;
 							align-items: center;
 							padding-top: 5rpx;
 
@@ -435,11 +432,6 @@
 								align-items: center;
 								flex: 1;
 
-								text {
-									font-size: 28rpx;
-									color: #333;
-									margin: 0 10rpx;
-								}
 							}
 						}
 

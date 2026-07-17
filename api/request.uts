@@ -60,13 +60,24 @@ export const getUserGroupList = () => {
 }
 
 // 发送远程指令
-export const sendCommand = (data: UTSJSONObject) => {
-    return post(sendcmd, data)
+type SendCommandResponse = {
+    code: number
+    msg: string
+}
+
+export const sendCommand = (data: UTSJSONObject): Promise<SendCommandResponse> => {
+    return post<SendCommandResponse>(sendcmd, data)
 }
 
 // 获取设备位置(跟踪也用此接口)
-export const getDevicePos = (data: UTSJSONObject) => {
-    return get(devicePos, data)
+type DevicePositionResponse = {
+    code: number
+    message: string
+    data: UTSJSONObject[]
+}
+
+export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => {
+    return get<DevicePositionResponse>(devicePos, data)
 }
 
 // 轨迹查询。里程查询
@@ -84,15 +95,29 @@ export const addDevice = (data: UTSJSONObject) => {
     return post(addDeviceUrl, data)
 }
 
+type BasicResponse = {
+    code: number
+    msg: string
+}
+
 // 删除设备
-export const delDevice = (imei: string) => {
+export const delDevice = (imei: string): Promise<BasicResponse> => {
     const data: UTSJSONObject = { imei } as UTSJSONObject
-    return post(deleteDevice, data)
+    return post<BasicResponse>(deleteDevice, data)
+}
+
+type UserDeviceListData = {
+    list: Array<UTSJSONObject>
+}
+
+type UserDeviceListResponse = {
+    code: number
+    data: UserDeviceListData
 }
 
 // 获取用户设备列表
-export const getUserDeviceList = (data: UTSJSONObject) => {
-    return post(userDeviceList, data)
+export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListResponse> => {
+    return post<UserDeviceListResponse>(userDeviceList, data)
 }
 
 // 微信授权登陆
@@ -121,8 +146,12 @@ export const editDeviceInfo = (data: UTSJSONObject) => {
 }
 
 // 获取设备详情
-export const getDeviceDetail = (deviceId: string) => {
-    return get(`${deviceDetail}${deviceId}`)
+type DeviceDetailResponse = {
+    data: UTSJSONObject
+}
+
+export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => {
+    return get<DeviceDetailResponse>(`${deviceDetail}${deviceId}`)
 }
 
 // 获取车辆品牌型号
@@ -130,59 +159,85 @@ export const getCarType = () => {
     return get(carType)
 }
 
+type GeofenceResponse = {
+    code: number
+    msg: string
+    data: Array<UTSJSONObject>
+}
+
+type DevicePageData = {
+    list: Array<UTSJSONObject>
+}
+
+type DevicePageResponse = {
+    code: number
+    data: DevicePageData
+}
+
 // 获取地理围栏列表
-export const getGeofenceList = () => {
-    return get(getGeofence)
+export const getGeofenceList = (): Promise<GeofenceResponse> => {
+    return get<GeofenceResponse>(getGeofence)
 }
 
 // 添加围栏
-export const addGeofence = (data: UTSJSONObject) => {
-    return post(getGeofence, data)
+export const addGeofence = (data: UTSJSONObject): Promise<BasicResponse> => {
+    return post<BasicResponse>(getGeofence, data)
 }
 
 // 修改围栏
-export const updateGeofence = (data: UTSJSONObject) => {
-    return put(getGeofence, data)
+export const updateGeofence = (data: UTSJSONObject): Promise<BasicResponse> => {
+    return put<BasicResponse>(getGeofence, data)
 }
 
 // 删除围栏
-export const deleteGeofence = (id: string) => {
-    return remove(`${deleteGeo}${id}`)
+export const deleteGeofence = (id: string): Promise<BasicResponse> => {
+    return remove<BasicResponse>(`${deleteGeo}${id}`)
 }
 
 // 获取未绑定围栏设备列表
-export const getUnboundDevices = (params: UTSJSONObject) => {
-    return get(unbindDeviceList, params)
+export const getUnboundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => {
+    return get<DevicePageResponse>(unbindDeviceList, params)
 }
 
 // 获取围栏内绑定的设备列表
-export const getBoundDevices = (params: UTSJSONObject) => {
-    return get(bindDeviceList, params)
+export const getBoundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => {
+    return get<DevicePageResponse>(bindDeviceList, params)
 }
 
 // 设备绑定围栏
-export const bindDevices = (data: UTSJSONObject) => {
-    return post(bindGeofence, data)
+export const bindDevices = (data: UTSJSONObject): Promise<BasicResponse> => {
+    return post<BasicResponse>(bindGeofence, data)
 }
 
 // 设备解绑围栏
-export const unbindDevices = (data: UTSJSONObject) => {
-    return remove(unbindGeofence, data)
+export const unbindDevices = (data: UTSJSONObject): Promise<BasicResponse> => {
+    return remove<BasicResponse>(unbindGeofence, data)
+}
+
+type CommandListResponse = {
+    code: number
+    data: Array<UTSJSONObject>
 }
 
 // 命令操作 - 获取指令类型列表
-export const getCmdAction = () => {
-    return get(cmdActionUrl)
+export const getCmdAction = (): Promise<CommandListResponse> => {
+    return get<CommandListResponse>(cmdActionUrl)
 }
 
 // 根据类型ID获取指令列表
-export const getCmdByMid = (data: UTSJSONObject) => {
-    return get(cmdByMidUrl, data)
+export const getCmdByMid = (data: UTSJSONObject): Promise<CommandListResponse> => {
+    return get<CommandListResponse>(cmdByMidUrl, data)
+}
+
+type SendCmdResponse = {
+    code: number
+    msg: string
+    data: string
 }
 
 // 发送命令
-export const sendCmd = (data: UTSJSONObject) => {
-    return post(cmdSendUrl, data)
+export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => {
+    return post<SendCmdResponse>(cmdSendUrl, data)
 }
 
 // 根据指令ID获取指令记录详情

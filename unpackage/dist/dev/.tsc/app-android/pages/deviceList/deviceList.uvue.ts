@@ -15,8 +15,7 @@ const _cache = __ins.renderCache;
 
 	const mapScale = ref(4)
 	const showMap = ref(true)
-	const markers = ref<Array<any>>([])
-	let mapCtx = undefined
+	const markers = ref<Array<UTSJSONObject>>([])
 	const iconColor = ref('#1296db')
 	const userLocation = ref({
 		latitude: 0, 
@@ -31,7 +30,7 @@ const _cache = __ins.renderCache;
 	}
 
 	// 原始设备列表
-	const originalDeviceList = ref<Array<any>>([])
+	const originalDeviceList = ref<Array<UTSJSONObject>>([])
 
 	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
@@ -41,9 +40,9 @@ const _cache = __ins.renderCache;
 
 		// 状态筛选
 		if (pickerStateTitle.value == '在线') {
-			result = result.filter(device => device?.connectionStatus == 'online')
+			result = result.filter((device: UTSJSONObject) => device['connectionStatus'] == 'online')
 		} else if (pickerStateTitle.value === '离线') {
-			result = result.filter(device => device?.connectionStatus == 'offline')
+			result = result.filter((device: UTSJSONObject) => device['connectionStatus'] == 'offline')
 		}
 
 		return result
@@ -51,16 +50,65 @@ const _cache = __ins.renderCache;
 
 	// 计算设备数量统计
 	const totalCount = computed(() => originalDeviceList.value.length)
-	const onlineCount = computed(() => originalDeviceList.value.filter(d => d?.connectionStatus == 'online').length)
+	const onlineCount = computed(() => originalDeviceList.value.filter((d: UTSJSONObject) => d['connectionStatus'] == 'online').length)
 	const offlineCount = computed(() => totalCount.value - onlineCount.value)
 
-	// 自动更新地图标记
-	watch([filteredDevices, showMap], ([devices, isMapVisible]) => {
-		if (isMapVisible) {
-			updateMarkers(devices)
-		}
-	})
 
+
+
+
+	const updateMarkers = (devices: Array<UTSJSONObject>): void => {
+		const nextMarkers: Array<UTSJSONObject> = []
+		for (let index = 0; index < devices.length; index++) {
+			const device = devices[index]
+			const latitude = device['latitude'] as string | number | null
+			const longitude = device['longitude'] as string | number | null
+			if (latitude == null || longitude == null) continue
+			const lat = parseFloat(latitude.toString())
+			const lng = parseFloat(longitude.toString())
+			if (isNaN(lat) || isNaN(lng)) continue
+			const connectionStatus = (device['connectionStatus'] as string | null) ?? ''
+			const carType = (device['carType'] as string | null) ?? ''
+			const idValue = device['deviceId'] as string | number | null
+			const parsedId = idValue != null ? parseInt(idValue.toString()) : NaN
+			const markerId = isNaN(parsedId) ? index + 1 : parsedId
+			const deviceName = (device['deviceName'] as string | null) ?? (device['plateNo'] as string | null) ?? '设备'
+			nextMarkers.push({
+				id: markerId,
+				latitude: lat,
+				longitude: lng,
+				iconPath: getDeviceIcon(connectionStatus, carType),
+				width: 30,
+				height: 30,
+				callout: {
+					content: deviceName,
+					display: 'ALWAYS',
+					padding: 8,
+					borderRadius: 8,
+					bgColor: '#ffffff'
+				},
+				joinCluster: true,
+				anchor: { x: 0.5, y: 0.5 }
+			} as UTSJSONObject)
+		}
+		markers.value = nextMarkers
+	}
+
+	const loadUserDeviceList = async (data: Array<UTSJSONObject>, from: boolean): Promise<void> => {
+		try {
+			let deviceList: Array<UTSJSONObject> = data
+			if (from) {
+				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 113, 11),  pageSize: 1000 } as UTSJSONObject
+				const res = await getUserDeviceList(params)
+				deviceList = res.data.list
+			}
+			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
+			updateMarkers(originalDeviceList.value)
+		} catch (err) {
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:120")
+			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
+		}
+	}
 		// 解绑设备
 	const unbindDevice = async (imei : string) => {
 		const res = await delDevice(imei)
@@ -79,31 +127,30 @@ const _cache = __ins.renderCache;
 		// 解绑成功后刷新设备列表
 		await loadUserDeviceList([],true)
 	}
-
 	// 获取当前位置
 	const getLocation = () => {
 		uni.getLocation({
 			type: 'wgs84',
 			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:100")
+				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:147")
 				userLocation.value.latitude = res.latitude
 				userLocation.value.longitude = res.longitude
 			},
 			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:105")
+				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:152")
 			}
 		})
 	}
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:111")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:158")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:115")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:162")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:118")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:165")
 			}
 		})
 	}
@@ -114,118 +161,30 @@ const _cache = __ins.renderCache;
 	}
 
 	// 点击地图标记
-	const handleTap = (e) => {
-		const markerId = e.detail.markerId
-		const selectedDevice = originalDeviceList.value.find(device => device.deviceId == markerId)
-
-		if (selectedDevice) {
-			uni.navigateTo({
-				url: `/pages/carInfoDetail/carInfoDetail?imei=${selectedDevice.imei}&deptId=${selectedDevice.companyId}&deviceId=${selectedDevice.deviceId}`,
-			})
-		} else {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:138")
+	const handleTap = (event: any) => {
+		const detail = event as UTSJSONObject
+		const markerId = detail != null ? detail['markerId'] : null
+		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
+		if (selectedDevice == null) {
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:181")
+			return
 		}
+		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
+		const companyId = (selectedDevice['companyId'] as string | number | null) ?? ''
+		const deviceId = (selectedDevice['deviceId'] as string | number | null) ?? ''
+		uni.navigateTo({
+			url: '/pages/carInfoDetail/carInfoDetail?imei=' + imeiValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
+		})
 	}
 
-	// 更新地图标记
-	const updateMarkers = (devices) => {
-		if (!Array.isArray(devices)) {
-			devices = []
-		}
-		markers.value = devices.map((device, index) => {
-			if (!device || typeof device !== 'object') {
-				return null
-			}
 
-			const lat = Number(device.latitude)
-			const lng = Number(device.longitude)
-
-			if (isNaN(lat) || isNaN(lng)) {
-				return null
-			}
-
-			const iconPath = getDeviceIcon(device.connectionStatus, device.carType)
-
-			let markerId : number
-			if (device.deviceId && !isNaN(Number(device.deviceId))) {
-				markerId = Number(device.deviceId)
-			} else {
-				markerId = index + 1
-			}
-			return {
-				id: markerId,  // 使用数字类型的 ID
-				latitude: lat,
-				longitude: lng,
-				iconPath: iconPath,
-				width: 30,
-				height: 30,
-				callout: {
-					content: device.deviceName || device.plateNo || '设备',
-					display: 'ALWAYS',
-					padding: 8,
-					borderRadius: 8,
-					bgColor: '#ffffff'
-				},
-				joinCluster: true,
-				anchor: { x: 0.5, y: 0.5 }
-			}
-		}).filter(marker => marker !== null)
-	}
 
 	// 加载用户设备列表
-	const loadUserDeviceList = async (data,from) => {
-		try {
-			if(from){
-				let params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 191, 9),
-				pageSize: 1000,
-			}
 
-				const res = await getUserDeviceList(params)
-				data = res.data.list
-			}
-			let deviceList = []
-			if (data) {
-				if (Array.isArray(data)) {
-					deviceList = data
-				} else if (Array.isArray(data.list)) {
-					deviceList = data.list
-				} else if (Array.isArray(data.devices)) {
-					deviceList = data.devices
-				} else if (Array.isArray(data.items)) {
-					deviceList = data.items
-				} else if (data.totalCount !== undefined) {
-					deviceList = []
-				}
-			}
-			// 使用插件转换坐标
-			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
-			updateMarkers(originalDeviceList.value)
-		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:216")
-			uni.showToast({
-				title: '获取设备列表失败',
-				icon: 'none'
-			})
-		}
-	}
 
-	onLoad(async (options) => {
-        getLocation()
-        await loadUserDeviceList(UTSAndroid.consoleDebugError(JSON.parse(options.userDeviceList), " at pages/deviceList/deviceList.uvue:226"),false)
-        // 初始化地图上下文
-        mapCtx = uni.createMapContext('myMap', this)
-        // 启用点聚合
-        if (mapCtx && mapCtx.initMarkerCluster) {
-            mapCtx.initMarkerCluster({
-                enableDefaultStyle: true,
-                zoomOnClick: true,
-                gridSize: 60,
-                complete: () => {
-                    console.log('聚合初始化完成', " at pages/deviceList/deviceList.uvue:236")
-                }
-            })
-        }
-		
+	onLoad((options) => {
+		getLocation()
+		loadUserDeviceList([], true)
 	})
 
 return (): any | null => {
@@ -271,11 +230,11 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
                   onClick: () => {changeState('全部状态')}
                 }), "全部 " + _tD(totalCount.value), 9 /* TEXT, PROPS */, ["onClick"]),
                 _cE("view", _uM({
-                  class: "onlineCar",
+                  class: "onlineCar status-spacing",
                   onClick: () => {changeState('在线')}
                 }), "在线 " + _tD(onlineCount.value), 9 /* TEXT, PROPS */, ["onClick"]),
                 _cE("view", _uM({
-                  class: "offlineCar",
+                  class: "offlineCar status-spacing",
                   onClick: () => {changeState('离线')}
                 }), "离线 " + _tD(offlineCount.value), 9 /* TEXT, PROPS */, ["onClick"])
               ])
@@ -293,4 +252,4 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
 
 })
 export default __sfc__
-const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["gap", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]
+const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]

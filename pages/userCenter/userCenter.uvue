@@ -200,7 +200,7 @@
 			.userinfo {
 				display: flex;
 				flex-direction: row;
-				justify-content: left;
+				justify-content: flex-start;
 				align-items: center;
 				flex: 1;
 			}
@@ -259,42 +259,6 @@
 			pointer-events: none;
 			z-index: 999;
 			
-			.movable-view {
-				width: 120px;
-				height: 200px;
-				pointer-events: auto; 
-				
-				.contact-button-movable {
-					padding: 0;
-					margin: 0;
-					border: 0;
-					background: transparent; 
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-					align-items: center;
-					line-height: 1;
-					&:active {
-						transform: scale(0.95);
-					}
-					&::after {
-						border: 0 !important;
-					}
-					
-					.contact-text {
-						font-size: 20rpx;
-						color: #666;
-						margin-top: 8rpx;
-						
-						&:first-of-type {
-							font-size: 24rpx;
-							font-weight: 500;
-							color: #333;
-							margin-top: 12rpx;
-						}
-					}
-				}
-			}
 		}
 	}
 </style>

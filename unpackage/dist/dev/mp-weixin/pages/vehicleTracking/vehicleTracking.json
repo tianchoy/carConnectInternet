@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "车辆跟踪",
-  "usingComponents": {
-    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "sub-nav-bar": "../../components/sub-navBar/sub-navBar"
-  }
-}

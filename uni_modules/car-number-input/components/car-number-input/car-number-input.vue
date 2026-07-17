@@ -211,10 +211,9 @@
 		padding: 0 5px;
 		height: 44px;
 		.car-input-box{
-			display: inline-block;
+			
 			width: 12.5%;
 			height: 44px;
-			vertical-align: middle;
 			.car-input-item{
 				position: relative;
 				border: 1px solid #E2E2E2;
@@ -258,7 +257,6 @@
 		width: 100%;
 		height: 254px;
 		background-color: #E3E2E7;
-		-webkit-box-shadow: 0 0 30upx rgba(0, 0, 0, 0.1);
 		box-shadow: 0 0 30upx rgba(0, 0, 0, 0.1);
 		overflow: hidden;
 		text-align: center;
@@ -277,36 +275,24 @@
 		.plate-popup-list {
 		    margin: 0 auto;
 		    overflow: hidden;
-		    display: inline-block;
-		    display: table;
+		    
+		    
 		
-		    &:last-child {
-		        margin-bottom: 2px;
-		    }
 		}
 		//键盘主体内容-单个
 		.plate-popup-item {
-		    float: left;
 		    font-size: 16px;
-		    width: 8vw;
-		    margin: 0 1vw;
+		    width: 8%;
+		    margin: 0 1%;
 		    margin-top: 8px;
 		    height: 40px;
 		    line-height: 40px;
 		    background: #FFFFFF;
 		    border-radius: 5px;
 		    color: #4A4A4A;
-			image {
-				width: 16px;
-				height: 16px;
-				margin: 12px auto;
-			}
-		}
-		.plate-popup-item:active{
-			background-color: #EAEAEA;
 		}
 		.province-item{
-			width: 8.8vw;
+			width: 8.8%;
 		}
 		.lock-item{
 			color: #AAA;

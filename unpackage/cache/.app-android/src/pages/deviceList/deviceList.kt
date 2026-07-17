@@ -12,7 +12,6 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.createMapContext as uni_createMapContext
 import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
@@ -27,27 +26,26 @@ open class GenPagesDeviceListDeviceList : BasePage {
             val _cache = __ins.renderCache
             val mapScale = ref(4)
             val showMap = ref(true)
-            val markers = ref(_uA<Any>())
-            var mapCtx = undefined
+            val markers = ref(_uA<UTSJSONObject>())
             val iconColor = ref("#1296db")
             val userLocation = ref(_uO("latitude" to 0, "longitude" to 0))
             val pickerStateTitle = ref("全部状态")
             val showWhat = fun(){
                 showMap.value = !showMap.value
             }
-            val originalDeviceList = ref(_uA<Any>())
-            val filteredDevices = computed(fun(): UTSArray<Any> {
+            val originalDeviceList = ref(_uA<UTSJSONObject>())
+            val filteredDevices = computed(fun(): UTSArray<UTSJSONObject> {
                 if (!UTSArray.isArray(originalDeviceList.value)) {
                     return _uA()
                 }
                 var result = originalDeviceList.value.slice()
                 if (pickerStateTitle.value == "在线") {
-                    result = result.filter(fun(device): Boolean {
-                        return device?.connectionStatus == "online"
+                    result = result.filter(fun(device: UTSJSONObject): Boolean {
+                        return device["connectionStatus"] == "online"
                     })
                 } else if (pickerStateTitle.value === "离线") {
-                    result = result.filter(fun(device): Boolean {
-                        return device?.connectionStatus == "offline"
+                    result = result.filter(fun(device: UTSJSONObject): Boolean {
+                        return device["connectionStatus"] == "offline"
                     }
                     )
                 }
@@ -59,8 +57,8 @@ open class GenPagesDeviceListDeviceList : BasePage {
             }
             )
             val onlineCount = computed(fun(): Number {
-                return originalDeviceList.value.filter(fun(d): Boolean {
-                    return d?.connectionStatus == "online"
+                return originalDeviceList.value.filter(fun(d: UTSJSONObject): Boolean {
+                    return d["connectionStatus"] == "online"
                 }
                 ).length
             }
@@ -69,17 +67,62 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 return totalCount.value - onlineCount.value
             }
             )
-            watch(_uA(
-                filteredDevices,
-                showMap
-            ), fun(ref__1){
-                var devices = ref__1[0]
-                var isMapVisible = ref__1[1]
-                if (isMapVisible) {
-                    updateMarkers(devices)
+            val updateMarkers = fun(devices: UTSArray<UTSJSONObject>): Unit {
+                val nextMarkers: UTSArray<UTSJSONObject> = _uA()
+                run {
+                    var index: Number = 0
+                    while(index < devices.length){
+                        val device = devices[index]
+                        val latitude = device["latitude"] as Any?
+                        val longitude = device["longitude"] as Any?
+                        if (latitude == null || longitude == null) {
+                            index++
+                            continue
+                        }
+                        val lat = parseFloat(latitude.toString())
+                        val lng = parseFloat(longitude.toString())
+                        if (isNaN(lat) || isNaN(lng)) {
+                            index++
+                            continue
+                        }
+                        val connectionStatus = (device["connectionStatus"] as String?) ?: ""
+                        val carType = (device["carType"] as String?) ?: ""
+                        val idValue = device["deviceId"] as Any?
+                        val parsedId = if (idValue != null) {
+                            parseInt(idValue.toString())
+                        } else {
+                            NaN
+                        }
+                        val markerId = if (isNaN(parsedId)) {
+                            index + 1
+                        } else {
+                            parsedId
+                        }
+                        val deviceName = (device["deviceName"] as String?) ?: (device["plateNo"] as String?) ?: "设备"
+                        nextMarkers.push(_uO("id" to markerId, "latitude" to lat, "longitude" to lng, "iconPath" to getDeviceIcon(connectionStatus, carType), "width" to 30, "height" to 30, "callout" to _uO("content" to deviceName, "display" to "ALWAYS", "padding" to 8, "borderRadius" to 8, "bgColor" to "#ffffff"), "joinCluster" to true, "anchor" to _uO("x" to 0.5, "y" to 0.5)))
+                        index++
+                    }
                 }
+                markers.value = nextMarkers
             }
-            )
+            val loadUserDeviceList = fun(data: UTSArray<UTSJSONObject>, from: Boolean): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        try {
+                            var deviceList: UTSArray<UTSJSONObject> = data
+                            if (from) {
+                                val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 113, 11), "pageSize" to 1000)
+                                val res = await(getUserDeviceList(params))
+                                deviceList = res.data.list
+                            }
+                            originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent")
+                            updateMarkers(originalDeviceList.value)
+                        }
+                         catch (err: Throwable) {
+                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:120")
+                            uni_showToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
+                        }
+                })
+            }
             val unbindDevice = fun(imei: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         val res = await(delDevice(imei))
@@ -94,111 +137,41 @@ open class GenPagesDeviceListDeviceList : BasePage {
             }
             val getLocation = fun(){
                 uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:100")
+                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:147")
                     userLocation.value["latitude"] = res.latitude
                     userLocation.value["longitude"] = res.longitude
                 }
                 , fail = fun(err){
-                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:105")
+                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:152")
                 }
                 ))
             }
             val changeState = fun(type: String){
                 pickerStateTitle.value = type
             }
-            val handleTap = fun(e){
-                val markerId = e.detail.markerId
-                val selectedDevice = originalDeviceList.value.find(fun(device): Boolean {
-                    return device.deviceId == markerId
-                }
-                )
-                if (isTruthy(selectedDevice)) {
-                    uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + selectedDevice.imei + "&deptId=" + selectedDevice.companyId + "&deviceId=" + selectedDevice.deviceId))
+            val handleTap = fun(event: Any){
+                val detail = event as UTSJSONObject
+                val markerId = if (detail != null) {
+                    detail["markerId"]
                 } else {
-                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:138")
+                    null
                 }
-            }
-            val updateMarkers = fun(reassignedDevices){
-                var devices = reassignedDevices
-                if (!UTSArray.isArray(devices)) {
-                    devices = _uA()
-                }
-                markers.value = devices.map(fun(device, index): UTSJSONObject? {
-                    if (!isTruthy(device) || UTSAndroid.`typeof`(device) !== "object") {
-                        return null
-                    }
-                    val lat = Number(device.latitude)
-                    val lng = Number(device.longitude)
-                    if (isNaN(lat) || isNaN(lng)) {
-                        return null
-                    }
-                    val iconPath = getDeviceIcon(device.connectionStatus, device.carType)
-                    var markerId: Number
-                    if (isTruthy(device.deviceId) && !isNaN(Number(device.deviceId))) {
-                        markerId = Number(device.deviceId)
-                    } else {
-                        markerId = index + 1
-                    }
-                    return _uO("id" to markerId, "latitude" to lat, "longitude" to lng, "iconPath" to iconPath, "width" to 30, "height" to 30, "callout" to _uO("content" to if (isTruthy(device.deviceName)) {
-                        device.deviceName
-                    } else {
-                        if (isTruthy(device.plateNo)) {
-                            device.plateNo
-                        } else {
-                            "设备"
-                        }
-                    }
-                    , "display" to "ALWAYS", "padding" to 8, "borderRadius" to 8, "bgColor" to "#ffffff"), "joinCluster" to true, "anchor" to _uO("x" to 0.5, "y" to 0.5))
-                }
-                ).filter(fun(marker): Boolean {
-                    return marker != null
+                val selectedDevice = originalDeviceList.value.find(fun(device: UTSJSONObject): Boolean {
+                    return device["deviceId"] == markerId
                 }
                 )
+                if (selectedDevice == null) {
+                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:181")
+                    return
+                }
+                val imeiValue = (selectedDevice["imei"] as String?) ?: ""
+                val companyId = (selectedDevice["companyId"] as Any?) ?: ""
+                val deviceId = (selectedDevice["deviceId"] as Any?) ?: ""
+                uni_navigateTo(NavigateToOptions(url = "/pages/carInfoDetail/carInfoDetail?imei=" + imeiValue + "&deptId=" + companyId.toString() + "&deviceId=" + deviceId.toString()))
             }
-            val loadUserDeviceList = fun(reassignedData, from): UTSPromise<Unit> {
-                var data = reassignedData
-                return wrapUTSPromise(suspend {
-                        try {
-                            if (isTruthy(from)) {
-                                var params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 191, 9), "pageSize" to 1000)
-                                val res = await(getUserDeviceList(params))
-                                data = res.data.list
-                            }
-                            var deviceList = _uA()
-                            if (isTruthy(data)) {
-                                if (UTSArray.isArray(data)) {
-                                    deviceList = data as UTSArray<Any>
-                                } else if (UTSArray.isArray(data.list)) {
-                                    deviceList = data.list
-                                } else if (UTSArray.isArray(data.devices)) {
-                                    deviceList = data.devices
-                                } else if (UTSArray.isArray(data.items)) {
-                                    deviceList = data.items
-                                } else if (data.totalCount !== undefined) {
-                                    deviceList = _uA()
-                                }
-                            }
-                            originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent")
-                            updateMarkers(originalDeviceList.value)
-                        }
-                         catch (err: Throwable) {
-                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:216")
-                            uni_showToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
-                        }
-                })
-            }
-            onLoad(fun(options): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        getLocation()
-                        await(loadUserDeviceList(UTSAndroid.consoleDebugError(JSON.parse(options["userDeviceList"]), " at pages/deviceList/deviceList.uvue:226"), false))
-                        mapCtx = uni_createMapContext("myMap", this)
-                        if (mapCtx && isTruthy(mapCtx.initMarkerCluster)) {
-                            mapCtx.initMarkerCluster(_uO("enableDefaultStyle" to true, "zoomOnClick" to true, "gridSize" to 60, "complete" to fun(){
-                                console.log("聚合初始化完成", " at pages/deviceList/deviceList.uvue:236")
-                            }
-                            ))
-                        }
-                })
+            onLoad(fun(options){
+                getLocation()
+                loadUserDeviceList(_uA(), true)
             }
             )
             return fun(): Any? {
@@ -225,12 +198,12 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                     }), "全部 " + _tD(totalCount.value), 9, _uA(
                                         "onClick"
                                     )),
-                                    _cE("view", _uM("class" to "onlineCar", "onClick" to fun(){
+                                    _cE("view", _uM("class" to "onlineCar status-spacing", "onClick" to fun(){
                                         changeState("在线")
                                     }), "在线 " + _tD(onlineCount.value), 9, _uA(
                                         "onClick"
                                     )),
-                                    _cE("view", _uM("class" to "offlineCar", "onClick" to fun(){
+                                    _cE("view", _uM("class" to "offlineCar status-spacing", "onClick" to fun(){
                                         changeState("离线")
                                     }), "离线 " + _tD(offlineCount.value), 9, _uA(
                                         "onClick"
@@ -257,7 +230,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "gap" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "status-spacing" to _uM(".container .right-bar " to _uM("marginLeft" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

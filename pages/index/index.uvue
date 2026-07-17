@@ -9,14 +9,15 @@
                             <text v-else class="car-id">暂无设备</text>
                         </view>
                         <text v-else class="login" @click="gotoLogin">点击登录!</text>
+                        <i-icon name="/static/right-bottom.png" fontSize="7"></i-icon>
                     </view>
                     <view class="nav-tools">
                         <view class="exit" @click="handleExit" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
                         <i-icon name="/static/reload.png" fontSize="20" @click="handleReload"></i-icon>
-                        <i-icon name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
-                        <i-icon name="/static/addNew.png" fontSize="20" @click="toAdd"></i-icon>
+                        <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
+                        <i-icon class="nav-tool-spacing" name="/static/addNew.png" fontSize="20" @click="toAdd"></i-icon>
                     </view>
                 </view> 
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
@@ -1107,10 +1108,10 @@ onLoad(() => {
 })
 </script>
 
+
 <style scoped lang="scss">
 .container {
     background: linear-gradient(90deg, #E6F9E6, #E0F0FF);
-    min-height: 100vh;
     padding: 0 30rpx 30rpx 30rpx;
     
     .loading-container {
@@ -1121,10 +1122,10 @@ onLoad(() => {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20rpx;
         z-index: 999;
         
         .loading-text {
+            margin-top: 20rpx;
             font-size: 28rpx;
             color: #666;
         }
@@ -1136,30 +1137,20 @@ onLoad(() => {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20rpx;
             
             .current-car {
                 position: relative;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
                 
                 .car-id {
                     font-size: 36rpx;
                     font-weight: bold;
                     color: #000;
                     text-align: center;
-                    padding-right: 30rpx;
                     position: relative;
-                    
-                    &::after {
-                        content: "";
-                        position: absolute;
-                        right: 0;
-                        bottom: 0;
-                        width: 0;
-                        height: 0;
-                        border-style: solid;
-                        border-color: transparent transparent #000 transparent;
-                        border-width: 0 0 10px 10px;
-                    }
+                    margin-right: 10rpx;
                 }
                 .login{
                     font-size: 36rpx;
@@ -1175,7 +1166,7 @@ onLoad(() => {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                gap: 30rpx;
+                .nav-tool-spacing { margin-left: 30rpx; }
                 .exit {
                     display: flex;
                     align-items: center;
@@ -1183,11 +1174,6 @@ onLoad(() => {
                     padding: 10rpx;
                     background-color: rgba(0, 0, 0, 0.05);
                     transition: all 0.2s ease;
-                    
-                    &:active {
-                        background-color: rgba(0, 0, 0, 0.15);
-                        transform: scale(0.95);
-                    }
                     border-radius: 50%;
                     
                     .exit-icon {
@@ -1201,11 +1187,11 @@ onLoad(() => {
         .device-info {
             display: flex;
             flex-direction: column;
-            gap: 16rpx;
             padding: 20rpx;
             border-radius: 16rpx;
             width: 50%;
             
+            .info + .info { margin-top: 16rpx; }
             .info {
                 font-size: 26rpx;
                 color: #333;
@@ -1221,20 +1207,20 @@ onLoad(() => {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            gap: 20rpx;
             padding: 20rpx 0;
             border-radius: 16rpx;
             
+            .state-item + .state-item { margin-left: 20rpx; }
             .state-item {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 12rpx;
                 background-color: #fff;
                 padding: 20rpx;
                 border-radius: 30rpx;
                 
+                .state-value { margin-top: 12rpx; }
                 .state-label {
                     font-size: 24rpx;
                     color: #999;
@@ -1338,16 +1324,6 @@ onLoad(() => {
                 align-items: center;
                 justify-content: center;
             }
-            .ring-item::before {
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                border: 4rpx solid #D8E2F0;
-                box-sizing: border-box;
-                z-index: 1;
-            }
             .ring-bg {
                 position: absolute;
                 width: 100%;
@@ -1387,7 +1363,7 @@ onLoad(() => {
                 text-align: right;
             }
             .label {
-                display: block;
+                
                 font-size: 25rpx;
                 color: #666;
                 margin-top: 12rpx;
@@ -1397,7 +1373,7 @@ onLoad(() => {
             display: flex;
             flex-direction: column;
             margin: 40rpx 0;
-            gap: 30rpx;
+            .device-item + .device-item { margin-top: 30rpx; }
             .device-item{
                 display: flex;
                 flex-direction: row;
@@ -1413,16 +1389,11 @@ onLoad(() => {
                     flex-direction: row;
                     align-items: flex-start;
                     align-items: center;
-                    gap: 20rpx;
                     .icon{
                         width: 80rpx;
                         height: 80rpx;
                         border-radius: 50%;
                         padding: 18rpx;
-                        image{
-                            width: 100%;
-                            height: 100%;
-                        }
                         &.icon-device{
                             background-color: #f0f9f0;
                         }
@@ -1433,7 +1404,12 @@ onLoad(() => {
                             background-color: #f1f7f4;
                         }
                     }
+                    .icon-image{
+                        width: 45rpx;
+                        height: 45rpx;
+                    }
                     .item-info{
+                        margin-left: 20rpx;
                         font-weight: normal;
                         .item-title{
                             font-size: 28rpx;
@@ -1471,12 +1447,12 @@ onLoad(() => {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: 10rpx;
                     .icon-image{
                         width: 60rpx;
                         height: 60rpx;
                     }
                     .item-title{
+                        margin-top: 10rpx;
                         font-size: 25rpx;
                         color: #222;
                     }

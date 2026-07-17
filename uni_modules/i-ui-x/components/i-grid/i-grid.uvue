@@ -334,7 +334,7 @@ function loadMore() {
 
 .i-grid__image {
   margin-bottom: 8px;
-  display: block;
+  
 }
 
 .i-grid__icon {

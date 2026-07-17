@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "",
-  "usingComponents": {
-    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
-    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button"
-  }
-}

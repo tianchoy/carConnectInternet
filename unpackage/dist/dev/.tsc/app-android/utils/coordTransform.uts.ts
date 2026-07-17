@@ -88,7 +88,7 @@ class CoordTransform {
      * @param targetSystem 目标坐标系 'tencent' | 'wgs84'
      * @returns 转换后的设备数组
      */
-    static batchConvertCoordinates(devices: Array<any>, targetSystem: string = 'tencent'): Array<any> {
+    static batchConvertCoordinates(devices: Array<UTSJSONObject>, targetSystem: string = 'tencent'): Array<UTSJSONObject> {
         if (!Array.isArray(devices)) return []
         
         return devices.map(device => {

@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "我的",
-  "usingComponents": {
-    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
-    "i-badge": "../../uni_modules/i-ui-x/components/i-badge/i-badge"
-  }
-}

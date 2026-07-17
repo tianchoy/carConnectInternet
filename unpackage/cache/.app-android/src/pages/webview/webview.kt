@@ -106,7 +106,7 @@ open class GenPagesWebviewWebview : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("webview-container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5")), "error-page" to _uM(".webview-container " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "40rpx", "paddingRight" to "40rpx", "paddingBottom" to "40rpx", "paddingLeft" to "40rpx")), "back-btn" to _uM(".webview-container .error-page " to _uM("marginTop" to "60rpx", "width" to "400rpx", "backgroundColor" to "#007aff", "color" to "#ffffff", "borderTopLeftRadius" to "44rpx", "borderTopRightRadius" to "44rpx", "borderBottomRightRadius" to "44rpx", "borderBottomLeftRadius" to "44rpx", "fontSize" to "28rpx", "opacity:active" to 0.8)))
+                return _uM("webview-container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5")), "error-page" to _uM(".webview-container " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center", "height" to "100%", "paddingTop" to "40rpx", "paddingRight" to "40rpx", "paddingBottom" to "40rpx", "paddingLeft" to "40rpx")), "back-btn" to _uM(".webview-container .error-page " to _uM("marginTop" to "60rpx", "width" to "400rpx", "backgroundColor" to "#007aff", "color" to "#ffffff", "borderTopLeftRadius" to "44rpx", "borderTopRightRadius" to "44rpx", "borderBottomRightRadius" to "44rpx", "borderBottomLeftRadius" to "44rpx", "fontSize" to "28rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

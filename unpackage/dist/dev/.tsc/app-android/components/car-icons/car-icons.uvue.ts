@@ -125,7 +125,10 @@ const _component_i_popup = resolveEasyComponent("i-popup",_easycom_i_popup)
     onClick: handlePopupClick
   }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "icon-selector" }), [
+      _cE("scroll-view", _uM({
+        class: "icon-selector",
+        "scroll-y": ""
+      }), [
         _cV(_component_i_grid, _uM({
           items: iconList,
           col: 4,
@@ -147,4 +150,4 @@ const _component_i_popup = resolveEasyComponent("i-popup",_easycom_i_popup)
 })
 export default __sfc__
 export type CarIconsComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenComponentsCarIconsCarIconsStyles = [_uM([["icon-selector", _pS(_uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["overflowY", "auto"], ["width::-webkit-scrollbar", 4], ["backgroundColor::-webkit-scrollbar-thumb", "#dddddd"], ["borderTopLeftRadius::-webkit-scrollbar-thumb", 4], ["borderTopRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomLeftRadius::-webkit-scrollbar-thumb", 4], ["backgroundColor::-webkit-scrollbar-track", "#f5f5f5"]]))], ["icon-grid", _uM([[".icon-selector ", _uM([["width", "100%"], ["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]])]])], ["grid-item", _uM([[".icon-selector .icon-grid ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "20rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "10rpx"], ["width", "25%"], ["height", "100%"], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"], ["transform:active", "scale(0.95)"], ["backgroundColor:active", "#f5f5f5"]])]])], ["icon-image", _uM([[".icon-selector .icon-grid .grid-item ", _uM([["width", "80rpx"], ["height", "80rpx"], ["marginBottom", "10rpx"]])]])], ["grid-text", _uM([[".icon-selector .icon-grid .grid-item ", _uM([["fontSize", "22rpx"], ["color", "#333333"], ["textAlign", "center"], ["lineHeight", 1.2], ["marginTop", "8rpx"], ["fontWeight", 400]])]])], ["@TRANSITION", _uM([["grid-item", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]
+const GenComponentsCarIconsCarIconsStyles = [_uM([["icon-selector", _pS(_uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["width::-webkit-scrollbar", 4], ["backgroundColor::-webkit-scrollbar-thumb", "#dddddd"], ["borderTopLeftRadius::-webkit-scrollbar-thumb", 4], ["borderTopRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomLeftRadius::-webkit-scrollbar-thumb", 4], ["backgroundColor::-webkit-scrollbar-track", "#f5f5f5"]]))], ["icon-grid", _uM([[".icon-selector ", _uM([["width", "100%"], ["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]])]])], ["grid-item", _uM([[".icon-selector .icon-grid ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "20rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "10rpx"], ["width", "25%"], ["height", "100%"], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])]])], ["@TRANSITION", _uM([["grid-item", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]

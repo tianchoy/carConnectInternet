@@ -43,7 +43,7 @@
 						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('polygon')">
 						多边形
 					</i-button>
-					<i-button :type="drawingMode == 'circle' ? 'success' : 'default'" size="small"
+					<i-button class="mode-button-spacing" :type="drawingMode == 'circle' ? 'success' : 'default'" size="small"
 						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('circle')">
 						圆形
 					</i-button>
@@ -177,14 +177,40 @@
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
-	const imei = ref(null)
-	const connectionStatus = ref(null)
-	const deptId = ref(null)
-	const carType = ref(null)
-	const deviceName = ref(null)
+	const imei = ref<string | null>(null)
+	const connectionStatus = ref<string | null>(null)
+	const deptId = ref<string | null>(null)
+	const carType = ref<string | null>(null)
+	const deviceName = ref<string | null>(null)
 	type Coordinate = {
 		latitude : number;
 		longitude : number;
+	};
+	type PaginationState = {
+		pageNum : number;
+		pageSize : number;
+		hasMore : boolean;
+		loadingMore : boolean;
+	};
+	type Pagination = {
+		bind : PaginationState;
+		unbind : PaginationState;
+	};
+	type CircleData = {
+		latitude : number;
+		longitude : number;
+		radius : number;
+	};
+	type CircleOverlay = {
+		id : number;
+		latitude : number;
+		longitude : number;
+		radius : number;
+		strokeWidth : number;
+		strokeColor : string;
+		fillColor : string;
+		zIndex : number;
+		centerMarker : boolean;
 	};
 	// 地图状态
 	const center = reactive({
@@ -192,30 +218,30 @@
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
-	const markers = ref([]) // 标记点
-	const carMarker = ref(null) // 车辆标记点
-	const circles = ref([]) // 圆形围栏
+	const markers = ref<Array<UTSJSONObject>>([]) // 标记点
+	const carMarker = ref<UTSJSONObject | null>(null) // 车辆标记点
+	const circles = ref<Array<CircleOverlay>>([]) // 圆形围栏
 	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关状态
 	const isDrawing = ref(false)
 	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
-	const points = ref([])
-	const polygons = ref([]) // 存储地理围栏多边形数据
-	const circleCenter = ref(null);
+	const points = ref<Array<Coordinate>>([])
+	const polygons = ref<Array<any>>([]) // 存储地理围栏多边形数据
+	const circleCenter = ref<Coordinate | null>(null);
 	const circleRadius = ref(0) // 圆形围栏半径（米）
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
-	const currentCar = ref('京A12345')
+	const currentCar = ref<string | null>('京A12345')
 	const lastDirection = ref(0)
-	const showFenceModal = ref(null)
+	const showFenceModal = ref<UTSJSONObject | null>(null)
 
 	// 围栏管理状态
-	const fenceList = ref([])
-	const selectedFence = ref(null)
-	const fencesPopup = ref(null)
-	const editDialogPopup = ref(null)
-	const editingFence = ref(null)
+	const fenceList = ref<Array<UTSJSONObject>>([])
+	const selectedFence = ref<UTSJSONObject | null>(null)
+	const fencesPopup = ref<UTSJSONObject | null>(null)
+	const editDialogPopup = ref<UTSJSONObject | null>(null)
+	const editingFence = ref<UTSJSONObject | null>(null)
 	const alarmTypeOptions = ['0', '1', '2', '3']
 	const fenceForm = reactive({
 		name: '',
@@ -223,10 +249,10 @@
 	})
 
 	// 设备绑定状态
-	const deviceDialogPopup = ref(null)
+	const deviceDialogPopup = ref<UTSJSONObject | null>(null)
 	const activeTab = ref('bind')
-	const deviceList = ref([]) // 当前显示的设备列表
-	const boundDevices = ref([]) // 已绑定设备完整列表
+	const deviceList = ref<Array<any>>([]) // 当前显示的设备列表
+	const boundDevices = ref<Array<any>>([]) // 已绑定设备完整列表
 	const currentFenceName = ref('')
 	const currentFenceId = ref('')
 	const loading = ref(false)
@@ -234,7 +260,7 @@
 	let loadMoreTimer = null // 防抖定时器
 
 	// 分页控制变量（已绑定/未绑定设备）
-	const pagination = reactive({
+	const pagination = reactive<Pagination>({
 		bind: {
 			pageNum: 1, // 当前页码
 			pageSize: 10, // 每页条数
@@ -249,11 +275,6 @@
 		}
 	})
 
-	// 计算当前标签页的分页信息
-	const currentPagination = computed(() => {
-		return pagination[activeTab.value]
-	})
-
 	// 计算是否可以完成绘制
 	const canFinishDrawing = computed(() => {
 		if (drawingMode.value === 'polygon') {
@@ -266,25 +287,16 @@
 
 	// 计算当前加载更多状态
 	const loadingMore = computed(() => {
-		return currentPagination.value.loadingMore
+		return activeTab.value === 'bind' ? pagination.bind.loadingMore : pagination.unbind.loadingMore
 	})
 
 	// 计算是否还有更多数据
 	const hasMore = computed(() => {
-		return currentPagination.value.hasMore
+		return activeTab.value === 'bind' ? pagination.bind.hasMore : pagination.unbind.hasMore
 	})
 
-	onLoad(async (option) => {
-		connectionStatus.value = option.connectionStatus
-		imei.value = option.imei
-		currentCar.value = option.plateNo
-		deptId.value = option.deptId
-		carType.value = option.carType
-		deviceName.value = option.deviceName
 
-		await loadInitialPosition()
-		await loadGeofenceList() // 页面加载时获取围栏列表
-	})
+
 
 	const loadInitialPosition = async () => {
 		uni.showLoading({
@@ -295,13 +307,13 @@
 			const data = { deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 
-			res.data.forEach(async item => {
+			res.data.forEach(item => {
 				if (item.imei == imei.value) {
 					const deviceData = item
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(
-						Number(deviceData.latitude),
-						Number(deviceData.longitude)
+						parseFloat(deviceData.latitude.toString()),
+						parseFloat(deviceData.longitude.toString())
 					)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
@@ -312,17 +324,17 @@
 					}
 
 					// 记录初始方向
-					lastDirection.value = deviceData.direction || 0
+					lastDirection.value = deviceData.direction ? parseFloat(deviceData.direction.toString()) : 0
 
 					// 创建车辆标记点
 					carMarker.value = {
 						id: 0,
 						latitude: position.latitude,
 						longitude: position.longitude,
-						iconPath: getDeviceIcon(connectionStatus.value, carType.value),
+						iconPath: getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()),
 						width: 25,
 						height: 25,
-						rotate: calculateMapRotation(lastDirection.value), // 修正方向
+						rotate: lastDirection.value >= 360 ? lastDirection.value - 360 : (lastDirection.value < 0 ? lastDirection.value + 360 : lastDirection.value), // 修正方向
 						callout: {
 							content: deviceName.value || '爱车位置',
 							color: connectionStatus.value == 'online' ? '#fff' : '#666',
@@ -334,14 +346,17 @@
 					}
 
 					// 更新标记点数组，保留车辆标记点
-					updateMarkers()
+					const marker = carMarker.value
+					if (marker != null) {
+						markers.value = [marker]
+					}
 
 					// 更新车辆信息
-					currentSpeed.value = deviceData.speed || 0
+					currentSpeed.value = deviceData.speed ? parseFloat(deviceData.speed.toString()) : 0
 					currentAddress.value = deviceData.positionUpdateTime
 						? `最后定位: ${deviceData.positionUpdateTime}`
 						: '未知位置'
-					connectionStatus.value = deviceData.connectionStatus || 'unknown'
+					connectionStatus.value = deviceData.connectionStatus ? deviceData.connectionStatus.toString() : 'unknown'
 				}
 			})
 
@@ -357,7 +372,9 @@
 	}
 
 	// 计算地图上的旋转角度（修正方向）
-	const calculateMapRotation = (direction) => {
+
+
+	function calculateMapRotation(direction : number) : number {
 		let rotation = direction
 		if (rotation >= 360) rotation -= 360
 		if (rotation < 0) rotation += 360
@@ -365,41 +382,140 @@
 		return rotation
 	}
 
-	// 加载围栏列表
-	const loadGeofenceList = async () => {
-		try {
-			const res = await getGeofenceList()
-			if (res.code === 0) {
-				fenceList.value = res.data || [];
-			} else {
-				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
-				fenceList.value = []; // 失败时也清空列表
-			}
-			// 无论数据是否为空，都重新渲染
-			renderFencesOnMap()
-		} catch (error) {
-			console.error('加载围栏列表失败:', error)
-			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
-			fenceList.value = []; // 异常时强制清空
-			renderFencesOnMap()
+	function getFenceType(fence : UTSJSONObject) : string {
+		const type = fence.getString('type', '')
+		if (type && type !== 'null') {
+			return type
 		}
-	}
-
-	// 获取围栏类型（根据area字段判断）
-	const getFenceType = (fence) => {
-		if (fence.type && fence.type !== 'null') {
-			return fence.type
-		}
-		// 根据area字段内容判断围栏类型
-		if (fence.area && fence.area.startsWith('CIRCLE')) {
+		const area = fence.getString('area', '')
+		if (area.startsWith('CIRCLE')) {
 			return 'circle'
-		} else if (fence.area && fence.area.startsWith('POLYGON')) {
+		} else if (area.startsWith('POLYGON')) {
 			return 'polygon'
 		}
-		return 'polygon' // 默认多边形
+		return 'polygon'
 	}
 
-	// 将围栏数据渲染到地图上
+	function parsePolygon(polygonStr : string) : Array<Coordinate> {
+		if (!polygonStr) return []
+		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
+		const coordPoints = coordStr.split(',')
+		return coordPoints.map((point : string) : Coordinate => {
+			const values = point.trim().split(' ')
+			const convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]))
+			return {
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng
+			}
+		})
+	}
+
+	function parseCircle(circleStr : string) : CircleData | null {
+		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
+		try {
+			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
+			const parts = coordStr.split(',')
+			if (parts.length !== 2) return null
+			const centerValues = parts[0].trim().split(' ')
+			const lat = parseFloat(centerValues[0])
+			const lng = parseFloat(centerValues[1])
+			const radius = parseFloat(parts[1].trim())
+			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+				console.error('无效的圆形围栏数据:', circleStr)
+				return null
+			}
+			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
+			return {
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
+				radius: radius
+			}
+		} catch (error) {
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr)
+			return null
+		}
+	}
+
+	function updateMarkers() : void {
+		const newMarkers : Array<UTSJSONObject> = []
+
+		// 首先添加车辆标记点
+		if (carMarker.value) {
+			newMarkers.push(carMarker.value)
+		}
+
+		// 添加围栏顶点标记
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				// 多边形顶点标记
+				points.value.forEach((point, index) => {
+					newMarkers.push({
+						id: 1000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				})
+			} else if (drawingMode.value === 'circle' && circleCenter.value) {
+				// 圆形圆心标记
+				newMarkers.push({
+					id: 1000,
+					latitude: circleCenter.value.latitude,
+					longitude: circleCenter.value.longitude,
+					iconPath: '/static/marker.png',
+					width: 32,
+					height: 32,
+					callout: { content: '圆心', display: 'ALWAYS' },
+					anchor: { x: 0.5, y: 0.5 }
+				})
+			}
+		} else {
+			const selected = selectedFence.value
+			if (selected == null) {
+				markers.value = newMarkers
+				return
+			}
+			// 选中围栏时显示标记
+			const fenceType = getFenceType(selected)
+			const area = selected.getString('area', '')
+			if (fenceType === 'circle') {
+				const circleData = parseCircle(area)
+				if (circleData != null) {
+					newMarkers.push({
+						id: 2000,
+						latitude: circleData.latitude,
+						longitude: circleData.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: '圆心', display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				}
+			} else {
+				const fencePoints = parsePolygon(area)
+				fencePoints.forEach((point, index) => {
+					newMarkers.push({
+						id: 2000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					})
+				})
+			}
+		}
+
+		markers.value = newMarkers
+	}
+
 	const renderFencesOnMap = () => {
 		// 当围栏列表为空时，强制清空地图上所有围栏和标记
 		if (!fenceList.value || fenceList.value.length === 0) {
@@ -409,22 +525,23 @@
 			return;
 		}
 
-		const fencePolygons = []
-		const fenceCircles = []
+		const fencePolygons : Array<any> = []
+		const fenceCircles : Array<CircleOverlay> = []
+		let colorIndex = 0
 
 		// 为每个围栏创建多边形或圆形
-		fenceList.value.forEach((fence, index) => {
+		fenceList.value.forEach((fence : UTSJSONObject) => {
 			const fenceType = getFenceType(fence)
 
 			if (fenceType === 'circle') {
 				// 处理圆形围栏
-				const circleData = parseCircle(fence.area)
-				if (circleData) {
+				const circleData = parseCircle(fence.getString('area', ''))
+				if (circleData != null) {
 					// 处理过大半径，避免无法显示
 					const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
 
 					fenceCircles.push({
-						id: fence.id,
+						id: fence.getNumber('id', 0),
 						latitude: circleData.latitude,
 						longitude: circleData.longitude,
 						radius: displayRadius,
@@ -437,14 +554,14 @@
 				}
 			} else {
 				// 处理多边形围栏
-				const fencePoints = parsePolygon(fence.area)
+				const fencePoints = parsePolygon(fence.getString('area', ''))
 				if (fencePoints.length >= 3) {
 					fencePolygons.push({
-						id: fence.id,
+						id: fence.getNumber('id', 0),
 						points: fencePoints,
 						strokeWidth: 2,
 						strokeColor: '#FF0000',
-						fillColor: index === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+						fillColor: colorIndex++ === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
 						zIndex: 1
 					})
 				}
@@ -461,65 +578,41 @@
 			center.latitude = firstCircle.latitude
 			center.longitude = firstCircle.longitude
 			// 根据半径设置合适的缩放级别
-			mapScale.value = calculateZoomLevelFromRadius(firstCircle.radius)
+			mapScale.value = firstCircle.radius > 50000 ? 8 : firstCircle.radius > 20000 ? 9 : firstCircle.radius > 10000 ? 10 : firstCircle.radius > 5000 ? 11 : firstCircle.radius > 2000 ? 12 : firstCircle.radius > 1000 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16
 		}
 	}
+
+	// 加载围栏列表
+	const loadGeofenceList = async () => {
+		try {
+			const res = await getGeofenceList()
+			if (res.code === 0) {
+				fenceList.value = res.data;
+			} else {
+				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+				fenceList.value = []; // 失败时也清空列表
+			}
+			// 无论数据是否为空，都重新渲染
+			renderFencesOnMap()
+		} catch (error) {
+			console.error('加载围栏列表失败:', error)
+			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+			fenceList.value = []; // 异常时强制清空
+			renderFencesOnMap()
+		}
+	}
+
+	// 获取围栏类型（根据area字段判断）
+
+
+	// 将围栏数据渲染到地图上
+
 
 	// 解析POLYGON字符串为坐标数组
-	const parsePolygon = (polygonStr) => {
-		if (!polygonStr) return []
 
-		// 去除字符串中的"POLYGON
-		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
-		// 按逗号分割坐标点
-		const coordPoints = coordStr.split(',')
-
-		return coordPoints.map(point => {
-			const [lat, lng] = point.trim().split(' ').map(Number)
-			// 转换坐标到腾讯地图坐标系
-			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-			return {
-				latitude: convertedCoord.lat,
-				longitude: convertedCoord.lng
-			}
-		})
-	}
 
 	// 解析CIRCLE字符串为圆心和半径
-	const parseCircle = (circleStr) => {
-		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
 
-		try {
-			// 去除字符串中的"CIRCLE
-			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
-			// 按逗号分割坐标点和半径
-			const parts = coordStr.split(',')
-
-			if (parts.length !== 2) return null
-
-			const [centerStr, radiusStr] = parts
-			const [lat, lng] = centerStr.trim().split(' ').map(Number)
-			const radius = Number(radiusStr.trim())
-
-			// 验证数据有效性
-			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr)
-				return null
-			}
-
-			// 转换坐标到腾讯地图坐标系
-			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
-
-			return {
-				latitude: convertedCoord.lat,
-				longitude: convertedCoord.lng,
-				radius: radius
-			}
-		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr)
-			return null
-		}
-	}
 
 	// 生成POLYGON字符串
 	const generatePolygonString = (points) => {
@@ -1078,79 +1171,9 @@
 	}
 
 	// 更新标记点数组，保留车辆标记点
-	const updateMarkers = () => {
-		const newMarkers = []
 
-		// 首先添加车辆标记点
-		if (carMarker.value) {
-			newMarkers.push(carMarker.value)
-		}
 
-		// 添加围栏顶点标记
-		if (isDrawing.value) {
-			if (drawingMode.value === 'polygon') {
-				// 多边形顶点标记
-				points.value.forEach((point, index) => {
-					newMarkers.push({
-						id: 1000 + index,
-						latitude: point.latitude,
-						longitude: point.longitude,
-						iconPath: '/static/marker.png',
-						width: 32,
-						height: 32,
-						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
-						anchor: { x: 0.5, y: 0.5 }
-					})
-				})
-			} else if (drawingMode.value === 'circle' && circleCenter.value) {
-				// 圆形圆心标记
-				newMarkers.push({
-					id: 1000,
-					latitude: circleCenter.value.latitude,
-					longitude: circleCenter.value.longitude,
-					iconPath: '/static/marker.png',
-					width: 32,
-					height: 32,
-					callout: { content: '圆心', display: 'ALWAYS' },
-					anchor: { x: 0.5, y: 0.5 }
-				})
-			}
-		} else if (selectedFence.value) {
-			// 选中围栏时显示标记
-			const fenceType = getFenceType(selectedFence.value)
-			if (fenceType === 'circle') {
-				const circleData = parseCircle(selectedFence.value.area)
-				if (circleData) {
-					newMarkers.push({
-						id: 2000,
-						latitude: circleData.latitude,
-						longitude: circleData.longitude,
-						iconPath: '/static/marker.png',
-						width: 32,
-						height: 32,
-						callout: { content: '圆心', display: 'ALWAYS' },
-						anchor: { x: 0.5, y: 0.5 }
-					})
-				}
-			} else {
-				const fencePoints = parsePolygon(selectedFence.value.area)
-				fencePoints.forEach((point, index) => {
-					newMarkers.push({
-						id: 2000 + index,
-						latitude: point.latitude,
-						longitude: point.longitude,
-						iconPath: '/static/marker.png',
-						width: 32,
-						height: 32,
-						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
-						anchor: { x: 0.5, y: 0.5 }
-					})
-				})
-			}
-		}
 
-		markers.value = newMarkers
-	}
 
 	// 更新围栏多边形显示
 	const updateFencePolygon = () => {
@@ -1219,13 +1242,25 @@
 
 		renderFencesOnMap(); // 重新渲染（空列表时触发清空逻辑）
 	}
+	onLoad((option) => {
+		connectionStatus.value = option.connectionStatus
+		imei.value = option.imei
+		currentCar.value = option.plateNo
+		deptId.value = option.deptId
+		carType.value = option.carType
+		deviceName.value = option.deviceName
+
+		loadInitialPosition()
+		loadGeofenceList() // 页面加载时获取围栏列表
+	})
+
 </script>
 
 <style lang="scss">
 	.container {
 		position: relative;
 		width: 100%;
-		height: 100vh;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		background-color: #f5f7fa;
@@ -1248,22 +1283,8 @@
 				color: #00aa00;
 				font-weight: bold;
 				box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
-				animation: pulse 1.5s infinite;
 			}
 
-			@keyframes pulse {
-				0% {
-					opacity: 0.7;
-				}
-
-				50% {
-					opacity: 1;
-				}
-
-				100% {
-					opacity: 0.7;
-				}
-			}
 		}
 
 		.fence-operations {
@@ -1292,10 +1313,6 @@
 				flex-direction: row;
 				justify-content: space-between;
 
-				i-button {
-					flex: 1;
-					margin: 0 10rpx;
-				}
 			}
 		}
 
@@ -1320,16 +1337,11 @@
 				}
 
 				.mode-buttons {
+					.mode-button-spacing { margin-left: 20rpx; }
 					display: flex;
 					flex-direction: row;
 					justify-content: flex-start;
 					align-items: center;
-					gap: 20rpx;
-
-					i-button {
-						flex: 1;
-						margin: 0 10rpx;
-					}
 				}
 			}
 
@@ -1340,10 +1352,6 @@
 				align-items: center;
 				margin-bottom: 20rpx;
 
-				i-button {
-					flex: 1;
-					margin: 0 10rpx;
-				}
 			}
 
 			.status-info {
@@ -1354,14 +1362,11 @@
 				color: #333;
 				border-top: 1rpx solid #eee;
 
-				text {
-					margin-bottom: 10rpx;
-				}
 			}
 		}
 
 		.fence-list {
-			height: 70vh;
+			height: 70%;
 			background-color: #fff;
 
 			.list-header {
@@ -1379,7 +1384,6 @@
 			}
 
 			.list-content {
-				height: calc(70vh - 100rpx);
 				padding: 20rpx;
 
 				.fence-item {
@@ -1390,9 +1394,6 @@
 					padding: 24rpx;
 					border-bottom: 1rpx solid #f5f5f5;
 
-					&:active {
-						background-color: #f9f9f9;
-					}
 
 					.fence-info {
 						display: flex;
@@ -1446,7 +1447,7 @@
 					margin-top: 30rpx;
 
 					.label {
-						display: block;
+						
 						margin-bottom: 30rpx;
 						font-size: 28rpx;
 						font-weight: 500;
@@ -1459,10 +1460,6 @@
 						align-items: center;
 					}
 
-					i-radio {
-						margin-right: 20rpx;
-						margin-bottom: 15rpx;
-					}
 				}
 			}
 
@@ -1473,15 +1470,11 @@
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
 
-				i-button {
-					flex: 1;
-					margin: 0 10rpx;
-				}
 			}
 		}
 
 		.device-dialog {
-			height: 70vh;
+			height: 70%;
 			background-color: #fff;
 
 			.dialog-header {
@@ -1514,7 +1507,7 @@
 			}
 
 			.device-list {
-				height: 60vh; 
+				height: 60%; 
 				padding: 20rpx;
 				box-sizing: border-box;
 
@@ -1554,10 +1547,6 @@
 					justify-content: center;
 					padding: 30rpx 0;
 					
-					.load-more-text {
-						font-size: 26rpx;
-						color: #999;
-					}
 				}
 
 				.no-more {

@@ -89,7 +89,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 112, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            if (res?.code === 0 && isTruthy(res.data) && res.data.length > 0) {
+                            if (res?.code === 0 && res.data != null && res.data.length > 0) {
                                 var foundDevice = false
                                 res.data.forEach(fun(item: Any){
                                     if (item.imei == imei.value) {
@@ -135,7 +135,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                     uni_showToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(res?.message)) {
+                                uni_showToast(ShowToastOptions(title = if (res?.message != "") {
                                     res?.message
                                 } else {
                                     "获取位置失败"
@@ -185,30 +185,30 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 232, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             console.log("222222", " at pages/vehicleTracking/vehicleTracking.uvue:238")
-                            if (res?.code === 0 && isTruthy(res.data) && res.data.length > 0) {
+                            if (res?.code === 0 && res.data != null && res.data.length > 0) {
                                 val deviceData = res.data.find(fun(item: Any): Boolean {
                                     return item.imei == imei.value
                                 }
                                 )
                                 if (isTruthy(deviceData)) {
-                                    val convertedCoord = CoordTransform.wgs84ToTencent(Number(deviceData.latitude), Number(deviceData.longitude))
-                                    val newPosition: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newPosition", "pages/vehicleTracking/vehicleTracking.uvue", 249, 12), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng, "speed" to if (isTruthy(deviceData.speed)) {
-                                        deviceData.speed
+                                    val convertedCoord = CoordTransform.wgs84ToTencent(Number(deviceData["latitude"]), Number(deviceData["longitude"]))
+                                    val newPosition: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newPosition", "pages/vehicleTracking/vehicleTracking.uvue", 249, 12), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng, "speed" to if (isTruthy(deviceData["speed"])) {
+                                        deviceData["speed"]
                                     } else {
                                         0
                                     }
-                                    , "address" to if (isTruthy(deviceData.positionUpdateTime)) {
-                                        deviceData.positionUpdateTime
+                                    , "address" to if (isTruthy(deviceData["positionUpdateTime"])) {
+                                        deviceData["positionUpdateTime"]
                                     } else {
                                         "未知位置"
                                     }
-                                    , "connectionStatus" to if (isTruthy(deviceData.connectionStatus)) {
-                                        deviceData.connectionStatus
+                                    , "connectionStatus" to if (isTruthy(deviceData["connectionStatus"])) {
+                                        deviceData["connectionStatus"]
                                     } else {
                                         "unknown"
                                     }
-                                    , "direction" to if (deviceData.direction !== undefined && deviceData.direction != null) {
-                                        deviceData.direction
+                                    , "direction" to if (deviceData["direction"] !== undefined && deviceData["direction"] != null) {
+                                        deviceData["direction"]
                                     } else {
                                         lastDirection.value
                                     }
@@ -497,7 +497,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "40rpx", "paddingBottom" to "20rpx", "paddingLeft" to "40rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "btn" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx")), "pos-info-box" to _uM(".container .tools-panel " to _uM("paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0)), "speed" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")), "address" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "40rpx", "paddingBottom" to "20rpx", "paddingLeft" to "40rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "btn" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx")), "pos-info-box" to _uM(".container .tools-panel " to _uM("paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0)), "speed" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")), "address" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

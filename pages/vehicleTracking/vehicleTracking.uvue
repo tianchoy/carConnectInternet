@@ -599,7 +599,7 @@
 	.container {
 		position: relative;
 		width: 100%;
-		height: 100vh;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		background-color: #f5f7fa;
@@ -621,14 +621,6 @@
 			.btn {
 				margin-bottom: 20rpx;
 
-				button {
-					width: 100%;
-					margin: 0;
-					background-color: '#1296db';
-					color: white;
-					font-size: 28rpx;
-					border-radius: 8rpx;
-				}
 			}
 
 			.pos-info-box {
@@ -638,21 +630,12 @@
 				.address {
 					display: flex;
 					flex-direction: row;
-					justify-content: start;
+					justify-content: flex-start;
 					align-items: center;
 					padding: 8rpx 0;
 					font-size: 28rpx;
 
-					text:first-child {
-						color: #666;
-						width: 160rpx;
-					}
 
-					text:last-child {
-						color: #333;
-						font-weight: 500;
-						flex: 1;
-					}
 				}
 			}
 		}

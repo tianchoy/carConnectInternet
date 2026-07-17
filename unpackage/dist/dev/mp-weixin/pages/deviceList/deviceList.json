@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "设备列表",
-  "usingComponents": {
-    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
-    "index-list-mode": "../../components/indexListMode/indexListMode"
-  }
-}
