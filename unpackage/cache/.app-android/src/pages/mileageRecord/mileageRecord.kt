@@ -29,91 +29,118 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             val carType = ref("")
             val totalMileage = ref(0)
             val averageSpeed = ref(0)
-            val tripData = ref(_uA<Any>())
+            val tripData = ref(_uA<UTSJSONObject>())
             val showDateTimePicker = ref(false)
             val currentPickerType = ref("start")
             val pickerTitle = ref("选择开始时间")
             val startTime = ref("")
             val endTime = ref("")
             val imei = ref<String?>("")
-            val groupedTrips = computed(fun(): UTSArray<GroupType> {
-                val groups = _uA<GroupType>()
-                val tripsByDate: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("tripsByDate", "pages/mileageRecord/mileageRecord.uvue", 93, 9))
-                tripData.value.forEach(fun(trip){
-                    val startTimeStr = if (trip.startTime != null) {
-                        trip.startTime.toString()
-                    } else {
-                        ""
-                    }
-                    val endTimeStr = if (trip.endTime != null) {
-                        trip.endTime.toString()
-                    } else {
-                        ""
-                    }
-                    val startTimeParts = startTimeStr.split(" ")
-                    val endTimeParts = endTimeStr.split(" ")
-                    val date = if (startTimeParts.length > 0 && startTimeParts[0].length > 0) {
-                        startTimeParts[0]
+            val groupedTrips = computed<UTSArray<GroupType>>(fun(): UTSArray<GroupType> {
+                val dateGroups: UTSArray<DateTripGroup> = _uA()
+                tripData.value.forEach(fun(trip: UTSJSONObject): Unit {
+                    val startTimeStr = trip.getString("startTime", "")
+                    val endTimeStr = trip.getString("endTime", "")
+                    val startParts = startTimeStr.split(" ")
+                    val endParts = endTimeStr.split(" ")
+                    val date = if (startParts.length > 0 && startParts[0] != "") {
+                        startParts[0]
                     } else {
                         "未知日期"
                     }
-                    if (!isTruthy(tripsByDate[date])) {
-                        tripsByDate[date] = _uA()
-                    }
-                    val startHour = if (startTimeParts.length > 1) {
-                        startTimeParts[1]
+                    trip.set("startHour", if (startParts.length > 1) {
+                        startParts[1]
                     } else {
                         ""
                     }
-                    val endHour = if (endTimeParts.length > 1) {
-                        endTimeParts[1]
+                    )
+                    trip.set("endHour", if (endParts.length > 1) {
+                        endParts[1]
                     } else {
                         ""
                     }
-                    tripsByDate[date].push(UTSJSONObject.assign(_uO(), trip, _uO("startHour" to startHour, "endHour" to endHour)))
+                    )
+                    var group = dateGroups.find(fun(item: DateTripGroup): Boolean {
+                        return item.date == date
+                    }
+                    )
+                    if (group == null) {
+                        group = DateTripGroup(date = date, trips = _uA<UTSJSONObject>())
+                        dateGroups.push(group)
+                    }
+                    group.trips.push(trip)
                 }
                 )
-                for(date in resolveUTSKeyIterator(tripsByDate)){
-                    val trips = tripsByDate[date]
+                val groups: UTSArray<GroupType> = _uA()
+                dateGroups.forEach(fun(dateGroup: DateTripGroup): Unit {
+                    dateGroup.trips.sort(fun(a: UTSJSONObject, b: UTSJSONObject): Number {
+                        return Date(b.getString("startTime", "")).getTime() - Date(a.getString("startTime", "")).getTime()
+                    }
+                    )
                     var totalDistance: Number = 0
-                    val sortedTrips = trips.sort(fun(a, b): Number {
-                        return Date(b.startTime).getTime() - Date(a.startTime).getTime()
+                    dateGroup.trips.forEach(fun(trip: UTSJSONObject): Unit {
+                        totalDistance += trip.getNumber("distance", 0)
                     }
                     )
-                    sortedTrips.forEach(fun(trip){
-                        totalDistance += if (isTruthy(trip.distance)) {
-                            trip.distance
-                        } else {
-                            0
-                        }
-                    }
-                    )
-                    groups.push(GroupType(date = date, trips = sortedTrips, totalDistance = totalDistance))
+                    groups.push(GroupType(date = dateGroup.date, trips = dateGroup.trips, totalDistance = totalDistance))
                 }
-                return groups.sort(fun(a, b): Number {
+                )
+                return groups.sort(fun(a: GroupType, b: GroupType): Number {
                     return Date(b.date).getTime() - Date(a.date).getTime()
                 }
                 )
             }
             )
+            val getTripStartTime = fun(trip: UTSJSONObject): String {
+                return trip.getString("startTime", "")
+            }
+            val getTripEndTime = fun(trip: UTSJSONObject): String {
+                return trip.getString("endTime", "")
+            }
+            val getTripHourRange = fun(trip: UTSJSONObject): String {
+                return trip.getString("startHour", "") + "-" + trip.getString("endHour", "")
+            }
+            val getTripDistanceText = fun(trip: UTSJSONObject): String {
+                return (trip.getNumber("distance", 0) / 1000).toFixed(2)
+            }
+            val getTripDuration = fun(trip: UTSJSONObject): Number {
+                return trip.getNumber("duration", 0)
+            }
             val totalTrips = computed(fun(): Number {
                 return tripData.value.length
             }
             )
-            onMounted(fun(){
-                initDateTime()
-                loadMileageData()
+            val initDateTime = fun(){
+                val now = Date()
+                val formatTime = fun(date: Date): String {
+                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
+                    val day = date.getDate().toString(10).padStart(2, "0")
+                    val hours = date.getHours().toString(10).padStart(2, "0")
+                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
+                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
+                    return "" + date.getFullYear() + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
+                }
+                endTime.value = formatTime(now)
+                val startDate = Date(now.getTime() - 86400000)
+                startTime.value = formatTime(startDate)
             }
-            )
-            onLoad(fun(option){
-                imei.value = option["imei"]
-                carStatus.value = option["connectionStatus"]
-                plateNo.value = option["plateNo"]
-                carType.value = option["carType"]
-            }
-            )
-            val gotoTripDetail = fun(startTime: String, endTime: String){
-                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?startTime=" + startTime + "&endTime=" + endTime + "&imei=" + imei.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value))
+            val processTripData = fun(data: UTSJSONObject): Unit {
+                val trips = data.getArray<UTSJSONObject>("trips")
+                if (trips != null && trips.length > 0) {
+                    tripData.value = trips
+                    var totalDistance: Number = 0
+                    var totalAvgSpeed: Number = 0
+                    trips.forEach(fun(trip: UTSJSONObject): Unit {
+                        totalDistance += trip.getNumber("distance", 0)
+                        totalAvgSpeed += trip.getNumber("averageSpeed", 0)
+                    })
+                    totalMileage.value = totalDistance
+                    averageSpeed.value = totalAvgSpeed / trips.length
+                } else {
+                    tripData.value = _uA()
+                    totalMileage.value = 0
+                    averageSpeed.value = 0
+                }
             }
             val loadMileageData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
@@ -122,15 +149,16 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             return@w1
                         }
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 174, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
-                            val res = await(getTrackPos(data))
-                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:184")
-                            if (isTruthy(res) && isTruthy(res.data)) {
-                                await(processTripData(res.data))
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 187, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                            val res = await(getTrackPos(data)) as UTSJSONObject
+                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:197")
+                            val trackData = res.getJSON("data")
+                            if (trackData != null) {
+                                processTripData(trackData)
                             }
                         }
                          catch (e: Throwable) {
-                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:189")
+                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:203")
                             uni_showToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {
@@ -138,47 +166,20 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                         }
                 })
             }
-            val processTripData = fun(data: Any): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        if (isTruthy(data.trips) && data.trips.length > 0) {
-                            val processedTrips = await(UTSPromise.all(data.trips.map(fun(trip: Any): UTSPromise<Any> {
-                                return wrapUTSPromise(suspend w2@{
-                                        return@w2 UTSJSONObject.assign(_uO(), trip, _uO("startAddress" to "查看位置", "endAddress" to "查看位置"))
-                                })
-                            })))
-                            tripData.value = processedTrips
-                            var totalDistance: Number = 0
-                            var totalDuration: Number = 0
-                            var totalAvgSpeed: Number = 0
-                            processedTrips.forEach(fun(trip: Any){
-                                totalDistance += if (isTruthy(trip.distance)) {
-                                    trip.distance
-                                } else {
-                                    0
-                                }
-                                totalDuration += if (isTruthy(trip.duration)) {
-                                    trip.duration
-                                } else {
-                                    0
-                                }
-                                totalAvgSpeed += if (isTruthy(trip.averageSpeed)) {
-                                    trip.averageSpeed
-                                } else {
-                                    0
-                                }
-                            })
-                            totalMileage.value = totalDistance
-                            averageSpeed.value = if (processedTrips.length > 0) {
-                                totalAvgSpeed / processedTrips.length
-                            } else {
-                                0
-                            }
-                        } else {
-                            tripData.value = _uA()
-                            totalMileage.value = 0
-                            averageSpeed.value = 0
-                        }
-                })
+            onMounted(fun(){
+                initDateTime()
+                loadMileageData()
+            }
+            )
+            onLoad(fun(option){
+                imei.value = option["imei"] ?: null
+                carStatus.value = option["connectionStatus"] ?: "在线"
+                plateNo.value = option["plateNo"] ?: ""
+                carType.value = option["carType"] ?: ""
+            }
+            )
+            val gotoTripDetail = fun(startTime: String, endTime: String){
+                uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?startTime=" + startTime + "&endTime=" + endTime + "&imei=" + imei.value + "&connectionStatus=" + carStatus.value + "&plateNo=" + plateNo.value + "&carType=" + carType.value))
             }
             val formatDisplayTime = fun(timeString: String): String {
                 if (!(timeString != "")) {
@@ -197,15 +198,6 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 } else {
                     return "" + seconds % 60 + "秒"
                 }
-            }
-            val initDateTime = fun(){
-                val now = Date()
-                val formatTime = fun(date: Date): String {
-                    return "" + date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0") + " " + String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0") + ":" + String(date.getSeconds()).padStart(2, "0")
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
             }
             val showPicker = fun(type: String){
                 currentPickerType.value = type
@@ -316,15 +308,15 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                         _cE("view", _uM("class" to "group-separator")),
                                         _cE(Fragment, null, RenderHelpers.renderList(group.trips, fun(item, index, __index, _cached): Any {
                                             return _cE("view", _uM("key" to index, "class" to "trip-item", "onClick" to fun(){
-                                                gotoTripDetail(item.startTime, item.endTime)
+                                                gotoTripDetail(getTripStartTime(item), getTripEndTime(item))
                                             }
                                             ), _uA(
                                                 _cE("view", _uM("class" to "trip-index"), _uA(
                                                     _cE("text", _uM("class" to "icon"), _tD(index + 1), 1),
                                                     _cE("view", _uM("class" to "trip-distance-time"), _uA(
-                                                        _cE("text", null, _tD(item.startHour) + "-" + _tD(item.endHour), 1),
-                                                        _cE("text", null, _tD((item.distance / 1000).toFixed(2)) + " km", 1),
-                                                        _cE("text", null, _tD(formatDuration(item.duration)), 1)
+                                                        _cE("text", null, _tD(getTripHourRange(item)), 1),
+                                                        _cE("text", null, _tD(getTripDistanceText(item)) + " km", 1),
+                                                        _cE("text", null, _tD(formatDuration(getTripDuration(item))), 1)
                                                     ))
                                                 ))
                                             ), 8, _uA(

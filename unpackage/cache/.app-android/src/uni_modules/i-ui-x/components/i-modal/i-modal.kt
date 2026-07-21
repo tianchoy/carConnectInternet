@@ -23,22 +23,22 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
     open var showCancelButton: Boolean by `$props`
     open var confirmColor: String by `$props`
     open var cancelColor: String by `$props`
-    open var duration: Any by `$props`
+    open var duration: Number by `$props`
     open var buttonReverse: Boolean by `$props`
     open var zoom: Boolean by `$props`
-    open var zIndex: Any by `$props`
+    open var zIndex: Number by `$props`
     open var asyncClose: Boolean by `$props`
     open var closeable: Boolean by `$props`
     open var closeOnMask: Boolean by `$props`
-    open var negativeTop: Any by `$props`
-    open var width: Any by `$props`
+    open var negativeTop: String by `$props`
+    open var width: String by `$props`
     open var confirmButtonShape: String by `$props`
-    open var round: Any by `$props`
+    open var round: String by `$props`
     open var buttonModel: String by `$props`
     open var buttonRadius: String by `$props`
     open var confirmBgColor: String by `$props`
     open var cancelBgColor: String by `$props`
-    open var customStyle: Any by `$props`
+    open var customStyle: String by `$props`
     open var open: () -> Unit
         get() {
             return unref(this.`$exposed`["open"]) as () -> Unit
@@ -64,17 +64,50 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_formatMs_fn(value: Number): String {
+                return value.toString(10) + "ms"
+            }
+            val formatMs = ::gen_formatMs_fn
+            fun gen_formatSize_fn(value: String): String {
+                if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
+                    return value
+                }
+                return value + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
+            fun gen_stringifyStyle_fn(value: String): String {
+                if (value.length == 0) {
+                    return ""
+                }
+                return if (value.endsWith(";")) {
+                    value
+                } else {
+                    value + ";"
+                }
+            }
+            val stringifyStyle = ::gen_stringifyStyle_fn
+            fun gen_animationDuration_fn(): Number {
+                return props.duration
+            }
+            val animationDuration = ::gen_animationDuration_fn
             val opened = ref(props.show)
             val active = ref(props.show)
             val loading = ref(false)
             var closeTimer: Number = 0
             val maskStyle = computed(fun(): String {
-                return ("z-index:" + String(props.zIndex) + ";opacity:" + (if (active.value) {
+                return ("z-index:" + props.zIndex.toString(10) + ";opacity:" + (if (props.show || active.value) {
                     "1"
                 } else {
                     "0"
                 }
                 ) + ";transition-duration:" + formatMs(props.duration) + ";")
+            }
+            )
+            val visibleMaskStyle = computed(fun(): String {
+                if (props.show && !opened.value) {
+                    return "z-index:" + props.zIndex.toString(10) + ";opacity:1;transition-duration:" + formatMs(props.duration) + ";"
+                }
+                return maskStyle.value
             }
             )
             val modalClass = computed(fun(): String {
@@ -90,7 +123,7 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 style = style + "transition-duration:" + formatMs(props.duration) + ";"
                 val top = formatSize(props.negativeTop)
                 val scaleValue = if (props.zoom) {
-                    if (active.value) {
+                    if (props.show || active.value) {
                         "1"
                     } else {
                         "0.86"
@@ -103,7 +136,7 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 } else {
                     "0px"
                 }
-                style = style + "opacity:" + (if (active.value) {
+                style = style + "opacity:" + (if (props.show || active.value) {
                     "1"
                 } else {
                     "0"
@@ -112,6 +145,10 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 style = style + "transform:translateY(" + translateValue + ") scale(" + scaleValue + ");"
                 style = style + stringifyStyle(props.customStyle)
                 return style
+            }
+            )
+            val visibleModalStyle = computed(fun(): String {
+                return modalStyle.value
             }
             )
             val confirmButtonClass = computed(fun(): String {
@@ -169,26 +206,13 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 return style
             }
             )
-            watch(fun(){
-                return props.show
-            }
-            , fun(nextValue){
-                if (nextValue) {
-                    openPanel()
-                } else {
-                    closePanel(false)
+            fun gen_clearCloseTimer_fn() {
+                if (closeTimer > 0) {
+                    clearTimeout(closeTimer)
+                    closeTimer = 0
                 }
             }
-            )
-            fun gen_open_fn() {
-                openPanel()
-                emit("update:show", true)
-            }
-            val open = ::gen_open_fn
-            fun gen_close_fn() {
-                closePanel(true)
-            }
-            val close = ::gen_close_fn
+            val clearCloseTimer = ::gen_clearCloseTimer_fn
             fun gen_openPanel_fn() {
                 clearCloseTimer()
                 opened.value = true
@@ -212,28 +236,15 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 , animationDuration())
             }
             val closePanel = ::gen_closePanel_fn
-            fun gen_clearCloseTimer_fn() {
-                if (closeTimer > 0) {
-                    clearTimeout(closeTimer)
-                    closeTimer = 0
-                }
+            fun gen_open_fn() {
+                openPanel()
+                emit("update:show", true)
             }
-            val clearCloseTimer = ::gen_clearCloseTimer_fn
-            fun gen_animationDuration_fn(): Number {
-                val text = String(props.duration)
-                if (text.indexOf("ms") >= 0) {
-                    return Number(text.replace("ms", ""))
-                }
-                if (text.indexOf("s") >= 0) {
-                    return Number(text.replace("s", "")) * 1000
-                }
-                val duration = Number(text)
-                if (isNaN(duration)) {
-                    return 200
-                }
-                return duration
+            val open = ::gen_open_fn
+            fun gen_close_fn() {
+                closePanel(true)
             }
-            val animationDuration = ::gen_animationDuration_fn
+            val close = ::gen_close_fn
             fun gen_confirm_fn() {
                 if (loading.value) {
                     return
@@ -264,42 +275,16 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
                 closePanel(true)
             }
             val handleOverlayClick = ::gen_handleOverlayClick_fn
-            fun gen_formatMs_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("ms") >= 0 || text.indexOf("s") >= 0) {
-                    return text
-                }
-                return text + "ms"
-            }
-            val formatMs = ::gen_formatMs_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            fun gen_stringifyStyle_fn(value): String {
-                if (value == null) {
-                    return ""
-                }
-                val text = String(value)
-                if (text == "[object Object]" || text.length == 0) {
-                    return ""
-                }
-                return if (text.endsWith(";")) {
-                    text
-                } else {
-                    text + ";"
-                }
-            }
-            val stringifyStyle = ::gen_stringifyStyle_fn
             __expose(_uM("open" to open, "close" to close))
             return fun(): Any? {
-                return if (isTrue(opened.value)) {
-                    _cE("view", _uM("key" to 0, "class" to "i-modal__mask", "style" to _nS(maskStyle.value), "onClick" to handleOverlayClick), _uA(
-                        _cE("view", _uM("class" to _nC(modalClass.value), "style" to _nS(modalStyle.value), "onClick" to withModifiers(fun(){}, _uA(
+                return if (isTrue(if (isTruthy(_ctx.show)) {
+                    _ctx.show
+                } else {
+                    opened.value
+                }
+                )) {
+                    _cE("view", _uM("key" to 0, "class" to "i-modal__mask", "style" to _nS(visibleMaskStyle.value), "onClick" to handleOverlayClick), _uA(
+                        _cE("view", _uM("class" to _nC(modalClass.value), "style" to _nS(visibleModalStyle.value), "onClick" to withModifiers(fun(){}, _uA(
                             "stop"
                         ))), _uA(
                             if (isTrue(_ctx.closeable)) {
@@ -403,25 +388,7 @@ open class GenUniModulesIUiXComponentsIModalIModal : VueComponent {
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("confirm" to null, "cancel" to null, "close" to null, "update:show" to null)
-        var props = _nP(_uM("show" to _uM("type" to "Boolean", "default" to false), "title" to _uM("type" to "String", "default" to ""), "content" to _uM("type" to "String", "default" to ""), "confirmText" to _uM("type" to "String", "default" to "确认"), "cancelText" to _uM("type" to "String", "default" to "取消"), "showConfirmButton" to _uM("type" to "Boolean", "default" to true), "showCancelButton" to _uM("type" to "Boolean", "default" to false), "confirmColor" to _uM("type" to "String", "default" to "#2979ff"), "cancelColor" to _uM("type" to "String", "default" to "#606266"), "duration" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to 200), "buttonReverse" to _uM("type" to "Boolean", "default" to false), "zoom" to _uM("type" to "Boolean", "default" to true), "zIndex" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to 10075), "asyncClose" to _uM("type" to "Boolean", "default" to false), "closeable" to _uM("type" to "Boolean", "default" to false), "closeOnMask" to _uM("type" to "Boolean", "default" to false), "negativeTop" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to 0), "width" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to "320px"), "confirmButtonShape" to _uM("type" to "String", "default" to "100px"), "round" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to "6px"), "buttonModel" to _uM("type" to "String", "default" to "text"), "buttonRadius" to _uM("type" to "String", "default" to "100px"), "confirmBgColor" to _uM("type" to "String", "default" to ""), "cancelBgColor" to _uM("type" to "String", "default" to ""), "customStyle" to _uM("type" to _uA(
-            "String",
-            "Object"
-        ), "default" to "")))
+        var props = _nP(_uM("show" to _uM("type" to "Boolean", "default" to false), "title" to _uM("type" to "String", "default" to ""), "content" to _uM("type" to "String", "default" to ""), "confirmText" to _uM("type" to "String", "default" to "确认"), "cancelText" to _uM("type" to "String", "default" to "取消"), "showConfirmButton" to _uM("type" to "Boolean", "default" to true), "showCancelButton" to _uM("type" to "Boolean", "default" to false), "confirmColor" to _uM("type" to "String", "default" to "#2979ff"), "cancelColor" to _uM("type" to "String", "default" to "#606266"), "duration" to _uM("type" to "Number", "default" to 200), "buttonReverse" to _uM("type" to "Boolean", "default" to false), "zoom" to _uM("type" to "Boolean", "default" to true), "zIndex" to _uM("type" to "Number", "default" to 10075), "asyncClose" to _uM("type" to "Boolean", "default" to false), "closeable" to _uM("type" to "Boolean", "default" to false), "closeOnMask" to _uM("type" to "Boolean", "default" to false), "negativeTop" to _uM("type" to "String", "default" to "0px"), "width" to _uM("type" to "String", "default" to "320px"), "confirmButtonShape" to _uM("type" to "String", "default" to "100px"), "round" to _uM("type" to "String", "default" to "6px"), "buttonModel" to _uM("type" to "String", "default" to "text"), "buttonRadius" to _uM("type" to "String", "default" to "100px"), "confirmBgColor" to _uM("type" to "String", "default" to ""), "cancelBgColor" to _uM("type" to "String", "default" to ""), "customStyle" to _uM("type" to "String", "default" to "")))
         var propsNeedCastKeys = _uA(
             "show",
             "title",

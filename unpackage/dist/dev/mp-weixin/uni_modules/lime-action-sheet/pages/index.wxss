@@ -1,0 +1,183 @@
+@import "../../../uvue.wxss";
+:host{display:flex;flex-direction:column}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.l-action-sheet {
+  color: var(--l-action-sheet-color, var(--l-text-color-1, #000000E0));
+  border-top-left-radius: var(--l-action-sheet-border-radius, var(--l-border-radius-lg, 9px));
+  border-top-right-radius: var(--l-action-sheet-border-radius, var(--l-border-radius-lg, 9px));
+}
+.l-action-sheet__item {
+  height: var(--l-action-sheet-item-height, 56px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  padding: 0 16px;
+}
+.l-action-sheet__item-text {
+  color: var(--l-action-sheet-color, var(--l-text-color-1, #000000E0));
+  font-size: var(--l-action-sheet-font-size, var(--l-font-size-md, 16px));
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.l-action-sheet__item-icon {
+  color: var(--l-action-sheet-color, var(--l-text-color-1, #000000E0));
+  font-size: var(--l-action-sheet-font-size, var(--l-font-size-md, 16px));
+}
+.l-action-sheet__item--hover {
+  background-color: var(--l-action-sheet-hover-color, var(--l-gray-3, #e7e7e7));
+}
+.l-action-sheet__item--left {
+  justify-content: flex-start;
+}
+.l-action-sheet__item--disabled {
+  opacity: 0.5;
+}
+.l-action-sheet__item--bordered:before {
+  position: absolute;
+  box-sizing: border-box;
+  content: " ";
+  pointer-events: none;
+  transform-origin: center;
+  /* cover wechat button:after default transforn-origin */
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid var(--l-action-sheet-border-color, var(--l-border-color-2, var(--l-gray-3, #e7e7e7)));
+  transform: scaleY(0.5);
+  transform: scaleY(0.8);
+}
+.l-action-sheet__gap {
+  height: var(--l-action-sheet-gap-height, var(--l-spacer-xs, 8px));
+  background-color: var(--l-action-sheet-gap-color, var(--l-bg-color-page, var(--l-gray-1, #f3f3f3)));
+}
+.l-action-sheet__cancel {
+  display: flex;
+  background-color: var(--l-action-sheet-cancel-bg-color, var(--l-bg-color-container, #fff));
+  height: var(--l-action-sheet-cancel-height, 48px);
+  justify-content: center;
+  align-items: center;
+  box-sizing: content-box;
+}
+.l-action-sheet__cancel--hover {
+  background-color: var(--l-action-sheet-hover-color, var(--l-gray-3, #e7e7e7));
+}
+.l-action-sheet__cancel-text {
+  color: var(--l-action-sheet-cancel-color, var(--l-text-color-1, #000000E0));
+  font-size: var(--l-action-sheet-font-size, var(--l-font-size-md, 16px));
+}
+.l-action-sheet__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  padding-top: var(--l-action-sheet-title-padding, var(--l-spacer, 16px));
+  padding-right: var(--l-action-sheet-title-padding, var(--l-spacer, 16px));
+  padding-bottom: var(--l-action-sheet-title-padding, var(--l-spacer, 16px));
+  padding-left: var(--l-action-sheet-title-padding, var(--l-spacer, 16px));
+  position: relative;
+}
+.l-action-sheet__title-text {
+  font-size: var(--l-action-sheet-title-font-size, 18px);
+  font-weight: var(--l-action-sheet-title-font-weight, 700);
+  color: var(--l-action-sheet-title-color, var(--l-text-color-1, #000000E0));
+}
+.l-action-sheet__title:focus {
+  outline: 0;
+}
+.l-action-sheet__close-btn {
+  font-family: l;
+  position: absolute;
+  top: var(--l-action-sheet-close-btn-spacing, var(--l-spacer, 16px));
+  right: var(--l-action-sheet-close-btn-spacing, var(--l-spacer, 16px));
+  font-size: var(--l-action-sheet-close-btn-font-size, 20px);
+  color: var(--l-action-sheet-close-btn-color, var(--l-text-color-1, #000000E0));
+}
+.l-action-sheet__description {
+  color: var(--l-action-sheet-description-color, var(--l-text-color-3, #00000073));
+  line-height: var(--l-action-sheet-description-line-height, 22px);
+  font-size: var(--l-action-sheet-description-font-size, var(--l-font-size, 14px));
+  text-align: var(--l-action-sheet-text-align, center);
+  padding-top: var(--l-action-sheet-description-padding-y, 12px);
+  padding-right: var(--l-action-sheet-description-padding-x, 16px);
+  padding-bottom: var(--l-action-sheet-description-padding-y, 12px);
+  padding-left: var(--l-action-sheet-description-padding-x, 16px);
+  border-bottom-width: 0.5px;
+  border-bottom-style: solid;
+  border-bottom-color: var(--l-action-sheet-border-color, var(--l-border-color-2, var(--l-gray-3, #e7e7e7)));
+}
+.l-action-sheet__description--left {
+  text-align: left;
+}
+.l-action-sheet__wrap {
+  display: flex;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  width: -webkit-fit-content;
+  width: fit-content;
+  min-width: 100%;
+}
+.l-action-sheet__row--border {
+  position: relative;
+}
+.l-action-sheet__row--border:before {
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--l-action-sheet-border-color, var(--l-border-color-2, var(--l-gray-3, #e7e7e7)));
+}
+.l-action-sheet__col {
+  justify-content: center;
+  align-items: center;
+}
+.l-action-sheet__col--evenly {
+  flex: 1;
+}
+.l-action-sheet__col-text {
+  color: var(--l-action-sheet-color, var(--l-text-color-1, #000000E0));
+  padding-top: var(--l-action-sheet-col-text-padding, var(--l-spacer-sm, 12px));
+  font-size: var(--l-action-sheet-col-font-size, var(--l-font-size-sm, 12px));
+}
+.l-action-sheet__col-icon {
+  font-size: var(--l-action-sheet-icon-size, 24px);
+  color: var(--l-action-sheet-color, var(--l-text-color-1, #000000E0));
+}
+.l-action-sheet__image {
+  width: var(--l-action-sheet-image-size, 48px);
+  height: var(--l-action-sheet-image-size, 48px);
+  margin: 0 16px;
+  background-color: var(--l-action-sheet-image-bg-color, var(--l-fill-3, #0000000A));
+  border-radius: 99px;
+}
+.l-action-sheet__image--center {
+  justify-content: center;
+  align-items: center;
+}

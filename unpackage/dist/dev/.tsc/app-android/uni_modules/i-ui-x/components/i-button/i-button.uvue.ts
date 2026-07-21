@@ -205,19 +205,34 @@ const lastClickTime = ref(0)
 const loadingAngle = ref(0)
 let loadingTimer = 0
 
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 const normalizedType = computed(() => {
   if (props.type == 'danger') return 'error'
   return props.type
 })
 
 const contentText = computed(() => {
-  return String(props.text).length > 0 ? String(props.text) : ''
+  if (props.text == null) return ''
+  return props.text.toString()
 })
 
 const computedHoverClass = computed(() => {
   if (props.disabled || props.loading) return 'none'
   return props.hoverClass
 })
+
+function normalizeNumber(value: string | number): number {
+  if (typeof value == 'number') return value
+  return Number.from(parseFloat(value))
+}
+
+const hoverStartTimeValue = computed(() : number => normalizeNumber(props.hoverStartTime))
+const hoverStayTimeValue = computed(() : number => normalizeNumber(props.hoverStayTime))
 
 const useNativeButton = computed(() => {
   return props.openType.length > 0 || props.formType.length > 0
@@ -293,14 +308,31 @@ const loadingStyle = computed(() => {
     ';height:' +
     size +
     ';transform:rotate(' +
-    String(loadingAngle.value) +
+    loadingAngle.value.toString() +
     'deg);'
   )
 })
 
+function startLoading(): void {
+  if (loadingTimer > 0) return
+  loadingTimer = setInterval(() => {
+    let angle = (loadingAngle.value + 24) % 360
+    if (angle < 0) angle = angle + 360
+    loadingAngle.value = angle
+  }, 50)
+}
+
+function stopLoading(): void {
+  if (loadingTimer > 0) {
+    clearInterval(loadingTimer)
+    loadingTimer = 0
+  }
+  loadingAngle.value = 0
+}
+
 watch(
-  () => props.loading,
-  (nextValue) => {
+  () : boolean => props.loading,
+  (nextValue : boolean) : void => {
     if (nextValue) {
       startLoading()
     } else {
@@ -317,69 +349,42 @@ onUnmounted(() => {
   stopLoading()
 })
 
-function startLoading() {
-  if (loadingTimer > 0) return
-  loadingTimer = setInterval(() => {
-    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
-  }, 50)
-}
-
-function stopLoading() {
-  if (loadingTimer > 0) {
-    clearInterval(loadingTimer)
-    loadingTimer = 0
-  }
-  loadingAngle.value = 0
-}
-
-function normalizeAngle(value: number): number {
-  let angle = value % 360
-  if (angle < 0) angle = angle + 360
-  return angle
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
-
-function canClick() {
+function canClick(): boolean {
   if (props.disabled || props.loading) return false
-  const wait = Number(props.throttleTime)
-  if (wait <= 0) return true
+  const wait = normalizeNumber(props.throttleTime)
+  if (wait <= 0 || isNaN(wait)) return true
   const now = Date.now()
   if (now - lastClickTime.value < wait) return false
   lastClickTime.value = now
   return true
 }
 
-function handleClick(event) {
+function handleClick(event: any): void {
   if (!canClick()) return
   emit('click', event)
 }
 
-function handleGetPhoneNumber(event) {
+function handleGetPhoneNumber(event: any): void {
   emit('getphonenumber', event)
 }
 
-function handleGetUserInfo(event) {
+function handleGetUserInfo(event: any): void {
   emit('getuserinfo', event)
 }
 
-function handleError(event) {
+function handleError(event: any): void {
   emit('error', event)
 }
 
-function handleOpenSetting(event) {
+function handleOpenSetting(event: any): void {
   emit('opensetting', event)
 }
 
-function handleLaunchApp(event) {
+function handleLaunchApp(event: any): void {
   emit('launchapp', event)
 }
 
-function handleAgreePrivacyAuthorization(event) {
+function handleAgreePrivacyAuthorization(event: any): void {
   emit('agreeprivacyauthorization', event)
 }
 
@@ -396,8 +401,8 @@ return (): any | null => {
         "app-parameter": _ctx.appParameter,
         "hover-class": computedHoverClass.value,
         "hover-stop-propagation": _ctx.hoverStopPropagation,
-        "hover-start-time": Number(_ctx.hoverStartTime),
-        "hover-stay-time": Number(_ctx.hoverStayTime),
+        "hover-start-time": hoverStartTimeValue.value,
+        "hover-stay-time": hoverStayTimeValue.value,
         lang: _ctx.lang,
         "session-from": _ctx.sessionFrom,
         "send-message-title": _ctx.sendMessageTitle,
@@ -456,8 +461,8 @@ return (): any | null => {
         style: _nS(buttonStyle.value),
         "hover-class": computedHoverClass.value,
         "hover-stop-propagation": _ctx.hoverStopPropagation,
-        "hover-start-time": Number(_ctx.hoverStartTime),
-        "hover-stay-time": Number(_ctx.hoverStayTime),
+        "hover-start-time": hoverStartTimeValue.value,
+        "hover-stay-time": hoverStayTimeValue.value,
         "data-name": _ctx.dataName,
         onClick: handleClick
       }), [

@@ -12,31 +12,50 @@ const _cache = __ins.renderCache;
 	const webviewUrl = ref('')
 	const emptyImage = '/static/empty.png'
 	
+	// 从 URL 中提取标题
+	function extractTitleFromUrl(url : string) : string {
+		let hostname = url
+		const protocolIndex = hostname.indexOf('://')
+		if (protocolIndex >= 0) {
+			hostname = hostname.substring(protocolIndex + 3)
+		}
+		const pathIndex = hostname.indexOf('/')
+		if (pathIndex >= 0) {
+			hostname = hostname.substring(0, pathIndex)
+		}
+		if (hostname.startsWith('www.')) {
+			hostname = hostname.substring(4)
+		}
+		return hostname
+	}
+
 	// 页面加载
 	onLoad((options) => {
-		console.log('接收到的参数:', options, " at pages/webview/webview.uvue:25")
-		
-		if (options.url) {
-			// 解码 URL
-			let decodedUrl = UTSAndroid.consoleDebugError(decodeURIComponent(options.url), " at pages/webview/webview.uvue:29")
-			
+		console.log('接收到的参数:', options, " at pages/webview/webview.uvue:42")
+
+		const optionData = options as UTSJSONObject
+		const url : string = optionData.getString('url', '') ?? ''
+		const pageTitle : string = optionData.getString('title', '') ?? ''
+		if (url != '') {
+			// decodeURIComponent 在 UTS 中返回可空字符串，使用空字符串作为回退值。
+			let decodedUrl : string = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:49") ?? ''
+
 			// 添加协议前缀（如果没有的话）
 			if (!decodedUrl.startsWith('http://') && !decodedUrl.startsWith('https://')) {
 				decodedUrl = 'https://' + decodedUrl
 			}
-			
+
 			webviewUrl.value = decodedUrl
-			
+
 			// 设置导航栏标题
-			if (options.title) {
+			if (pageTitle != '') {
 				uni.setNavigationBarTitle({
-					title: UTSAndroid.consoleDebugError(decodeURIComponent(options.title), " at pages/webview/webview.uvue:41")
+					title: UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:61") ?? ''
 				})
 			} else {
-				// 从 URL 中提取标题
-				const title = extractTitleFromUrl(decodedUrl)
+				const extractedTitle = extractTitleFromUrl(decodedUrl)
 				uni.setNavigationBarTitle({
-					title: title || '网页加载中...'
+					title: extractedTitle != '' ? extractedTitle : '网页加载中...'
 				})
 			}
 		} else {
@@ -46,28 +65,16 @@ const _cache = __ins.renderCache;
 			})
 		}
 	})
-	
-	// 从 URL 中提取标题
-	const extractTitleFromUrl = (url) => {
-		try {
-			const urlObj = new URL(url)
-			const hostname = urlObj.hostname
-			// 移除 www. 前缀
-			return hostname.replace(/^www\./, '')
-		} catch (e) {
-			return ''
-		}
-	}
-	
+
 	// webview 加载成功
-	const handleLoad = (e) => {
-		console.log('网页加载成功', e, " at pages/webview/webview.uvue:72")
+	const handleLoad = (e : any) : void => {
+		console.log('网页加载成功', e, " at pages/webview/webview.uvue:79")
 		uni.hideLoading()
 	}
 	
 	// webview 加载错误
-	const handleError = (e) => {
-		console.error('网页加载失败', e, " at pages/webview/webview.uvue:78")
+	const handleError = (e : any) : void => {
+		console.error('网页加载失败', e, " at pages/webview/webview.uvue:85")
 		uni.showToast({
 			title: '页面加载失败',
 			icon: 'none'
@@ -75,14 +82,9 @@ const _cache = __ins.renderCache;
 	}
 	
 	// 接收网页传递的消息（如果网页调用了 postMessage）
-	const handleMessage = (e) => {
-		console.log('接收网页消息:', e.detail, " at pages/webview/webview.uvue:87")
-		const data = e.detail.data
-		if (data && data.length > 0) {
-			// 处理网页传来的消息
-			const lastMessage = data[data.length - 1]
-			console.log('最后一条消息:', lastMessage, " at pages/webview/webview.uvue:92")
-		}
+	const handleMessage = (e : UTSJSONObject) : void => {
+		const detail = e.getJSON('detail')
+		console.log('接收网页消息:', detail, " at pages/webview/webview.uvue:95")
 	}
 	
 	// 返回上一页
@@ -92,13 +94,6 @@ const _cache = __ins.renderCache;
 		})
 	}
 	
-	// 页面分享配置（可选）
-	onShareAppMessage(() => {
-		return {
-			title: '产品商城',
-			path: `/pages/webview/webview?url=${UTSAndroid.consoleDebugError(encodeURIComponent(webviewUrl.value), " at pages/webview/webview.uvue:107")}`
-		}
-	})
 
 return (): any | null => {
 

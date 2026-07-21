@@ -39,58 +39,56 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            val bgColor = computed(fun(): String {
-                return props.bgColor
+            fun gen_valueText_fn(value: Any): String {
+                if (UTSAndroid.`typeof`(value) == "string") {
+                    return value as String
+                }
+                if (UTSAndroid.`typeof`(value) == "number" || UTSAndroid.`typeof`(value) == "boolean") {
+                    return (value as Any).toString()
+                }
+                return ""
             }
-            )
-            val selected = ref(-1)
-            val gridStyle = computed(fun(): String {
-                return ("width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";")
-            }
-            )
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
+            val valueText = ::gen_valueText_fn
+            fun formatSize(value: Any): String {
+                val text = value.toString()
                 if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto") {
                     return text
                 }
                 return text + "px"
             }
-            val formatSize = ::gen_formatSize_fn
-            fun gen_itemValue_fn(item, keyName): String {
-                if (item == null) {
+            fun gen_itemValue_fn(item: Any, keyName: String): String {
+                if (item == null || UTSAndroid.`typeof`(item) != "object") {
                     return ""
                 }
-                if (UTSAndroid.`typeof`(item) == "object") {
-                    val value = item[keyName]
-                    if (value == null) {
-                        return ""
-                    }
-                    return String(value)
+                val values = item as UTSJSONObject
+                val value = values[keyName]
+                if (value == null) {
+                    return ""
                 }
-                return ""
+                return valueText(value as Any)
             }
             val itemValue = ::gen_itemValue_fn
-            fun gen_getItemText_fn(item): String {
+            fun gen_getItemText_fn(item: Any): String {
                 val text = itemValue(item, "text")
                 if (text.length > 0) {
                     return text
                 }
-                return String(item)
+                return valueText(item)
             }
             val getItemText = ::gen_getItemText_fn
-            fun gen_getItemIcon_fn(item): String {
+            fun gen_getItemIcon_fn(item: Any): String {
                 return itemValue(item, "icon")
             }
             val getItemIcon = ::gen_getItemIcon_fn
-            fun gen_getItemImage_fn(item): String {
+            fun gen_getItemImage_fn(item: Any): String {
                 return itemValue(item, "image")
             }
             val getItemImage = ::gen_getItemImage_fn
-            fun gen_getItemName_fn(item): String {
+            fun gen_getItemName_fn(item: Any): String {
                 return itemValue(item, "name")
             }
             val getItemName = ::gen_getItemName_fn
-            fun gen_getItemBgColor_fn(item): String {
+            fun gen_getItemBgColor_fn(item: Any): String {
                 val color = itemValue(item, "bgColor")
                 if (color.length > 0) {
                     return color
@@ -98,7 +96,7 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 return props.itemBgColor
             }
             val getItemBgColor = ::gen_getItemBgColor_fn
-            fun gen_getItemIconColor_fn(item): String {
+            fun gen_getItemIconColor_fn(item: Any): String {
                 val color = itemValue(item, "iconColor")
                 if (color.length > 0) {
                     return color
@@ -106,7 +104,7 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 return props.iconColor
             }
             val getItemIconColor = ::gen_getItemIconColor_fn
-            fun gen_getItemTextColor_fn(item): String {
+            fun gen_getItemTextColor_fn(item: Any): String {
                 val color = itemValue(item, "textColor")
                 if (color.length > 0) {
                     return color
@@ -114,10 +112,27 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 return props.textColor
             }
             val getItemTextColor = ::gen_getItemTextColor_fn
-            fun gen_getItemUrl_fn(item): String {
+            fun gen_getItemUrl_fn(item: Any): String {
                 return itemValue(item, "url")
             }
             val getItemUrl = ::gen_getItemUrl_fn
+            val bgColor = computed(fun(): String {
+                return props.bgColor
+            }
+            )
+            val gridItems = computed(fun(): UTSArray<Any> {
+                val items = props.items
+                if (items == null) {
+                    return _uA<Any>()
+                }
+                return items as UTSArray<Any>
+            }
+            )
+            val selected = ref(-1)
+            val gridStyle = computed(fun(): String {
+                return ("width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";")
+            }
+            )
             fun gen_getColumns_fn(): Number {
                 if (props.col <= 1) {
                     return 1
@@ -130,7 +145,11 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
             val getColumns = ::gen_getColumns_fn
             fun gen_getRows_fn(): Number {
                 val columns = getColumns()
-                return Math.ceil(props.items.length / columns)
+                val items = props.items
+                if (items == null) {
+                    return 0
+                }
+                return Math.ceil(items.length / columns)
             }
             val getRows = ::gen_getRows_fn
             fun gen_getItemWidth_fn(): String {
@@ -153,7 +172,7 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 return "16.6667%"
             }
             val getItemWidth = ::gen_getItemWidth_fn
-            fun gen_getItemStyle_fn(index, item): String {
+            fun gen_getItemStyle_fn(index: Number, item: Any): String {
                 val columns = getColumns()
                 val row = Math.floor(index / columns)
                 val colIndex = index % columns
@@ -169,24 +188,24 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 return style
             }
             val getItemStyle = ::gen_getItemStyle_fn
-            fun gen_getIconStyle_fn(item): String {
+            fun gen_getIconStyle_fn(item: Any): String {
                 return ("color:" + getItemIconColor(item) + ";font-size:" + formatSize(props.iconSize) + ";line-height:" + formatSize(props.iconSize) + ";")
             }
             val getIconStyle = ::gen_getIconStyle_fn
-            fun gen_getImageStyle_fn(item): String {
+            fun gen_getImageStyle_fn(item: Any): String {
                 val size = formatSize(props.imageSize)
                 return "width:" + size + ";height:" + size + ";"
             }
             val getImageStyle = ::gen_getImageStyle_fn
-            fun gen_getTextStyle_fn(item): String {
+            fun gen_getTextStyle_fn(item: Any): String {
                 return "color:" + getItemTextColor(item) + ";font-size:" + formatSize(props.fontSize) + ";"
             }
             val getTextStyle = ::gen_getTextStyle_fn
-            fun gen_buildPayload_fn(item, index): UTSJSONObject {
+            fun gen_buildPayload_fn(item: Any, index: Number): UTSJSONObject {
                 return _uO("index" to index, "name" to getItemName(item), "text" to getItemText(item), "icon" to getItemIcon(item), "image" to getItemImage(item), "url" to getItemUrl(item))
             }
             val buildPayload = ::gen_buildPayload_fn
-            fun gen_select_fn(item, index) {
+            fun gen_select_fn(item: Any, index: Number): Unit {
                 selected.value = index
                 val payload = buildPayload(item, index)
                 emit("select", payload)
@@ -194,19 +213,19 @@ open class GenUniModulesIUiXComponentsIGridIGrid : VueComponent {
                 emit("click", payload)
             }
             val select = ::gen_select_fn
-            fun gen_loadMore_fn() {
-                emit("loadmore", props.items.length)
+            fun gen_loadMore_fn(): Unit {
+                emit("loadmore", gridItems.value.length)
             }
             val loadMore = ::gen_loadMore_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to "i-grid", "style" to _nS(gridStyle.value)), _uA(
-                    _cE(Fragment, null, RenderHelpers.renderList(_ctx.items, fun(item, index, __index, _cached): Any {
-                        return _cE("view", _uM("key" to (String(index) + "-" + getItemText(item)), "class" to _nC(if (selected.value == index) {
+                    _cE(Fragment, null, RenderHelpers.renderList(gridItems.value, fun(item, index, __index, _cached): Any {
+                        return _cE("view", _uM("key" to (index.toString(10) + "-" + getItemText(item)), "class" to _nC(if (selected.value == index) {
                             "i-grid__item i-grid__item--active"
                         } else {
                             "i-grid__item"
                         }
-                        ), "style" to _nS(getItemStyle(index, item)), "hover-class" to if (_ctx.isLink) {
+                        ), "style" to _nS(getItemStyle(index, item as Any)), "hover-class" to if (_ctx.isLink) {
                             "i-grid__item--hover"
                         } else {
                             "none"

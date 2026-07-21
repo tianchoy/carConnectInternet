@@ -162,15 +162,9 @@ const touching = ref(false)
 let closeTimer = 0
 let lazyTimer = 0
 
-const rootStyle = computed(() => {
-  return 'z-index:' + String(props.zIndex) + ';'
-})
-
-const panelClass = computed(() => {
-  const classes = ['i-popup__panel']
-  classes.push('i-popup__panel--' + normalizedMode.value)
-  if (shouldCoverCenter()) classes.push('i-popup__panel--cover-center')
-  return classes.join(' ')
+const drawerPosition = computed(() => {
+  if (props.position.length > 0) return props.position
+  return props.mode
 })
 
 const normalizedMode = computed(() => {
@@ -185,13 +179,49 @@ const normalizedMode = computed(() => {
   return 'bottom'
 })
 
-const drawerPosition = computed(() => {
-  if (props.position.length > 0) return props.position
-  return props.mode
+function shouldCoverCenter(): boolean {
+  return (
+    props.widthCoverCenter &&
+    (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') &&
+    props.width.toString().length > 0
+  )
+}
+
+function stringifyStyle(value: any): string {
+  if (value == null) return ''
+  const text = value.toString()
+  if (text == '[object Object]') return ''
+  if (text.length == 0) return ''
+  return text.endsWith(';') ? text : text + ';'
+}
+
+function formatMs(value: any): string {
+  const text = value.toString()
+  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
+  return text + 'ms'
+}
+
+function formatSize(value: any): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+const rootStyle = computed(() => {
+  return 'z-index:' + props.zIndex.toString() + ';'
+})
+
+const panelClass = computed(() => {
+  const classes = ['i-popup__panel']
+  classes.push('i-popup__panel--' + normalizedMode.value)
+  if (shouldCoverCenter()) classes.push('i-popup__panel--cover-center')
+  return classes.join(' ')
 })
 
 const overlayComputedStyle = computed(() => {
-  let bgColor = 'rgba(0,0,0,' + String(props.overlayOpacity) + ')'
+  let bgColor = 'rgba(0,0,0,' + props.overlayOpacity.toString() + ')'
   if (props.overflayBgColor.length > 0) bgColor = props.overflayBgColor
   let style = 'background-color:' + bgColor + ';'
   style = style + 'opacity:' + (active.value ? '1' : '0') + ';'
@@ -203,6 +233,88 @@ const overlayComputedStyle = computed(() => {
 const titleStyleText = computed(() => {
   return stringifyStyle(props.titleStyle)
 })
+
+
+function marginStyle(): string {
+  const margin = formatSize(props.margin)
+  if (margin == '0px') return ''
+  return 'margin:' + margin + ';'
+}
+
+function sizeStyle(): string {
+  let style = ''
+  const size = props.size.toString()
+  if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
+    if (props.width.toString().length > 0) {
+      style = style + 'width:' + formatSize(props.width) + ';'
+    } else if (size.length > 0) {
+      style = style + 'width:' + formatSize(size) + ';'
+    }
+  } else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
+    if (props.width.toString().length == 0 && !shouldCoverCenter()) {
+      style = style + 'width:100%;'
+    }
+    if (props.height.toString().length > 0) {
+      style = style + 'height:' + formatSize(props.height) + ';'
+    } else if (size.length > 0) {
+      style = style + 'height:' + formatSize(size) + ';'
+    }
+    if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  } else {
+    if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+    if (props.height.toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  }
+  if (normalizedMode.value == 'top') {
+    if (props.navbarHeight > 0) style = style + 'top:' + props.navbarHeight.toString() + 'px;'
+    if (props.offsetTop.toString().length > 0) style = style + 'top:' + formatSize(props.offsetTop) + ';'
+  }
+  if (normalizedMode.value == 'bottom' && props.offsetBottom.toString().length > 0) {
+    style = style + 'bottom:' + formatSize(props.offsetBottom) + ';'
+  }
+  return style
+}
+
+
+function roundStyle(): string {
+  const round = formatSize(props.round)
+  if (normalizedMode.value == 'top') return 'border-radius:0 0 ' + round + ' ' + round + ';'
+  if (normalizedMode.value == 'bottom') return 'border-radius:' + round + ' ' + round + ' 0 0;'
+  if (normalizedMode.value == 'left') return 'border-radius:0 ' + round + ' ' + round + ' 0;'
+  if (normalizedMode.value == 'right') return 'border-radius:' + round + ' 0 0 ' + round + ';'
+  if (normalizedMode.value == 'center') return 'border-radius:' + round + ';'
+  return ''
+}
+
+function safeAreaStyle(): string {
+  let style = ''
+  if (props.safeTop && normalizedMode.value == 'top') {
+    style = style + 'padding-top:env(safe-area-inset-top);'
+  }
+  if (props.safeBottom && normalizedMode.value == 'bottom') {
+    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
+  }
+  return style
+}
+
+function transformStyle(): string {
+  const x = offsetX.value.toString()
+  const y = offsetY.value.toString()
+  if (normalizedMode.value == 'center') {
+    const scale = props.zoom ? (active.value ? '1' : '0.88') : '1'
+    return 'opacity:' + (active.value ? '1' : '0') + ';transform:translate(-50%,-50%) translate(' + x + 'px,' + y + 'px) scale(' + scale + ');'
+  }
+  if (normalizedMode.value == 'bottom') {
+    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
+    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '100%') + ');'
+  }
+  if (normalizedMode.value == 'top') {
+    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
+    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '-100%') + ');'
+  }
+  if (normalizedMode.value == 'left') return 'transform:translateX(' + (active.value ? x + 'px' : '-100%') + ');'
+  if (normalizedMode.value == 'right') return 'transform:translateX(' + (active.value ? x + 'px' : '100%') + ');'
+  return ''
+}
 
 const panelStyle = computed(() => {
   let style = 'background-color:' + bgColor.value + ';'
@@ -219,7 +331,7 @@ const panelStyle = computed(() => {
 
 const bodyStyle = computed(() => {
   let style = 'padding:' + formatSize(props.contentMargin) + ';'
-  if (String(props.maxHeight).length > 0) style = style + 'max-height:' + formatSize(props.maxHeight) + ';'
+  if (props.maxHeight.toString().length > 0) style = style + 'max-height:' + formatSize(props.maxHeight) + ';'
   return style
 })
 
@@ -246,7 +358,15 @@ const contentVisible = computed(() => {
 
 const closeClass = computed(() => {
   const classes = ['i-popup__close']
-  classes.push('i-popup__close--' + normalizeClosePos())
+  let position = 'top-right'
+  if (
+    props.closeIconPos == 'top-left' ||
+    props.closeIconPos == 'bottom-left' ||
+    props.closeIconPos == 'bottom-right'
+  ) {
+    position = props.closeIconPos
+  }
+  classes.push('i-popup__close--' + position)
   return classes.join(' ')
 })
 
@@ -259,26 +379,33 @@ const closeIconText = computed(() => {
   return props.closeIcon
 })
 
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (nextValue) {
-      openPanel(false)
-    } else {
-      closePanel(false)
-    }
-  },
-)
-
-function open() {
-  openPanel(true)
+const clearTimers = (): void => {
+  if (closeTimer > 0) {
+    clearTimeout(closeTimer)
+    closeTimer = 0
+  }
+  if (lazyTimer > 0) {
+    clearTimeout(lazyTimer)
+    lazyTimer = 0
+  }
 }
 
-function close() {
-  closePanel(true)
+const resetOffset = (): void => {
+  offsetX.value = 0
+  offsetY.value = 0
+  touching.value = false
 }
 
-function openPanel(shouldEmitUpdate: boolean) {
+const animationDuration = (): number => {
+  const text = props.duration.toString()
+  if (text.indexOf('ms') >= 0) return parseFloat(text.replace('ms', ''))
+  if (text.indexOf('s') >= 0) return parseFloat(text.replace('s', '')) * 1000
+  const duration = parseFloat(text)
+  if (isNaN(duration)) return 300
+  return duration
+}
+
+const openPanel = (shouldEmitUpdate: boolean): void => {
   if (props.disabled) return
   if (opened.value && active.value) return
   clearTimers()
@@ -299,7 +426,7 @@ function openPanel(shouldEmitUpdate: boolean) {
   }, 20)
 }
 
-function closePanel(shouldEmitUpdate: boolean) {
+const closePanel = (shouldEmitUpdate: boolean): void => {
   if (!opened.value && !active.value) return
   clearTimers()
   emit('beforeClose')
@@ -314,15 +441,23 @@ function closePanel(shouldEmitUpdate: boolean) {
   }, animationDuration())
 }
 
-function clearTimers() {
-  if (closeTimer > 0) {
-    clearTimeout(closeTimer)
-    closeTimer = 0
-  }
-  if (lazyTimer > 0) {
-    clearTimeout(lazyTimer)
-    lazyTimer = 0
-  }
+watch(
+  (): boolean => props.show,
+  (nextValue: boolean) => {
+    if (nextValue) {
+      openPanel(false)
+    } else {
+      closePanel(false)
+    }
+  },
+)
+
+function open() {
+  openPanel(true)
+}
+
+function close() {
+  closePanel(true)
 }
 
 function handleOverlayClick() {
@@ -342,23 +477,45 @@ function confirm() {
   close()
 }
 
-function handleContentTouchStart(event) {
-  if (!props.contentDraggable) return
-  handleTouchStart(event)
+const readTouchX = (event: UniTouchEvent): number => {
+  let point: UniTouch | null = null
+  if (event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return 0
+  return point.clientX
 }
 
-function handleHandleTouchStart(event) {
-  handleTouchStart(event)
+const readTouchY = (event: UniTouchEvent): number => {
+  let point: UniTouch | null = null
+  if (event.touches.length > 0) {
+    point = event.touches[0]
+  } else if (event.changedTouches.length > 0) {
+    point = event.changedTouches[0]
+  }
+  if (point == null) return 0
+  return point.clientY
 }
 
-function handleTouchStart(event) {
+const handleTouchStart = (event: UniTouchEvent): void => {
   if (!props.swipeClose) return
   touching.value = true
   startX.value = readTouchX(event)
   startY.value = readTouchY(event)
 }
 
-function handleTouchMove(event) {
+function handleContentTouchStart(event: UniTouchEvent) {
+  if (!props.contentDraggable) return
+  handleTouchStart(event)
+}
+
+function handleHandleTouchStart(event: UniTouchEvent) {
+  handleTouchStart(event)
+}
+
+function handleTouchMove(event: UniTouchEvent) {
   if (!props.swipeClose || !touching.value) return
   const currentX = readTouchX(event)
   const currentY = readTouchY(event)
@@ -374,188 +531,12 @@ function handleTouchMove(event) {
 function handleTouchEnd() {
   if (!touching.value) return
   touching.value = false
-  const threshold = Number(props.swipeCloseThreshold)
+  const threshold = parseFloat(props.swipeCloseThreshold.toString())
   if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
     close()
     return
   }
   resetOffset()
-}
-
-function resetOffset() {
-  offsetX.value = 0
-  offsetY.value = 0
-  touching.value = false
-}
-
-function transformStyle(): string {
-  const x = String(offsetX.value)
-  const y = String(offsetY.value)
-  if (normalizedMode.value == 'center') {
-    const scale = props.zoom ? (active.value ? '1' : '0.88') : '1'
-    return (
-      'opacity:' +
-      (active.value ? '1' : '0') +
-      ';transform:translate(-50%,-50%) translate(' +
-      x +
-      'px,' +
-      y +
-      'px) scale(' +
-      scale +
-      ');'
-    )
-  }
-  if (normalizedMode.value == 'bottom') {
-    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
-    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '100%') + ');'
-  }
-  if (normalizedMode.value == 'top') {
-    const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : ''
-    return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '-100%') + ');'
-  }
-  if (normalizedMode.value == 'left') {
-    return 'transform:translateX(' + (active.value ? x + 'px' : '-100%') + ');'
-  }
-  if (normalizedMode.value == 'right') {
-    return 'transform:translateX(' + (active.value ? x + 'px' : '100%') + ');'
-  }
-  return ''
-}
-
-function marginStyle(): string {
-  const margin = formatSize(props.margin)
-  if (margin == '0px') return ''
-  return 'margin:' + margin + ';'
-}
-
-function sizeStyle(): string {
-  let style = ''
-  const size = String(props.size)
-  if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
-    if (String(props.width).length > 0) {
-      style = style + 'width:' + formatSize(props.width) + ';'
-    } else if (size.length > 0) {
-      style = style + 'width:' + formatSize(size) + ';'
-    }
-  } else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
-    if (String(props.width).length == 0 && !shouldCoverCenter()) {
-      style = style + 'width:100%;'
-    }
-    if (String(props.height).length > 0) {
-      style = style + 'height:' + formatSize(props.height) + ';'
-    } else if (size.length > 0) {
-      style = style + 'height:' + formatSize(size) + ';'
-    }
-    if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-  } else {
-    if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-    if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
-  }
-  if (normalizedMode.value == 'top') {
-    if (props.navbarHeight > 0) style = style + 'top:' + String(props.navbarHeight) + 'px;'
-    if (String(props.offsetTop).length > 0) style = style + 'top:' + formatSize(props.offsetTop) + ';'
-  }
-  if (normalizedMode.value == 'bottom' && String(props.offsetBottom).length > 0) {
-    style = style + 'bottom:' + formatSize(props.offsetBottom) + ';'
-  }
-  return style
-}
-
-function roundStyle(): string {
-  const round = formatSize(props.round)
-  if (normalizedMode.value == 'top') return 'border-radius:0 0 ' + round + ' ' + round + ';'
-  if (normalizedMode.value == 'bottom') return 'border-radius:' + round + ' ' + round + ' 0 0;'
-  if (normalizedMode.value == 'left') return 'border-radius:0 ' + round + ' ' + round + ' 0;'
-  if (normalizedMode.value == 'right') return 'border-radius:' + round + ' 0 0 ' + round + ';'
-  if (normalizedMode.value == 'center') return 'border-radius:' + round + ';'
-  return ''
-}
-
-function safeAreaStyle(): string {
-  let style = ''
-  if (props.safeTop && normalizedMode.value == 'top') {
-    style = style + 'padding-top:env(safe-area-inset-top);'
-  }
-  if (props.safeBottom && normalizedMode.value == 'bottom') {
-    style = style + 'padding-bottom:env(safe-area-inset-bottom);'
-  }
-  return style
-}
-
-function normalizeClosePos(): string {
-  if (
-    props.closeIconPos == 'top-left' ||
-    props.closeIconPos == 'bottom-left' ||
-    props.closeIconPos == 'bottom-right'
-  ) {
-    return props.closeIconPos
-  }
-  return 'top-right'
-}
-
-function stringifyStyle(value): string {
-  if (value == null) return ''
-  const text = String(value)
-  if (text == '[object Object]') return ''
-  if (text.length == 0) return ''
-  return text.endsWith(';') ? text : text + ';'
-}
-
-function formatMs(value): string {
-  const text = String(value)
-  if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0) return text
-  return text + 'ms'
-}
-
-function animationDuration(): number {
-  const text = String(props.duration)
-  if (text.indexOf('ms') >= 0) return Number(text.replace('ms', ''))
-  if (text.indexOf('s') >= 0) return Number(text.replace('s', '')) * 1000
-  const duration = Number(text)
-  if (isNaN(duration)) return 300
-  return duration
-}
-
-function isVerticalMode(): boolean {
-  return normalizedMode.value == 'top' || normalizedMode.value == 'bottom'
-}
-
-function shouldCoverCenter(): boolean {
-  return props.widthCoverCenter && isVerticalMode() && String(props.width).length > 0
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
-
-function readTouchX(event): number {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return 0
-  const clientX = Number(point.clientX)
-  if (!isNaN(clientX)) return clientX
-  return Number(point.pageX)
-}
-
-function readTouchY(event): number {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return 0
-  const clientY = Number(point.clientY)
-  if (!isNaN(clientY)) return clientY
-  return Number(point.pageY)
 }
 
 __expose({

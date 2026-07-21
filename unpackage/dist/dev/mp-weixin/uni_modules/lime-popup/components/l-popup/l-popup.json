@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "l-overlay": "../../../lime-overlay/components/l-overlay/l-overlay",
+    "i-icon": "../../../i-ui-x/components/i-icon/i-icon"
+  }
+}

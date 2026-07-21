@@ -13,7 +13,6 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.createSelectorQuery as uni_createSelectorQuery
-import io.dcloud.uniapp.extapi.getElementById as uni_getElementById
 open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
     open var modelValue: Any by `$props`
@@ -46,11 +45,89 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_initialValue_fn(): Any {
+                if (props.modelValue.toString().length > 0) {
+                    return props.modelValue
+                }
+                return props.value
+            }
+            val initialValue = ::gen_initialValue_fn
+            fun gen_normalizeSingle_fn(value: Any): Number {
+                var nextValue = parseFloat(value.toString())
+                if (isNaN(nextValue)) {
+                    nextValue = props.min
+                }
+                if (nextValue < props.min) {
+                    nextValue = props.min
+                }
+                if (nextValue > props.max) {
+                    nextValue = props.max
+                }
+                return nextValue
+            }
+            val normalizeSingle = ::gen_normalizeSingle_fn
+            fun gen_normalizeRange_fn(value: Any): UTSArray<Number> {
+                var start = props.min
+                var end = props.max
+                if (UTSArray.isArray(value) && (value as UTSArray<Any>).length > 1) {
+                    start = parseFloat((value as UTSArray<Any>)[0].toString())
+                    end = parseFloat((value as UTSArray<Any>)[1].toString())
+                } else {
+                    val text = value.toString()
+                    if (text.indexOf(",") >= 0) {
+                        start = parseFloat(text.split(",")[0])
+                        end = parseFloat(text.split(",")[1])
+                    }
+                }
+                start = normalizeSingle(start)
+                end = normalizeSingle(end)
+                if (props.noCross && start > end) {
+                    start = end
+                }
+                return _uA(
+                    start,
+                    end
+                )
+            }
+            val normalizeRange = ::gen_normalizeRange_fn
+            fun gen_valuePercent_fn(value: Number): Number {
+                val distance = props.max - props.min
+                if (distance <= 0) {
+                    return 0
+                }
+                val percent = ((value - props.min) / distance) * 100
+                if (percent < 0) {
+                    return 0
+                }
+                if (percent > 100) {
+                    return 100
+                }
+                return percent
+            }
+            val valuePercent = ::gen_valuePercent_fn
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
+            fun gen_thumbStyle_fn(value: Number): String {
+                val size = parseFloat(props.thumbSize.toString())
+                val halfSize = if (isNaN(size)) {
+                    10
+                } else {
+                    size / 2
+                }
+                return ("left:" + valuePercent(value).toString(10) + "%;width:" + formatSize(props.thumbSize) + ";height:" + formatSize(props.thumbSize) + ";margin-left:" + formatSize(0 - halfSize) + ";border:" + props.thumbBorder + ";border-radius:" + props.thumbRadius + ";background-color:" + props.thumbColor + ";")
+            }
+            val thumbStyle = ::gen_thumbStyle_fn
             val singleValue = ref(normalizeSingle(initialValue()))
             val rangeStart = ref(normalizeRange(initialValue())[0])
             val rangeEnd = ref(normalizeRange(initialValue())[1])
             val dragging = ref(false)
-            val rangeId = "i-slider-range-" + String(Math.floor(Math.random() * 1000000))
+            val rangeId = "i-slider-range-" + Math.floor(Math.random() * 1000000).toString(10)
             val rangeRectLeft = ref(0)
             val rangeRectWidth = ref(0)
             val activeRangeThumb = ref("")
@@ -69,9 +146,9 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
             )
             val displayValue = computed(fun(): String {
                 if (props.range) {
-                    return String(rangeStart.value) + " - " + String(rangeEnd.value)
+                    return rangeStart.value.toString(10) + " - " + rangeEnd.value.toString(10)
                 }
-                return String(singleValue.value)
+                return singleValue.value.toString(10)
             }
             )
             val rangeRailStyle = computed(fun(): String {
@@ -81,7 +158,7 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
             val rangeTrackStyle = computed(fun(): String {
                 val startPercent = valuePercent(rangeStart.value)
                 val endPercent = valuePercent(rangeEnd.value)
-                return ("left:" + String(startPercent) + "%;width:" + String(endPercent - startPercent) + "%;height:" + formatSize(props.railSize) + ";border-radius:" + formatSize(props.railRadius) + ";background-color:" + props.trackColor + ";")
+                return ("left:" + startPercent.toString(10) + "%;width:" + (endPercent - startPercent).toString(10) + "%;height:" + formatSize(props.railSize) + ";border-radius:" + formatSize(props.railRadius) + ";background-color:" + props.trackColor + ";")
             }
             )
             val startThumbStyle = computed(fun(): String {
@@ -92,47 +169,71 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 return thumbStyle(rangeEnd.value)
             }
             )
-            watch(fun(){
-                return props.modelValue
-            }
-            , fun(){
-                syncFromProps()
-            }
-            )
-            watch(fun(){
-                return props.value
-            }
-            , fun(){
-                syncFromProps()
-            }
-            )
-            fun gen_initialValue_fn(): Any {
-                if (String(props.modelValue).length > 0) {
-                    return props.modelValue
-                }
-                return props.value
-            }
-            val initialValue = ::gen_initialValue_fn
-            fun gen_syncFromProps_fn() {
+            val syncFromProps = fun(): Unit {
                 singleValue.value = normalizeSingle(initialValue())
                 val values = normalizeRange(initialValue())
                 rangeStart.value = values[0]
                 rangeEnd.value = values[1]
             }
-            val syncFromProps = ::gen_syncFromProps_fn
-            fun gen_handleSingleChanging_fn(event) {
+            watch(fun(): Any {
+                return props.modelValue
+            }
+            , fun(): Unit {
+                syncFromProps()
+            }
+            )
+            watch(fun(): Any {
+                return props.value
+            }
+            , fun(): Unit {
+                syncFromProps()
+            }
+            )
+            fun gen_normalizeStart_fn(value: Number): Number {
+                var nextValue = normalizeSingle(value)
+                if (props.noCross && nextValue > rangeEnd.value) {
+                    nextValue = rangeEnd.value
+                }
+                return nextValue
+            }
+            val normalizeStart = ::gen_normalizeStart_fn
+            fun gen_normalizeEnd_fn(value: Number): Number {
+                var nextValue = normalizeSingle(value)
+                if (props.noCross && nextValue < rangeStart.value) {
+                    nextValue = rangeStart.value
+                }
+                return nextValue
+            }
+            val normalizeEnd = ::gen_normalizeEnd_fn
+            val startDrag = fun(): Unit {
+                if (dragging.value) {
+                    return
+                }
+                dragging.value = true
+                emit("dragStart")
+            }
+            val endDrag = fun(): Unit {
+                dragging.value = false
+                emit("dragEnd")
+            }
+            val emitValue = fun(value: Any): Unit {
+                emit("update:modelValue", value)
+                emit("update:value", value)
+                emit("change", value)
+            }
+            fun gen_handleSingleChanging_fn(event: UniSliderChangeEvent) {
                 startDrag()
                 singleValue.value = normalizeSingle(event.detail.value)
                 emit("changing", singleValue.value)
             }
             val handleSingleChanging = ::gen_handleSingleChanging_fn
-            fun gen_handleSingleChange_fn(event) {
+            fun gen_handleSingleChange_fn(event: UniSliderChangeEvent) {
                 singleValue.value = normalizeSingle(event.detail.value)
                 emitValue(singleValue.value)
                 endDrag()
             }
             val handleSingleChange = ::gen_handleSingleChange_fn
-            fun gen_handleStartChanging_fn(event) {
+            fun gen_handleStartChanging_fn(event: UniSliderChangeEvent) {
                 startDrag()
                 rangeStart.value = normalizeStart(event.detail.value)
                 emit("changing", _uA(
@@ -141,7 +242,7 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 ))
             }
             val handleStartChanging = ::gen_handleStartChanging_fn
-            fun gen_handleStartChange_fn(event) {
+            fun gen_handleStartChange_fn(event: UniSliderChangeEvent) {
                 rangeStart.value = normalizeStart(event.detail.value)
                 emitValue(_uA(
                     rangeStart.value,
@@ -150,7 +251,7 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 endDrag()
             }
             val handleStartChange = ::gen_handleStartChange_fn
-            fun gen_handleEndChanging_fn(event) {
+            fun gen_handleEndChanging_fn(event: UniSliderChangeEvent) {
                 startDrag()
                 rangeEnd.value = normalizeEnd(event.detail.value)
                 emit("changing", _uA(
@@ -159,7 +260,7 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 ))
             }
             val handleEndChanging = ::gen_handleEndChanging_fn
-            fun gen_handleEndChange_fn(event) {
+            fun gen_handleEndChange_fn(event: UniSliderChangeEvent) {
                 rangeEnd.value = normalizeEnd(event.detail.value)
                 emitValue(_uA(
                     rangeStart.value,
@@ -168,7 +269,112 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 endDrag()
             }
             val handleEndChange = ::gen_handleEndChange_fn
-            fun gen_handleRangeTouchStart_fn(event) {
+            fun gen_normalizeRectPoint_fn(first: Any, fallback: Any): Number {
+                val firstValue = parseFloat(first.toString())
+                if (!isNaN(firstValue)) {
+                    return firstValue
+                }
+                val fallbackValue = parseFloat(fallback.toString())
+                if (!isNaN(fallbackValue)) {
+                    return fallbackValue
+                }
+                return 0
+            }
+            val normalizeRectPoint = ::gen_normalizeRectPoint_fn
+            fun gen_normalizeStep_fn(value: Number): Number {
+                val stepValue = if (props.step <= 0) {
+                    1
+                } else {
+                    props.step
+                }
+                val nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue
+                return normalizeSingle(parseFloat(nextValue.toFixed(6)))
+            }
+            val normalizeStep = ::gen_normalizeStep_fn
+            fun gen_valueFromPoint_fn(x: Number): Number {
+                var percent = (x - rangeRectLeft.value) / rangeRectWidth.value
+                if (percent < 0) {
+                    percent = 0
+                }
+                if (percent > 1) {
+                    percent = 1
+                }
+                val rawValue = props.min + (props.max - props.min) * percent
+                return normalizeStep(rawValue)
+            }
+            val valueFromPoint = ::gen_valueFromPoint_fn
+            fun gen_pickRangeThumb_fn(value: Number): Unit {
+                val startDistance = Math.abs(value - rangeStart.value)
+                val endDistance = Math.abs(value - rangeEnd.value)
+                activeRangeThumb.value = if (startDistance <= endDistance) {
+                    "start"
+                } else {
+                    "end"
+                }
+            }
+            val pickRangeThumb = ::gen_pickRangeThumb_fn
+            fun gen_readTouchX_fn(event: UniTouchEvent): Number {
+                var point: UniTouch? = null
+                if (event.touches.length > 0) {
+                    point = event.touches[0]
+                } else if (event.changedTouches.length > 0) {
+                    point = event.changedTouches[0]
+                }
+                if (point == null) {
+                    return NaN
+                }
+                return point.clientX
+            }
+            val readTouchX = ::gen_readTouchX_fn
+            fun gen_updateRangeByTouch_fn(event: UniTouchEvent, shouldPickThumb: Boolean): Unit {
+                val x = readTouchX(event)
+                if (isNaN(x) || rangeRectWidth.value <= 0) {
+                    return
+                }
+                val nextValue = valueFromPoint(x)
+                if (shouldPickThumb) {
+                    pickRangeThumb(nextValue)
+                }
+                if (activeRangeThumb.value == "start") {
+                    rangeStart.value = normalizeStart(nextValue)
+                } else {
+                    rangeEnd.value = normalizeEnd(nextValue)
+                }
+                emit("changing", _uA(
+                    rangeStart.value,
+                    rangeEnd.value
+                ))
+            }
+            val updateRangeByTouch = ::gen_updateRangeByTouch_fn
+            fun gen_setRangeRect_fn(rect: Any): Unit {
+                val rects = rect as UTSArray<NodeInfo>
+                if (rects.length == 0) {
+                    return
+                }
+                val nodeInfo = rects[0]
+                rangeRectLeft.value = if (nodeInfo.left != null) {
+                    nodeInfo.left!!
+                } else {
+                    0
+                }
+                rangeRectWidth.value = if (nodeInfo.width != null) {
+                    nodeInfo.width!!
+                } else {
+                    0
+                }
+            }
+            val setRangeRect = ::gen_setRangeRect_fn
+            fun gen_refreshRangeRect_fn(event: UniTouchEvent, shouldPickThumb: Boolean, shouldUpdate: Boolean): Unit {
+                uni_createSelectorQuery().select("#" + rangeId).boundingClientRect(fun(rect: Any){
+                    setRangeRect(rect)
+                    if (shouldUpdate) {
+                        updateRangeByTouch(event, shouldPickThumb)
+                    }
+                }
+                ).exec()
+            }
+            val refreshRangeRect = ::gen_refreshRangeRect_fn
+            fun gen_handleRangeTouchStart_fn(event: UniTouchEvent) {
                 if (props.disabled || props.readonly) {
                     return
                 }
@@ -176,7 +382,7 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 refreshRangeRect(event, true, true)
             }
             val handleRangeTouchStart = ::gen_handleRangeTouchStart_fn
-            fun gen_handleRangeTouchMove_fn(event) {
+            fun gen_handleRangeTouchMove_fn(event: UniTouchEvent) {
                 if (props.disabled || props.readonly || activeRangeThumb.value.length == 0) {
                     return
                 }
@@ -195,245 +401,6 @@ open class GenUniModulesIUiXComponentsISliderISlider : VueComponent {
                 endDrag()
             }
             val handleRangeTouchEnd = ::gen_handleRangeTouchEnd_fn
-            fun gen_startDrag_fn() {
-                if (dragging.value) {
-                    return
-                }
-                dragging.value = true
-                emit("dragStart")
-            }
-            val startDrag = ::gen_startDrag_fn
-            fun gen_endDrag_fn() {
-                dragging.value = false
-                emit("dragEnd")
-            }
-            val endDrag = ::gen_endDrag_fn
-            fun gen_emitValue_fn(value) {
-                emit("update:modelValue", value)
-                emit("update:value", value)
-                emit("change", value)
-            }
-            val emitValue = ::gen_emitValue_fn
-            fun gen_normalizeSingle_fn(value): Number {
-                var nextValue = Number(value)
-                if (isNaN(nextValue)) {
-                    nextValue = props.min
-                }
-                if (nextValue < props.min) {
-                    nextValue = props.min
-                }
-                if (nextValue > props.max) {
-                    nextValue = props.max
-                }
-                return nextValue
-            }
-            val normalizeSingle = ::gen_normalizeSingle_fn
-            fun gen_normalizeRange_fn(value): UTSArray<Number> {
-                var start = props.min
-                var end = props.max
-                if (UTSArray.isArray(value) && (value as UTSArray<Any>).length > 1) {
-                    start = Number((value as UTSArray<Any>)[0])
-                    end = Number((value as UTSArray<Any>)[1])
-                } else {
-                    val text = String(value)
-                    if (text.indexOf(",") >= 0) {
-                        start = Number(text.split(",")[0])
-                        end = Number(text.split(",")[1])
-                    }
-                }
-                start = normalizeSingle(start)
-                end = normalizeSingle(end)
-                if (props.noCross && start > end) {
-                    start = end
-                }
-                return _uA(
-                    start,
-                    end
-                )
-            }
-            val normalizeRange = ::gen_normalizeRange_fn
-            fun gen_normalizeStart_fn(value): Number {
-                var nextValue = normalizeSingle(value)
-                if (props.noCross && nextValue > rangeEnd.value) {
-                    nextValue = rangeEnd.value
-                }
-                return nextValue
-            }
-            val normalizeStart = ::gen_normalizeStart_fn
-            fun gen_normalizeEnd_fn(value): Number {
-                var nextValue = normalizeSingle(value)
-                if (props.noCross && nextValue < rangeStart.value) {
-                    nextValue = rangeStart.value
-                }
-                return nextValue
-            }
-            val normalizeEnd = ::gen_normalizeEnd_fn
-            fun gen_refreshRangeRect_fn(event, shouldPickThumb, shouldUpdate) {
-                val element = uni_getElementById(rangeId)
-                if (element != null && element.getBoundingClientRect != null && UTSAndroid.`typeof`(element.getBoundingClientRect) == "function") {
-                    val rect = element.getBoundingClientRect()
-                    setRangeRect(rect)
-                    if (isTruthy(shouldUpdate)) {
-                        updateRangeByTouch(event, shouldPickThumb)
-                    }
-                    return
-                }
-                if (element != null && element.getBoundingClientRectAsync != null && UTSAndroid.`typeof`(element.getBoundingClientRectAsync) == "function") {
-                    element.getBoundingClientRectAsync().then(fun(rect){
-                        setRangeRect(rect)
-                        if (isTruthy(shouldUpdate)) {
-                            updateRangeByTouch(event, shouldPickThumb)
-                        }
-                    }
-                    ).`catch`(fun(){
-                        refreshRangeRectBySelector(event, shouldPickThumb, shouldUpdate)
-                    }
-                    )
-                    return
-                }
-                refreshRangeRectBySelector(event, shouldPickThumb, shouldUpdate)
-            }
-            val refreshRangeRect = ::gen_refreshRangeRect_fn
-            fun gen_refreshRangeRectBySelector_fn(event, shouldPickThumb, shouldUpdate) {
-                uni_createSelectorQuery().select("#" + rangeId).boundingClientRect(fun(rect){
-                    setRangeRect(rect)
-                    if (isTruthy(shouldUpdate)) {
-                        updateRangeByTouch(event, shouldPickThumb)
-                    }
-                }
-                ).exec()
-            }
-            val refreshRangeRectBySelector = ::gen_refreshRangeRectBySelector_fn
-            fun gen_setRangeRect_fn(rect) {
-                if (rect == null) {
-                    return
-                }
-                rangeRectLeft.value = normalizeRectPoint(rect.left, rect.x)
-                rangeRectWidth.value = Number(rect.width)
-            }
-            val setRangeRect = ::gen_setRangeRect_fn
-            fun gen_updateRangeByTouch_fn(event, shouldPickThumb) {
-                val x = readTouchX(event)
-                if (isNaN(x) || rangeRectWidth.value <= 0) {
-                    return
-                }
-                val nextValue = valueFromPoint(x)
-                if (isTruthy(shouldPickThumb)) {
-                    pickRangeThumb(nextValue)
-                }
-                if (activeRangeThumb.value == "start") {
-                    rangeStart.value = normalizeStart(nextValue)
-                } else {
-                    rangeEnd.value = normalizeEnd(nextValue)
-                }
-                emit("changing", _uA(
-                    rangeStart.value,
-                    rangeEnd.value
-                ))
-            }
-            val updateRangeByTouch = ::gen_updateRangeByTouch_fn
-            fun gen_pickRangeThumb_fn(value) {
-                val startDistance = Math.abs(value - rangeStart.value)
-                val endDistance = Math.abs(value - rangeEnd.value)
-                activeRangeThumb.value = if (startDistance <= endDistance) {
-                    "start"
-                } else {
-                    "end"
-                }
-            }
-            val pickRangeThumb = ::gen_pickRangeThumb_fn
-            fun gen_valueFromPoint_fn(x): Number {
-                var percent = (x - rangeRectLeft.value) / rangeRectWidth.value
-                if (percent < 0) {
-                    percent = 0
-                }
-                if (percent > 1) {
-                    percent = 1
-                }
-                val rawValue = props.min + (props.max - props.min) * percent
-                return normalizeStep(rawValue)
-            }
-            val valueFromPoint = ::gen_valueFromPoint_fn
-            fun gen_normalizeStep_fn(value): Number {
-                val stepValue = if (props.step <= 0) {
-                    1
-                } else {
-                    props.step
-                }
-                val nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue
-                return normalizeSingle(Number(nextValue.toFixed(6)))
-            }
-            val normalizeStep = ::gen_normalizeStep_fn
-            fun gen_readTouchX_fn(event): Number {
-                var point = null
-                if (event.touches != null && event.touches.length > 0) {
-                    point = event.touches[0]
-                } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-                    point = event.changedTouches[0]
-                }
-                if (point == null) {
-                    return NaN
-                }
-                val clientX = Number(point.clientX)
-                if (!isNaN(clientX)) {
-                    return clientX
-                }
-                val pageX = Number(point.pageX)
-                if (!isNaN(pageX)) {
-                    return pageX
-                }
-                return Number(point.x)
-            }
-            val readTouchX = ::gen_readTouchX_fn
-            fun gen_valuePercent_fn(value): Number {
-                val distance = props.max - props.min
-                if (distance <= 0) {
-                    return 0
-                }
-                val percent = ((Number(value) - props.min) / distance) * 100
-                if (percent < 0) {
-                    return 0
-                }
-                if (percent > 100) {
-                    return 100
-                }
-                return percent
-            }
-            val valuePercent = ::gen_valuePercent_fn
-            fun gen_thumbStyle_fn(value): String {
-                val size = numericSize(props.thumbSize, 20)
-                return ("left:" + String(valuePercent(value)) + "%;width:" + formatSize(props.thumbSize) + ";height:" + formatSize(props.thumbSize) + ";margin-left:" + formatSize(0 - size / 2) + ";border:" + props.thumbBorder + ";border-radius:" + props.thumbRadius + ";background-color:" + props.thumbColor + ";")
-            }
-            val thumbStyle = ::gen_thumbStyle_fn
-            fun gen_numericSize_fn(value, fallback): Any {
-                val text = String(value)
-                val numberValue = Number(text.replace("px", "").replace("rpx", "").replace("%", ""))
-                if (isNaN(numberValue)) {
-                    return fallback
-                }
-                return numberValue
-            }
-            val numericSize = ::gen_numericSize_fn
-            fun gen_normalizeRectPoint_fn(first, fallback): Number {
-                val firstValue = Number(first)
-                if (!isNaN(firstValue)) {
-                    return firstValue
-                }
-                val fallbackValue = Number(fallback)
-                if (!isNaN(fallbackValue)) {
-                    return fallbackValue
-                }
-                return 0
-            }
-            val normalizeRectPoint = ::gen_normalizeRectPoint_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
             return fun(): Any? {
                 val _component_slider = resolveComponent("slider")
                 return _cE("view", _uM("class" to _nC(wrapClass.value)), _uA(

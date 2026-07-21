@@ -103,14 +103,15 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                 ), 8, _uA(
                                     "onClick"
                                 ))
-                            }), 128),
-                            _cV(_component_i_modal, _uM("show" to unref(modal), "title" to "提示", "content" to "是否要解绑设备？", "buttonReverse" to true, "align" to "center", "confirmText" to "确定", "cancelText" to "取消", "showCancelButton" to true, "onConfirm" to confirm, "onCancel" to cancel), null, 8, _uA(
-                                "show"
-                            ))
+                            }), 128)
                         ))
                     } else {
                         _cE("view", _uM("key" to 1, "class" to "empty"), " 暂无数据 ")
                     }
+                    ,
+                    _cV(_component_i_modal, _uM("show" to unref(modal), "title" to "提示", "content" to "是否要解绑设备？", "buttonReverse" to true, "align" to "center", "confirmText" to "确定", "cancelText" to "取消", "showCancelButton" to true, "onConfirm" to confirm, "onCancel" to cancel), null, 8, _uA(
+                        "show"
+                    ))
                 ))
             }
         }

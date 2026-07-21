@@ -32,15 +32,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val showDateTimePicker = ref(false)
             val currentPickerType = ref("start")
             val pickerTitle = ref("选择开始时间")
-            val trackPoints = ref(_uA<Any>())
-            val polyline = ref(_uA<Any>())
+            val trackPoints = ref(_uA<TrackPoint>())
+            val polyline = ref(_uA<PolylineData>())
             val isPlaying = ref(false)
             val playbackSpeed = ref(5)
             val totalDistance = ref(0)
             val currentSpeed = ref(0)
             val currentTime = ref("")
             val currentIndex = ref(0)
-            val carMarker = ref<Any>(null)
+            val carMarker = ref<CarMarker?>(null)
             var playbackTimer: Number? = 0
             var lastTimestamp: Number = 0
             val startTime = ref("")
@@ -49,7 +49,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val lng = ref<String?>("")
             val sTime = ref("")
             val eTime = ref("")
-            val markers = ref(_uA<Any>())
+            val markers = ref(_uA<UTSJSONObject>())
             fun gen_safeParseDate_fn(dateStr: String): Number {
                 if (!(dateStr != "")) {
                     return 0
@@ -102,7 +102,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return s * 6378137
             }
             val getDistance = ::gen_getDistance_fn
-            fun gen_calculateTrackBounds_fn(): UTSJSONObject? {
+            fun gen_calculateTrackBounds_fn(): TrackBounds? {
                 if (trackPoints.value.length == 0) {
                     return null
                 }
@@ -110,21 +110,22 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 var maxLat = trackPoints.value[0].latitude
                 var minLng = trackPoints.value[0].longitude
                 var maxLng = trackPoints.value[0].longitude
-                trackPoints.value.forEach(fun(point){
+                trackPoints.value.forEach(fun(point: TrackPoint): Unit {
                     minLat = Math.min(minLat, point.latitude)
                     maxLat = Math.max(maxLat, point.latitude)
                     minLng = Math.min(minLng, point.longitude)
                     maxLng = Math.max(maxLng, point.longitude)
                 }
                 )
-                return _uO("minLat" to minLat, "maxLat" to maxLat, "minLng" to minLng, "maxLng" to maxLng)
+                return TrackBounds(minLat = minLat, maxLat = maxLat, minLng = minLng, maxLng = maxLng)
             }
             val calculateTrackBounds = ::gen_calculateTrackBounds_fn
             fun gen_adjustMapToFitTrack_fn() {
-                val bounds = calculateTrackBounds()
-                if (!isTruthy(bounds)) {
+                val nullableBounds = calculateTrackBounds()
+                if (nullableBounds == null) {
                     return
                 }
+                val bounds = nullableBounds
                 center["latitude"] = (bounds.minLat + bounds.maxLat) / 2
                 center["longitude"] = (bounds.minLng + bounds.maxLng) / 2
                 val latDiff = bounds.maxLat - bounds.minLat
@@ -155,7 +156,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_initDateTime_fn() {
                 val now = Date()
                 val formatTime = fun(date: Date): String {
-                    return "" + date.getFullYear() + "/" + String(date.getMonth() + 1).padStart(2, "0") + "/" + String(date.getDate()).padStart(2, "0") + " " + String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0") + ":" + String(date.getSeconds()).padStart(2, "0")
+                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
+                    val day = date.getDate().toString(10).padStart(2, "0")
+                    val hours = date.getHours().toString(10).padStart(2, "0")
+                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
+                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
+                    return "" + date.getFullYear() + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds
                 }
                 endTime.value = formatTime(now)
                 val startDate = Date(now.getTime() - 86400000)
@@ -164,18 +170,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val initDateTime = ::gen_initDateTime_fn
             fun gen_initCarMarker_fn() {
                 if (trackPoints.value.length > 0) {
-                    carMarker.value = _uO("id" to 999, "latitude" to trackPoints.value[0].latitude, "longitude" to trackPoints.value[0].longitude, "iconPath" to getDeviceIcon(carStatus.value, carType.value), "width" to 25, "height" to 25, "rotate" to if (isTruthy(trackPoints.value[0].rotation)) {
-                        trackPoints.value[0].rotation
-                    } else {
-                        0
-                    }
-                    )
-                    val startMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 252, 10), "id" to 1000, "latitude" to trackPoints.value[0].latitude, "longitude" to trackPoints.value[0].longitude, "iconPath" to "/static/start.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "起点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
-                    val endMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 268, 10), "id" to 1001, "latitude" to trackPoints.value[trackPoints.value.length - 1].latitude, "longitude" to trackPoints.value[trackPoints.value.length - 1].longitude, "iconPath" to "/static/end.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "终点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
+                    val firstPoint = trackPoints.value[0]
+                    val marker = CarMarker(id = 999, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = firstPoint.rotation, anchor = _uO(), callout = _uO(), animation = _uO())
+                    carMarker.value = marker
+                    val startMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 290, 10), "id" to 1000, "latitude" to trackPoints.value[0].latitude, "longitude" to trackPoints.value[0].longitude, "iconPath" to "/static/start.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "起点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
+                    val endMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 306, 10), "id" to 1001, "latitude" to trackPoints.value[trackPoints.value.length - 1].latitude, "longitude" to trackPoints.value[trackPoints.value.length - 1].longitude, "iconPath" to "/static/end.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "终点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
                     markers.value = _uA(
-                        carMarker.value,
-                        startMarker,
-                        endMarker
+                        marker as UTSJSONObject,
+                        startMarker as UTSJSONObject,
+                        endMarker as UTSJSONObject
                     )
                 }
             }
@@ -185,38 +188,35 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     polyline.value = _uA()
                     return
                 }
-                val newPolyline: polyData = _uA()
+                val newPolyline: UTSArray<PolylineData> = _uA()
                 if (currentIndex.value > 0) {
                     val playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
                     if (playedPoints.length >= 2) {
-                        newPolyline.push(_uO("points" to playedPoints.map(fun(p): UTSJSONObject {
-                            return (_uO("latitude" to p.latitude, "longitude" to p.longitude))
+                        newPolyline.push(PolylineData(points = playedPoints.map(fun(point: TrackPoint): CoordinatePoint {
+                            return (CoordinatePoint(latitude = point.latitude, longitude = point.longitude))
                         }
-                        ), "color" to "#1890FF", "width" to 6, "arrowLine" to true, "borderColor" to "#FFF", "borderWidth" to 1))
+                        ), color = "#1890FF", width = 6, arrowLine = true, borderColor = "#FFF", borderWidth = 1))
                     }
                 }
                 if (currentIndex.value < trackPoints.value.length - 1) {
                     val unplayedPoints = trackPoints.value.slice(currentIndex.value)
                     if (unplayedPoints.length >= 2) {
-                        newPolyline.push(_uO("points" to unplayedPoints.map(fun(p): UTSJSONObject {
-                            return (_uO("latitude" to p.latitude, "longitude" to p.longitude))
+                        newPolyline.push(PolylineData(points = unplayedPoints.map(fun(point: TrackPoint): CoordinatePoint {
+                            return (CoordinatePoint(latitude = point.latitude, longitude = point.longitude))
                         }
-                        ), "color" to "#999", "width" to 3, "borderColor" to "#FFF", "borderWidth" to 1, "dottedLine" to true))
+                        ), color = "#999", width = 3, borderColor = "#FFF", borderWidth = 1))
                     }
                 }
                 polyline.value = newPolyline
             }
             val updatePolyline = ::gen_updatePolyline_fn
             fun gen_updateCarPosition_fn() {
-                if (isTruthy(carMarker.value) && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+                val marker = carMarker.value
+                if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
                     val point = trackPoints.value[currentIndex.value]
-                    carMarker.value.latitude = point.latitude
-                    carMarker.value.longitude = point.longitude
-                    carMarker.value.rotate = if (isTruthy(point.rotation)) {
-                        point.rotation
-                    } else {
-                        0
-                    }
+                    marker.latitude = point.latitude
+                    marker.longitude = point.longitude
+                    marker.rotate = point.rotation
                     if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
                         center["latitude"] = point.latitude
                         center["longitude"] = point.longitude
@@ -234,6 +234,149 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = true
             }
             val showPicker = ::gen_showPicker_fn
+            fun gen_showCurrentPosition_fn() {
+                uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                val originalLatText = lat.value ?: ""
+                val originalLngText = lng.value ?: ""
+                val originalLat = parseFloat(originalLatText)
+                val originalLng = parseFloat(originalLngText)
+                val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+                center["latitude"] = convertedCoord.lat
+                center["longitude"] = convertedCoord.lng
+                mapScale.value = 15
+                val currentPoint = TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = Date().toLocaleString(), speed = 0)
+                val marker = CarMarker(id = 999, latitude = currentPoint.latitude, longitude = currentPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = 0, anchor = _uO(), callout = _uO(), animation = _uO())
+                carMarker.value = marker
+                markers.value = _uA(
+                    marker as UTSJSONObject
+                )
+            }
+            val showCurrentPosition = ::gen_showCurrentPosition_fn
+            fun gen_processTrackData_fn(positions: UTSArray<UTSJSONObject>): Unit {
+                val processedPoints: UTSArray<TrackPoint> = _uA()
+                run {
+                    var i: Number = 0
+                    while(i < positions.length){
+                        val point = positions[i]
+                        val deviceTimeStr = point.getString("deviceTime", "")
+                        val originalLat = point.getNumber("latitude", 0)
+                        val originalLng = point.getNumber("longitude", 0)
+                        val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+                        val processedPoint = TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = formatDateForDisplay(deviceTimeStr), speed = point.getNumber("speed", 0))
+                        if (i > 0) {
+                            val prevPoint = processedPoints[i - 1]
+                            processedPoint.rotation = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint.latitude, processedPoint.longitude)
+                        } else {
+                            processedPoint.rotation = 0
+                        }
+                        processedPoints.push(processedPoint)
+                        i++
+                    }
+                }
+                if (processedPoints.length > 1) {
+                    processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation
+                }
+                trackPoints.value = processedPoints
+                calculateTrackDistance()
+                initCarMarker()
+                updatePolyline()
+                adjustMapToFitTrack()
+                if (trackPoints.value.length > 0) {
+                    currentTime.value = trackPoints.value[0].deviceTime
+                }
+            }
+            val processTrackData = ::gen_processTrackData_fn
+            val loadTrackPos = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 496, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val res = await(getTrackPos(data)) as UTSJSONObject
+                        val trackData = res.getJSON("data")
+                        val positions = trackData?.getArray<UTSJSONObject>("positions")
+                        if (positions != null && positions.length > 0) {
+                            processTrackData(positions)
+                            uni_hideLoading(null)
+                        } else {
+                            showCurrentPosition()
+                            uni_hideLoading(null)
+                        }
+                })
+            }
+            fun gen_pausePlayback_fn() {
+                isPlaying.value = false
+                val timer = playbackTimer
+                if (timer != null) {
+                    clearTimeout(timer)
+                    playbackTimer = null
+                }
+            }
+            val pausePlayback = ::gen_pausePlayback_fn
+            fun gen_resetPlayback_fn() {
+                pausePlayback()
+                currentIndex.value = 0
+                currentSpeed.value = 0
+                if (trackPoints.value.length > 0) {
+                    currentTime.value = trackPoints.value[0].deviceTime
+                }
+                updateCarPosition()
+                updatePolyline()
+            }
+            val resetPlayback = ::gen_resetPlayback_fn
+            fun gen_playNextPoint_fn() {
+                if (currentIndex.value >= trackPoints.value.length - 1) {
+                    pausePlayback()
+                    updatePolyline()
+                    uni_showToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
+                    return
+                }
+                currentIndex.value++
+                updateCarPosition()
+                updatePolyline()
+                val point = trackPoints.value[currentIndex.value]
+                currentSpeed.value = point.speed
+                currentTime.value = point.deviceTime
+            }
+            val playNextPoint = ::gen_playNextPoint_fn
+            fun gen_playbackStep_fn() {
+                if (!isPlaying.value) {
+                    return
+                }
+                val now = Date.now()
+                val elapsed = now - lastTimestamp
+                val interval = (1000 as Number) / playbackSpeed.value
+                if (elapsed >= interval) {
+                    playNextPoint()
+                    lastTimestamp = now - (elapsed % interval)
+                }
+                if (isPlaying.value) {
+                    playbackTimer = setTimeout(fun(){
+                        gen_playbackStep_fn()
+                    }
+                    , 16)
+                }
+            }
+            val playbackStep = ::gen_playbackStep_fn
+            fun gen_startPlayback_fn() {
+                if (trackPoints.value.length == 0) {
+                    uni_showToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
+                    return
+                }
+                if (currentIndex.value >= trackPoints.value.length - 1) {
+                    resetPlayback()
+                }
+                isPlaying.value = true
+                lastTimestamp = Date.now()
+                playbackStep()
+            }
+            val startPlayback = ::gen_startPlayback_fn
+            fun gen_togglePlayback_fn() {
+                if (isPlaying.value) {
+                    pausePlayback()
+                } else {
+                    startPlayback()
+                }
+            }
+            val togglePlayback = ::gen_togglePlayback_fn
             fun gen_onConfirm_fn(value: String) {
                 var formattedValue = value
                 if (formattedValue.includes("-")) {
@@ -253,90 +396,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = false
             }
             val onCancel = ::gen_onCancel_fn
-            fun gen_togglePlayback_fn() {
-                if (isPlaying.value) {
-                    pausePlayback()
-                } else {
-                    startPlayback()
-                }
-            }
-            val togglePlayback = ::gen_togglePlayback_fn
-            fun gen_startPlayback_fn() {
-                if (trackPoints.value.length == 0) {
-                    uni_showToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
-                    return
-                }
-                if (currentIndex.value >= trackPoints.value.length - 1) {
-                    resetPlayback()
-                }
-                isPlaying.value = true
-                lastTimestamp = Date.now()
-                playbackStep()
-            }
-            val startPlayback = ::gen_startPlayback_fn
-            fun gen_playbackStep_fn() {
-                if (!isPlaying.value) {
-                    return
-                }
-                val now = Date.now()
-                val elapsed = now - lastTimestamp
-                val interval = (1000 as Number) / playbackSpeed.value
-                if (elapsed >= interval) {
-                    playNextPoint()
-                    lastTimestamp = now - (elapsed % interval)
-                }
-                if (isPlaying.value) {
-                    playbackTimer = setTimeout(playbackStep, 16)
-                }
-            }
-            val playbackStep = ::gen_playbackStep_fn
-            fun gen_playNextPoint_fn() {
-                if (currentIndex.value >= trackPoints.value.length - 1) {
-                    pausePlayback()
-                    updatePolyline()
-                    uni_showToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
-                    return
-                }
-                currentIndex.value++
-                updateCarPosition()
-                updatePolyline()
-                val point = trackPoints.value[currentIndex.value]
-                currentSpeed.value = if (isTruthy(point.speed)) {
-                    point.speed
-                } else {
-                    0
-                }
-                currentTime.value = if (isTruthy(point.deviceTime)) {
-                    point.deviceTime
-                } else {
-                    ""
-                }
-            }
-            val playNextPoint = ::gen_playNextPoint_fn
-            fun gen_pausePlayback_fn() {
-                isPlaying.value = false
-                if (isTruthy(playbackTimer)) {
-                    clearTimeout(playbackTimer)
-                    playbackTimer = null
-                }
-            }
-            val pausePlayback = ::gen_pausePlayback_fn
-            fun gen_resetPlayback_fn() {
-                pausePlayback()
-                currentIndex.value = 0
-                currentSpeed.value = 0
-                if (trackPoints.value.length > 0) {
-                    currentTime.value = if (isTruthy(trackPoints.value[0].deviceTime)) {
-                        trackPoints.value[0].deviceTime
-                    } else {
-                        ""
-                    }
-                }
-                updateCarPosition()
-                updatePolyline()
-            }
-            val resetPlayback = ::gen_resetPlayback_fn
-            fun gen_setPlaybackSpeed_fn(e: Any) {
+            fun gen_setPlaybackSpeed_fn(e: Number): Unit {
                 val wasPlaying = isPlaying.value
                 if (wasPlaying) {
                     pausePlayback()
@@ -348,15 +408,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             }
             val setPlaybackSpeed = ::gen_setPlaybackSpeed_fn
             onLoad(fun(option){
-                imei.value = option["imei"]
-                carStatus.value = option["connectionStatus"]
-                plateNo.value = option["plateNo"]
-                carType.value = option["carType"]
-                lat.value = option["lat"]
-                lng.value = option["lng"]
-                sTime.value = option["startTime"]
-                eTime.value = option["endTime"]
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:481")
+                imei.value = option["imei"] ?: null
+                carStatus.value = option["connectionStatus"] ?: ""
+                plateNo.value = option["plateNo"] ?: ""
+                carType.value = option["carType"] ?: ""
+                lat.value = option["lat"] ?: null
+                lng.value = option["lng"] ?: null
+                sTime.value = option["startTime"] ?: ""
+                eTime.value = option["endTime"] ?: ""
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:658")
                 if (sTime.value != "" && eTime.value != "") {
                     startTime.value = sTime.value
                     endTime.value = eTime.value
@@ -371,69 +431,6 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 pausePlayback()
             }
             )
-            val loadTrackPos = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 499, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
-                        val res = await(getTrackPos(data))
-                        if (isTruthy(res.data.positions) && res.data.positions.length > 0) {
-                            processTrackData(res.data.positions)
-                            uni_hideLoading(null)
-                        } else {
-                            showCurrentPosition()
-                            uni_hideLoading(null)
-                        }
-                })
-            }
-            fun gen_showCurrentPosition_fn() {
-                uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
-                val originalLat = parseFloat(lat.value)
-                val originalLng = parseFloat(lng.value)
-                val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
-                center["latitude"] = convertedCoord.lat
-                center["longitude"] = convertedCoord.lng
-                mapScale.value = 15
-                val currentPoint: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("currentPoint", "pages/playBack/playBack.uvue", 540, 9), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng, "speed" to 0, "deviceTime" to Date().toLocaleString(), "timestamp" to Date.now(), "rotation" to 0, "originalLatitude" to originalLat, "originalLongitude" to originalLng)
-                carMarker.value = _uO("id" to 999, "latitude" to currentPoint["latitude"], "longitude" to currentPoint["longitude"], "iconPath" to getDeviceIcon(carStatus.value, carType.value), "width" to 25, "height" to 25, "rotate" to 0)
-                markers.value = _uA(
-                    carMarker.value
-                )
-            }
-            val showCurrentPosition = ::gen_showCurrentPosition_fn
-            fun gen_processTrackData_fn(positions: UTSArray<Any>) {
-                val processedPoints = _uA()
-                run {
-                    var i: Number = 0
-                    while(i < positions.length){
-                        val point = positions[i]
-                        val deviceTimeStr = point.getString("deviceTime", "")
-                        val originalLat = point.getNumber("latitude", 0)
-                        val originalLng = point.getNumber("longitude", 0)
-                        val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
-                        val processedPoint: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("processedPoint", "pages/playBack/playBack.uvue", 588, 10), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng, "speed" to point.getNumber("speed", 0), "deviceTime" to formatDateForDisplay(deviceTimeStr), "timestamp" to safeParseDate(deviceTimeStr), "originalLatitude" to originalLat, "originalLongitude" to originalLng)
-                        if (i > 0) {
-                            val prevPoint = processedPoints[i - 1]
-                            processedPoint["rotation"] = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint["latitude"], processedPoint["longitude"])
-                        } else {
-                            processedPoint["rotation"] = 0
-                        }
-                        processedPoints.push(processedPoint)
-                        i++
-                    }
-                }
-                if (processedPoints.length > 1) {
-                    processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation
-                }
-                trackPoints.value = processedPoints
-                calculateTrackDistance()
-                initCarMarker()
-                updatePolyline()
-                adjustMapToFitTrack()
-                if (trackPoints.value.length > 0) {
-                    currentTime.value = trackPoints.value[0].deviceTime
-                }
-            }
-            val processTrackData = ::gen_processTrackData_fn
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_marker = resolveComponent("marker")
@@ -449,7 +446,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
                                 if (isTrue(carMarker.value)) {
-                                    _cV(_component_marker, _uM("key" to 0, "id" to carMarker.value.id, "latitude" to carMarker.value.latitude, "longitude" to carMarker.value.longitude, "iconPath" to carMarker.value.iconPath, "width" to carMarker.value.width, "height" to carMarker.value.height, "rotate" to carMarker.value.rotate, "anchor" to carMarker.value.anchor, "callout" to carMarker.value.callout, "animation" to carMarker.value.animation), null, 8, _uA(
+                                    _cV(_component_marker, _uM("key" to 0, "id" to carMarker.value!!.id, "latitude" to carMarker.value!!.latitude, "longitude" to carMarker.value!!.longitude, "iconPath" to carMarker.value!!.iconPath, "width" to carMarker.value!!.width, "height" to carMarker.value!!.height, "rotate" to carMarker.value!!.rotate, "anchor" to carMarker.value!!.anchor, "callout" to carMarker.value!!.callout, "animation" to carMarker.value!!.animation), null, 8, _uA(
                                         "id",
                                         "latitude",
                                         "longitude",

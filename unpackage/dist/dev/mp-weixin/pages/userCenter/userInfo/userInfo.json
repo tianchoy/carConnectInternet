@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "custom-nav-bar": "../../../components/custom-navBar/custom-navBar",
+    "i-icon": "../../../uni_modules/i-ui-x/components/i-icon/i-icon"
+  }
+}

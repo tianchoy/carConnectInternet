@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "i-empty": "../../uni_modules/i-ui-x/components/i-empty/i-empty"
+  }
+}

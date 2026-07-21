@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "设备列表",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-tag": "../../uni_modules/i-ui-x/components/i-tag/i-tag",
+    "index-list-mode": "../../components/indexListMode/indexListMode"
+  }
+}

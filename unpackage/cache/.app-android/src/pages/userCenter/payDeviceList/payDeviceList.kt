@@ -29,14 +29,6 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
             val loading = ref(false)
             val hasMore = ref(true)
             val needRefresh = ref(false)
-            onShow(fun(){
-                if (needRefresh.value || deviceList.value.length === 0) {
-                    resetData()
-                    loadPayDeviceListData()
-                    needRefresh.value = false
-                }
-            }
-            )
             val resetData = fun(){
                 deviceList.value = _uA()
                 currPage.value = 1
@@ -50,7 +42,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                         }
                         loading.value = true
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 96, 10), "page" to currPage.value, "pageSize" to pageSize.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 87, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
                             if (res.code == 0) {
                                 totalPage.value = res.data.totalPage
@@ -64,7 +56,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                     currPage.value++
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(res.msg)) {
+                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "加载失败"
@@ -73,7 +65,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:128")
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:119")
                             uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
@@ -81,11 +73,19 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                         }
                 })
             }
+            onShow(fun(){
+                if (needRefresh.value || deviceList.value.length === 0) {
+                    resetData()
+                    loadPayDeviceListData()
+                    needRefresh.value = false
+                }
+            }
+            )
             onReachBottom(fun(){
                 loadPayDeviceListData()
             }
             )
-            val pay = fun(reassignedIccid: String, simMerchant: String){
+            fun gen_pay_fn(reassignedIccid: String, simMerchant: String) {
                 var iccid = reassignedIccid
                 if (simMerchant.toLowerCase() == "zddx") {
                     iccid = iccid.substring(0, iccid.length - 1)
@@ -94,6 +94,12 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 needRefresh.value = true
                 needRefresh.value = false
                 uni_showToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))
+            }
+            val pay = ::gen_pay_fn
+            val payDevice = fun(item: UTSJSONObject){
+                val iccid = item.getString("iccid", "")
+                val simMerchant = item.getString("simMerchant", "")
+                pay(iccid, simMerchant)
             }
             onPullDownRefresh(fun(){
                 resetData()
@@ -142,7 +148,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                     _cE("view", _uM("class" to "device-info"), _uA(
                                         _cE("view"),
                                         _cE("text", _uM("class" to "pay-btn", "onClick" to fun(){
-                                            pay(item["iccid"], item["simMerchant"])
+                                            payDevice(item)
                                         }
                                         ), "去续费", 8, _uA(
                                             "onClick"

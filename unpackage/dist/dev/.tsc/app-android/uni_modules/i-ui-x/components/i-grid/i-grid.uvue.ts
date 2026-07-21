@@ -110,8 +110,80 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function valueText(value: any): string {
+  if (typeof value == 'string') return value
+  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
+  return ''
+}
+
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('%') >= 0 ||
+    text == 'auto'
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+function itemValue(item: any, keyName: string): string {
+  if (item == null || typeof item != 'object') return ''
+  const values = item as UTSJSONObject
+  const value = values[keyName]
+  if (value == null) return ''
+  return valueText(value as any)
+}
+
+function getItemText(item: any): string {
+  const text = itemValue(item, 'text')
+  if (text.length > 0) return text
+  return valueText(item)
+}
+
+function getItemIcon(item: any): string {
+  return itemValue(item, 'icon')
+}
+
+function getItemImage(item: any): string {
+  return itemValue(item, 'image')
+}
+
+function getItemName(item: any): string {
+  return itemValue(item, 'name')
+}
+
+function getItemBgColor(item: any): string {
+  const color = itemValue(item, 'bgColor')
+  if (color.length > 0) return color
+  return props.itemBgColor
+}
+
+function getItemIconColor(item: any): string {
+  const color = itemValue(item, 'iconColor')
+  if (color.length > 0) return color
+  return props.iconColor
+}
+
+function getItemTextColor(item: any): string {
+  const color = itemValue(item, 'textColor')
+  if (color.length > 0) return color
+  return props.textColor
+}
+
+function getItemUrl(item: any): string {
+  return itemValue(item, 'url')
+}
+
 const bgColor = computed(() => {
   return props.bgColor
+})
+const gridItems = computed((): Array<any> => {
+  const items = props.items
+  if (items == null) return [] as Array<any>
+  return items as Array<any>
 })
 const selected = ref(-1)
 
@@ -127,77 +199,17 @@ const gridStyle = computed(() => {
   )
 })
 
-function formatSize(value) {
-  const text = String(value)
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('%') >= 0 ||
-    text == 'auto'
-  )
-    return text
-  return text + 'px'
-}
-
-function itemValue(item, keyName) {
-  if (item == null) return ''
-  if (typeof item == 'object') {
-    const value = item[keyName]
-    if (value == null) return ''
-    return String(value)
-  }
-  return ''
-}
-
-function getItemText(item) {
-  const text = itemValue(item, 'text')
-  if (text.length > 0) return text
-  return String(item)
-}
-
-function getItemIcon(item) {
-  return itemValue(item, 'icon')
-}
-
-function getItemImage(item) {
-  return itemValue(item, 'image')
-}
-
-function getItemName(item) {
-  return itemValue(item, 'name')
-}
-
-function getItemBgColor(item) {
-  const color = itemValue(item, 'bgColor')
-  if (color.length > 0) return color
-  return props.itemBgColor
-}
-
-function getItemIconColor(item) {
-  const color = itemValue(item, 'iconColor')
-  if (color.length > 0) return color
-  return props.iconColor
-}
-
-function getItemTextColor(item) {
-  const color = itemValue(item, 'textColor')
-  if (color.length > 0) return color
-  return props.textColor
-}
-
-function getItemUrl(item) {
-  return itemValue(item, 'url')
-}
-
 function getColumns() {
   if (props.col <= 1) return 1
   if (props.col >= 6) return 6
   return props.col
 }
 
-function getRows() {
+function getRows(): number {
   const columns = getColumns()
-  return Math.ceil(props.items.length / columns)
+  const items = props.items
+  if (items == null) return 0
+  return Math.ceil(items.length / columns)
 }
 
 function getItemWidth() {
@@ -210,7 +222,7 @@ function getItemWidth() {
   return '16.6667%'
 }
 
-function getItemStyle(index, item) {
+function getItemStyle(index: number, item: any): string {
   const columns = getColumns()
   const row = Math.floor(index / columns)
   const colIndex = index % columns
@@ -241,7 +253,7 @@ function getItemStyle(index, item) {
   return style
 }
 
-function getIconStyle(item) {
+function getIconStyle(item: any): string {
   return (
     'color:' +
     getItemIconColor(item) +
@@ -253,16 +265,16 @@ function getIconStyle(item) {
   )
 }
 
-function getImageStyle(item) {
+function getImageStyle(item: any): string {
   const size = formatSize(props.imageSize)
   return 'width:' + size + ';height:' + size + ';'
 }
 
-function getTextStyle(item) {
+function getTextStyle(item: any): string {
   return 'color:' + getItemTextColor(item) + ';font-size:' + formatSize(props.fontSize) + ';'
 }
 
-function buildPayload(item, index) {
+function buildPayload(item: any, index: number): UTSJSONObject {
   return {
     index,
     name: getItemName(item),
@@ -273,7 +285,7 @@ function buildPayload(item, index) {
   }
 }
 
-function select(item, index) {
+function select(item: any, index: number): void {
   selected.value = index
   const payload = buildPayload(item, index)
   emit('select', payload)
@@ -281,8 +293,8 @@ function select(item, index) {
   emit('click', payload)
 }
 
-function loadMore() {
-  emit('loadmore', props.items.length)
+function loadMore(): void {
+  emit('loadmore', gridItems.value.length)
 }
 
 return (): any | null => {
@@ -291,15 +303,15 @@ return (): any | null => {
     class: "i-grid",
     style: _nS(gridStyle.value)
   }), [
-    _cE(Fragment, null, RenderHelpers.renderList(_ctx.items, (item, index, __index, _cached): any => {
+    _cE(Fragment, null, RenderHelpers.renderList(gridItems.value, (item, index, __index, _cached): any => {
       return _cE("view", _uM({
-        key: String(index) + '-' + getItemText(item),
+        key: index.toString() + '-' + getItemText(item),
         class: _nC(
         selected.value == index
           ? 'i-grid__item i-grid__item--active'
           : 'i-grid__item'
       ),
-        style: _nS(getItemStyle(index, item)),
+        style: _nS(getItemStyle(index, item as any)),
         "hover-class": _ctx.isLink ? 'i-grid__item--hover' : 'none',
         onClick: () => {select(item, index)}
       }), [

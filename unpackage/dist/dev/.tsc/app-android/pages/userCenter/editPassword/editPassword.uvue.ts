@@ -8,6 +8,10 @@ import {changePassWord} from '../../../api/request.uts'
 		id : string,
 		mobile : string,
 	}
+	type FormInstance = { __$originalPosition?: UTSSourceMapPosition<"FormInstance", "pages/userCenter/editPassword/editPassword.uvue", 35, 7>;
+		validate: () => boolean
+	}
+
 	
 const __sfc__ = defineComponent({
   __name: 'editPassword',
@@ -27,18 +31,18 @@ const _cache = __ins.renderCache;
 	});
 
 	// 表单引用
-	const formRef = ref(null);
+	const formRef = ref<FormInstance | null>(null);
 
 	// 验证规则
-	const validateConfirmPassword = (rule, value, callback) => {
+	const validateConfirmPassword = (rule : UTSJSONObject, value : string, callback : (error : Error | null) => void) : void => {
 		if (value !== formData.value.newPassword) {
 			callback(new Error('两次输入的密码不一致'));
 		} else {
-			callback();
+			callback(null);
 		}
 	};
 
-	const rules = {__$originalPosition: new UTSSourceMapPosition("rules", "pages/userCenter/editPassword/editPassword.uvue", 57, 8),
+	const rules = {__$originalPosition: new UTSSourceMapPosition("rules", "pages/userCenter/editPassword/editPassword.uvue", 61, 8),
 		password: [
 			{ required: true, message: '请输入原密码', trigger: 'blur' },
 			{ min: 6, max: 20, message: '密码长度在6到20个字符', trigger: 'blur' }
@@ -61,10 +65,13 @@ const _cache = __ins.renderCache;
 	// 提交表单
 	const handleSubmit = async () => {
 		try {
-			await formRef.value.validate();
+			const form = formRef.value
+			if (form == null || !form.validate()) {
+				throw new Error('表单验证失败')
+			}
 			uni.showLoading({ title: '提交中...', mask: true });
 
-			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 83, 10),
+			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 90, 10),
 				password: formData.value.password,
 				newPassword: formData.value.newPassword
 			}
@@ -92,32 +99,30 @@ const _cache = __ins.renderCache;
 			}
 
 			
-		} catch (error) {
+		} catch (error : any) {
 			uni.hideLoading();
-			if (error) {
-				uni.showToast({
-					title: error[0].message || '表单验证失败',
-					icon: 'none',
-					duration: 2000
-				});
-			}
+			uni.showToast({
+				title: '表单验证失败',
+				icon: 'none',
+				duration: 2000
+			});
 		}
 	};
 
 	onLoad((options) => {
-		if (options.userInfo) {
+		if (options.userInfo != null) {
 			try {
-				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo), " at pages/userCenter/editPassword/editPassword.uvue:126")), " at pages/userCenter/editPassword/editPassword.uvue:126") as UTSJSONObject
-				console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:127")
+				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/editPassword/editPassword.uvue:131") as string), " at pages/userCenter/editPassword/editPassword.uvue:131") as UTSJSONObject
+				console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:132")
 				const userId = parsedInfo.getString("userId")
 				const mobile = parsedInfo.getString("mobile")
 				userInfo.value = {
 					id: userId != null ? userId : "",
 					mobile: mobile != null ? mobile : ""
 				}
-				console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:134")
+				console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:139")
 			} catch (e) {
-				console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:136")
+				console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:141")
 			}
 		}
 	})

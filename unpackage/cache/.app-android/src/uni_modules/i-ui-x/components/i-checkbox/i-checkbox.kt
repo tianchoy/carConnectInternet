@@ -44,7 +44,53 @@ open class GenUniModulesIUiXComponentsICheckboxICheckbox : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            val internalChecked = ref(isChecked())
+            fun formatSize(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            fun gen_valueText_fn(value: Any): String {
+                if (UTSAndroid.`typeof`(value) == "string") {
+                    return value as String
+                }
+                if (UTSAndroid.`typeof`(value) == "number" || UTSAndroid.`typeof`(value) == "boolean") {
+                    return (value as Any).toString()
+                }
+                return ""
+            }
+            val valueText = ::gen_valueText_fn
+            fun gen_isChecked_fn(): Boolean {
+                if (props.checked) {
+                    return true
+                }
+                val modelValue = props.modelValue
+                val value = if (valueText(modelValue).length > 0) {
+                    modelValue
+                } else {
+                    props.value
+                }
+                if (UTSArray.isArray(value)) {
+                    val names = value as UTSArray<Any>
+                    run {
+                        var i: Number = 0
+                        while(i < names.length){
+                            if (valueText(names[i]) == valueText(props.name)) {
+                                return true
+                            }
+                            i++
+                        }
+                    }
+                    return false
+                }
+                if (UTSAndroid.`typeof`(value) == "boolean") {
+                    return value as Boolean
+                }
+                return valueText(value) == valueText(props.name)
+            }
+            val isChecked = ::gen_isChecked_fn
+            val internalChecked = ref<Boolean>(isChecked())
             val checked = computed(fun(): Boolean {
                 return internalChecked.value
             }
@@ -124,42 +170,60 @@ open class GenUniModulesIUiXComponentsICheckboxICheckbox : VueComponent {
                 return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";"
             }
             )
-            watch(fun(){
+            watch(fun(): Any {
                 return props.modelValue
             }
-            , fun(){
+            , fun(): Unit {
                 internalChecked.value = isChecked()
             }
             )
-            watch(fun(){
+            watch(fun(): Any {
                 return props.value
             }
-            , fun(){
+            , fun(): Unit {
                 internalChecked.value = isChecked()
             }
             )
-            watch(fun(){
+            watch(fun(): Boolean {
                 return props.checked
             }
-            , fun(){
+            , fun(): Unit {
                 internalChecked.value = isChecked()
             }
             )
-            fun gen_toggle_fn() {
-                if (props.disabled) {
-                    return
+            fun gen_buildValue_fn(nextChecked: Boolean, previousChecked: Boolean): Any {
+                val modelValue = props.modelValue
+                val value = if (valueText(modelValue).length > 0) {
+                    modelValue
+                } else {
+                    props.value
                 }
-                updateChecked(!checked.value)
-            }
-            val toggle = ::gen_toggle_fn
-            fun gen_toggleByLabel_fn() {
-                if (props.labelDisabled) {
-                    return
+                if (UTSArray.isArray(value)) {
+                    val list = value as UTSArray<Any>
+                    val nextList = list.slice(0)
+                    val exists = previousChecked
+                    if (nextChecked && !exists) {
+                        nextList.push(props.name)
+                    }
+                    if (!nextChecked && exists) {
+                        val filtered = _uA<Any>()
+                        run {
+                            var i: Number = 0
+                            while(i < nextList.length){
+                                if (valueText(nextList[i]) != valueText(props.name)) {
+                                    filtered.push(nextList[i])
+                                }
+                                i++
+                            }
+                        }
+                        return filtered
+                    }
+                    return nextList
                 }
-                toggle()
+                return nextChecked
             }
-            val toggleByLabel = ::gen_toggleByLabel_fn
-            fun gen_updateChecked_fn(nextChecked) {
+            val buildValue = ::gen_buildValue_fn
+            fun gen_updateChecked_fn(nextChecked: Boolean): Unit {
                 val previousChecked = checked.value
                 internalChecked.value = nextChecked
                 val nextValue = buildValue(nextChecked, previousChecked)
@@ -169,71 +233,20 @@ open class GenUniModulesIUiXComponentsICheckboxICheckbox : VueComponent {
                 emit("change", nextValue)
             }
             val updateChecked = ::gen_updateChecked_fn
-            fun gen_isChecked_fn(): Boolean {
-                if (props.checked) {
-                    return true
+            fun gen_toggle_fn(): Unit {
+                if (props.disabled) {
+                    return
                 }
-                val value = if (String(props.modelValue).length > 0) {
-                    props.modelValue
-                } else {
-                    props.value
-                }
-                if (UTSArray.isArray(value)) {
-                    run {
-                        var i: Number = 0
-                        while(i < (value as UTSArray<*>).length){
-                            if (String((value as UTSArray<*>)[i]) == String(props.name)) {
-                                return true
-                            }
-                            i++
-                        }
-                    }
-                    return false
-                }
-                if (UTSAndroid.`typeof`(value) == "boolean") {
-                    return value as Boolean
-                }
-                return String(value) == String(props.name)
+                updateChecked(!checked.value)
             }
-            val isChecked = ::gen_isChecked_fn
-            fun gen_buildValue_fn(nextChecked, previousChecked): Any {
-                val value = if (String(props.modelValue).length > 0) {
-                    props.modelValue
-                } else {
-                    props.value
+            val toggle = ::gen_toggle_fn
+            fun gen_toggleByLabel_fn(): Unit {
+                if (props.labelDisabled) {
+                    return
                 }
-                if (UTSArray.isArray(value)) {
-                    val list = (value as UTSArray<*>).slice(0)
-                    val exists = previousChecked
-                    if (isTruthy(nextChecked) && !isTruthy(exists)) {
-                        list.push(props.name)
-                    }
-                    if (!isTruthy(nextChecked) && isTruthy(exists)) {
-                        val nextList = _uA()
-                        run {
-                            var i: Number = 0
-                            while(i < list.length){
-                                if (String(list[i]) != String(props.name)) {
-                                    nextList.push(list[i])
-                                }
-                                i++
-                            }
-                        }
-                        return nextList
-                    }
-                    return list
-                }
-                return nextChecked
+                toggle()
             }
-            val buildValue = ::gen_buildValue_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
+            val toggleByLabel = ::gen_toggleByLabel_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to _nC(wrapClass.value), "onClick" to toggle), _uA(
                     renderSlot(_ctx.`$slots`, "icon", _uM("checked" to checked.value), fun(): UTSArray<Any> {

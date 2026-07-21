@@ -104,7 +104,7 @@ const _cache = __ins.renderCache;
 	// 扫码功能
 	const scanCode = () => {
 		uni.navigateTo({
-			url: '/pages/scancode/scancode'
+			url: '/pages/scancode/scancode?source=addCar'
 		})
 	}
 
@@ -112,9 +112,9 @@ const _cache = __ins.renderCache;
 	const handleScanResult = (data: ScanResultData) => {
 		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:144")
 		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
-		if (data.result.length === 15) {
+		if (data.result.length == 15) {
 			carInfo.value.imei = '0' + data.result.slice(4, 15)
-		} else if (data.result.length === 11) {
+		} else if (data.result.length == 11) {
 			carInfo.value.imei = '0' + data.result
 		} else {
 			uni.showToast({
@@ -227,6 +227,14 @@ const _cache = __ins.renderCache;
 		// 注册扫码结果事件监听
 		uni.$on('scanCodeResult', handleScanResult)
 		console.log('formRef 初始值:', formRef.value, " at pages/addCar/addCar.uvue:260")
+	})
+
+	onShow(() => {
+		const result = uni.getStorageSync('scanCodeResult') as string
+		if (result.length > 0) {
+			uni.removeStorageSync('scanCodeResult')
+			handleScanResult({ result: result })
+		}
 	})
 
 	onUnload(() => {

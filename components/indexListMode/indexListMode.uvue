@@ -16,12 +16,12 @@
 					<text class="imei">ID: {{item.imei}}</text>
 				</view>
 			</view>
-			<i-modal :show="modal" title="提示" content="是否要解绑设备？" :buttonReverse="true" align="center" confirmText="确定" cancelText="取消" :showCancelButton="true" @confirm="confirm" @cancel="cancel"></i-modal>
 		</scroll-view>
 		
 		<view class="empty" v-else>
 			暂无数据
 		</view>
+			<i-modal :show="modal" title="提示" content="是否要解绑设备？" :buttonReverse="true" align="center" confirmText="确定" cancelText="取消" :showCancelButton="true" @confirm="confirm" @cancel="cancel"></i-modal>
 	</view>
 </template>
 

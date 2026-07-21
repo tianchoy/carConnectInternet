@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 
 
 const __sfc__ = defineComponent({
@@ -49,14 +49,7 @@ const normalized = computed(() => {
   return Math.round(current.value)
 })
 
-watch(
-  () => props.percent,
-  (nextValue) => {
-    current.value = nextValue
-  },
-)
-
-function step(delta) {
+function step(delta: number) {
   current.value = Math.min(100, Math.max(0, current.value + delta))
   emit('change', current.value)
   emit('update:percent', current.value)

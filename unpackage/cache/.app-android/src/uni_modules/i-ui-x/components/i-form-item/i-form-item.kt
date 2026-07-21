@@ -34,6 +34,33 @@ open class GenUniModulesIUiXComponentsIFormItemIFormItem : VueComponent {
             val _ctx = __ins.proxy as GenUniModulesIUiXComponentsIFormItemIFormItem
             val _cache = __ins.renderCache
             val props = __props
+            fun formatSize(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            fun gen_normalizeIdName_fn(name: String): String {
+                var result = ""
+                run {
+                    var i: Number = 0
+                    while(i < name.length){
+                        val char = name.charAt(i)
+                        val isNumber = char >= "0" && char <= "9"
+                        val isUpper = char >= "A" && char <= "Z"
+                        val isLower = char >= "a" && char <= "z"
+                        if (isNumber || isUpper || isLower || char == "-" || char == "_") {
+                            result = result + char
+                        } else {
+                            result = result + "-"
+                        }
+                        i++
+                    }
+                }
+                return result
+            }
+            val normalizeIdName = ::gen_normalizeIdName_fn
             val itemId = computed(fun(): String {
                 if (props.scrollId.length > 0) {
                     return props.scrollId
@@ -89,36 +116,6 @@ open class GenUniModulesIUiXComponentsIFormItemIFormItem : VueComponent {
                 return "text-align:" + props.errorAlign + ";"
             }
             )
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            fun gen_normalizeIdName_fn(name): String {
-                val text = String(name)
-                var result = ""
-                run {
-                    var i: Number = 0
-                    while(i < text.length){
-                        val code = text.charCodeAt(i)
-                        val char = text.charAt(i)
-                        val isNumber = code >= 48 && code <= 57
-                        val isUpper = code >= 65 && code <= 90
-                        val isLower = code >= 97 && code <= 122
-                        if (isNumber || isUpper || isLower || char == "-" || char == "_") {
-                            result = result + char
-                        } else {
-                            result = result + "-"
-                        }
-                        i++
-                    }
-                }
-                return result
-            }
-            val normalizeIdName = ::gen_normalizeIdName_fn
             return fun(): Any? {
                 return _cE("view", _uM("id" to itemId.value, "class" to _nC(itemClass.value)), _uA(
                     if (isTrue(_ctx.showLabel)) {

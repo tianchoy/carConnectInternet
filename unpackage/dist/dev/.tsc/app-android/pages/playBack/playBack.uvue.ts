@@ -13,17 +13,46 @@ import { ref, reactive, onMounted, watch } from 'vue'
 	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 67, 7>;
 		latitude : number;
 		longitude : number;
+		rotation : number;
+		deviceTime : string;
+		speed : number;
 	}
 
-	type polyData = { __$originalPosition?: UTSSourceMapPosition<"polyData", "pages/playBack/playBack.uvue", 72, 7>;
-		points : Array<TrackPoint>;
-		color : string;
-		width : number;
-		arrowLine : boolean;
-		borderColor : string;
-		borderWidth : number;
+	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 75, 7>;
+		minLat : number;
+		maxLat : number;
+		minLng : number;
+		maxLng : number;
 	}
+
+	type PolylineData = { __$originalPosition?: UTSSourceMapPosition<"PolylineData", "pages/playBack/playBack.uvue", 82, 7>;
+		points: Array<CoordinatePoint>
+		color: string
+		width: number
+		arrowLine: boolean
+		borderColor: string
+		borderWidth: number
+	}
+	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/playBack/playBack.uvue", 90, 7>;
+		latitude: number
+		longitude: number
+	}
+
+	type polyData = Array<PolylineData>
 	// 地图状态
+	type CarMarker = { __$originalPosition?: UTSSourceMapPosition<"CarMarker", "pages/playBack/playBack.uvue", 113, 7>;
+		id: number
+		latitude: number
+		longitude: number
+		iconPath: string
+		width: number
+		height: number
+		rotate: number
+		anchor: UTSJSONObject
+		callout: UTSJSONObject
+		animation: UTSJSONObject
+	}
+
 	
 const __sfc__ = defineComponent({
   __name: 'playBack',
@@ -48,15 +77,15 @@ const _cache = __ins.renderCache;
 	const pickerTitle = ref('选择开始时间')
 
 	// 轨迹回放相关
-	const trackPoints = ref<Array<any>>([])
-	const polyline = ref<Array<any>>([])
+	const trackPoints = ref<Array<TrackPoint>>([])
+	const polyline = ref<Array<PolylineData>>([])
 	const isPlaying = ref(false)
 	const playbackSpeed = ref(5)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
 	const currentIndex = ref(0)
-	const carMarker = ref<any>(null)
+	const carMarker = ref<CarMarker | null>(null)
 	let playbackTimer : number | null = 0
 	let lastTimestamp = 0
 
@@ -68,7 +97,7 @@ const _cache = __ins.renderCache;
 	const eTime = ref('')
 
 	// 标记点集合
-	const markers = ref<Array<any>>([])
+	const markers = ref<Array<UTSJSONObject>>([])
 
 	// 日期函数
 	function safeParseDate(dateStr : string) : number {
@@ -121,7 +150,7 @@ const _cache = __ins.renderCache;
 	}
 
 	// 计算轨迹边界
-	function calculateTrackBounds() {
+	function calculateTrackBounds() : TrackBounds | null {
 		if (trackPoints.value.length == 0) return null
 
 		let minLat = trackPoints.value[0].latitude
@@ -129,20 +158,26 @@ const _cache = __ins.renderCache;
 		let minLng = trackPoints.value[0].longitude
 		let maxLng = trackPoints.value[0].longitude
 
-		trackPoints.value.forEach(point => {
+		trackPoints.value.forEach((point : TrackPoint) : void => {
 			minLat = Math.min(minLat, point.latitude)
 			maxLat = Math.max(maxLat, point.latitude)
 			minLng = Math.min(minLng, point.longitude)
 			maxLng = Math.max(maxLng, point.longitude)
 		})
 
-		return { minLat, maxLat, minLng, maxLng }
+		return {
+			minLat: minLat,
+			maxLat: maxLat,
+			minLng: minLng,
+			maxLng: maxLng
+		}
 	}
 
 	// 调整地图以适应轨迹
 	function adjustMapToFitTrack() {
-		const bounds = calculateTrackBounds()
-		if (!bounds) return
+		const nullableBounds = calculateTrackBounds()
+		if (nullableBounds == null) return
+		const bounds = nullableBounds
 
 		center.latitude = (bounds.minLat + bounds.maxLat) / 2
 		center.longitude = (bounds.minLng + bounds.maxLng) / 2
@@ -174,7 +209,12 @@ const _cache = __ins.renderCache;
 	function initDateTime() {
 		const now = new Date()
 		const formatTime = (date : Date) : string => {
-			return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
+			const month = (date.getMonth() + 1).toString().padStart(2, '0')
+			const day = date.getDate().toString().padStart(2, '0')
+			const hours = date.getHours().toString().padStart(2, '0')
+			const minutes = date.getMinutes().toString().padStart(2, '0')
+			const seconds = date.getSeconds().toString().padStart(2, '0')
+			return `${date.getFullYear()}/${month}/${day} ${hours}:${minutes}:${seconds}`
 		}
 
 		endTime.value = formatTime(now)
@@ -185,25 +225,23 @@ const _cache = __ins.renderCache;
 	// 初始化小车标记
 	function initCarMarker() {
 		if (trackPoints.value.length > 0) {
-			carMarker.value = {
-				id: 999,
-				latitude: trackPoints.value[0].latitude,
-				longitude: trackPoints.value[0].longitude,
-				iconPath: getDeviceIcon(carStatus.value, carType.value),	
-				width: 25,
-				height: 25,
-				rotate: trackPoints.value[0].rotation || 0,
-				// anchor: { x: 0.5, y: 0.5 },
-				// callout: {
-				// 	content: plateNo,
-				// 	borderRadius: 5,
-				// 	padding: 5,
-				// 	display: 'ALWAYS'
-				// }
-			}
+			const firstPoint = trackPoints.value[0]
+				const marker : CarMarker = {
+					id: 999,
+					latitude: firstPoint.latitude,
+					longitude: firstPoint.longitude,
+					iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+					width: 25,
+					height: 25,
+					rotate: firstPoint.rotation,
+					anchor: {},
+					callout: {},
+					animation: {}
+				}
+				carMarker.value = marker
 
 			// 添加起点和终点标记
-			const startMarker = {__$originalPosition: new UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 252, 10),
+			const startMarker = {__$originalPosition: new UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 290, 10),
 				id: 1000,
 				latitude: trackPoints.value[0].latitude,
 				longitude: trackPoints.value[0].longitude,
@@ -219,7 +257,7 @@ const _cache = __ins.renderCache;
 				}
 			}
 
-			const endMarker = {__$originalPosition: new UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 268, 10),
+			const endMarker = {__$originalPosition: new UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 306, 10),
 				id: 1001,
 				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
 				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
@@ -235,7 +273,7 @@ const _cache = __ins.renderCache;
 				}
 			}
 
-			markers.value = [carMarker.value, startMarker, endMarker]
+			markers.value = [marker as UTSJSONObject, startMarker as UTSJSONObject, endMarker as UTSJSONObject]
 		}
 	}
 
@@ -246,14 +284,14 @@ const _cache = __ins.renderCache;
 			return
 		}
 
-		const newPolyline : polyData = []
+		const newPolyline : Array<PolylineData> = []
 
 		// 已播放的轨迹部分（实线）
 		if (currentIndex.value > 0) {
 			const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
 			if (playedPoints.length >= 2) {
 				newPolyline.push({
-					points: playedPoints.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
+					points: playedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
 					color: '#1890FF',
 					width: 6,
 					arrowLine: true,
@@ -268,12 +306,11 @@ const _cache = __ins.renderCache;
 			const unplayedPoints = trackPoints.value.slice(currentIndex.value)
 			if (unplayedPoints.length >= 2) {
 				newPolyline.push({
-					points: unplayedPoints.map(p => ({ latitude: p.latitude, longitude: p.longitude })),
+					points: unplayedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
 					color: '#999',
 					width: 3,
 					borderColor: '#FFF',
-					borderWidth: 1,
-					dottedLine: true
+					borderWidth: 1
 				})
 			}
 		}
@@ -283,12 +320,13 @@ const _cache = __ins.renderCache;
 
 	// 更新小车位置
 	function updateCarPosition() {
-		if (carMarker.value && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
+		const marker = carMarker.value
+		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
 			const point = trackPoints.value[currentIndex.value]
 
-			carMarker.value.latitude = point.latitude
-			carMarker.value.longitude = point.longitude
-			carMarker.value.rotate = point.rotation || 0
+			marker.latitude = point.latitude
+			marker.longitude = point.longitude
+			marker.rotate = point.rotation
 
 			// 每5个点更新一次中心点
 			if (currentIndex.value % 5 == 0 ||
@@ -307,172 +345,6 @@ const _cache = __ins.renderCache;
 		showDateTimePicker.value = true
 	}
 
-	// 确认选择时间
-	function onConfirm(value : string) {
-		let formattedValue = value
-		if (formattedValue.includes('-')) {
-			formattedValue = formattedValue.replace(/-/g, '/')
-		}
-
-		if (currentPickerType.value == 'start') {
-			startTime.value = formattedValue
-		} else {
-			endTime.value = formattedValue
-		}
-		resetPlayback()
-		loadTrackPos()
-		showDateTimePicker.value = false
-	}
-	// 取消选择时间
-	function onCancel() {
-		showDateTimePicker.value = false
-	}
-
-	// 播放控制
-	function togglePlayback() {
-		if (isPlaying.value) {
-			pausePlayback()
-		} else {
-			startPlayback()
-		}
-	}
-	// 开始回放
-	function startPlayback() {
-		if (trackPoints.value.length == 0) {
-			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
-			return
-		}
-
-		if (currentIndex.value >= trackPoints.value.length - 1) {
-			resetPlayback()
-		}
-
-		isPlaying.value = true
-		lastTimestamp = Date.now()
-		playbackStep()
-	}
-	// 回放步骤
-	function playbackStep() {
-		if (!isPlaying.value) return
-
-		const now = Date.now()
-		const elapsed = now - lastTimestamp
-		const interval = 1000 / playbackSpeed.value
-
-		if (elapsed >= interval) {
-			playNextPoint()
-			lastTimestamp = now - (elapsed % interval)
-		}
-
-		if (isPlaying.value) {
-			playbackTimer = setTimeout(playbackStep, 16) // 约60fps
-		}
-	}
-	// 播放下一个点
-	function playNextPoint() {
-		if (currentIndex.value >= trackPoints.value.length - 1) {
-			pausePlayback()
-			updatePolyline()
-			uni.showToast({
-				title: '轨迹回放完成',
-				icon: 'none',
-				duration: 1500
-			})
-			return
-		}
-
-		currentIndex.value++
-		updateCarPosition()
-		updatePolyline()
-
-		const point = trackPoints.value[currentIndex.value]
-		currentSpeed.value = point.speed || 0
-		currentTime.value = point.deviceTime || ''
-	}
-	// 暂停回放
-	function pausePlayback() {
-		isPlaying.value = false
-		if (playbackTimer) {
-			clearTimeout(playbackTimer)
-			playbackTimer = null
-		}
-	}
-	// 重置回放
-	function resetPlayback() {
-		pausePlayback()
-		currentIndex.value = 0
-		currentSpeed.value = 0
-		if (trackPoints.value.length > 0) {
-			currentTime.value = trackPoints.value[0].deviceTime || ''
-		}
-		updateCarPosition()
-		updatePolyline()
-	}
-
-	// 设置回放速度
-	function setPlaybackSpeed(e : any) {
-		const wasPlaying = isPlaying.value
-		if (wasPlaying) {
-			pausePlayback()
-		}
-
-		playbackSpeed.value = e
-
-		if (wasPlaying) {
-			startPlayback()
-		}
-	}
-
-	onLoad((option) => {
-		imei.value = option.imei
-		carStatus.value = option.connectionStatus
-		plateNo.value = option.plateNo
-		carType.value = option.carType
-		lat.value = option.lat
-		lng.value = option.lng
-		sTime.value = option.startTime
-		eTime.value = option.endTime
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:481")
-		if(sTime.value && eTime.value) {
-			startTime.value = sTime.value
-			endTime.value = eTime.value
-			loadTrackPos()
-		}else{
-			initDateTime()
-			loadTrackPos()
-		}
-		
-	})
-
-	onUnload(() => {
-		pausePlayback()
-	})
-
-	const loadTrackPos = async () => {
-		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 499, 9),
-			imei: imei.value,
-			startTime: startTime.value.replace(/\//g, '-'),
-			endTime: endTime.value.replace(/\//g, '-'),
-			minParkTime: 2,
-			withStop: false,
-			withPos: true,
-			withTrip: false,
-		}
-
-		const res = await getTrackPos(data)
-		//当轨迹数据不为空时，处理轨迹数据
-		if (res.data.positions && res.data.positions.length > 0) {
-			processTrackData(res.data.positions)
-			uni.hideLoading()
-		}
-		else {
-			// 当轨迹数据为空时，使用传过来的经纬度 来标记当前位置
-			showCurrentPosition()
-			uni.hideLoading()
-		}
-	}
-
 	// 显示当前位置
 	function showCurrentPosition() {
 		uni.showToast({
@@ -481,8 +353,10 @@ const _cache = __ins.renderCache;
 			duration: 2000
 		})
 		// 转换坐标到腾讯地图坐标系
-		const originalLat = parseFloat(lat.value)
-		const originalLng = parseFloat(lng.value)
+		const originalLatText = lat.value ?? ''
+		const originalLngText = lng.value ?? ''
+		const originalLat = parseFloat(originalLatText)
+		const originalLng = parseFloat(originalLngText)
 		const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
 
 		// 设置地图中心点
@@ -491,42 +365,37 @@ const _cache = __ins.renderCache;
 		mapScale.value = 15
 
 		// 创建当前位置标记
-		const currentPoint = {__$originalPosition: new UTSSourceMapPosition("currentPoint", "pages/playBack/playBack.uvue", 540, 9),
+		const currentPoint : TrackPoint = {
 			latitude: convertedCoord.lat,
 			longitude: convertedCoord.lng,
-			speed: 0,
-			deviceTime: new Date().toLocaleString(),
-			timestamp: Date.now(),
 			rotation: 0,
-			originalLatitude: originalLat,
-			originalLongitude: originalLng
+			deviceTime: new Date().toLocaleString(),
+			speed: 0
 		}
 
 		// 初始化小车标记
-		carMarker.value = {
+		const marker : CarMarker = {
 			id: 999,
 			latitude: currentPoint.latitude,
 			longitude: currentPoint.longitude,
-			iconPath: getDeviceIcon(carStatus.value, carType.value),
+			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
 			width: 25,
 			height: 25,
 			rotate: 0,
-			// anchor: { x: 0.5, y: 0.5 },
-			// callout: {
-			// 	content: plateNo.value,
-			// 	borderRadius: 5,
-			// 	padding: 5,
-			// 	display: 'ALWAYS'
-			// }
+			anchor: {},
+			callout: {},
+			animation: {}
 		}
+		carMarker.value = marker
 
 		// 设置标记点
-		markers.value = [carMarker.value]
+		markers.value = [marker as UTSJSONObject]
 	}
 
+
 	// 处理轨迹数据
-	function processTrackData(positions : Array<any>) {
-		const processedPoints = []
+	function processTrackData(positions : Array<UTSJSONObject>) : void {
+		const processedPoints : Array<TrackPoint> = []
 
 		for (let i = 0; i < positions.length; i++) {
 			const point = positions[i]
@@ -539,15 +408,12 @@ const _cache = __ins.renderCache;
 			// 转换坐标到腾讯地图坐标系
 			const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
 
-			const processedPoint = {__$originalPosition: new UTSSourceMapPosition("processedPoint", "pages/playBack/playBack.uvue", 588, 10),
+			const processedPoint : TrackPoint = {
 				latitude: convertedCoord.lat,
 				longitude: convertedCoord.lng,
-				speed: point.getNumber('speed', 0),
+				rotation: 0,
 				deviceTime: formatDateForDisplay(deviceTimeStr),
-				timestamp: safeParseDate(deviceTimeStr),
-				// 保留原始坐标信息
-				originalLatitude: originalLat,
-				originalLongitude: originalLng
+				speed: point.getNumber('speed', 0)
 			}
 
 			if (i > 0) {
@@ -579,6 +445,188 @@ const _cache = __ins.renderCache;
 		}
 
 	}
+	const loadTrackPos = async () => {
+		uni.showLoading({ title: '加载中...' })
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 496, 9),
+			imei: imei.value,
+			startTime: startTime.value.replace(/\//g, '-'),
+			endTime: endTime.value.replace(/\//g, '-'),
+			minParkTime: 2,
+			withStop: false,
+			withPos: true,
+			withTrip: false,
+		}
+
+		const res = await getTrackPos(data) as UTSJSONObject
+		const trackData = res.getJSON('data')
+		const positions = trackData?.getArray<UTSJSONObject>('positions')
+		if (positions != null && positions.length > 0) {
+			processTrackData(positions)
+			uni.hideLoading()
+		}
+		else {
+			// 当轨迹数据为空时，使用传过来的经纬度 来标记当前位置
+			showCurrentPosition()
+			uni.hideLoading()
+		}
+	}
+
+
+	// 暂停回放
+	function pausePlayback() {
+		isPlaying.value = false
+		const timer = playbackTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			playbackTimer = null
+		}
+	}
+
+
+
+
+
+
+	function resetPlayback() {
+		pausePlayback()
+		currentIndex.value = 0
+		currentSpeed.value = 0
+		if (trackPoints.value.length > 0) {
+			currentTime.value = trackPoints.value[0].deviceTime
+		}
+		updateCarPosition()
+		updatePolyline()
+	}
+
+
+	// 播放下一个点
+	function playNextPoint() {
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			pausePlayback()
+			updatePolyline()
+			uni.showToast({
+				title: '轨迹回放完成',
+				icon: 'none',
+				duration: 1500
+			})
+			return
+		}
+
+		currentIndex.value++
+		updateCarPosition()
+		updatePolyline()
+
+		const point = trackPoints.value[currentIndex.value]
+		currentSpeed.value = point.speed
+		currentTime.value = point.deviceTime
+	}
+
+
+	// 回放步骤
+	function playbackStep() {
+		if (!isPlaying.value) return
+
+		const now = Date.now()
+		const elapsed = now - lastTimestamp
+		const interval = 1000 / playbackSpeed.value
+
+		if (elapsed >= interval) {
+			playNextPoint()
+			lastTimestamp = now - (elapsed % interval)
+		}
+
+		if (isPlaying.value) {
+			playbackTimer = setTimeout(() => { playbackStep() }, 16) // 约60fps
+		}
+	}
+	// 开始回放
+	function startPlayback() {
+		if (trackPoints.value.length == 0) {
+			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
+			return
+		}
+
+		if (currentIndex.value >= trackPoints.value.length - 1) {
+			resetPlayback()
+		}
+
+		isPlaying.value = true
+		lastTimestamp = Date.now()
+		playbackStep()
+	}
+	// 播放控制
+	function togglePlayback() {
+		if (isPlaying.value) {
+			pausePlayback()
+		} else {
+			startPlayback()
+		}
+	}
+
+	// 确认选择时间
+	function onConfirm(value : string) {
+		let formattedValue = value
+		if (formattedValue.includes('-')) {
+			formattedValue = formattedValue.replace(/-/g, '/')
+		}
+
+		if (currentPickerType.value == 'start') {
+			startTime.value = formattedValue
+		} else {
+			endTime.value = formattedValue
+		}
+		resetPlayback()
+		void loadTrackPos()
+		showDateTimePicker.value = false
+	}
+	// 取消选择时间
+	function onCancel() {
+		showDateTimePicker.value = false
+	}
+
+	// 重置回放
+
+	// 设置回放速度
+	function setPlaybackSpeed(e : number) : void {
+		const wasPlaying = isPlaying.value
+		if (wasPlaying) {
+			pausePlayback()
+		}
+
+		playbackSpeed.value = e
+
+		if (wasPlaying) {
+			startPlayback()
+		}
+	}
+
+	onLoad((option) => {
+		imei.value = option.imei ?? null
+		carStatus.value = option.connectionStatus ?? ''
+		plateNo.value = option.plateNo ?? ''
+		carType.value = option.carType ?? ''
+		lat.value = option.lat ?? null
+		lng.value = option.lng ?? null
+		sTime.value = option.startTime ?? ''
+		eTime.value = option.endTime ?? ''
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:658")
+		if(sTime.value != '' && eTime.value != '') {
+			startTime.value = sTime.value
+			endTime.value = eTime.value
+			loadTrackPos()
+		}else{
+			initDateTime()
+			loadTrackPos()
+		}
+		
+	})
+
+	onUnload(() => {
+		pausePlayback()
+	})
+
+
+
 
 return (): any | null => {
 
@@ -618,16 +666,16 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
           isTrue(carMarker.value)
             ? _cV(_component_marker, _uM({
                 key: 0,
-                id: carMarker.value.id,
-                latitude: carMarker.value.latitude,
-                longitude: carMarker.value.longitude,
-                iconPath: carMarker.value.iconPath,
-                width: carMarker.value.width,
-                height: carMarker.value.height,
-                rotate: carMarker.value.rotate,
-                anchor: carMarker.value.anchor,
-                callout: carMarker.value.callout,
-                animation: carMarker.value.animation
+                id: carMarker.value!.id,
+                latitude: carMarker.value!.latitude,
+                longitude: carMarker.value!.longitude,
+                iconPath: carMarker.value!.iconPath,
+                width: carMarker.value!.width,
+                height: carMarker.value!.height,
+                rotate: carMarker.value!.rotate,
+                anchor: carMarker.value!.anchor,
+                callout: carMarker.value!.callout,
+                animation: carMarker.value!.animation
               }), null, 8 /* PROPS */, ["id", "latitude", "longitude", "iconPath", "width", "height", "rotate", "anchor", "callout", "animation"])
             : _cC("v-if", true),
           _cV(_component_sub_navBar, _uM({

@@ -51,6 +51,18 @@ __ins.emit(event, ...do_not_transform_spread)
 }
 
 
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
+function formatBoxSize(value: string | number): string {
+  const text = value.toString()
+  if (text.indexOf(' ') >= 0) return text
+  return formatSize(value)
+}
+
 const bgColor = computed(() => {
   return props.bgColor
 })
@@ -61,16 +73,6 @@ const descStyle = computed(() => 'color:' + props.descriptionColor + ';')
 const buttonStyle = computed(() => 'background-color:' + props.buttonColor + ';')
 const buttonTextStyle = computed(() => 'color:' + props.buttonTextColor + ';')
 
-function formatBoxSize(value): string {
-  const text = String(value)
-  if (text.indexOf(' ') >= 0) return text
-  return formatSize(value)
-}
-function formatSize(value): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
 
 return (): any | null => {
 

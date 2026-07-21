@@ -26,9 +26,9 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             val _cache = __ins.renderCache
             val userInfo = ref<UserInfo>(UserInfo(id = "", mobile = "", type = 0, createTime = ""))
             onLoad(fun(options){
-                if (isTruthy(options["userInfo"])) {
+                if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"]), " at pages/userCenter/userInfo/userInfo.uvue:70")), " at pages/userCenter/userInfo/userInfo.uvue:70") as UTSJSONObject
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:69") as String), " at pages/userCenter/userInfo/userInfo.uvue:69") as UTSJSONObject
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         val type = parsedInfo.getNumber("type")
@@ -54,10 +54,10 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:81")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:80")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:83")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:82")
                     }
                 }
             }

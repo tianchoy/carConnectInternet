@@ -33,9 +33,13 @@ const cmdRecordByIdUrl = '/command/recordById?id=';
 export const login = (data: UTSJSONObject): Promise<any> => {
     return post(loginUrl, data);
 };
+type BasicResponse = {
+    code: number;
+    msg: string;
+};
 // 退出接口
-export const logout = (): Promise<any> => {
-    return post(logoutUrl);
+export const logout = (): Promise<BasicResponse> => {
+    return post<BasicResponse>(logoutUrl);
 };
 // 获取客户列表
 export const getCustomList = (): Promise<any> => {
@@ -71,17 +75,16 @@ export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionRespons
 export const getTrackPos = (data: UTSJSONObject): Promise<any> => {
     return get(trackPos, data);
 };
+type UserInfoResponse = {
+    data: UTSJSONObject;
+};
 // 获取用户信息
-export const getUserInfo = (): Promise<any> => {
-    return get(userinfo);
+export const getUserInfo = (): Promise<UserInfoResponse> => {
+    return get<UserInfoResponse>(userinfo);
 };
 // 添加设备
 export const addDevice = (data: UTSJSONObject): Promise<any> => {
     return post(addDeviceUrl, data);
-};
-type BasicResponse = {
-    code: number;
-    msg: string;
 };
 // 删除设备
 export const delDevice = (imei: string): Promise<BasicResponse> => {
@@ -90,9 +93,12 @@ export const delDevice = (imei: string): Promise<BasicResponse> => {
 };
 type UserDeviceListData = {
     list: Array<UTSJSONObject>;
+    totalPage: number;
+    totalCount: number;
 };
 type UserDeviceListResponse = {
     code: number;
+    msg: string;
     data: UserDeviceListData;
 };
 // 获取用户设备列表
@@ -103,9 +109,12 @@ export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListRe
 export const PostWechatlogin = (data: UTSJSONObject): Promise<any> => {
     return post(wechatLogin, data);
 };
+type ChangePasswordResponse = {
+    msg: string;
+};
 // 修改密码
-export const changePassWord = (data: UTSJSONObject): Promise<any> => {
-    return post(changePSW, data);
+export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => {
+    return post<ChangePasswordResponse>(changePSW, data);
 };
 // 获取消息列表
 export const getUserMsgList = (data?: UTSJSONObject): Promise<any> => {

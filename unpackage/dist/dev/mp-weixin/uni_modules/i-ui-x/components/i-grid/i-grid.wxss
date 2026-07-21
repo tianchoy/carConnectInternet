@@ -1,0 +1,32 @@
+:host{display:flex;flex-direction:column}
+
+.i-grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+.i-grid__item {
+  box-sizing: border-box;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+.i-grid__item--hover {
+  background-color: #f3f4f6;
+}
+.i-grid__item--active {
+  background-color: #ecf5ff;
+}
+.i-grid__image {
+  margin-bottom: 8px;
+}
+.i-grid__icon {
+  margin-bottom: 8px;
+  text-align: center;
+  lines: 1;
+}
+.i-grid__text {
+  line-height: 18px;
+  text-align: center;
+  lines: 1;
+}

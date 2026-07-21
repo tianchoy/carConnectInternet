@@ -35,8 +35,8 @@
 	 * @property {string} confirmBtn 确定按钮文字
 	 * @property {string | object} confirmStyle 确定按钮样式
 	 * @property {'zh' | 'tc' | 'en' | 'ja' | 'ko' | 'ru'} customLocale 组件国际化语言
-	 * @property {string|number} end 最大可选时间（默认当前时间+10年）
-	 * @property {string|number} start 最小可选时间（默认当前时间-10年）
+	 * @property {string|number} end 最大可选时间（默认当前时间）
+	 * @property {string|number} start 最小可选时间（默认当前时间-5年）
 	 * @property {object} steps 时间间隔步数（例：{ minute: 5 }）
 	 * @property {string} title 标题文字
 	 * @property {string | object} titleStyle 标题样式
@@ -115,12 +115,12 @@
 	const isTimeMode = ['hour', 'minute', 'second'].includes(meaningColumn[0]);
 	//@ts-ignore
 	const normalize = (val : DateValue | null, defaultDay : Dayuts) : Dayuts => val != '' && val != null && dayuts(val).isValid() ? dayuts(val) : defaultDay;
-	const start = computed(() : Dayuts => normalize(props.start as DateValue | null, dayuts().subtract(10, 'year')));
-	const end = computed(() : Dayuts => normalize(props.end as DateValue | null, dayuts().add(10, 'year')));
+	const minDate = computed(() : Dayuts => normalize(props.start as DateValue | null, dayuts().subtract(1, 'year')));
+	const maxDate = computed(() : Dayuts => normalize(props.end as DateValue | null, dayuts()));
 	const rationalize = (val : Dayuts) : Dayuts => {
 		if (isTimeMode) return val;
-		if (val.isBefore(start.value)) return start.value;
-		if (val.isAfter(end.value)) return end.value;
+		if (val.isBefore(minDate.value)) return minDate.value;
+		if (val.isAfter(maxDate.value)) return maxDate.value;
 		return val;
 	};
 
@@ -153,11 +153,11 @@
 				space = ':'
 			}
 			
-			const dateStr = dayuts(start.value).format(format);
+			const dateStr = dayuts(minDate.value).format(format);
 			currentValue = `${dateStr}${space}${currentValue}`;
 		}
 		//@ts-ignore
-		return currentValue != null && dayuts(currentValue).isValid() ? rationalize(dayuts(currentValue)) : start.value;
+		return currentValue != null && dayuts(currentValue).isValid() ? rationalize(dayuts(currentValue)) : maxDate.value;
 	};
 
 	const curDate = ref(calcDate(innerValue.value));
@@ -176,8 +176,8 @@
 		];
 		//@ts-ignore
 		const [curYear, curMonth, curDay, curHour, curMinute] = getDate(curDate.value);
-		const [minYear, minMonth, minDay, minHour, minMinute, minSecond] = getDate(start.value);
-		const [maxYear, maxMonth, maxDay, maxHour, maxMinute, maxSecond] = getDate(end.value);
+		const [minYear, minMonth, minDay, minHour, minMinute, minSecond] = getDate(minDate.value);
+		const [maxYear, maxMonth, maxDay, maxHour, maxMinute, maxSecond] = getDate(maxDate.value);
 
 		const isInMinYear = curYear == minYear;
 		const isInMaxYear = curYear == maxYear;

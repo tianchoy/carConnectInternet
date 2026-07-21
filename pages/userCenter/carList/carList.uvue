@@ -5,11 +5,11 @@
 	<view class="container">
 
 		<view class="content">
-			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.deviceId)">
-				<text class="title">{{item.deviceName}}</text>
+			<view class="list" v-for="(item,index) in carList" :key="index" @click="carDetail(item.getString('deviceId', ''))">
+				<text class="title">{{item.getString('deviceName', '')}}</text>
 				<view class="device-info">
-					<text>{{item.plateNo}}</text>
-					<text class="tel">{{item.imei}}</text>
+					<text>{{item.getString('plateNo', '')}}</text>
+					<text class="tel">{{item.getString('imei', '')}}</text>
 				</view>
 			</view>
 
@@ -45,11 +45,6 @@
 		})
 	}
 
-	onShow(() => {
-		resetData()
-		loadCarListData()
-	})
-
 	// 重置数据
 	const resetData = () => {
 		carList.value = []
@@ -65,10 +60,10 @@
 
 		loading.value = true
 		try {
-			const data = {
+			const data : UTSJSONObject = {
 				page: currPage.value,
 				pageSize: pageSize.value
-			}
+			} as UTSJSONObject
 			const res = await getUserDeviceList(data)
 
 			if (res.code == 0) {
@@ -105,6 +100,11 @@
 			loading.value = false
 		}
 	}
+
+	onShow(() => {
+		resetData()
+		loadCarListData()
+	})
 
 	// 监听页面滚动到底部，触发加载更多
 	onReachBottom(() => {

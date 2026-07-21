@@ -8,9 +8,9 @@
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
-                <view class="allCar" @click="changeState('全部状态')">全部 {{totalCount}}</view>
-			<view class="onlineCar status-spacing" @click="changeState('在线')">在线 {{onlineCount}}</view>
-			<view class="offlineCar status-spacing" @click="changeState('离线')">离线 {{offlineCount}}</view>
+				<i-tag type="primary" @click="changeState('在线')" :text="`在线 ${onlineCount}`"></i-tag>
+			<i-tag type="success" @click="changeState('在线')" :text="`在线 ${onlineCount}`"></i-tag>
+			<i-tag type="danger" @click="changeState('离线')" :text="`离线 ${offlineCount}`"></i-tag>
             </view>
 		</view>
 		<view v-else>
@@ -105,6 +105,11 @@
 		}
 		markers.value = nextMarkers
 	}
+	watchEffect(() => {
+		if (showMap.value) {
+			updateMarkers(filteredDevices.value)
+		}
+	})
 
 	const loadUserDeviceList = async (data: Array<UTSJSONObject>, from: boolean): Promise<void> => {
 		try {
@@ -204,7 +209,9 @@
 	.container {
 		position: relative;
 		width: 100%;
-		height: 100%;
+		//#ifdef MP-WEIXIN
+		min-height: 100%;
+		//#endif
 		display: flex;
 		flex-direction: column;
 		background-color: #f5f7fa;

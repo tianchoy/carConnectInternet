@@ -1,0 +1,21 @@
+:host{display:flex;flex-direction:column}
+
+.i-form {
+  padding: 4px 0;
+}
+.i-form__message {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.i-form__message--success {
+  color: #19be6b;
+}
+.i-form__message--error {
+  color: #fa3534;
+}
+.i-form__actions {
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: flex-end;
+}

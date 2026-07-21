@@ -119,9 +119,9 @@ const emit = defineEmits([
   'update:valid',
 ])
 
-const valid = ref(true)
-const message = ref('')
-const errors = ref([])
+const valid = ref<boolean>(true)
+const message = ref<string>('')
+const errors = ref<Array<UTSJSONObject>>([])
 
 const formClass = computed(() => {
   const classes = ['i-form']
@@ -139,67 +139,132 @@ const messageStyle = computed(() => {
   return 'text-align:' + props.errorAlign + ';'
 })
 
-function activeFields() {
-  if (props.fields.length > 0) return props.fields
-  return props.rules
+function valueText(value: any): string {
+  if (typeof value == 'string') return value
+  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
+  if (Array.isArray(value)) {
+    const list = value as Array<any>
+    return list.join(',')
+  }
+  if (value != null && typeof value == 'object') return '[object Object]'
+  return ''
 }
 
-function fieldValue(item) {
-  if (item.value != null) return item.value
-  const name = String(item.name == null ? '' : item.name)
+function activeFields(): Array<UTSJSONObject> {
+  const fields = props.fields
+  if (fields != null && fields.length > 0) return fields as Array<UTSJSONObject>
+  const rules = props.rules
+  if (rules != null) return rules as Array<UTSJSONObject>
+  return [] as Array<UTSJSONObject>
+}
+
+function fieldValue(item: UTSJSONObject): any {
+  const configuredValue = item['value']
+  if (configuredValue != null) return configuredValue
+  const name = item.getString('name', '')
   if (name.length == 0) return ''
-  const values = props.modelValue
-  if (values != null && typeof values == 'object' && values[name] != null) {
-    return values[name]
+  const values = props.modelValue as UTSJSONObject | null
+  if (values != null) {
+    const modelValue = values[name]
+    if (modelValue != null) return modelValue as any
   }
   return ''
 }
 
-function fieldLabel(item) {
-  const label = String(item.label == null ? item.name : item.label)
+function fieldLabel(item: UTSJSONObject): string {
+  const label = item.getString('label', item.getString('name', ''))
   return label.length > 0 ? label : '字段'
 }
 
-function fieldRequired(item) {
-  return item.required == true
+function fieldRequired(item: UTSJSONObject): boolean {
+  return item.getBoolean('required', false)
 }
 
-function fieldMessage(item) {
-  const customMessage = String(item.message == null ? '' : item.message)
+function fieldMessage(item: UTSJSONObject): string {
+  const customMessage = item.getString('message', '')
   if (customMessage.length > 0) return customMessage
   return fieldLabel(item) + '不能为空'
 }
 
-function checkField(item, selectedKeys) {
-  const name = String(item.name == null ? '' : item.name)
+function checkField(item: UTSJSONObject, selectedKeys: Array<string>): string {
+  const name = item.getString('name', '')
   if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0) return ''
   const value = fieldValue(item)
-  if (fieldRequired(item) && String(value).length == 0) {
+  if (fieldRequired(item) && valueText(value).length == 0) {
     return fieldMessage(item)
   }
   return ''
 }
 
-function collectValues() {
-  const values = {}
+function collectValues(): UTSJSONObject {
+  const values = {} as UTSJSONObject
   const list = activeFields()
   for (let i = 0; i < list.length; i++) {
-    const item = list[i]
-    const name = String(item.name == null ? '' : item.name)
+    const item = list[i] as UTSJSONObject
+    const name = item.getString('name', '')
     if (name.length > 0) values[name] = fieldValue(item)
   }
   return values
 }
 
-function validateFields(selectedKeys, silent) {
+function numberValue(value: string | number): number {
+  if (typeof value == 'number') return value
+  return Number.from(parseFloat(value))
+}
+
+function normalizeIdName(name: string): string {
+  let result = ''
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charAt(i)
+    const isNumber = char >= '0' && char <= '9'
+    const isUpper = char >= 'A' && char <= 'Z'
+    const isLower = char >= 'a' && char <= 'z'
+    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
+      result = result + char
+    } else {
+      result = result + '-'
+    }
+  }
+  return result
+}
+
+function scrollTargetId(name: string): string {
+  return props.scrollIdPrefix + normalizeIdName(name)
+}
+
+function scrollToFirstError(nextErrors: Array<UTSJSONObject>): void {
+  if (!props.errorAutoPage || nextErrors.length == 0) return
+  const field = nextErrors[0].getString('field', '')
+  if (field.length == 0) return
+  const targetId = scrollTargetId(field)
+  const selector = '#' + targetId
+  const offsetTop = numberValue(props.scrollOffsetTop)
+  const duration = numberValue(props.scrollDuration)
+  emit('scroll-to-error', {
+    field,
+    targetId,
+    selector,
+    offsetTop,
+    duration,
+  })
+  nextTick(() => {
+    uni.pageScrollTo({
+      selector,
+      offsetTop,
+      duration,
+    })
+  })
+}
+
+function validateFields(selectedKeys: Array<string>, silent: boolean): boolean {
   const list = activeFields()
-  const nextErrors = []
+  const nextErrors = [] as Array<UTSJSONObject>
   for (let i = 0; i < list.length; i++) {
     const item = list[i]
     const errorMessage = checkField(item, selectedKeys)
     if (errorMessage.length > 0) {
       nextErrors.push({
-        field: String(item.name == null ? '' : item.name),
+        field: item.getString('name', ''),
         message: errorMessage,
       })
     }
@@ -207,7 +272,12 @@ function validateFields(selectedKeys, silent) {
   errors.value = nextErrors
   valid.value = nextErrors.length == 0
   if (!silent) {
-    message.value = valid.value ? '校验通过' : String(nextErrors[0].message)
+    if (valid.value) {
+      message.value = '校验通过'
+    } else {
+      const firstError = nextErrors[0]
+      message.value = firstError.getString('message', '')
+    }
     emit('validate', {
       valid: valid.value,
       message: message.value,
@@ -221,27 +291,27 @@ function validateFields(selectedKeys, silent) {
   return valid.value
 }
 
-function validate() {
-  return validateFields([], false)
+function validate(): boolean {
+  return validateFields([] as Array<string>, false)
 }
 
-function validFields(keys) {
+function validFields(keys: Array<string>): boolean {
   return validateFields(keys, false)
 }
 
-function checkAsyncVaildStatus() {
-  return validateFields([], true)
+function checkAsyncVaildStatus(): boolean {
+  return validateFields([] as Array<string>, true)
 }
 
-function clearValid() {
+function clearValid(): void {
   valid.value = true
   message.value = ''
-  errors.value = []
+  errors.value = [] as Array<UTSJSONObject>
   emit('update:modelValid', true)
   emit('update:valid', true)
 }
 
-function submit() {
+function submit(): void {
   const isValid = validate()
   const result = {
     valid: isValid,
@@ -252,61 +322,17 @@ function submit() {
   emit('submit', result)
 }
 
-function reset() {
+function reset(): void {
   clearValid()
   emit('reset', {
     values: collectValues(),
   })
 }
 
-function scrollToFirstError(nextErrors) {
-  if (!props.errorAutoPage || nextErrors.length == 0) return
-  const field = String(nextErrors[0].field == null ? '' : nextErrors[0].field)
-  if (field.length == 0) return
-  const targetId = scrollTargetId(field)
-  const selector = '#' + targetId
-  emit('scroll-to-error', {
-    field,
-    targetId,
-    selector,
-    offsetTop: Number(props.scrollOffsetTop),
-    duration: Number(props.scrollDuration),
-  })
-  nextTick(() => {
-    uni.pageScrollTo({
-      selector,
-      offsetTop: Number(props.scrollOffsetTop),
-      duration: Number(props.scrollDuration),
-    })
-  })
-}
-
-function scrollTargetId(name) {
-  return props.scrollIdPrefix + normalizeIdName(name)
-}
-
-function normalizeIdName(name) {
-  const text = String(name)
-  let result = ''
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i)
-    const char = text.charAt(i)
-    const isNumber = code >= 48 && code <= 57
-    const isUpper = code >= 65 && code <= 90
-    const isLower = code >= 97 && code <= 122
-    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
-      result = result + char
-    } else {
-      result = result + '-'
-    }
-  }
-  return result
-}
-
 watch(
-  () => [props.fields, props.rules, props.modelValue, props.watchValidStatus],
-  () => {
-    if (props.watchValidStatus) validateFields([], true)
+  () : any => [props.fields, props.rules, props.modelValue, props.watchValidStatus],
+  () : void => {
+    if (props.watchValidStatus) validateFields([] as Array<string>, true)
   },
   { deep: true }
 )

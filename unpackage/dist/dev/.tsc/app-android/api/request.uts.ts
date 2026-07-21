@@ -38,9 +38,14 @@ export const login = (data: UTSJSONObject) => {
     return post(loginUrl, data)
 }
 
+type BasicResponse = {
+    code: number
+    msg: string
+}
+
 // 退出接口
-export const logout = () => {
-    return post(logoutUrl)
+export const logout = (): Promise<BasicResponse> => {
+    return post<BasicResponse>(logoutUrl)
 }
 
 // 获取客户列表
@@ -85,19 +90,18 @@ export const getTrackPos = (data: UTSJSONObject) => {
     return get(trackPos, data)
 }
 
+type UserInfoResponse = {
+    data: UTSJSONObject
+}
+
 // 获取用户信息
-export const getUserInfo = () => {
-    return get(userinfo)
+export const getUserInfo = (): Promise<UserInfoResponse> => {
+    return get<UserInfoResponse>(userinfo)
 }
 
 // 添加设备
 export const addDevice = (data: UTSJSONObject) => {
     return post(addDeviceUrl, data)
-}
-
-type BasicResponse = {
-    code: number
-    msg: string
 }
 
 // 删除设备
@@ -108,10 +112,13 @@ export const delDevice = (imei: string): Promise<BasicResponse> => {
 
 type UserDeviceListData = {
     list: Array<UTSJSONObject>
+    totalPage: number
+    totalCount: number
 }
 
 type UserDeviceListResponse = {
     code: number
+    msg: string
     data: UserDeviceListData
 }
 
@@ -125,9 +132,13 @@ export const PostWechatlogin = (data: UTSJSONObject) => {
     return post(wechatLogin, data)
 }
 
+type ChangePasswordResponse = {
+    msg: string
+}
+
 // 修改密码
-export const changePassWord = (data: UTSJSONObject) => {
-    return post(changePSW, data)
+export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => {
+    return post<ChangePasswordResponse>(changePSW, data)
 }
 
 // 获取消息列表

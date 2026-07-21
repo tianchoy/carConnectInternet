@@ -27,11 +27,6 @@ const _cache = __ins.renderCache;
 		})
 	}
 
-	onShow(() => {
-		resetData()
-		loadCarListData()
-	})
-
 	// 重置数据
 	const resetData = () => {
 		carList.value = []
@@ -42,15 +37,15 @@ const _cache = __ins.renderCache;
 
 	// 加载车辆列表数据
 	const loadCarListData = async () => {
-		console.log(currPage.value,totalPage.value, " at pages/userCenter/carList/carList.uvue:63")
+		console.log(currPage.value,totalPage.value, " at pages/userCenter/carList/carList.uvue:58")
 		if (loading.value || !hasMore.value) return
 
 		loading.value = true
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 68, 10),
+			const data : UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10), 
 				page: currPage.value,
 				pageSize: pageSize.value
-			}
+			} as UTSJSONObject
 			const res = await getUserDeviceList(data)
 
 			if (res.code == 0) {
@@ -78,7 +73,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:99")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:94")
 			uni.showToast({
 				title: '加载失败，请重试',
 				icon: 'none'
@@ -87,6 +82,11 @@ const _cache = __ins.renderCache;
 			loading.value = false
 		}
 	}
+
+	onShow(() => {
+		resetData()
+		loadCarListData()
+	})
 
 	// 监听页面滚动到底部，触发加载更多
 	onReachBottom(() => {
@@ -120,12 +120,12 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
           return _cE("view", _uM({
             class: "list",
             key: index,
-            onClick: () => {carDetail(item.deviceId)}
+            onClick: () => {carDetail(item.getString('deviceId', ''))}
           }), [
-            _cE("text", _uM({ class: "title" }), _tD(item.deviceName), 1 /* TEXT */),
+            _cE("text", _uM({ class: "title" }), _tD(item.getString('deviceName', '')), 1 /* TEXT */),
             _cE("view", _uM({ class: "device-info" }), [
-              _cE("text", null, _tD(item.plateNo), 1 /* TEXT */),
-              _cE("text", _uM({ class: "tel" }), _tD(item.imei), 1 /* TEXT */)
+              _cE("text", null, _tD(item.getString('plateNo', '')), 1 /* TEXT */),
+              _cE("text", _uM({ class: "tel" }), _tD(item.getString('imei', '')), 1 /* TEXT */)
             ])
           ], 8 /* PROPS */, ["onClick"])
         }), 128 /* KEYED_FRAGMENT */),

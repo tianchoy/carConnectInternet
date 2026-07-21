@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "l-popup": "../../lime-popup/components/l-popup/l-popup"
+  }
+}

@@ -15,9 +15,11 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.`$emit` as uni__emit
 import io.dcloud.uniapp.extapi.`$off` as uni__off
 import io.dcloud.uniapp.extapi.`$on` as uni__on
+import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
+import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
@@ -29,7 +31,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesAddCarAddCar
             val _cache = __ins.renderCache
-            val formRef = ref<FormInstance?>(null)
+            val formRef = ref<FormInstance__1?>(null)
             val deviceTypeSelect = ref<DeviceTypeSelectorInstance?>(null)
             val loading = ref<Boolean>(false)
             val formValid = ref<Boolean>(false)
@@ -54,13 +56,13 @@ open class GenPagesAddCarAddCar : BasePage {
                 formValid.value = !!isTruthy(value)
             }
             val scanCode = fun(){
-                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode"))
+                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar"))
             }
             val handleScanResult = fun(data: ScanResultData){
                 console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:144")
-                if (data.result.length === 15) {
+                if (data.result.length == 15) {
                     carInfo.value.imei = "0" + data.result.slice(4, 15)
-                } else if (data.result.length === 11) {
+                } else if (data.result.length == 11) {
                     carInfo.value.imei = "0" + data.result
                 } else {
                     uni_showToast(ShowToastOptions(title = "请输入正确的设备ID", icon = "none"))
@@ -134,6 +136,14 @@ open class GenPagesAddCarAddCar : BasePage {
             onLoad(fun(_options){
                 uni__on("scanCodeResult", handleScanResult)
                 console.log("formRef 初始值:", formRef.value, " at pages/addCar/addCar.uvue:260")
+            }
+            )
+            onShow(fun(){
+                val result = uni_getStorageSync("scanCodeResult") as String
+                if (result.length > 0) {
+                    uni_removeStorageSync("scanCodeResult")
+                    handleScanResult(ScanResultData(result = result))
+                }
             }
             )
             onUnload(fun(){

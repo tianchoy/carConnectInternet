@@ -41,14 +41,7 @@ open class GenUniModulesIUiXComponentsILineProgressILineProgress : VueComponent 
                 return Math.round(current.value)
             }
             )
-            watch(fun(){
-                return props.percent
-            }
-            , fun(nextValue){
-                current.value = nextValue
-            }
-            )
-            fun gen_step_fn(delta) {
+            fun gen_step_fn(delta: Number) {
                 current.value = Math.min(100, Math.max(0, current.value + delta))
                 emit("change", current.value)
                 emit("update:percent", current.value)

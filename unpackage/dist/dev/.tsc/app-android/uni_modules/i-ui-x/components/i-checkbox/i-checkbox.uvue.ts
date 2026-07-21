@@ -118,9 +118,38 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
-const internalChecked = ref(isChecked())
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
 
-const checked = computed(() => {
+function valueText(value: any): string {
+  if (typeof value == 'string') return value
+  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
+  return ''
+}
+
+function isChecked(): boolean {
+  if (props.checked) return true
+  const modelValue = props.modelValue
+  const value = valueText(modelValue).length > 0 ? modelValue : props.value
+  if (Array.isArray(value)) {
+    const names = value as Array<any>
+    for (let i = 0; i < names.length; i++) {
+      if (valueText(names[i]) == valueText(props.name)) return true
+    }
+    return false
+  }
+  if (typeof value == 'boolean') return value
+  return valueText(value) == valueText(props.name)
+}
+
+const internalChecked = ref<boolean>(isChecked())
+
+const checked = computed((): boolean => {
   return internalChecked.value
 })
 
@@ -173,37 +202,47 @@ const labelStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  () : any => props.modelValue,
+  () : void => {
     internalChecked.value = isChecked()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  () : any => props.value,
+  () : void => {
     internalChecked.value = isChecked()
   },
 )
 
 watch(
-  () => props.checked,
-  () => {
+  () : boolean => props.checked,
+  () : void => {
     internalChecked.value = isChecked()
   },
 )
 
-function toggle() {
-  if (props.disabled) return
-  updateChecked(!checked.value)
+function buildValue(nextChecked: boolean, previousChecked: boolean): any {
+  const modelValue = props.modelValue
+  const value = valueText(modelValue).length > 0 ? modelValue : props.value
+  if (Array.isArray(value)) {
+    const list = value as Array<any>
+    const nextList = list.slice(0)
+    const exists = previousChecked
+    if (nextChecked && !exists) nextList.push(props.name)
+    if (!nextChecked && exists) {
+      const filtered = [] as Array<any>
+      for (let i = 0; i < nextList.length; i++) {
+        if (valueText(nextList[i]) != valueText(props.name)) filtered.push(nextList[i])
+      }
+      return filtered
+    }
+    return nextList
+  }
+  return nextChecked
 }
 
-function toggleByLabel() {
-  if (props.labelDisabled) return
-  toggle()
-}
-
-function updateChecked(nextChecked) {
+function updateChecked(nextChecked: boolean): void {
   const previousChecked = checked.value
   internalChecked.value = nextChecked
   const nextValue = buildValue(nextChecked, previousChecked)
@@ -213,44 +252,16 @@ function updateChecked(nextChecked) {
   emit('change', nextValue)
 }
 
-function isChecked() {
-  if (props.checked) return true
-  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
-  if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      if (String(value[i]) == String(props.name)) return true
-    }
-    return false
-  }
-  if (typeof value == 'boolean') return value
-  return String(value) == String(props.name)
+function toggle(): void {
+  if (props.disabled) return
+  updateChecked(!checked.value)
 }
 
-function buildValue(nextChecked, previousChecked) {
-  const value = String(props.modelValue).length > 0 ? props.modelValue : props.value
-  if (Array.isArray(value)) {
-    const list = value.slice(0)
-    const exists = previousChecked
-    if (nextChecked && !exists) list.push(props.name)
-    if (!nextChecked && exists) {
-      const nextList = []
-      for (let i = 0; i < list.length; i++) {
-        if (String(list[i]) != String(props.name)) nextList.push(list[i])
-      }
-      return nextList
-    }
-    return list
-  }
-  return nextChecked
+function toggleByLabel(): void {
+  if (props.labelDisabled) return
+  toggle()
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 
 return (): any | null => {
 

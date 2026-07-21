@@ -13,13 +13,10 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.`$emit` as uni__emit
-import io.dcloud.uniapp.extapi.authorize as uni_authorize
-import io.dcloud.uniapp.extapi.getSetting as uni_getSetting
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
-import io.dcloud.uniapp.extapi.openSetting as uni_openSetting
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
+import io.dcloud.uniapp.extapi.scanCode as uni_scanCode
+import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
-import io.dcloud.uniapp.extapi.vibrateLong as uni_vibrateLong
 open class GenPagesScancodeScancode : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -29,70 +26,47 @@ open class GenPagesScancodeScancode : BasePage {
             val _ctx = __ins.proxy as GenPagesScancodeScancode
             val _cache = __ins.renderCache
             val scanFunctionIsUseable = ref(true)
-            val handleScan = fun(e: Any){
-                if (scanFunctionIsUseable.value && isTruthy(e.detail.result)) {
-                    uni_vibrateLong()
-                    scanFunctionIsUseable.value = false
-                    val scanResult = e.detail.result
-                    console.log("扫码结果:", scanResult, " at pages/scancode/scancode.uvue:23")
-                    val pages = getCurrentPages()
-                    if (pages.length >= 2) {
-                        val prevPage = pages[pages.length - 2]
-                        if (prevPage != null && isTruthy(prevPage.carInfo)) {
-                            prevPage.carInfo.imei = scanResult
-                            console.log("已设置上一页面IMEI:", scanResult, " at pages/scancode/scancode.uvue:33")
-                        } else {
-                            uni__emit("scanCodeResult", _uO("result" to scanResult))
-                        }
-                    }
-                    uni_showToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 1000))
-                    setTimeout(fun(){
-                        uni_navigateBack(NavigateBackOptions(delta = 1))
-                    }
-                    , 1000)
+            val goBack = fun(){
+                uni_navigateBack(NavigateBackOptions(delta = 1))
+            }
+            val handleScanResult = fun(scanResult: String){
+                if (!scanFunctionIsUseable.value || scanResult.length == 0) {
+                    return
                 }
+                scanFunctionIsUseable.value = false
+                console.log("扫码结果:", scanResult, " at pages/scancode/scancode.uvue:17")
+                uni_setStorageSync("scanCodeResult", scanResult)
+                uni__emit("scanCodeResult", _uO("result" to scanResult))
+                uni_showToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 1000))
+                setTimeout(fun(){
+                    uni_navigateBack(NavigateBackOptions(delta = 1))
+                }
+                , 1000)
             }
-            val error = fun(e: Any){
-                console.log("摄像头错误:", e, " at pages/scancode/scancode.uvue:56")
-                uni_showToast(ShowToastOptions(title = "摄像头初始化失败", icon = "none"))
-            }
-            val requestCameraPermission = fun(){
-                uni_getSetting(GetSettingOptions(success = fun(res){
-                    if (isTruthy(res.authSetting["scope.camera"])) {
-                        console.log("已有摄像头权限", " at pages/scancode/scancode.uvue:67")
-                        return
+            val startScan = fun(){
+                if (!scanFunctionIsUseable.value) {
+                    return
+                }
+                uni_scanCode(ScanCodeOptions(onlyFromCamera = true, success = fun(res){
+                    console.log("扫码成功res:", res, " at pages/scancode/scancode.uvue:35")
+                    val result = res.result
+                    if (result != null) {
+                        handleScanResult(result)
                     }
-                    uni_authorize(AuthorizeOptions(scope = "scope.camera", success = fun(_){
-                        console.log("摄像头权限授权成功", " at pages/scancode/scancode.uvue:74")
-                    }
-                    , fail = fun(_){
-                        uni_showModal(ShowModalOptions(title = "权限提示", content = "需要摄像头权限才能扫码，是否去设置开启？", success = fun(modalRes){
-                            if (modalRes.confirm) {
-                                uni_openSetting()
-                            } else {
-                                uni_navigateBack(null)
-                            }
-                        }
-                        ))
-                    }
-                    ))
+                }
+                , fail = fun(err){
+                    console.log("扫码失败:", err, " at pages/scancode/scancode.uvue:40")
+                    uni_showToast(ShowToastOptions(title = "扫码失败", icon = "none"))
+                    goBack()
                 }
                 ))
             }
             onLoad(fun(_options){
-                requestCameraPermission()
+                startScan()
             }
             )
             return fun(): Any? {
-                val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
-                val _component_camera = resolveComponent("camera")
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "扫码添加ID", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "scancode-box"), _uA(
-                        _cV(_component_camera, _uM("device-position" to "back", "mode" to "scanCode", "flash" to "off", "onScancode" to handleScan, "onError" to error, "class" to "scan-code"))
-                    )),
-                    _cE("view", _uM("class" to "tip"), "请将IMEI码放入框内,自动扫描")
-                ))
+                return _cE("view")
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
@@ -102,7 +76,7 @@ open class GenPagesScancodeScancode : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to 0, "paddingBottom" to 0, "paddingLeft" to 0)), "scan-code" to _pS(_uM("width" to "100%", "height" to "100%")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
+                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scan-header" to _pS(_uM("height" to "88rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "backgroundColor" to "#ffffff")), "back-button" to _pS(_uM("width" to "120rpx", "color" to "#333333", "fontSize" to "28rpx", "textAlign" to "center")), "title" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "color" to "#333333", "fontSize" to "36rpx", "fontWeight" to "bold", "textAlign" to "center", "marginRight" to "120rpx")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "scan-button" to _pS(_uM("color" to "#ffffff", "fontSize" to "32rpx", "backgroundColor" to "#007aff", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "paddingTop" to "24rpx", "paddingRight" to "60rpx", "paddingBottom" to "24rpx", "paddingLeft" to "60rpx")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "添加车辆",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
+    "i-form-item": "../../uni_modules/i-ui-x/components/i-form-item/i-form-item",
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-form": "../../uni_modules/i-ui-x/components/i-form/i-form",
+    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
+    "car-icons": "../../components/car-icons/car-icons"
+  }
+}

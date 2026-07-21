@@ -29,7 +29,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             val deptId = ref<String?>("")
             val imei = ref<String?>("")
             val deviceId = ref<String?>("")
-            val center = reactive<MapCenter>(MapCenter(latitude = 39.90469, longitude = 116.40717))
+            val center = reactive<MapCenter__1>(MapCenter__1(latitude = 39.90469, longitude = 116.40717))
             val mapScale = ref(15)
             val datainfo = ref(_uO())
             val address = ref("")

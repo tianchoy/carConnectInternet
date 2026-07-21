@@ -3,6 +3,23 @@ import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uv
 import { ref, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 	
+	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 61, 7>;
+		open: () => void
+		close: () => void
+	}
+
+	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 85, 7>;
+		list: Array<UTSJSONObject>
+		total: number
+		totalPage: number
+	};
+	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 90, 7>;
+		code: number
+		msg: string
+		data: MessageData
+	};
+
+	// 停止新消息检查
 	
 const __sfc__ = defineComponent({
   __name: 'message',
@@ -11,7 +28,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const modal = ref(null);
+	const modal = ref<ModalInstance | null>(null);
 	const modalContent = ref<UTSJSONObject>({})
 	const refresherTriggered = ref(false)
 	
@@ -28,9 +45,135 @@ const _cache = __ins.renderCache;
 	const Login = ref(false)
 	
 	// 定时器相关
-	let checkTimer: number | null = null
-	const isPageActive = ref(false) // 页面是否处于活动状态
+	let checkTimer: number = 0
+	const isPageActive = ref(false)
+	function stopNewMessageCheck() : void {
+		if (checkTimer > 0) {
+			console.log('停止定时消息检查', " at pages/message/message.uvue:99")
+			clearInterval(checkTimer)
+			checkTimer = 0
+		}
+	}
+	
+	// 震动报警函数
+	function vibrateAlert() : void {
+		for (let i = 0; i < 3; i++) {
+			uni.vibrateLong({})
+		}
+	}
+	
+	// 检查新消息
+	async function checkNewMessages() : Promise<void> {
+		if (!isPageActive.value || isLoading.value) return
+		try {
+			const res = await getUserMsgList({ page: 1, pageSize: 1 }) as UTSJSONObject
+			const code = res.getNumber('code', -1)
+			if (code != 0) return
+			const data = res.getJSON('data')
+			if (data == null) return
+			const list = data.getArray<UTSJSONObject>('list')
+			if (list == null || list.length == 0) return
+			const latestMessage = list[0]
+			const createTime = latestMessage.getString('createTime', '')
+			if (createTime == '') return
+			const messageTime = new Date(createTime).getTime()
+			if (messageTime <= lastUpdateTime.value) return
+			hasNewMessages.value = true
+			vibrateAlert()
+			const countRes = await getUserMsgList({ page: 1, pageSize: 50 }) as UTSJSONObject
+			const countData = countRes.getJSON('data')
+			const newList = countData?.getArray<UTSJSONObject>('list')
+			if (newList != null) {
+				let count = 0
+				newList.forEach((message : UTSJSONObject) : void => {
+					if (new Date(message.getString('createTime', '')).getTime() > lastUpdateTime.value) count++
+				})
+				newMessageCount.value = count
+			}
+		} catch (error) {
+			console.error('检查新消息失败:', error, " at pages/message/message.uvue:141")
+		}
+	}
+
+	// 启动新消息检查
+	function startNewMessageCheck() : void {
+		if (checkTimer > 0) {
+			stopNewMessageCheck()
+		}
 		
+		console.log('启动定时消息检查', " at pages/message/message.uvue:151")
+		// 每10秒检查一次新消息
+		checkTimer = setInterval(() => {
+			if (isPageActive.value) {
+				console.log('定时检查新消息...', " at pages/message/message.uvue:155")
+				checkNewMessages()
+			}
+		}, 10000)
+	}
+	
+
+	// 加载消息列表
+	async function loadMsgList(isInit : boolean = false) : Promise<void> {
+		if (isInit) {
+			currPage.value = 1
+			msgList.value = []
+			loadStatus.value = 'loadmore'
+		}
+		if (isLoading.value) return
+		isLoading.value = true
+		try {
+			if (!isInit) loadStatus.value = 'loading'
+			const res = await getUserMsgList({
+				page: currPage.value,
+				pageSize: pageSize.value
+			}) as UTSJSONObject
+			if (res.getNumber('code', -1) != 0) {
+				loadStatus.value = 'loadmore'
+				return
+			}
+			const data = res.getJSON('data')
+			if (data == null) {
+				loadStatus.value = 'nomore'
+				return
+			}
+			const totalPages = data.getNumber('totalPage', 1)
+			totalPage.value = totalPages > 0 ? totalPages : 1
+			const dataList = data.getArray<UTSJSONObject>('list')
+			const newData : Array<UTSJSONObject> = dataList != null ? dataList : []
+			if (isInit) {
+				msgList.value = newData
+				if (newData.length > 0) lastUpdateTime.value = new Date().getTime()
+			} else {
+				newData.forEach((item : UTSJSONObject) : void => {
+					const messageId = item.getString('messageId', '')
+					const exists = msgList.value.some((existing : UTSJSONObject) : boolean => existing.getString('messageId', '') == messageId)
+					if (!exists) msgList.value.push(item)
+				})
+			}
+			loadStatus.value = currPage.value >= totalPage.value ? 'nomore' : 'loadmore'
+			if (isInit) {
+				hasNewMessages.value = false
+				newMessageCount.value = 0
+			}
+		} catch (error) {
+			loadStatus.value = 'loadmore'
+			console.error('请求异常:', error, " at pages/message/message.uvue:207")
+		} finally {
+			isLoading.value = false
+		}
+	}
+
+	// 加载新消息
+	async function loadNewMessages() : Promise<void> {
+		console.log('加载新消息', " at pages/message/message.uvue:215")
+		await loadMsgList(true)
+		hasNewMessages.value = false
+		newMessageCount.value = 0
+		lastUpdateTime.value = new Date().getTime()
+		console.log('新消息加载完成', " at pages/message/message.uvue:220")
+	}
+	
+
 	// 页面加载时初始化数据
 	onLoad(() => {
 		// 获取 token
@@ -51,7 +194,7 @@ const _cache = __ins.renderCache;
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:101")
+			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:244")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -61,9 +204,9 @@ const _cache = __ins.renderCache;
 	
 	// 页面隐藏时停止定时器
 	onHide(() => {
-		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:111")
+		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:254")
 		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:113")
+			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:256")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -71,18 +214,18 @@ const _cache = __ins.renderCache;
 	
 	// 页面卸载时清理资源
 	onUnload(() => {
-		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:121")
+		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:264")
 		if (Login.value) {
-			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:123")
+			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:266")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
 	
 	onActivated(() => {
-		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:130")
+		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:273")
 		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:132")
+			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:275")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -91,9 +234,9 @@ const _cache = __ins.renderCache;
 	})
 	
 	onDeactivated(() => {
-		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:141")
+		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:284")
 		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:143")
+			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:286")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -101,7 +244,7 @@ const _cache = __ins.renderCache;
 	
 	// 下拉刷新处理
 	const onRefresherRefresh = () => {
-		console.log('下拉刷新触发', " at pages/message/message.uvue:151")
+		console.log('下拉刷新触发', " at pages/message/message.uvue:294")
 		refresherTriggered.value = true
 		loadMsgList(true).then(() => {
 			refresherTriggered.value = false
@@ -110,188 +253,9 @@ const _cache = __ins.renderCache;
 		})
 	}
 	
-	// 滚动到底部加载更多
-	const onScrollToLower = () => {
-		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:162")
-		if (loadStatus.value == 'loadmore' && !isLoading.value) {
-			loadMore()
-		}
-	}
-	
-	// 启动新消息检查
-	const startNewMessageCheck = () => {
-		if (checkTimer) {
-			stopNewMessageCheck()
-		}
-		
-		console.log('启动定时消息检查', " at pages/message/message.uvue:174")
-		// 每30秒检查一次新消息
-		checkTimer = setInterval(() => {
-			if (isPageActive.value) {
-				console.log('定时检查新消息...', " at pages/message/message.uvue:178")
-				checkNewMessages()
-			}
-		}, 10000)
-	}
-	
-	// 停止新消息检查
-	const stopNewMessageCheck = () => {
-		if (checkTimer) {
-			console.log('停止定时消息检查', " at pages/message/message.uvue:187")
-			clearInterval(checkTimer)
-			checkTimer = null
-		}
-	}
-	
-	// 检查新消息
-	const checkNewMessages = async () => {
-		// 如果页面不活跃，不执行检查
-		if (!isPageActive.value) {
-			console.log('页面不活跃，跳过新消息检查', " at pages/message/message.uvue:197")
-			return
-		}
-		
-		// 如果正在加载中，跳过检查
-		if (isLoading.value) {
-			console.log('正在加载中，跳过新消息检查', " at pages/message/message.uvue:203")
-			return
-		}
-		
-		try {
-			console.log('开始检查新消息...', " at pages/message/message.uvue:208")
-			const res = await getUserMsgList({
-				page: 1,
-				pageSize: 1
-			})
-			
-			if (res.code == 0 && res.msg == 'success') {
-				const data = res.data || { list: [], total: 0 }
-				const latestMessage = data.list?.[0]
-				
-				if (latestMessage && latestMessage.createTime) {
-					const messageTime = new Date(latestMessage.createTime).getTime()
-					if (messageTime > lastUpdateTime.value) {
-						// 有新消息
-						hasNewMessages.value = true
-						// 触发震动报警
-						vibrateAlert()
-						// 获取新消息数量
-						const countRes = await getUserMsgList({
-							page: 1,
-							pageSize: 50
-						})
-						if (countRes.code == 0) {
-							const newMessages = countRes.data?.list?.filter((msg: UTSJSONObject) => {
-								return new Date(msg.createTime).getTime() > lastUpdateTime.value
-							}) || []
-							newMessageCount.value = newMessages.length
-							console.log('新消息数量:', newMessageCount.value, " at pages/message/message.uvue:235")
-						}
-					} else {
-						console.log('没有发现新消息', " at pages/message/message.uvue:238")
-					}
-				}
-			}
-		} catch (error) {
-			console.error('检查新消息失败:', error, " at pages/message/message.uvue:243")
-		}
-	}
-	
-	// 震动报警函数
-	const vibrateAlert = () => {
-		for (let i = 0; i < 3; i++) {
-			uni.vibrateLong()
-		}
-	}
-	
-	// 加载新消息
-	const loadNewMessages = () => {
-		console.log('加载新消息', " at pages/message/message.uvue:256")
-		loadMsgList(true).then(() => {
-			hasNewMessages.value = false
-			newMessageCount.value = 0
-			lastUpdateTime.value = new Date().getTime()
-			console.log('新消息加载完成', " at pages/message/message.uvue:261")
-		})
-	}
-	
-	// 加载消息列表
-	const loadMsgList = async (isInit = false) => {
-		if (isInit) {
-			currPage.value = 1
-			msgList.value = []
-			loadStatus.value = 'loadmore'
-		}
-		
-		if (isLoading.value) return
-		isLoading.value = true
-		
-		try {
-			if (!isInit) {
-				loadStatus.value = 'loading'
-			}
-			
-			console.log('请求数据 - 页码:', currPage.value, " at pages/message/message.uvue:281")
-			
-			// 调用接口
-			const res = await getUserMsgList({
-				page: currPage.value,
-				pageSize: pageSize.value
-			})
-			
-			if (res.code == 0 && res.msg == 'success') {
-				const data = res.data || { list: [], totalPage: 0 }
-				totalPage.value = data.totalPage || 1
-				
-				console.log('第', currPage.value, '页接口返回:', data, " at pages/message/message.uvue:293");
-				console.log('第', currPage.value, '页列表长度:', data.list?.length, " at pages/message/message.uvue:294");
-				
-				if (isInit) {
-					msgList.value = data.list || []
-					// 更新最后更新时间
-					if (data.list && data.list.length > 0) {
-						lastUpdateTime.value = new Date().getTime()
-					}
-				} else {
-					const newData = data.list || []
-					console.log('即将添加的新数据长度:', newData.length, " at pages/message/message.uvue:304")
-					
-					// 去重
-					const existingIds = new Set(msgList.value.map(item => item.messageId))
-					const uniqueNewData = newData.filter((item: UTSJSONObject) => !existingIds.has(item.messageId))
-					
-					if (uniqueNewData.length > 0) {
-						msgList.value = [...msgList.value, ...uniqueNewData]
-					}
-				}
-				
-				// 更新状态
-				if (currPage.value >= totalPage.value) {
-					loadStatus.value = 'nomore'
-				} else {
-					loadStatus.value = 'loadmore'
-				}
-				
-				// 重置新消息提示
-				if (isInit) {
-					hasNewMessages.value = false
-					newMessageCount.value = 0
-				}
-			} else {
-				loadStatus.value = 'loadmore'
-				console.error('接口返回错误:', res.msg, " at pages/message/message.uvue:329")
-			}
-		} catch (error) {
-			loadStatus.value = 'loadmore'
-			console.error('请求异常:', error, " at pages/message/message.uvue:333")
-		} finally {
-			isLoading.value = false
-		}
-	}
-	
 	// 加载更多
 	const loadMore = async () => {
-		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:341")
+		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:305")
 		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
 			if (currPage.value >= totalPage.value) {
 				loadStatus.value = 'nomore'
@@ -303,41 +267,71 @@ const _cache = __ins.renderCache;
 		await loadMsgList()
 	}
 	
+	// 滚动到底部加载更多
+	const onScrollToLower = () => {
+		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:319")
+		if (loadStatus.value == 'loadmore' && !isLoading.value) {
+			loadMore()
+		}
+	}
+	
+
+
 	// 处理消息点击
-	const handleItemClick = async (item) => {
+	const handleItemClick = async (item : UTSJSONObject) : Promise<void> => {
 		modalContent.value = item
-		modal.value?.open();
-		
-		if (item.status == 1) {
+		modal.value?.open()
+		if (item.getNumber('status', 0) == 1) {
 			try {
-				const res = await setMsgState(item.messageId)
-				if (res.msg == 'success') {
-					const index = msgList.value.findIndex(msg => msg.messageId == item.messageId)
-					if (index !== -1) {
-						msgList.value[index].status = 0
-						// 触发视图更新
+				const messageId = item.getString('messageId', '')
+				const res = await setMsgState(messageId) as UTSJSONObject
+				if (res.getString('msg', '') == 'success') {
+					const index = msgList.value.findIndex((message : UTSJSONObject) : boolean => message.getString('messageId', '') == messageId)
+					if (index != -1) {
+						msgList.value[index].set('status', 0)
 						msgList.value = [...msgList.value]
 					}
 				}
 			} catch (error) {
-				console.error('更新状态失败:', error, " at pages/message/message.uvue:370")
+				console.error('更新状态失败:', error, " at pages/message/message.uvue:343")
 			}
 		}
 	}
-	
+
 	const ReadIt = () => {
 		modal.value?.close();
 	}
 	
-	// 工具函数
-	const getMessageTypeText = (type: number) => {
+	const getMessageId = (item : UTSJSONObject, index : number) : string => {
+		const messageId = item.getString('messageId', '')
+		return messageId != '' ? messageId : index.toString()
+	}
+
+	const getMessageCreateTime = (item : UTSJSONObject) : string => {
+		return item.getString('createTime', '')
+	}
+
+	const getMessageContent = (item : UTSJSONObject) : string => {
+		return item.getString('content', '')
+	}
+
+	const isMessageUnread = (item : UTSJSONObject) : boolean => {
+		return item.getNumber('status', 0) == 1
+	}
+
+	const getMessageTypeText = (type: number) : string => {
 		switch(type) {
 			case 1: return '警告'
 			case 2: return '事件'
 			default: return '通知'
 		}
 	}
-	
+
+	const getMessageTitle = (item : UTSJSONObject) : string => {
+		return getMessageTypeText(item.getNumber('messageType', 0)) + ' - ' + getMessageCreateTime(item)
+	}
+
+	// 工具函数
 	const formatTime = (timeString: string) => {
 		if (!timeString) return ''
 		try {
@@ -403,17 +397,17 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
             : _cC("v-if", true),
           _cE(Fragment, null, RenderHelpers.renderList(msgList.value, (item, index, __index, _cached): any => {
             return _cE("view", _uM({
-              key: item.messageId || index,
+              key: getMessageId(item, index),
               class: "message-item",
               onClick: () => {handleItemClick(item)}
             }), [
               _cE("view", _uM({ class: "message-header" }), [
-                _cE("text", _uM({ class: "message-title" }), _tD(getMessageTypeText(item.messageType) + ' - ' + item.createTime), 1 /* TEXT */),
-                _cE("text", _uM({ class: "time-text" }), _tD(formatTime(item.createTime)), 1 /* TEXT */)
+                _cE("text", _uM({ class: "message-title" }), _tD(getMessageTitle(item)), 1 /* TEXT */),
+                _cE("text", _uM({ class: "time-text" }), _tD(formatTime(getMessageCreateTime(item))), 1 /* TEXT */)
               ]),
               _cE("view", _uM({ class: "message-content-row" }), [
-                _cE("text", _uM({ class: "message-content" }), _tD(item.content), 1 /* TEXT */),
-                item.status == 1
+                _cE("text", _uM({ class: "message-content" }), _tD(getMessageContent(item)), 1 /* TEXT */),
+                isTrue(isMessageUnread(item))
                   ? _cE("text", _uM({
                       key: 0,
                       class: "unread-badge"
@@ -439,8 +433,8 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
       _cV(_component_i_modal, _uM({
         ref_key: "modal",
         ref: modal,
-        title: getMessageTypeText(modalContent.value.messageType),
-        content: modalContent.value.content,
+        title: getMessageTypeText(modalContent.value.getNumber('messageType', 0)),
+        content: modalContent.value.getString('content', ''),
         onConfirm: ReadIt
       }), null, 8 /* PROPS */, ["title", "content"])
     ])

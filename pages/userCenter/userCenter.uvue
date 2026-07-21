@@ -63,6 +63,19 @@
 	const buttonWidth = 120 
 	const buttonHeight = 200
 	
+	// 加载数据
+	const loadData = async () => {
+		let params = {}
+		const res = await getUserInfo()
+		userInfo.value = res.data
+
+		const resCars = await getUserDeviceList(params)
+
+		if (resCars?.data?.totalCount) {
+			carsnumber.value = resCars.data.totalCount
+		}
+	}
+
 	onShow(() => {
 		// 获取窗口尺寸
 		const systemInfo = uni.getSystemInfoSync()
@@ -91,6 +104,7 @@
 	})
 
 	const contactCustomerService = () => {
+		//#ifdef MP-WEIXIN
 		uni.openCustomerServiceChat({
 			extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
 			corpId: 'ww686122ec6a4db85a',
@@ -98,26 +112,24 @@
 				console.log(res)
 			}
 		})
+		//#endif
+
+		//#ifndef MP-WEIXIN
+		uni.showToast({
+			title: '请在微信小程序中联系人工客服',
+			icon: 'none'
+		})
+		//#endif
 	}
 	
-	// 加载数据
-	const loadData = async () => {
-		let params = {}
-		const res = await getUserInfo()
-		userInfo.value = res.data
 
-		const resCars = await getUserDeviceList(params)
-			
-		if (resCars?.data?.totalCount) {
-			carsnumber.value = resCars.data.totalCount
-		}
-	}
-
-	const onMoveChange = (e) => {
-		const { x, y } = e.detail
+	const onMoveChange = (e : UTSJSONObject) => {
+		const detail = e.getJSON('detail')
+		const x = detail != null ? detail.getNumber('x', 0) : 0
+		const y = detail != null ? detail.getNumber('y', 0) : 0
 		const maxX = windowWidth.value - buttonWidth
 		const maxY = windowHeight.value - buttonHeight
-		
+
 		// 边界限制，防止拖出屏幕
 		if (x < 0 || x > maxX || y < 0 || y > maxY) {
 			moveX.value = Math.max(0, Math.min(maxX, x))

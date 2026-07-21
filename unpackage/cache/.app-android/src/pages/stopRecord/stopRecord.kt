@@ -31,54 +31,60 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val startTime = ref("")
             val endTime = ref("")
             val imei = ref<String?>("")
-            val carStopDetail = ref(_uO())
-            val address = ref("")
-            val sortedCarStopDetail = computed(fun(): UTSArray<Any> {
-                if (!(carStopDetail.value != null) || !UTSArray.isArray(carStopDetail.value)) {
-                    return _uA()
-                }
-                return carStopDetail.value.slice().sort(fun(a, b): Number {
-                    val timeA = Date(a.endTime).getTime()
-                    val timeB = Date(b.endTime).getTime()
+            val carStopDetail = ref(_uA<StopRecord>())
+            val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
+                val sorted = carStopDetail.value.slice()
+                sorted.sort(fun(a: StopRecord, b: StopRecord): Number {
+                    val timeA = Date(a.getString("endTime", "")).getTime()
+                    val timeB = Date(b.getString("endTime", "")).getTime()
                     return timeB - timeA
                 }
                 )
-            }
-            )
-            onMounted(fun(){
-                initDateTime()
-                loadStopData()
+                return sorted
             }
             )
             onLoad(fun(option){
                 imei.value = option["imei"]
             }
             )
-            val loadStopData = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 98, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
-                        val res = await(getTrackPos(data))
-                        val stopsWithAddress = await(UTSPromise.all(res.data.stops.map(fun(stop): UTSPromise<Any> {
-                            return wrapUTSPromise(suspend w2@{
-                                    val convertedCoord = CoordTransform.wgs84ToTencent(stop.latitude, stop.longitude)
-                                    return@w2 UTSJSONObject.assign(_uO(), stop, _uO("latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng))
-                            })
-                        }
-                        )))
-                        carStopDetail.value = stopsWithAddress
-                        uni_hideLoading(null)
-                })
-            }
             val initDateTime = fun(){
                 val now = Date()
                 val formatTime = fun(date: Date): String {
-                    return "" + date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0") + " " + String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0") + ":" + String(date.getSeconds()).padStart(2, "0")
+                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
+                    val day = date.getDate().toString(10).padStart(2, "0")
+                    val hours = date.getHours().toString(10).padStart(2, "0")
+                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
+                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
+                    return "" + date.getFullYear() + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
                 }
                 endTime.value = formatTime(now)
                 val startDate = Date(now.getTime() - 86400000)
                 startTime.value = formatTime(startDate)
             }
+            val loadStopData = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 108, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val res = await(getTrackPos(data)) as UTSJSONObject
+                        var stopsWithAddress: UTSArray<StopRecord> = _uA()
+                        val trackData = res.getJSON("data")
+                        val stops = trackData?.getArray<UTSJSONObject>("stops") ?: _uA()
+                        stops.forEach(fun(stop: UTSJSONObject): Unit {
+                            val convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0))
+                            stop.set("latitude", convertedCoord.lat)
+                            stop.set("longitude", convertedCoord.lng)
+                            stopsWithAddress.push(stop)
+                        }
+                        )
+                        carStopDetail.value = stopsWithAddress
+                        uni_hideLoading(null)
+                })
+            }
+            onMounted(fun(){
+                initDateTime()
+                loadStopData()
+            }
+            )
             val showPicker = fun(type: String){
                 currentPickerType.value = type
                 pickerTitle.value = if (type === "start") {
@@ -106,15 +112,15 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 val seconds = Math.floor((diff % 60000) / 1000)
                 return "" + hours + "小时" + minutes + "分" + seconds + "秒"
             }
-            val showAddress = fun(latitude: String, longitude: String): UTSPromise<Unit> {
+            val showAddress = fun(latitude: Number, longitude: Number): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:168")
+                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:170")
                         uni_openLocation(OpenLocationOptions(latitude = latitude, longitude = longitude, name = "当前位置", scale = 18, success = fun(_){
-                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:175")
+                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:177")
                         }
                         , fail = fun(err){
                             uni_showToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:182")
+                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:184")
                         }
                         ))
                 })
@@ -181,27 +187,27 @@ open class GenPagesStopRecordStopRecord : BasePage {
                                 return _cE("view", _uM("class" to "content", "key" to index), _uA(
                                     _cE("view", _uM("class" to "item"), _uA(
                                         _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/startTime.png")),
-                                        _cE("text", null, _tD(item.startTime), 1)
+                                        _cE("text", null, _tD(item["startTime"]), 1)
                                     )),
                                     _cE("view", _uM("class" to "item"), _uA(
                                         _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/endTime.png")),
-                                        _cE("text", null, _tD(item.endTime), 1)
+                                        _cE("text", null, _tD(item["endTime"]), 1)
                                     )),
                                     _cE("view", _uM("class" to "item"), _uA(
                                         _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/stopTime.png")),
-                                        _cE("text", null, "停留 " + _tD(calculateDuration(item.duration)), 1)
+                                        _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber("duration", 0))), 1)
                                     )),
                                     _cE("view", _uM("class" to "item"), _uA(
                                         _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/user_location.png")),
-                                        if (isTrue(item.address)) {
-                                            _cE("text", _uM("key" to 0, "class" to "address"), _tD(if (isTruthy(item.address)) {
-                                                item.address
+                                        if (isTrue(item["address"])) {
+                                            _cE("text", _uM("key" to 0, "class" to "address"), _tD(if (isTruthy(item["address"])) {
+                                                item["address"]
                                             } else {
                                                 "加载中..."
                                             }), 1)
                                         } else {
                                             _cE("text", _uM("key" to 1, "onClick" to fun(){
-                                                showAddress(item.latitude, item.longitude)
+                                                showAddress(item.getNumber("latitude", 0), item.getNumber("longitude", 0))
                                             }
                                             ), "点击查看停车位置", 8, _uA(
                                                 "onClick"

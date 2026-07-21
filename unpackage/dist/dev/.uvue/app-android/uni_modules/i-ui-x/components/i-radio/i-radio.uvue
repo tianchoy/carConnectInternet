@@ -107,11 +107,19 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
+        function formatSize(value: any): string {
+            const text = value.toString();
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
+            }
+            return text + 'px';
+        }
         const checked = computed((): boolean => {
             if (props.checked)
                 return true;
-            const value = String(props.modelValue).length > 0 ? props.modelValue : props.value;
-            return String(value) == String(props.name);
+            const modelValueText = props.modelValue.toString();
+            const value = modelValueText.length > 0 ? props.modelValue : props.value;
+            return value.toString() == props.name.toString();
         });
         const wrapClass = computed((): string => {
             const classes = ['i-radio'];
@@ -154,7 +162,7 @@ const __sfc__ = defineComponent({
                 ';');
         });
         const dotStyle = computed((): string => {
-            const fontSize = props.shape == 'check' ? formatSize(Number(props.iconSize) + 2) : formatSize(props.iconSize);
+            const fontSize = props.shape == 'check' ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize);
             return ('background-color:' +
                 props.activeColor +
                 ';color:' +
@@ -181,13 +189,6 @@ const __sfc__ = defineComponent({
             if (props.labelDisabled)
                 return;
             select();
-        }
-        function formatSize(value): string {
-            const text = String(value);
-            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-                return text;
-            }
-            return text + 'px';
         }
         return (): any | null => {
             return _cE("view", _uM({

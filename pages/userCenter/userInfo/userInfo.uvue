@@ -64,10 +64,9 @@
 	})
 
 	onLoad((options) => {
-		
-		if (options.userInfo) {
+		if (options.userInfo != null) {
 			try {
-				const parsedInfo = JSON.parse(decodeURIComponent(options.userInfo)) as UTSJSONObject
+				const parsedInfo = JSON.parse(decodeURIComponent(options.userInfo as string) as string) as UTSJSONObject
 				const userId = parsedInfo.getString("userId")
 				const mobile = parsedInfo.getString("mobile")
 				const type = parsedInfo.getNumber("type")

@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "l-date-time-picker": "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker",
+    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup",
+    "i-empty": "../../uni_modules/i-ui-x/components/i-empty/i-empty"
+  }
+}

@@ -43,9 +43,33 @@ open class GenUniModulesIUiXComponentsISwitchISwitch : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_initialValue_fn(): Any {
+                if (props.modelValue.toString().length > 0) {
+                    return props.modelValue
+                }
+                return props.value
+            }
+            val initialValue = ::gen_initialValue_fn
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
+            fun gen_numericSize_fn(value: Any, fallback: Number): Number {
+                val text = value.toString().replace("px", "").replace("rpx", "").replace("%", "")
+                val numberValue = parseFloat(text)
+                if (isNaN(numberValue)) {
+                    return fallback
+                }
+                return numberValue
+            }
+            val numericSize = ::gen_numericSize_fn
             val current = ref(initialValue())
             val checked = computed(fun(): Boolean {
-                return String(current.value) == String(props.activeValue)
+                return current.value.toString() == props.activeValue.toString()
             }
             )
             val switchClass = computed(fun(): String {
@@ -110,27 +134,20 @@ open class GenUniModulesIUiXComponentsISwitchISwitch : VueComponent {
                 return "font-size:" + formatSize(props.loadingSize) + ";"
             }
             )
-            watch(fun(){
+            watch(fun(): Any {
                 return props.modelValue
             }
-            , fun(){
+            , fun(): Unit {
                 current.value = initialValue()
             }
             )
-            watch(fun(){
+            watch(fun(): Any {
                 return props.value
             }
-            , fun(){
+            , fun(): Unit {
                 current.value = initialValue()
             }
             )
-            fun gen_initialValue_fn(): Any {
-                if (String(props.modelValue).length > 0) {
-                    return props.modelValue
-                }
-                return props.value
-            }
-            val initialValue = ::gen_initialValue_fn
             fun gen_toggle_fn() {
                 if (props.disabled || props.loading) {
                     return
@@ -148,23 +165,6 @@ open class GenUniModulesIUiXComponentsISwitchISwitch : VueComponent {
                 emit("update:value", nextValue)
             }
             val toggle = ::gen_toggle_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            fun gen_numericSize_fn(value, fallback): Any {
-                val text = String(value).replace("px", "").replace("rpx", "").replace("%", "")
-                val numberValue = Number(text)
-                if (isNaN(numberValue)) {
-                    return fallback
-                }
-                return numberValue
-            }
-            val numericSize = ::gen_numericSize_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to "i-switch-wrap"), _uA(
                     if (_ctx.inactiveText.length > 0) {

@@ -144,7 +144,7 @@ const bgColor = computed(() => {
 const closeClicking = ref(false)
 
 const contentText = computed(() => {
-  return String(props.text)
+  return props.text.toString()
 })
 
 const normalizedType = computed(() => {
@@ -181,8 +181,8 @@ const computedTextColor = computed(() => {
 })
 
 const computedIconSize = computed(() => {
-  if (String(props.iconSize).length > 0) return props.iconSize
-  if (String(props.fontSize).length > 0) return props.fontSize
+  if (props.iconSize.toString().length > 0) return props.iconSize
+  if (props.fontSize.toString().length > 0) return props.fontSize
   if (props.size == 'xs' || props.size == 'mini') return 11
   if (props.size == 's' || props.size == 'small') return 12
   if (props.size == 'g' || props.size == 'large') return 15
@@ -192,6 +192,24 @@ const computedIconSize = computed(() => {
 const closeText = computed(() => {
   if (props.closeIcon == 'close' || props.closeIcon == 'close-line') return 'x'
   return props.closeIcon
+})
+
+const normalizedSize = computed(() => {
+  if (props.size == 'xs' || props.size == 'mini') return 'xs'
+  if (props.size == 's' || props.size == 'small') return 'small'
+  if (props.size == 'm' || props.size == 'normal' || props.size == 'n') return 'normal'
+  if (props.size == 'g' || props.size == 'large') return 'large'
+  return props.size
+})
+
+const isCustomRound = computed(() => {
+  if (typeof props.round == 'boolean') return false
+  return props.round.toString().length > 0
+})
+
+const isRound = computed(() => {
+  if (typeof props.round == 'boolean') return props.round
+  return props.round.toString().length > 0
 })
 
 const tagClass = computed(() => {
@@ -220,21 +238,55 @@ const closeClass = computed(() => {
   return classes.join(' ')
 })
 
+function formatSize(value: any): string {
+  const text = value.toString()
+  if (
+    text.indexOf('px') >= 0 ||
+    text.indexOf('rpx') >= 0 ||
+    text.indexOf('rem') >= 0 ||
+    text.indexOf('%') >= 0
+  ) {
+    return text
+  }
+  return text + 'px'
+}
+
+const shadowStyle = computed(() => {
+  const value = props.shadow
+  const text = value.toString()
+  if (text.length == 0 || text == 'none') return ''
+  if (Array.isArray(value) && value.length >= 4) {
+    const shadowValues = value as Array<any>
+    return (
+      'box-shadow:' +
+      formatSize(shadowValues[0]) +
+      ' ' +
+      formatSize(shadowValues[1]) +
+      ' ' +
+      formatSize(shadowValues[2]) +
+      ' ' +
+      shadowValues[3].toString() +
+      ';'
+    )
+  }
+  return 'box-shadow:0 ' + formatSize(value) + ' ' + formatSize(parseFloat(value.toString()) * 2) + ' rgba(0,0,0,0.12);'
+})
+
 const tagStyle = computed(() => {
   let style = ''
-  if (String(props.width).length > 0) style = style + 'width:' + formatSize(props.width) + ';'
-  if (String(props.height).length > 0) style = style + 'height:' + formatSize(props.height) + ';'
+  if (props.width.toString().length > 0) style = style + 'width:' + formatSize(props.width) + ';'
+  if (props.height.toString().length > 0) style = style + 'height:' + formatSize(props.height) + ';'
   if (props.borderWidth != 1) style = style + 'border-width:' + formatSize(props.borderWidth) + ';'
   if (isCustomRound.value) style = style + 'border-radius:' + formatSize(props.round) + ';'
   if (props.linear.length >= 3) {
     style =
       style +
       'background:linear-gradient(' +
-      String(props.linear[0]) +
+      props.linear[0].toString() +
       ',' +
-      String(props.linear[1]) +
+      props.linear[1].toString() +
       ',' +
-      String(props.linear[2]) +
+      props.linear[2].toString() +
       ');border-color:transparent;'
   } else if (bgColor.value.length > 0) {
     style = style + 'background-color:' + bgColor.value + ';'
@@ -250,7 +302,7 @@ const tagStyle = computed(() => {
 
 const textStyle = computed(() => {
   let style = 'color:' + computedTextColor.value + ';'
-  if (String(props.fontSize).length > 0) {
+  if (props.fontSize.toString().length > 0) {
     style = style + 'font-size:' + formatSize(props.fontSize) + ';'
   }
   return style
@@ -258,44 +310,6 @@ const textStyle = computed(() => {
 
 const closeStyle = computed(() => {
   return 'color:' + computedTextColor.value + ';'
-})
-
-const normalizedSize = computed(() => {
-  if (props.size == 'xs' || props.size == 'mini') return 'xs'
-  if (props.size == 's' || props.size == 'small') return 'small'
-  if (props.size == 'm' || props.size == 'normal' || props.size == 'n') return 'normal'
-  if (props.size == 'g' || props.size == 'large') return 'large'
-  return props.size
-})
-
-const isCustomRound = computed(() => {
-  if (typeof props.round == 'boolean') return false
-  return String(props.round).length > 0
-})
-
-const isRound = computed(() => {
-  if (typeof props.round == 'boolean') return props.round
-  return String(props.round).length > 0
-})
-
-const shadowStyle = computed(() => {
-  const value = props.shadow
-  const text = String(value)
-  if (text.length == 0 || text == 'none') return ''
-  if (Array.isArray(value) && value.length >= 4) {
-    return (
-      'box-shadow:' +
-      formatSize(value[0]) +
-      ' ' +
-      formatSize(value[1]) +
-      ' ' +
-      formatSize(value[2]) +
-      ' ' +
-      String(value[3]) +
-      ';'
-    )
-  }
-  return 'box-shadow:0 ' + formatSize(value) + ' ' + formatSize(Number(value) * 2) + ' rgba(0,0,0,0.12);'
 })
 
 function handleClick() {
@@ -316,18 +330,6 @@ function handleClose() {
   }, 0)
 }
 
-function formatSize(value): string {
-  const text = String(value)
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('rem') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
 
 return (): any | null => {
 

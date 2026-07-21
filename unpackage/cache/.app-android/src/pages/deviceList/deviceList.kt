@@ -105,12 +105,18 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 }
                 markers.value = nextMarkers
             }
+            watchEffect(fun(){
+                if (showMap.value) {
+                    updateMarkers(filteredDevices.value)
+                }
+            }
+            )
             val loadUserDeviceList = fun(data: UTSArray<UTSJSONObject>, from: Boolean): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
                             var deviceList: UTSArray<UTSJSONObject> = data
                             if (from) {
-                                val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 113, 11), "pageSize" to 1000)
+                                val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 118, 11), "pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
                                 deviceList = res.data.list
                             }
@@ -118,7 +124,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             updateMarkers(originalDeviceList.value)
                         }
                          catch (err: Throwable) {
-                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:120")
+                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:125")
                             uni_showToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
                         }
                 })
@@ -137,12 +143,12 @@ open class GenPagesDeviceListDeviceList : BasePage {
             }
             val getLocation = fun(){
                 uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:147")
+                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:152")
                     userLocation.value["latitude"] = res.latitude
                     userLocation.value["longitude"] = res.longitude
                 }
                 , fail = fun(err){
-                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:152")
+                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:157")
                 }
                 ))
             }
@@ -161,7 +167,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 }
                 )
                 if (selectedDevice == null) {
-                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:181")
+                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:186")
                     return
                 }
                 val imeiValue = (selectedDevice["imei"] as String?) ?: ""
@@ -177,6 +183,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_map = resolveComponent("map")
+                val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
                 val _component_indexListMode = resolveEasyComponent("indexListMode", GenComponentsIndexListModeIndexListModeClass)
                 return _cE("view", _uM("class" to "container"), _uA(
                     _cV(_component_custom_navBar, _uM("title" to "全部设备", "show-back" to true, "backgroundColor" to "#f1f1f1", "textColor" to "#333", "showCapsule" to true, "isIcon" to true, "onCapsuleClick" to showWhat, "Icon" to "/static/maps.png", "iconColor" to iconColor.value), null, 8, _uA(
@@ -193,20 +200,23 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             )),
                             if (isTrue(showMap.value)) {
                                 _cE("view", _uM("key" to 0, "class" to "right-bar"), _uA(
-                                    _cE("view", _uM("class" to "allCar", "onClick" to fun(){
-                                        changeState("全部状态")
-                                    }), "全部 " + _tD(totalCount.value), 9, _uA(
-                                        "onClick"
-                                    )),
-                                    _cE("view", _uM("class" to "onlineCar status-spacing", "onClick" to fun(){
+                                    _cV(_component_i_tag, _uM("type" to "primary", "onClick" to fun(){
                                         changeState("在线")
-                                    }), "在线 " + _tD(onlineCount.value), 9, _uA(
-                                        "onClick"
+                                    }, "text" to ("在线 " + onlineCount.value)), null, 8, _uA(
+                                        "onClick",
+                                        "text"
                                     )),
-                                    _cE("view", _uM("class" to "offlineCar status-spacing", "onClick" to fun(){
+                                    _cV(_component_i_tag, _uM("type" to "success", "onClick" to fun(){
+                                        changeState("在线")
+                                    }, "text" to ("在线 " + onlineCount.value)), null, 8, _uA(
+                                        "onClick",
+                                        "text"
+                                    )),
+                                    _cV(_component_i_tag, _uM("type" to "danger", "onClick" to fun(){
                                         changeState("离线")
-                                    }), "离线 " + _tD(offlineCount.value), 9, _uA(
-                                        "onClick"
+                                    }, "text" to ("离线 " + offlineCount.value)), null, 8, _uA(
+                                        "onClick",
+                                        "text"
                                     ))
                                 ))
                             } else {
@@ -230,7 +240,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "status-spacing" to _uM(".container .right-bar " to _uM("marginLeft" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tool-nav" to _uM(".container " to _uM("position" to "absolute", "top" to "200rpx", "right" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "35rpx")), "btn-map-list" to _uM(".container .tool-nav " to _uM("paddingTop" to "10rpx", "paddingRight" to "10rpx", "paddingBottom" to "10rpx", "paddingLeft" to "10rpx", "backgroundColor" to "#1296db", "color" to "#ffffff", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx")), "right-bar" to _uM(".container " to _uM("position" to "absolute", "top" to "25rpx", "left" to "20rpx", "zIndex" to 100, "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "status-spacing" to _uM(".container .right-bar " to _uM("marginLeft" to "20rpx")), "allCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#1296db")), "onlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#0da117")), "offlineCar" to _uM(".container .right-bar " to _uM("backgroundColor" to "#d81e06")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

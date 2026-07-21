@@ -1,0 +1,82 @@
+:host{display:flex;flex-direction:column}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.tools-box.data-v-f630fc82, .tools-box .second.data-v-f630fc82, .tools-box .car-box .car-state.data-v-f630fc82, .tools-box .car-box .car-state .car-box.data-v-f630fc82, .tools-box .car-box .selectCar.data-v-f630fc82, .tools-box .car-box .selectCar .car-box.data-v-f630fc82, .tools-box .car-box.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+}
+.tools-box .slot.data-v-f630fc82, .tools-box .car-box .car-state .slot.data-v-f630fc82, .tools-box .car-box .selectCar .slot.data-v-f630fc82 {
+  width: 50rpx;
+  height: 20rpx;
+}
+.tools-box .car-box.data-v-f630fc82, .tools-box .car-box .car-state .car-box.data-v-f630fc82, .tools-box .car-box .selectCar .car-box.data-v-f630fc82 {
+  padding: 0;
+}
+.tools-box .car-box .selectCar.data-v-f630fc82 {
+  margin-right: 20rpx;
+  color: #fff;
+  background-color: rgba(3, 109, 246, 0.71);
+  padding: 10rpx;
+  border-radius: 10rpx;
+}
+.tools-box .car-box .selectCar .plateNo.data-v-f630fc82 {
+  font-size: 30rpx;
+}
+.tools-box .car-box .car-state.data-v-f630fc82 {
+  border-radius: 10rpx;
+  color: #fff;
+  padding: 10rpx 15rpx;
+  font-size: 25rpx;
+}
+.tools-box .car-box .car-state .state.data-v-f630fc82 {
+  font-size: 25rpx;
+}
+.tools-box .car-box .success.data-v-f630fc82 {
+  background-color: #5ac725;
+}
+.tools-box .car-box .error.data-v-f630fc82 {
+  background-color: #f56c6c;
+}
+.tools-box .second.data-v-f630fc82 {
+  padding: 10rpx;
+  background-color: rgba(3, 109, 246, 0.71);
+  border-radius: 10rpx;
+  color: #fff;
+}
+.tools-box .second .times.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 30rpx;
+}
+.tools-box .down_icon.data-v-f630fc82 {
+  width: 30rpx;
+  height: 30rpx;
+}

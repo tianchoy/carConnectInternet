@@ -111,7 +111,38 @@ const __sfc__ = defineComponent({
         function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
             __ins.emit(event, ...do_not_transform_spread);
         }
-        const internalChecked = ref(isChecked());
+        function formatSize(value: string | number): string {
+            const text = value.toString();
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
+            }
+            return text + 'px';
+        }
+        function valueText(value: any): string {
+            if (typeof value == 'string')
+                return value as string;
+            if (typeof value == 'number' || typeof value == 'boolean')
+                return (value as any).toString();
+            return '';
+        }
+        function isChecked(): boolean {
+            if (props.checked)
+                return true;
+            const modelValue = props.modelValue;
+            const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+            if (Array.isArray(value)) {
+                const names = value as Array<any>;
+                for (let i = 0; i < names.length; i++) {
+                    if (valueText(names[i]) == valueText(props.name))
+                        return true;
+                }
+                return false;
+            }
+            if (typeof value == 'boolean')
+                return value as boolean;
+            return valueText(value) == valueText(props.name);
+        }
+        const internalChecked = ref<boolean>(isChecked());
         const checked = computed((): boolean => {
             return internalChecked.value;
         });
@@ -166,26 +197,37 @@ const __sfc__ = defineComponent({
                 color = props.activeLabelColor;
             return 'color:' + color + ';font-size:' + formatSize(props.labelSize) + ';';
         });
-        watch(() => props.modelValue, () => {
+        watch((): any => props.modelValue, (): void => {
             internalChecked.value = isChecked();
         });
-        watch(() => props.value, () => {
+        watch((): any => props.value, (): void => {
             internalChecked.value = isChecked();
         });
-        watch(() => props.checked, () => {
+        watch((): boolean => props.checked, (): void => {
             internalChecked.value = isChecked();
         });
-        function toggle() {
-            if (props.disabled)
-                return;
-            updateChecked(!checked.value);
+        function buildValue(nextChecked: boolean, previousChecked: boolean): any {
+            const modelValue = props.modelValue;
+            const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+            if (Array.isArray(value)) {
+                const list = value as Array<any>;
+                const nextList = list.slice(0);
+                const exists = previousChecked;
+                if (nextChecked && !exists)
+                    nextList.push(props.name);
+                if (!nextChecked && exists) {
+                    const filtered = [] as Array<any>;
+                    for (let i = 0; i < nextList.length; i++) {
+                        if (valueText(nextList[i]) != valueText(props.name))
+                            filtered.push(nextList[i]);
+                    }
+                    return filtered;
+                }
+                return nextList;
+            }
+            return nextChecked;
         }
-        function toggleByLabel() {
-            if (props.labelDisabled)
-                return;
-            toggle();
-        }
-        function updateChecked(nextChecked) {
+        function updateChecked(nextChecked: boolean): void {
             const previousChecked = checked.value;
             internalChecked.value = nextChecked;
             const nextValue = buildValue(nextChecked, previousChecked);
@@ -194,46 +236,15 @@ const __sfc__ = defineComponent({
             emit('update:value', nextValue);
             emit('change', nextValue);
         }
-        function isChecked(): boolean {
-            if (props.checked)
-                return true;
-            const value = String(props.modelValue).length > 0 ? props.modelValue : props.value;
-            if (Array.isArray(value)) {
-                for (let i = 0; i < (value as unknown[]).length; i++) {
-                    if (String((value as unknown[])[i]) == String(props.name))
-                        return true;
-                }
-                return false;
-            }
-            if (typeof value == 'boolean')
-                return value as boolean;
-            return String(value) == String(props.name);
+        function toggle(): void {
+            if (props.disabled)
+                return;
+            updateChecked(!checked.value);
         }
-        function buildValue(nextChecked, previousChecked): any {
-            const value = String(props.modelValue).length > 0 ? props.modelValue : props.value;
-            if (Array.isArray(value)) {
-                const list = (value as unknown[]).slice(0);
-                const exists = previousChecked;
-                if (isTruthy(nextChecked) && !isTruthy(exists))
-                    list.push(props.name);
-                if (!isTruthy(nextChecked) && isTruthy(exists)) {
-                    const nextList = [];
-                    for (let i = 0; i < list.length; i++) {
-                        if (String(list[i]) != String(props.name))
-                            nextList.push(list[i]);
-                    }
-                    return nextList;
-                }
-                return list;
-            }
-            return nextChecked;
-        }
-        function formatSize(value): string {
-            const text = String(value);
-            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-                return text;
-            }
-            return text + 'px';
+        function toggleByLabel(): void {
+            if (props.labelDisabled)
+                return;
+            toggle();
         }
         return (): any | null => {
             return _cE("view", _uM({

@@ -29,15 +29,6 @@ const _cache = __ins.renderCache;
 		})
 	}
 
-	onShow(() => {
-		// 如果需要刷新或者首次加载，则加载数据
-		if (needRefresh.value || deviceList.value.length === 0) {
-			resetData()
-			loadPayDeviceListData()
-			needRefresh.value = false
-		}
-	})
-
 	// 重置数据
 	const resetData = () => {
 		deviceList.value = []
@@ -52,7 +43,7 @@ const _cache = __ins.renderCache;
 
 		loading.value = true
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 96, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 87, 10),
 				page: currPage.value,
 				pageSize: pageSize.value
 			}
@@ -76,7 +67,7 @@ const _cache = __ins.renderCache;
 				if (hasMore.value) {
 					currPage.value++
 				}
-				
+
 			} else {
 				uni.showToast({
 					title: res.msg || '加载失败',
@@ -84,7 +75,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:128")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:119")
 			uni.showToast({
 				title: '加载失败，请重试',
 				icon: 'none'
@@ -94,13 +85,22 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	// 页面显示时加载或刷新设备列表
+	onShow(() => {
+		if (needRefresh.value || deviceList.value.length === 0) {
+			resetData()
+			loadPayDeviceListData()
+			needRefresh.value = false
+		}
+	})
+
+
 	// 监听页面滚动到底部，触发加载更多
 	onReachBottom(() => {
 		loadPayDeviceListData()
 	})
 
-	// 支付
-	const pay = (iccid : string,simMerchant : string) => {
+	function pay(iccid : string, simMerchant : string) {
 		if(simMerchant.toLowerCase() == 'zddx'){
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
@@ -136,6 +136,12 @@ const _cache = __ins.renderCache;
 			icon: 'none'
 		})
 
+	}
+
+	const payDevice = (item : UTSJSONObject) => {
+		const iccid = item.getString('iccid', '')
+		const simMerchant = item.getString('simMerchant', '')
+		pay(iccid, simMerchant)
 	}
 
 	// 添加下拉刷新功能
@@ -197,7 +203,7 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
               _cE("view"),
               _cE("text", _uM({
                 class: "pay-btn",
-                onClick: () => {pay(item.iccid,item.simMerchant)}
+                onClick: () => {payDevice(item)}
               }), "去续费", 8 /* PROPS */, ["onClick"])
             ])
           ])

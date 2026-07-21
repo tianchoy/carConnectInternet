@@ -1,5 +1,5 @@
 <template>
-    <view class="container">
+    <scroll-view class="container" scroll-y="true" :show-scrollbar="false">
         <view>
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
@@ -37,7 +37,7 @@
                     </view>
                     <view class="state-item">
                         <text class="state-label">最后定位</text>
-                        <text class="state-value">{{devicePosInfo.positionUpdateTime ?? '暂无位置'}}</text>
+                        <text class="state-value">{{ devicePositionUpdateTime }}</text>
                     </view>
                 </view>
             </view>
@@ -155,19 +155,21 @@
             @cancel="closePicker"
             @close="closePicker"
         ></i-picker>
-    </view>
+    </scroll-view>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
-import { getTodayZeroTime } from '../../utils/gettime.uts'
+import { getTodayZeroTime, type TodayTimeRange } from '../../utils/gettime.uts'
 import { formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
-const { nowTime, todayZero } = getTodayZeroTime()
+const timeRange: TodayTimeRange = getTodayZeroTime()
+const nowTime: number = timeRange.nowTime
+const todayZero: number = timeRange.todayZero
 
-interface Device {
+type Device = {
     name: string,
     deviceName: string,
     value: string,
@@ -184,12 +186,21 @@ interface Device {
 }
 
 //// 响应式数据
-const center = reactive({
+type MapCenter = {
+    latitude: number
+    longitude: number
+}
+
+const center = reactive<MapCenter>({
     latitude: 39.90469,
     longitude: 116.40717
 })
 
-const userDeviceList = ref<Array<any>>([])
+type UserDeviceListData = {
+    list: Array<UTSJSONObject>
+}
+
+const userDeviceList = ref<Array<UTSJSONObject>>([])
 const isMapReady = ref(false)
 const mapScale = ref(12)
 const statusBarHeight = ref(20)
@@ -209,34 +220,45 @@ const currentCarSimMerchant = ref('')
 const currentCarConnectionStatus = ref('')
 const currentCarCarType = ref('')
 const currentCarPlateNo = ref('')
-const deviceDetail = ref({
+type DeviceStatus = {
+    batteryPercent: number
+    voltage: number
+    signalStrength: number
+}
+
+type DeviceDetailState = {
+    deviceStatus: DeviceStatus
+    connectionStatus: string
+    lastUpdateTime: string
+}
+
+const deviceDetail = ref<DeviceDetailState>({
     deviceStatus: {
         batteryPercent: 0,
         voltage: 0,
         signalStrength: 0
     },
     connectionStatus: 'offline',
-    lastUpdateTime: null
+    lastUpdateTime: ''
 })
 const markers = ref<Array<any>>([])
 const lastUpdateTime = ref('--:--:--')
 
 // 本地存储key
-const STORAGE_KEYS = {
-    SELECTED_DEVICE: 'selected_device_info',
-    SELECTED_DEVICE_INDEX: 'selected_device_index'
-}
+const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
+const SELECTED_DEVICE_INDEX_STORAGE_KEY: string = 'selected_device_index'
 
 // 计算属性 
-const safeDeviceDetail = computed(() => {
+const safeDeviceDetail = computed<DeviceDetailState>(() => {
+    const detail = deviceDetail.value
     return {
         deviceStatus: {
-            batteryPercent: deviceDetail.value?.deviceStatus?.batteryPercent ?? 0,
-            voltage: deviceDetail.value?.deviceStatus?.voltage ?? 0,
-            signalStrength: deviceDetail.value?.deviceStatus?.signalStrength ?? 0
+            batteryPercent: detail.deviceStatus.batteryPercent,
+            voltage: detail.deviceStatus.voltage,
+            signalStrength: detail.deviceStatus.signalStrength
         },
-        connectionStatus: deviceDetail.value?.connectionStatus ?? 'offline',
-        lastUpdateTime: deviceDetail.value?.lastUpdateTime ?? null
+        connectionStatus: detail.connectionStatus,
+        lastUpdateTime: detail.lastUpdateTime
     }
 })
 
@@ -261,7 +283,13 @@ const initDimensions = () => {
 }
 
 // 延迟函数
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number): Promise<void> => {
+    return new Promise<void>((resolve: (value: void) => void) => {
+        setTimeout(() => {
+            resolve()
+        }, ms)
+    })
+}
 
 // 保存选中的设备信息
 const saveSelectedDevice = (device: Device) => {
@@ -278,18 +306,31 @@ const saveSelectedDevice = (device: Device) => {
             carType: device.carType,
             plateNo: device.plateNo
         }
-        uni.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE, deviceInfo)
+        uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, deviceInfo)
         console.log('保存选中设备成功:', deviceInfo)
     } catch (error) {
         console.error('保存选中设备失败:', error)
     }
 }
 
+interface SavedDevice {
+    name: string
+    deviceName: string
+    imei: string
+    deptId: string
+    deviceId: string
+    iccid: string
+    simMerchant: string
+    connectionStatus: string
+    carType: string
+    plateNo: string
+}
+
 // 获取保存的选中设备
-const getSavedSelectedDevice = () => {
+const getSavedSelectedDevice = (): SavedDevice | null => {
     try {
-        const savedDevice = uni.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE)
-        if (savedDevice && savedDevice.imei) {
+        const savedDevice = uni.getStorageSync(SELECTED_DEVICE_STORAGE_KEY) as SavedDevice | null
+        if (savedDevice != null && savedDevice.imei) {
             return savedDevice
         }
     } catch (error) {
@@ -301,7 +342,7 @@ const getSavedSelectedDevice = () => {
 // 清除保存的选中设备
 const clearSavedSelectedDevice = () => {
     try {
-        uni.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE)
+        uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
         console.log('清除保存设备成功')
     } catch (error) {
         console.error('清除保存设备失败:', error)
@@ -311,7 +352,7 @@ const clearSavedSelectedDevice = () => {
 // 保存选中的设备索引
 const saveSelectedDeviceIndex = (index: number) => {
     try {
-        uni.setStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX, index)
+        uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
     } catch (error) {
         console.error('保存选中设备索引失败:', error)
     }
@@ -320,8 +361,8 @@ const saveSelectedDeviceIndex = (index: number) => {
 // 获取保存的选中设备索引
 const getSavedSelectedDeviceIndex = (): number | null => {
     try {
-        const savedIndex = uni.getStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX)
-        if (savedIndex !== undefined && savedIndex !== null) {
+        const savedIndex = uni.getStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY) as number | null
+        if (savedIndex != null) {
             return savedIndex
         }
     } catch (error) {
@@ -333,7 +374,7 @@ const getSavedSelectedDeviceIndex = (): number | null => {
 // 清除保存的选中设备索引
 const clearSavedSelectedDeviceIndex = () => {
     try {
-        uni.removeStorageSync(STORAGE_KEYS.SELECTED_DEVICE_INDEX)
+        uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
     } catch (error) {
         console.error('清除保存设备索引失败:', error)
     }
@@ -390,47 +431,226 @@ const handlePicker = () => {
     })
 }
 
-// 处理选择车辆确认
-const handleConfirm = (e: any) => {
-    
-    // 关闭 picker
-    showPicker.value = false
-    
-    // 获取选中的索引 - 从 indexs 字段获取
-    let selectedIndex = -1
-    
-    // 1. 从 e.indexs 获取（i-picker 返回的索引数组）
-    if (e && e.indexs && Array.isArray(e.indexs) && e.indexs.length > 0) {
-        selectedIndex = e.indexs[0]
+// 创建标记点
+const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
+    const isOnline = currentCarConnectionStatus.value === 'online'
+    const iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
+    const marker = {
+        id,
+        latitude: lat,
+        longitude: lng,
+        width: 30,
+        height: 30,
+        iconPath: iconPath,
+        callout: {
+            content: title || '爱车位置',
+            color: isOnline ? '#ffffff' : '#999999',
+            borderRadius: 6,
+            bgColor: isOnline ? '#07C160' : '#CCCCCC',
+            padding: 4,
+            fontSize: 12,
+            display: 'ALWAYS'
+        },
+        anchor: { x: 0.5, y: 0.5 }
     }
-    // 2. 从 e.index 获取（兼容其他格式）
-    else if (e && e.index !== undefined && e.index !== null) {
-        selectedIndex = typeof e.index === 'number' ? e.index : parseInt(e.index)
-    }
-    // 3. 从 e.detail 获取
-    else if (e && e.detail) {
-        if (e.detail.indexs && Array.isArray(e.detail.indexs) && e.detail.indexs.length > 0) {
-            selectedIndex = e.detail.indexs[0]
-        } else if (e.detail.index !== undefined) {
-            selectedIndex = e.detail.index
-        }
-    }
-    // 4. 从 e.value 对象中尝试获取
-    else if (e && e.value && typeof e.value === 'object') {
-        // 如果 value 是对象，尝试通过 text 匹配设备
-        const text = e.value.text || e.value.value
-        if (text && typeof text === 'string') {
-            const matchedDevice = deviceList.value.find((device) => {
-                const displayName = device.deviceName || device.name || device.imei || '未命名设备'
-                const statusText = device.connectionStatus === 'online' ? '在线' : '离线'
-                const fullDisplay = `${displayName} (${statusText})`
-                return fullDisplay === text
-            })
-            if (matchedDevice) {
-                selectedIndex = deviceList.value.indexOf(matchedDevice)
+    return marker
+}
+
+// 加载车辆详情
+const loadDeviceDetail = async (deviceId: string) => {
+    try {
+        const res = await getDeviceDetail(deviceId)
+        const detail = res.data
+        if (detail != null) {
+            const deviceStatus = detail.getJSON('deviceStatus')
+            deviceDetail.value = {
+                deviceStatus: {
+                    batteryPercent: deviceStatus?.getNumber('batteryPercent', 0) ?? 0,
+                    voltage: deviceStatus?.getNumber('voltage', 0) ?? 0,
+                    signalStrength: deviceStatus?.getNumber('signalStrength', 0) ?? 0
+                },
+                connectionStatus: detail.getString('connectionStatus', 'offline'),
+                lastUpdateTime: detail.getString('lastUpdateTime', '')
+            }
+
+            const updateTime = detail.getString('lastUpdateTime', '')
+            if (updateTime) {
+                const date = new Date(updateTime)
+                lastUpdateTime.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
             }
         }
+    } catch (error) {
+        console.error('加载设备详情失败', error)
     }
+}
+
+// 加载轨迹轨迹
+const trackPosInfo = ref<any>({})
+const tripData = ref<Array<UTSJSONObject>>([])
+const totalMileage = ref(0)
+const averageSpeed = ref(0)
+
+// 处理行程数据
+const processTripData = (data : UTSJSONObject) : void => {
+    const trips = data.getArray<UTSJSONObject>('trips')
+    if (trips != null && trips.length > 0) {
+        tripData.value = trips
+
+        let totalDistance = 0
+        let totalDuration = 0
+        let totalAvgSpeed = 0
+
+        trips.forEach((trip : UTSJSONObject) : void => {
+            totalDistance += trip.getNumber('distance', 0)
+            totalDuration += trip.getNumber('duration', 0)
+            totalAvgSpeed += trip.getNumber('averageSpeed', 0)
+        })
+
+        totalMileage.value = totalDistance
+        averageSpeed.value = totalAvgSpeed / trips.length
+    } else {
+        tripData.value = []
+        totalMileage.value = 0
+        averageSpeed.value = 0
+    }
+}
+
+const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
+    try {
+        const res = await getTrackPos(data) as UTSJSONObject
+        if (res.getNumber('code', 0) == 401) {
+            uni.showToast({
+                title: '登录过期，请重新登录',
+                icon: 'none',
+                duration: 2000
+            })
+            uni.removeStorageSync('token')
+            uni.reLaunch({
+                url: '/pages/index/index'
+            })
+            return
+        }
+        const trackData = res.getJSON('data')
+        if (trackData != null) {
+            processTripData(trackData)
+        }
+        uni.hideLoading()
+    } catch (error) {
+        console.error('加载轨迹失败', error)
+    }
+}
+
+// 加载设备位置
+const devicePosInfo = ref<UTSJSONObject | null>(null)
+const devicePositionUpdateTime = computed<string>(() => {
+    const position = devicePosInfo.value
+    return position != null ? position.getString('positionUpdateTime', '暂无位置') : '暂无位置'
+})
+const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
+    try {
+        const res = await getDevicePos(data)
+        if (res.code == 0 && res.data && res.data.length > 0) {
+            const position = res.data[0]
+            devicePosInfo.value = position
+
+            const lat = position.getNumber('latitude', 0);
+            const lng = position.getNumber('longitude', 0);
+
+            if (isNaN(lat) || isNaN(lng)) {
+                console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''))
+                uni.showToast({
+                    title: '定位数据异常',
+                    icon: 'none'
+                })
+                return false;
+            }
+
+            const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
+
+            center.latitude = convertedCoord.lat;
+            center.longitude = convertedCoord.lng;
+            isMapReady.value = true
+
+            await delay(100);
+
+            const deviceMarker = createMarker(
+                1,
+                convertedCoord.lat,
+                convertedCoord.lng,
+                'device',
+                currentCarName.value
+            );
+            
+            markers.value = [];
+            await delay(50);
+            markers.value = [deviceMarker];
+
+            console.log('标记点更新完成');
+            return true;
+        } else {
+            console.warn('获取设备位置失败')
+            isMapReady.value = false
+            uni.showToast({
+                title: '获取位置失败',
+                icon: 'none'
+            })
+            return false
+        }
+    } catch (error) {
+        console.error('加载设备位置失败', error)
+        uni.showToast({
+            title: '定位失败，请重试',
+            icon: 'none'
+        })
+        return false
+    }
+}
+
+// 加载设备数据
+const loadDeviceData = async (device: Device) => {
+    console.log('开始加载设备数据:', device)
+    try {
+        await loadDeviceDetail(device.deviceId);
+        await loadDevicePos({
+            deviceId: device.deviceId,
+            deviceids: device.imei || device.value
+        })
+        await loadTrackPos({
+            imei: device.imei || device.value,
+            startTime: formatTimes(todayZero),
+            endTime: formatTimes(nowTime),
+            minParkTime: 120,
+            withStop: false,
+            withPos: false,
+            withTrip: true,
+        })
+        uni.showToast({
+            title: '切换成功',
+            icon: 'success'
+        })
+    } catch (error) {
+        console.error('切换车辆失败', error)
+        uni.showToast({
+            title: '切换失败，请重试',
+            icon: 'none'
+        })
+    } finally {
+        uni.hideLoading()
+    }
+}
+
+interface PickerConfirmEvent {
+    indexs: number[]
+}
+
+// 处理选择车辆确认
+const handleConfirm = (e: PickerConfirmEvent) => {
+
+    // 关闭 picker
+    showPicker.value = false
+
+    // i-picker 返回的第一列索引
+    let selectedIndex = e.indexs.length > 0 ? e.indexs[0] : -1
     
     // 如果索引无效，使用当前设备
     if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
@@ -500,39 +720,6 @@ const handleConfirm = (e: any) => {
     loadDeviceData(selectedDevice)
 }
 
-// 加载设备数据
-const loadDeviceData = async (device: Device) => {
-    console.log('开始加载设备数据:', device)
-    try {
-        await loadDeviceDetail(device.deviceId);
-        await loadDevicePos({
-            deviceId: device.deviceId,
-            deviceids: device.imei || device.value
-        })
-        await loadTrackPos({
-            imei: device.imei || device.value,
-            startTime: formatTimes(todayZero),
-            endTime: formatTimes(nowTime),
-            minParkTime: 120,
-            withStop: false,
-            withPos: false,
-            withTrip: true,
-        })
-        uni.showToast({
-            title: '切换成功',
-            icon: 'success'
-        })
-    } catch (error) {
-        console.error('切换车辆失败', error)
-        uni.showToast({
-            title: '切换失败，请重试',
-            icon: 'none'
-        })
-    } finally {
-        uni.hideLoading()
-    }
-}
-
 // 加载车辆列表
 const loadDeviceList = async () => {
     try {
@@ -541,29 +728,34 @@ const loadDeviceList = async () => {
         })
         
         if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
-            userDeviceList.value = res.data
-            deviceList.value = res.data.list.map((item: any) => ({ 
-                name: item.deviceName || item.imei || '未命名设备',
-                deviceName: item.deviceName || item.imei || '未命名设备',
-                value: item.imei,
-                imei: item.imei,
-                deptId: item.companyId,
-                deviceId: item.deviceId,
-                iccid: item.iccid,
-                simMerchant: item.simMerchant,
-                connectionStatus: item.connectionStatus,
-                carType: item.carType,
-                plateNo: item.plateNo,
-                latitude: item.latitude,
-                longitude: item.longitude,
-            }))
+            userDeviceList.value = res.data.list
+            deviceList.value = res.data.list.map((item: UTSJSONObject): Device => {
+                const imei = item.getString('imei', '')
+                const rawDeviceName = item.getString('deviceName', '')
+                const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备')
+                return {
+                    name: deviceName,
+                    deviceName: deviceName,
+                    value: imei,
+                    imei: imei,
+                    deptId: item.getString('companyId', ''),
+                    deviceId: item.getString('deviceId', ''),
+                    iccid: item.getString('iccid', ''),
+                    simMerchant: item.getString('simMerchant', ''),
+                    connectionStatus: item.getString('connectionStatus', ''),
+                    carType: item.getString('carType', ''),
+                    plateNo: item.getString('plateNo', ''),
+                    latitude: item.getNumber('latitude', 0),
+                    longitude: item.getNumber('longitude', 0)
+                }
+            })
             
             // 获取保存的设备
             const savedDevice = getSavedSelectedDevice()
             const savedIndex = getSavedSelectedDeviceIndex()
             
-            let selectedDevice = null
-            let selectedIdx = -1
+            let selectedDevice : Device | null = null
+            let selectedIdx : number = -1
             
             // 优先使用保存的索引
             if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
@@ -572,7 +764,7 @@ const loadDeviceList = async () => {
             }
             
             // 如果索引无效或设备不存在，尝试使用保存的设备信息
-            if (!selectedDevice && savedDevice && savedDevice.imei) {
+            if (selectedDevice == null && savedDevice != null && savedDevice.imei != '') {
                 selectedDevice = deviceList.value.find(device => 
                     device.imei === savedDevice.imei || 
                     device.value === savedDevice.imei
@@ -596,33 +788,34 @@ const loadDeviceList = async () => {
                 console.log('使用第一个设备作为默认:', selectedDevice?.deviceName)
             }
             
-            if (selectedDevice) {
+            if (selectedDevice != null) {
+                const device = selectedDevice
                 // 设置当前车辆信息
-                const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
+                const deviceName = device.deviceName != '' ? device.deviceName : (device.name != '' ? device.name : '未命名设备')
                 currentCarName.value = deviceName
-                currentCarImei.value = selectedDevice.imei || selectedDevice.value
-                currentCarDeptId.value = selectedDevice.deptId
-                currentCarDeviceId.value = selectedDevice.deviceId
-                currentCarIccId.value = selectedDevice.iccid
-                currentCarSimMerchant.value = selectedDevice.simMerchant
-                currentCarConnectionStatus.value = selectedDevice.connectionStatus
-                currentCarCarType.value = selectedDevice.carType
-                currentCarPlateNo.value = selectedDevice.plateNo
-                center.latitude = selectedDevice.latitude
-                center.longitude = selectedDevice.longitude
+                currentCarImei.value = device.imei != '' ? device.imei : device.value
+                currentCarDeptId.value = device.deptId
+                currentCarDeviceId.value = device.deviceId
+                currentCarIccId.value = device.iccid
+                currentCarSimMerchant.value = device.simMerchant
+                currentCarConnectionStatus.value = device.connectionStatus
+                currentCarCarType.value = device.carType
+                currentCarPlateNo.value = device.plateNo
+                center.latitude = device.latitude
+                center.longitude = device.longitude
                 
                 // 设置 picker 默认索引
                 if (selectedIdx !== -1) {
                     pickerDefaultIndex.value = [selectedIdx]
                 }
                 
-                await loadDeviceDetail(selectedDevice.deviceId);
+                await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
-                    deviceId: selectedDevice.deviceId,
-                    deviceids: selectedDevice.imei || selectedDevice.value
+                    deviceId: device.deviceId,
+                    deviceids: device.imei != '' ? device.imei : device.value
                 })
                 await loadTrackPos({
-                    imei: selectedDevice.imei || selectedDevice.value,
+                    imei: device.imei != '' ? device.imei : device.value,
                     startTime: formatTimes(todayZero),
                     endTime: formatTimes(nowTime),
                     minParkTime: 120,
@@ -633,7 +826,7 @@ const loadDeviceList = async () => {
             }
         } else {
             uni.showToast({
-                title: res.msg || '暂无车辆数据',
+                title: '暂无车辆数据',
                 icon: 'none'
             })
         }
@@ -646,165 +839,10 @@ const loadDeviceList = async () => {
     } 
 }
 
-// 加载车辆详情
-const loadDeviceDetail = async (deviceId: string) => {
-    try {
-        const res = await getDeviceDetail(deviceId)
-        if (res.code == 0 && res.data) {
-            deviceDetail.value = {
-                deviceStatus: {
-                    batteryPercent: res.data.deviceStatus?.batteryPercent ?? 0,
-                    voltage: res.data.deviceStatus?.voltage ?? 0,
-                    signalStrength: res.data.deviceStatus?.signalStrength ?? 0
-                },
-                connectionStatus: res.data.connectionStatus ?? 'offline',
-                lastUpdateTime: res.data.lastUpdateTime ?? null
-            }
-            
-            // 更新最后定位时间
-            if (res.data.lastUpdateTime) {
-                const date = new Date(res.data.lastUpdateTime)
-                lastUpdateTime.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
-            }
-        } else {
-            console.warn('获取设备详情失败:', res.msg)
-        }
-    } catch (error) {
-        console.error('加载设备详情失败', error)
-    }
-}
-
-// 加载轨迹轨迹
-const trackPosInfo = ref<any>({})
-const tripData = ref<Array<any>>([])
-const totalMileage = ref(0)
-const averageSpeed = ref(0)
-
-const loadTrackPos = async (data: any) => {
-    try {
-        const res = await getTrackPos(data)
-            if (res.code == 401) {
-                uni.showToast({
-                    title: '登录过期，请重新登录',
-                    icon: 'none',
-                    duration: 2000
-                })
-                uni.removeStorageSync('token')
-                uni.reLaunch({
-                    url: '/pages/index/index'
-                })
-                return false
-            }
-            await processTripData(res.data)
-            uni.hideLoading()
-    } catch (error) {
-        console.error('加载轨迹失败', error)
-    }
-}
-
 // 计算属性：总行程数
 const totalTrips = computed(() => {
     return tripData.value.length
 })
-
-// 处理行程数据
-const processTripData = async (data : any) => {
-    if (data.trips && data.trips.length > 0) {
-        const processedTrips = await Promise.all(
-            data.trips.map(async (trip : any) => {
-                return {
-                    ...trip,
-                };
-            })
-        );
-
-        tripData.value = processedTrips;
-
-        let totalDistance = 0;
-        let totalDuration = 0;
-        let totalAvgSpeed = 0;
-
-        processedTrips.forEach((trip : any) => {
-            totalDistance += trip.distance || 0;
-            totalDuration += trip.duration || 0;
-            totalAvgSpeed += trip.averageSpeed || 0;
-        });
-
-        totalMileage.value = totalDistance;
-        averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
-    } else {
-        tripData.value = [];
-        totalMileage.value = 0;
-        averageSpeed.value = 0;
-    }
-};
-
-// 加载设备位置
-const devicePosInfo = ref<any>({})
-const loadDevicePos = async (data: any) => {
-    try {
-        const res = await getDevicePos(data)
-        if (res.code == 0 && res.data && res.data.length > 0) {
-            devicePosInfo.value = res.data[0]
-            
-            const lat = Number(res.data[0].latitude);
-            const lng = Number(res.data[0].longitude);
-
-            if (isNaN(lat) || isNaN(lng)) {
-                console.error('经纬度格式错误', res.data[0].latitude, res.data[0].longitude);
-                uni.showToast({
-                    title: '定位数据异常',
-                    icon: 'none'
-                })
-                return false;
-            }
-
-            let convertedCoord;
-            try {
-                convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
-            } catch (transformError) {
-                console.error('坐标转换失败:', transformError);
-                convertedCoord = { lat: lat, lng: lng };
-            }
-
-            center.latitude = convertedCoord.lat;
-            center.longitude = convertedCoord.lng;
-            isMapReady.value = true
-
-            await delay(100);
-
-            const deviceMarker = createMarker(
-                1,
-                convertedCoord.lat,
-                convertedCoord.lng,
-                'device',
-                currentCarName.value
-            );
-            
-            markers.value = [];
-            await delay(50);
-            markers.value = [deviceMarker];
-
-            console.log('标记点更新完成');
-            return true;
-        } else {
-            console.warn('获取设备位置失败:', res.msg)
-            isMapReady.value = false
-            uni.showToast({
-                title: res.msg || '获取位置失败',
-                icon: 'none'
-            })
-            return false
-        }
-    } catch (error) {
-        console.error('加载设备位置失败', error)
-        uni.showToast({
-            title: '定位失败，请重试',
-            icon: 'none'
-        })
-        return false
-    }
-}
 
 // 刷新位置
 const refreshLocation = async () => {
@@ -826,11 +864,6 @@ const refreshLocation = async () => {
             deviceids: currentCarImei.value
         })
         if (success) {
-            const mapContext = uni.createMapContext('myMap', this);
-            mapContext.moveToLocation({
-                latitude: center.latitude,
-                longitude: center.longitude,
-            });
             uni.showToast({
                 title: '位置已更新',
                 icon: 'success'
@@ -845,6 +878,22 @@ const refreshLocation = async () => {
     } finally {
         uni.hideLoading()
     }
+}
+
+function checkToken() : boolean {
+    const token = uni.getStorageSync('token')
+    return token != null && token.toString() != ''
+}
+
+function isLogin() : boolean {
+    if (!checkToken()) {
+        uni.showToast({
+            title: '请先登录',
+            icon: 'none'
+        })
+        return false
+    }
+    return true
 }
 
 // 跳转轨迹详情
@@ -862,31 +911,6 @@ const toDeviceList = () => {
     uni.navigateTo({
         url: '/pages/deviceList/deviceList?userDeviceList=' + JSON.stringify(userDeviceList.value),
     })
-}
-
-// 创建标记点
-const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
-    const isOnline = safeDeviceDetail.value.connectionStatus === 'online'
-    const iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
-    const marker = {
-        id,
-        latitude: lat,
-        longitude: lng,
-        width: 30,
-        height: 30,
-        iconPath: iconPath,
-        callout: {
-            content: title || '爱车位置',
-            color: isOnline ? '#ffffff' : '#999999',
-            borderRadius: 6,
-            bgColor: isOnline ? '#07C160' : '#CCCCCC',
-            padding: 4,
-            fontSize: 12,
-            display: 'ALWAYS'
-        },
-        anchor: { x: 0.5, y: 0.5 }
-    }
-    return marker
 }
 
 // 跳转设备详情
@@ -953,6 +977,7 @@ const toFence = () => {
 }
 
 // 联系客服
+// #ifdef MP-WEIXIN
 const contactCustomerService = () => {
     uni.openCustomerServiceChat({
         extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
@@ -962,6 +987,15 @@ const contactCustomerService = () => {
         }
     })
 }
+// #endif
+// #ifndef MP-WEIXIN
+const contactCustomerService = () => {
+    uni.showToast({
+        title: '请在微信小程序中联系客服',
+        icon: 'none'
+    })
+}
+// #endif
 
 // 支付
 const needRefresh = ref(false)
@@ -1009,29 +1043,33 @@ const gotoLogin = () => {
     })
 }
 
+async function unbindCurrentDevice() : Promise<void> {
+    const result = await delDevice(currentCarImei.value)
+    if (result.code == 0) {
+        uni.showToast({
+            title: '解绑成功',
+            icon: 'success'
+        })
+        clearSavedSelectedDevice()
+        clearSavedSelectedDeviceIndex()
+    } else {
+        uni.showToast({
+            title: '解绑失败',
+            icon: 'error'
+        })
+    }
+    await loadDeviceList()
+}
+
 // 解绑设备
-const unbindDevice = async () => {
-    if (!isLogin()) return 
+const unbindDevice = () : void => {
+    if (!isLogin()) return
     uni.showModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',
-        success: async (res) => {
+        success: (res: ShowModalSuccess) : void => {
             if (res.confirm) {
-                const res = await delDevice(currentCarImei.value)
-                if (res.code == 0) {
-                    uni.showToast({
-                        title: '解绑成功',
-                        icon: 'success'
-                    })
-                    clearSavedSelectedDevice()
-                    clearSavedSelectedDeviceIndex()
-                } else {
-                    uni.showToast({
-                        title: '解绑失败',
-                        icon: 'error'
-                    })
-                }
-                loadDeviceList();
+                void unbindCurrentDevice()
             }
         }
     })
@@ -1073,24 +1111,6 @@ onShow(async () => {
     }
 })
 
-// 检查token状态
-const checkToken = (): boolean => {
-    const token = uni.getStorageSync('token')
-    return !!token
-}
-
-// 检查是否登录
-const isLogin = (): boolean => {
-    if (!checkToken()) {
-        uni.showToast({
-            title: '请先登录',
-            icon: 'none'
-        })
-        return false
-    }
-    return true
-}
-
 // 刷新设备列表
 const handleReload = () => {
     if (!isLogin()) return 
@@ -1113,6 +1133,7 @@ onLoad(() => {
 .container {
     background: linear-gradient(90deg, #E6F9E6, #E0F0FF);
     padding: 0 30rpx 30rpx 30rpx;
+    height: 100%;
     
     .loading-container {
         position: fixed;

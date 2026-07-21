@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 
 const __sfc__ = defineComponent({
@@ -10,7 +10,7 @@ name: 'i-icon',
     default: 'home-3-fill',
   },
   fontSize: {
-    type: [String, Number],
+    type: String,
     default: '16',
   },
   fontFamily: {
@@ -46,7 +46,7 @@ name: 'i-icon',
     default: '',
   },
   size: {
-    type: [String, Number],
+    type: String,
     default: '',
   },
   plain: {
@@ -82,6 +82,18 @@ __ins.emit(event, ...do_not_transform_spread)
 
 const spinAngle = ref(0)
 let spinTimer = 0
+
+function formatSize(value: string): string {
+  if (
+    value.indexOf('px') >= 0 ||
+    value.indexOf('rpx') >= 0 ||
+    value.indexOf('rem') >= 0 ||
+    value.indexOf('%') >= 0
+  ) {
+    return value
+  }
+  return value + 'px'
+}
 
 const iconBgColor = computed(() => {
   return props.bgColor
@@ -176,8 +188,8 @@ const iconText = computed(() => {
   return props.name
 })
 
-const normalizedSize = computed(() => {
-  const value = String(props.size)
+const normalizedSize = computed((): string => {
+  const value = props.size as string
   if (value == 'mini' || value == 'normal' || value == 'large') return value
   if (value.length > 0) return 'custom'
   return ''
@@ -214,8 +226,8 @@ const imageClass = computed(() => {
   return classes.join(' ')
 })
 
-const resolvedFontSize = computed(() => {
-  const value = String(props.size)
+const resolvedFontSize = computed((): string => {
+  const value = props.size as string
   if (value == 'mini') return '14px'
   if (value == 'normal') return '17px'
   if (value == 'large') return '22px'
@@ -223,15 +235,14 @@ const resolvedFontSize = computed(() => {
   return formatSize(props.fontSize)
 })
 
-const badgeSize = computed(() => {
-  const value = String(props.size)
+const badgeSize = computed((): string => {
+  const value = props.size as string
   if (value == 'mini') return '26px'
   if (value == 'normal') return '34px'
   if (value == 'large') return '44px'
   if (value.length > 0) return formatSize(value)
-  const numberSize = Number(props.fontSize)
-  if (isNaN(numberSize)) return formatSize(props.fontSize)
-  return formatSize(numberSize + 18)
+  if (props.fontSize.length > 0) return formatSize(props.fontSize)
+  return '16px'
 })
 
 const wrapStyle = computed(() => {
@@ -246,13 +257,46 @@ const wrapStyle = computed(() => {
   return style
 })
 
+function iconTypeColor(): string {
+  if (props.type == 'primary') return '#2979ff'
+  if (props.type == 'success') return '#19be6b'
+  if (props.type == 'warning') return '#ff9900'
+  if (props.type == 'danger') return '#fa3534'
+  return '#303133'
+}
+
+const activeRotation = computed(() => {
+  let angle = (props.rotation + spinAngle.value) % 360
+  if (angle < 0) angle = angle + 360
+  return angle
+})
+
 const imageStyle = computed(() => {
   const size = resolvedFontSize.value
   let style = 'width:' + size + ';height:' + size + ';'
   const angle = activeRotation.value
-  if (angle != 0) style = style + 'transform:rotate(' + String(angle) + 'deg);'
+  if (angle != 0) style = style + 'transform:rotate(' + angle.toString() + 'deg);'
   return style
 })
+
+function startSpin() {
+  if (spinTimer > 0) return
+  spinTimer = setInterval(() => {
+    const duration = Math.max(120, props.duration)
+    const step = Math.max(6, Math.round(360 * 50 / duration))
+    let angle = (spinAngle.value + step) % 360
+    if (angle < 0) angle = angle + 360
+    spinAngle.value = angle
+  }, 50)
+}
+
+function stopSpin() {
+  if (spinTimer > 0) {
+    clearInterval(spinTimer)
+    spinTimer = 0
+  }
+  spinAngle.value = 0
+}
 
 const textStyle = computed(() => {
   let style = 'font-size:' + resolvedFontSize.value + ';'
@@ -265,34 +309,9 @@ const textStyle = computed(() => {
   }
   if (color.length > 0) style = style + 'color:' + color + ';'
   const angle = activeRotation.value
-  if (angle != 0) style = style + 'transform:rotate(' + String(angle) + 'deg);'
+  if (angle != 0) style = style + 'transform:rotate(' + angle.toString() + 'deg);'
   return style
 })
-
-const activeRotation = computed(() => {
-  return normalizeAngle(props.rotation + spinAngle.value)
-})
-
-watch(
-  () => props.spin,
-  (nextValue) => {
-    if (nextValue) {
-      startSpin()
-    } else {
-      stopSpin()
-    }
-  },
-)
-
-watch(
-  () => props.duration,
-  () => {
-    if (props.spin) {
-      stopSpin()
-      startSpin()
-    }
-  },
-)
 
 onMounted(() => {
   if (props.spin) startSpin()
@@ -301,50 +320,6 @@ onMounted(() => {
 onUnmounted(() => {
   stopSpin()
 })
-
-function startSpin() {
-  if (spinTimer > 0) return
-  spinTimer = setInterval(() => {
-    const duration = Math.max(120, Number(props.duration))
-    const step = Math.max(6, Math.round(360 * 50 / duration))
-    spinAngle.value = normalizeAngle(spinAngle.value + step)
-  }, 50)
-}
-
-function stopSpin() {
-  if (spinTimer > 0) {
-    clearInterval(spinTimer)
-    spinTimer = 0
-  }
-  spinAngle.value = 0
-}
-
-function normalizeAngle(value: number): number {
-  let angle = value % 360
-  if (angle < 0) angle = angle + 360
-  return angle
-}
-
-function iconTypeColor(): string {
-  if (props.type == 'primary') return '#2979ff'
-  if (props.type == 'success') return '#19be6b'
-  if (props.type == 'warning') return '#ff9900'
-  if (props.type == 'danger') return '#fa3534'
-  return '#303133'
-}
-
-function formatSize(value): string {
-  const text = String(value)
-  if (
-    text.indexOf('px') >= 0 ||
-    text.indexOf('rpx') >= 0 ||
-    text.indexOf('rem') >= 0 ||
-    text.indexOf('%') >= 0
-  ) {
-    return text
-  }
-  return text + 'px'
-}
 
 function handleClick() {
   emit('click', {

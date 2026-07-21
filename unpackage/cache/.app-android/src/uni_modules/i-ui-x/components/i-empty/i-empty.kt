@@ -38,6 +38,20 @@ open class GenUniModulesIUiXComponentsIEmptyIEmpty : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun formatSize(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            fun formatBoxSize(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf(" ") >= 0) {
+                    return text
+                }
+                return formatSize(value)
+            }
             val bgColor = computed(fun(): String {
                 return props.bgColor
             }
@@ -66,22 +80,6 @@ open class GenUniModulesIUiXComponentsIEmptyIEmpty : VueComponent {
                 return "color:" + props.buttonTextColor + ";"
             }
             )
-            fun gen_formatBoxSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf(" ") >= 0) {
-                    return text
-                }
-                return formatSize(value)
-            }
-            val formatBoxSize = ::gen_formatBoxSize_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to "i-empty", "style" to _nS(wrapStyle.value), "onClick" to fun(){
                     emit("click")

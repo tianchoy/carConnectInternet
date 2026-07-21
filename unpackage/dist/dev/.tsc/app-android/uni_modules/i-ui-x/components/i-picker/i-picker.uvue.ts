@@ -1,5 +1,11 @@
 import { computed, ref, watch } from 'vue'
 
+type PickerItem = { __$originalPosition?: UTSSourceMapPosition<"PickerItem", "uni_modules/i-ui-x/components/i-picker/i-picker.uvue", 280, 6>;
+  text: string;
+  value: any;
+  disabled: boolean;
+};
+
 
 const __sfc__ = defineComponent({
   __name: 'i-picker',
@@ -30,7 +36,7 @@ name: 'i-picker',
     default: false,
   },
   itemHeight: {
-    type: [String, Number],
+    type: Number,
     default: 44,
   },
   cancelText: {
@@ -50,7 +56,7 @@ name: 'i-picker',
     default: '#3c9cff',
   },
   visibleItemCount: {
-    type: [String, Number],
+    type: Number,
     default: 5,
   },
   closeOnMask: { type: Boolean, default: true },
@@ -145,30 +151,98 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function isArray(value: any): boolean {
+  return Array.isArray(value)
+}
 
+function normalizeItem(item: any | null): PickerItem {
+  const data = item as UTSJSONObject
+  if (data != null) {
+    const rawValue = data['value']
+    const rawText = data['text']
+    const text = rawText != null ? rawText.toString() : (rawValue != null ? rawValue.toString() : '')
+    const value = rawValue != null ? rawValue : text
+    return {
+      text,
+      value,
+      disabled: data['disabled'] == true,
+    }
+  }
+
+  return {
+    text: item.toString(),
+    value: item,
+    disabled: false,
+  }
+}
+
+function normalizeColumn(list: Array<any>): Array<PickerItem> {
+  const result = new Array<PickerItem>()
+  for (let i = 0; i < list.length; i++) result.push(normalizeItem(list[i]))
+  return result
+}
 
 const opened = ref(props.show)
-const currentIndexs = ref([])
+const currentIndexs = ref<Array<number>>([])
 
-const normalizedColumns = computed(() => {
+const normalizedColumns = computed<Array<Array<PickerItem>>>(() => {
   const source = props.columns.length > 0 ? props.columns : props.options
-  if (source.length == 0) return []
+  if (source.length == 0) return new Array<Array<PickerItem>>()
 
   const first = source[0]
   if (isArray(first)) {
-    const result = []
-    for (let i = 0; i < source.length; i++) result.push(normalizeColumn(source[i]))
+    const result = new Array<Array<PickerItem>>()
+    for (let i = 0; i < source.length; i++) result.push(normalizeColumn(source[i] as Array<any>))
     return result
   }
 
-  return [normalizeColumn(source)]
+  return [normalizeColumn(source as Array<any>)]
 })
+
+function selectedIndexAt(columnIndex: number): number {
+  if (currentIndexs.value.length <= columnIndex) return 0
+  return currentIndexs.value[columnIndex]
+}
+
+function selectedItems(): Array<PickerItem> {
+  const result = new Array<PickerItem>()
+  const columns = normalizedColumns.value
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i]
+    const index = selectedIndexAt(i)
+    if (index >= 0 && index < column.length) result.push(column[index])
+  }
+
+  return result
+}
+
+function columnAt(index: number): Array<PickerItem> {
+  if (index < 0 || index >= normalizedColumns.value.length) return new Array<PickerItem>()
+  return normalizedColumns.value[index]
+}
+
+function visibleCountNumber(): number {
+  const count = props.visibleItemCount
+  if (count <= 0) return 5
+  return count
+}
+
+function itemHeightNumber(): number {
+  const height = props.itemHeight
+  if (height <= 0) return 44
+  return height
+}
+
+function formatSize(value: number): string {
+  return value.toString() + 'px'
+}
 
 const displayText = computed(() => {
   const items = selectedItems()
   if (items.length == 0) return '请选择'
 
-  const texts = []
+  const texts = new Array<string>()
   for (let i = 0; i < items.length; i++) texts.push(items[i].text)
   return texts.join(' / ')
 })
@@ -192,7 +266,7 @@ const column5 = computed(() => columnAt(5))
 
 const columnsStyle = computed(() => {
   const height = itemHeightNumber() * visibleCountNumber()
-  return 'width:100%;height:' + String(height) + 'px;'
+  return 'width:100%;height:' + height.toString() + 'px;'
 })
 
 const indicatorStyle = computed(() => {
@@ -208,57 +282,122 @@ const itemStyle = computed(() => {
 })
 
 const panelStyle = computed(() => {
-  const radius = formatSize(props.round)
+  const radius = formatSize(props.round as number)
   return 'border-radius:' + radius + ' ' + radius + ' 0 0;'
 })
 
-watch(
-  () => props.show,
-  (nextValue) => {
-    if (opened.value == nextValue) return
-    opened.value = nextValue
-    if (nextValue) {
-      syncIndexs()
-      emit('open')
-    } else {
-      emit('close')
+function hasModelValue(): boolean {
+  if (isArray(props.modelValue)) {
+    const modelValues = props.modelValue as Array<any>
+    return modelValues.length > 0
+  }
+  return (props.modelValue as string).length > 0
+}
+
+function activeModelValue() {
+  if (hasModelValue()) return props.modelValue
+  const value = props.value as string
+  if (value.length > 0) return value
+  return null
+}
+
+function columnTargetValue(value: any | null, columnIndex: number): any | null {
+  if (value == null) return null
+  if (isArray(value)) {
+    const values = value as Array<any>
+    return values.length > columnIndex ? values[columnIndex] : null
+  }
+  return columnIndex == 0 ? value : null
+}
+
+function defaultIndexAt(columnIndex: number): number {
+  if (isArray(props.defaultIndex)) {
+    const defaultIndexes = props.defaultIndex as Array<number>
+    if (defaultIndexes.length > columnIndex) return defaultIndexes[columnIndex]
+    return 0
+  }
+  return columnIndex == 0 ? (props.defaultIndex as number) : 0
+}
+
+function findValueIndex(column: Array<PickerItem>, value: any | null): number {
+  for (let i = 0; i < column.length; i++) {
+    const itemValue = column[i].value
+    if (itemValue == value) return i
+  }
+  return -1
+}
+
+function hasTargetValue(value: any | null): boolean {
+  if (value == null) return false
+  if (isArray(value)) return true
+  return (value as string).length > 0
+}
+
+function syncIndexs() {
+  const columns = normalizedColumns.value
+  const result = new Array<number>()
+  const value = activeModelValue()
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i]
+    const targetValue = columnTargetValue(value, i)
+    let index = -1
+    if (hasTargetValue(targetValue)) {
+      index = findValueIndex(column, targetValue)
     }
-  },
-)
 
-watch(
-  () => props.modelValue,
-  () => {
-    syncIndexs()
-  },
-)
+    if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
+      index = defaultIndexAt(i)
+    }
 
-watch(
-  () => props.value,
-  () => {
-    syncIndexs()
-  },
-)
+    if (index < 0) index = 0
+    if (index >= column.length) index = column.length - 1
+    result.push(index)
+  }
 
-watch(
-  () => props.columns,
-  () => {
-    syncIndexs()
-  },
-)
-
-watch(
-  () => props.defaultIndex,
-  () => {
-    syncIndexs()
-  },
-)
+  currentIndexs.value = result
+}
 
 syncIndexs()
 
-function openByTrigger() {
-  if (props.disabled) return
-  open()
+function selectedValue() {
+  const items = selectedItems()
+  if (items.length == 0) return ''
+  if (items.length == 1) return items[0].value
+
+  const values = new Array<any>()
+  for (let i = 0; i < items.length; i++) values.push(items[i].value)
+  return values
+}
+
+function pickerValuePayload(): any {
+  const items = selectedItems()
+  if (items.length == 1) return items[0]
+  return items
+}
+
+function buildChangeEvent(columnIndex: number, index: number) {
+  return {
+    index,
+    indexs: currentIndexs.value,
+    columnIndex,
+    value: pickerValuePayload(),
+    values: selectedItems(),
+  }
+}
+
+function buildConfirmEvent() {
+  return {
+    indexs: currentIndexs.value,
+    value: pickerValuePayload(),
+    values: selectedItems(),
+  }
+}
+
+function emitSelectedValue() {
+  const value = selectedValue()
+  emit('update:modelValue', value)
+  emit('update:value', isArray(value) ? '' : value)
 }
 
 function open() {
@@ -267,6 +406,11 @@ function open() {
   opened.value = true
   emit('open')
   emit('update:show', true)
+}
+
+function openByTrigger() {
+  if (props.disabled) return
+  open()
 }
 
 function close() {
@@ -301,11 +445,11 @@ function handleOverlayClick() {
   close()
 }
 
-function handlePickerChange(event) {
+function handlePickerChange(event: UniPickerViewChangeEvent) {
   if (props.disabled || props.loading) return
 
-  const values = event.detail.value
-  const nextIndexs = []
+  const values: Array<number> = event.detail.value
+  const nextIndexs = new Array<number>()
   let changedColumnIndex = 0
 
   for (let i = 0; i < normalizedColumns.value.length; i++) {
@@ -313,7 +457,7 @@ function handlePickerChange(event) {
     const oldIndex = selectedIndexAt(i)
     let nextIndex = 0
 
-    if (values.length > i) nextIndex = Number(values[i])
+    if (values.length > i) nextIndex = values[i]
     if (nextIndex < 0) nextIndex = 0
     if (nextIndex >= column.length) nextIndex = column.length - 1
 
@@ -333,193 +477,26 @@ function handlePickerChange(event) {
   if (props.immediateChange) emitSelectedValue()
 }
 
-function emitSelectedValue() {
-  const value = selectedValue()
-  emit('update:modelValue', value)
-  emit('update:value', isArray(value) ? '' : value)
-}
-
-function syncIndexs() {
-  const columns = normalizedColumns.value
-  const result = []
-  const value = activeModelValue()
-
-  for (let i = 0; i < columns.length; i++) {
-    const column = columns[i]
-    const targetValue = columnTargetValue(value, i)
-    let index = -1
-    if (targetValue != null && String(targetValue).length > 0) {
-      index = findValueIndex(column, targetValue)
-    }
-
-    if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
-      index = defaultIndexAt(i)
-    }
-
-    if (index < 0) index = 0
-    if (index >= column.length) index = column.length - 1
-    result.push(index)
-  }
-
-  currentIndexs.value = result
-}
-
-function activeModelValue() {
-  if (hasModelValue()) return props.modelValue
-  if (String(props.value).length > 0) return props.value
-  return null
-}
-
-function hasModelValue() {
-  if (isArray(props.modelValue)) return props.modelValue.length > 0
-  return String(props.modelValue).length > 0
-}
-
-function columnTargetValue(value, columnIndex) {
-  if (value == null) return null
-  if (isArray(value)) return value.length > columnIndex ? value[columnIndex] : null
-  return columnIndex == 0 ? value : null
-}
-
-function defaultIndexAt(columnIndex) {
-  if (isArray(props.defaultIndex)) {
-    if (props.defaultIndex.length > columnIndex) return Number(props.defaultIndex[columnIndex])
-    return 0
-  }
-  return columnIndex == 0 ? Number(props.defaultIndex) : 0
-}
-
-function findValueIndex(column, value) {
-  for (let i = 0; i < column.length; i++) {
-    if (String(column[i].value) == String(value)) return i
-  }
-  return -1
-}
-
-function selectedItems() {
-  const result = []
-  const columns = normalizedColumns.value
-
-  for (let i = 0; i < columns.length; i++) {
-    const column = columns[i]
-    const index = selectedIndexAt(i)
-    if (index >= 0 && index < column.length) result.push(column[index])
-  }
-
-  return result
-}
-
-function selectedValue() {
-  const items = selectedItems()
-  if (items.length == 0) return ''
-  if (items.length == 1) return items[0].value
-
-  const values = []
-  for (let i = 0; i < items.length; i++) values.push(items[i].value)
-  return values
-}
-
-function selectedIndexAt(columnIndex) {
-  if (currentIndexs.value.length <= columnIndex) return 0
-  return Number(currentIndexs.value[columnIndex])
-}
-
-function buildChangeEvent(columnIndex, index) {
-  return {
-    index,
-    indexs: currentIndexs.value,
-    columnIndex,
-    value: pickerValuePayload(),
-    values: selectedItems(),
-  }
-}
-
-function buildConfirmEvent() {
-  return {
-    indexs: currentIndexs.value,
-    value: pickerValuePayload(),
-    values: selectedItems(),
-  }
-}
-
-function pickerValuePayload() {
-  const items = selectedItems()
-  if (items.length == 1) return items[0]
-  return items
-}
-
-function columnAt(index) {
-  if (index < 0 || index >= normalizedColumns.value.length) return []
-  return normalizedColumns.value[index]
-}
-
-function normalizeColumn(list) {
-  const result = []
-  for (let i = 0; i < list.length; i++) result.push(normalizeItem(list[i]))
-  return result
-}
-
-function normalizeItem(item) {
-  if (item != null && typeof item == 'object') {
-    const text = item.text != null ? String(item.text) : String(item.value)
-    const value = item.value != null ? item.value : text
-    return {
-      text,
-      value,
-      disabled: item.disabled == true,
-    }
-  }
-
-  return {
-    text: String(item),
-    value: item,
-    disabled: false,
-  }
-}
-
-function itemClass(item, columnIndex, itemIndex) {
-  const classes = ['i-picker__item']
+function itemClass(item: PickerItem, columnIndex: number, itemIndex: number): string {
+  const classes = new Array<string>()
+  classes.push('i-picker__item')
   if (selectedIndexAt(columnIndex) == itemIndex) classes.push('i-picker__item--active')
   if (item.disabled) classes.push('i-picker__item--disabled')
   return classes.join(' ')
 }
 
-function itemTextClass(item, columnIndex, itemIndex) {
+function itemTextClass(item: PickerItem, columnIndex: number, itemIndex: number): string {
   return selectedIndexAt(columnIndex) == itemIndex
     ? 'i-picker__item-text i-picker__item-text--active'
     : 'i-picker__item-text'
 }
 
-function itemTextStyle(item, columnIndex, itemIndex) {
+function itemTextStyle(item: PickerItem, columnIndex: number, itemIndex: number): string {
   let style = 'line-height:' + formatSize(props.itemHeight) + ';color:#606266;'
   if (selectedIndexAt(columnIndex) == itemIndex) {
     style = style + 'color:#111827;'
   }
   return style
-}
-
-function isArray(value) {
-  return Object.prototype.toString.call(value) == '[object Array]'
-}
-
-function visibleCountNumber() {
-  const count = Number(props.visibleItemCount)
-  if (isNaN(count) || count <= 0) return 5
-  return count
-}
-
-function itemHeightNumber() {
-  const height = Number(props.itemHeight)
-  if (isNaN(height) || height <= 0) return 44
-  return height
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
 }
 
 __expose({
@@ -535,11 +512,11 @@ __expose({
   getColumns() {
     return normalizedColumns.value
   },
-  getColumnValues(columnIndex) {
+  getColumnValues(columnIndex: number) {
     if (columnIndex < 0 || columnIndex >= normalizedColumns.value.length) return []
     return normalizedColumns.value[columnIndex]
   },
-  setColumnValues(columnIndex, values) {
+  setColumnValues(columnIndex: number, values: Array<any>) {
     // columns 是外部受控数据，组件只提供兼容方法入口，不直接修改 props。
     emit('change', {
       index: selectedIndexAt(columnIndex),

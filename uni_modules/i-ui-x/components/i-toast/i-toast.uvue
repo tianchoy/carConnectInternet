@@ -216,7 +216,9 @@ function setValue(options, keyName) {
 function startLoadingAnimation() {
   if (loadingTimer > 0) return
   loadingTimer = setInterval(() => {
-    loadingAngle.value = normalizeAngle(loadingAngle.value + 24)
+    let angle = (loadingAngle.value + 24) % 360
+    if (angle < 0) angle = angle + 360
+    loadingAngle.value = angle
   }, 50)
 }
 
@@ -226,12 +228,6 @@ function stopLoadingAnimation() {
     loadingTimer = 0
   }
   loadingAngle.value = 0
-}
-
-function normalizeAngle(value: number): number {
-  let angle = value % 360
-  if (angle < 0) angle = angle + 360
-  return angle
 }
 
 function normalizePosition(value) {

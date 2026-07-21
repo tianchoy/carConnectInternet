@@ -149,15 +149,10 @@ const __sfc__ = defineComponent({
         const touching = ref(false);
         let closeTimer = 0;
         let lazyTimer = 0;
-        const rootStyle = computed((): string => {
-            return 'z-index:' + String(props.zIndex) + ';';
-        });
-        const panelClass = computed((): string => {
-            const classes = ['i-popup__panel'];
-            classes.push('i-popup__panel--' + normalizedMode.value);
-            if (shouldCoverCenter())
-                classes.push('i-popup__panel--cover-center');
-            return classes.join(' ');
+        const drawerPosition = computed((): string => {
+            if (props.position.length > 0)
+                return props.position;
+            return props.mode;
         });
         const normalizedMode = computed((): string => {
             if (drawerPosition.value == 'left' ||
@@ -168,13 +163,46 @@ const __sfc__ = defineComponent({
             }
             return 'bottom';
         });
-        const drawerPosition = computed((): string => {
-            if (props.position.length > 0)
-                return props.position;
-            return props.mode;
+        function shouldCoverCenter(): boolean {
+            return (props.widthCoverCenter &&
+                (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') &&
+                props.width.toString().length > 0);
+        }
+        function stringifyStyle(value: any): string {
+            if (value == null)
+                return '';
+            const text = value.toString();
+            if (text == '[object Object]')
+                return '';
+            if (text.length == 0)
+                return '';
+            return isTruthy(text.endsWith(';')) ? text : text + ';';
+        }
+        function formatMs(value: any): string {
+            const text = value.toString();
+            if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0)
+                return text;
+            return text + 'ms';
+        }
+        function formatSize(value: any): string {
+            const text = value.toString();
+            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+                return text;
+            }
+            return text + 'px';
+        }
+        const rootStyle = computed((): string => {
+            return 'z-index:' + props.zIndex.toString() + ';';
+        });
+        const panelClass = computed((): string => {
+            const classes = ['i-popup__panel'];
+            classes.push('i-popup__panel--' + normalizedMode.value);
+            if (shouldCoverCenter())
+                classes.push('i-popup__panel--cover-center');
+            return classes.join(' ');
         });
         const overlayComputedStyle = computed((): string => {
-            let bgColor = 'rgba(0,0,0,' + String(props.overlayOpacity) + ')';
+            let bgColor = 'rgba(0,0,0,' + props.overlayOpacity.toString() + ')';
             if (props.overflayBgColor.length > 0)
                 bgColor = props.overflayBgColor;
             let style = 'background-color:' + bgColor + ';';
@@ -186,214 +214,6 @@ const __sfc__ = defineComponent({
         const titleStyleText = computed((): string => {
             return stringifyStyle(props.titleStyle);
         });
-        const panelStyle = computed((): string => {
-            let style = 'background-color:' + bgColor.value + ';';
-            style = style + 'transition-duration:' + formatMs(props.duration) + ';';
-            style = style + marginStyle();
-            style = style + sizeStyle();
-            style = style + roundStyle();
-            style = style + safeAreaStyle();
-            style = style + transformStyle();
-            style = style + stringifyStyle(props.customStyle);
-            style = style + stringifyStyle(props.customWrapStyle);
-            return style;
-        });
-        const bodyStyle = computed((): string => {
-            let style = 'padding:' + formatSize(props.contentMargin) + ';';
-            if (String(props.maxHeight).length > 0)
-                style = style + 'max-height:' + formatSize(props.maxHeight) + ';';
-            return style;
-        });
-        const footerStyle = computed((): string => {
-            return stringifyStyle(props.customFooterStyle);
-        });
-        const confirmTextStyle = computed((): string => {
-            const color = props.btnColor.length > 0 ? props.btnColor : '#1989fa';
-            return 'color:' + color + ';';
-        });
-        const confirmTextValue = computed((): string => {
-            return props.confirmText.length > 0 ? props.confirmText : '确定';
-        });
-        const cancelTextValue = computed((): string => {
-            return props.cancelText.length > 0 ? props.cancelText : '取消';
-        });
-        const contentVisible = computed((): boolean => {
-            return !props.lazy || contentReady.value;
-        });
-        const closeClass = computed((): string => {
-            const classes = ['i-popup__close'];
-            classes.push('i-popup__close--' + normalizeClosePos());
-            return classes.join(' ');
-        });
-        const closeStyle = computed((): string => {
-            return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';';
-        });
-        const closeIconText = computed((): string => {
-            if (props.closeIcon == 'close')
-                return '×';
-            return props.closeIcon;
-        });
-        watch(() => props.show, (nextValue) => {
-            if (nextValue) {
-                openPanel(false);
-            }
-            else {
-                closePanel(false);
-            }
-        });
-        function open() {
-            openPanel(true);
-        }
-        function close() {
-            closePanel(true);
-        }
-        function openPanel(shouldEmitUpdate: boolean) {
-            if (props.disabled)
-                return;
-            if (opened.value && active.value)
-                return;
-            clearTimers();
-            emit('beforeOpen');
-            opened.value = true;
-            resetOffset();
-            if (!props.lazy)
-                contentReady.value = true;
-            setTimeout(() => {
-                active.value = true;
-                if (props.lazy) {
-                    lazyTimer = setTimeout(() => {
-                        contentReady.value = true;
-                        lazyTimer = 0;
-                    }, animationDuration());
-                }
-                emit('open');
-                if (shouldEmitUpdate)
-                    emit('update:show', true);
-            }, 20);
-        }
-        function closePanel(shouldEmitUpdate: boolean) {
-            if (!opened.value && !active.value)
-                return;
-            clearTimers();
-            emit('beforeClose');
-            active.value = false;
-            if (props.lazy)
-                contentReady.value = false;
-            resetOffset();
-            closeTimer = setTimeout(() => {
-                opened.value = false;
-                closeTimer = 0;
-                emit('close');
-                if (shouldEmitUpdate)
-                    emit('update:show', false);
-            }, animationDuration());
-        }
-        function clearTimers() {
-            if (closeTimer > 0) {
-                clearTimeout(closeTimer);
-                closeTimer = 0;
-            }
-            if (lazyTimer > 0) {
-                clearTimeout(lazyTimer);
-                lazyTimer = 0;
-            }
-        }
-        function handleOverlayClick() {
-            emit('click');
-            if (!props.overlayClick || !props.closeOnMask)
-                return;
-            close();
-        }
-        function cancel() {
-            emit('cancel');
-            close();
-        }
-        function confirm() {
-            if (props.disabledConfirm)
-                return;
-            emit('confirm');
-            close();
-        }
-        function handleContentTouchStart(event) {
-            if (!props.contentDraggable)
-                return;
-            handleTouchStart(event);
-        }
-        function handleHandleTouchStart(event) {
-            handleTouchStart(event);
-        }
-        function handleTouchStart(event) {
-            if (!props.swipeClose)
-                return;
-            touching.value = true;
-            startX.value = readTouchX(event);
-            startY.value = readTouchY(event);
-        }
-        function handleTouchMove(event) {
-            if (!props.swipeClose || !touching.value)
-                return;
-            const currentX = readTouchX(event);
-            const currentY = readTouchY(event);
-            const deltaX = currentX - startX.value;
-            const deltaY = currentY - startY.value;
-            if (normalizedMode.value == 'bottom' && deltaY > 0)
-                offsetY.value = deltaY;
-            if (normalizedMode.value == 'top' && deltaY < 0)
-                offsetY.value = deltaY;
-            if (normalizedMode.value == 'left' && deltaX < 0)
-                offsetX.value = deltaX;
-            if (normalizedMode.value == 'right' && deltaX > 0)
-                offsetX.value = deltaX;
-            if (normalizedMode.value == 'center' && deltaY > 0)
-                offsetY.value = deltaY;
-        }
-        function handleTouchEnd() {
-            if (!touching.value)
-                return;
-            touching.value = false;
-            const threshold = Number(props.swipeCloseThreshold);
-            if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
-                close();
-                return;
-            }
-            resetOffset();
-        }
-        function resetOffset() {
-            offsetX.value = 0;
-            offsetY.value = 0;
-            touching.value = false;
-        }
-        function transformStyle(): string {
-            const x = String(offsetX.value);
-            const y = String(offsetY.value);
-            if (normalizedMode.value == 'center') {
-                const scale = props.zoom ? (active.value ? '1' : '0.88') : '1';
-                return ('opacity:' +
-                    (active.value ? '1' : '0') +
-                    ';transform:translate(-50%,-50%) translate(' +
-                    x +
-                    'px,' +
-                    y +
-                    'px) scale(' +
-                    scale +
-                    ');');
-            }
-            if (normalizedMode.value == 'bottom') {
-                const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : '';
-                return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '100%') + ');';
-            }
-            if (normalizedMode.value == 'top') {
-                const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : '';
-                return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '-100%') + ');';
-            }
-            if (normalizedMode.value == 'left') {
-                return 'transform:translateX(' + (active.value ? x + 'px' : '-100%') + ');';
-            }
-            if (normalizedMode.value == 'right') {
-                return 'transform:translateX(' + (active.value ? x + 'px' : '100%') + ');';
-            }
-            return '';
-        }
         function marginStyle(): string {
             const margin = formatSize(props.margin);
             if (margin == '0px')
@@ -402,9 +222,9 @@ const __sfc__ = defineComponent({
         }
         function sizeStyle(): string {
             let style = '';
-            const size = String(props.size);
+            const size = props.size.toString();
             if (normalizedMode.value == 'left' || normalizedMode.value == 'right') {
-                if (String(props.width).length > 0) {
+                if (props.width.toString().length > 0) {
                     style = style + 'width:' + formatSize(props.width) + ';';
                 }
                 else if (size.length > 0) {
@@ -412,31 +232,31 @@ const __sfc__ = defineComponent({
                 }
             }
             else if (normalizedMode.value == 'top' || normalizedMode.value == 'bottom') {
-                if (String(props.width).length == 0 && !shouldCoverCenter()) {
+                if (props.width.toString().length == 0 && !shouldCoverCenter()) {
                     style = style + 'width:100%;';
                 }
-                if (String(props.height).length > 0) {
+                if (props.height.toString().length > 0) {
                     style = style + 'height:' + formatSize(props.height) + ';';
                 }
                 else if (size.length > 0) {
                     style = style + 'height:' + formatSize(size) + ';';
                 }
-                if (String(props.width).length > 0)
+                if (props.width.toString().length > 0)
                     style = style + 'width:' + formatSize(props.width) + ';';
             }
             else {
-                if (String(props.width).length > 0)
+                if (props.width.toString().length > 0)
                     style = style + 'width:' + formatSize(props.width) + ';';
-                if (String(props.height).length > 0)
+                if (props.height.toString().length > 0)
                     style = style + 'height:' + formatSize(props.height) + ';';
             }
             if (normalizedMode.value == 'top') {
                 if (props.navbarHeight > 0)
-                    style = style + 'top:' + String(props.navbarHeight) + 'px;';
-                if (String(props.offsetTop).length > 0)
+                    style = style + 'top:' + props.navbarHeight.toString(10) + 'px;';
+                if (props.offsetTop.toString().length > 0)
                     style = style + 'top:' + formatSize(props.offsetTop) + ';';
             }
-            if (normalizedMode.value == 'bottom' && String(props.offsetBottom).length > 0) {
+            if (normalizedMode.value == 'bottom' && props.offsetBottom.toString().length > 0) {
                 style = style + 'bottom:' + formatSize(props.offsetBottom) + ';';
             }
             return style;
@@ -465,83 +285,244 @@ const __sfc__ = defineComponent({
             }
             return style;
         }
-        function normalizeClosePos(): string {
+        function transformStyle(): string {
+            const x = offsetX.value.toString(10);
+            const y = offsetY.value.toString(10);
+            if (normalizedMode.value == 'center') {
+                const scale = props.zoom ? (active.value ? '1' : '0.88') : '1';
+                return 'opacity:' + (active.value ? '1' : '0') + ';transform:translate(-50%,-50%) translate(' + x + 'px,' + y + 'px) scale(' + scale + ');';
+            }
+            if (normalizedMode.value == 'bottom') {
+                const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : '';
+                return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '100%') + ');';
+            }
+            if (normalizedMode.value == 'top') {
+                const prefix = shouldCoverCenter() ? 'translateX(-50%) ' : '';
+                return 'transform:' + prefix + 'translateY(' + (active.value ? y + 'px' : '-100%') + ');';
+            }
+            if (normalizedMode.value == 'left')
+                return 'transform:translateX(' + (active.value ? x + 'px' : '-100%') + ');';
+            if (normalizedMode.value == 'right')
+                return 'transform:translateX(' + (active.value ? x + 'px' : '100%') + ');';
+            return '';
+        }
+        const panelStyle = computed((): string => {
+            let style = 'background-color:' + bgColor.value + ';';
+            style = style + 'transition-duration:' + formatMs(props.duration) + ';';
+            style = style + marginStyle();
+            style = style + sizeStyle();
+            style = style + roundStyle();
+            style = style + safeAreaStyle();
+            style = style + transformStyle();
+            style = style + stringifyStyle(props.customStyle);
+            style = style + stringifyStyle(props.customWrapStyle);
+            return style;
+        });
+        const bodyStyle = computed((): string => {
+            let style = 'padding:' + formatSize(props.contentMargin) + ';';
+            if (props.maxHeight.toString().length > 0)
+                style = style + 'max-height:' + formatSize(props.maxHeight) + ';';
+            return style;
+        });
+        const footerStyle = computed((): string => {
+            return stringifyStyle(props.customFooterStyle);
+        });
+        const confirmTextStyle = computed((): string => {
+            const color = props.btnColor.length > 0 ? props.btnColor : '#1989fa';
+            return 'color:' + color + ';';
+        });
+        const confirmTextValue = computed((): string => {
+            return props.confirmText.length > 0 ? props.confirmText : '确定';
+        });
+        const cancelTextValue = computed((): string => {
+            return props.cancelText.length > 0 ? props.cancelText : '取消';
+        });
+        const contentVisible = computed((): boolean => {
+            return !props.lazy || contentReady.value;
+        });
+        const closeClass = computed((): string => {
+            const classes = ['i-popup__close'];
+            let position = 'top-right';
             if (props.closeIconPos == 'top-left' ||
                 props.closeIconPos == 'bottom-left' ||
                 props.closeIconPos == 'bottom-right') {
-                return props.closeIconPos;
+                position = props.closeIconPos;
             }
-            return 'top-right';
-        }
-        function stringifyStyle(value): string {
-            if (value == null)
-                return '';
-            const text = String(value);
-            if (text == '[object Object]')
-                return '';
-            if (text.length == 0)
-                return '';
-            return text.endsWith(';') ? text : text + ';';
-        }
-        function formatMs(value): string {
-            const text = String(value);
-            if (text.indexOf('ms') >= 0 || text.indexOf('s') >= 0)
-                return text;
-            return text + 'ms';
-        }
-        function animationDuration(): number {
-            const text = String(props.duration);
+            classes.push('i-popup__close--' + position);
+            return classes.join(' ');
+        });
+        const closeStyle = computed((): string => {
+            return 'color:' + props.closeIconColor + ';font-size:' + formatSize(props.closeIconSize) + ';';
+        });
+        const closeIconText = computed((): string => {
+            if (props.closeIcon == 'close')
+                return '×';
+            return props.closeIcon;
+        });
+        const clearTimers = (): void => {
+            if (closeTimer > 0) {
+                clearTimeout(closeTimer);
+                closeTimer = 0;
+            }
+            if (lazyTimer > 0) {
+                clearTimeout(lazyTimer);
+                lazyTimer = 0;
+            }
+        };
+        const resetOffset = (): void => {
+            offsetX.value = 0;
+            offsetY.value = 0;
+            touching.value = false;
+        };
+        const animationDuration = (): number => {
+            const text = props.duration.toString();
             if (text.indexOf('ms') >= 0)
-                return Number(text.replace('ms', ''));
+                return parseFloat(text.replace('ms', ''));
             if (text.indexOf('s') >= 0)
-                return Number(text.replace('s', '')) * 1000;
-            const duration = Number(text);
+                return parseFloat(text.replace('s', '')) * 1000;
+            const duration = parseFloat(text);
             if (isNaN(duration))
                 return 300;
             return duration;
-        }
-        function isVerticalMode(): boolean {
-            return normalizedMode.value == 'top' || normalizedMode.value == 'bottom';
-        }
-        function shouldCoverCenter(): boolean {
-            return props.widthCoverCenter && isVerticalMode() && String(props.width).length > 0;
-        }
-        function formatSize(value): string {
-            const text = String(value);
-            if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-                return text;
+        };
+        const openPanel = (shouldEmitUpdate: boolean): void => {
+            if (props.disabled)
+                return;
+            if (opened.value && active.value)
+                return;
+            clearTimers();
+            emit('beforeOpen');
+            opened.value = true;
+            resetOffset();
+            if (!props.lazy)
+                contentReady.value = true;
+            setTimeout(() => {
+                active.value = true;
+                if (props.lazy) {
+                    lazyTimer = setTimeout(() => {
+                        contentReady.value = true;
+                        lazyTimer = 0;
+                    }, animationDuration());
+                }
+                emit('open');
+                if (shouldEmitUpdate)
+                    emit('update:show', true);
+            }, 20);
+        };
+        const closePanel = (shouldEmitUpdate: boolean): void => {
+            if (!opened.value && !active.value)
+                return;
+            clearTimers();
+            emit('beforeClose');
+            active.value = false;
+            if (props.lazy)
+                contentReady.value = false;
+            resetOffset();
+            closeTimer = setTimeout(() => {
+                opened.value = false;
+                closeTimer = 0;
+                emit('close');
+                if (shouldEmitUpdate)
+                    emit('update:show', false);
+            }, animationDuration());
+        };
+        watch((): boolean => props.show, (nextValue: boolean) => {
+            if (nextValue) {
+                openPanel(false);
             }
-            return text + 'px';
+            else {
+                closePanel(false);
+            }
+        });
+        function open() {
+            openPanel(true);
         }
-        function readTouchX(event): number {
-            let point = null;
-            if (event.touches != null && event.touches.length > 0) {
+        function close() {
+            closePanel(true);
+        }
+        function handleOverlayClick() {
+            emit('click');
+            if (!props.overlayClick || !props.closeOnMask)
+                return;
+            close();
+        }
+        function cancel() {
+            emit('cancel');
+            close();
+        }
+        function confirm() {
+            if (props.disabledConfirm)
+                return;
+            emit('confirm');
+            close();
+        }
+        const readTouchX = (event: UniTouchEvent): number => {
+            let point: UniTouch | null = null;
+            if (event.touches.length > 0) {
                 point = event.touches[0];
             }
-            else if (event.changedTouches != null && event.changedTouches.length > 0) {
+            else if (event.changedTouches.length > 0) {
                 point = event.changedTouches[0];
             }
             if (point == null)
                 return 0;
-            const clientX = Number(point.clientX);
-            if (!isNaN(clientX))
-                return clientX;
-            return Number(point.pageX);
-        }
-        function readTouchY(event): number {
-            let point = null;
-            if (event.touches != null && event.touches.length > 0) {
+            return point.clientX;
+        };
+        const readTouchY = (event: UniTouchEvent): number => {
+            let point: UniTouch | null = null;
+            if (event.touches.length > 0) {
                 point = event.touches[0];
             }
-            else if (event.changedTouches != null && event.changedTouches.length > 0) {
+            else if (event.changedTouches.length > 0) {
                 point = event.changedTouches[0];
             }
             if (point == null)
                 return 0;
-            const clientY = Number(point.clientY);
-            if (!isNaN(clientY))
-                return clientY;
-            return Number(point.pageY);
+            return point.clientY;
+        };
+        const handleTouchStart = (event: UniTouchEvent): void => {
+            if (!props.swipeClose)
+                return;
+            touching.value = true;
+            startX.value = readTouchX(event);
+            startY.value = readTouchY(event);
+        };
+        function handleContentTouchStart(event: UniTouchEvent) {
+            if (!props.contentDraggable)
+                return;
+            handleTouchStart(event);
+        }
+        function handleHandleTouchStart(event: UniTouchEvent) {
+            handleTouchStart(event);
+        }
+        function handleTouchMove(event: UniTouchEvent) {
+            if (!props.swipeClose || !touching.value)
+                return;
+            const currentX = readTouchX(event);
+            const currentY = readTouchY(event);
+            const deltaX = currentX - startX.value;
+            const deltaY = currentY - startY.value;
+            if (normalizedMode.value == 'bottom' && deltaY > 0)
+                offsetY.value = deltaY;
+            if (normalizedMode.value == 'top' && deltaY < 0)
+                offsetY.value = deltaY;
+            if (normalizedMode.value == 'left' && deltaX < 0)
+                offsetX.value = deltaX;
+            if (normalizedMode.value == 'right' && deltaX > 0)
+                offsetX.value = deltaX;
+            if (normalizedMode.value == 'center' && deltaY > 0)
+                offsetY.value = deltaY;
+        }
+        function handleTouchEnd() {
+            if (!touching.value)
+                return;
+            touching.value = false;
+            const threshold = parseFloat(props.swipeCloseThreshold.toString());
+            if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
+                close();
+                return;
+            }
+            resetOffset();
         }
         __expose({
             open,

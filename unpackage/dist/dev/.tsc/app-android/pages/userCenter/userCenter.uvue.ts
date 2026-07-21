@@ -27,6 +27,19 @@ const _cache = __ins.renderCache;
 	const buttonWidth = 120 
 	const buttonHeight = 200
 	
+	// 加载数据
+	const loadData = async () => {
+		let params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 7),}
+		const res = await getUserInfo()
+		userInfo.value = res.data
+
+		const resCars = await getUserDeviceList(params)
+
+		if (resCars?.data?.totalCount) {
+			carsnumber.value = resCars.data.totalCount
+		}
+	}
+
 	onShow(() => {
 		// 获取窗口尺寸
 		const systemInfo = uni.getSystemInfoSync()
@@ -55,33 +68,32 @@ const _cache = __ins.renderCache;
 	})
 
 	const contactCustomerService = () => {
-		uni.openCustomerServiceChat({
-			extInfo: {url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a'},
-			corpId: 'ww686122ec6a4db85a',
-			success(res) {
-				console.log(res, " at pages/userCenter/userCenter.uvue:98")
-			}
+
+
+
+
+
+
+
+
+
+
+
+		uni.showToast({
+			title: '请在微信小程序中联系人工客服',
+			icon: 'none'
 		})
+
 	}
 	
-	// 加载数据
-	const loadData = async () => {
-		let params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 105, 7),}
-		const res = await getUserInfo()
-		userInfo.value = res.data
 
-		const resCars = await getUserDeviceList(params)
-			
-		if (resCars?.data?.totalCount) {
-			carsnumber.value = resCars.data.totalCount
-		}
-	}
-
-	const onMoveChange = (e) => {
-		const { x, y } = e.detail
+	const onMoveChange = (e : UTSJSONObject) => {
+		const detail = e.getJSON('detail')
+		const x = detail != null ? detail.getNumber('x', 0) : 0
+		const y = detail != null ? detail.getNumber('y', 0) : 0
 		const maxX = windowWidth.value - buttonWidth
 		const maxY = windowHeight.value - buttonHeight
-		
+
 		// 边界限制，防止拖出屏幕
 		if (x < 0 || x > maxX || y < 0 || y > maxY) {
 			moveX.value = Math.max(0, Math.min(maxX, x))
@@ -93,7 +105,7 @@ const _cache = __ins.renderCache;
 	const userInfoDetail = () => {
 		if (Login.value) {
 			uni.navigateTo({
-				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:132")
+				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:144")
 			})
 		} else {
 			uni.navigateTo({
@@ -135,7 +147,7 @@ const _cache = __ins.renderCache;
 		if (Login.value) {
 			// 跳转到网页容器页面
 			uni.navigateTo({
-				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:174")
+				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:186")
 			})
 		} else {
 			uni.showToast({

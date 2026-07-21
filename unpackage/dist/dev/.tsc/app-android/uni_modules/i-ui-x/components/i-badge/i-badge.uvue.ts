@@ -98,6 +98,107 @@ __ins.emit(event, ...do_not_transform_spread)
 }
 
 
+function hasNumberValue() {
+  if (props.value != null && props.value.toString().length > 0) return true
+  return props.count > 0 || props.showZero
+}
+
+function effectiveCount() {
+  if (props.value != null && props.value.toString().length > 0) {
+    if (typeof props.value == 'number') return props.value
+    return parseFloat(props.value as string)
+  }
+  return props.count
+}
+
+function getMaxCount() {
+  if (props.maxCount != 99) return props.maxCount
+  return props.max
+}
+
+function effectiveBgColor() {
+  if (props.bgColor.length > 0) return props.bgColor
+  return props.type
+}
+
+function effectiveFontColor() {
+  if (props.color.length > 0) return props.color
+  return props.fontColor
+}
+
+
+function normalizeTheme(value: string): string {
+  const text = value
+  if (text == 'danger') return 'error'
+  if (
+    text == 'error' ||
+    text == 'primary' ||
+    text == 'success' ||
+    text == 'warning' ||
+    text == 'info'
+  )
+    return text
+  return 'custom'
+}
+
+function parseColor(value: string): string {
+  const text = value
+  if (text == 'white') return '#ffffff'
+  if (text == 'black') return '#000000'
+  if (text == 'danger' || text == 'error') return '#f56c6c'
+  if (text == 'primary') return '#3c9cff'
+  if (text == 'success') return '#5ac725'
+  if (text == 'warning') return '#f9ae3d'
+  if (text == 'info') return '#909399'
+  return text
+}
+
+function normalizePosition(value: string): string {
+  const text = value
+  if (text == 'rightTop') return 'right'
+  if (text == 'leftTop') return 'left'
+  if (text == 'rightBottom') return 'bottomRight'
+  if (text == 'leftBottom') return 'bottomLeft'
+  if (
+    text == 'left' ||
+    text == 'right' ||
+    text == 'bottomLeft' ||
+    text == 'bottomRight' ||
+    text == 'top' ||
+    text == 'bottom'
+  )
+    return text
+  return 'right'
+}
+
+function getOffset(index: number): number {
+  const offset = props.offset
+  if (offset == null || offset.length <= index) return 0
+  const value = offset[index] as number | string | null
+  if (typeof value == 'number') return value as number
+  if (typeof value == 'string') return parseFloat(value as string)
+  return 0
+}
+
+function positionStyle() {
+  const x = getOffset(0)
+  const y = getOffset(1)
+  const position = normalizePosition(props.position)
+  const edge = 0
+  if (position == 'left') return 'left:' + (edge + x) + 'px;top:' + (edge + y) + 'px;'
+  if (position == 'bottomLeft') return 'left:' + (edge + x) + 'px;bottom:' + (edge - y) + 'px;'
+  if (position == 'bottomRight') return 'right:' + (edge - x) + 'px;bottom:' + (edge - y) + 'px;'
+  if (position == 'top') return 'left:50%;top:' + (edge + y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
+  if (position == 'bottom') return 'left:50%;bottom:' + (edge - y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
+  return 'right:' + (edge - x) + 'px;top:' + (edge + y) + 'px;'
+}
+
+function formatSize(value: string | number): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
+  return text + 'px'
+}
+
 const bgColor = computed(() => {
   return props.bgColor
 })
@@ -116,7 +217,7 @@ const displayValue = computed(() => {
   const value = effectiveCount()
   const max = getMaxCount()
   if (value > max) return max + '+'
-  return String(value)
+  return value.toString()
 })
 
 const dot = computed(() => {
@@ -172,97 +273,6 @@ function handleClick() {
   })
 }
 
-function hasNumberValue() {
-  return String(props.value).length > 0 || props.count > 0 || props.showZero
-}
-
-function effectiveCount() {
-  if (String(props.value).length > 0) return Number(props.value)
-  return props.count
-}
-
-function getMaxCount() {
-  if (props.maxCount != 99) return props.maxCount
-  return props.max
-}
-
-function effectiveBgColor() {
-  if (bgColor.value.length > 0) return bgColor.value
-  return props.type
-}
-
-function effectiveFontColor() {
-  if (props.color.length > 0) return props.color
-  return props.fontColor
-}
-
-function normalizeTheme(value: string): string {
-  const text = String(value)
-  if (text == 'danger') return 'error'
-  if (
-    text == 'error' ||
-    text == 'primary' ||
-    text == 'success' ||
-    text == 'warning' ||
-    text == 'info'
-  )
-    return text
-  return 'custom'
-}
-
-function parseColor(value: string): string {
-  const text = String(value)
-  if (text == 'white') return '#ffffff'
-  if (text == 'black') return '#000000'
-  if (text == 'danger' || text == 'error') return '#f56c6c'
-  if (text == 'primary') return '#3c9cff'
-  if (text == 'success') return '#5ac725'
-  if (text == 'warning') return '#f9ae3d'
-  if (text == 'info') return '#909399'
-  return text
-}
-
-function normalizePosition(value: string): string {
-  const text = String(value)
-  if (text == 'rightTop') return 'right'
-  if (text == 'leftTop') return 'left'
-  if (text == 'rightBottom') return 'bottomRight'
-  if (text == 'leftBottom') return 'bottomLeft'
-  if (
-    text == 'left' ||
-    text == 'right' ||
-    text == 'bottomLeft' ||
-    text == 'bottomRight' ||
-    text == 'top' ||
-    text == 'bottom'
-  )
-    return text
-  return 'right'
-}
-
-function positionStyle() {
-  const x = getOffset(0)
-  const y = getOffset(1)
-  const position = normalizePosition(props.position)
-  const edge = 0
-  if (position == 'left') return 'left:' + (edge + x) + 'px;top:' + (edge + y) + 'px;'
-  if (position == 'bottomLeft') return 'left:' + (edge + x) + 'px;bottom:' + (edge - y) + 'px;'
-  if (position == 'bottomRight') return 'right:' + (edge - x) + 'px;bottom:' + (edge - y) + 'px;'
-  if (position == 'top') return 'left:50%;top:' + (edge + y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
-  if (position == 'bottom') return 'left:50%;bottom:' + (edge - y) + 'px;transform:translateX(-50%);margin-left:' + x + 'px;'
-  return 'right:' + (edge - x) + 'px;top:' + (edge + y) + 'px;'
-}
-
-function getOffset(index: number): number {
-  if (props.offset.length <= index) return 0
-  return Number(props.offset[index])
-}
-
-function formatSize(value: string | number): string {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) return text
-  return text + 'px'
-}
 
 return (): any | null => {
 

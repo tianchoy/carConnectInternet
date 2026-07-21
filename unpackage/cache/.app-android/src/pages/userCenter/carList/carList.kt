@@ -31,11 +31,6 @@ open class GenPagesUserCenterCarListCarList : BasePage {
             val addCar = fun(){
                 uni_navigateTo(NavigateToOptions(url = "/pages/addCar/addCar"))
             }
-            onShow(fun(){
-                resetData()
-                loadCarListData()
-            }
-            )
             val resetData = fun(){
                 carList.value = _uA()
                 currPage.value = 1
@@ -44,13 +39,13 @@ open class GenPagesUserCenterCarListCarList : BasePage {
             }
             val loadCarListData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:63")
+                        console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:58")
                         if (loading.value || !hasMore.value) {
                             return@w1
                         }
                         loading.value = true
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 68, 10), "page" to currPage.value, "pageSize" to pageSize.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
                             if (res.code == 0) {
                                 totalPage.value = res.data.totalPage
@@ -64,7 +59,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                                     currPage.value++
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(res.msg)) {
+                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "加载失败"
@@ -73,7 +68,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:99")
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:94")
                             uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
@@ -81,6 +76,11 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                         }
                 })
             }
+            onShow(fun(){
+                resetData()
+                loadCarListData()
+            }
+            )
             onReachBottom(fun(){
                 loadCarListData()
             }
@@ -96,13 +96,13 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                         _cE("view", _uM("class" to "content"), _uA(
                             _cE(Fragment, null, RenderHelpers.renderList(unref(carList), fun(item, index, __index, _cached): Any {
                                 return _cE("view", _uM("class" to "list", "key" to index, "onClick" to fun(){
-                                    carDetail(item["deviceId"])
+                                    carDetail(item.getString("deviceId", ""))
                                 }
                                 ), _uA(
-                                    _cE("text", _uM("class" to "title"), _tD(item["deviceName"]), 1),
+                                    _cE("text", _uM("class" to "title"), _tD(item.getString("deviceName", "")), 1),
                                     _cE("view", _uM("class" to "device-info"), _uA(
-                                        _cE("text", null, _tD(item["plateNo"]), 1),
-                                        _cE("text", _uM("class" to "tel"), _tD(item["imei"]), 1)
+                                        _cE("text", null, _tD(item.getString("plateNo", "")), 1),
+                                        _cE("text", _uM("class" to "tel"), _tD(item.getString("imei", "")), 1)
                                     ))
                                 ), 8, _uA(
                                     "onClick"

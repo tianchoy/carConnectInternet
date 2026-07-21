@@ -26,20 +26,39 @@ open class GenPagesWebviewWebview : BasePage {
             val _cache = __ins.renderCache
             val webviewUrl = ref("")
             val emptyImage = "/static/empty.png"
+            fun gen_extractTitleFromUrl_fn(url: String): String {
+                var hostname = url
+                val protocolIndex = hostname.indexOf("://")
+                if (protocolIndex >= 0) {
+                    hostname = hostname.substring(protocolIndex + 3)
+                }
+                val pathIndex = hostname.indexOf("/")
+                if (pathIndex >= 0) {
+                    hostname = hostname.substring(0, pathIndex)
+                }
+                if (hostname.startsWith("www.")) {
+                    hostname = hostname.substring(4)
+                }
+                return hostname
+            }
+            val extractTitleFromUrl = ::gen_extractTitleFromUrl_fn
             onLoad(fun(options){
-                console.log("接收到的参数:", options, " at pages/webview/webview.uvue:25")
-                if (isTruthy(options["url"])) {
-                    var decodedUrl = UTSAndroid.consoleDebugError(decodeURIComponent(options["url"]), " at pages/webview/webview.uvue:29")
+                console.log("接收到的参数:", options, " at pages/webview/webview.uvue:42")
+                val optionData = options as UTSJSONObject
+                val url: String = optionData.getString("url", "") ?: ""
+                val pageTitle: String = optionData.getString("title", "") ?: ""
+                if (url != "") {
+                    var decodedUrl: String = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:49") ?: ""
                     if (!decodedUrl.startsWith("http://") && !decodedUrl.startsWith("https://")) {
                         decodedUrl = "https://" + decodedUrl
                     }
                     webviewUrl.value = decodedUrl
-                    if (isTruthy(options["title"])) {
-                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = UTSAndroid.consoleDebugError(decodeURIComponent(options["title"]), " at pages/webview/webview.uvue:41")))
+                    if (pageTitle != "") {
+                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:61") ?: ""))
                     } else {
-                        val title = extractTitleFromUrl(decodedUrl)
-                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = if (isTruthy(title)) {
-                            title
+                        val extractedTitle = extractTitleFromUrl(decodedUrl)
+                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = if (extractedTitle != "") {
+                            extractedTitle
                         } else {
                             "网页加载中..."
                         }))
@@ -49,39 +68,21 @@ open class GenPagesWebviewWebview : BasePage {
                 }
             }
             )
-            val extractTitleFromUrl = fun(url): Any {
-                try {
-                    val urlObj = URL(url)
-                    val hostname = urlObj.hostname
-                    return hostname.replace(UTSRegExp("^www\\.", ""), "")
-                }
-                 catch (e: Throwable) {
-                    return ""
-                }
-            }
-            val handleLoad = fun(e){
-                console.log("网页加载成功", e, " at pages/webview/webview.uvue:72")
+            val handleLoad = fun(e: Any): Unit {
+                console.log("网页加载成功", e, " at pages/webview/webview.uvue:79")
                 uni_hideLoading(null)
             }
-            val handleError = fun(e){
-                console.error("网页加载失败", e, " at pages/webview/webview.uvue:78")
+            val handleError = fun(e: Any): Unit {
+                console.error("网页加载失败", e, " at pages/webview/webview.uvue:85")
                 uni_showToast(ShowToastOptions(title = "页面加载失败", icon = "none"))
             }
-            val handleMessage = fun(e){
-                console.log("接收网页消息:", e.detail, " at pages/webview/webview.uvue:87")
-                val data = e.detail.data
-                if (isTruthy(data) && data.length > 0) {
-                    val lastMessage = data[data.length - 1]
-                    console.log("最后一条消息:", lastMessage, " at pages/webview/webview.uvue:92")
-                }
+            val handleMessage = fun(e: UTSJSONObject): Unit {
+                val detail = e.getJSON("detail")
+                console.log("接收网页消息:", detail, " at pages/webview/webview.uvue:95")
             }
             val goBack = fun(){
                 uni_navigateBack(NavigateBackOptions(delta = 1))
             }
-            onShareAppMessage(fun(): UTSJSONObject {
-                return _uO("title" to "产品商城", "path" to ("/pages/webview/webview?url=" + UTSAndroid.consoleDebugError(encodeURIComponent(webviewUrl.value), " at pages/webview/webview.uvue:107")))
-            }
-            )
             return fun(): Any? {
                 val _component_web_view = resolveComponent("web-view")
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)

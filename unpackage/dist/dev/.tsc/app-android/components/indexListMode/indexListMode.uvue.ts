@@ -147,24 +147,24 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                 _cE("text", _uM({ class: "imei" }), "ID: " + _tD(item.imei), 1 /* TEXT */)
               ])
             ], 8 /* PROPS */, ["onClick"])
-          }), 128 /* KEYED_FRAGMENT */),
-          _cV(_component_i_modal, _uM({
-            show: unref(modal),
-            title: "提示",
-            content: "是否要解绑设备？",
-            buttonReverse: true,
-            align: "center",
-            confirmText: "确定",
-            cancelText: "取消",
-            showCancelButton: true,
-            onConfirm: confirm,
-            onCancel: cancel
-          }), null, 8 /* PROPS */, ["show"])
+          }), 128 /* KEYED_FRAGMENT */)
         ])
       : _cE("view", _uM({
           key: 1,
           class: "empty"
-        }), " 暂无数据 ")
+        }), " 暂无数据 "),
+    _cV(_component_i_modal, _uM({
+      show: unref(modal),
+      title: "提示",
+      content: "是否要解绑设备？",
+      buttonReverse: true,
+      align: "center",
+      confirmText: "确定",
+      cancelText: "取消",
+      showCancelButton: true,
+      onConfirm: confirm,
+      onCancel: cancel
+    }), null, 8 /* PROPS */, ["show"])
   ])
 }
 }

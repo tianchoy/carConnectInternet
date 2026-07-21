@@ -43,16 +43,25 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
             val checked = computed(fun(): Boolean {
                 if (props.checked) {
                     return true
                 }
-                val value = if (String(props.modelValue).length > 0) {
+                val modelValueText = props.modelValue.toString()
+                val value = if (modelValueText.length > 0) {
                     props.modelValue
                 } else {
                     props.value
                 }
-                return String(value) == String(props.name)
+                return value.toString() == props.name.toString()
             }
             )
             val wrapClass = computed(fun(): String {
@@ -118,7 +127,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
             )
             val dotStyle = computed(fun(): String {
                 val fontSize = if (props.shape == "check") {
-                    formatSize(Number(props.iconSize) + 2)
+                    formatSize(parseFloat(props.iconSize.toString()) + 2)
                 } else {
                     formatSize(props.iconSize)
                 }
@@ -150,14 +159,6 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                 select()
             }
             val selectByLabel = ::gen_selectByLabel_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
             return fun(): Any? {
                 return _cE("view", _uM("class" to _nC(wrapClass.value), "onClick" to select), _uA(
                     renderSlot(_ctx.`$slots`, "icon", _uM("checked" to checked.value), fun(): UTSArray<Any> {

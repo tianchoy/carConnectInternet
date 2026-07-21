@@ -9,6 +9,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
+	type StopRecord = UTSJSONObject
 	
 const __sfc__ = defineComponent({
   __name: 'stopRecord',
@@ -27,75 +28,76 @@ const _cache = __ins.renderCache;
 	const startTime = ref('')
 	const endTime = ref('')
 	const imei = ref<string | null>('')
-	const carStopDetail = ref<UTSJSONObject>({})
-	const address = ref('')
+	const carStopDetail = ref<Array<StopRecord>>([])
+	const getStopNumber = (item: UTSJSONObject, key: string): number => item.getNumber(key, 0)
+	const getStopText = (item: UTSJSONObject, key: string): string => item.getString(key, '')
 
 	// 计算属性：按照时间倒序排列的停车记录
-	const sortedCarStopDetail = computed(() => {
-		if (!carStopDetail.value || !Array.isArray(carStopDetail.value)) {
-			return []
-		}
-		
-		// 按照开始时间倒序排列
-		return [...carStopDetail.value].sort((a, b) => {
-			const timeA = new Date(a.endTime).getTime()
-			const timeB = new Date(b.endTime).getTime()
+	const sortedCarStopDetail = computed((): Array<StopRecord> => {
+		const sorted = carStopDetail.value.slice()
+		sorted.sort((a: StopRecord, b: StopRecord): number => {
+			const timeA = new Date(a.getString('endTime', '')).getTime()
+			const timeB = new Date(b.getString('endTime', '')).getTime()
 			return timeB - timeA // 倒序排列
 		})
-	})
-
-	// 初始化加载
-	onMounted(() => {
-		initDateTime()
-		loadStopData()
+		return sorted
 	})
 
 	onLoad((option) => {
 		imei.value = option.imei
 	})
 
-	const loadStopData = async () => {
+	const initDateTime = () => {
+		const now = new Date()
+		const formatTime = (date : Date) : string => {
+			const month = (date.getMonth() + 1).toString().padStart(2, '0')
+			const day = date.getDate().toString().padStart(2, '0')
+			const hours = date.getHours().toString().padStart(2, '0')
+			const minutes = date.getMinutes().toString().padStart(2, '0')
+			const seconds = date.getSeconds().toString().padStart(2, '0')
+			return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`
+		}
+
+		endTime.value = formatTime(now)
+		// 开始时间默认为当前时间前24小时
+		const startDate = new Date(now.getTime() - 3600000 * 24)
+		startTime.value = formatTime(startDate)
+	}
+
+	const loadStopData = async () : Promise<void> => {
 		uni.showLoading({
-			title: '加载中...',
+			title: '加载中...'
 		})
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 98, 9),
+		const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 108, 9), 
 			imei: imei.value,
 			startTime: startTime.value,
 			endTime: endTime.value,
 			minParkTime: 10,
 			withStop: true,
 			withPos: false,
-			withTrip: false,
-		}
-		const res = await getTrackPos(data)
-		const stopsWithAddress = await Promise.all(res.data.stops.map(async (stop) => {
-			// const address = await getAddress(stop.latitude, stop.longitude)
+			withTrip: false
+		} as UTSJSONObject
+		const res = await getTrackPos(data) as UTSJSONObject
+		let stopsWithAddress : Array<StopRecord> = []
+		const trackData = res.getJSON('data')
+		const stops = trackData?.getArray<UTSJSONObject>('stops') ?? []
+		stops.forEach((stop : UTSJSONObject) : void => {
 			// 转换坐标到腾讯地图坐标系
-			const convertedCoord = CoordTransform.wgs84ToTencent(stop.latitude, stop.longitude)
-			return {
-				...stop,
-				latitude: convertedCoord.lat,
-				longitude: convertedCoord.lng,
-				// address: address.value
-			}
-		}))
+			const convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber('latitude', 0), stop.getNumber('longitude', 0))
+			stop.set('latitude', convertedCoord.lat)
+			stop.set('longitude', convertedCoord.lng)
+			stopsWithAddress.push(stop)
+		})
 
 		carStopDetail.value = stopsWithAddress
 		uni.hideLoading()
 	}
 
-	// 初始化时间
-	const initDateTime = () => {
-		const now = new Date()
-		const formatTime = (date : Date) : string => {
-			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
-		}
-
-		endTime.value = formatTime(now)
-		// 开始时间默认为当前时间前24小时
-		const startDate = new Date(now.getTime() - 3600000*24)
-		startTime.value = formatTime(startDate)
-	}
+	// 初始化加载
+	onMounted(() => {
+		initDateTime()
+		loadStopData()
+	})
 
 	// 显示日期时间选择器
 	const showPicker = (type : string) => {
@@ -127,22 +129,22 @@ const _cache = __ins.renderCache;
 		return `${hours}小时${minutes}分${seconds}秒`
 	}
 
-	const showAddress = async (latitude : string, longitude : string) => {
-		console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:168")
+	const showAddress = async (latitude : number, longitude : number) => {
+		console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:170")
 			uni.openLocation({
 			latitude: latitude,
 			longitude: longitude,
 			name: '当前位置',
 			scale: 18,
 			success: () => {
-				console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:175")
+				console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:177")
 			},
 			fail: (err) => {
 				uni.showToast({
 					title: '调起地图失败',
 					icon: 'none'
 				});
-				console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:182");
+				console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:184");
 			}
 		});
 	}
@@ -250,7 +252,7 @@ const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
                   mode: "aspectFit",
                   src: "/static/stopTime.png"
                 })),
-                _cE("text", null, "停留 " + _tD(calculateDuration(item.duration)), 1 /* TEXT */)
+                _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber('duration', 0))), 1 /* TEXT */)
               ]),
               _cE("view", _uM({ class: "item" }), [
                 _cE("image", _uM({
@@ -265,7 +267,7 @@ const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
                     }), _tD(item.address || '加载中...'), 1 /* TEXT */)
                   : _cE("text", _uM({
                       key: 1,
-                      onClick: () => {showAddress(item.latitude, item.longitude)}
+                      onClick: () => {showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0))}
                     }), "点击查看停车位置", 8 /* PROPS */, ["onClick"])
               ])
             ])

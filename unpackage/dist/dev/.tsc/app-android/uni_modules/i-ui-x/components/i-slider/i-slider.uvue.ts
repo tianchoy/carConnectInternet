@@ -125,11 +125,82 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function initialValue() {
+  if (props.modelValue.toString().length > 0) return props.modelValue
+  return props.value
+}
+
+function normalizeSingle(value: any): number {
+  let nextValue = parseFloat(value.toString())
+  if (isNaN(nextValue)) nextValue = props.min
+  if (nextValue < props.min) nextValue = props.min
+  if (nextValue > props.max) nextValue = props.max
+  return nextValue
+}
+
+function normalizeRange(value: any): Array<number> {
+  let start = props.min
+  let end = props.max
+  if (Array.isArray(value) && value.length > 1) {
+    start = parseFloat(value[0].toString())
+    end = parseFloat(value[1].toString())
+  } else {
+    const text = value.toString()
+    if (text.indexOf(',') >= 0) {
+      start = parseFloat(text.split(',')[0])
+      end = parseFloat(text.split(',')[1])
+    }
+  }
+  start = normalizeSingle(start)
+  end = normalizeSingle(end)
+  if (props.noCross && start > end) start = end
+  return [start, end]
+}
+
+function valuePercent(value: number): number {
+  const distance = props.max - props.min
+  if (distance <= 0) return 0
+  const percent = ((value - props.min) / distance) * 100
+  if (percent < 0) return 0
+  if (percent > 100) return 100
+  return percent
+}
+
+function formatSize(value: any): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function thumbStyle(value: number): string {
+  const size = parseFloat(props.thumbSize.toString())
+  const halfSize = isNaN(size) ? 10 : size / 2
+  return (
+    'left:' +
+    valuePercent(value).toString() +
+    '%;width:' +
+    formatSize(props.thumbSize) +
+    ';height:' +
+    formatSize(props.thumbSize) +
+    ';margin-left:' +
+    formatSize(0 - halfSize) +
+    ';border:' +
+    props.thumbBorder +
+    ';border-radius:' +
+    props.thumbRadius +
+    ';background-color:' +
+    props.thumbColor +
+    ';'
+  )
+}
+
 const singleValue = ref(normalizeSingle(initialValue()))
 const rangeStart = ref(normalizeRange(initialValue())[0])
 const rangeEnd = ref(normalizeRange(initialValue())[1])
 const dragging = ref(false)
-const rangeId = 'i-slider-range-' + String(Math.floor(Math.random() * 1000000))
+const rangeId = 'i-slider-range-' + Math.floor(Math.random() * 1000000).toString()
 const rangeRectLeft = ref(0)
 const rangeRectWidth = ref(0)
 const activeRangeThumb = ref('')
@@ -142,8 +213,8 @@ const wrapClass = computed(() => {
 })
 
 const displayValue = computed(() => {
-  if (props.range) return String(rangeStart.value) + ' - ' + String(rangeEnd.value)
-  return String(singleValue.value)
+  if (props.range) return rangeStart.value.toString() + ' - ' + rangeEnd.value.toString()
+  return singleValue.value.toString()
 })
 
 const rangeRailStyle = computed(() => {
@@ -163,9 +234,9 @@ const rangeTrackStyle = computed(() => {
   const endPercent = valuePercent(rangeEnd.value)
   return (
     'left:' +
-    String(startPercent) +
+    startPercent.toString() +
     '%;width:' +
-    String(endPercent - startPercent) +
+    (endPercent - startPercent).toString() +
     '%;height:' +
     formatSize(props.railSize) +
     ';border-radius:' +
@@ -184,75 +255,164 @@ const endThumbStyle = computed(() => {
   return thumbStyle(rangeEnd.value)
 })
 
-watch(
-  () => props.modelValue,
-  () => {
-    syncFromProps()
-  },
-)
-
-watch(
-  () => props.value,
-  () => {
-    syncFromProps()
-  },
-)
-
-function initialValue() {
-  if (String(props.modelValue).length > 0) return props.modelValue
-  return props.value
-}
-
-function syncFromProps() {
+const syncFromProps = (): void => {
   singleValue.value = normalizeSingle(initialValue())
   const values = normalizeRange(initialValue())
   rangeStart.value = values[0]
   rangeEnd.value = values[1]
 }
 
-function handleSingleChanging(event) {
+watch(
+  (): any => props.modelValue,
+  (): void => {
+    syncFromProps()
+  },
+)
+
+watch(
+  (): any => props.value,
+  (): void => {
+    syncFromProps()
+  },
+)
+
+function normalizeStart(value: number): number {
+  let nextValue = normalizeSingle(value)
+  if (props.noCross && nextValue > rangeEnd.value) nextValue = rangeEnd.value
+  return nextValue
+}
+
+function normalizeEnd(value: number): number {
+  let nextValue = normalizeSingle(value)
+  if (props.noCross && nextValue < rangeStart.value) nextValue = rangeStart.value
+  return nextValue
+}
+
+const startDrag = (): void => {
+  if (dragging.value) return
+  dragging.value = true
+  emit('dragStart')
+}
+
+const endDrag = (): void => {
+  dragging.value = false
+  emit('dragEnd')
+}
+
+const emitValue = (value: any): void => {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('change', value)
+}
+
+function handleSingleChanging(event: UniSliderChangeEvent) {
   startDrag()
   singleValue.value = normalizeSingle(event.detail.value)
   emit('changing', singleValue.value)
 }
 
-function handleSingleChange(event) {
+function handleSingleChange(event: UniSliderChangeEvent) {
   singleValue.value = normalizeSingle(event.detail.value)
   emitValue(singleValue.value)
   endDrag()
 }
 
-function handleStartChanging(event) {
+function handleStartChanging(event: UniSliderChangeEvent) {
   startDrag()
   rangeStart.value = normalizeStart(event.detail.value)
   emit('changing', [rangeStart.value, rangeEnd.value])
 }
 
-function handleStartChange(event) {
+function handleStartChange(event: UniSliderChangeEvent) {
   rangeStart.value = normalizeStart(event.detail.value)
   emitValue([rangeStart.value, rangeEnd.value])
   endDrag()
 }
 
-function handleEndChanging(event) {
+function handleEndChanging(event: UniSliderChangeEvent) {
   startDrag()
   rangeEnd.value = normalizeEnd(event.detail.value)
   emit('changing', [rangeStart.value, rangeEnd.value])
 }
 
-function handleEndChange(event) {
+function handleEndChange(event: UniSliderChangeEvent) {
   rangeEnd.value = normalizeEnd(event.detail.value)
   emitValue([rangeStart.value, rangeEnd.value])
   endDrag()
 }
 
-function handleRangeTouchStart(event) {
+function normalizeRectPoint(first: any, fallback: any): number {
+  const firstValue = parseFloat(first.toString())
+  if (!isNaN(firstValue)) return firstValue
+  const fallbackValue = parseFloat(fallback.toString())
+  if (!isNaN(fallbackValue)) return fallbackValue
+  return 0
+}
+
+function normalizeStep(value: number): number {
+  const stepValue = props.step <= 0 ? 1 : props.step
+  const nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue
+  return normalizeSingle(parseFloat(nextValue.toFixed(6)))
+}
+
+function valueFromPoint(x: number): number {
+  let percent = (x - rangeRectLeft.value) / rangeRectWidth.value
+  if (percent < 0) percent = 0
+  if (percent > 1) percent = 1
+  const rawValue = props.min + (props.max - props.min) * percent
+  return normalizeStep(rawValue)
+}
+
+function pickRangeThumb(value: number): void {
+  const startDistance = Math.abs(value - rangeStart.value)
+  const endDistance = Math.abs(value - rangeEnd.value)
+  activeRangeThumb.value = startDistance <= endDistance ? 'start' : 'end'
+}
+
+function readTouchX(event: UniTouchEvent): number {
+  let point: UniTouch | null = null
+  if (event.touches.length > 0) point = event.touches[0]
+  else if (event.changedTouches.length > 0) point = event.changedTouches[0]
+  if (point == null) return NaN
+  return point.clientX
+}
+
+function updateRangeByTouch(event: UniTouchEvent, shouldPickThumb: boolean): void {
+  const x = readTouchX(event)
+  if (isNaN(x) || rangeRectWidth.value <= 0) return
+  const nextValue = valueFromPoint(x)
+  if (shouldPickThumb) pickRangeThumb(nextValue)
+  if (activeRangeThumb.value == 'start') rangeStart.value = normalizeStart(nextValue)
+  else rangeEnd.value = normalizeEnd(nextValue)
+  emit('changing', [rangeStart.value, rangeEnd.value])
+}
+
+function setRangeRect(rect: any): void {
+  const rects = rect as Array<NodeInfo>
+  if (rects.length == 0) return
+  const nodeInfo = rects[0]
+  rangeRectLeft.value = nodeInfo.left != null ? nodeInfo.left : 0
+  rangeRectWidth.value = nodeInfo.width != null ? nodeInfo.width : 0
+}
+
+function refreshRangeRect(event: UniTouchEvent, shouldPickThumb: boolean, shouldUpdate: boolean): void {
+  uni
+    .createSelectorQuery()
+    .select('#' + rangeId)
+    .boundingClientRect((rect: any) => {
+      setRangeRect(rect)
+      if (shouldUpdate) updateRangeByTouch(event, shouldPickThumb)
+    })
+    .exec()
+}
+
+function handleRangeTouchStart(event: UniTouchEvent) {
   if (props.disabled || props.readonly) return
   startDrag()
   refreshRangeRect(event, true, true)
 }
 
-function handleRangeTouchMove(event) {
+function handleRangeTouchMove(event: UniTouchEvent) {
   if (props.disabled || props.readonly || activeRangeThumb.value.length == 0) return
   updateRangeByTouch(event, false)
 }
@@ -264,210 +424,6 @@ function handleRangeTouchEnd() {
   endDrag()
 }
 
-function startDrag() {
-  if (dragging.value) return
-  dragging.value = true
-  emit('dragStart')
-}
-
-function endDrag() {
-  dragging.value = false
-  emit('dragEnd')
-}
-
-function emitValue(value) {
-  emit('update:modelValue', value)
-  emit('update:value', value)
-  emit('change', value)
-}
-
-function normalizeSingle(value) {
-  let nextValue = Number(value)
-  if (isNaN(nextValue)) nextValue = props.min
-  if (nextValue < props.min) nextValue = props.min
-  if (nextValue > props.max) nextValue = props.max
-  return nextValue
-}
-
-function normalizeRange(value) {
-  let start = props.min
-  let end = props.max
-  if (Array.isArray(value) && value.length > 1) {
-    start = Number(value[0])
-    end = Number(value[1])
-  } else {
-    const text = String(value)
-    if (text.indexOf(',') >= 0) {
-      start = Number(text.split(',')[0])
-      end = Number(text.split(',')[1])
-    }
-  }
-  start = normalizeSingle(start)
-  end = normalizeSingle(end)
-  if (props.noCross && start > end) start = end
-  return [start, end]
-}
-
-function normalizeStart(value) {
-  let nextValue = normalizeSingle(value)
-  if (props.noCross && nextValue > rangeEnd.value) nextValue = rangeEnd.value
-  return nextValue
-}
-
-function normalizeEnd(value) {
-  let nextValue = normalizeSingle(value)
-  if (props.noCross && nextValue < rangeStart.value) nextValue = rangeStart.value
-  return nextValue
-}
-
-function refreshRangeRect(event, shouldPickThumb, shouldUpdate) {
-  const element = uni.getElementById(rangeId)
-  if (
-    element != null &&
-    element.getBoundingClientRect != null &&
-    typeof element.getBoundingClientRect == 'function'
-  ) {
-    const rect = element.getBoundingClientRect()
-    setRangeRect(rect)
-    if (shouldUpdate) updateRangeByTouch(event, shouldPickThumb)
-    return
-  }
-  if (
-    element != null &&
-    element.getBoundingClientRectAsync != null &&
-    typeof element.getBoundingClientRectAsync == 'function'
-  ) {
-    element
-      .getBoundingClientRectAsync()
-      .then((rect) => {
-        setRangeRect(rect)
-        if (shouldUpdate) updateRangeByTouch(event, shouldPickThumb)
-      })
-      .catch(() => {
-        refreshRangeRectBySelector(event, shouldPickThumb, shouldUpdate)
-      })
-    return
-  }
-  refreshRangeRectBySelector(event, shouldPickThumb, shouldUpdate)
-}
-
-function refreshRangeRectBySelector(event, shouldPickThumb, shouldUpdate) {
-  uni
-    .createSelectorQuery()
-    .select('#' + rangeId)
-    .boundingClientRect((rect) => {
-      setRangeRect(rect)
-      if (shouldUpdate) updateRangeByTouch(event, shouldPickThumb)
-    })
-    .exec()
-}
-
-function setRangeRect(rect) {
-  if (rect == null) return
-  rangeRectLeft.value = normalizeRectPoint(rect.left, rect.x)
-  rangeRectWidth.value = Number(rect.width)
-}
-
-function updateRangeByTouch(event, shouldPickThumb) {
-  const x = readTouchX(event)
-  if (isNaN(x) || rangeRectWidth.value <= 0) return
-  const nextValue = valueFromPoint(x)
-  if (shouldPickThumb) pickRangeThumb(nextValue)
-  if (activeRangeThumb.value == 'start') {
-    rangeStart.value = normalizeStart(nextValue)
-  } else {
-    rangeEnd.value = normalizeEnd(nextValue)
-  }
-  emit('changing', [rangeStart.value, rangeEnd.value])
-}
-
-function pickRangeThumb(value) {
-  const startDistance = Math.abs(value - rangeStart.value)
-  const endDistance = Math.abs(value - rangeEnd.value)
-  activeRangeThumb.value = startDistance <= endDistance ? 'start' : 'end'
-}
-
-function valueFromPoint(x) {
-  let percent = (x - rangeRectLeft.value) / rangeRectWidth.value
-  if (percent < 0) percent = 0
-  if (percent > 1) percent = 1
-  const rawValue = props.min + (props.max - props.min) * percent
-  return normalizeStep(rawValue)
-}
-
-function normalizeStep(value) {
-  const stepValue = props.step <= 0 ? 1 : props.step
-  const nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue
-  return normalizeSingle(Number(nextValue.toFixed(6)))
-}
-
-function readTouchX(event) {
-  let point = null
-  if (event.touches != null && event.touches.length > 0) {
-    point = event.touches[0]
-  } else if (event.changedTouches != null && event.changedTouches.length > 0) {
-    point = event.changedTouches[0]
-  }
-  if (point == null) return NaN
-  const clientX = Number(point.clientX)
-  if (!isNaN(clientX)) return clientX
-  const pageX = Number(point.pageX)
-  if (!isNaN(pageX)) return pageX
-  return Number(point.x)
-}
-
-function valuePercent(value) {
-  const distance = props.max - props.min
-  if (distance <= 0) return 0
-  const percent = ((Number(value) - props.min) / distance) * 100
-  if (percent < 0) return 0
-  if (percent > 100) return 100
-  return percent
-}
-
-function thumbStyle(value) {
-  const size = numericSize(props.thumbSize, 20)
-  return (
-    'left:' +
-    String(valuePercent(value)) +
-    '%;width:' +
-    formatSize(props.thumbSize) +
-    ';height:' +
-    formatSize(props.thumbSize) +
-    ';margin-left:' +
-    formatSize(0 - size / 2) +
-    ';border:' +
-    props.thumbBorder +
-    ';border-radius:' +
-    props.thumbRadius +
-    ';background-color:' +
-    props.thumbColor +
-    ';'
-  )
-}
-
-function numericSize(value, fallback) {
-  const text = String(value)
-  const numberValue = Number(text.replace('px', '').replace('rpx', '').replace('%', ''))
-  if (isNaN(numberValue)) return fallback
-  return numberValue
-}
-
-function normalizeRectPoint(first, fallback) {
-  const firstValue = Number(first)
-  if (!isNaN(firstValue)) return firstValue
-  const fallbackValue = Number(fallback)
-  if (!isNaN(fallbackValue)) return fallbackValue
-  return 0
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
 
 return (): any | null => {
 

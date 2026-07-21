@@ -20,12 +20,12 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
     open var title: String by `$props`
     open var columns: UTSArray<Any?> by `$props`
     open var loading: Boolean by `$props`
-    open var itemHeight: Any by `$props`
+    open var itemHeight: Number by `$props`
     open var cancelText: String by `$props`
     open var confirmText: String by `$props`
     open var cancelColor: String by `$props`
     open var confirmColor: String by `$props`
-    open var visibleItemCount: Any by `$props`
+    open var visibleItemCount: Number by `$props`
     open var closeOnMask: Boolean by `$props`
     open var defaultIndex: Any by `$props`
     open var immediateChange: Boolean by `$props`
@@ -56,37 +56,37 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
         set(value) {
             setRefValue(this.`$exposed`, "clear", value)
         }
-    open var getIndexs: () -> UTSArray<Any?>
+    open var getIndexs: () -> UTSArray<Number>
         get() {
-            return unref(this.`$exposed`["getIndexs"]) as () -> UTSArray<Any?>
+            return unref(this.`$exposed`["getIndexs"]) as () -> UTSArray<Number>
         }
         set(value) {
             setRefValue(this.`$exposed`, "getIndexs", value)
         }
-    open var getValues: () -> UTSArray<Any?>
+    open var getValues: () -> UTSArray<PickerItem>
         get() {
-            return unref(this.`$exposed`["getValues"]) as () -> UTSArray<Any?>
+            return unref(this.`$exposed`["getValues"]) as () -> UTSArray<PickerItem>
         }
         set(value) {
             setRefValue(this.`$exposed`, "getValues", value)
         }
-    open var getColumns: () -> UTSArray<UTSArray<Any?>>
+    open var getColumns: () -> UTSArray<UTSArray<PickerItem>>
         get() {
-            return unref(this.`$exposed`["getColumns"]) as () -> UTSArray<UTSArray<Any?>>
+            return unref(this.`$exposed`["getColumns"]) as () -> UTSArray<UTSArray<PickerItem>>
         }
         set(value) {
             setRefValue(this.`$exposed`, "getColumns", value)
         }
-    open var getColumnValues: (columnIndex) -> UTSArray<Any?>
+    open var getColumnValues: (columnIndex: Number) -> UTSArray<PickerItem>
         get() {
-            return unref(this.`$exposed`["getColumnValues"]) as (columnIndex) -> UTSArray<Any?>
+            return unref(this.`$exposed`["getColumnValues"]) as (columnIndex: Number) -> UTSArray<PickerItem>
         }
         set(value) {
             setRefValue(this.`$exposed`, "getColumnValues", value)
         }
-    open var setColumnValues: (columnIndex, values) -> Unit
+    open var setColumnValues: (columnIndex: Number, values: UTSArray<Any>) -> Unit
         get() {
-            return unref(this.`$exposed`["setColumnValues"]) as (columnIndex, values) -> Unit
+            return unref(this.`$exposed`["setColumnValues"]) as (columnIndex: Number, values: UTSArray<Any>) -> Unit
         }
         set(value) {
             setRefValue(this.`$exposed`, "setColumnValues", value)
@@ -102,40 +102,131 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_isArray_fn(value: Any): Boolean {
+                return UTSArray.isArray(value)
+            }
+            val isArray = ::gen_isArray_fn
+            fun gen_normalizeItem_fn(item: Any?): PickerItem {
+                val data = item as UTSJSONObject
+                if (data != null) {
+                    val rawValue = data["value"]
+                    val rawText = data["text"]
+                    val text = if (rawText != null) {
+                        rawText.toString()
+                    } else {
+                        if (rawValue != null) {
+                            rawValue.toString()
+                        } else {
+                            ""
+                        }
+                    }
+                    val value = if (rawValue != null) {
+                        rawValue
+                    } else {
+                        text
+                    }
+                    return PickerItem(text = text, value = value, disabled = data["disabled"] == true)
+                }
+                return PickerItem(text = item.toString(), value = item, disabled = false)
+            }
+            val normalizeItem = ::gen_normalizeItem_fn
+            fun gen_normalizeColumn_fn(list: UTSArray<Any>): UTSArray<PickerItem> {
+                val result = UTSArray<PickerItem>()
+                run {
+                    var i: Number = 0
+                    while(i < list.length){
+                        result.push(normalizeItem(list[i]))
+                        i++
+                    }
+                }
+                return result
+            }
+            val normalizeColumn = ::gen_normalizeColumn_fn
             val opened = ref(props.show)
-            val currentIndexs = ref(_uA())
-            val normalizedColumns = computed(fun(): UTSArray<UTSArray<Any?>> {
+            val currentIndexs = ref(_uA<Number>())
+            val normalizedColumns = computed<UTSArray<UTSArray<PickerItem>>>(fun(): UTSArray<UTSArray<PickerItem>> {
                 val source = if (props.columns.length > 0) {
                     props.columns
                 } else {
                     props.options
                 }
                 if (source.length == 0) {
-                    return _uA()
+                    return UTSArray<UTSArray<PickerItem>>()
                 }
                 val first = source[0]
                 if (isArray(first)) {
-                    val result = _uA()
+                    val result = UTSArray<UTSArray<PickerItem>>()
                     run {
                         var i: Number = 0
                         while(i < source.length){
-                            result.push(normalizeColumn(source[i]))
+                            result.push(normalizeColumn(source[i] as UTSArray<Any>))
                             i++
                         }
                     }
                     return result
                 }
                 return _uA(
-                    normalizeColumn(source)
+                    normalizeColumn(source as UTSArray<Any>)
                 )
             }
             )
+            fun gen_selectedIndexAt_fn(columnIndex: Number): Number {
+                if (currentIndexs.value.length <= columnIndex) {
+                    return 0
+                }
+                return currentIndexs.value[columnIndex]
+            }
+            val selectedIndexAt = ::gen_selectedIndexAt_fn
+            fun gen_selectedItems_fn(): UTSArray<PickerItem> {
+                val result = UTSArray<PickerItem>()
+                val columns = normalizedColumns.value
+                run {
+                    var i: Number = 0
+                    while(i < columns.length){
+                        val column = columns[i]
+                        val index = selectedIndexAt(i)
+                        if (index >= 0 && index < column.length) {
+                            result.push(column[index])
+                        }
+                        i++
+                    }
+                }
+                return result
+            }
+            val selectedItems = ::gen_selectedItems_fn
+            fun gen_columnAt_fn(index: Number): UTSArray<PickerItem> {
+                if (index < 0 || index >= normalizedColumns.value.length) {
+                    return UTSArray<PickerItem>()
+                }
+                return normalizedColumns.value[index]
+            }
+            val columnAt = ::gen_columnAt_fn
+            fun gen_visibleCountNumber_fn(): Number {
+                val count = props.visibleItemCount
+                if (count <= 0) {
+                    return 5
+                }
+                return count
+            }
+            val visibleCountNumber = ::gen_visibleCountNumber_fn
+            fun gen_itemHeightNumber_fn(): Number {
+                val height = props.itemHeight
+                if (height <= 0) {
+                    return 44
+                }
+                return height
+            }
+            val itemHeightNumber = ::gen_itemHeightNumber_fn
+            fun gen_formatSize_fn(value: Number): String {
+                return value.toString(10) + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
             val displayText = computed(fun(): String {
                 val items = selectedItems()
                 if (items.length == 0) {
                     return "请选择"
                 }
-                val texts = _uA()
+                val texts = UTSArray<String>()
                 run {
                     var i: Number = 0
                     while(i < items.length){
@@ -158,33 +249,33 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 return normalizedColumns.value.length
             }
             )
-            val column0 = computed(fun(): UTSArray<Any?> {
+            val column0 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(0)
             }
             )
-            val column1 = computed(fun(): UTSArray<Any?> {
+            val column1 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(1)
             }
             )
-            val column2 = computed(fun(): UTSArray<Any?> {
+            val column2 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(2)
             }
             )
-            val column3 = computed(fun(): UTSArray<Any?> {
+            val column3 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(3)
             }
             )
-            val column4 = computed(fun(): UTSArray<Any?> {
+            val column4 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(4)
             }
             )
-            val column5 = computed(fun(): UTSArray<Any?> {
+            val column5 = computed(fun(): UTSArray<PickerItem> {
                 return columnAt(5)
             }
             )
             val columnsStyle = computed(fun(): String {
                 val height = itemHeightNumber() * visibleCountNumber()
-                return "width:100%;height:" + String(height) + "px;"
+                return "width:100%;height:" + height.toString(10) + "px;"
             }
             )
             val indicatorStyle = computed(fun(): String {
@@ -196,62 +287,163 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             }
             )
             val panelStyle = computed(fun(): String {
-                val radius = formatSize(props.round)
+                val radius = formatSize(props.round as Number)
                 return "border-radius:" + radius + " " + radius + " 0 0;"
             }
             )
-            watch(fun(){
-                return props.show
-            }
-            , fun(nextValue){
-                if (opened.value == nextValue) {
-                    return
+            fun gen_hasModelValue_fn(): Boolean {
+                if (isArray(props.modelValue)) {
+                    val modelValues = props.modelValue as UTSArray<Any>
+                    return modelValues.length > 0
                 }
-                opened.value = nextValue
-                if (nextValue) {
-                    syncIndexs()
-                    emit("open")
+                return (props.modelValue as String).length > 0
+            }
+            val hasModelValue = ::gen_hasModelValue_fn
+            fun gen_activeModelValue_fn(): Any? {
+                if (hasModelValue()) {
+                    return props.modelValue
+                }
+                val value = props.value as String
+                if (value.length > 0) {
+                    return value
+                }
+                return null
+            }
+            val activeModelValue = ::gen_activeModelValue_fn
+            fun gen_columnTargetValue_fn(value: Any?, columnIndex: Number): Any? {
+                if (value == null) {
+                    return null
+                }
+                if (isArray(value)) {
+                    val values = value as UTSArray<Any>
+                    return if (values.length > columnIndex) {
+                        values[columnIndex]
+                    } else {
+                        null
+                    }
+                }
+                return if (columnIndex == 0) {
+                    value
                 } else {
-                    emit("close")
+                    null
                 }
             }
-            )
-            watch(fun(){
-                return props.modelValue
+            val columnTargetValue = ::gen_columnTargetValue_fn
+            fun gen_defaultIndexAt_fn(columnIndex: Number): Number {
+                if (isArray(props.defaultIndex)) {
+                    val defaultIndexes = props.defaultIndex as UTSArray<Number>
+                    if (defaultIndexes.length > columnIndex) {
+                        return defaultIndexes[columnIndex]
+                    }
+                    return 0
+                }
+                return if (columnIndex == 0) {
+                    (props.defaultIndex as Number)
+                } else {
+                    0
+                }
             }
-            , fun(){
-                syncIndexs()
+            val defaultIndexAt = ::gen_defaultIndexAt_fn
+            fun gen_findValueIndex_fn(column: UTSArray<PickerItem>, value: Any?): Number {
+                run {
+                    var i: Number = 0
+                    while(i < column.length){
+                        val itemValue = column[i].value
+                        if (itemValue == value) {
+                            return i
+                        }
+                        i++
+                    }
+                }
+                return -1
             }
-            )
-            watch(fun(){
-                return props.value
+            val findValueIndex = ::gen_findValueIndex_fn
+            fun gen_hasTargetValue_fn(value: Any?): Boolean {
+                if (value == null) {
+                    return false
+                }
+                if (isArray(value)) {
+                    return true
+                }
+                return (value as String).length > 0
             }
-            , fun(){
-                syncIndexs()
+            val hasTargetValue = ::gen_hasTargetValue_fn
+            fun gen_syncIndexs_fn() {
+                val columns = normalizedColumns.value
+                val result = UTSArray<Number>()
+                val value = activeModelValue()
+                run {
+                    var i: Number = 0
+                    while(i < columns.length){
+                        val column = columns[i]
+                        val targetValue = columnTargetValue(value, i)
+                        var index: Number = -1
+                        if (hasTargetValue(targetValue)) {
+                            index = findValueIndex(column, targetValue)
+                        }
+                        if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
+                            index = defaultIndexAt(i)
+                        }
+                        if (index < 0) {
+                            index = 0
+                        }
+                        if (index >= column.length) {
+                            index = column.length - 1
+                        }
+                        result.push(index)
+                        i++
+                    }
+                }
+                currentIndexs.value = result
             }
-            )
-            watch(fun(){
-                return props.columns
-            }
-            , fun(){
-                syncIndexs()
-            }
-            )
-            watch(fun(){
-                return props.defaultIndex
-            }
-            , fun(){
-                syncIndexs()
-            }
-            )
+            val syncIndexs = ::gen_syncIndexs_fn
             syncIndexs()
-            fun gen_openByTrigger_fn() {
-                if (props.disabled) {
-                    return
+            fun gen_selectedValue_fn(): Any {
+                val items = selectedItems()
+                if (items.length == 0) {
+                    return ""
                 }
-                open()
+                if (items.length == 1) {
+                    return items[0].value
+                }
+                val values = UTSArray<Any>()
+                run {
+                    var i: Number = 0
+                    while(i < items.length){
+                        values.push(items[i].value)
+                        i++
+                    }
+                }
+                return values
             }
-            val openByTrigger = ::gen_openByTrigger_fn
+            val selectedValue = ::gen_selectedValue_fn
+            fun gen_pickerValuePayload_fn(): Any {
+                val items = selectedItems()
+                if (items.length == 1) {
+                    return items[0]
+                }
+                return items
+            }
+            val pickerValuePayload = ::gen_pickerValuePayload_fn
+            fun gen_buildChangeEvent_fn(columnIndex: Number, index: Number): UTSJSONObject {
+                return _uO("index" to index, "indexs" to currentIndexs.value, "columnIndex" to columnIndex, "value" to pickerValuePayload(), "values" to selectedItems())
+            }
+            val buildChangeEvent = ::gen_buildChangeEvent_fn
+            fun gen_buildConfirmEvent_fn(): UTSJSONObject {
+                return _uO("indexs" to currentIndexs.value, "value" to pickerValuePayload(), "values" to selectedItems())
+            }
+            val buildConfirmEvent = ::gen_buildConfirmEvent_fn
+            fun gen_emitSelectedValue_fn() {
+                val value = selectedValue()
+                emit("update:modelValue", value)
+                emit("update:value", if (isArray(value)) {
+                    ""
+                } else {
+                    value
+                }
+                )
+            }
+            val emitSelectedValue = ::gen_emitSelectedValue_fn
             fun gen_open_fn() {
                 if (opened.value) {
                     return
@@ -262,6 +454,13 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 emit("update:show", true)
             }
             val open = ::gen_open_fn
+            fun gen_openByTrigger_fn() {
+                if (props.disabled) {
+                    return
+                }
+                open()
+            }
+            val openByTrigger = ::gen_openByTrigger_fn
             fun gen_close_fn() {
                 if (!opened.value) {
                     return
@@ -298,12 +497,12 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 close()
             }
             val handleOverlayClick = ::gen_handleOverlayClick_fn
-            fun gen_handlePickerChange_fn(event) {
+            fun gen_handlePickerChange_fn(event: UniPickerViewChangeEvent) {
                 if (props.disabled || props.loading) {
                     return
                 }
-                val values = event.detail.value
-                val nextIndexs = _uA()
+                val values: UTSArray<Number> = event.detail.value
+                val nextIndexs = UTSArray<Number>()
                 var changedColumnIndex: Number = 0
                 run {
                     var i: Number = 0
@@ -312,7 +511,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                         val oldIndex = selectedIndexAt(i)
                         var nextIndex: Number = 0
                         if (values.length > i) {
-                            nextIndex = Number(values[i])
+                            nextIndex = values[i]
                         }
                         if (nextIndex < 0) {
                             nextIndex = 0
@@ -320,7 +519,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                         if (nextIndex >= column.length) {
                             nextIndex = column.length - 1
                         }
-                        if (column.length > 0 && isTruthy(column[nextIndex].disabled)) {
+                        if (column.length > 0 && column[nextIndex].disabled) {
                             nextIndex = oldIndex
                         }
                         if (oldIndex != nextIndex) {
@@ -338,217 +537,19 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 }
             }
             val handlePickerChange = ::gen_handlePickerChange_fn
-            fun gen_emitSelectedValue_fn() {
-                val value = selectedValue()
-                emit("update:modelValue", value)
-                emit("update:value", if (isArray(value)) {
-                    ""
-                } else {
-                    value
-                }
-                )
-            }
-            val emitSelectedValue = ::gen_emitSelectedValue_fn
-            fun gen_syncIndexs_fn() {
-                val columns = normalizedColumns.value
-                val result = _uA()
-                val value = activeModelValue()
-                run {
-                    var i: Number = 0
-                    while(i < columns.length){
-                        val column = columns[i]
-                        val targetValue = columnTargetValue(value, i)
-                        var index: Number = -1
-                        if (targetValue != null && String(targetValue).length > 0) {
-                            index = findValueIndex(column, targetValue)
-                        }
-                        if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
-                            index = defaultIndexAt(i)
-                        }
-                        if (index < 0) {
-                            index = 0
-                        }
-                        if (index >= column.length) {
-                            index = column.length - 1
-                        }
-                        result.push(index)
-                        i++
-                    }
-                }
-                currentIndexs.value = result
-            }
-            val syncIndexs = ::gen_syncIndexs_fn
-            fun gen_activeModelValue_fn(): Any? {
-                if (hasModelValue()) {
-                    return props.modelValue
-                }
-                if (String(props.value).length > 0) {
-                    return props.value
-                }
-                return null
-            }
-            val activeModelValue = ::gen_activeModelValue_fn
-            fun gen_hasModelValue_fn(): Boolean {
-                if (isArray(props.modelValue)) {
-                    return props.modelValue.length > 0
-                }
-                return String(props.modelValue).length > 0
-            }
-            val hasModelValue = ::gen_hasModelValue_fn
-            fun gen_columnTargetValue_fn(value, columnIndex): Any {
-                if (value == null) {
-                    return null
-                }
-                if (isArray(value)) {
-                    return if (value.length > columnIndex) {
-                        value[columnIndex]
-                    } else {
-                        null
-                    }
-                }
-                return if (columnIndex == 0) {
-                    value
-                } else {
-                    null
-                }
-            }
-            val columnTargetValue = ::gen_columnTargetValue_fn
-            fun gen_defaultIndexAt_fn(columnIndex): Number {
-                if (isArray(props.defaultIndex)) {
-                    if (props.defaultIndex.length > columnIndex) {
-                        return Number(props.defaultIndex[columnIndex])
-                    }
-                    return 0
-                }
-                return if (columnIndex == 0) {
-                    Number(props.defaultIndex)
-                } else {
-                    0
-                }
-            }
-            val defaultIndexAt = ::gen_defaultIndexAt_fn
-            fun gen_findValueIndex_fn(column, value): Number {
-                run {
-                    var i: Number = 0
-                    while(i < column.length){
-                        if (String(column[i].value) == String(value)) {
-                            return i
-                        }
-                        i++
-                    }
-                }
-                return -1
-            }
-            val findValueIndex = ::gen_findValueIndex_fn
-            fun gen_selectedItems_fn(): UTSArray<Any?> {
-                val result = _uA()
-                val columns = normalizedColumns.value
-                run {
-                    var i: Number = 0
-                    while(i < columns.length){
-                        val column = columns[i]
-                        val index = selectedIndexAt(i)
-                        if (index >= 0 && index < column.length) {
-                            result.push(column[index])
-                        }
-                        i++
-                    }
-                }
-                return result
-            }
-            val selectedItems = ::gen_selectedItems_fn
-            fun gen_selectedValue_fn(): Any {
-                val items = selectedItems()
-                if (items.length == 0) {
-                    return ""
-                }
-                if (items.length == 1) {
-                    return items[0].value
-                }
-                val values = _uA()
-                run {
-                    var i: Number = 0
-                    while(i < items.length){
-                        values.push(items[i].value)
-                        i++
-                    }
-                }
-                return values
-            }
-            val selectedValue = ::gen_selectedValue_fn
-            fun gen_selectedIndexAt_fn(columnIndex): Number {
-                if (currentIndexs.value.length <= columnIndex) {
-                    return 0
-                }
-                return Number(currentIndexs.value[columnIndex])
-            }
-            val selectedIndexAt = ::gen_selectedIndexAt_fn
-            fun gen_buildChangeEvent_fn(columnIndex, index): UTSJSONObject {
-                return _uO("index" to index, "indexs" to currentIndexs.value, "columnIndex" to columnIndex, "value" to pickerValuePayload(), "values" to selectedItems())
-            }
-            val buildChangeEvent = ::gen_buildChangeEvent_fn
-            fun gen_buildConfirmEvent_fn(): UTSJSONObject {
-                return _uO("indexs" to currentIndexs.value, "value" to pickerValuePayload(), "values" to selectedItems())
-            }
-            val buildConfirmEvent = ::gen_buildConfirmEvent_fn
-            fun gen_pickerValuePayload_fn(): UTSArray<Any?> {
-                val items = selectedItems()
-                if (items.length == 1) {
-                    return items[0]
-                }
-                return items
-            }
-            val pickerValuePayload = ::gen_pickerValuePayload_fn
-            fun gen_columnAt_fn(index): UTSArray<Any?> {
-                if (index < 0 || index >= normalizedColumns.value.length) {
-                    return _uA()
-                }
-                return normalizedColumns.value[index]
-            }
-            val columnAt = ::gen_columnAt_fn
-            fun gen_normalizeColumn_fn(list): UTSArray<Any?> {
-                val result = _uA()
-                run {
-                    var i: Number = 0
-                    while(i < list.length){
-                        result.push(normalizeItem(list[i]))
-                        i++
-                    }
-                }
-                return result
-            }
-            val normalizeColumn = ::gen_normalizeColumn_fn
-            fun gen_normalizeItem_fn(item): UTSJSONObject {
-                if (item != null && UTSAndroid.`typeof`(item) == "object") {
-                    val text = if (item.text != null) {
-                        String(item.text)
-                    } else {
-                        String(item.value)
-                    }
-                    val value = if (item.value != null) {
-                        item.value
-                    } else {
-                        text
-                    }
-                    return _uO("text" to text, "value" to value, "disabled" to (item.disabled == true))
-                }
-                return _uO("text" to String(item), "value" to item, "disabled" to false)
-            }
-            val normalizeItem = ::gen_normalizeItem_fn
-            fun gen_itemClass_fn(item, columnIndex, itemIndex): String {
-                val classes = _uA(
-                    "i-picker__item"
-                )
+            fun gen_itemClass_fn(item: PickerItem, columnIndex: Number, itemIndex: Number): String {
+                val classes = UTSArray<String>()
+                classes.push("i-picker__item")
                 if (selectedIndexAt(columnIndex) == itemIndex) {
                     classes.push("i-picker__item--active")
                 }
-                if (isTruthy(item.disabled)) {
+                if (item.disabled) {
                     classes.push("i-picker__item--disabled")
                 }
                 return classes.join(" ")
             }
             val itemClass = ::gen_itemClass_fn
-            fun gen_itemTextClass_fn(item, columnIndex, itemIndex): String {
+            fun gen_itemTextClass_fn(item: PickerItem, columnIndex: Number, itemIndex: Number): String {
                 return if (selectedIndexAt(columnIndex) == itemIndex) {
                     "i-picker__item-text i-picker__item-text--active"
                 } else {
@@ -556,7 +557,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 }
             }
             val itemTextClass = ::gen_itemTextClass_fn
-            fun gen_itemTextStyle_fn(item, columnIndex, itemIndex): String {
+            fun gen_itemTextStyle_fn(item: PickerItem, columnIndex: Number, itemIndex: Number): String {
                 var style = "line-height:" + formatSize(props.itemHeight) + ";color:#606266;"
                 if (selectedIndexAt(columnIndex) == itemIndex) {
                     style = style + "color:#111827;"
@@ -564,50 +565,22 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
                 return style
             }
             val itemTextStyle = ::gen_itemTextStyle_fn
-            fun gen_isArray_fn(value): Boolean {
-                return Object.prototype.toString.call(value) == "[object Array]"
-            }
-            val isArray = ::gen_isArray_fn
-            fun gen_visibleCountNumber_fn(): Number {
-                val count = Number(props.visibleItemCount)
-                if (isNaN(count) || count <= 0) {
-                    return 5
-                }
-                return count
-            }
-            val visibleCountNumber = ::gen_visibleCountNumber_fn
-            fun gen_itemHeightNumber_fn(): Number {
-                val height = Number(props.itemHeight)
-                if (isNaN(height) || height <= 0) {
-                    return 44
-                }
-                return height
-            }
-            val itemHeightNumber = ::gen_itemHeightNumber_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
-            __expose(_uM("open" to open, "close" to close, "clear" to clear, "getIndexs" to fun(): UTSArray<Any?> {
+            __expose(_uM("open" to open, "close" to close, "clear" to clear, "getIndexs" to fun(): UTSArray<Number> {
                 return currentIndexs.value
             }
-            , "getValues" to fun(): UTSArray<Any?> {
+            , "getValues" to fun(): UTSArray<PickerItem> {
                 return selectedItems()
             }
-            , "getColumns" to fun(): UTSArray<UTSArray<Any?>> {
+            , "getColumns" to fun(): UTSArray<UTSArray<PickerItem>> {
                 return normalizedColumns.value
             }
-            , "getColumnValues" to fun(columnIndex): UTSArray<Any?> {
+            , "getColumnValues" to fun(columnIndex: Number): UTSArray<PickerItem> {
                 if (columnIndex < 0 || columnIndex >= normalizedColumns.value.length) {
                     return _uA()
                 }
                 return normalizedColumns.value[columnIndex]
             }
-            , "setColumnValues" to fun(columnIndex, values) {
+            , "setColumnValues" to fun(columnIndex: Number, values: UTSArray<Any>) {
                 emit("change", _uO("index" to selectedIndexAt(columnIndex), "indexs" to currentIndexs.value, "columnIndex" to columnIndex, "value" to values, "values" to values))
             }
             ))
@@ -771,13 +744,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
         ), "default" to ""), "show" to _uM("type" to "Boolean", "default" to false), "showToolbar" to _uM("type" to "Boolean", "default" to true), "title" to _uM("type" to "String", "default" to ""), "columns" to _uM("type" to "Array", "default" to fun(): UTSArray<Any?> {
             return _uA()
         }
-        ), "loading" to _uM("type" to "Boolean", "default" to false), "itemHeight" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to 44), "cancelText" to _uM("type" to "String", "default" to "取消"), "confirmText" to _uM("type" to "String", "default" to "确认"), "cancelColor" to _uM("type" to "String", "default" to "#909193"), "confirmColor" to _uM("type" to "String", "default" to "#3c9cff"), "visibleItemCount" to _uM("type" to _uA(
-            "String",
-            "Number"
-        ), "default" to 5), "closeOnMask" to _uM("type" to "Boolean", "default" to true), "defaultIndex" to _uM("type" to _uA(
+        ), "loading" to _uM("type" to "Boolean", "default" to false), "itemHeight" to _uM("type" to "Number", "default" to 44), "cancelText" to _uM("type" to "String", "default" to "取消"), "confirmText" to _uM("type" to "String", "default" to "确认"), "cancelColor" to _uM("type" to "String", "default" to "#909193"), "confirmColor" to _uM("type" to "String", "default" to "#3c9cff"), "visibleItemCount" to _uM("type" to "Number", "default" to 5), "closeOnMask" to _uM("type" to "Boolean", "default" to true), "defaultIndex" to _uM("type" to _uA(
             "Number",
             "Array"
         ), "default" to 0), "immediateChange" to _uM("type" to "Boolean", "default" to false), "round" to _uM("type" to _uA(

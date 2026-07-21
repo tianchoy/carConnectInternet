@@ -11,26 +11,51 @@ import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
-	type Coordinate = { __$originalPosition?: UTSSourceMapPosition<"Coordinate", "pages/geofencing/geofencing.uvue", 185, 7>;
+	type Coordinate = { __$originalPosition?: UTSSourceMapPosition<"Coordinate", "pages/geofencing/geofencing.uvue", 180, 7>;
 		latitude : number;
 		longitude : number;
 	};
-	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 189, 7>;
+	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 184, 7>;
 		pageNum : number;
 		pageSize : number;
 		hasMore : boolean;
 		loadingMore : boolean;
 	};
-	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 195, 7>;
+	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 190, 7>;
 		bind : PaginationState;
 		unbind : PaginationState;
 	};
-	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 199, 7>;
+	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 194, 7>;
 		latitude : number;
 		longitude : number;
 		radius : number;
 	};
-	type CircleOverlay = { __$originalPosition?: UTSSourceMapPosition<"CircleOverlay", "pages/geofencing/geofencing.uvue", 204, 7>;
+	type PopupInstance = { __$originalPosition?: UTSSourceMapPosition<"PopupInstance", "pages/geofencing/geofencing.uvue", 199, 7>;
+		open: () => void;
+		close: () => void;
+	};
+	type ModalResult = { __$originalPosition?: UTSSourceMapPosition<"ModalResult", "pages/geofencing/geofencing.uvue", 203, 7>;
+		confirm : boolean;
+	};
+	type FenceForm = { __$originalPosition?: UTSSourceMapPosition<"FenceForm", "pages/geofencing/geofencing.uvue", 206, 7>;
+		name : string;
+		alarmType : string;
+	};
+	type FenceResponse = { __$originalPosition?: UTSSourceMapPosition<"FenceResponse", "pages/geofencing/geofencing.uvue", 210, 7>;
+		code : number;
+		msg : string;
+	};
+	type MapTapEventDetail = { __$originalPosition?: UTSSourceMapPosition<"MapTapEventDetail", "pages/geofencing/geofencing.uvue", 214, 7>;
+		latitude : number;
+		longitude : number;
+	};
+	type MapTapEvent = { __$originalPosition?: UTSSourceMapPosition<"MapTapEvent", "pages/geofencing/geofencing.uvue", 218, 7>;
+		detail : MapTapEventDetail;
+	};
+	type SwitchChangeEvent = { __$originalPosition?: UTSSourceMapPosition<"SwitchChangeEvent", "pages/geofencing/geofencing.uvue", 221, 7>;
+		value : boolean;
+	};
+	type CircleOverlay = { __$originalPosition?: UTSSourceMapPosition<"CircleOverlay", "pages/geofencing/geofencing.uvue", 224, 7>;
 		id : number;
 		latitude : number;
 		longitude : number;
@@ -42,6 +67,14 @@ import { ref, reactive, onMounted, computed, watch } from 'vue'
 		centerMarker : boolean;
 	};
 	// 地图状态
+	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 690, 7>;
+		minLat : number;
+		maxLat : number;
+		minLng : number;
+		maxLng : number;
+	};
+
+	// 根据半径计算合适的缩放级别
 	
 const __sfc__ = defineComponent({
   __name: 'geofencing',
@@ -76,25 +109,25 @@ const _cache = __ins.renderCache;
 	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
 	const lastDirection = ref(0)
-	const showFenceModal = ref<UTSJSONObject | null>(null)
+	const showFenceModal = ref<PopupInstance | null>(null)
 
 	// 围栏管理状态
 	const fenceList = ref<Array<UTSJSONObject>>([])
 	const selectedFence = ref<UTSJSONObject | null>(null)
-	const fencesPopup = ref<UTSJSONObject | null>(null)
-	const editDialogPopup = ref<UTSJSONObject | null>(null)
+	const fencesPopup = ref<PopupInstance | null>(null)
+	const editDialogPopup = ref<PopupInstance | null>(null)
 	const editingFence = ref<UTSJSONObject | null>(null)
 	const alarmTypeOptions = ['0', '1', '2', '3']
-	const fenceForm = reactive({
+	const fenceForm = reactive<FenceForm>({
 		name: '',
 		alarmType: '1'
 	})
 
 	// 设备绑定状态
-	const deviceDialogPopup = ref<UTSJSONObject | null>(null)
+	const deviceDialogPopup = ref<PopupInstance | null>(null)
 	const activeTab = ref('bind')
-	const deviceList = ref<Array<any>>([]) // 当前显示的设备列表
-	const boundDevices = ref<Array<any>>([]) // 已绑定设备完整列表
+	const deviceList = ref<Array<UTSJSONObject>>([]) // 当前显示的设备列表
+	const boundDevices = ref<Array<UTSJSONObject>>([]) // 已绑定设备完整列表
 	const currentFenceName = ref('')
 	const currentFenceId = ref('')
 	const loading = ref(false)
@@ -146,7 +179,7 @@ const _cache = __ins.renderCache;
 		})
 
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 307, 10), deptId: deptId.value, deviceids: imei.value }
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 327, 10), deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			res.data.forEach(item => {
@@ -160,7 +193,7 @@ const _cache = __ins.renderCache;
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
-					const position = {__$originalPosition: new UTSSourceMapPosition("position", "pages/geofencing/geofencing.uvue", 321, 12),
+					const position = {__$originalPosition: new UTSSourceMapPosition("position", "pages/geofencing/geofencing.uvue", 341, 12),
 						latitude: convertedCoord.lat,
 						longitude: convertedCoord.lng
 					}
@@ -203,7 +236,7 @@ const _cache = __ins.renderCache;
 			})
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:364")
+			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:384")
 			uni.showToast({
 				title: '获取车辆位置失败',
 				icon: 'none'
@@ -263,7 +296,7 @@ const _cache = __ins.renderCache;
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
 			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:424")
+				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:444")
 				return null
 			}
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -273,7 +306,7 @@ const _cache = __ins.renderCache;
 				radius: radius
 			}
 		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:434")
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:454")
 			return null
 		}
 	}
@@ -424,6 +457,44 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	function updateMapDisplay() : void {
+		updateMarkers()
+
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				polygons.value = points.value.length >= 3 ? [{
+					points: points.value,
+					strokeWidth: 2,
+					strokeColor: '#FF0000',
+					fillColor: 'rgba(255,0,0,0.2)',
+					zIndex: 1
+				}] : []
+				circles.value = []
+			} else if (drawingMode.value === 'circle') {
+				const drawingCenter = circleCenter.value
+				if (drawingCenter != null && circleRadius.value > 0) {
+					const drawingCircle : CircleOverlay = {
+						id: 0,
+						latitude: drawingCenter.latitude,
+						longitude: drawingCenter.longitude,
+						radius: circleRadius.value,
+						strokeWidth: 2,
+						strokeColor: '#FF0000',
+						fillColor: 'rgba(255,0,0,0.2)',
+						zIndex: 1,
+						centerMarker: false
+					}
+					circles.value = [drawingCircle]
+				} else {
+					circles.value = []
+				}
+				polygons.value = []
+			}
+		} else {
+			renderFencesOnMap()
+		}
+	}
+
 	// 加载围栏列表
 	const loadGeofenceList = async () => {
 		try {
@@ -437,7 +508,7 @@ const _cache = __ins.renderCache;
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
-			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:598")
+			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:656")
 			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
@@ -457,8 +528,8 @@ const _cache = __ins.renderCache;
 
 
 	// 生成POLYGON字符串
-	const generatePolygonString = (points) => {
-		const coords = points.map(point => {
+	const generatePolygonString = (points : Array<Coordinate>) : string => {
+		const coords = points.map((point : Coordinate) : string => {
 			const originalCoord = CoordTransform.tencentToWgs84(point.latitude, point.longitude)
 			return `${originalCoord.lat} ${originalCoord.lng}`
 		}).join(', ')
@@ -466,18 +537,48 @@ const _cache = __ins.renderCache;
 	}
 
 	// 生成CIRCLE字符串
-	const generateCircleString = (center, radius) => {
+	const generateCircleString = (center : Coordinate, radius : number) : string => {
 		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
 		return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`
 	}
 
+	const calculateZoomLevelFromRadius = (radius : number) : number => {
+		if (radius > 50000) return 8   // 50公里以上
+		if (radius > 20000) return 9    // 20-50公里
+		if (radius > 10000) return 10    // 10-20公里
+		if (radius > 5000) return 11     // 5-10公里
+		if (radius > 2000) return 12     // 2-5公里
+		if (radius > 1000) return 13    // 1-2公里
+		if (radius > 500) return 14      // 500米-1公里
+		if (radius > 200) return 15      // 200-500米
+		return 16                       // 200米以下
+	}
+
+	// 计算坐标边界
+	const calculateBounds = (points : Array<Coordinate>) : CoordinateBounds => {
+		let minLat = points[0].latitude
+		let maxLat = points[0].latitude
+		let minLng = points[0].longitude
+		let maxLng = points[0].longitude
+
+		points.forEach((point : Coordinate) : void => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+
+		return { minLat, maxLat, minLng, maxLng }
+	}
+
 	// 调整地图中心到围栏中心位置
-	const setMapCenterToFence = (fence) => {
+	const setMapCenterToFence = (fence : UTSJSONObject) : void => {
 		const fenceType = getFenceType(fence)
+		const area = fence.getString('area', '')
 
 		if (fenceType === 'circle') {
-			const circleData = parseCircle(fence.area)
-			if (circleData) {
+			const circleData = parseCircle(area)
+			if (circleData != null) {
 				center.latitude = circleData.latitude
 				center.longitude = circleData.longitude
 				// 处理过大半径，设置合理的缩放级别
@@ -486,7 +587,7 @@ const _cache = __ins.renderCache;
 				mapScale.value = calculateZoomLevelFromRadius(displayRadius)
 			}
 		} else {
-			const fencePoints = parsePolygon(fence.area)
+			const fencePoints = parsePolygon(area)
 			if (fencePoints.length === 0) return
 
 			// 计算中心点
@@ -514,58 +615,29 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	// 根据半径计算合适的缩放级别
-	const calculateZoomLevelFromRadius = (radius) => {
-		if (radius > 50000) return 8   // 50公里以上
-		if (radius > 20000) return 9    // 20-50公里
-		if (radius > 10000) return 10    // 10-20公里
-		if (radius > 5000) return 11     // 5-10公里
-		if (radius > 2000) return 12     // 2-5公里
-		if (radius > 1000) return 13    // 1-2公里
-		if (radius > 500) return 14      // 500米-1公里
-		if (radius > 200) return 15      // 200-500米
-		return 16                       // 200米以下
-	}
-
-	// 计算坐标边界
-	const calculateBounds = (points) => {
-		let minLat = points[0].latitude
-		let maxLat = points[0].latitude
-		let minLng = points[0].longitude
-		let maxLng = points[0].longitude
-
-		points.forEach(point => {
-			minLat = Math.min(minLat, point.latitude)
-			maxLat = Math.max(maxLat, point.latitude)
-			minLng = Math.min(minLng, point.longitude)
-			maxLng = Math.max(maxLng, point.longitude)
-		})
-
-		return { minLat, maxLat, minLng, maxLng }
-	}
-
 	// 显示围栏列表
 	const showFenceList = () => {
 		fencesPopup.value?.open()
 	}
 
 	// 选择围栏
-	const selectFence = (fence) => {
+	const selectFence = (fence : UTSJSONObject) : void => {
 		selectedFence.value = fence
 		fencesPopup.value?.close()
 		showFenceModal.value?.open()
 
 		// 根据围栏类型显示
 		const fenceType = getFenceType(fence)
+		const area = fence.getString('area', '')
 		if (fenceType === 'circle') {
-			const circleData = parseCircle(fence.area)
-			if (circleData) {
+			const circleData = parseCircle(area)
+			if (circleData != null) {
 				circleCenter.value = { latitude: circleData.latitude, longitude: circleData.longitude }
 				circleRadius.value = circleData.radius
 				points.value = []
 			}
 		} else {
-			const fencePoints = parsePolygon(fence.area)
+			const fencePoints = parsePolygon(area)
 			points.value = fencePoints
 			circleCenter.value = null
 			circleRadius.value = 0
@@ -576,29 +648,30 @@ const _cache = __ins.renderCache;
 	}
 
 	// 编辑围栏 - 修复版本
-	const editFence = (fence) => {
+	const editFence = (fence : UTSJSONObject) : void => {
 		editingFence.value = fence
-		fenceForm.name = fence.name
-		const alarmType = String(fence.alarmType ?? '')
+		fenceForm.name = fence.getString('name', '')
+		const alarmType = fence.getString('alarmType', '')
 		fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : '1'
-		
+
 		// 设置当前绘制模式为围栏实际类型
 		const fenceType = getFenceType(fence)
 		drawingMode.value = fenceType
-		
+		const area = fence.getString('area', '')
+
 		// 【关键修复】恢复围栏数据到绘制状态
 		if (fenceType === 'circle') {
-			const circleData = parseCircle(fence.area)
-			if (circleData) {
-				circleCenter.value = { 
-					latitude: circleData.latitude, 
-					longitude: circleData.longitude 
+			const circleData = parseCircle(area)
+			if (circleData != null) {
+				circleCenter.value = {
+					latitude: circleData.latitude,
+					longitude: circleData.longitude
 				}
 				circleRadius.value = circleData.radius
 				points.value = [] // 清空多边形点
 			}
 		} else {
-			const fencePoints = parsePolygon(fence.area)
+			const fencePoints = parsePolygon(area)
 			if (fencePoints.length >= 3) {
 				points.value = fencePoints
 				circleCenter.value = null
@@ -613,37 +686,38 @@ const _cache = __ins.renderCache;
 		editDialogPopup.value?.open()
 	}
 
+	async function deleteFenceById(id : string) : Promise<void> {
+		try {
+			const result = await deleteGeofence(id)
+			if (result.code === 0) {
+				uni.showToast({ title: '删除成功' })
+				selectedFence.value = null
+				points.value = []
+				circleCenter.value = null
+				circleRadius.value = 0
+				isDrawing.value = false
+				polygons.value = []
+				circles.value = []
+				updateMarkers()
+				showFenceModal.value?.close()
+				await loadGeofenceList()
+			} else {
+				uni.showToast({ title: '删除失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:861")
+			uni.showToast({ title: '删除失败', icon: 'none' })
+		}
+	}
+
 	// 删除围栏
-	const deleteFence = async (id) => {
+	const deleteFence = (id : string) : void => {
 		uni.showModal({
 			title: '确认删除',
 			content: '确定要删除这个围栏吗？',
-			success: async (res) => {
+			success: (res : ShowModalSuccess) : void => {
 				if (res.confirm) {
-					try {
-						const result = await deleteGeofence(id)
-						if (result.code === 0) {
-							uni.showToast({ title: '删除成功' })
-
-							selectedFence.value = null;       // 取消选中围栏
-							points.value = [];                 // 清空多边形顶点
-							circleCenter.value = null;         // 清空圆形圆心
-							circleRadius.value = 0;            // 清空圆形半径
-							isDrawing.value = false;           // 退出绘制模式
-
-							polygons.value = [];
-							circles.value = [];
-							updateMarkers();
-							showFenceModal.value?.close();    // 清空围栏标记
-
-							await loadGeofenceList();
-						} else {
-							uni.showToast({ title: '删除失败', icon: 'none' })
-						}
-					} catch (error) {
-						console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:802")
-						uni.showToast({ title: '删除失败', icon: 'none' })
-					}
+					void deleteFenceById(id.toString())
 				}
 			}
 		})
@@ -667,7 +741,7 @@ const _cache = __ins.renderCache;
 				area = generateCircleString(circleCenter.value, circleRadius.value)
 			} else {
 				// 没有重新绘制，使用原有数据
-				area = editingFence.value.area
+				area = editingFence.value.getString('area', '')
 			}
 		} else {
 			// 【新增模式】必须绘制
@@ -696,15 +770,15 @@ const _cache = __ins.renderCache;
 			return
 		}
 
-		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 857, 9),
+		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 926, 9),
 			name: fenceForm.name,
 			area: area,
-			alarmType: Number(fenceForm.alarmType),
+			alarmType: parseInt(fenceForm.alarmType),
 			type: drawingMode.value
 		}
 
 		try {
-			let result
+			let result : any
 			if (editingFence.value) {
 				// 更新围栏
 				uni.showLoading({ title: '更新中...' })
@@ -742,15 +816,90 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			uni.hideLoading()
-			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:903")
+			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:972")
 			uni.showToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
 
+	function initPagination(tabType : string) : void {
+		pagination[tabType] = {
+			pageNum: 1,
+			pageSize: 10,
+			hasMore: true,
+			loadingMore: false
+		}
+		if (activeTab.value === tabType) {
+			deviceList.value = []
+		}
+	}
+
+	async function loadBoundDevices(fenceId : string) : Promise<void> {
+		const page = pagination.bind
+		if (!page.hasMore || page.loadingMore) return
+
+		page.loadingMore = true
+		try {
+			const res = await getBoundDevices({
+				pageNum: page.pageNum,
+				pageSize: page.pageSize,
+				geoId: fenceId
+			})
+
+			if (res.code === 0) {
+				const dataList = res.data.list || []
+				if (page.pageNum === 1) {
+					boundDevices.value = dataList
+					deviceList.value = dataList
+				} else {
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
+			}
+		} catch (error) {
+			page.hasMore = false
+		} finally {
+			page.loadingMore = false
+		}
+	}
+
+	async function loadUnboundDevices() : Promise<void> {
+		const page = pagination.unbind
+		if (!page.hasMore || page.loadingMore) return
+
+		page.loadingMore = true
+		try {
+			const res = await getUnboundDevices({
+				pageNum: page.pageNum,
+				pageSize: page.pageSize
+			})
+
+			if (res.code === 0) {
+				const dataList = res.data.list || []
+				if (page.pageNum === 1) {
+					deviceList.value = dataList
+				} else {
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
+			}
+		} catch (error) {
+			page.hasMore = false
+		} finally {
+			page.loadingMore = false
+		}
+	}
+
 	// 显示绑定设备对话框
-	const showBindDevices = async (fenceId) => {
+	const showBindDevices = async (fenceId : string) : Promise<void> => {
 		currentFenceId.value = fenceId
-		currentFenceName.value = selectedFence.value.name
+		const selected = selectedFence.value
+		currentFenceName.value = selected != null ? selected.getString('name', '') : ''
 		deviceDialogPopup.value?.open()
 		activeTab.value = 'bind'
 		scrollTop.value = 0
@@ -766,7 +915,9 @@ const _cache = __ins.renderCache;
 	}
 
 	// 切换标签页
-	const switchTab = async (tab) => {
+	const switchTab = async (tab : string) : Promise<void> => {
+
+		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1073")
 		if (activeTab.value === tab) return
 		
 		activeTab.value = tab
@@ -778,93 +929,10 @@ const _cache = __ins.renderCache;
 		
 		// 加载对应数据
 		if (tab === 'bind') {
+			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1085")
 			await loadBoundDevices(currentFenceId.value)
 		} else {
 			await loadUnboundDevices()
-		}
-	}
-
-	// 初始化分页状态
-	const initPagination = (tabType) => {
-		pagination[tabType] = {
-			pageNum: 1,
-			pageSize: 10,
-			hasMore: true,
-				loadingMore: false
-		}
-		// 清空当前设备列表
-		if (activeTab.value === tabType) {
-			deviceList.value = []
-		}
-	}
-
-
-	// 加载已绑定设备
-	const loadBoundDevices = async (fenceId) => {
-		const page = pagination.bind
-		if (!page.hasMore || page.loadingMore) return
-
-		page.loadingMore = true
-		try {
-			const res = await getBoundDevices({
-				pageNum: page.pageNum,
-				pageSize: page.pageSize,
-				geoId: fenceId
-			})
-
-			if (res.code === 0) {
-				const dataList = res.data.list || []
-				
-				if (page.pageNum === 1) {
-					boundDevices.value = dataList
-					deviceList.value = dataList
-				} else {
-					deviceList.value = [...deviceList.value, ...dataList]
-				}
-
-				// 判断是否还有更多
-				page.hasMore = dataList.length === page.pageSize
-				if (page.hasMore) page.pageNum++
-			} else {
-				page.hasMore = false
-			}
-		} catch (error) {
-			page.hasMore = false
-		} finally {
-			page.loadingMore = false
-		}
-	}
-
-	// 加载未绑定设备
-	const loadUnboundDevices = async () => {
-		const page = pagination.unbind
-		if (!page.hasMore || page.loadingMore) return
-
-		page.loadingMore = true
-		try {
-			const res = await getUnboundDevices({
-				pageNum: page.pageNum,
-				pageSize: page.pageSize
-			})
-
-			if (res.code === 0) {
-				const dataList = res.data.list || []
-				
-				if (page.pageNum === 1) {
-					deviceList.value = dataList
-				} else {
-					deviceList.value = [...deviceList.value, ...dataList]
-				}
-
-				page.hasMore = dataList.length === page.pageSize
-				if (page.hasMore) page.pageNum++
-			} else {
-				page.hasMore = false
-			}
-		} catch (error) {
-			page.hasMore = false
-		} finally {
-			page.loadingMore = false
 		}
 	}
 
@@ -880,15 +948,16 @@ const _cache = __ins.renderCache;
 	}
 
 	// 切换设备绑定状态
-	const toggleDeviceBinding = async (deviceImei, bound) => {
+	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
+		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1105")
 		loading.value = true
 		try {
-			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1044, 10),
+			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1108, 10),
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-
-			let result
+			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1112")
+			let result : any
 			if (bound) {
 				result = await bindDevices(params)
 			} else {
@@ -910,7 +979,7 @@ const _cache = __ins.renderCache;
 				uni.showToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1071")
+			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1135")
 			uni.showToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
@@ -918,13 +987,13 @@ const _cache = __ins.renderCache;
 	}
 
 	// 检查设备是否已绑定
-	const isDeviceBound = (deviceImei) => {
-		return boundDevices.value.some(device => device.imei === deviceImei)
+	const isDeviceBound = (deviceImei : string) : boolean => {
+		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('imei', '') === deviceImei)
 	}
 
 	/* 电子围栏绘制功能 */
 	// 设置绘制模式
-	const setDrawingMode = (mode) => {
+	const setDrawingMode = (mode : string) : void => {
 		drawingMode.value = mode
 		// 切换模式时清空当前绘制
 		if (isDrawing.value) {
@@ -945,8 +1014,89 @@ const _cache = __ins.renderCache;
 		updateMapDisplay()
 	}
 
+	function handleDeviceBindingChange(deviceImei : string, bound : boolean) : void {
+		void toggleDeviceBinding(deviceImei, bound)
+	}
+
+	function getDeviceImei(device : UTSJSONObject) : string {
+		return device.getString('imei', '')
+	}
+
+	function isDeviceOnline(device : UTSJSONObject) : boolean {
+		return device.getString('connectionStatus', '') === 'online'
+	}
+
+	function getDeviceDisplayName(device : UTSJSONObject) : string {
+		const deviceName = device.getString('deviceName', '')
+		return deviceName ? deviceName : device.getString('plateNo', '')
+	}
+
+	function closeFenceList() : void {
+		fencesPopup.value?.close()
+	}
+
+	function closeEditDialog() : void {
+		editDialogPopup.value?.close()
+	}
+
+	function getSelectedFenceName() : string {
+		const fence = selectedFence.value
+		return fence != null ? fence.getString('name', '') : ''
+	}
+
+	function editSelectedFence() : void {
+		const fence = selectedFence.value
+		if (fence != null) {
+			editFence(fence)
+		}
+	}
+
+	function deleteSelectedFence(): void {
+		const fence = selectedFence.value;
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1209");
+		
+		if (fence != null) {
+			const fenceId = fence.getString('id', '');
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1213");
+			
+			if (fenceId !== '') {
+				deleteFence(fenceId);
+			} else {
+				uni.showToast({
+					title: '围栏ID无效',
+					icon: 'none'
+				});
+			}
+		}
+	}
+
+	function showSelectedFenceDevices() : void {
+		const fence = selectedFence.value
+		if (fence != null) {
+			void showBindDevices(fence.getString('id', ''))
+		}
+	}
+
+	function calculateDistance(lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number {
+		const R = 6371000
+		const dLat = (lat2 - lat1) * Math.PI / 180
+		const dLng = (lng2 - lng1) * Math.PI / 180
+		const a =
+			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+			Math.sin(dLng / 2) * Math.sin(dLng / 2)
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+		return R * c
+	}
+
+	function addNewPoint(lat : number, lng : number) : void {
+		const point : Coordinate = { latitude: lat, longitude: lng }
+		points.value.push(point)
+		updateMapDisplay()
+	}
+
 	// 处理地图点击事件
-	const handleMapTap = (e) => {
+	const handleMapTap = (e : MapTapEvent) : void => {
 		if (isDrawing.value) {
 			if (drawingMode.value === 'polygon') {
 				addNewPoint(e.detail.latitude, e.detail.longitude)
@@ -973,26 +1123,6 @@ const _cache = __ins.renderCache;
 				}
 			}
 		}
-	}
-
-	// 计算两点之间的距离（米）
-	const calculateDistance = (lat1, lng1, lat2, lng2) => {
-		const R = 6371000 // 地球半径（米）
-		const dLat = (lat2 - lat1) * Math.PI / 180
-		const dLng = (lng2 - lng1) * Math.PI / 180
-		const a =
-			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-			Math.sin(dLng / 2) * Math.sin(dLng / 2)
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-		const distance = R * c
-		return distance
-	}
-
-	// 添加新点
-	const addNewPoint = (lat, lng) => {
-		points.value.push({ latitude: lat, longitude: lng })
-		updateMapDisplay()
 	}
 
 	// 完成绘制
@@ -1046,26 +1176,6 @@ const _cache = __ins.renderCache;
 			}]
 		} else {
 			circles.value = []
-		}
-	}
-
-	// 更新地图显示
-	const updateMapDisplay = () => {
-		// 更新标记点
-		updateMarkers()
-
-		// 更新围栏显示
-		if (isDrawing.value) {
-			if (drawingMode.value === 'polygon') {
-				updateFencePolygon()
-				circles.value = []
-			} else if (drawingMode.value === 'circle') {
-				updateFenceCircle()
-				polygons.value = []
-			}
-		} else {
-			// 如果不是绘制模式，重新渲染所有围栏
-			renderFencesOnMap()
 		}
 	}
 
@@ -1171,7 +1281,7 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
               class: "fence-operations"
             }), [
               _cE("view", _uM({ class: "fence-header" }), [
-                _cE("text", _uM({ class: "fence-name" }), _tD(selectedFence.value.name), 1 /* TEXT */),
+                _cE("text", _uM({ class: "fence-name" }), _tD(getSelectedFenceName()), 1 /* TEXT */),
                 _cV(_component_i_icon, _uM({
                   name: "close",
                   onClick: () => {selectedFence.value = null; showFenceModal.value?.close()}
@@ -1180,27 +1290,27 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
               _cE("view", _uM({ class: "fence-actions" }), [
                 _cV(_component_i_button, _uM({
                   size: "small",
-                  onClick: () => {editFence(selectedFence.value)}
+                  onClick: editSelectedFence
                 }), _uM({
                   default: withSlotCtx((): any[] => ["编辑"]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["onClick"]),
+                })),
                 _cV(_component_i_button, _uM({
                   size: "small",
                   type: "error",
-                  onClick: () => {deleteFence(selectedFence.value.id)}
+                  onClick: deleteSelectedFence
                 }), _uM({
                   default: withSlotCtx((): any[] => ["删除"]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["onClick"]),
+                })),
                 _cV(_component_i_button, _uM({
                   size: "small",
                   type: "primary",
-                  onClick: () => {showBindDevices(selectedFence.value.id)}
+                  onClick: showSelectedFenceDevices
                 }), _uM({
                   default: withSlotCtx((): any[] => ["绑定设备"]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["onClick"])
+                }))
               ])
             ])
           : _cC("v-if", true)
@@ -1292,8 +1402,8 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
             _cV(_component_i_icon, _uM({
               name: "/static/close.png",
               fontSize: "15",
-              onClick: () => {fencesPopup.value.close()}
-            }), null, 8 /* PROPS */, ["onClick"])
+              onClick: closeFenceList
+            }))
           ]),
           _cE("scroll-view", _uM({
             class: "list-content",
@@ -1388,12 +1498,10 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
             ])
           ]),
           _cE("view", _uM({ class: "dialog-actions" }), [
-            _cV(_component_i_button, _uM({
-              onClick: () => {editDialogPopup.value.close()}
-            }), _uM({
+            _cV(_component_i_button, _uM({ onClick: closeEditDialog }), _uM({
               default: withSlotCtx((): any[] => ["取消"]),
               _: 1 /* STABLE */
-            }), 8 /* PROPS */, ["onClick"]),
+            })),
             _cV(_component_i_button, _uM({
               type: "primary",
               onClick: saveFence
@@ -1441,21 +1549,21 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
           }), [
             _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, (device, __key, __index, _cached): any => {
               return _cE("view", _uM({
-                key: device.imei,
+                key: getDeviceImei(device),
                 class: "device-item"
               }), [
                 _cE("view", _uM({ class: "device-info" }), [
-                  _cE("text", _uM({ class: "name" }), _tD(device.deviceName || device.plateNo), 1 /* TEXT */),
-                  isTrue(device.connectionStatus)
+                  _cE("text", _uM({ class: "name" }), _tD(getDeviceDisplayName(device)), 1 /* TEXT */),
+                  isTrue(getDeviceImei(device))
                     ? _cE("text", _uM({
                         key: 0,
                         class: "status"
-                      }), _tD(device.connectionStatus === 'online' ? '在线' : '离线'), 1 /* TEXT */)
+                      }), _tD(isDeviceOnline(device) ? '在线' : '离线'), 1 /* TEXT */)
                     : _cC("v-if", true)
                 ]),
                 _cV(_component_i_switch, _uM({
-                  "model-value": isDeviceBound(device.imei),
-                  onChange: ($event: any) => {toggleDeviceBinding(device.imei, $event)},
+                  "model-value": isDeviceBound(getDeviceImei(device)),
+                  onChange: ($event: any) => {handleDeviceBindingChange(getDeviceImei(device), $event as boolean)},
                   disabled: loading.value || loadingMore.value,
                   size: "20"
                 }), null, 8 /* PROPS */, ["model-value", "onChange", "disabled"])
@@ -1492,4 +1600,4 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
 
 })
 export default __sfc__
-const GenPagesGeofencingGeofencingStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "20rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"]])]])], ["fence-operations", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["width", "500rpx"], ["height", "200rpx"]])]])], ["fence-header", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "40rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["fence-name", _uM([[".container .fence-operations .fence-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["fence-actions", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["boxShadow", "0 -2px 10px rgba(0, 0, 0, 0.1)"]])]])], ["drawing-mode-selector", _uM([[".container .tools-panel ", _uM([["marginBottom", "20rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["mode-title", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["fontSize", "28rpx"], ["marginBottom", "15rpx"], ["color", "#333333"], ["fontWeight", 500]])]])], ["mode-buttons", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["mode-button-spacing", _uM([[".container .tools-panel .drawing-mode-selector .mode-buttons ", _uM([["marginLeft", "20rpx"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["status-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["fontSize", "28rpx"], ["color", "#333333"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["fence-list", _uM([[".container ", _uM([["height", "70%"], ["backgroundColor", "#ffffff"]])]])], ["list-header", _uM([[".container .fence-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["title", _uM([[".container .fence-list .list-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["list-content", _uM([[".container .fence-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["fence-item", _uM([[".container .fence-list .list-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["fence-info", _uM([[".container .fence-list .list-content .fence-item ", _uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["name", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "30rpx"], ["fontWeight", 500], ["marginBottom", "8rpx"]])], [".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "30rpx"], ["marginBottom", "8rpx"]])]])], ["type", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#2979ff"], ["marginBottom", "8rpx"]])]])], ["devices", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["empty", _uM([[".container .fence-list .list-content ", _uM([["textAlign", "center"], ["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0], ["color", "#999999"]])], [".container .device-dialog .device-list ", _uM([["textAlign", "center"], ["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])], ["edit-dialog", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["overflow", "hidden"]])]])], ["dialog-header", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["textAlign", "center"], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["display", "flex"], ["justifyContent", "space-between"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"], ["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["dialog-content", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]])]])], ["radio-group", _uM([[".container .edit-dialog .dialog-content ", _uM([["marginTop", "30rpx"]])]])], ["label", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["marginBottom", "30rpx"], ["fontSize", "28rpx"], ["fontWeight", 500]])]])], ["radio-options", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["alignItems", "center"]])]])], ["dialog-actions", _uM([[".container .edit-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["device-dialog", _uM([[".container ", _uM([["height", "70%"], ["backgroundColor", "#ffffff"]])]])], ["dialog-tabs", _uM([[".container .device-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["tab", _uM([[".container .device-dialog .dialog-tabs ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["fontSize", "28rpx"]])], [".container .device-dialog .dialog-tabs .active", _uM([["color", "#2979ff"], ["borderBottomWidth", "4rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#2979ff"]])]])], ["device-list", _uM([[".container .device-dialog ", _uM([["height", "60%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["boxSizing", "border-box"]])]])], ["device-item", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["device-info", _uM([[".container .device-dialog .device-list .device-item ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["status", _uM([[".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["loading-tip", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["no-more", _uM([[".container .device-dialog .device-list ", _uM([["textAlign", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "26rpx"]])]])], ["i-popup__content", _uM([[".container ", _uM([["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["i-grid-item", _uM([[".container ", _uM([["!alignItems", "flex-start"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])]])]
+const GenPagesGeofencingGeofencingStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "20rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"]])]])], ["fence-operations", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["width", "500rpx"], ["height", "200rpx"]])]])], ["fence-header", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "40rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["fence-name", _uM([[".container .fence-operations .fence-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["fence-actions", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["boxShadow", "0 -2px 10px rgba(0, 0, 0, 0.1)"]])]])], ["drawing-mode-selector", _uM([[".container .tools-panel ", _uM([["marginBottom", "20rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["mode-title", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["fontSize", "28rpx"], ["marginBottom", "15rpx"], ["color", "#333333"], ["fontWeight", 500]])]])], ["mode-buttons", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["mode-button-spacing", _uM([[".container .tools-panel .drawing-mode-selector .mode-buttons ", _uM([["marginLeft", "20rpx"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["status-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["fontSize", "28rpx"], ["color", "#333333"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["fence-list", _uM([[".container ", _uM([["height", "70%"], ["backgroundColor", "#ffffff"]])]])], ["list-header", _uM([[".container .fence-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["title", _uM([[".container .fence-list .list-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["list-content", _uM([[".container .fence-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["fence-item", _uM([[".container .fence-list .list-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["fence-info", _uM([[".container .fence-list .list-content .fence-item ", _uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["name", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "30rpx"], ["fontWeight", 500], ["marginBottom", "8rpx"]])], [".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "30rpx"], ["marginBottom", "8rpx"]])]])], ["type", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#2979ff"], ["marginBottom", "8rpx"]])]])], ["devices", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["empty", _uM([[".container .fence-list .list-content ", _uM([["textAlign", "center"], ["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0], ["color", "#999999"]])], [".container .device-dialog .device-list ", _uM([["textAlign", "center"], ["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])], ["edit-dialog", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["overflow", "hidden"]])]])], ["dialog-header", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["textAlign", "center"], ["fontSize", "32rpx"], ["fontWeight", "bold"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["display", "flex"], ["justifyContent", "space-between"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"], ["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["dialog-content", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]])]])], ["radio-group", _uM([[".container .edit-dialog .dialog-content ", _uM([["marginTop", "30rpx"]])]])], ["label", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["marginBottom", "30rpx"], ["fontSize", "28rpx"], ["fontWeight", 500]])]])], ["radio-options", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["alignItems", "center"]])]])], ["dialog-actions", _uM([[".container .edit-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["device-dialog", _uM([[".container ", _uM([["height", "800rpx"], ["backgroundColor", "#ffffff"]])]])], ["dialog-tabs", _uM([[".container .device-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["tab", _uM([[".container .device-dialog .dialog-tabs ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["fontSize", "28rpx"]])], [".container .device-dialog .dialog-tabs .active", _uM([["color", "#2979ff"], ["borderBottomWidth", "4rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#2979ff"]])]])], ["device-list", _uM([[".container .device-dialog ", _uM([["height", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "75rpx"], ["paddingLeft", "20rpx"], ["boxSizing", "border-box"]])]])], ["device-item", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["device-info", _uM([[".container .device-dialog .device-list .device-item ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["status", _uM([[".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["loading-tip", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["no-more", _uM([[".container .device-dialog .device-list ", _uM([["textAlign", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "26rpx"]])]])], ["i-popup__content", _uM([[".container ", _uM([["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["i-grid-item", _uM([[".container ", _uM([["!alignItems", "flex-start"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])]])]

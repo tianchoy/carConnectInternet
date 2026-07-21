@@ -39,6 +39,146 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
+            fun gen_hasNumberValue_fn(): Boolean {
+                if (props.value != null && props.value.toString().length > 0) {
+                    return true
+                }
+                return props.count > 0 || props.showZero
+            }
+            val hasNumberValue = ::gen_hasNumberValue_fn
+            fun gen_effectiveCount_fn(): Number {
+                if (props.value != null && props.value.toString().length > 0) {
+                    if (UTSAndroid.`typeof`(props.value) == "number") {
+                        return props.value as Number
+                    }
+                    return parseFloat(props.value as String)
+                }
+                return props.count
+            }
+            val effectiveCount = ::gen_effectiveCount_fn
+            fun gen_getMaxCount_fn(): Number {
+                if (props.maxCount != 99) {
+                    return props.maxCount
+                }
+                return props.max
+            }
+            val getMaxCount = ::gen_getMaxCount_fn
+            fun gen_effectiveBgColor_fn(): String {
+                if (props.bgColor.length > 0) {
+                    return props.bgColor
+                }
+                return props.type
+            }
+            val effectiveBgColor = ::gen_effectiveBgColor_fn
+            fun gen_effectiveFontColor_fn(): String {
+                if (props.color.length > 0) {
+                    return props.color
+                }
+                return props.fontColor
+            }
+            val effectiveFontColor = ::gen_effectiveFontColor_fn
+            fun gen_normalizeTheme_fn(value: String): String {
+                val text = value
+                if (text == "danger") {
+                    return "error"
+                }
+                if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info") {
+                    return text
+                }
+                return "custom"
+            }
+            val normalizeTheme = ::gen_normalizeTheme_fn
+            fun gen_parseColor_fn(value: String): String {
+                val text = value
+                if (text == "white") {
+                    return "#ffffff"
+                }
+                if (text == "black") {
+                    return "#000000"
+                }
+                if (text == "danger" || text == "error") {
+                    return "#f56c6c"
+                }
+                if (text == "primary") {
+                    return "#3c9cff"
+                }
+                if (text == "success") {
+                    return "#5ac725"
+                }
+                if (text == "warning") {
+                    return "#f9ae3d"
+                }
+                if (text == "info") {
+                    return "#909399"
+                }
+                return text
+            }
+            val parseColor = ::gen_parseColor_fn
+            fun gen_normalizePosition_fn(value: String): String {
+                val text = value
+                if (text == "rightTop") {
+                    return "right"
+                }
+                if (text == "leftTop") {
+                    return "left"
+                }
+                if (text == "rightBottom") {
+                    return "bottomRight"
+                }
+                if (text == "leftBottom") {
+                    return "bottomLeft"
+                }
+                if (text == "left" || text == "right" || text == "bottomLeft" || text == "bottomRight" || text == "top" || text == "bottom") {
+                    return text
+                }
+                return "right"
+            }
+            val normalizePosition = ::gen_normalizePosition_fn
+            fun gen_getOffset_fn(index: Number): Number {
+                val offset = props.offset
+                if (offset == null || offset.length <= index) {
+                    return 0
+                }
+                val value = offset[index] as Any?
+                if (UTSAndroid.`typeof`(value) == "number") {
+                    return value as Number
+                }
+                if (UTSAndroid.`typeof`(value) == "string") {
+                    return parseFloat(value as String)
+                }
+                return 0
+            }
+            val getOffset = ::gen_getOffset_fn
+            fun gen_positionStyle_fn(): String {
+                val x = getOffset(0)
+                val y = getOffset(1)
+                val position = normalizePosition(props.position)
+                val edge: Number = 0
+                if (position == "left") {
+                    return "left:" + (edge + x) + "px;top:" + (edge + y) + "px;"
+                }
+                if (position == "bottomLeft") {
+                    return "left:" + (edge + x) + "px;bottom:" + (edge - y) + "px;"
+                }
+                if (position == "bottomRight") {
+                    return "right:" + (edge - x) + "px;bottom:" + (edge - y) + "px;"
+                }
+                if (position == "top") {
+                    return "left:50%;top:" + (edge + y) + "px;transform:translateX(-50%);margin-left:" + x + "px;"
+                }
+                if (position == "bottom") {
+                    return "left:50%;bottom:" + (edge - y) + "px;transform:translateX(-50%);margin-left:" + x + "px;"
+                }
+                return "right:" + (edge - x) + "px;top:" + (edge + y) + "px;"
+            }
+            val positionStyle = ::gen_positionStyle_fn
+            fun formatSize(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
             val bgColor = computed(fun(): String {
                 return props.bgColor
             }
@@ -68,7 +208,7 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
                 if (value > max) {
                     return max + "+"
                 }
-                return String(value)
+                return value.toString(10)
             }
             )
             val dot = computed(fun(): Boolean {
@@ -137,132 +277,6 @@ open class GenUniModulesIUiXComponentsIBadgeIBadge : VueComponent {
                 emit("click", _uO("label" to props.label, "count" to effectiveCount(), "value" to displayValue.value, "dot" to dot.value, "position" to props.position))
             }
             val handleClick = ::gen_handleClick_fn
-            fun gen_hasNumberValue_fn(): Boolean {
-                return String(props.value).length > 0 || props.count > 0 || props.showZero
-            }
-            val hasNumberValue = ::gen_hasNumberValue_fn
-            fun gen_effectiveCount_fn(): Number {
-                if (String(props.value).length > 0) {
-                    return Number(props.value)
-                }
-                return props.count
-            }
-            val effectiveCount = ::gen_effectiveCount_fn
-            fun gen_getMaxCount_fn(): Number {
-                if (props.maxCount != 99) {
-                    return props.maxCount
-                }
-                return props.max
-            }
-            val getMaxCount = ::gen_getMaxCount_fn
-            fun gen_effectiveBgColor_fn(): String {
-                if (bgColor.value.length > 0) {
-                    return bgColor.value
-                }
-                return props.type
-            }
-            val effectiveBgColor = ::gen_effectiveBgColor_fn
-            fun gen_effectiveFontColor_fn(): String {
-                if (props.color.length > 0) {
-                    return props.color
-                }
-                return props.fontColor
-            }
-            val effectiveFontColor = ::gen_effectiveFontColor_fn
-            fun gen_normalizeTheme_fn(value: String): String {
-                val text = String(value)
-                if (text == "danger") {
-                    return "error"
-                }
-                if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info") {
-                    return text
-                }
-                return "custom"
-            }
-            val normalizeTheme = ::gen_normalizeTheme_fn
-            fun gen_parseColor_fn(value: String): String {
-                val text = String(value)
-                if (text == "white") {
-                    return "#ffffff"
-                }
-                if (text == "black") {
-                    return "#000000"
-                }
-                if (text == "danger" || text == "error") {
-                    return "#f56c6c"
-                }
-                if (text == "primary") {
-                    return "#3c9cff"
-                }
-                if (text == "success") {
-                    return "#5ac725"
-                }
-                if (text == "warning") {
-                    return "#f9ae3d"
-                }
-                if (text == "info") {
-                    return "#909399"
-                }
-                return text
-            }
-            val parseColor = ::gen_parseColor_fn
-            fun gen_normalizePosition_fn(value: String): String {
-                val text = String(value)
-                if (text == "rightTop") {
-                    return "right"
-                }
-                if (text == "leftTop") {
-                    return "left"
-                }
-                if (text == "rightBottom") {
-                    return "bottomRight"
-                }
-                if (text == "leftBottom") {
-                    return "bottomLeft"
-                }
-                if (text == "left" || text == "right" || text == "bottomLeft" || text == "bottomRight" || text == "top" || text == "bottom") {
-                    return text
-                }
-                return "right"
-            }
-            val normalizePosition = ::gen_normalizePosition_fn
-            fun gen_positionStyle_fn(): String {
-                val x = getOffset(0)
-                val y = getOffset(1)
-                val position = normalizePosition(props.position)
-                val edge: Number = 0
-                if (position == "left") {
-                    return "left:" + (edge + x) + "px;top:" + (edge + y) + "px;"
-                }
-                if (position == "bottomLeft") {
-                    return "left:" + (edge + x) + "px;bottom:" + (edge - y) + "px;"
-                }
-                if (position == "bottomRight") {
-                    return "right:" + (edge - x) + "px;bottom:" + (edge - y) + "px;"
-                }
-                if (position == "top") {
-                    return "left:50%;top:" + (edge + y) + "px;transform:translateX(-50%);margin-left:" + x + "px;"
-                }
-                if (position == "bottom") {
-                    return "left:50%;bottom:" + (edge - y) + "px;transform:translateX(-50%);margin-left:" + x + "px;"
-                }
-                return "right:" + (edge - x) + "px;top:" + (edge + y) + "px;"
-            }
-            val positionStyle = ::gen_positionStyle_fn
-            fun gen_getOffset_fn(index: Number): Number {
-                if (props.offset.length <= index) {
-                    return 0
-                }
-                return Number(props.offset[index])
-            }
-            val getOffset = ::gen_getOffset_fn
-            fun formatSize(value: Any): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
             return fun(): Any? {
                 return _cE("view", _uM("class" to _nC(rootClass.value)), _uA(
                     renderSlot(_ctx.`$slots`, "default"),

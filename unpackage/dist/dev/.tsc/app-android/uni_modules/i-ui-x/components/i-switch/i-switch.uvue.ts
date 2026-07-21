@@ -116,10 +116,30 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function initialValue(): any {
+  if (props.modelValue.toString().length > 0) return props.modelValue
+  return props.value
+}
+
+function formatSize(value: any): string {
+  const text = value.toString()
+  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
+    return text
+  }
+  return text + 'px'
+}
+
+function numericSize(value: any, fallback: number): number {
+  const text = value.toString().replace('px', '').replace('rpx', '').replace('%', '')
+  const numberValue = parseFloat(text)
+  if (isNaN(numberValue)) return fallback
+  return numberValue
+}
+
 const current = ref(initialValue())
 
 const checked = computed(() => {
-  return String(current.value) == String(props.activeValue)
+  return current.value.toString() == props.activeValue.toString()
 })
 
 const switchClass = computed(() => {
@@ -176,23 +196,18 @@ const loadingStyle = computed(() => {
 })
 
 watch(
-  () => props.modelValue,
-  () => {
+  (): any => props.modelValue,
+  (): void => {
     current.value = initialValue()
   },
 )
 
 watch(
-  () => props.value,
-  () => {
+  (): any => props.value,
+  (): void => {
     current.value = initialValue()
   },
 )
-
-function initialValue() {
-  if (String(props.modelValue).length > 0) return props.modelValue
-  return props.value
-}
 
 function toggle() {
   if (props.disabled || props.loading) return
@@ -203,20 +218,6 @@ function toggle() {
   emit('update:value', nextValue)
 }
 
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
-}
-
-function numericSize(value, fallback) {
-  const text = String(value).replace('px', '').replace('rpx', '').replace('%', '')
-  const numberValue = Number(text)
-  if (isNaN(numberValue)) return fallback
-  return numberValue
-}
 
 return (): any | null => {
 

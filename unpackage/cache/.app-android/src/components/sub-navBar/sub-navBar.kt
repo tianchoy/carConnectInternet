@@ -21,8 +21,8 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
     open var currentTime: String by `$props`
     open var currentCar: String by `$props`
     open var carStatus: String by `$props`
-    open var times: UTSArray<UTSArray<PickerItem>> by `$props`
-    open var cars: UTSArray<UTSArray<PickerItem>> by `$props`
+    open var times: UTSArray<UTSArray<PickerItem__1>> by `$props`
+    open var cars: UTSArray<UTSArray<PickerItem__1>> by `$props`
     companion object {
         @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
         var setup: (__props: GenComponentsSubNavBarSubNavBar) -> Any? = fun(__props): Any? {
@@ -30,7 +30,7 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
             val _ctx = __ins.proxy as GenComponentsSubNavBarSubNavBar
             val _cache = __ins.renderCache
             val props = __props
-            val columns = ref(_uA<UTSArray<PickerItem>>())
+            val columns = ref(_uA<UTSArray<PickerItem__1>>())
             val picker = ref(null)
             val currentPickerType = ref("")
             val handleTime = fun(){

@@ -29,9 +29,9 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
     open var scrollIdPrefix: String by `$props`
     open var watchValidStatus: Boolean by `$props`
     open var modelValid: Boolean by `$props`
-    open var valid: (keys) -> Boolean
+    open var valid: (keys: UTSArray<String>) -> Boolean
         get() {
-            return unref(this.`$exposed`["valid"]) as (keys) -> Boolean
+            return unref(this.`$exposed`["valid"]) as (keys: UTSArray<String>) -> Boolean
         }
         set(value) {
             setRefValue(this.`$exposed`, "valid", value)
@@ -82,9 +82,9 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            val valid = ref(true)
-            val message = ref("")
-            val errors = ref(_uA())
+            val valid = ref<Boolean>(true)
+            val message = ref<String>("")
+            val errors = ref(_uA<UTSJSONObject>())
             val formClass = computed(fun(): String {
                 val classes = _uA(
                     "i-form"
@@ -107,40 +107,56 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
                 return "text-align:" + props.errorAlign + ";"
             }
             )
-            fun gen_activeFields_fn(): UTSArray<*> {
-                if (props.fields.length > 0) {
-                    return props.fields
+            fun gen_valueText_fn(value: Any): String {
+                if (UTSAndroid.`typeof`(value) == "string") {
+                    return value as String
                 }
-                return props.rules
+                if (UTSAndroid.`typeof`(value) == "number" || UTSAndroid.`typeof`(value) == "boolean") {
+                    return (value as Any).toString()
+                }
+                if (UTSArray.isArray(value)) {
+                    val list = value as UTSArray<Any>
+                    return list.join(",")
+                }
+                if (value != null && UTSAndroid.`typeof`(value) == "object") {
+                    return "[object Object]"
+                }
+                return ""
+            }
+            val valueText = ::gen_valueText_fn
+            fun gen_activeFields_fn(): UTSArray<UTSJSONObject> {
+                val fields = props.fields
+                if (fields != null && fields.length > 0) {
+                    return fields as UTSArray<UTSJSONObject>
+                }
+                val rules = props.rules
+                if (rules != null) {
+                    return rules as UTSArray<UTSJSONObject>
+                }
+                return _uA<UTSJSONObject>()
             }
             val activeFields = ::gen_activeFields_fn
-            fun gen_fieldValue_fn(item): Any {
-                if (item.value != null) {
-                    return item.value
+            fun gen_fieldValue_fn(item: UTSJSONObject): Any {
+                val configuredValue = item["value"]
+                if (configuredValue != null) {
+                    return configuredValue
                 }
-                val name = String(if (item.name == null) {
-                    ""
-                } else {
-                    item.name
-                }
-                )
+                val name = item.getString("name", "")
                 if (name.length == 0) {
                     return ""
                 }
-                val values = props.modelValue
-                if (values != null && UTSAndroid.`typeof`(values) == "object" && values[name] != null) {
-                    return values[name]
+                val values = props.modelValue as UTSJSONObject?
+                if (values != null) {
+                    val modelValue = values[name]
+                    if (modelValue != null) {
+                        return modelValue as Any
+                    }
                 }
                 return ""
             }
             val fieldValue = ::gen_fieldValue_fn
-            fun gen_fieldLabel_fn(item): String {
-                val label = String(if (item.label == null) {
-                    item.name
-                } else {
-                    item.label
-                }
-                )
+            fun gen_fieldLabel_fn(item: UTSJSONObject): String {
+                val label = item.getString("label", item.getString("name", ""))
                 return if (label.length > 0) {
                     label
                 } else {
@@ -148,53 +164,38 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
                 }
             }
             val fieldLabel = ::gen_fieldLabel_fn
-            fun gen_fieldRequired_fn(item): Boolean {
-                return item.required == true
+            fun gen_fieldRequired_fn(item: UTSJSONObject): Boolean {
+                return item.getBoolean("required", false)
             }
             val fieldRequired = ::gen_fieldRequired_fn
-            fun gen_fieldMessage_fn(item): String {
-                val customMessage = String(if (item.message == null) {
-                    ""
-                } else {
-                    item.message
-                }
-                )
+            fun gen_fieldMessage_fn(item: UTSJSONObject): String {
+                val customMessage = item.getString("message", "")
                 if (customMessage.length > 0) {
                     return customMessage
                 }
                 return fieldLabel(item) + "不能为空"
             }
             val fieldMessage = ::gen_fieldMessage_fn
-            fun gen_checkField_fn(item, selectedKeys): String {
-                val name = String(if (item.name == null) {
-                    ""
-                } else {
-                    item.name
-                }
-                )
+            fun gen_checkField_fn(item: UTSJSONObject, selectedKeys: UTSArray<String>): String {
+                val name = item.getString("name", "")
                 if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0) {
                     return ""
                 }
                 val value = fieldValue(item)
-                if (fieldRequired(item) && String(value).length == 0) {
+                if (fieldRequired(item) && valueText(value).length == 0) {
                     return fieldMessage(item)
                 }
                 return ""
             }
             val checkField = ::gen_checkField_fn
             fun gen_collectValues_fn(): UTSJSONObject {
-                val values: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("values", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 184, 9))
+                val values: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("values", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 200, 9))
                 val list = activeFields()
                 run {
                     var i: Number = 0
                     while(i < list.length){
-                        val item = list[i]
-                        val name = String(if (item.name == null) {
-                            ""
-                        } else {
-                            item.name
-                        }
-                        )
+                        val item = list[i] as UTSJSONObject
+                        val name = item.getString("name", "")
                         if (name.length > 0) {
                             values[name] = fieldValue(item)
                         }
@@ -204,32 +205,77 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
                 return values
             }
             val collectValues = ::gen_collectValues_fn
-            fun gen_validateFields_fn(selectedKeys, silent): Boolean {
+            fun numberValue(value: Any): Number {
+                if (UTSAndroid.`typeof`(value) == "number") {
+                    return value as Number
+                }
+                return UTSNumber.from(parseFloat(value as String))
+            }
+            fun gen_normalizeIdName_fn(name: String): String {
+                var result = ""
+                run {
+                    var i: Number = 0
+                    while(i < name.length){
+                        val char = name.charAt(i)
+                        val isNumber = char >= "0" && char <= "9"
+                        val isUpper = char >= "A" && char <= "Z"
+                        val isLower = char >= "a" && char <= "z"
+                        if (isNumber || isUpper || isLower || char == "-" || char == "_") {
+                            result = result + char
+                        } else {
+                            result = result + "-"
+                        }
+                        i++
+                    }
+                }
+                return result
+            }
+            val normalizeIdName = ::gen_normalizeIdName_fn
+            fun gen_scrollTargetId_fn(name: String): String {
+                return props.scrollIdPrefix + normalizeIdName(name)
+            }
+            val scrollTargetId = ::gen_scrollTargetId_fn
+            fun gen_scrollToFirstError_fn(nextErrors: UTSArray<UTSJSONObject>): Unit {
+                if (!props.errorAutoPage || nextErrors.length == 0) {
+                    return
+                }
+                val field = nextErrors[0].getString("field", "")
+                if (field.length == 0) {
+                    return
+                }
+                val targetId = scrollTargetId(field)
+                val selector = "#" + targetId
+                val offsetTop = numberValue(props.scrollOffsetTop)
+                val duration = numberValue(props.scrollDuration)
+                emit("scroll-to-error", _uO("field" to field, "targetId" to targetId, "selector" to selector, "offsetTop" to offsetTop, "duration" to duration))
+                nextTick(fun(){
+                    uni_pageScrollTo(PageScrollToOptions(selector = selector, offsetTop = offsetTop, duration = duration))
+                }
+                )
+            }
+            val scrollToFirstError = ::gen_scrollToFirstError_fn
+            fun gen_validateFields_fn(selectedKeys: UTSArray<String>, silent: Boolean): Boolean {
                 val list = activeFields()
-                val nextErrors = _uA()
+                val nextErrors = _uA<UTSJSONObject>()
                 run {
                     var i: Number = 0
                     while(i < list.length){
                         val item = list[i]
                         val errorMessage = checkField(item, selectedKeys)
                         if (errorMessage.length > 0) {
-                            nextErrors.push(_uO("field" to String(if (item.name == null) {
-                                ""
-                            } else {
-                                item.name
-                            }
-                            ), "message" to errorMessage))
+                            nextErrors.push(_uO("field" to item.getString("name", ""), "message" to errorMessage))
                         }
                         i++
                     }
                 }
                 errors.value = nextErrors
                 valid.value = nextErrors.length == 0
-                if (!isTruthy(silent)) {
-                    message.value = if (valid.value) {
-                        "校验通过"
+                if (!silent) {
+                    if (valid.value) {
+                        message.value = "校验通过"
                     } else {
-                        String(nextErrors[0].message)
+                        val firstError = nextErrors[0]
+                        message.value = firstError.getString("message", "")
                     }
                     emit("validate", _uO("valid" to valid.value, "message" to message.value, "errors" to nextErrors, "values" to collectValues()))
                     if (!valid.value) {
@@ -242,85 +288,37 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
             }
             val validateFields = ::gen_validateFields_fn
             fun gen_validate_fn(): Boolean {
-                return validateFields(_uA(), false)
+                return validateFields(_uA<String>(), false)
             }
             val validate = ::gen_validate_fn
-            fun gen_validFields_fn(keys): Boolean {
+            fun gen_validFields_fn(keys: UTSArray<String>): Boolean {
                 return validateFields(keys, false)
             }
             val validFields = ::gen_validFields_fn
             fun gen_checkAsyncVaildStatus_fn(): Boolean {
-                return validateFields(_uA(), true)
+                return validateFields(_uA<String>(), true)
             }
             val checkAsyncVaildStatus = ::gen_checkAsyncVaildStatus_fn
-            fun gen_clearValid_fn() {
+            fun gen_clearValid_fn(): Unit {
                 valid.value = true
                 message.value = ""
-                errors.value = _uA()
+                errors.value = _uA<UTSJSONObject>()
                 emit("update:modelValid", true)
                 emit("update:valid", true)
             }
             val clearValid = ::gen_clearValid_fn
-            fun gen_submit_fn() {
+            fun gen_submit_fn(): Unit {
                 val isValid = validate()
-                val result: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("result", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 246, 9), "valid" to isValid, "values" to collectValues(), "errors" to errors.value, "message" to message.value)
+                val result: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("result", "uni_modules/i-ui-x/components/i-form/i-form.uvue", 316, 9), "valid" to isValid, "values" to collectValues(), "errors" to errors.value, "message" to message.value)
                 emit("submit", result)
             }
             val submit = ::gen_submit_fn
-            fun gen_reset_fn() {
+            fun gen_reset_fn(): Unit {
                 clearValid()
                 emit("reset", _uO("values" to collectValues()))
             }
             val reset = ::gen_reset_fn
-            fun gen_scrollToFirstError_fn(nextErrors) {
-                if (!props.errorAutoPage || nextErrors.length == 0) {
-                    return
-                }
-                val field = String(if (nextErrors[0].field == null) {
-                    ""
-                } else {
-                    nextErrors[0].field
-                }
-                )
-                if (field.length == 0) {
-                    return
-                }
-                val targetId = scrollTargetId(field)
-                val selector = "#" + targetId
-                emit("scroll-to-error", _uO("field" to field, "targetId" to targetId, "selector" to selector, "offsetTop" to Number(props.scrollOffsetTop), "duration" to Number(props.scrollDuration)))
-                nextTick(fun(){
-                    uni_pageScrollTo(PageScrollToOptions(selector = selector, offsetTop = Number(props.scrollOffsetTop), duration = Number(props.scrollDuration)))
-                }
-                )
-            }
-            val scrollToFirstError = ::gen_scrollToFirstError_fn
-            fun gen_scrollTargetId_fn(name): String {
-                return props.scrollIdPrefix + normalizeIdName(name)
-            }
-            val scrollTargetId = ::gen_scrollTargetId_fn
-            fun gen_normalizeIdName_fn(name): String {
-                val text = String(name)
-                var result = ""
-                run {
-                    var i: Number = 0
-                    while(i < text.length){
-                        val code = text.charCodeAt(i)
-                        val char = text.charAt(i)
-                        val isNumber = code >= 48 && code <= 57
-                        val isUpper = code >= 65 && code <= 90
-                        val isLower = code >= 97 && code <= 122
-                        if (isNumber || isUpper || isLower || char == "-" || char == "_") {
-                            result = result + char
-                        } else {
-                            result = result + "-"
-                        }
-                        i++
-                    }
-                }
-                return result
-            }
-            val normalizeIdName = ::gen_normalizeIdName_fn
-            watch(fun(){
+            watch(fun(): Any {
                 return _uA(
                     props.fields,
                     props.rules,
@@ -328,9 +326,9 @@ open class GenUniModulesIUiXComponentsIFormIForm : VueComponent {
                     props.watchValidStatus
                 )
             }
-            , fun(){
+            , fun(): Unit {
                 if (props.watchValidStatus) {
-                    validateFields(_uA(), true)
+                    validateFields(_uA<String>(), true)
                 }
             }
             , WatchOptions(deep = true))

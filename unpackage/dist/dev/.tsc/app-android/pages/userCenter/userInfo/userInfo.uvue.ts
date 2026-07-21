@@ -23,10 +23,9 @@ const _cache = __ins.renderCache;
 	})
 
 	onLoad((options) => {
-		
-		if (options.userInfo) {
+		if (options.userInfo != null) {
 			try {
-				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo), " at pages/userCenter/userInfo/userInfo.uvue:70")), " at pages/userCenter/userInfo/userInfo.uvue:70") as UTSJSONObject
+				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/userInfo/userInfo.uvue:69") as string), " at pages/userCenter/userInfo/userInfo.uvue:69") as UTSJSONObject
 				const userId = parsedInfo.getString("userId")
 				const mobile = parsedInfo.getString("mobile")
 				const type = parsedInfo.getNumber("type")
@@ -37,9 +36,9 @@ const _cache = __ins.renderCache;
 					type: type != null ? type : 0,
 					createTime: createTime != null ? createTime : ""
 				}
-				console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:81")
+				console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:80")
 			} catch (e) {
-				console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:83")
+				console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:82")
 			}
 		}
 	})

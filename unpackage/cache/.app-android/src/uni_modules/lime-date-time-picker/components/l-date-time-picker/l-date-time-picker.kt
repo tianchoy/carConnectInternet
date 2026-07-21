@@ -83,23 +83,23 @@ open class GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePick
                     defaultDay
                 }
             }
-            val start = computed(fun(): Dayuts {
-                return normalize(props.start as DateValue?, dayuts().subtract(10, "year"))
+            val minDate = computed(fun(): Dayuts {
+                return normalize(props.start as DateValue?, dayuts().subtract(1, "year"))
             }
             )
-            val end = computed(fun(): Dayuts {
-                return normalize(props.end as DateValue?, dayuts().add(10, "year"))
+            val maxDate = computed(fun(): Dayuts {
+                return normalize(props.end as DateValue?, dayuts())
             }
             )
             val rationalize = fun(kVal: Dayuts): Dayuts {
                 if (isTimeMode) {
                     return kVal
                 }
-                if (kVal.isBefore(start.value)) {
-                    return start.value
+                if (kVal.isBefore(minDate.value)) {
+                    return minDate.value
                 }
-                if (kVal.isAfter(end.value)) {
-                    return end.value
+                if (kVal.isAfter(maxDate.value)) {
+                    return maxDate.value
                 }
                 return kVal
             }
@@ -128,13 +128,13 @@ open class GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePick
                         format += " HH:mm"
                         space = ":"
                     }
-                    val dateStr = dayuts(start.value).format(format)
+                    val dateStr = dayuts(minDate.value).format(format)
                     currentValue = "" + dateStr + space + currentValue as String
                 }
                 return if (currentValue != null && dayuts(currentValue).isValid()) {
                     rationalize(dayuts(currentValue))
                 } else {
-                    start.value
+                    maxDate.value
                 }
             }
             val curDate = ref(calcDate(innerValue.value))
@@ -164,14 +164,14 @@ open class GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePick
                 val curDay = _getDate[2]
                 val curHour = _getDate[3]
                 val curMinute = _getDate[4]
-                val _getDate__1 = getDate(start.value)
+                val _getDate__1 = getDate(minDate.value)
                 val minYear = _getDate__1[0]
                 val minMonth = _getDate__1[1]
                 val minDay = _getDate__1[2]
                 val minHour = _getDate__1[3]
                 val minMinute = _getDate__1[4]
                 val minSecond = _getDate__1[5]
-                val _getDate__2 = getDate(end.value)
+                val _getDate__2 = getDate(maxDate.value)
                 val maxYear = _getDate__2[0]
                 val maxMonth = _getDate__2[1]
                 val maxDay = _getDate__2[2]
@@ -313,7 +313,7 @@ open class GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePick
                 return format
             }
             )
-            val onConfirm = fun(ref__1: PickerConfirmEvent){
+            val onConfirm = fun(ref__1: PickerConfirmEvent__1){
                 var values = ref__1.values
                 var cur = curDate.value
                 values.forEach(fun(item, index){

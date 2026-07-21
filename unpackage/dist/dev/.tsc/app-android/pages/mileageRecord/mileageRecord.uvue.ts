@@ -8,7 +8,8 @@ import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
-	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 72, 7>; date : string; trips : any; totalDistance : number; }
+	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 72, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
+	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 73, 7>; date : string; trips : Array<UTSJSONObject>; }
 
 	
 const __sfc__ = defineComponent({
@@ -23,7 +24,7 @@ const _cache = __ins.renderCache;
 	const carType = ref('')
 	const totalMileage = ref(0)
 	const averageSpeed = ref(0)
-	const tripData = ref<Array<any>>([])
+	const tripData = ref<Array<UTSJSONObject>>([])
 
 	// 日期时间选择器相关
 	const showDateTimePicker = ref(false)
@@ -35,82 +36,94 @@ const _cache = __ins.renderCache;
 	const imei = ref<string | null>('')
 
 	// 计算属性：按日期分组的行程数据
-	const groupedTrips = computed(() => {
-		const groups = [] as GroupType[]
-		const tripsByDate = {__$originalPosition: new UTSSourceMapPosition("tripsByDate", "pages/mileageRecord/mileageRecord.uvue", 93, 9),}
-
-		// 按日期分组
-		tripData.value.forEach(trip => {
-			const startTimeStr = trip.startTime != null ? trip.startTime.toString() : ''
-			const endTimeStr = trip.endTime != null ? trip.endTime.toString() : ''
-			const startTimeParts = startTimeStr.split(' ')
-			const endTimeParts = endTimeStr.split(' ')
-			const date = startTimeParts.length > 0 && startTimeParts[0].length > 0
-				? startTimeParts[0]
-				: '未知日期'
-			if (!tripsByDate[date]) {
-				tripsByDate[date] = []
+	const groupedTrips = computed<Array<GroupType>>(() : Array<GroupType> => {
+		const dateGroups : Array<DateTripGroup> = []
+		tripData.value.forEach((trip : UTSJSONObject) : void => {
+			const startTimeStr = trip.getString('startTime', '')
+			const endTimeStr = trip.getString('endTime', '')
+			const startParts = startTimeStr.split(' ')
+			const endParts = endTimeStr.split(' ')
+			const date = startParts.length > 0 && startParts[0] != '' ? startParts[0] : '未知日期'
+			trip.set('startHour', startParts.length > 1 ? startParts[1] : '')
+			trip.set('endHour', endParts.length > 1 ? endParts[1] : '')
+			let group = dateGroups.find((item : DateTripGroup) : boolean => item.date == date)
+			if (group == null) {
+				group = { date: date, trips: [] as Array<UTSJSONObject> }
+				dateGroups.push(group)
 			}
-
-			// 为每个行程添加格式化后的时间
-			const startHour = startTimeParts.length > 1 ? startTimeParts[1] : ''
-			const endHour = endTimeParts.length > 1 ? endTimeParts[1] : ''
-
-			tripsByDate[date].push({
-				...trip,
-				startHour,
-				endHour
-			})
+			group.trips.push(trip)
 		})
 
-		// 转换为数组并计算每组的统计信息
-		for (const date in tripsByDate) {
-			const trips = tripsByDate[date]
+		const groups : Array<GroupType> = []
+		dateGroups.forEach((dateGroup : DateTripGroup) : void => {
+			dateGroup.trips.sort((a : UTSJSONObject, b : UTSJSONObject) : number => {
+				return new Date(b.getString('startTime', '')).getTime() - new Date(a.getString('startTime', '')).getTime()
+			})
 			let totalDistance = 0
-
-			// 对每个日期组内的行程按开始时间倒序排列
-			const sortedTrips = trips.sort((a, b) => {
-				return new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+			dateGroup.trips.forEach((trip : UTSJSONObject) : void => {
+				totalDistance += trip.getNumber('distance', 0)
 			})
-
-			sortedTrips.forEach(trip => {
-				totalDistance += trip.distance || 0
-			})
-
-			groups.push({
-				date,
-				trips: sortedTrips, // 使用排序后的行程数组
-				totalDistance
-			})
-		}
-
-		// 按日期倒序排列
-		return groups.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+			groups.push({ date: dateGroup.date, trips: dateGroup.trips, totalDistance: totalDistance })
+		})
+		return groups.sort((a : GroupType, b : GroupType) : number => new Date(b.date).getTime() - new Date(a.date).getTime())
 	})
+
+	const getTripStartTime = (trip : UTSJSONObject) : string => trip.getString('startTime', '')
+	const getTripEndTime = (trip : UTSJSONObject) : string => trip.getString('endTime', '')
+	const getTripHourRange = (trip : UTSJSONObject) : string => {
+		return trip.getString('startHour', '') + '-' + trip.getString('endHour', '')
+	}
+	const getTripDistanceText = (trip : UTSJSONObject) : string => {
+		return (trip.getNumber('distance', 0) / 1000).toFixed(2)
+	}
+	const getTripDuration = (trip : UTSJSONObject) : number => trip.getNumber('duration', 0)
 
 	// 计算属性：总行程数
 	const totalTrips = computed(() => {
 		return tripData.value.length
 	})
 
-	// 初始化加载
-	onMounted(() => {
-		initDateTime()
-		loadMileageData()
-	})
+	// 初始化时间
+	const initDateTime = () => {
+		const now = new Date()
+		const formatTime = (date : Date) : string => {
+			const month = (date.getMonth() + 1).toString().padStart(2, '0')
+			const day = date.getDate().toString().padStart(2, '0')
+			const hours = date.getHours().toString().padStart(2, '0')
+			const minutes = date.getMinutes().toString().padStart(2, '0')
+			const seconds = date.getSeconds().toString().padStart(2, '0')
+			return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`
+		}
 
-	onLoad((option) => {
-		imei.value = option.imei
-		carStatus.value = option.connectionStatus
-		plateNo.value = option.plateNo
-		carType.value = option.carType
-	})
-
-	const gotoTripDetail = (startTime : string, endTime : string) => {
-		uni.navigateTo({
-			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value + '&connectionStatus=' + carStatus.value + '&plateNo=' + plateNo.value + '&carType=' + carType.value
-		})
+		endTime.value = formatTime(now)
+		// 开始时间默认为当前时间前1天
+		const startDate = new Date(now.getTime() - 3600000 * 24)
+		startTime.value = formatTime(startDate)
 	}
+
+
+	// 处理行程数据
+	const processTripData = (data : UTSJSONObject) : void => {
+		const trips = data.getArray<UTSJSONObject>('trips')
+		if (trips != null && trips.length > 0) {
+			tripData.value = trips
+
+			let totalDistance = 0
+			let totalAvgSpeed = 0
+			trips.forEach((trip : UTSJSONObject) : void => {
+				totalDistance += trip.getNumber('distance', 0)
+				totalAvgSpeed += trip.getNumber('averageSpeed', 0)
+			})
+
+			totalMileage.value = totalDistance
+			averageSpeed.value = totalAvgSpeed / trips.length
+		} else {
+			tripData.value = []
+			totalMileage.value = 0
+			averageSpeed.value = 0
+		}
+	}
+
 
 	const loadMileageData = async () => {
 		uni.showLoading({
@@ -118,7 +131,7 @@ const _cache = __ins.renderCache;
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 174, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 187, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -127,13 +140,14 @@ const _cache = __ins.renderCache;
 				withPos: false,
 				withTrip: true,
 			};
-			const res = await getTrackPos(data);
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:184");
-			if (res && res.data) {
-				await processTripData(res.data); // 等待地址获取完成
+			const res = await getTrackPos(data) as UTSJSONObject;
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:197");
+			const trackData = res.getJSON('data')
+			if (trackData != null) {
+				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:189");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:203");
 			uni.showToast({
 				title: '数据加载失败',
 				icon: 'none',
@@ -143,42 +157,27 @@ const _cache = __ins.renderCache;
 		}
 	};
 
-	// 处理行程数据
-	const processTripData = async (data : any) => {
-		if (data.trips && data.trips.length > 0) {
-			// 遍历所有行程，获取地址
-			const processedTrips = await Promise.all(
-				data.trips.map(async (trip : any) => {
 
-					return {
-						...trip,
-						startAddress: '查看位置',
-						endAddress: '查看位置',
-					};
-				})
-			);
 
-			tripData.value = processedTrips;
+	// 初始化加载
+	onMounted(() => {
+		initDateTime()
+		loadMileageData()
+	})
 
-			// 计算总里程和平均速度
-			let totalDistance = 0;
-			let totalDuration = 0;
-			let totalAvgSpeed = 0;
+	onLoad((option) => {
+		imei.value = option.imei ?? null
+		carStatus.value = option.connectionStatus ?? '在线'
+		plateNo.value = option.plateNo ?? ''
+		carType.value = option.carType ?? ''
+	})
 
-			processedTrips.forEach((trip : any) => {
-				totalDistance += trip.distance || 0;
-				totalDuration += trip.duration || 0;
-				totalAvgSpeed += trip.averageSpeed || 0;
-			});
+	const gotoTripDetail = (startTime : string, endTime : string) => {
+		uni.navigateTo({
+			url: '/pages/playBack/playBack?startTime=' + startTime + '&endTime=' + endTime + '&imei=' + imei.value + '&connectionStatus=' + carStatus.value + '&plateNo=' + plateNo.value + '&carType=' + carType.value
+		})
+	}
 
-			totalMileage.value = totalDistance;
-			averageSpeed.value = processedTrips.length > 0 ? totalAvgSpeed / processedTrips.length : 0;
-		} else {
-			tripData.value = [];
-			totalMileage.value = 0;
-			averageSpeed.value = 0;
-		}
-	};
 
 	// 格式化显示时间 (只显示日期)
 	const formatDisplayTime = (timeString : string) : string => {
@@ -207,18 +206,6 @@ const _cache = __ins.renderCache;
 		}
 	}
 
-	// 初始化时间
-	const initDateTime = () => {
-		const now = new Date()
-		const formatTime = (date : Date) : string => {
-			return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
-		}
-
-		endTime.value = formatTime(now)
-		// 开始时间默认为当前时间前1天
-		const startDate = new Date(now.getTime() - 3600000 * 24)
-		startTime.value = formatTime(startDate)
-	}
 
 	// 显示日期时间选择器
 	const showPicker = (type : string) => {
@@ -359,14 +346,14 @@ const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
                   return _cE("view", _uM({
                     key: index,
                     class: "trip-item",
-                    onClick: () => {gotoTripDetail(item.startTime, item.endTime)}
+                    onClick: () => {gotoTripDetail(getTripStartTime(item), getTripEndTime(item))}
                   }), [
                     _cE("view", _uM({ class: "trip-index" }), [
                       _cE("text", _uM({ class: "icon" }), _tD(index + 1), 1 /* TEXT */),
                       _cE("view", _uM({ class: "trip-distance-time" }), [
-                        _cE("text", null, _tD(item.startHour) + "-" + _tD(item.endHour), 1 /* TEXT */),
-                        _cE("text", null, _tD((item.distance /1000).toFixed(2)) + " km", 1 /* TEXT */),
-                        _cE("text", null, _tD(formatDuration(item.duration)), 1 /* TEXT */)
+                        _cE("text", null, _tD(getTripHourRange(item)), 1 /* TEXT */),
+                        _cE("text", null, _tD(getTripDistanceText(item)) + " km", 1 /* TEXT */),
+                        _cE("text", null, _tD(formatDuration(getTripDuration(item))), 1 /* TEXT */)
                       ])
                     ])
                   ], 8 /* PROPS */, ["onClick"])

@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 
 const __sfc__ = defineComponent({
@@ -6,11 +6,11 @@ const __sfc__ = defineComponent({
 name: 'i-input',
   props: {
   modelValue: {
-    type: [String, Number],
+    type: String,
     default: '',
   },
   value: {
-    type: [String, Number],
+    type: String,
     default: '',
   },
   type: {
@@ -18,7 +18,7 @@ name: 'i-input',
     default: 'text',
   },
   height: {
-    type: [String, Number],
+    type: String,
     default: '40px',
   },
   disabled: {
@@ -42,7 +42,7 @@ name: 'i-input',
     default: true,
   },
   maxlength: {
-    type: [String, Number],
+    type: Number,
     default: -1,
   },
   placeholder: {
@@ -74,19 +74,19 @@ name: 'i-input',
     default: false,
   },
   cursor: {
-    type: [String, Number],
+    type: Number,
     default: -1,
   },
   cursorSpacing: {
-    type: [String, Number],
+    type: Number,
     default: 30,
   },
   selectionStart: {
-    type: [String, Number],
+    type: Number,
     default: -1,
   },
   selectionEnd: {
-    type: [String, Number],
+    type: Number,
     default: -1,
   },
   adjustPosition: {
@@ -98,7 +98,7 @@ name: 'i-input',
     default: 'left',
   },
   fontSize: {
-    type: [String, Number],
+    type: String,
     default: '15px',
   },
   color: {
@@ -208,6 +208,18 @@ function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
 __ins.emit(event, ...do_not_transform_spread)
 }
 
+function initialValue(): string {
+  const modelValue = props.modelValue as string
+  if (modelValue.length > 0) return modelValue
+  return props.value as string
+}
+
+function formatSize(value: string): string {
+  if (value.indexOf('px') >= 0 || value.indexOf('rpx') >= 0 || value.indexOf('%') >= 0) {
+    return value
+  }
+  return value + 'px'
+}
 
 const inputBgColor = computed(() => {
   return props.bgColor
@@ -267,27 +279,15 @@ const placeholderStyleText = computed(() => {
   return 'color:#c0c4cc;'
 })
 
-watch(
-  () => props.modelValue,
-  () => {
-    current.value = initialValue()
-  },
-)
-
-watch(
-  () => props.value,
-  () => {
-    current.value = initialValue()
-  },
-)
-
-function initialValue() {
-  if (String(props.modelValue).length > 0) return String(props.modelValue)
-  return String(props.value)
+function emitValue(value: string) {
+  emit('update:modelValue', value)
+  emit('update:value', value)
+  emit('input', value)
+  emit('change', value)
 }
 
-function handleInput(event) {
-  const nextValue = String(event.detail.value)
+function handleInput(event: UniInputEvent) {
+  const nextValue = event.detail.value
   if (props.readonly) {
     current.value = initialValue()
     return
@@ -296,28 +296,21 @@ function handleInput(event) {
   emitValue(nextValue)
 }
 
-function emitValue(value) {
-  emit('update:modelValue', value)
-  emit('update:value', value)
-  emit('input', value)
-  emit('change', value)
-}
-
-function handleFocus(event) {
+function handleFocus(event: UniInputFocusEvent) {
   focused.value = true
   emit('focus', event)
 }
 
-function handleBlur(event) {
+function handleBlur(event: UniInputBlurEvent) {
   focused.value = false
   emit('blur', event)
 }
 
-function handleConfirm(event) {
+function handleConfirm(event: UniInputConfirmEvent) {
   emit('confirm', event.detail.value)
 }
 
-function handleKeyboardHeightChange(event) {
+function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent) {
   emit('keyboardheightchange', event)
 }
 
@@ -329,14 +322,6 @@ function clear() {
 
 function togglePassword() {
   passwordVisible.value = !passwordVisible.value
-}
-
-function formatSize(value) {
-  const text = String(value)
-  if (text.indexOf('px') >= 0 || text.indexOf('rpx') >= 0 || text.indexOf('%') >= 0) {
-    return text
-  }
-  return text + 'px'
 }
 
 __expose({
@@ -370,15 +355,15 @@ return (): any | null => {
       "placeholder-style": placeholderStyleText.value,
       password: passwordVisible.value,
       disabled: _ctx.disabled,
-      maxlength: Number(_ctx.maxlength),
+      maxlength: _ctx.maxlength,
       "confirm-type": _ctx.confirmType,
       "confirm-hold": _ctx.confirmHold,
       inputmode: _ctx.inputmode,
       focus: _ctx.focus,
-      cursor: Number(_ctx.cursor),
-      "cursor-spacing": Number(_ctx.cursorSpacing),
-      "selection-start": Number(_ctx.selectionStart),
-      "selection-end": Number(_ctx.selectionEnd),
+      cursor: _ctx.cursor,
+      "cursor-spacing": _ctx.cursorSpacing,
+      "selection-start": _ctx.selectionStart,
+      "selection-end": _ctx.selectionEnd,
       "adjust-position": _ctx.adjustPosition,
       onInput: handleInput,
       onFocus: handleFocus,

@@ -52,7 +52,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             )
             val closeClicking = ref(false)
             val contentText = computed(fun(): String {
-                return String(props.text)
+                return props.text.toString()
             }
             )
             val normalizedType = computed(fun(): String {
@@ -117,10 +117,10 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             }
             )
             val computedIconSize = computed(fun(): Any {
-                if (String(props.iconSize).length > 0) {
+                if (props.iconSize.toString().length > 0) {
                     return props.iconSize
                 }
-                if (String(props.fontSize).length > 0) {
+                if (props.fontSize.toString().length > 0) {
                     return props.fontSize
                 }
                 if (props.size == "xs" || props.size == "mini") {
@@ -140,6 +140,36 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                     return "x"
                 }
                 return props.closeIcon
+            }
+            )
+            val normalizedSize = computed(fun(): String {
+                if (props.size == "xs" || props.size == "mini") {
+                    return "xs"
+                }
+                if (props.size == "s" || props.size == "small") {
+                    return "small"
+                }
+                if (props.size == "m" || props.size == "normal" || props.size == "n") {
+                    return "normal"
+                }
+                if (props.size == "g" || props.size == "large") {
+                    return "large"
+                }
+                return props.size
+            }
+            )
+            val isCustomRound = computed(fun(): Boolean {
+                if (UTSAndroid.`typeof`(props.round) == "boolean") {
+                    return false
+                }
+                return (props.round as Any).toString().length > 0
+            }
+            )
+            val isRound = computed(fun(): Boolean {
+                if (UTSAndroid.`typeof`(props.round) == "boolean") {
+                    return props.round as Boolean
+                }
+                return (props.round as Any).toString().length > 0
             }
             )
             val tagClass = computed(fun(): String {
@@ -182,12 +212,33 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 return classes.join(" ")
             }
             )
+            fun gen_formatSize_fn(value: Any): String {
+                val text = value.toString()
+                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
+                    return text
+                }
+                return text + "px"
+            }
+            val formatSize = ::gen_formatSize_fn
+            val shadowStyle = computed(fun(): String {
+                val value = props.shadow
+                val text = value.toString()
+                if (text.length == 0 || text == "none") {
+                    return ""
+                }
+                if (UTSArray.isArray(value) && (value as UTSArray<*>).length >= 4) {
+                    val shadowValues = value as UTSArray<Any>
+                    return ("box-shadow:" + formatSize(shadowValues[0]) + " " + formatSize(shadowValues[1]) + " " + formatSize(shadowValues[2]) + " " + shadowValues[3].toString() + ";")
+                }
+                return "box-shadow:0 " + formatSize(value) + " " + formatSize(parseFloat(value.toString()) * 2) + " rgba(0,0,0,0.12);"
+            }
+            )
             val tagStyle = computed(fun(): String {
                 var style = ""
-                if (String(props.width).length > 0) {
+                if (props.width.toString().length > 0) {
                     style = style + "width:" + formatSize(props.width) + ";"
                 }
-                if (String(props.height).length > 0) {
+                if (props.height.toString().length > 0) {
                     style = style + "height:" + formatSize(props.height) + ";"
                 }
                 if (props.borderWidth != 1) {
@@ -197,7 +248,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                     style = style + "border-radius:" + formatSize(props.round) + ";"
                 }
                 if (props.linear.length >= 3) {
-                    style = style + "background:linear-gradient(" + String(props.linear[0]) + "," + String(props.linear[1]) + "," + String(props.linear[2]) + ");border-color:transparent;"
+                    style = style + "background:linear-gradient(" + props.linear[0].toString() + "," + props.linear[1].toString() + "," + props.linear[2].toString() + ");border-color:transparent;"
                 } else if (bgColor.value.length > 0) {
                     style = style + "background-color:" + bgColor.value + ";"
                     if (normalizedSkin.value == "normal" && props.borderColor.length == 0) {
@@ -218,7 +269,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             )
             val textStyle = computed(fun(): String {
                 var style = "color:" + computedTextColor.value + ";"
-                if (String(props.fontSize).length > 0) {
+                if (props.fontSize.toString().length > 0) {
                     style = style + "font-size:" + formatSize(props.fontSize) + ";"
                 }
                 return style
@@ -226,48 +277,6 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
             )
             val closeStyle = computed(fun(): String {
                 return "color:" + computedTextColor.value + ";"
-            }
-            )
-            val normalizedSize = computed(fun(): String {
-                if (props.size == "xs" || props.size == "mini") {
-                    return "xs"
-                }
-                if (props.size == "s" || props.size == "small") {
-                    return "small"
-                }
-                if (props.size == "m" || props.size == "normal" || props.size == "n") {
-                    return "normal"
-                }
-                if (props.size == "g" || props.size == "large") {
-                    return "large"
-                }
-                return props.size
-            }
-            )
-            val isCustomRound = computed(fun(): Boolean {
-                if (UTSAndroid.`typeof`(props.round) == "boolean") {
-                    return false
-                }
-                return String(props.round).length > 0
-            }
-            )
-            val isRound = computed(fun(): Boolean {
-                if (UTSAndroid.`typeof`(props.round) == "boolean") {
-                    return props.round as Boolean
-                }
-                return String(props.round).length > 0
-            }
-            )
-            val shadowStyle = computed(fun(): String {
-                val value = props.shadow
-                val text = String(value)
-                if (text.length == 0 || text == "none") {
-                    return ""
-                }
-                if (UTSArray.isArray(value) && (value as UTSArray<*>).length >= 4) {
-                    return ("box-shadow:" + formatSize((value as UTSArray<*>)[0]) + " " + formatSize((value as UTSArray<*>)[1]) + " " + formatSize((value as UTSArray<*>)[2]) + " " + String((value as UTSArray<*>)[3]) + ";")
-                }
-                return "box-shadow:0 " + formatSize(value) + " " + formatSize(Number(value) * 2) + " rgba(0,0,0,0.12);"
             }
             )
             fun gen_handleClick_fn() {
@@ -293,14 +302,6 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 , 0)
             }
             val handleClose = ::gen_handleClose_fn
-            fun gen_formatSize_fn(value): String {
-                val text = String(value)
-                if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("rem") >= 0 || text.indexOf("%") >= 0) {
-                    return text
-                }
-                return text + "px"
-            }
-            val formatSize = ::gen_formatSize_fn
             return fun(): Any? {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 return _cE("view", _uM("class" to _nC(tagClass.value), "style" to _nS(tagStyle.value), "onClick" to withModifiers(handleClick, _uA(

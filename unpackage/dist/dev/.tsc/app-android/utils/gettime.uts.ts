@@ -2,7 +2,12 @@
  * 获取 当前时间戳 + 今日0点整时间戳
  * @returns { nowTime: 当前时间戳(ms), todayZero: 今日0点时间戳(ms) }
  */
-export function getTodayZeroTime() {
+export type TodayTimeRange = {
+  nowTime: number
+  todayZero: number
+}
+
+export function getTodayZeroTime(): TodayTimeRange {
   const now = new Date();
   // 当前时间戳 毫秒
   const nowTime = now.getTime();

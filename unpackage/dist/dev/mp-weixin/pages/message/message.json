@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "消息",
+  "usingComponents": {
+    "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
+    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal"
+  }
+}

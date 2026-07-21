@@ -75,8 +75,6 @@ const editPassword_uvue_vue_type_style_index_0_lang = {};
 
 const carList_uvue_vue_type_style_index_0_lang = {};
 
-const carNumberInput_vue_vue_type_style_index_0_lang = {};
-
 const carDetail_uvue_vue_type_style_index_0_lang = {};
 
 const iRadio_uvue_vue_type_style_index_0_lang = {};

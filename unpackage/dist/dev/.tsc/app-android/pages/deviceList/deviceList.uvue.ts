@@ -1,4 +1,5 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue'
 import { ref, computed, watch } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
@@ -93,19 +94,24 @@ const _cache = __ins.renderCache;
 		}
 		markers.value = nextMarkers
 	}
+	watchEffect(() => {
+		if (showMap.value) {
+			updateMarkers(filteredDevices.value)
+		}
+	})
 
 	const loadUserDeviceList = async (data: Array<UTSJSONObject>, from: boolean): Promise<void> => {
 		try {
 			let deviceList: Array<UTSJSONObject> = data
 			if (from) {
-				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 113, 11),  pageSize: 1000 } as UTSJSONObject
+				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 118, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
 				deviceList = res.data.list
 			}
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:120")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:125")
 			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
@@ -132,25 +138,25 @@ const _cache = __ins.renderCache;
 		uni.getLocation({
 			type: 'wgs84',
 			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:147")
+				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:152")
 				userLocation.value.latitude = res.latitude
 				userLocation.value.longitude = res.longitude
 			},
 			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:152")
+				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:157")
 			}
 		})
 	}
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:158")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:163")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:162")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:167")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:165")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:170")
 			}
 		})
 	}
@@ -166,7 +172,7 @@ const _cache = __ins.renderCache;
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:181")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:186")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
@@ -191,6 +197,7 @@ return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_map = resolveComponent("map")
+const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
 const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_indexListMode)
 
   return _cE("view", _uM({ class: "container" }), [
@@ -225,18 +232,21 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
                 key: 0,
                 class: "right-bar"
               }), [
-                _cE("view", _uM({
-                  class: "allCar",
-                  onClick: () => {changeState('全部状态')}
-                }), "全部 " + _tD(totalCount.value), 9 /* TEXT, PROPS */, ["onClick"]),
-                _cE("view", _uM({
-                  class: "onlineCar status-spacing",
-                  onClick: () => {changeState('在线')}
-                }), "在线 " + _tD(onlineCount.value), 9 /* TEXT, PROPS */, ["onClick"]),
-                _cE("view", _uM({
-                  class: "offlineCar status-spacing",
-                  onClick: () => {changeState('离线')}
-                }), "离线 " + _tD(offlineCount.value), 9 /* TEXT, PROPS */, ["onClick"])
+                _cV(_component_i_tag, _uM({
+                  type: "primary",
+                  onClick: () => {changeState('在线')},
+                  text: `在线 ${onlineCount.value}`
+                }), null, 8 /* PROPS */, ["onClick", "text"]),
+                _cV(_component_i_tag, _uM({
+                  type: "success",
+                  onClick: () => {changeState('在线')},
+                  text: `在线 ${onlineCount.value}`
+                }), null, 8 /* PROPS */, ["onClick", "text"]),
+                _cV(_component_i_tag, _uM({
+                  type: "danger",
+                  onClick: () => {changeState('离线')},
+                  text: `离线 ${offlineCount.value}`
+                }), null, 8 /* PROPS */, ["onClick", "text"])
               ])
             : _cC("v-if", true)
         ])
@@ -252,4 +262,4 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
 
 })
 export default __sfc__
-const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]
+const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]

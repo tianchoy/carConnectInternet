@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.openCustomerServiceChat as uni_openCustomerServiceChat
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesUserCenterUserCenter : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -35,6 +34,17 @@ open class GenPagesUserCenterUserCenter : BasePage {
             val windowHeight = ref(0)
             val buttonWidth: Number = 120
             val buttonHeight: Number = 200
+            val loadData = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        var params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 7))
+                        val res = await(getUserInfo())
+                        userInfo.value = res.data
+                        val resCars = await(getUserDeviceList(params))
+                        if (resCars?.data?.totalCount != 0) {
+                            carsnumber.value = resCars.data.totalCount
+                        }
+                })
+            }
             onShow(fun(){
                 val systemInfo = uni_getSystemInfoSync()
                 windowWidth.value = systemInfo.windowWidth
@@ -51,26 +61,20 @@ open class GenPagesUserCenterUserCenter : BasePage {
             }
             )
             val contactCustomerService = fun(){
-                uni_openCustomerServiceChat(OpenCustomerServiceChatOptions(extInfo = _uO("url" to "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a"), corpId = "ww686122ec6a4db85a", success = fun(res) {
-                    console.log(res, " at pages/userCenter/userCenter.uvue:98")
+                uni_showToast(ShowToastOptions(title = "请在微信小程序中联系人工客服", icon = "none"))
+            }
+            val onMoveChange = fun(e: UTSJSONObject){
+                val detail = e.getJSON("detail")
+                val x = if (detail != null) {
+                    detail.getNumber("x", 0)
+                } else {
+                    0
                 }
-                ))
-            }
-            val loadData = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        var params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 105, 7))
-                        val res = await(getUserInfo())
-                        userInfo.value = res.data
-                        val resCars = await(getUserDeviceList(params))
-                        if (isTruthy(resCars?.data?.totalCount)) {
-                            carsnumber.value = resCars.data.totalCount
-                        }
-                })
-            }
-            val onMoveChange = fun(e){
-                val _e_detail = e.detail
-                val x = _e_detail.x
-                val y = _e_detail.y
+                val y = if (detail != null) {
+                    detail.getNumber("y", 0)
+                } else {
+                    0
+                }
                 val maxX = windowWidth.value - buttonWidth
                 val maxY = windowHeight.value - buttonHeight
                 if (x < 0 || x > maxX || y < 0 || y > maxY) {
@@ -80,7 +84,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
             }
             val userInfoDetail = fun(){
                 if (Login.value) {
-                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:132")))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:144")))
                 } else {
                     uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
                 }
