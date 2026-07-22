@@ -70,12 +70,14 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  font-size: 10000px;
   white-space: nowrap;
-  font-size: 10px;
 }
 .container .content .documents .doc-info-box .doc-link.data-v-27a30816 {
   color: #007AFF;
+  font-size: 10px;
+}
+.container .content .documents .doc-info-box .doc-text.data-v-27a30816 {
+  font-size: 10px;
 }
 .container .content .remember-password.data-v-27a30816 {
   display: flex;

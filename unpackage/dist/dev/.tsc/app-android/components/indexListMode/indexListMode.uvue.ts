@@ -1,17 +1,7 @@
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import { getCustomList } from '../../api/request.uts'
-	interface DeviceItem {
-		plateNo : string
-		imei : string,
-		status: number,
-		companyId:string,
-		deviceName : string,
-		deviceId : string,
-		iccid:string,
-		simMerchant:string,
-		connectionStatus:string
-	}
+	import { DeviceItem } from '../../utils/device.uts'
 	
 const __sfc__ = defineComponent({
   __name: 'indexListMode',
@@ -40,7 +30,7 @@ __ins.emit(event, ...do_not_transform_spread)
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
 		
-		console.log(iccid, " at components/indexListMode/indexListMode.uvue:59")
+		console.log(iccid, " at components/indexListMode/indexListMode.uvue:51")
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		
@@ -120,7 +110,7 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
             }), [
               _cE("view", _uM({ class: "title" }), [
                 _cE("view", _uM({ class: "car-number" }), [
-                  _tD(item.deviceName) + " ",
+                  _tD(item.deviceName || item.imei) + " ",
                   _cV(_component_i_tag, _uM({
                     class: "car-status-spacing",
                     size: "mini",
@@ -130,11 +120,6 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
                   }), null, 8 /* PROPS */, ["text", "type"])
                 ]),
                 _cE("view", _uM({ class: "device-tools" }), [
-                  _cV(_component_i_tag, _uM({
-                    text: "充值",
-                    type: "success",
-                    onClick: withModifiers(() => {pay(item.iccid,item.simMerchant)}, ["stop"])
-                  }), null, 8 /* PROPS */, ["onClick"]),
                   _cV(_component_i_tag, _uM({
                     class: "device-tool-spacing",
                     text: "解绑",

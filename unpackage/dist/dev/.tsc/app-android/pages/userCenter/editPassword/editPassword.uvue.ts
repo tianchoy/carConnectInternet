@@ -42,25 +42,11 @@ const _cache = __ins.renderCache;
 		}
 	};
 
-	const rules = {__$originalPosition: new UTSSourceMapPosition("rules", "pages/userCenter/editPassword/editPassword.uvue", 61, 8),
-		password: [
-			{ required: true, message: '请输入原密码', trigger: 'blur' },
-			{ min: 6, max: 20, message: '密码长度在6到20个字符', trigger: 'blur' }
-		],
-		newPassword: [
-			{ required: true, message: '请输入新密码', trigger: 'blur' },
-			{ min: 6, max: 20, message: '密码长度在6到20个字符', trigger: 'blur' },
-			{
-				pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,20}$/,
-				message: '密码需包含大小写字母和数字',
-				trigger: 'blur'
-			}
-		],
-		confirmPassword: [
-			{ required: true, message: '请确认新密码', trigger: 'blur' },
-			{ validator: validateConfirmPassword, trigger: 'blur' }
-		]
-	};
+	const rules = [
+		{ name: 'password', required: true, message: '请输入原密码' } as UTSJSONObject,
+		{ name: 'newPassword', required: true, message: '请输入新密码' } as UTSJSONObject,
+		{ name: 'confirmPassword', required: true, message: '请确认新密码' } as UTSJSONObject
+	] as Array<UTSJSONObject>
 
 	// 提交表单
 	const handleSubmit = async () => {
@@ -71,7 +57,7 @@ const _cache = __ins.renderCache;
 			}
 			uni.showLoading({ title: '提交中...', mask: true });
 
-			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 90, 10),
+			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 76, 10),
 				password: formData.value.password,
 				newPassword: formData.value.newPassword
 			}
@@ -112,17 +98,17 @@ const _cache = __ins.renderCache;
 	onLoad((options) => {
 		if (options.userInfo != null) {
 			try {
-				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/editPassword/editPassword.uvue:131") as string), " at pages/userCenter/editPassword/editPassword.uvue:131") as UTSJSONObject
-				console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:132")
+				const parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options.userInfo as string), " at pages/userCenter/editPassword/editPassword.uvue:117") as string), " at pages/userCenter/editPassword/editPassword.uvue:117") as UTSJSONObject
+				console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:118")
 				const userId = parsedInfo.getString("userId")
 				const mobile = parsedInfo.getString("mobile")
 				userInfo.value = {
 					id: userId != null ? userId : "",
 					mobile: mobile != null ? mobile : ""
 				}
-				console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:139")
+				console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:125")
 			} catch (e) {
-				console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:141")
+				console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:127")
 			}
 		}
 	})

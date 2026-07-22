@@ -274,14 +274,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
   const closeStyle = common_vendor.computed(() => {
     return "color:" + computedTextColor.value + ";";
   });
-  function handleClick() {
+  function handleClick(event = null) {
     if (closeClicking.value) {
       closeClicking.value = false;
       return null;
     }
     if (props.disabled)
       return null;
-    emit("click", contentText.value);
+    emit("click", event);
   }
   function handleClose() {
     if (props.disabled)

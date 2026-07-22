@@ -8,7 +8,7 @@ import { ref } from 'vue';
 import { addDevice, getCarType } from '../../api/request';
 import carIcons from '../../components/car-icons/car-icons.uvue';
 type CarFormData = {
-    __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 50, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 49, 7>;
     deviceName: string;
     imei: string;
     deviceType: string;
@@ -17,29 +17,15 @@ type CarFormData = {
     carType: string;
 };
 type ScanResultData = {
-    __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 59, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 58, 7>;
     result: string;
 };
-type CarIconItem = {
-    __$originalPosition?: UTSSourceMapPosition<"CarIconItem", "pages/addCar/addCar.uvue", 63, 7>;
-    name: string;
-    text: string;
-    image: string;
-};
+type CarIconItem = UTSJSONObject;
 type AddDeviceResponse = {
-    __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 69, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 64, 7>;
     code: number;
     msg: string;
     data: CarFormData;
-};
-type FormInstance = {
-    __$originalPosition?: UTSSourceMapPosition<"FormInstance", "pages/addCar/addCar.uvue", 75, 7>;
-    validate: () => boolean;
-};
-type DeviceTypeSelectorInstance = {
-    __$originalPosition?: UTSSourceMapPosition<"DeviceTypeSelectorInstance", "pages/addCar/addCar.uvue", 79, 7>;
-    open: () => void;
-    close: () => void;
 };
 const __sfc__ = defineComponent({
     __name: 'addCar',
@@ -47,8 +33,7 @@ const __sfc__ = defineComponent({
         const __ins = getCurrentInstance()!;
         const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
         const _cache = __ins.renderCache;
-        const formRef = ref<FormInstance | null>(null);
-        const deviceTypeSelect = ref<DeviceTypeSelectorInstance | null>(null);
+        const carIconSelectorVisible = ref<boolean>(false);
         const loading = ref<boolean>(false);
         const formValid = ref<boolean>(false);
         const carInfo = ref<CarFormData>({
@@ -61,28 +46,10 @@ const __sfc__ = defineComponent({
         } as CarFormData);
         const actions = ref<any[]>([]);
         // ===== 表单验证规则 =====
-        const rules = { __$originalPosition: new UTSSourceMapPosition("rules", "pages/addCar/addCar.uvue", 101, 8),
-            imei: [
-                {
-                    required: true,
-                    message: '请输入设备ID',
-                    trigger: ['blur', 'change']
-                },
-                {
-                    min: 8,
-                    max: 18,
-                    message: 'ID长度应在8-18位之间',
-                    trigger: ['blur', 'change']
-                }
-            ],
-            deviceType: [
-                {
-                    required: true,
-                    message: '请选择设备图标',
-                    trigger: ['blur', 'change']
-                }
-            ]
-        } as UTSJSONObject;
+        const rules = [
+            { name: 'imei', required: true, message: '请输入设备ID' } as UTSJSONObject,
+            { name: 'deviceType', required: true, message: '请选择设备图标' } as UTSJSONObject
+        ] as Array<UTSJSONObject>;
         // ===== 处理表单验证状态更新 =====
         const handleModelValid = (value: any) => {
             // 使用双重否定或比较运算符来转换为布尔值，避免使用 Boolean()
@@ -104,7 +71,7 @@ const __sfc__ = defineComponent({
         };
         // 扫码结果事件处理
         const handleScanResult = (data: ScanResultData) => {
-            console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:144");
+            console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:111");
             // 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
             if (data.result.length == 15) {
                 carInfo.value.imei = '0' + data.result.slice(4, 15);
@@ -119,58 +86,66 @@ const __sfc__ = defineComponent({
                 });
             }
         };
+        const updateCarIconSelectorVisible = (visible: boolean) => {
+            carIconSelectorVisible.value = visible;
+        };
         // 选择车标
         const selectIcon = (item: CarIconItem) => {
-            console.log(item.name, " at pages/addCar/addCar.uvue:160");
-            carInfo.value.deviceType = item.name;
-            carInfo.value.deviceTypeValue = item.text;
-            deviceTypeSelect.value?.close();
+            const name = item.getString('name', '');
+            const text = item.getString('text', '');
+            console.log(name, " at pages/addCar/addCar.uvue:133");
+            carInfo.value.deviceType = name;
+            carInfo.value.deviceTypeValue = text;
+            carIconSelectorVisible.value = false;
         };
         // 打开车标选择器
         const deviceTypeSelectFun = () => {
-            deviceTypeSelect.value?.open();
+            carIconSelectorVisible.value = true;
         };
         // 刷新首页设备列表的方法
         const refreshDeviceList = () => {
             uni.$emit('refreshDeviceList');
         };
-        // ===== 表单验证 - 封装为 Promise =====
-        const validateForm = (): Promise<boolean> => {
-            return new Promise<boolean>((resolve, reject) => {
-                const form = formRef.value;
-                if (form == null) {
-                    reject(new Error('表单实例不存在'));
-                    return;
-                }
-                if (form.validate()) {
-                    resolve(true);
-                }
-                else {
-                    reject(new Error('表单验证失败'));
-                }
-            });
+        // ===== 表单验证 =====
+        const validateForm = (): boolean => {
+            if (carInfo.value.imei.length == 0) {
+                uni.showToast({
+                    title: '请输入设备ID',
+                    icon: 'none'
+                });
+                return false;
+            }
+            if (carInfo.value.deviceType.length == 0) {
+                uni.showToast({
+                    title: '请选择设备图标',
+                    icon: 'none'
+                });
+                return false;
+            }
+            return true;
         };
         // ===== 提交表单 =====
         const submit = async (): Promise<void> => {
-            console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:195");
+            console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:170");
             try {
                 // 表单验证
-                await validateForm();
-                console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:200");
+                if (!validateForm())
+                    return;
+                console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:175");
                 loading.value = true;
                 uni.showLoading({
                     title: '添加中...',
                     mask: true
                 });
-                const submitData = { __$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 208, 10),
+                const submitData = { __$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 183, 10),
                     deviceName: carInfo.value.deviceName,
                     imei: carInfo.value.imei,
                     carType: carInfo.value.deviceType,
                     // plateNo: carInfo.value.plateNo
                 } as UTSJSONObject;
-                console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:215");
+                console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:190");
                 const res = await addDevice(submitData);
-                console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:218");
+                console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:193");
                 uni.hideLoading();
                 loading.value = false;
                 if (res.code == 0) {
@@ -194,7 +169,7 @@ const __sfc__ = defineComponent({
                 }
             }
             catch (error: any) {
-                console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:245");
+                console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:220");
                 uni.hideLoading();
                 loading.value = false;
                 uni.showToast({
@@ -208,7 +183,6 @@ const __sfc__ = defineComponent({
             // loadCarTypeData()
             // 注册扫码结果事件监听
             uni.$on('scanCodeResult', handleScanResult);
-            console.log('formRef 初始值:', formRef.value, " at pages/addCar/addCar.uvue:260");
         });
         onShow(() => {
             const rawResult = uni.getStorageSync('scanCodeResult');
@@ -264,8 +238,6 @@ const __sfc__ = defineComponent({
                         labelPosition: "left",
                         modelValue: carInfo.value,
                         rules: rules,
-                        ref_key: "formRef",
-                        ref: formRef,
                         labelDirection: "horizontal",
                         watchValidStatus: "",
                         "onUpdate:modelValid": handleModelValid
@@ -328,10 +300,10 @@ const __sfc__ = defineComponent({
                                 _: 1 /* STABLE */
                             })),
                             _cV(unref(carIcons), _uM({
-                                ref_key: "deviceTypeSelect",
-                                ref: deviceTypeSelect,
+                                show: carIconSelectorVisible.value,
+                                "onUpdate:show": updateCarIconSelectorVisible,
                                 onSelect: selectIcon
-                            }), null, 512 /* NEED_PATCH */)
+                            }), null, 8 /* PROPS */, ["show"])
                         ]),
                         _: 1 /* STABLE */
                     }), 8 /* PROPS */, ["modelValue"])

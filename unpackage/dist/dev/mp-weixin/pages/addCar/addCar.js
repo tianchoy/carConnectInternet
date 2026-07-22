@@ -68,29 +68,6 @@ class ScanResultData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class CarIconItem extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          name: { type: String, optional: false },
-          text: { type: String, optional: false },
-          image: { type: String, optional: false }
-        };
-      },
-      name: "CarIconItem"
-    };
-  }
-  constructor(options, metadata = CarIconItem.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.name = this.__props__.name;
-    this.text = this.__props__.text;
-    this.image = this.__props__.image;
-    delete this.__props__;
-  }
-}
 class AddDeviceResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -114,51 +91,10 @@ class AddDeviceResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class FormInstance extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          validate: { type: "Unknown", optional: false }
-        };
-      },
-      name: "FormInstance"
-    };
-  }
-  constructor(options, metadata = FormInstance.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.validate = this.__props__.validate;
-    delete this.__props__;
-  }
-}
-class DeviceTypeSelectorInstance extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          open: { type: "Unknown", optional: false },
-          close: { type: "Unknown", optional: false }
-        };
-      },
-      name: "DeviceTypeSelectorInstance"
-    };
-  }
-  constructor(options, metadata = DeviceTypeSelectorInstance.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.open = this.__props__.open;
-    this.close = this.__props__.close;
-    delete this.__props__;
-  }
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "addCar",
   setup(__props) {
-    const formRef = common_vendor.ref(null);
-    const deviceTypeSelect = common_vendor.ref(null);
+    const carIconSelectorVisible = common_vendor.ref(false);
     const loading = common_vendor.ref(false);
     const formValid = common_vendor.ref(false);
     const carInfo = common_vendor.ref(new CarFormData({
@@ -170,31 +106,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carType: ""
     }));
     common_vendor.ref([]);
-    const rules = new common_vendor.UTSJSONObject(
-      {
-        imei: [
-          new common_vendor.UTSJSONObject({
-            required: true,
-            message: "请输入设备ID",
-            trigger: ["blur", "change"]
-          }),
-          new common_vendor.UTSJSONObject({
-            min: 8,
-            max: 18,
-            message: "ID长度应在8-18位之间",
-            trigger: ["blur", "change"]
-          })
-        ],
-        deviceType: [
-          new common_vendor.UTSJSONObject({
-            required: true,
-            message: "请选择设备图标",
-            trigger: ["blur", "change"]
-          })
-        ]
-      }
-      // ===== 处理表单验证状态更新 =====
-    );
+    const rules = [
+      new common_vendor.UTSJSONObject({ name: "imei", required: true, message: "请输入设备ID" }),
+      new common_vendor.UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
+    ];
     const handleModelValid = (value = null) => {
       formValid.value = !!value;
     };
@@ -204,7 +119,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:144", "接收到扫码结果:", data.result);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:111", "接收到扫码结果:", data.result);
       if (data.result.length == 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
       } else if (data.result.length == 11) {
@@ -216,40 +131,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
+    const updateCarIconSelectorVisible = (visible) => {
+      carIconSelectorVisible.value = visible;
+    };
     const selectIcon = (item) => {
-      var _a;
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:160", item.name);
-      carInfo.value.deviceType = item.name;
-      carInfo.value.deviceTypeValue = item.text;
-      (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.close();
+      const name = item.getString("name", "");
+      const text = item.getString("text", "");
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:133", name);
+      carInfo.value.deviceType = name;
+      carInfo.value.deviceTypeValue = text;
+      carIconSelectorVisible.value = false;
     };
     const deviceTypeSelectFun = () => {
-      var _a;
-      (_a = deviceTypeSelect.value) === null || _a === void 0 ? null : _a.open();
+      carIconSelectorVisible.value = true;
     };
     const refreshDeviceList = () => {
       common_vendor.index.$emit("refreshDeviceList");
     };
     const validateForm = () => {
-      return new Promise((resolve, reject) => {
-        const form = formRef.value;
-        if (form == null) {
-          reject(new Error("表单实例不存在"));
-          return null;
-        }
-        if (form.validate()) {
-          resolve(true);
-        } else {
-          reject(new Error("表单验证失败"));
-        }
-      });
+      if (carInfo.value.imei.length == 0) {
+        common_vendor.index.showToast({
+          title: "请输入设备ID",
+          icon: "none"
+        });
+        return false;
+      }
+      if (carInfo.value.deviceType.length == 0) {
+        common_vendor.index.showToast({
+          title: "请选择设备图标",
+          icon: "none"
+        });
+        return false;
+      }
+      return true;
     };
     const submit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:195", "=== 开始提交设备 ===");
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:170", "=== 开始提交设备 ===");
         try {
-          yield validateForm();
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:200", "✅ 表单验证通过");
+          if (!validateForm())
+            return Promise.resolve(null);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:175", "✅ 表单验证通过");
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "添加中...",
@@ -261,9 +183,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             carType: carInfo.value.deviceType
             // plateNo: carInfo.value.plateNo
           });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:215", "📤 提交数据:", submitData);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:190", "📤 提交数据:", submitData);
           const res = yield api_request.addDevice(submitData);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:218", "✅ 添加设备返回:", res);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:193", "✅ 添加设备返回:", res);
           common_vendor.index.hideLoading();
           loading.value = false;
           if (res.code == 0) {
@@ -284,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:245", "❌ 添加设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:220", "❌ 添加设备失败:", error);
           common_vendor.index.hideLoading();
           loading.value = false;
           common_vendor.index.showToast({
@@ -296,7 +218,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad(() => {
       common_vendor.index.$on("scanCodeResult", handleScanResult);
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:260", "formRef 初始值:", formRef.value);
     });
     common_vendor.onShow(() => {
       const rawResult = common_vendor.index.getStorageSync("scanCodeResult");
@@ -322,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return carInfo.value.deviceName = $event;
-        }, "db"),
+        }, "50"),
         c: common_vendor.p({
           border: "none",
           placeholder: "请输入设备名称",
@@ -335,7 +256,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        e: common_vendor.o(scanCode, "d2"),
+        e: common_vendor.o(scanCode, "a5"),
         f: common_vendor.p({
           name: "/static/sancode.png",
           fontSize: "20",
@@ -343,7 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.o(($event) => {
           return carInfo.value.imei = $event;
-        }, "ea"),
+        }, "d4"),
         h: common_vendor.p({
           border: "none",
           placeholder: "请输入设备ID(必填)",
@@ -358,42 +279,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.t(carInfo.value.deviceTypeValue || "请选择设备图标(必选)"),
         k: !carInfo.value.deviceTypeValue ? 1 : "",
-        l: common_vendor.o(deviceTypeSelectFun, "37"),
+        l: common_vendor.o(deviceTypeSelectFun, "9d"),
         m: common_vendor.p({
           label: "车标",
           name: "deviceType",
           labelDirection: "horizontal",
           class: "data-v-6409e324"
         }),
-        n: common_vendor.sr(deviceTypeSelect, "6409e324-8,6409e324-1", {
-          "k": "deviceTypeSelect"
-        }),
-        o: common_vendor.o(selectIcon, "80"),
+        n: common_vendor.o(updateCarIconSelectorVisible, "a6"),
+        o: common_vendor.o(selectIcon, "c2"),
         p: common_vendor.p({
-          class: "r data-v-6409e324"
+          show: carIconSelectorVisible.value,
+          class: "data-v-6409e324"
         }),
-        q: common_vendor.sr(formRef, "6409e324-1", {
-          "k": "formRef"
-        }),
-        r: common_vendor.o(handleModelValid, "06"),
-        s: common_vendor.p({
+        q: common_vendor.o(handleModelValid, "5e"),
+        r: common_vendor.p({
           labelPosition: "left",
           modelValue: carInfo.value,
           rules,
           labelDirection: "horizontal",
           watchValidStatus: true,
-          class: "r data-v-6409e324"
+          class: "data-v-6409e324"
         }),
-        t: common_vendor.o(submit, "09"),
-        v: common_vendor.p({
+        s: common_vendor.o(submit, "12"),
+        t: common_vendor.p({
           type: "primary",
           loading: loading.value,
           class: "data-v-6409e324"
         }),
-        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        x: `${_ctx.u_s_b_h}px`,
-        y: `${_ctx.u_s_a_i_b}px`,
-        z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        w: `${_ctx.u_s_b_h}px`,
+        x: `${_ctx.u_s_a_i_b}px`,
+        y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

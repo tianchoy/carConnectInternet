@@ -1,7 +1,12 @@
 <template>
     <scroll-view class="container" scroll-y="true" :show-scrollbar="false">
         <view class="page-bg">
-            <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
+            <!--#ifdef MP-WEIXIN-->
+            <view class="top" :style="{paddingTop: statusBarHeight + 43 + 'px'}">
+            <!--#endif-->
+            <!--#ifndef MP-WEIXIN-->
+            <view class="top" :style="{paddingTop: statusBarHeight+ 10 + 'px'}">
+            <!--#endif-->
                 <view class="device-car">
                     <view class="current-car">
                         <view v-if="checkToken()">
@@ -918,9 +923,12 @@ function isLogin() : boolean {
 
 // 跳转轨迹详情
 const toRecordDetail = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.navigateTo({
-        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude
+        url: '/pages/playBack/playBack?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&lat=' + center.latitude + '&lng=' + center.longitude,
+        fail: (err) => {
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转轨迹详情失败:', err)
+        }
     })
 }
 
@@ -950,9 +958,12 @@ const toDeviceDetail = (e: any) => {
 
 // 跳转添加车辆
 const toAdd = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.navigateTo({
         url: '/pages/addCar/addCar',
+        fail: (err) => {
+            if (err.errMsg.indexOf('locked') < 0) console.error('跳转添加设备失败:', err)
+        }
     })
 }
 
@@ -1410,6 +1421,7 @@ onLoad(() => {
                 font-size: 45rpx;
                 font-weight: bold;
                 color: #333;
+                text-align: center;
             }
             .unit {
                 font-size: 20rpx;
@@ -1473,6 +1485,8 @@ onLoad(() => {
                         }
                         .item-desc{
                             color: #ccc;
+                            font-size: 24rpx;
+                            margin-top: 10rpx;
                         }
                     }
                 }

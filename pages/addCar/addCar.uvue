@@ -6,8 +6,7 @@
 			<i-form 
 				labelPosition="left" 
 				:modelValue="carInfo" 
-				:rules="rules" 
-				ref="formRef"
+				:rules="rules"
 				labelDirection="horizontal"
 				watchValidStatus
 				@update:modelValid="handleModelValid"
@@ -32,7 +31,7 @@
 						</text>
 					</view>
 				</i-form-item>
-				<carIcons ref="deviceTypeSelect" @select="selectIcon"></carIcons>
+				<carIcons :show="carIconSelectorVisible" @update:show="updateCarIconSelectorVisible" @select="selectIcon"></carIcons>
 			</i-form>
 		</view>
 		<view class="btn">
@@ -60,11 +59,7 @@
 		result: string
 	}
 
-	type CarIconItem = {
-		name: string
-		text: string
-		image: string
-	}
+	type CarIconItem = UTSJSONObject
 
 	type AddDeviceResponse = {
 		code: number
@@ -72,17 +67,7 @@
 		data: CarFormData
 	}
 
-	type FormInstance = {
-		validate: () => boolean
-	}
-
-	type DeviceTypeSelectorInstance = {
-		open: () => void
-		close: () => void
-	}
-
-	const formRef = ref<FormInstance | null>(null)
-	const deviceTypeSelect = ref<DeviceTypeSelectorInstance | null>(null)
+	const carIconSelectorVisible = ref<boolean>(false)
 	const loading = ref<boolean>(false)
 	const formValid = ref<boolean>(false)
 
@@ -98,28 +83,10 @@
 	const actions = ref<any[]>([])
 
 	// ===== 表单验证规则 =====
-	const rules = {
-		imei: [
-			{
-				required: true,
-				message: '请输入设备ID',
-				trigger: ['blur', 'change']
-			},
-			{
-				min: 8,
-				max: 18,
-				message: 'ID长度应在8-18位之间',
-				trigger: ['blur', 'change']
-			}
-		],
-		deviceType: [
-			{
-				required: true,
-				message: '请选择设备图标',
-				trigger: ['blur', 'change']
-			}
-		]
-	}
+	const rules = [
+		{ name: 'imei', required: true, message: '请输入设备ID' } as UTSJSONObject,
+		{ name: 'deviceType', required: true, message: '请选择设备图标' } as UTSJSONObject
+	] as Array<UTSJSONObject>
 
 	// ===== 处理表单验证状态更新 =====
 	const handleModelValid = (value: any) => {
@@ -155,17 +122,23 @@
 		}
 	}
 
+	const updateCarIconSelectorVisible = (visible: boolean) => {
+		carIconSelectorVisible.value = visible
+	}
+
 	// 选择车标
 	const selectIcon = (item: CarIconItem) => {
-		console.log(item.name)
-		carInfo.value.deviceType = item.name
-		carInfo.value.deviceTypeValue = item.text
-		deviceTypeSelect.value?.close()
+		const name = item.getString('name', '')
+		const text = item.getString('text', '')
+		console.log(name)
+		carInfo.value.deviceType = name
+		carInfo.value.deviceTypeValue = text
+		carIconSelectorVisible.value = false
 	}
 
 	// 打开车标选择器
 	const deviceTypeSelectFun = () => {
-		deviceTypeSelect.value?.open()
+		carIconSelectorVisible.value = true
 	}
 
 	// 刷新首页设备列表的方法
@@ -173,21 +146,23 @@
 		uni.$emit('refreshDeviceList')
 	}
 
-	// ===== 表单验证 - 封装为 Promise =====
-	const validateForm = (): Promise<boolean> => {
-		return new Promise<boolean>((resolve, reject) => {
-			const form = formRef.value
-			if (form == null) {
-				reject(new Error('表单实例不存在'))
-				return
-			}
-
-			if (form.validate()) {
-				resolve(true)
-			} else {
-				reject(new Error('表单验证失败'))
-			}
-		})
+	// ===== 表单验证 =====
+	const validateForm = (): boolean => {
+		if (carInfo.value.imei.length == 0) {
+			uni.showToast({
+				title: '请输入设备ID',
+				icon: 'none'
+			})
+			return false
+		}
+		if (carInfo.value.deviceType.length == 0) {
+			uni.showToast({
+				title: '请选择设备图标',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
 	}
 
 	// ===== 提交表单 =====
@@ -196,7 +171,7 @@
 		
 		try {
 			// 表单验证
-			await validateForm()
+			if (!validateForm()) return
 			console.log('✅ 表单验证通过')
 			
 			loading.value = true
@@ -257,7 +232,6 @@
 		// loadCarTypeData()
 		// 注册扫码结果事件监听
 		uni.$on('scanCodeResult', handleScanResult)
-		console.log('formRef 初始值:', formRef.value)
 	})
 
 	onShow(() => {

@@ -110,7 +110,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_Te3bWS"
+    val id: String = "app-android_s68AMH"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1048,7 +1048,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 172, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 177, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1232,7 +1232,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 189, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 194, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1286,7 +1286,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 223, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 228, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1352,7 +1352,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 229, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 234, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1436,7 +1436,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 322, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 327, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -1713,18 +1713,23 @@ open class AddressResponse (
 fun getAddress(latitude: Number, longitude: Number, tk: String = DEFAULT_TK): UTSPromise<AddressResponse> {
     return UTSPromise<AddressResponse>(fun(resolve, reject){
         val postStr = JSON.stringify(_uO("lon" to longitude, "lat" to latitude, "ver" to 1))
-        uni_request<Any>(RequestOptions(url = "https://api.tianditu.gov.cn/geocoder?postStr=" + UTSAndroid.consoleDebugError(encodeURIComponent(postStr), " at utils/getAdress.uts:17") + "&type=geocode&tk=" + tk, method = "GET", success = fun(res: RequestSuccess<Any>){
-            if (res.statusCode == 200 && res.data != null) {
-                val response = res.data as UTSJSONObject
-                val result = response.getJSON("result")
-                if (result == null) {
-                    reject(UTSError("获取地址信息失败"))
-                    return
-                }
-                resolve(AddressResponse(result = AddressResult(formatted_address = result.getString("formatted_address", ""))))
-            } else {
-                reject(UTSError("获取地址信息失败"))
+        uni_request<Any>(RequestOptions(url = "https://api.tianditu.gov.cn/geocoder?postStr=" + UTSAndroid.consoleDebugError(encodeURIComponent(postStr), " at utils/getAdress.uts:17") + "&type=geocode&tk=" + tk, method = "GET", header = _uO("User-Agent" to "Mozilla/5.0"), success = fun(res: RequestSuccess<Any>){
+            if (res.statusCode != 200 || res.data == null) {
+                reject(UTSError("获取地址信息失败，状态码：" + res.statusCode))
+                return
             }
+            val response = res.data as UTSJSONObject
+            val result = response.getJSON("result")
+            if (result == null) {
+                reject(UTSError("获取地址信息失败：" + response.getString("msg", "响应缺少结果")))
+                return
+            }
+            val formattedAddress = result.getString("formatted_address", "")
+            if (formattedAddress == "") {
+                reject(UTSError("获取地址信息失败：响应缺少地址"))
+                return
+            }
+            resolve(AddressResponse(result = AddressResult(formatted_address = formattedAddress)))
         }
         , fail = fun(err: RequestFail){
             reject(err)
@@ -1755,7 +1760,7 @@ open class MapCenter__1 (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 122, 7)
+        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 121, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenter__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1811,7 +1816,7 @@ open class SignalDetail (
     open var level: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 206, 7)
+        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 199, 7)
     }
 }
 val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfoDetailCarInfoDetail::class.java, fun(): VueComponentOptions {
@@ -1835,26 +1840,16 @@ val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModu
 }
 )
 interface Props {
+    var show: Boolean
     var title: String
     var col: Number
     var iconSize: Number
     var safeAreaInsetBottom: Boolean
 }
-open class CarIconItem (
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var text: String,
-    @JsonNotNull
-    open var image: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarIconItem", "components/car-icons/car-icons.uvue", 38, 6)
-    }
-}
+typealias CarIconItem = UTSJSONObject
 val GenComponentsCarIconsCarIconsClass = CreateVueComponent(GenComponentsCarIconsCarIcons::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCarIconsCarIcons.inheritAttrs, inject = GenComponentsCarIconsCarIcons.inject, props = GenComponentsCarIconsCarIcons.props, propsNeedCastKeys = GenComponentsCarIconsCarIcons.propsNeedCastKeys, emits = GenComponentsCarIconsCarIcons.emits, components = GenComponentsCarIconsCarIcons.components, styles = GenComponentsCarIconsCarIcons.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
-        return GenComponentsCarIconsCarIcons.setup(props as GenComponentsCarIconsCarIcons, ctx)
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsCarIconsCarIcons.inheritAttrs, inject = GenComponentsCarIconsCarIcons.inject, props = GenComponentsCarIconsCarIcons.props, propsNeedCastKeys = GenComponentsCarIconsCarIcons.propsNeedCastKeys, emits = GenComponentsCarIconsCarIcons.emits, components = GenComponentsCarIconsCarIcons.components, styles = GenComponentsCarIconsCarIcons.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsCarIconsCarIcons.setup(props as GenComponentsCarIconsCarIcons)
     }
     )
 }
@@ -1877,7 +1872,7 @@ open class CarFormData (
     open var carType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 50, 7)
+        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 49, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return CarFormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1975,72 +1970,10 @@ open class ScanResultData (
     open var result: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 59, 7)
+        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 58, 7)
     }
 }
-open class CarIconItem__1 (
-    @JsonNotNull
-    open var name: String,
-    @JsonNotNull
-    open var text: String,
-    @JsonNotNull
-    open var image: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarIconItem", "pages/addCar/addCar.uvue", 63, 7)
-    }
-}
-open class FormInstance (
-    open var validate: () -> Boolean,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormInstance", "pages/addCar/addCar.uvue", 75, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
-    override var __v_raw: FormInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
-        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-open class DeviceTypeSelectorInstance (
-    open var open: () -> Unit,
-    open var close: () -> Unit,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceTypeSelectorInstance", "pages/addCar/addCar.uvue", 79, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return DeviceTypeSelectorInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class DeviceTypeSelectorInstanceReactiveObject : DeviceTypeSelectorInstance, IUTSReactive<DeviceTypeSelectorInstance> {
-    override var __v_raw: DeviceTypeSelectorInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: DeviceTypeSelectorInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(open = __v_raw.open, close = __v_raw.close) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceTypeSelectorInstanceReactiveObject {
-        return DeviceTypeSelectorInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
+typealias CarIconItem__1 = UTSJSONObject
 val GenPagesAddCarAddCarClass = CreateVueComponent(GenPagesAddCarAddCar::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesAddCarAddCar.inheritAttrs, inject = GenPagesAddCarAddCar.inject, props = GenPagesAddCarAddCar.props, propsNeedCastKeys = GenPagesAddCarAddCar.propsNeedCastKeys, emits = GenPagesAddCarAddCar.emits, components = GenPagesAddCarAddCar.components, styles = GenPagesAddCarAddCar.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesAddCarAddCar.setup(props as GenPagesAddCarAddCar)
@@ -8200,29 +8133,29 @@ class UserInfo__1ReactiveObject : UserInfo__1, IUTSReactive<UserInfo__1> {
             _tRS(__v_raw, "mobile", oldValue, value)
         }
 }
-open class FormInstance__1 (
+open class FormInstance (
     open var validate: () -> Boolean,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("FormInstance", "pages/userCenter/editPassword/editPassword.uvue", 35, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstance__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class FormInstance__1ReactiveObject : FormInstance__1, IUTSReactive<FormInstance__1> {
-    override var __v_raw: FormInstance__1
+class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
+    override var __v_raw: FormInstance
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
+    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstance__1ReactiveObject {
-        return FormInstance__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
+        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
 val GenPagesUserCenterEditPasswordEditPasswordClass = CreateVueComponent(GenPagesUserCenterEditPasswordEditPassword::class.java, fun(): VueComponentOptions {
@@ -8781,16 +8714,155 @@ val GenPagesWebviewWebviewClass = CreateVueComponent(GenPagesWebviewWebview::cla
     return GenPagesWebviewWebview(instance, renderer)
 }
 )
-interface DeviceItem {
-    var plateNo: String
-    var imei: String
-    var status: Number
-    var companyId: String
-    var deviceName: String
-    var deviceId: String
-    var iccid: String
-    var simMerchant: String
-    var connectionStatus: String
+open class DeviceItem (
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var imei: String,
+    @JsonNotNull
+    open var status: Number,
+    @JsonNotNull
+    open var companyId: String,
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var deviceId: String,
+    @JsonNotNull
+    open var iccid: String,
+    @JsonNotNull
+    open var simMerchant: String,
+    @JsonNotNull
+    open var connectionStatus: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("DeviceItem", "utils/device.uts", 1, 13)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return DeviceItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class DeviceItemReactiveObject : DeviceItem, IUTSReactive<DeviceItem> {
+    override var __v_raw: DeviceItem
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: DeviceItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(plateNo = __v_raw.plateNo, imei = __v_raw.imei, status = __v_raw.status, companyId = __v_raw.companyId, deviceName = __v_raw.deviceName, deviceId = __v_raw.deviceId, iccid = __v_raw.iccid, simMerchant = __v_raw.simMerchant, connectionStatus = __v_raw.connectionStatus) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): DeviceItemReactiveObject {
+        return DeviceItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var plateNo: String
+        get() {
+            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("plateNo")) {
+                return
+            }
+            val oldValue = __v_raw.plateNo
+            __v_raw.plateNo = value
+            _tRS(__v_raw, "plateNo", oldValue, value)
+        }
+    override var imei: String
+        get() {
+            return _tRG(__v_raw, "imei", __v_raw.imei, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("imei")) {
+                return
+            }
+            val oldValue = __v_raw.imei
+            __v_raw.imei = value
+            _tRS(__v_raw, "imei", oldValue, value)
+        }
+    override var status: Number
+        get() {
+            return _tRG(__v_raw, "status", __v_raw.status, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("status")) {
+                return
+            }
+            val oldValue = __v_raw.status
+            __v_raw.status = value
+            _tRS(__v_raw, "status", oldValue, value)
+        }
+    override var companyId: String
+        get() {
+            return _tRG(__v_raw, "companyId", __v_raw.companyId, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("companyId")) {
+                return
+            }
+            val oldValue = __v_raw.companyId
+            __v_raw.companyId = value
+            _tRS(__v_raw, "companyId", oldValue, value)
+        }
+    override var deviceName: String
+        get() {
+            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceName")) {
+                return
+            }
+            val oldValue = __v_raw.deviceName
+            __v_raw.deviceName = value
+            _tRS(__v_raw, "deviceName", oldValue, value)
+        }
+    override var deviceId: String
+        get() {
+            return _tRG(__v_raw, "deviceId", __v_raw.deviceId, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceId")) {
+                return
+            }
+            val oldValue = __v_raw.deviceId
+            __v_raw.deviceId = value
+            _tRS(__v_raw, "deviceId", oldValue, value)
+        }
+    override var iccid: String
+        get() {
+            return _tRG(__v_raw, "iccid", __v_raw.iccid, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("iccid")) {
+                return
+            }
+            val oldValue = __v_raw.iccid
+            __v_raw.iccid = value
+            _tRS(__v_raw, "iccid", oldValue, value)
+        }
+    override var simMerchant: String
+        get() {
+            return _tRG(__v_raw, "simMerchant", __v_raw.simMerchant, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("simMerchant")) {
+                return
+            }
+            val oldValue = __v_raw.simMerchant
+            __v_raw.simMerchant = value
+            _tRS(__v_raw, "simMerchant", oldValue, value)
+        }
+    override var connectionStatus: String
+        get() {
+            return _tRG(__v_raw, "connectionStatus", __v_raw.connectionStatus, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("connectionStatus")) {
+                return
+            }
+            val oldValue = __v_raw.connectionStatus
+            __v_raw.connectionStatus = value
+            _tRS(__v_raw, "connectionStatus", oldValue, value)
+        }
 }
 val GenComponentsIndexListModeIndexListModeClass = CreateVueComponent(GenComponentsIndexListModeIndexListMode::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = "", inheritAttrs = GenComponentsIndexListModeIndexListMode.inheritAttrs, inject = GenComponentsIndexListModeIndexListMode.inject, props = GenComponentsIndexListModeIndexListMode.props, propsNeedCastKeys = GenComponentsIndexListModeIndexListMode.propsNeedCastKeys, emits = GenComponentsIndexListModeIndexListMode.emits, components = GenComponentsIndexListModeIndexListMode.components, styles = GenComponentsIndexListModeIndexListMode.styles, setup = fun(props: ComponentPublicInstance): Any? {

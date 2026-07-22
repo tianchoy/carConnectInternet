@@ -26,25 +26,8 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
             val _cache = __ins.renderCache
             val userInfo = ref<UserInfo__1>(UserInfo__1(id = "", mobile = ""))
             val formData = ref(_uO("password" to "", "newPassword" to "", "confirmPassword" to ""))
-            val formRef = ref<FormInstance__1?>(null)
-            val validateConfirmPassword = fun(rule: UTSJSONObject, value: String, callback: (error: UTSError?) -> Unit): Unit {
-                if (value !== formData.value["newPassword"]) {
-                    callback(UTSError("两次输入的密码不一致"))
-                } else {
-                    callback(null)
-                }
-            }
-            val rules: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("rules", "pages/userCenter/editPassword/editPassword.uvue", 61, 8), "password" to _uA(
-                _uO("required" to true, "message" to "请输入原密码", "trigger" to "blur"),
-                _uO("min" to 6, "max" to 20, "message" to "密码长度在6到20个字符", "trigger" to "blur")
-            ), "newPassword" to _uA(
-                _uO("required" to true, "message" to "请输入新密码", "trigger" to "blur"),
-                _uO("min" to 6, "max" to 20, "message" to "密码长度在6到20个字符", "trigger" to "blur"),
-                _uO("pattern" to UTSRegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[^]{6,20}\$", ""), "message" to "密码需包含大小写字母和数字", "trigger" to "blur")
-            ), "confirmPassword" to _uA(
-                _uO("required" to true, "message" to "请确认新密码", "trigger" to "blur"),
-                _uO("validator" to validateConfirmPassword, "trigger" to "blur")
-            ))
+            val formRef = ref<FormInstance?>(null)
+            val rules = _uA<UTSJSONObject>(_uO("name" to "password", "required" to true, "message" to "请输入原密码"), _uO("name" to "newPassword", "required" to true, "message" to "请输入新密码"), _uO("name" to "confirmPassword", "required" to true, "message" to "请确认新密码"))
             val handleSubmit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
@@ -53,7 +36,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                                 throw UTSError("表单验证失败")
                             }
                             uni_showLoading(ShowLoadingOptions(title = "提交中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 90, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 76, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
                             val res = await(changePassWord(submitData))
                             if (res.msg == "success") {
                                 uni_hideLoading(null)
@@ -75,8 +58,8 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
             onLoad(fun(options){
                 if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/editPassword/editPassword.uvue:131") as String), " at pages/userCenter/editPassword/editPassword.uvue:131") as UTSJSONObject
-                        console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:132")
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/editPassword/editPassword.uvue:117") as String), " at pages/userCenter/editPassword/editPassword.uvue:117") as UTSJSONObject
+                        console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:118")
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         userInfo.value = UserInfo__1(id = if (userId != null) {
@@ -90,10 +73,10 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:139")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:125")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:141")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:127")
                     }
                 }
             }

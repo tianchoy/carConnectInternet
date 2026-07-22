@@ -49,18 +49,26 @@ function getAddress(latitude, longitude, tk = DEFAULT_TK) {
     common_vendor.index.request({
       url: `https://api.tianditu.gov.cn/geocoder?postStr=${encodeURIComponent(postStr)}&type=geocode&tk=${tk}`,
       method: "GET",
+      header: new common_vendor.UTSJSONObject({
+        "User-Agent": "Mozilla/5.0"
+      }),
       success: (res) => {
-        if (res.statusCode == 200 && res.data != null) {
-          const response = res.data;
-          const result = response.getJSON("result");
-          if (result == null) {
-            reject(new Error("获取地址信息失败"));
-            return null;
-          }
-          resolve({ result: new AddressResult({ formatted_address: result.getString("formatted_address", "") }) });
-        } else {
-          reject(new Error("获取地址信息失败"));
+        if (res.statusCode != 200 || res.data == null) {
+          reject(new Error(`获取地址信息失败，状态码：${res.statusCode}`));
+          return null;
         }
+        const response = res.data;
+        const result = response.getJSON("result");
+        if (result == null) {
+          reject(new Error(`获取地址信息失败：${response.getString("msg", "响应缺少结果")}`));
+          return null;
+        }
+        const formattedAddress = result.getString("formatted_address", "");
+        if (formattedAddress == "") {
+          reject(new Error("获取地址信息失败：响应缺少地址"));
+          return null;
+        }
+        resolve({ result: new AddressResult({ formatted_address: formattedAddress }) });
       },
       fail: (err) => {
         reject(err);

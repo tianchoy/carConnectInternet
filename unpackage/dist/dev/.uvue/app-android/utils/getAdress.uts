@@ -16,19 +16,26 @@ export function getAddress(latitude: number, longitude: number, tk: string = DEF
         uni.request({
             url: `https://api.tianditu.gov.cn/geocoder?postStr=${encodeURIComponent(postStr)}&type=geocode&tk=${tk}`,
             method: 'GET',
+            header: {
+                'User-Agent': 'Mozilla/5.0'
+            },
             success: (res: RequestSuccess<any>) => {
-                if (res.statusCode == 200 && res.data != null) {
-                    const response = res.data as UTSJSONObject;
-                    const result = response.getJSON('result');
-                    if (result == null) {
-                        reject(new Error('获取地址信息失败'));
-                        return;
-                    }
-                    resolve({ result: { formatted_address: result.getString('formatted_address', '') } as AddressResult } as AddressResponse);
+                if (res.statusCode != 200 || res.data == null) {
+                    reject(new Error(`获取地址信息失败，状态码：${res.statusCode}`));
+                    return;
                 }
-                else {
-                    reject(new Error('获取地址信息失败'));
+                const response = res.data as UTSJSONObject;
+                const result = response.getJSON('result');
+                if (result == null) {
+                    reject(new Error(`获取地址信息失败：${response.getString('msg', '响应缺少结果')}`));
+                    return;
                 }
+                const formattedAddress = result.getString('formatted_address', '');
+                if (formattedAddress == '') {
+                    reject(new Error('获取地址信息失败：响应缺少地址'));
+                    return;
+                }
+                resolve({ result: { formatted_address: formattedAddress } as AddressResult } as AddressResponse);
             },
             fail: (err: RequestFail) => {
                 reject(err);

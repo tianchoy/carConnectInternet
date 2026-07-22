@@ -157,6 +157,7 @@
 }
 .container .tools-panel .Imei-box .pos-date .addree-box .address-text,
 .container .tools-panel .Imei-box .pos-adress .addree-box .address-text {
+  font-size: 22rpx;
   max-width: 490rpx;
   line-height: 1.4;
 }
@@ -176,6 +177,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-right: 10rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal {
   display: flex;
@@ -191,10 +193,11 @@
   flex-direction: row;
   align-items: flex-end;
   height: 40rpx;
-  margin-right: 10rpx;
+  margin-right: 5rpx;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h {
   width: 8rpx;
+  margin-right: 3rpx;
   border-radius: 2rpx 2rpx 0 0;
   transition: all 0.3s ease;
 }
@@ -212,12 +215,6 @@
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-5 {
   height: 28rpx;
-}
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.bar-active {
-  background: var(--signal-color, #52c41a) !important;
-}
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.bar-off {
-  background: #e8e8e8;
 }
 .container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h {
   display: flex;

@@ -13,7 +13,6 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenComponentsIndexListModeIndexListMode : VueComponent {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
     open var lists: UTSArray<DeviceItem> by `$props`
@@ -30,16 +29,6 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
             val modal = ref<Boolean>(false)
             val imeis = ref("")
             val needRefresh = ref(false)
-            val pay = fun(reassignedIccid: String, simMerchant: String){
-                var iccid = reassignedIccid
-                if (simMerchant.toLowerCase() == "zddx") {
-                    iccid = iccid.substring(0, iccid.length - 1)
-                }
-                console.log(iccid, " at components/indexListMode/indexListMode.uvue:59")
-                needRefresh.value = true
-                needRefresh.value = false
-                uni_showToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))
-            }
             val unbindDevice = fun(imei: String){
                 imeis.value = imei
                 modal.value = true
@@ -66,7 +55,11 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                 }), _uA(
                                     _cE("view", _uM("class" to "title"), _uA(
                                         _cE("view", _uM("class" to "car-number"), _uA(
-                                            _tD(item.deviceName) + " ",
+                                            _tD(if (item.deviceName != "") {
+                                                item.deviceName
+                                            } else {
+                                                item.imei
+                                            }) + " ",
                                             _cV(_component_i_tag, _uM("class" to "car-status-spacing", "size" to "mini", "shape" to "circle", "text" to if (item.connectionStatus == "online") {
                                                 "在线"
                                             } else {
@@ -81,13 +74,6 @@ open class GenComponentsIndexListModeIndexListMode : VueComponent {
                                             ))
                                         )),
                                         _cE("view", _uM("class" to "device-tools"), _uA(
-                                            _cV(_component_i_tag, _uM("text" to "充值", "type" to "success", "onClick" to withModifiers(fun(){
-                                                pay(item.iccid, item.simMerchant)
-                                            }, _uA(
-                                                "stop"
-                                            ))), null, 8, _uA(
-                                                "onClick"
-                                            )),
                                             _cV(_component_i_tag, _uM("class" to "device-tool-spacing", "text" to "解绑", "type" to "warning", "onClick" to withModifiers(fun(){
                                                 unbindDevice(item.imei)
                                             }, _uA(

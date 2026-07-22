@@ -4,11 +4,13 @@
 			<view class="list-item" v-for="(item,index) in props.lists" :key="index" @click="todetail(item.companyId,item.imei,item.deviceId)">
 				<view class="title">
 					<view class="car-number">
-						{{item.deviceName}}
+						{{item.deviceName || item.imei}}
 						<i-tag class="car-status-spacing" size="mini" shape="circle" :text="item.connectionStatus == 'online' ? '在线' : '离线'" :type="item.connectionStatus== 'online' ? 'success' : 'error'"></i-tag>
 					</view>
 					<view class="device-tools">
+						<!--#ifdef MP-WEIXIN-->
 						<i-tag text="充值" type="success" @click.stop="pay(item.iccid,item.simMerchant)"></i-tag>
+						<!--#endif-->
 						<i-tag class="device-tool-spacing" text="解绑" type="warning" @click.stop="unbindDevice(item.imei)"></i-tag>
 					</view>
 				</view>
@@ -27,17 +29,7 @@
 
 <script setup lang="uts">
 	import { getCustomList } from '../../api/request.uts'
-	interface DeviceItem {
-		plateNo : string
-		imei : string,
-		status: number,
-		companyId:string,
-		deviceName : string,
-		deviceId : string,
-		iccid:string,
-		simMerchant:string,
-		connectionStatus:string
-	}
+	import { DeviceItem } from '../../utils/device.uts'
 	const props = defineProps<{
 		lists : DeviceItem[]
 	}>()

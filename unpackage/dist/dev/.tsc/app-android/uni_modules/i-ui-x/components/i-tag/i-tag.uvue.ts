@@ -95,7 +95,7 @@ name: 'i-tag',
     default: '',
   },
 },
-  emits: ['click', 'close'],
+  emits: ["click", "close"],
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
@@ -312,13 +312,13 @@ const closeStyle = computed(() => {
   return 'color:' + computedTextColor.value + ';'
 })
 
-function handleClick() {
+function handleClick(event: any): void {
   if (closeClicking.value) {
     closeClicking.value = false
     return
   }
   if (props.disabled) return
-  emit('click', contentText.value)
+  emit('click', event)
 }
 
 function handleClose() {

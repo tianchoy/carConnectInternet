@@ -14,42 +14,14 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 open class GenComponentsCarIconsCarIcons : VueComponent, Props {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {}
+    override var show: Boolean by `$props`
     override var title: String by `$props`
     override var col: Number by `$props`
     override var iconSize: Number by `$props`
     override var safeAreaInsetBottom: Boolean by `$props`
-    open var open: () -> Unit
-        get() {
-            return unref(this.`$exposed`["open"]) as () -> Unit
-        }
-        set(value) {
-            setRefValue(this.`$exposed`, "open", value)
-        }
-    open var close: () -> Unit
-        get() {
-            return unref(this.`$exposed`["close"]) as () -> Unit
-        }
-        set(value) {
-            setRefValue(this.`$exposed`, "close", value)
-        }
-    open var iconList: UTSArray<CarIconItem>
-        get() {
-            return unref(this.`$exposed`["iconList"]) as UTSArray<CarIconItem>
-        }
-        set(value) {
-            setRefValue(this.`$exposed`, "iconList", value)
-        }
-    open var getIconByName: (name: String) -> CarIconItem?
-        get() {
-            return unref(this.`$exposed`["getIconByName"]) as (name: String) -> CarIconItem?
-        }
-        set(value) {
-            setRefValue(this.`$exposed`, "getIconByName", value)
-        }
     companion object {
         @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
-        var setup: (__props: GenComponentsCarIconsCarIcons, __setupCtx: SetupContext) -> Any? = fun(__props, __setupCtx): Any? {
-            val __expose = __setupCtx.expose
+        var setup: (__props: GenComponentsCarIconsCarIcons) -> Any? = fun(__props): Any? {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenComponentsCarIconsCarIcons
             val _cache = __ins.renderCache
@@ -57,28 +29,27 @@ open class GenComponentsCarIconsCarIcons : VueComponent, Props {
             fun emit(event: String, vararg do_not_transform_spread: Any?) {
                 __ins.emit(event, *do_not_transform_spread)
             }
-            val visible = ref(false)
             val iconList = _uA(
-                CarIconItem(name = "car", text = "轿车", image = "/static/cars/online/car.png"),
-                CarIconItem(name = "suv", text = "越野车", image = "/static/cars/online/suv.png"),
-                CarIconItem(name = "bus", text = "公交车", image = "/static/cars/online/bus.png"),
-                CarIconItem(name = "huoche", text = "货车", image = "/static/cars/online/huoche.png"),
-                CarIconItem(name = "train", text = "火车", image = "/static/cars/online/train.png"),
-                CarIconItem(name = "diandong", text = "电动车", image = "/static/cars/online/diandong.png"),
-                CarIconItem(name = "moto", text = "摩托车", image = "/static/cars/online/moto.png"),
-                CarIconItem(name = "bike", text = "自行车", image = "/static/cars/online/bike.png"),
-                CarIconItem(name = "sanlun", text = "三轮车", image = "/static/cars/online/sanlun.png"),
-                CarIconItem(name = "tuola", text = "拖拉机", image = "/static/cars/online/tuola.png"),
-                CarIconItem(name = "wajue", text = "挖掘机", image = "/static/cars/online/wajue.png"),
-                CarIconItem(name = "tuiche", text = "手推车", image = "/static/cars/online/tuiche.png"),
-                CarIconItem(name = "baby", text = "婴儿车", image = "/static/cars/online/baby.png"),
-                CarIconItem(name = "muma", text = "木马", image = "/static/cars/online/muma.png"),
-                CarIconItem(name = "tank", text = "坦克", image = "/static/cars/online/tank.png"),
-                CarIconItem(name = "zhuangjia", text = "装甲车", image = "/static/cars/online/zhuangjia.png"),
-                CarIconItem(name = "plan", text = "飞机", image = "/static/cars/online/plan.png"),
-                CarIconItem(name = "hangmu", text = "航母", image = "/static/cars/online/hangmu.png"),
-                CarIconItem(name = "junjian", text = "军舰", image = "/static/cars/online/junjian.png"),
-                CarIconItem(name = "walk", text = "步行", image = "/static/cars/online/walk.png")
+                _uO("name" to "car", "text" to "轿车", "image" to "/static/cars/online/car.png"),
+                _uO("name" to "suv", "text" to "越野车", "image" to "/static/cars/online/suv.png"),
+                _uO("name" to "bus", "text" to "公交车", "image" to "/static/cars/online/bus.png"),
+                _uO("name" to "huoche", "text" to "货车", "image" to "/static/cars/online/huoche.png"),
+                _uO("name" to "train", "text" to "火车", "image" to "/static/cars/online/train.png"),
+                _uO("name" to "diandong", "text" to "电动车", "image" to "/static/cars/online/diandong.png"),
+                _uO("name" to "moto", "text" to "摩托车", "image" to "/static/cars/online/moto.png"),
+                _uO("name" to "bike", "text" to "自行车", "image" to "/static/cars/online/bike.png"),
+                _uO("name" to "sanlun", "text" to "三轮车", "image" to "/static/cars/online/sanlun.png"),
+                _uO("name" to "tuola", "text" to "拖拉机", "image" to "/static/cars/online/tuola.png"),
+                _uO("name" to "wajue", "text" to "挖掘机", "image" to "/static/cars/online/wajue.png"),
+                _uO("name" to "tuiche", "text" to "手推车", "image" to "/static/cars/online/tuiche.png"),
+                _uO("name" to "baby", "text" to "婴儿车", "image" to "/static/cars/online/baby.png"),
+                _uO("name" to "muma", "text" to "木马", "image" to "/static/cars/online/muma.png"),
+                _uO("name" to "tank", "text" to "坦克", "image" to "/static/cars/online/tank.png"),
+                _uO("name" to "zhuangjia", "text" to "装甲车", "image" to "/static/cars/online/zhuangjia.png"),
+                _uO("name" to "plan", "text" to "飞机", "image" to "/static/cars/online/plan.png"),
+                _uO("name" to "hangmu", "text" to "航母", "image" to "/static/cars/online/hangmu.png"),
+                _uO("name" to "junjian", "text" to "军舰", "image" to "/static/cars/online/junjian.png"),
+                _uO("name" to "walk", "text" to "步行", "image" to "/static/cars/online/walk.png")
             ) as UTSArray<CarIconItem>
             val itemWidth = computed(fun(): String {
                 val cols = if (props.col > 0) {
@@ -90,31 +61,21 @@ open class GenComponentsCarIconsCarIcons : VueComponent, Props {
             }
             )
             val close = fun(){
-                visible.value = false
+                emit("update:show", false)
             }
             val handleSelect = fun(item: Any){
-                val selected = item as CarIconItem
-                console.log("选择的图标:", selected, " at components/car-icons/car-icons.uvue:97")
+                val selected = item as UTSJSONObject
+                console.log("选择的图标:", selected, " at components/car-icons/car-icons.uvue:93")
                 emit("select", selected)
                 close()
             }
             val handlePopupClick = fun(){
-                console.log("Popup clicked", " at components/car-icons/car-icons.uvue:104")
+                console.log("Popup clicked", " at components/car-icons/car-icons.uvue:100")
             }
-            val open = fun(){
-                visible.value = true
-            }
-            val getIconByName = fun(name: String): CarIconItem? {
-                return iconList.find(fun(item): Boolean {
-                    return item.name === name
-                }
-                )
-            }
-            __expose(_uM("open" to open, "close" to close, "iconList" to iconList, "getIconByName" to getIconByName))
             return fun(): Any? {
                 val _component_i_grid = resolveEasyComponent("i-grid", GenUniModulesIUiXComponentsIGridIGridClass)
                 val _component_i_popup = resolveEasyComponent("i-popup", GenUniModulesIUiXComponentsIPopupIPopupClass)
-                return _cV(_component_i_popup, _uM("show" to visible.value, "title" to _ctx.title, "mode" to "bottom", "safeBottom" to _ctx.safeAreaInsetBottom, "showClose" to "", "onClose" to close, "onClick" to handlePopupClick), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                return _cV(_component_i_popup, _uM("show" to props.show, "title" to _ctx.title, "mode" to "bottom", "safeBottom" to _ctx.safeAreaInsetBottom, "showClose" to "", "onClose" to close, "onClick" to handlePopupClick), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("scroll-view", _uM("class" to "icon-selector", "scroll-y" to ""), _uA(
                             _cV(_component_i_grid, _uM("items" to iconList, "col" to 4, "itemHeight" to "88", "round" to "8", "imageSize" to 30, "iconColor" to "#3c9cff", "textColor" to "#606266", "showBorder" to true, "onClick" to fun(`$event`: Any){
@@ -144,9 +105,10 @@ open class GenComponentsCarIconsCarIcons : VueComponent, Props {
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
-        var emits: Map<String, Any?> = _uM("select" to null)
-        var props = _nP(_uM("title" to _uM("type" to "String", "required" to true, "default" to "请选择图标"), "col" to _uM("type" to "Number", "required" to true, "default" to 4), "iconSize" to _uM("type" to "Number", "required" to true, "default" to 40), "safeAreaInsetBottom" to _uM("type" to "Boolean", "required" to true, "default" to true)))
+        var emits: Map<String, Any?> = _uM("select" to null, "update:show" to null)
+        var props = _nP(_uM("show" to _uM("type" to "Boolean", "required" to true, "default" to false), "title" to _uM("type" to "String", "required" to true, "default" to "请选择图标"), "col" to _uM("type" to "Number", "required" to true, "default" to 4), "iconSize" to _uM("type" to "Number", "required" to true, "default" to 40), "safeAreaInsetBottom" to _uM("type" to "Boolean", "required" to true, "default" to true)))
         var propsNeedCastKeys = _uA(
+            "show",
             "title",
             "col",
             "iconSize",

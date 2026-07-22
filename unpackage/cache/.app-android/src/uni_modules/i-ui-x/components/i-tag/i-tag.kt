@@ -279,7 +279,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 return "color:" + computedTextColor.value + ";"
             }
             )
-            fun gen_handleClick_fn() {
+            fun gen_handleClick_fn(event: Any): Unit {
                 if (closeClicking.value) {
                     closeClicking.value = false
                     return
@@ -287,7 +287,7 @@ open class GenUniModulesIUiXComponentsITagITag : VueComponent {
                 if (props.disabled) {
                     return
                 }
-                emit("click", contentText.value)
+                emit("click", event)
             }
             val handleClick = ::gen_handleClick_fn
             fun gen_handleClose_fn() {

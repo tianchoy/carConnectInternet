@@ -1,10 +1,11 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
+	import { DeviceItem } from '../../utils/device.uts'
 
 	
 const __sfc__ = defineComponent({
@@ -16,7 +17,7 @@ const _cache = __ins.renderCache;
 
 	const mapScale = ref(4)
 	const showMap = ref(true)
-	const markers = ref<Array<UTSJSONObject>>([])
+	const markers = ref<Array<Marker>>([])
 	const iconColor = ref('#1296db')
 	const userLocation = ref({
 		latitude: 0, 
@@ -32,6 +33,24 @@ const _cache = __ins.renderCache;
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<UTSJSONObject>>([])
+
+	const deviceListItems = computed((): Array<DeviceItem> => {
+		return originalDeviceList.value.map((item: UTSJSONObject): DeviceItem => {
+			const imei = item.getString('imei', '')
+			const rawDeviceName = item.getString('deviceName', '')
+			return {
+				plateNo: item.getString('plateNo', ''),
+				imei: imei,
+				status: item.getNumber('status', 0),
+				companyId: item.getString('companyId', ''),
+				deviceName: rawDeviceName != '' ? rawDeviceName : imei,
+				deviceId: item.getString('deviceId', ''),
+				iccid: item.getString('iccid', ''),
+				simMerchant: item.getString('simMerchant', ''),
+				connectionStatus: item.getString('connectionStatus', '')
+			}
+		})
+	})
 
 	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
@@ -59,7 +78,7 @@ const _cache = __ins.renderCache;
 
 
 	const updateMarkers = (devices: Array<UTSJSONObject>): void => {
-		const nextMarkers: Array<UTSJSONObject> = []
+		const nextMarkers: Array<Marker> = []
 		for (let index = 0; index < devices.length; index++) {
 			const device = devices[index]
 			const latitude = device['latitude'] as string | number | null
@@ -88,11 +107,15 @@ const _cache = __ins.renderCache;
 					borderRadius: 8,
 					bgColor: '#ffffff'
 				},
-				joinCluster: true,
 				anchor: { x: 0.5, y: 0.5 }
-			} as UTSJSONObject)
+			} as Marker)
 		}
 		markers.value = nextMarkers
+		if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
+			const firstMarker = nextMarkers[0]
+			userLocation.value.latitude = firstMarker.latitude
+			userLocation.value.longitude = firstMarker.longitude
+		}
 	}
 	watchEffect(() => {
 		if (showMap.value) {
@@ -104,15 +127,24 @@ const _cache = __ins.renderCache;
 		try {
 			let deviceList: Array<UTSJSONObject> = data
 			if (from) {
-				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 118, 11),  pageSize: 1000 } as UTSJSONObject
+				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 141, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				const list = res.data.list
-				deviceList = list != null ? list : []
+				const list = (res.code == 0 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
+				if (list == null || !Array.isArray(list)) {
+					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:145")
+					originalDeviceList.value = []
+					markers.value = []
+					return
+				}
+				deviceList = list ?? []
 			}
+			if (!Array.isArray(deviceList)) deviceList = []
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:126")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:156")
+			originalDeviceList.value = []
+			markers.value = []
 			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
@@ -139,25 +171,26 @@ const _cache = __ins.renderCache;
 		uni.getLocation({
 			type: 'wgs84',
 			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:153")
+				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:185")
 				userLocation.value.latitude = res.latitude
 				userLocation.value.longitude = res.longitude
 			},
 			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:158")
+				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:190")
 			}
 		})
 	}
+
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:164")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:197")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:168")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:201")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:171")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:204")
 			}
 		})
 	}
@@ -173,7 +206,7 @@ const _cache = __ins.renderCache;
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:187")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:220")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
@@ -183,11 +216,6 @@ const _cache = __ins.renderCache;
 			url: '/pages/carInfoDetail/carInfoDetail?imei=' + imeiValue + '&deptId=' + companyId.toString() + '&deviceId=' + deviceId.toString()
 		})
 	}
-
-
-
-	// 加载用户设备列表
-
 
 	onLoad((options) => {
 		getLocation()
@@ -225,8 +253,9 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
             onMarkertap: handleTap,
             latitude: userLocation.value.latitude,
             longitude: userLocation.value.longitude,
+            markers: markers.value,
             "enable-traffic": true
-          }), null, 8 /* PROPS */, ["scale", "style", "latitude", "longitude"]),
+          }), null, 8 /* PROPS */, ["scale", "style", "latitude", "longitude", "markers"]),
           isTrue(showMap.value)
             ? _cE("view", _uM({
                 key: 0,
@@ -252,7 +281,7 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
         ])
       : _cE("view", _uM({ key: 1 }), [
           _cV(_component_indexListMode, _uM({
-            lists: originalDeviceList.value,
+            lists: deviceListItems.value,
             onUnbindDevice: unbindDevice
           }), null, 8 /* PROPS */, ["lists"])
         ])
@@ -262,4 +291,4 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
 
 })
 export default __sfc__
-const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]
+const GenPagesDeviceListDeviceListStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tool-nav", _uM([[".container ", _uM([["position", "absolute"], ["top", "200rpx"], ["right", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "35rpx"]])]])], ["btn-map-list", _uM([[".container .tool-nav ", _uM([["paddingTop", "10rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "10rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"]])]])], ["right-bar", _uM([[".container ", _uM([["position", "absolute"], ["top", "25rpx"], ["left", "20rpx"], ["zIndex", 100], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["status-spacing", _uM([[".container .right-bar ", _uM([["marginLeft", "20rpx"]])]])], ["allCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#1296db"]])]])], ["onlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#0da117"]])]])], ["offlineCar", _uM([[".container .right-bar ", _uM([["backgroundColor", "#d81e06"]])]])]])]

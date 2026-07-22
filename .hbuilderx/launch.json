@@ -6,6 +6,9 @@
             "type" : "uni-app:app-ios"
         },
         {
+            "iOSProjectStandardBaseHistory" : {
+                "current" : "Pandora_simulator_debug_5.21.2026071110-alpha.app"
+            },
             "playground" : "standard",
             "type" : "uni-app:app-ios_simulator"
         },

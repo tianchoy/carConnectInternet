@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 require("../../api/request.js");
+require("../../utils/device.js");
 if (!Array) {
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
   const _easycom_i_modal_1 = common_vendor.resolveComponent("i-modal");
@@ -28,17 +29,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:59", iccid);
+      common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:51", iccid);
       needRefresh.value = true;
       common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:71", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:63", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:75", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at components/indexListMode/indexListMode.uvue:67", "打开小程序失败", res);
           needRefresh.value = false;
           common_vendor.index.showToast({
             title: "打开支付页面失败",
@@ -70,7 +71,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, props.lists.length != 0 ? {
         b: common_vendor.f(props.lists, (item, index, i0) => {
           return {
-            a: common_vendor.t(item.deviceName),
+            a: common_vendor.t(item.deviceName || item.imei),
             b: "245c735a-0-" + i0,
             c: common_vendor.p({
               size: "mini",
@@ -104,8 +105,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "device-tool-spacing"
         })
       } : {}, {
-        e: common_vendor.o(confirm, "48"),
-        f: common_vendor.o(cancel, "2f"),
+        e: common_vendor.o(confirm, "7c"),
+        f: common_vendor.o(cancel, "ff"),
         g: common_vendor.p({
           show: common_vendor.unref(modal),
           title: "提示",

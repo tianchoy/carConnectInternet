@@ -146,7 +146,10 @@ const props = defineProps({
  * - click: 点击组件时触发，用于响应用户主动操作。
  * - close: 组件关闭或收起时触发。
  */
-const emit = defineEmits(['click', 'close'])
+const emit = defineEmits<{
+  (e: 'click', event: any): void
+  (e: 'close', text: string): void
+}>()
 
 const bgColor = computed(() => {
   return props.bgColor
@@ -322,13 +325,13 @@ const closeStyle = computed(() => {
   return 'color:' + computedTextColor.value + ';'
 })
 
-function handleClick() {
+function handleClick(event: any): void {
   if (closeClicking.value) {
     closeClicking.value = false
     return
   }
   if (props.disabled) return
-  emit('click', contentText.value)
+  emit('click', event)
 }
 
 function handleClose() {

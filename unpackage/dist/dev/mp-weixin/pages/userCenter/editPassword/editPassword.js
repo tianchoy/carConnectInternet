@@ -70,32 +70,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       confirmPassword: ""
     }));
     const formRef = common_vendor.ref(null);
-    const validateConfirmPassword = (rule, value, callback) => {
-      if (value !== formData.value.newPassword) {
-        callback(new Error("两次输入的密码不一致"));
-      } else {
-        callback(null);
-      }
-    };
-    const rules = new common_vendor.UTSJSONObject({
-      password: [
-        new common_vendor.UTSJSONObject({ required: true, message: "请输入原密码", trigger: "blur" }),
-        new common_vendor.UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" })
-      ],
-      newPassword: [
-        new common_vendor.UTSJSONObject({ required: true, message: "请输入新密码", trigger: "blur" }),
-        new common_vendor.UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" }),
-        new common_vendor.UTSJSONObject({
-          pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,20}$/,
-          message: "密码需包含大小写字母和数字",
-          trigger: "blur"
-        })
-      ],
-      confirmPassword: [
-        new common_vendor.UTSJSONObject({ required: true, message: "请确认新密码", trigger: "blur" }),
-        new common_vendor.UTSJSONObject({ validator: validateConfirmPassword, trigger: "blur" })
-      ]
-    });
+    const rules = [
+      new common_vendor.UTSJSONObject({ name: "password", required: true, message: "请输入原密码" }),
+      new common_vendor.UTSJSONObject({ name: "newPassword", required: true, message: "请输入新密码" }),
+      new common_vendor.UTSJSONObject({ name: "confirmPassword", required: true, message: "请确认新密码" })
+    ];
     const handleSubmit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
@@ -141,16 +120,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo != null) {
         try {
           const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:132", parsedInfo);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:118", parsedInfo);
           const userId = parsedInfo.getString("userId");
           const mobile = parsedInfo.getString("mobile");
           userInfo.value = {
             id: userId != null ? userId : "",
             mobile: mobile != null ? mobile : ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:139", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:125", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:141", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:127", "解析用户信息失败:", e);
         }
       }
     });

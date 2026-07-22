@@ -264,6 +264,7 @@
   font-size: 45rpx;
   font-weight: bold;
   color: #333;
+  text-align: center;
 }
 .container .page-bg .content .mile-record .unit.data-v-00a60067 {
   font-size: 20rpx;
@@ -331,6 +332,8 @@
 }
 .container .page-bg .content .device-list .device-item .item-label .item-info .item-desc.data-v-00a60067 {
   color: #ccc;
+  font-size: 24rpx;
+  margin-top: 10rpx;
 }
 .container .page-bg .content .service.data-v-00a60067 {
   display: flex;

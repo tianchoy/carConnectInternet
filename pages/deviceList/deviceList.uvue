@@ -5,7 +5,7 @@
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
 			<map id="myMap" :scale="mapScale" style="width:100%;height:100%"
-				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
+				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :markers="markers" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
 				<i-tag type="primary" @click="changeState('在线')" :text="`在线 ${onlineCount}`"></i-tag>
@@ -14,20 +14,21 @@
             </view>
 		</view>
 		<view v-else>
-			<indexListMode :lists="originalDeviceList" @unbindDevice="unbindDevice" />
+			<indexListMode :lists="deviceListItems" @unbindDevice="unbindDevice" />
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, computed, watch } from 'vue'
+	import { ref, computed, watchEffect } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
+	import { DeviceItem } from '../../utils/device.uts'
 
 	const mapScale = ref(4)
 	const showMap = ref(true)
-	const markers = ref<Array<UTSJSONObject>>([])
+	const markers = ref<Array<Marker>>([])
 	const iconColor = ref('#1296db')
 	const userLocation = ref({
 		latitude: 0, 
@@ -43,6 +44,24 @@
 
 	// 原始设备列表
 	const originalDeviceList = ref<Array<UTSJSONObject>>([])
+
+	const deviceListItems = computed((): Array<DeviceItem> => {
+		return originalDeviceList.value.map((item: UTSJSONObject): DeviceItem => {
+			const imei = item.getString('imei', '')
+			const rawDeviceName = item.getString('deviceName', '')
+			return {
+				plateNo: item.getString('plateNo', ''),
+				imei: imei,
+				status: item.getNumber('status', 0),
+				companyId: item.getString('companyId', ''),
+				deviceName: rawDeviceName != '' ? rawDeviceName : imei,
+				deviceId: item.getString('deviceId', ''),
+				iccid: item.getString('iccid', ''),
+				simMerchant: item.getString('simMerchant', ''),
+				connectionStatus: item.getString('connectionStatus', '')
+			}
+		})
+	})
 
 	// 计算属性 筛选逻辑
 	const filteredDevices = computed(() => {
@@ -70,7 +89,7 @@
 
 
 	const updateMarkers = (devices: Array<UTSJSONObject>): void => {
-		const nextMarkers: Array<UTSJSONObject> = []
+		const nextMarkers: Array<Marker> = []
 		for (let index = 0; index < devices.length; index++) {
 			const device = devices[index]
 			const latitude = device['latitude'] as string | number | null
@@ -99,11 +118,15 @@
 					borderRadius: 8,
 					bgColor: '#ffffff'
 				},
-				joinCluster: true,
 				anchor: { x: 0.5, y: 0.5 }
-			} as UTSJSONObject)
+			} as Marker)
 		}
 		markers.value = nextMarkers
+		if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
+			const firstMarker = nextMarkers[0]
+			userLocation.value.latitude = firstMarker.latitude
+			userLocation.value.longitude = firstMarker.longitude
+		}
 	}
 	watchEffect(() => {
 		if (showMap.value) {
@@ -117,13 +140,22 @@
 			if (from) {
 				const params: UTSJSONObject = { pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				const list = res.data.list
-				deviceList = list != null ? list : []
+				const list = (res.code == 0 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
+				if (list == null || !Array.isArray(list)) {
+					console.warn('获取设备列表返回异常:', res)
+					originalDeviceList.value = []
+					markers.value = []
+					return
+				}
+				deviceList = list ?? []
 			}
+			if (!Array.isArray(deviceList)) deviceList = []
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
 			console.error('获取设备列表失败:', err)
+			originalDeviceList.value = []
+			markers.value = []
 			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
@@ -159,6 +191,7 @@
 			}
 		})
 	}
+
 	// 订阅消息
 	const subMsg = () => {
 		console.log('订阅消息')
@@ -195,11 +228,6 @@
 		})
 	}
 
-
-
-	// 加载用户设备列表
-
-
 	onLoad((options) => {
 		getLocation()
 		loadUserDeviceList([], true)
@@ -210,6 +238,7 @@
 	.container {
 		position: relative;
 		width: 100%;
+		height: 100%;
 		//#ifdef MP-WEIXIN
 		min-height: 100%;
 		//#endif

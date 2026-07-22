@@ -67,7 +67,7 @@
 				<i-checkbox :checked="docState" @change="isDocState">
 				</i-checkbox>
 				<view class="doc-info-box">
-					已阅读并同意<text class="doc-link" @click="gotoAgreement">《用户协议》</text>和<text class="doc-link" @click="gotoPrivacy">《隐私政策》</text>
+					<text class="doc-text">已阅读并同意</text><text class="doc-link" @click="gotoAgreement">《用户协议》</text><text class="doc-text">和</text><text class="doc-link" @click="gotoPrivacy">《隐私政策》</text>
 				</view>
 			</view>
 		</view>
@@ -497,12 +497,14 @@
 					flex-direction: row;
 					justify-content: flex-start;
 					align-items: center;
-					font-size: 10000px;
 					white-space: nowrap;
 					.doc-link {
 						color: #007AFF;
+						font-size: 10px;
 					}
-					font-size: 10px;
+					.doc-text {
+						font-size: 10px;
+					}
 				}
 			}
 
