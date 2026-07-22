@@ -193,9 +193,9 @@
 				withPos: false,
 				withTrip: true,
 			};
-			const res = await getTrackPos(data) as UTSJSONObject;
+			const res = await getTrackPos(data);
 			console.log('获取里程数据成功:', res);
-			const trackData = res.getJSON('data')
+			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}

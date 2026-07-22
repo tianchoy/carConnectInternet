@@ -118,13 +118,18 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (from) {
                                 val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 118, 11), "pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
-                                deviceList = res.data.list
+                                val list = res.data.list
+                                deviceList = if (list != null) {
+                                    list
+                                } else {
+                                    _uA()
+                                }
                             }
                             originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent")
                             updateMarkers(originalDeviceList.value)
                         }
                          catch (err: Throwable) {
-                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:125")
+                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:126")
                             uni_showToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
                         }
                 })
@@ -143,12 +148,12 @@ open class GenPagesDeviceListDeviceList : BasePage {
             }
             val getLocation = fun(){
                 uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:152")
+                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:153")
                     userLocation.value["latitude"] = res.latitude
                     userLocation.value["longitude"] = res.longitude
                 }
                 , fail = fun(err){
-                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:157")
+                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:158")
                 }
                 ))
             }
@@ -167,7 +172,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 }
                 )
                 if (selectedDevice == null) {
-                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:186")
+                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:187")
                     return
                 }
                 val imeiValue = (selectedDevice["imei"] as String?) ?: ""
@@ -191,8 +196,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                     )),
                     if (isTrue(showMap.value)) {
                         _cE("view", _uM("key" to 0, "class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "markers" to markers.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "onMarkertap" to handleTap, "latitude" to userLocation.value["latitude"], "longitude" to userLocation.value["longitude"], "enable-traffic" to true), null, 8, _uA(
-                                "markers",
+                            _cV(_component_map, _uM("id" to "myMap", "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "onMarkertap" to handleTap, "latitude" to userLocation.value["latitude"], "longitude" to userLocation.value["longitude"], "enable-traffic" to true), null, 8, _uA(
                                 "scale",
                                 "style",
                                 "latitude",

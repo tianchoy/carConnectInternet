@@ -33,8 +33,8 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
             val toggleEdit = fun(){}
             val loadCarListData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(getDeviceDetail(deviceId.value)) as UTSJSONObject
-                        val data = res.getJSON("data")
+                        val res = await(getDeviceDetail(deviceId.value))
+                        val data = res.data
                         if (data != null) {
                             carInfo.value = data
                         }

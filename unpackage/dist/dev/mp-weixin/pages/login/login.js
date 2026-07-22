@@ -41,25 +41,6 @@ class FormData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class FormInstance extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          validate: { type: "Unknown", optional: false }
-        };
-      },
-      name: "FormInstance"
-    };
-  }
-  constructor(options, metadata = FormInstance.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.validate = this.__props__.validate;
-    delete this.__props__;
-  }
-}
 class SavedAccount extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -78,25 +59,6 @@ class SavedAccount extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.username = this.__props__.username;
     this.password = this.__props__.password;
-    delete this.__props__;
-  }
-}
-class LoginResponse extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          data: { type: "Unknown", optional: true }
-        };
-      },
-      name: "LoginResponse"
-    };
-  }
-  constructor(options, metadata = LoginResponse.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.data = this.__props__.data;
     delete this.__props__;
   }
 }
@@ -158,25 +120,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       username: "",
       password: ""
     }));
-    const formRef = common_vendor.ref(null);
     const deviceModel = common_vendor.ref("");
-    const pswrules = new common_vendor.UTSJSONObject({
-      username: [new common_vendor.UTSJSONObject({ required: true, message: "请输入账号" })],
-      password: [new common_vendor.UTSJSONObject({ required: true, message: "请输入密码" })]
-    });
+    const pswrules = [
+      new common_vendor.UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
+      new common_vendor.UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
+    ];
     const updateFormValid = (valid) => {
       formValid.value = valid;
     };
     function loadSavedAccount() {
       try {
-        const savedAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount");
-        if (savedAccount != null) {
-          form.value.username = savedAccount.username;
-          form.value.password = savedAccount.password;
-          rememberPassword.value = true;
-        }
+        const rawAccount = common_vendor.index.getStorageSync("savedEnterpriseAccount");
+        if (rawAccount == null || rawAccount == "")
+          return null;
+        const account = typeof rawAccount == "string" ? common_vendor.UTS.JSON.parse(rawAccount) : rawAccount;
+        form.value.username = account.getString("username", "");
+        form.value.password = account.getString("password", "");
+        rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:138", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:127", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -199,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           username: form.value.username,
           password: form.value.password
         });
-        common_vendor.index.setStorageSync("savedEnterpriseAccount", accountInfo);
+        common_vendor.index.setStorageSync("savedEnterpriseAccount", common_vendor.UTS.JSON.stringify(accountInfo));
       } else if (!rememberPassword.value) {
         common_vendor.index.removeStorageSync("savedEnterpriseAccount");
       }
@@ -213,15 +175,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:181", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:170", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
-      const currentForm = formRef.value;
-      if (currentForm == null) {
-        common_vendor.index.showToast({ title: "表单未初始化", icon: "none" });
+      if (form.value.username.length == 0) {
+        common_vendor.index.showToast({ title: "请输入账号", icon: "none" });
         return false;
       }
-      return currentForm.validate();
+      if (form.value.password.length == 0) {
+        common_vendor.index.showToast({ title: "请输入密码", icon: "none" });
+        return false;
+      }
+      return true;
     };
     const loginBt = () => {
       if (!docState.value) {
@@ -232,10 +197,78 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
     };
-    const handleGetPhoneNumber = () => {
-      common_vendor.index.showToast({
-        title: "请使用企业账号登录",
-        icon: "none"
+    const handleGetPhoneNumber = (e = null) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (!docState.value) {
+          common_vendor.index.showToast({
+            title: "请先阅读并同意用户协议",
+            icon: "error"
+          });
+          return Promise.resolve(null);
+        }
+        if (e.detail.errMsg === "getPhoneNumber:fail user deny") {
+          common_vendor.index.showToast({
+            title: "您拒绝了授权",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        if (e.detail.errMsg !== "getPhoneNumber:ok") {
+          common_vendor.index.showToast({
+            title: "获取手机号失败",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        try {
+          common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "登录中..." }));
+          const loginRes = yield new Promise((resolve, reject) => {
+            common_vendor.index.login(new common_vendor.UTSJSONObject({
+              provider: "weixin",
+              success: resolve,
+              fail: reject
+            }));
+          });
+          const res = yield api_request.PostWechatlogin(new common_vendor.UTSJSONObject({
+            code: loginRes.code,
+            encryptedData: e.detail.encryptedData,
+            iv: e.detail.iv
+          }));
+          const loginData = res.data;
+          if (loginData == null) {
+            common_vendor.index.showToast({
+              title: res.msg || "登录失败",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          const token = loginData.getString("token", "");
+          if (token == "") {
+            common_vendor.index.showToast({
+              title: "登录失败: 未获取到token",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          common_vendor.index.setStorageSync("token", token);
+          common_vendor.index.showToast({
+            title: "登录成功",
+            icon: "success"
+          });
+          setTimeout(() => {
+            common_vendor.index.reLaunch({
+              url: "/pages/index/index"
+            });
+          }, 500);
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:273", "微信登录失败:", error);
+          common_vendor.index.showToast({
+            title: "微信登录失败",
+            icon: "none"
+          });
+        } finally {
+          common_vendor.index.hideLoading();
+        }
       });
     };
     const submit = () => {
@@ -248,25 +281,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:228", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:298", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:230", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:300", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:239", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:309", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:249", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:319", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:251", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:321", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
@@ -290,7 +323,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:280", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:350", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -329,14 +362,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:376", "pswLogin 初始值:", pswLogin.value);
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:377", "formRef 初始值:", formRef.value);
-      setTimeout(() => {
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:381", "延迟检查 formRef.value:", formRef.value);
-        if (formRef.value) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:383", "formRef 已初始化");
-        }
-      }, 500);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:446", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -354,7 +380,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pswLogin.value ? {
         d: common_vendor.o(($event) => {
           return form.value.username = $event;
-        }, "4b"),
+        }, "ae"),
         e: common_vendor.p({
           placeholder: "请输入账号",
           clearable: true,
@@ -370,10 +396,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelWidth: "0",
           class: "data-v-27a30816"
         }),
-        g: common_vendor.o(filterNonLatin, "0e"),
+        g: common_vendor.o(filterNonLatin, "ec"),
         h: common_vendor.o(($event) => {
           return form.value.password = $event;
-        }, "10"),
+        }, "11"),
         i: common_vendor.p({
           placeholder: "请输入密码",
           password: true,
@@ -388,52 +414,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelWidth: "0",
           class: "data-v-27a30816"
         }),
-        k: common_vendor.o(toggleRememberPassword, "23"),
+        k: common_vendor.o(toggleRememberPassword, "b6"),
         l: common_vendor.p({
           checked: rememberPassword.value,
           label: "记住密码",
           class: "data-v-27a30816"
         }),
-        m: common_vendor.o(submit, "5d"),
+        m: common_vendor.o(submit, "b1"),
         n: common_vendor.p({
           type: "primary",
           loading: loading.value,
           class: "data-v-27a30816"
         }),
-        o: common_vendor.sr(formRef, "27a30816-1", {
-          "k": "formRef"
-        }),
-        p: common_vendor.o(updateFormValid, "66"),
-        q: common_vendor.p({
+        o: common_vendor.o(updateFormValid, "e5"),
+        p: common_vendor.p({
           modelValue: form.value,
           rules: pswrules,
           labelDirection: "horizontal",
           watchValidStatus: true,
-          class: "r data-v-27a30816"
+          class: "data-v-27a30816"
         })
       } : common_vendor.e({
-        r: !docState.value
+        q: !docState.value
       }, !docState.value ? {
-        s: common_vendor.o(loginBt, "0e")
+        r: common_vendor.o(loginBt, "33")
       } : {}, {
-        t: docState.value
+        s: docState.value
       }, docState.value ? {
-        v: common_vendor.o(handleGetPhoneNumber, "71")
+        t: common_vendor.o(handleGetPhoneNumber, "11")
       } : {}), {
-        w: common_vendor.o(isDocState, "c6"),
-        x: common_vendor.p({
+        v: common_vendor.o(isDocState, "fe"),
+        w: common_vendor.p({
           checked: docState.value,
           class: "data-v-27a30816"
         }),
-        y: common_vendor.o(gotoAgreement, "d9"),
-        z: common_vendor.o(gotoPrivacy, "b7"),
-        A: common_vendor.o(gotoIndex, "7b"),
-        B: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        C: common_vendor.o(isPswLogin, "fa"),
-        D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        E: `${_ctx.u_s_b_h}px`,
-        F: `${_ctx.u_s_a_i_b}px`,
-        G: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        x: common_vendor.o(gotoAgreement, "83"),
+        y: common_vendor.o(gotoPrivacy, "53"),
+        z: common_vendor.o(gotoIndex, "9d"),
+        A: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
+        B: common_vendor.o(isPswLogin, "71"),
+        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        D: `${_ctx.u_s_b_h}px`,
+        E: `${_ctx.u_s_a_i_b}px`,
+        F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

@@ -183,12 +183,12 @@ const _cache = __ins.renderCache;
 			const res = await getDevicePos(data)
 
 			res.data.forEach(item => {
-				if (item.imei == imei.value) {
+				if (item.getString('imei', '') == imei.value) {
 					const deviceData = item
 					// 转换坐标到腾讯地图坐标系
 					const convertedCoord = CoordTransform.wgs84ToTencent(
-						parseFloat(deviceData.latitude.toString()),
-						parseFloat(deviceData.longitude.toString())
+						deviceData.getNumber('latitude', 0),
+						deviceData.getNumber('longitude', 0)
 					)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
@@ -199,7 +199,7 @@ const _cache = __ins.renderCache;
 					}
 
 					// 记录初始方向
-					lastDirection.value = deviceData.direction ? parseFloat(deviceData.direction.toString()) : 0
+					lastDirection.value = deviceData.getNumber('direction', 0)
 
 					// 创建车辆标记点
 					carMarker.value = {
@@ -290,7 +290,7 @@ const _cache = __ins.renderCache;
 		try {
 			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
 			const parts = coordStr.split(',')
-			if (parts.length !== 2) return null
+			if (parts.length != 2) return null
 			const centerValues = parts[0].trim().split(' ')
 			const lat = parseFloat(centerValues[0])
 			const lng = parseFloat(centerValues[1])
@@ -393,7 +393,7 @@ const _cache = __ins.renderCache;
 
 	const renderFencesOnMap = () => {
 		// 当围栏列表为空时，强制清空地图上所有围栏和标记
-		if (!fenceList.value || fenceList.value.length === 0) {
+		if (!fenceList.value || fenceList.value.length == 0) {
 			polygons.value = []; // 清空多边形围栏
 			circles.value = [];  // 清空圆形围栏
 			updateMarkers();    // 清空围栏相关标记（如顶点、圆心）

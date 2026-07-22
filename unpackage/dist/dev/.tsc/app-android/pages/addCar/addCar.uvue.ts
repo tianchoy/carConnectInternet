@@ -183,7 +183,7 @@ const _cache = __ins.renderCache;
 
 			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:215")
 
-			const res = await addDevice(submitData) as AddDeviceResponse
+			const res = await addDevice(submitData)
 			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:218")
 
 			uni.hideLoading()
@@ -230,7 +230,8 @@ const _cache = __ins.renderCache;
 	})
 
 	onShow(() => {
-		const result = uni.getStorageSync('scanCodeResult') as string
+		const rawResult = uni.getStorageSync('scanCodeResult')
+			const result = rawResult != null ? rawResult.toString() : ''
 		if (result.length > 0) {
 			uni.removeStorageSync('scanCodeResult')
 			handleScanResult({ result: result })

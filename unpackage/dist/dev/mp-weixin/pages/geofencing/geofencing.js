@@ -400,9 +400,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const data = new common_vendor.UTSJSONObject({ deptId: deptId.value, deviceids: imei.value });
           const res = yield api_request.getDevicePos(data);
           res.data.forEach((item) => {
-            if (item.imei == imei.value) {
+            if (item.getString("imei", "") == imei.value) {
               const deviceData = item;
-              const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(parseFloat(deviceData.latitude.toString()), parseFloat(deviceData.longitude.toString()));
+              const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(deviceData.getNumber("latitude", 0), deviceData.getNumber("longitude", 0));
               center.latitude = convertedCoord.lat;
               center.longitude = convertedCoord.lng;
               const position = new common_vendor.UTSJSONObject(
@@ -412,7 +412,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 }
                 // 记录初始方向
               );
-              lastDirection.value = deviceData.direction ? parseFloat(deviceData.direction.toString()) : 0;
+              lastDirection.value = deviceData.getNumber("direction", 0);
               carMarker.value = new common_vendor.UTSJSONObject(
                 {
                   id: 0,
@@ -486,7 +486,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         const coordStr = circleStr.replace(/CIRCLE \(/, "").replace(/\)/, "");
         const parts = coordStr.split(",");
-        if (parts.length !== 2)
+        if (parts.length != 2)
           return null;
         const centerValues = parts[0].trim().split(" ");
         const lat = parseFloat(centerValues[0]);
@@ -579,7 +579,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       markers.value = newMarkers;
     }
     const renderFencesOnMap = () => {
-      if (!fenceList.value || fenceList.value.length === 0) {
+      if (!fenceList.value || fenceList.value.length == 0) {
         polygons.value = [];
         circles.value = [];
         updateMarkers();

@@ -1,5 +1,5 @@
 export function getDeviceIcon(connectionStatus: string, carType: string): string {
-    const basePath = connectionStatus === 'online' 
+    const basePath = connectionStatus == 'online' 
         ? '/static/cars/online/' 
         : '/static/cars/offline/'
     

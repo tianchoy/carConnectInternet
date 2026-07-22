@@ -103,7 +103,7 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
       _cE("view", _uM({
         class: "capsule",
         style: _nS(_uM({
-      right: 200+'rpx',
+      right: 10+'rpx',
     }))
       }), [
         _cE("view", _uM({ class: "capsule-item" }), [

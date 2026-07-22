@@ -41,12 +41,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: pageSize.value
           });
           const res = yield api_request.getUserDeviceList(data);
-          if (res.code == 0) {
-            totalPage.value = res.data.totalPage;
+          const code = res.code;
+          const list = res.data.list;
+          const pageCount = res.data.totalPage;
+          if (code == 0 && list != null) {
+            totalPage.value = pageCount;
             if (currPage.value == 1) {
-              carList.value = res.data.list;
+              carList.value = list;
             } else {
-              carList.value = [...carList.value, ...res.data.list];
+              carList.value = [...carList.value, ...list];
             }
             hasMore.value = currPage.value < totalPage.value;
             if (hasMore.value) {
@@ -59,7 +62,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:94", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:98", "加载车辆列表失败:", error);
           common_vendor.index.showToast({
             title: "加载失败，请重试",
             icon: "none"

@@ -17,8 +17,8 @@ const _cache = __ins.renderCache;
 	const toggleEdit = () => {}
 
 	const loadCarListData = async () : Promise<void> => {
-		const res = await getDeviceDetail(deviceId.value) as UTSJSONObject
-		const data = res.getJSON('data')
+		const res = await getDeviceDetail(deviceId.value)
+		const data = res.data
 		if (data != null) carInfo.value = data
 	}
 

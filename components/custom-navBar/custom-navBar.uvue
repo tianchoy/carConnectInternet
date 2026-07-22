@@ -19,7 +19,8 @@
 		<view class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
 			<slot name="title">{{ title }}</slot>
 		</view>
-		<view class="capsule" :style="{
+		<!-- #ifdef MP-WEIXIN-->
+		 <view class="capsule" :style="{
       right: 200+'rpx',
     }">
 			<view class="capsule-item">
@@ -29,6 +30,19 @@
 				</view>
 			</view>
 		</view>
+		<!-- #endif-->
+		 <!-- #ifndef MP-WEIXIN-->
+		 <view class="capsule" :style="{
+      right: 10+'rpx',
+    }">
+			<view class="capsule-item">
+				<view v-if="showCapsule" @click="handleCapsuleClick">
+					<i-icon :name="Icon" v-if="isIcon"  fontSize="20"></i-icon>
+					<text v-else>{{rightText}}</text>
+				</view>
+			</view>
+		</view>
+		 <!-- #endif-->
 	</view>
 </template>
 

@@ -114,9 +114,9 @@
 			withPos: false,
 			withTrip: false
 		} as UTSJSONObject
-		const res = await getTrackPos(data) as UTSJSONObject
+		const res = await getTrackPos(data)
 		let stopsWithAddress : Array<StopRecord> = []
-		const trackData = res.getJSON('data')
+		const trackData = res.data
 		const stops = trackData?.getArray<UTSJSONObject>('stops') ?? []
 		stops.forEach((stop : UTSJSONObject) : void => {
 			// 转换坐标到腾讯地图坐标系

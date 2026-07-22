@@ -29,15 +29,15 @@ const _cache = __ins.renderCache;
 	
 	// 加载数据
 	const loadData = async () => {
-		let params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 7),}
+		const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 9), } as UTSJSONObject
 		const res = await getUserInfo()
-		userInfo.value = res.data
+		userInfo.value = {
+			avatar: res.data.getString('avatar', '/static/avatar.png'),
+			nickname: res.data.getString('nickname', '')
+		}
 
 		const resCars = await getUserDeviceList(params)
-
-		if (resCars?.data?.totalCount) {
-			carsnumber.value = resCars.data.totalCount
-		}
+		carsnumber.value = resCars.data.totalCount
 	}
 
 	onShow(() => {

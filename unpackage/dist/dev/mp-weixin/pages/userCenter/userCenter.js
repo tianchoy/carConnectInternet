@@ -31,14 +31,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const windowHeight = common_vendor.ref(0);
     const loadData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
-        let params = new common_vendor.UTSJSONObject({});
+        const params = new common_vendor.UTSJSONObject({});
         const res = yield api_request.getUserInfo();
-        userInfo.value = res.data;
+        userInfo.value = {
+          avatar: res.data.getString("avatar", "/static/avatar.png"),
+          nickname: res.data.getString("nickname", "")
+        };
         const resCars = yield api_request.getUserDeviceList(params);
-        if ((_a = resCars === null || resCars === void 0 ? null : resCars.data) === null || _a === void 0 ? null : _a.totalCount) {
-          carsnumber.value = resCars.data.totalCount;
-        }
+        carsnumber.value = resCars.data.totalCount;
       });
     };
     common_vendor.onShow(() => {

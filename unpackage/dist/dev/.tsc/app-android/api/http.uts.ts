@@ -104,7 +104,7 @@ function responseInterceptor(response: RequestSuccess<any>, config: RequestOptio
 // 错误处理
 function errorHandler(error: HttpError, config: RequestOptions): void {
     // 隐藏加载中
-    if (config.showLoading !== false) {
+    if (config.showLoading != false) {
         uni.hideLoading()
     }
     
@@ -150,7 +150,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
 }
 
 // 封装uni.request
-function request<T = any>(options: RequestOptions): Promise<T> {
+function request(options: RequestOptions): Promise<any> {
     const requestUrl = options.url != null ? options.url! : ''
 
     // 合并配置
@@ -159,7 +159,7 @@ function request<T = any>(options: RequestOptions): Promise<T> {
         method: options.method != null ? options.method : 'GET',
         data: options.data != null ? options.data : {},
         header: options.header != null ? options.header : new UTSJSONObject(),
-        showLoading: options.showLoading !== false
+        showLoading: options.showLoading != false
     }
     
     // 处理完整URL
@@ -170,7 +170,7 @@ function request<T = any>(options: RequestOptions): Promise<T> {
     // 请求拦截
     const processedConfig = requestInterceptor(config)
     
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
         uni.request<any>({
             url: processedConfig.url!,
             method: processedConfig.method,
@@ -178,9 +178,9 @@ function request<T = any>(options: RequestOptions): Promise<T> {
             header: processedConfig.header,
             success: (res: RequestSuccess<any>) => {
                 const statusCode = res.statusCode
-                if (statusCode === 200) {
+                if (statusCode == 200) {
                     const data = responseInterceptor(res, processedConfig)
-                    resolve(data as T)
+                    resolve(data)
                 } else {
                     const httpError: HttpError = {
                         statusCode: statusCode,
@@ -205,8 +205,8 @@ function request<T = any>(options: RequestOptions): Promise<T> {
 }
 
 // 封装常用方法
-export function get<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
-    return request<T>({
+export function get(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
+    return request({
         url: url,
         method: 'GET',
         data: data,
@@ -215,8 +215,8 @@ export function get<T = any>(url: string, data: any = {}, options: RequestOption
     })
 }
 
-export function post<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
-    return request<T>({
+export function post(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
+    return request({
         url: url,
         method: 'POST',
         data: data,
@@ -225,8 +225,8 @@ export function post<T = any>(url: string, data: any = {}, options: RequestOptio
     })
 }
 
-export function put<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
-    return request<T>({
+export function put(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
+    return request({
         url: url,
         method: 'PUT',
         data: data,
@@ -235,8 +235,8 @@ export function put<T = any>(url: string, data: any = {}, options: RequestOption
     })
 }
 
-export function remove<T = any>(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<T> {
-    return request<T>({
+export function remove(url: string, data: any = {}, options: RequestOptions = {} as RequestOptions): Promise<any> {
+    return request({
         url: url,
         method: 'DELETE',
         data: data,
@@ -245,8 +245,8 @@ export function remove<T = any>(url: string, data: any = {}, options: RequestOpt
     })
 }
 
-export function upload<T = any>(url: string, filePath: string, name: string = 'file', formData: UTSJSONObject = {} as UTSJSONObject, options: RequestOptions = {} as RequestOptions): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
+export function upload(url: string, filePath: string, name: string = 'file', formData: UTSJSONObject = {} as UTSJSONObject, options: RequestOptions = {} as RequestOptions): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
         // 处理完整URL
         const fullUrl = url.startsWith('http') ? url : BASE_URL + url
 
@@ -263,7 +263,7 @@ export function upload<T = any>(url: string, filePath: string, name: string = 'f
 
         }
 
-        if (options.showLoading !== false) {
+        if (options.showLoading != false) {
             uni.showLoading({
                 title: '上传中...',
                 mask: true
@@ -277,16 +277,16 @@ export function upload<T = any>(url: string, filePath: string, name: string = 'f
             formData: formData,
             header: header,
             success: (res) => {
-                if (options.showLoading !== false) {
+                if (options.showLoading != false) {
                     uni.hideLoading()
                 }
 
-                if (res.statusCode === 200) {
+                if (res.statusCode == 200) {
                     try {
                         const data = JSON.parse(res.data)
-                        resolve(data as T)
+                        resolve(data)
                     } catch (e) {
-                        resolve(res.data as T)
+                        resolve(res.data)
                     }
                 } else {
                     const error: HttpError = {
@@ -299,7 +299,7 @@ export function upload<T = any>(url: string, filePath: string, name: string = 'f
                 }
             },
             fail: (error) => {
-                if (options.showLoading !== false) {
+                if (options.showLoading != false) {
                     uni.hideLoading()
                 }
 

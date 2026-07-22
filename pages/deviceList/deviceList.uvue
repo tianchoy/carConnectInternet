@@ -4,7 +4,7 @@
 			:isIcon="true" @capsuleClick="showWhat" Icon="/static/maps.png" :iconColor="iconColor">
 		</custom-navBar>
 		<view class="map-container" v-if="showMap">
-			<map id="myMap" :markers="markers" :scale="mapScale" style="width:100%;height:100%"
+			<map id="myMap" :scale="mapScale" style="width:100%;height:100%"
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
@@ -117,7 +117,8 @@
 			if (from) {
 				const params: UTSJSONObject = { pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				deviceList = res.data.list
+				const list = res.data.list
+				deviceList = list != null ? list : []
 			}
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)

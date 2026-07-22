@@ -457,8 +457,8 @@ const _cache = __ins.renderCache;
 			withTrip: false,
 		}
 
-		const res = await getTrackPos(data) as UTSJSONObject
-		const trackData = res.getJSON('data')
+		const res = await getTrackPos(data)
+		const trackData = res.data
 		const positions = trackData?.getArray<UTSJSONObject>('positions')
 		if (positions != null && positions.length > 0) {
 			processTrackData(positions)

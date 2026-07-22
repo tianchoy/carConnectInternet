@@ -108,9 +108,9 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
     )
 }
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
-    val hosts: String = "127.0.0.1,192.168.1.22"
+    val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_tYSKPk"
+    val id: String = "app-android_Te3bWS"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -326,7 +326,7 @@ fun responseInterceptor(response: RequestSuccess<Any>, config: RequestOptions__1
     return response.data!!
 }
 fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
-    if (config.showLoading !== false) {
+    if (config.showLoading != false) {
         uni_hideLoading(null)
     }
     console.log("请求错误详情:", error, " at api/http.uts:111")
@@ -351,7 +351,7 @@ fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
         uni_showToast(ShowToastOptions(title = "网络错误，请检查网络连接", icon = "none"))
     }
 }
-fun <T> request(options: RequestOptions__1): UTSPromise<T> {
+fun request(options: RequestOptions__1): UTSPromise<Any> {
     val requestUrl = if (options.url != null) {
         options.url!!
     } else {
@@ -372,17 +372,17 @@ fun <T> request(options: RequestOptions__1): UTSPromise<T> {
     } else {
         UTSJSONObject()
     }
-    , showLoading = options.showLoading !== false)
+    , showLoading = options.showLoading != false)
     if (!config.url!!.startsWith("http")) {
         config.url = BASE_URL + config.url!!
     }
     val processedConfig = requestInterceptor(config)
-    return UTSPromise<T>(fun(resolve, reject){
+    return UTSPromise<Any>(fun(resolve, reject){
         uni_request<Any>(RequestOptions(url = processedConfig.url!!, method = processedConfig.method, data = processedConfig.data, header = processedConfig.header, success = fun(res: RequestSuccess<Any>){
             val statusCode = res.statusCode
-            if (statusCode === 200) {
+            if (statusCode == 200) {
                 val data = responseInterceptor(res, processedConfig)
-                resolve(data as T)
+                resolve(data)
             } else {
                 val httpError = HttpError(statusCode = statusCode, message = "请求失败: " + statusCode, data = res.data)
                 errorHandler(httpError, processedConfig)
@@ -403,17 +403,50 @@ fun <T> request(options: RequestOptions__1): UTSPromise<T> {
     }
     )
 }
-fun <T> get(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<T> {
-    return request<T>(RequestOptions__1(url = url, method = "GET", data = data, header = options.header, showLoading = options.showLoading))
+fun get(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "GET", data = data, header = options.header, showLoading = options.showLoading))
 }
-fun <T> post(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<T> {
-    return request<T>(RequestOptions__1(url = url, method = "POST", data = data, header = options.header, showLoading = options.showLoading))
+fun post(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "POST", data = data, header = options.header, showLoading = options.showLoading))
 }
-fun <T> put(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<T> {
-    return request<T>(RequestOptions__1(url = url, method = "PUT", data = data, header = options.header, showLoading = options.showLoading))
+fun put(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "PUT", data = data, header = options.header, showLoading = options.showLoading))
 }
-fun <T> remove(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<T> {
-    return request<T>(RequestOptions__1(url = url, method = "DELETE", data = data, header = options.header, showLoading = options.showLoading))
+fun remove(url: String, data: Any = _uO(), options: RequestOptions__1 = RequestOptions__1()): UTSPromise<Any> {
+    return request(RequestOptions__1(url = url, method = "DELETE", data = data, header = options.header, showLoading = options.showLoading))
+}
+fun asJSONObject(value: Any): UTSJSONObject {
+    if (value == null) {
+        return UTSJSONObject()
+    }
+    return value as UTSJSONObject
+}
+fun getResponseCode(response: UTSJSONObject): Number {
+    return response.getNumber("code", -1)
+}
+fun getResponseMessage(response: UTSJSONObject): String {
+    val msg = response.getString("msg", "")
+    return if (msg != "") {
+        msg
+    } else {
+        response.getString("message", "")
+    }
+}
+fun getResponseDataObject(response: UTSJSONObject): UTSJSONObject {
+    val data = response.getJSON("data")
+    return if (data != null) {
+        data
+    } else {
+        UTSJSONObject()
+    }
+}
+fun getResponseDataArray(response: UTSJSONObject): UTSArray<UTSJSONObject> {
+    val data = response.getArray<UTSJSONObject>("data")
+    return if (data != null) {
+        data
+    } else {
+        _uA()
+    }
 }
 val loginUrl = "/sys/login"
 val devicePos = "/gps/lastPosition?deptId="
@@ -437,9 +470,6 @@ val deleteDevice = "/userDevice/del"
 val cmdActionUrl = "/command/cmdAction"
 val cmdByMidUrl = "/command/cmdByMid"
 val cmdSendUrl = "/command/sendCmd"
-val login = fun(data: UTSJSONObject): UTSPromise<Any> {
-    return post(loginUrl, data)
-}
 open class BasicResponse (
     @JsonNotNull
     open var code: Number,
@@ -447,24 +477,20 @@ open class BasicResponse (
     open var msg: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("BasicResponse", "api/request.uts", 36, 6)
+        return UTSSourceMapPosition("BasicResponse", "api/request.uts", 32, 13)
     }
 }
-val logout = fun(): UTSPromise<BasicResponse> {
-    return post<BasicResponse>(logoutUrl)
-}
-open class SendCommandResponse (
+open class JsonDataResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
     open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendCommandResponse", "api/request.uts", 58, 6)
+        return UTSSourceMapPosition("JsonDataResponse", "api/request.uts", 36, 13)
     }
-}
-val sendCommand = fun(data: UTSJSONObject): UTSPromise<SendCommandResponse> {
-    return post<SendCommandResponse>(sendcmd, data)
 }
 open class DevicePositionResponse (
     @JsonNotNull
@@ -475,32 +501,32 @@ open class DevicePositionResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 66, 6)
+        return UTSSourceMapPosition("DevicePositionResponse", "api/request.uts", 41, 13)
     }
 }
-val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
-    return get<DevicePositionResponse>(devicePos, data)
-}
-val getTrackPos = fun(data: UTSJSONObject): UTSPromise<Any> {
-    return get(trackPos, data)
-}
-open class UserInfoResponse (
+open class TrackPosResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
     @JsonNotNull
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 78, 6)
+        return UTSSourceMapPosition("TrackPosResponse", "api/request.uts", 46, 13)
     }
 }
-val getUserInfo = fun(): UTSPromise<UserInfoResponse> {
-    return get<UserInfoResponse>(userinfo)
-}
-val addDevice = fun(data: UTSJSONObject): UTSPromise<Any> {
-    return post(addDeviceUrl, data)
-}
-val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
-    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "api/request.uts", 91, 11), "imei" to imei)
-    return post<BasicResponse>(deleteDevice, data)
+open class UserInfoResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UTSJSONObject,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("UserInfoResponse", "api/request.uts", 51, 13)
+    }
 }
 open class UserDeviceListData (
     @JsonNotNull
@@ -511,7 +537,7 @@ open class UserDeviceListData (
     open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 94, 6)
+        return UTSSourceMapPosition("UserDeviceListData", "api/request.uts", 56, 13)
     }
 }
 open class UserDeviceListResponse (
@@ -523,43 +549,20 @@ open class UserDeviceListResponse (
     open var data: UserDeviceListData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 99, 6)
+        return UTSSourceMapPosition("UserDeviceListResponse", "api/request.uts", 61, 13)
     }
-}
-val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
-    return post<UserDeviceListResponse>(userDeviceList, data)
-}
-open class ChangePasswordResponse (
-    @JsonNotNull
-    open var msg: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ChangePasswordResponse", "api/request.uts", 112, 6)
-    }
-}
-val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
-    return post<ChangePasswordResponse>(changePSW, data)
-}
-val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<Any> {
-    return if (data != null) {
-        get(userMsgList, data)
-    } else {
-        get(userMsgList)
-    }
-}
-val setMsgState = fun(msgId: String): UTSPromise<Any> {
-    return get("" + msgState + msgId)
 }
 open class DeviceDetailResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
     @JsonNotNull
     open var data: UTSJSONObject,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 132, 6)
+        return UTSSourceMapPosition("DeviceDetailResponse", "api/request.uts", 66, 13)
     }
-}
-val getDeviceDetail = fun(deviceId: String): UTSPromise<DeviceDetailResponse> {
-    return get<DeviceDetailResponse>("" + deviceDetail + deviceId)
 }
 open class GeofenceResponse (
     @JsonNotNull
@@ -570,66 +573,44 @@ open class GeofenceResponse (
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 142, 6)
+        return UTSSourceMapPosition("GeofenceResponse", "api/request.uts", 71, 13)
     }
 }
 open class DevicePageData (
     @JsonNotNull
     open var list: UTSArray<UTSJSONObject>,
+    @JsonNotNull
+    open var totalPage: Number,
+    @JsonNotNull
+    open var totalCount: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 147, 6)
+        return UTSSourceMapPosition("DevicePageData", "api/request.uts", 76, 13)
     }
 }
 open class DevicePageResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
     open var data: DevicePageData,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 150, 6)
+        return UTSSourceMapPosition("DevicePageResponse", "api/request.uts", 81, 13)
     }
-}
-val getGeofenceList = fun(): UTSPromise<GeofenceResponse> {
-    return get<GeofenceResponse>(getGeofence)
-}
-val addGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post<BasicResponse>(getGeofence, data)
-}
-val updateGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return put<BasicResponse>(getGeofence, data)
-}
-val deleteGeofence = fun(id: String): UTSPromise<BasicResponse> {
-    return remove<BasicResponse>("" + deleteGeo + id)
-}
-val getUnboundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
-    return get<DevicePageResponse>(unbindDeviceList, params)
-}
-val getBoundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
-    return get<DevicePageResponse>(bindDeviceList, params)
-}
-val bindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return post<BasicResponse>(bindGeofence, data)
-}
-val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
-    return remove<BasicResponse>(unbindGeofence, data)
 }
 open class CommandListResponse (
     @JsonNotNull
     open var code: Number,
     @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
     open var data: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 186, 6)
+        return UTSSourceMapPosition("CommandListResponse", "api/request.uts", 86, 13)
     }
-}
-val getCmdAction = fun(): UTSPromise<CommandListResponse> {
-    return get<CommandListResponse>(cmdActionUrl)
-}
-val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
-    return get<CommandListResponse>(cmdByMidUrl, data)
 }
 open class SendCmdResponse (
     @JsonNotNull
@@ -640,11 +621,224 @@ open class SendCmdResponse (
     open var data: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 198, 6)
+        return UTSSourceMapPosition("SendCmdResponse", "api/request.uts", 91, 13)
     }
 }
+open class ChangePasswordResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ChangePasswordResponse", "api/request.uts", 96, 13)
+    }
+}
+open class MessageResponse (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: UserDeviceListData,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("MessageResponse", "api/request.uts", 100, 13)
+    }
+}
+fun basicResponse(raw: Any): BasicResponse {
+    val response = asJSONObject(raw)
+    return BasicResponse(code = getResponseCode(response), msg = getResponseMessage(response))
+}
+fun jsonDataResponse(raw: Any): JsonDataResponse {
+    val response = asJSONObject(raw)
+    return JsonDataResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+}
+fun devicePageResponse(raw: Any): DevicePageResponse {
+    val response = asJSONObject(raw)
+    val data = getResponseDataObject(response)
+    val list = data.getArray<UTSJSONObject>("list")
+    return DevicePageResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = DevicePageData(list = if (list != null) {
+        list
+    } else {
+        _uA()
+    }
+    , totalPage = data.getNumber("totalPage", 0), totalCount = data.getNumber("totalCount", 0)))
+}
+fun userDevicePageResponse(raw: Any): UserDeviceListResponse {
+    val page = devicePageResponse(raw)
+    return UserDeviceListResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
+}
+fun messagePageResponse(raw: Any): MessageResponse {
+    val page = devicePageResponse(raw)
+    return MessageResponse(code = page.code, msg = page.msg, data = UserDeviceListData(list = page.data.list, totalPage = page.data.totalPage, totalCount = page.data.totalCount))
+}
+fun userInfoResponse(raw: Any): UserInfoResponse {
+    val response = jsonDataResponse(raw)
+    return UserInfoResponse(code = response.code, msg = response.msg, data = response.data)
+}
+fun deviceDetailResponse(raw: Any): DeviceDetailResponse {
+    val response = jsonDataResponse(raw)
+    return DeviceDetailResponse(code = response.code, msg = response.msg, data = response.data)
+}
+fun changePasswordResponse(raw: Any): ChangePasswordResponse {
+    val response = basicResponse(raw)
+    return ChangePasswordResponse(code = response.code, msg = response.msg)
+}
+val login = fun(data: UTSJSONObject): UTSPromise<JsonDataResponse> {
+    return post(loginUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val logout = fun(): UTSPromise<BasicResponse> {
+    return post(logoutUrl).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val sendCommand = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(sendcmd, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getDevicePos = fun(data: UTSJSONObject): UTSPromise<DevicePositionResponse> {
+    return get(devicePos, data).then(fun(raw: Any): DevicePositionResponse {
+        val response = asJSONObject(raw)
+        return DevicePositionResponse(code = getResponseCode(response), message = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val getTrackPos = fun(data: UTSJSONObject): UTSPromise<TrackPosResponse> {
+    return get(trackPos, data).then(fun(raw: Any): TrackPosResponse {
+        val response = asJSONObject(raw)
+        return TrackPosResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataObject(response))
+    }
+    )
+}
+val getUserInfo = fun(): UTSPromise<UserInfoResponse> {
+    return get(userinfo).then(fun(raw: Any): UserInfoResponse {
+        return userInfoResponse(raw)
+    }
+    )
+}
+val addDevice = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(addDeviceUrl, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
+    return post(deleteDevice, _uO("imei" to imei)).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
+    return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
+        return userDevicePageResponse(raw)
+    }
+    )
+}
+val changePassWord = fun(data: UTSJSONObject): UTSPromise<ChangePasswordResponse> {
+    return put(changePSW, data).then(fun(raw: Any): ChangePasswordResponse {
+        return changePasswordResponse(raw)
+    }
+    )
+}
+val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<MessageResponse> {
+    return (if (data != null) {
+        get(userMsgList, data)
+    } else {
+        get(userMsgList)
+    }
+    ).then(fun(raw: Any): MessageResponse {
+        return messagePageResponse(raw)
+    }
+    )
+}
+val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
+    return get("" + msgState + msgId).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getDeviceDetail = fun(deviceId: String): UTSPromise<DeviceDetailResponse> {
+    return get("" + deviceDetail + deviceId).then(fun(raw: Any): DeviceDetailResponse {
+        return deviceDetailResponse(raw)
+    }
+    )
+}
+val getGeofenceList = fun(): UTSPromise<GeofenceResponse> {
+    return get(getGeofence).then(fun(raw: Any): GeofenceResponse {
+        val response = asJSONObject(raw)
+        return GeofenceResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val addGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(getGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val updateGeofence = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return put(getGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val deleteGeofence = fun(id: String): UTSPromise<BasicResponse> {
+    return remove("" + deleteGeo + id).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getUnboundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
+    return get(unbindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
+        return devicePageResponse(raw)
+    }
+    )
+}
+val getBoundDevices = fun(params: UTSJSONObject): UTSPromise<DevicePageResponse> {
+    return get(bindDeviceList, params).then(fun(raw: Any): DevicePageResponse {
+        return devicePageResponse(raw)
+    }
+    )
+}
+val bindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return post(bindGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val unbindDevices = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return remove(unbindGeofence, data).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val getCmdAction = fun(): UTSPromise<CommandListResponse> {
+    return get(cmdActionUrl).then(fun(raw: Any): CommandListResponse {
+        val response = asJSONObject(raw)
+        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
+val getCmdByMid = fun(data: UTSJSONObject): UTSPromise<CommandListResponse> {
+    return get(cmdByMidUrl, data).then(fun(raw: Any): CommandListResponse {
+        val response = asJSONObject(raw)
+        return CommandListResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = getResponseDataArray(response))
+    }
+    )
+}
 val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
-    return post<SendCmdResponse>(cmdSendUrl, data)
+    return post(cmdSendUrl, data).then(fun(raw: Any): SendCmdResponse {
+        val response = asJSONObject(raw)
+        return SendCmdResponse(code = getResponseCode(response), msg = getResponseMessage(response), data = response.getString("data", ""))
+    }
+    )
 }
 open class Coordinate (
     @JsonNotNull
@@ -792,7 +986,7 @@ fun formatTimes(timestamp: Number): String {
     return "" + y + "-" + m + "-" + day + " " + h + ":" + mi + ":" + s
 }
 fun getDeviceIcon(connectionStatus: String, carType: String): String {
-    val basePath = if (connectionStatus === "online") {
+    val basePath = if (connectionStatus == "online") {
         "/static/cars/online/"
     } else {
         "/static/cars/offline/"
@@ -1215,20 +1409,35 @@ class DeviceDetailStateReactiveObject : DeviceDetailState, IUTSReactive<DeviceDe
             _tRS(__v_raw, "lastUpdateTime", oldValue, value)
         }
 }
-interface SavedDevice {
-    var name: String
-    var deviceName: String
-    var imei: String
-    var deptId: String
-    var deviceId: String
-    var iccid: String
-    var simMerchant: String
-    var connectionStatus: String
-    var carType: String
-    var plateNo: String
-}
-interface PickerConfirmEvent {
-    var indexs: UTSArray<Number>
+open class SavedDevice (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var imei: String,
+    @JsonNotNull
+    open var deptId: String,
+    @JsonNotNull
+    open var deviceId: String,
+    @JsonNotNull
+    open var iccid: String,
+    @JsonNotNull
+    open var simMerchant: String,
+    @JsonNotNull
+    open var connectionStatus: String,
+    @JsonNotNull
+    open var carType: String,
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 322, 6)
+    }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesIndexIndex.inheritAttrs, inject = GenPagesIndexIndex.inject, props = GenPagesIndexIndex.props, propsNeedCastKeys = GenPagesIndexIndex.propsNeedCastKeys, emits = GenPagesIndexIndex.emits, components = GenPagesIndexIndex.components, styles = GenPagesIndexIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
@@ -1260,32 +1469,6 @@ val GenUniModulesIUiXComponentsIModalIModalClass = CreateVueComponent(GenUniModu
     return GenUniModulesIUiXComponentsIModalIModal(instance)
 }
 )
-open class ModalInstance (
-    open var open: () -> Unit,
-    open var close: () -> Unit,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ModalInstance", "pages/message/message.uvue", 61, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return ModalInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class ModalInstanceReactiveObject : ModalInstance, IUTSReactive<ModalInstance> {
-    override var __v_raw: ModalInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: ModalInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(open = __v_raw.open, close = __v_raw.close) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): ModalInstanceReactiveObject {
-        return ModalInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
 val GenPagesMessageMessageClass = CreateVueComponent(GenPagesMessageMessage::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesMessageMessage.inheritAttrs, inject = GenPagesMessageMessage.inject, props = GenPagesMessageMessage.props, propsNeedCastKeys = GenPagesMessageMessage.propsNeedCastKeys, emits = GenPagesMessageMessage.emits, components = GenPagesMessageMessage.components, styles = GenPagesMessageMessage.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesMessageMessage.setup(props as GenPagesMessageMessage)
@@ -1373,7 +1556,7 @@ open class FormData (
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 94, 7)
+        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 93, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1418,31 +1601,6 @@ class FormDataReactiveObject : FormData, IUTSReactive<FormData> {
             _tRS(__v_raw, "password", oldValue, value)
         }
 }
-open class FormInstance (
-    open var validate: () -> Boolean,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormInstance", "pages/login/login.uvue", 98, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
-    override var __v_raw: FormInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
-        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
 open class SavedAccount (
     @JsonNotNull
     open var username: String,
@@ -1450,14 +1608,7 @@ open class SavedAccount (
     open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 101, 7)
-    }
-}
-open class LoginResponse (
-    open var data: UTSJSONObject? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LoginResponse", "pages/login/login.uvue", 106, 7)
+        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 97, 7)
     }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
@@ -1563,8 +1714,14 @@ fun getAddress(latitude: Number, longitude: Number, tk: String = DEFAULT_TK): UT
     return UTSPromise<AddressResponse>(fun(resolve, reject){
         val postStr = JSON.stringify(_uO("lon" to longitude, "lat" to latitude, "ver" to 1))
         uni_request<Any>(RequestOptions(url = "https://api.tianditu.gov.cn/geocoder?postStr=" + UTSAndroid.consoleDebugError(encodeURIComponent(postStr), " at utils/getAdress.uts:17") + "&type=geocode&tk=" + tk, method = "GET", success = fun(res: RequestSuccess<Any>){
-            if (res.statusCode === 200 && res.data != null) {
-                resolve(res.data!! as AddressResponse)
+            if (res.statusCode == 200 && res.data != null) {
+                val response = res.data as UTSJSONObject
+                val result = response.getJSON("result")
+                if (result == null) {
+                    reject(UTSError("获取地址信息失败"))
+                    return
+                }
+                resolve(AddressResponse(result = AddressResult(formatted_address = result.getString("formatted_address", ""))))
             } else {
                 reject(UTSError("获取地址信息失败"))
             }
@@ -1833,41 +1990,29 @@ open class CarIconItem__1 (
         return UTSSourceMapPosition("CarIconItem", "pages/addCar/addCar.uvue", 63, 7)
     }
 }
-open class AddDeviceResponse (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: CarFormData,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("AddDeviceResponse", "pages/addCar/addCar.uvue", 69, 7)
-    }
-}
-open class FormInstance__1 (
+open class FormInstance (
     open var validate: () -> Boolean,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("FormInstance", "pages/addCar/addCar.uvue", 75, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstance__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return FormInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class FormInstance__1ReactiveObject : FormInstance__1, IUTSReactive<FormInstance__1> {
-    override var __v_raw: FormInstance__1
+class FormInstanceReactiveObject : FormInstance, IUTSReactive<FormInstance> {
+    override var __v_raw: FormInstance
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
+    constructor(__v_raw: FormInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstance__1ReactiveObject {
-        return FormInstance__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstanceReactiveObject {
+        return FormInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
 open class DeviceTypeSelectorInstance (
@@ -2021,7 +2166,7 @@ open class PickerPickEvent (
         return UTSSourceMapPosition("PickerPickEvent", "uni_modules/lime-picker/components/l-picker/type.uts", 12, 13)
     }
 }
-open class PickerConfirmEvent__1 (
+open class PickerConfirmEvent (
     @JsonNotNull
     open var values: UTSArray<PickerValue>,
     @JsonNotNull
@@ -8055,29 +8200,29 @@ class UserInfo__1ReactiveObject : UserInfo__1, IUTSReactive<UserInfo__1> {
             _tRS(__v_raw, "mobile", oldValue, value)
         }
 }
-open class FormInstance__2 (
+open class FormInstance__1 (
     open var validate: () -> Boolean,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("FormInstance", "pages/userCenter/editPassword/editPassword.uvue", 35, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return FormInstance__2ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return FormInstance__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class FormInstance__2ReactiveObject : FormInstance__2, IUTSReactive<FormInstance__2> {
-    override var __v_raw: FormInstance__2
+class FormInstance__1ReactiveObject : FormInstance__1, IUTSReactive<FormInstance__1> {
+    override var __v_raw: FormInstance__1
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: FormInstance__2, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
+    constructor(__v_raw: FormInstance__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(validate = __v_raw.validate) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstance__2ReactiveObject {
-        return FormInstance__2ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): FormInstance__1ReactiveObject {
+        return FormInstance__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
 val GenPagesUserCenterEditPasswordEditPasswordClass = CreateVueComponent(GenPagesUserCenterEditPasswordEditPassword::class.java, fun(): VueComponentOptions {

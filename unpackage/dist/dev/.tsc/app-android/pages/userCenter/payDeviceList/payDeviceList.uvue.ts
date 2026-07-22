@@ -49,15 +49,19 @@ const _cache = __ins.renderCache;
 			}
 			const res = await getUserDeviceList(data)
 
-			if (res.code == 0) {
+			const code = res.code
+			const list = res.data.list
+			const pageCount = res.data.totalPage
+
+			if (code == 0 && list != null) {
 				// 保存总页数
-				totalPage.value = res.data.totalPage
+				totalPage.value = pageCount
 
 				// 如果是第一页，直接赋值
 				if (currPage.value == 1) {
-					deviceList.value = res.data.list
+					deviceList.value = list
 				} else {
-					deviceList.value = [...deviceList.value, ...res.data.list]
+					deviceList.value = [...deviceList.value, ...list]
 				}
 
 				// 判断是否还有更多数据
@@ -75,7 +79,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:119")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:123")
 			uni.showToast({
 				title: '加载失败，请重试',
 				icon: 'none'
@@ -106,7 +110,7 @@ const _cache = __ins.renderCache;
 		}
 		// iccid = iccid.substring(0,iccid.length-1)
 		
-		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:150")
+		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:154")
 		// 设置需要刷新的标志
 		needRefresh.value = true
 		

@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_request.getDeviceDetail(deviceId.value);
-        const data = res.getJSON("data");
+        const data = res.data;
         if (data != null)
           carInfo.value = data;
       });

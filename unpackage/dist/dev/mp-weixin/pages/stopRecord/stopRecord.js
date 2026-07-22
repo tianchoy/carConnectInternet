@@ -74,7 +74,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         const res = yield api_request.getTrackPos(data);
         let stopsWithAddress = [];
-        const trackData = res.getJSON("data");
+        const trackData = res.data;
         const stops = (_a = trackData === null || trackData === void 0 ? null : trackData.getArray("stops")) !== null && _a !== void 0 ? _a : [];
         stops.forEach((stop) => {
           const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0));

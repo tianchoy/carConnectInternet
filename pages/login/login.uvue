@@ -10,8 +10,7 @@
 		<view class="content">
 			<view v-if="pswLogin">
 				<i-form 
-					ref="formRef" 
-					:modelValue="form" 
+					:modelValue="form"
 					:rules="pswrules" 
 					labelDirection="horizontal"
 					watchValidStatus
@@ -95,16 +94,9 @@
 		username: string
 		password: string
 	}
-	type FormInstance = {
-		validate: () => boolean
-	}
 	type SavedAccount = {
 		username: string
 		password: string
-	}
-
-	type LoginResponse = {
-		data: UTSJSONObject | null
 	}
 
 	const form = ref<FormData>({
@@ -112,15 +104,12 @@
 		password: ''
 	})
 
-	// ===== 表单引用 =====
-	// 使用 any 类型避免类型冲突
-	const formRef = ref<FormInstance | null>(null)
 	const deviceModel = ref('')
 
-	const pswrules : UTSJSONObject = {
-		username: [{ required: true, message: '请输入账号' }],
-		password: [{ required: true, message: '请输入密码' }]
-	} as UTSJSONObject
+	const pswrules = [
+		{ name: 'username', required: true, message: '请输入账号' } as UTSJSONObject,
+		{ name: 'password', required: true, message: '请输入密码' } as UTSJSONObject
+	] as Array<UTSJSONObject>
 
 	const updateFormValid = (valid : boolean) : void => {
 		formValid.value = valid
@@ -128,12 +117,12 @@
 
 	function loadSavedAccount() : void {
 		try {
-			const savedAccount = uni.getStorageSync('savedEnterpriseAccount') as SavedAccount | null
-			if (savedAccount != null) {
-				form.value.username = savedAccount.username
-				form.value.password = savedAccount.password
-				rememberPassword.value = true
-			}
+			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
+			if (rawAccount == null || rawAccount == '') return
+			const account = typeof rawAccount == 'string' ? JSON.parse(rawAccount) as UTSJSONObject : rawAccount as UTSJSONObject
+			form.value.username = account.getString('username', '')
+			form.value.password = account.getString('password', '')
+			rememberPassword.value = form.value.username != '' || form.value.password != ''
 		} catch (error) {
 			console.error('加载保存的账号密码失败:', error)
 		}
@@ -161,7 +150,7 @@
 				username: form.value.username,
 				password: form.value.password
 			}
-			uni.setStorageSync('savedEnterpriseAccount', accountInfo)
+			uni.setStorageSync('savedEnterpriseAccount', JSON.stringify(accountInfo))
 		} else if (!rememberPassword.value) {
 			uni.removeStorageSync('savedEnterpriseAccount')
 		}
@@ -182,14 +171,17 @@
 	}
 
 	// ===== 表单验证 =====
-		const validateForm = () : boolean => {
-			const currentForm = formRef.value
-			if (currentForm == null) {
-				uni.showToast({ title: '表单未初始化', icon: 'none' })
-				return false
-			}
-			return currentForm.validate()
+	const validateForm = () : boolean => {
+		if (form.value.username.length == 0) {
+			uni.showToast({ title: '请输入账号', icon: 'none' })
+			return false
 		}
+		if (form.value.password.length == 0) {
+			uni.showToast({ title: '请输入密码', icon: 'none' })
+			return false
+		}
+		return true
+	}
 
 // ===== 登录相关函数 =====
 
@@ -204,13 +196,91 @@
 		}
 	}
 
-		// 微信手机号授权仅支持微信小程序，Android 端保留入口提示。
-		const handleGetPhoneNumber = () : void => {
+	const handleGetPhoneNumber = async (e: any) => {
+
+		// #ifdef MP-WEIXIN
+		if (!docState.value) {
 			uni.showToast({
-				title: '请使用企业账号登录',
+				title: '请先阅读并同意用户协议',
+				icon: 'error'
+			})
+			return
+		}
+
+		if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
+			uni.showToast({
+				title: '您拒绝了授权',
 				icon: 'none'
 			})
+			return
 		}
+
+		if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+			uni.showToast({
+				title: '获取手机号失败',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			uni.showLoading({ title: '登录中...' })
+
+			const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
+				uni.login({
+					provider: 'weixin',
+					success: resolve,
+					fail: reject
+				})
+			})
+
+			const res = await PostWechatlogin({
+				code: loginRes.code,
+				encryptedData: e.detail.encryptedData,
+				iv: e.detail.iv
+			})
+			const loginData = res.data
+
+			if (loginData == null) {
+				uni.showToast({
+					title: res.msg || '登录失败',
+					icon: 'none'
+				})
+				return
+			}
+
+			const token = loginData.getString('token', '')
+			if (token == '') {
+				uni.showToast({
+					title: '登录失败: 未获取到token',
+					icon: 'none'
+				})
+				return
+			}
+
+			uni.setStorageSync('token', token)
+			uni.showToast({
+				title: '登录成功',
+				icon: 'success'
+			})
+			setTimeout(() => {
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
+			}, 500)
+
+		} catch (error) {
+			console.error('微信登录失败:', error)
+			uni.showToast({
+				title: '微信登录失败',
+				icon: 'none'
+			})
+		} finally {
+			uni.hideLoading()
+		}
+
+		// #endif
+	}
 
 // 提交登录（账号密码）
 	const submit = async () => {
@@ -247,9 +317,9 @@
 			
 			// 调用登录接口
 			console.log('🚀 开始调用 login 接口...')
-			const res = await login(newFormData) as LoginResponse
+			const res = await login(newFormData)
 			console.log('✅ 登录接口返回:', res)
-			
+
 			// 隐藏加载状态
 			loading.value = false
 			uni.hideLoading()
@@ -374,15 +444,6 @@
 		getSystemInfo()
 		loadSavedAccount()
 		console.log('pswLogin 初始值:', pswLogin.value)
-		console.log('formRef 初始值:', formRef.value)
-		
-		// 延迟检查 formRef
-		setTimeout(() => {
-			console.log('延迟检查 formRef.value:', formRef.value)
-			if (formRef.value) {
-				console.log('formRef 已初始化')
-			}
-		}, 500)
 	})
 
 
@@ -428,17 +489,16 @@
 			.documents {
 				display: flex;
 				flex-direction: row;
-				justify-content: center;
+				justify-content: flex-start;
 				align-items: center;
 				margin-top: 40rpx;
-				
 				.doc-info-box {
 					display: flex;
 					flex-direction: row;
-					justify-content: center;
+					justify-content: flex-start;
 					align-items: center;
-					margin-left: 10px;
-					font-size: 10px;
+					font-size: 10000px;
+					white-space: nowrap;
 					.doc-link {
 						color: #007AFF;
 					}

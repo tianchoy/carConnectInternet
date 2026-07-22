@@ -106,12 +106,13 @@ const _cache = __ins.renderCache;
 			if (from) {
 				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 118, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
-				deviceList = res.data.list
+				const list = res.data.list
+				deviceList = list != null ? list : []
 			}
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:125")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:126")
 			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
@@ -138,25 +139,25 @@ const _cache = __ins.renderCache;
 		uni.getLocation({
 			type: 'wgs84',
 			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:152")
+				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:153")
 				userLocation.value.latitude = res.latitude
 				userLocation.value.longitude = res.longitude
 			},
 			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:157")
+				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:158")
 			}
 		})
 	}
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:163")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:164")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:167")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:168")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:170")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:171")
 			}
 		})
 	}
@@ -172,7 +173,7 @@ const _cache = __ins.renderCache;
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:186")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:187")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
@@ -219,14 +220,13 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
         }), [
           _cV(_component_map, _uM({
             id: "myMap",
-            markers: markers.value,
             scale: mapScale.value,
             style: _nS(_uM({"width":"100%","height":"100%"})),
             onMarkertap: handleTap,
             latitude: userLocation.value.latitude,
             longitude: userLocation.value.longitude,
             "enable-traffic": true
-          }), null, 8 /* PROPS */, ["markers", "scale", "style", "latitude", "longitude"]),
+          }), null, 8 /* PROPS */, ["scale", "style", "latitude", "longitude"]),
           isTrue(showMap.value)
             ? _cE("view", _uM({
                 key: 0,

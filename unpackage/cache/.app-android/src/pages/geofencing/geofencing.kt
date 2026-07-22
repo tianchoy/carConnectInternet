@@ -99,17 +99,13 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 327, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             res.data.forEach(fun(item){
-                                if (item["imei"] == imei.value) {
+                                if (item.getString("imei", "") == imei.value) {
                                     val deviceData = item
-                                    val convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(deviceData["latitude"].toString()), parseFloat(deviceData["longitude"].toString()))
+                                    val convertedCoord = CoordTransform.wgs84ToTencent(deviceData.getNumber("latitude", 0), deviceData.getNumber("longitude", 0))
                                     center["latitude"] = convertedCoord.lat
                                     center["longitude"] = convertedCoord.lng
                                     val position: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("position", "pages/geofencing/geofencing.uvue", 341, 12), "latitude" to convertedCoord.lat, "longitude" to convertedCoord.lng)
-                                    lastDirection.value = if (isTruthy(deviceData["direction"])) {
-                                        parseFloat(deviceData["direction"].toString())
-                                    } else {
-                                        0
-                                    }
+                                    lastDirection.value = deviceData.getNumber("direction", 0)
                                     carMarker.value = _uO("id" to 0, "latitude" to position["latitude"], "longitude" to position["longitude"], "iconPath" to getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()), "width" to 25, "height" to 25, "rotate" to if (lastDirection.value >= 360) {
                                         lastDirection.value - 360
                                     } else {
@@ -215,7 +211,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 try {
                     val coordStr = circleStr.replace(UTSRegExp("CIRCLE \\(", ""), "").replace(UTSRegExp("\\)", ""), "")
                     val parts = coordStr.split(",")
-                    if (parts.length !== 2) {
+                    if (parts.length != 2) {
                         return null
                     }
                     val centerValues = parts[0].trim().split(" ")
@@ -273,7 +269,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val updateMarkers = ::gen_updateMarkers_fn
             val renderFencesOnMap = fun(){
-                if (!(fenceList.value != null) || fenceList.value.length === 0) {
+                if (!(fenceList.value != null) || fenceList.value.length == 0) {
                     polygons.value = _uA()
                     circles.value = _uA()
                     updateMarkers()

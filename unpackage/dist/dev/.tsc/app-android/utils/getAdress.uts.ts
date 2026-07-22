@@ -21,8 +21,14 @@ export function getAddress(latitude: number, longitude: number, tk: string = DEF
       url: `https://api.tianditu.gov.cn/geocoder?postStr=${encodeURIComponent(postStr)}&type=geocode&tk=${tk}`,
       method: 'GET',
       success: (res: RequestSuccess<any>) => {
-        if (res.statusCode === 200 && res.data != null) {
-          resolve(res.data! as AddressResponse)
+        if (res.statusCode == 200 && res.data != null) {
+          const response = res.data as UTSJSONObject
+          const result = response.getJSON('result')
+          if (result == null) {
+            reject(new Error('获取地址信息失败'))
+            return
+          }
+          resolve({ result: { formatted_address: result.getString('formatted_address', '') } })
         } else {
           reject(new Error('获取地址信息失败'));
         }

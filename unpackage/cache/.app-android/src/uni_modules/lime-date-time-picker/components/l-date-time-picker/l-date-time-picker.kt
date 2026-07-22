@@ -313,7 +313,7 @@ open class GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePick
                 return format
             }
             )
-            val onConfirm = fun(ref__1: PickerConfirmEvent__1){
+            val onConfirm = fun(ref__1: PickerConfirmEvent){
                 var values = ref__1.values
                 var cur = curDate.value
                 values.forEach(fun(item, index){

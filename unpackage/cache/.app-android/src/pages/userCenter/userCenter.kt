@@ -36,13 +36,11 @@ open class GenPagesUserCenterUserCenter : BasePage {
             val buttonHeight: Number = 200
             val loadData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        var params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 7))
+                        val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 9))
                         val res = await(getUserInfo())
-                        userInfo.value = res.data
+                        userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
                         val resCars = await(getUserDeviceList(params))
-                        if (resCars?.data?.totalCount != 0) {
-                            carsnumber.value = resCars.data.totalCount
-                        }
+                        carsnumber.value = resCars.data.totalCount
                 })
             }
             onShow(fun(){

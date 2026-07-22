@@ -46,7 +46,7 @@
 		
 		
 		<i-modal 
-			ref="modal" 
+			:show="modal" 
 			:title="getMessageTypeText(modalContent.getNumber('messageType', 0))"
 			:content="modalContent.getString('content', '')"
 			@confirm="ReadIt">
@@ -63,7 +63,7 @@
 		close: () => void
 	}
 
-	const modal = ref<ModalInstance | null>(null);
+	const modal = ref<boolean>(false)
 	const modalContent = ref<UTSJSONObject>({})
 	const refresherTriggered = ref(false)
 	
@@ -113,12 +113,11 @@
 	async function checkNewMessages() : Promise<void> {
 		if (!isPageActive.value || isLoading.value) return
 		try {
-			const res = await getUserMsgList({ page: 1, pageSize: 1 }) as UTSJSONObject
-			const code = res.getNumber('code', -1)
+			const res = await getUserMsgList({ page: 1, pageSize: 1 })
+			const code = res.code
 			if (code != 0) return
-			const data = res.getJSON('data')
-			if (data == null) return
-			const list = data.getArray<UTSJSONObject>('list')
+			const data = res.data
+			const list = data.list
 			if (list == null || list.length == 0) return
 			const latestMessage = list[0]
 			const createTime = latestMessage.getString('createTime', '')
@@ -127,9 +126,8 @@
 			if (messageTime <= lastUpdateTime.value) return
 			hasNewMessages.value = true
 			vibrateAlert()
-			const countRes = await getUserMsgList({ page: 1, pageSize: 50 }) as UTSJSONObject
-			const countData = countRes.getJSON('data')
-			const newList = countData?.getArray<UTSJSONObject>('list')
+			const countRes = await getUserMsgList({ page: 1, pageSize: 50 })
+			const newList = countRes.data.list
 			if (newList != null) {
 				let count = 0
 				newList.forEach((message : UTSJSONObject) : void => {
@@ -173,20 +171,15 @@
 			const res = await getUserMsgList({
 				page: currPage.value,
 				pageSize: pageSize.value
-			}) as UTSJSONObject
-			if (res.getNumber('code', -1) != 0) {
+			})
+			if (res.code != 0) {
 				loadStatus.value = 'loadmore'
 				return
 			}
-			const data = res.getJSON('data')
-			if (data == null) {
-				loadStatus.value = 'nomore'
-				return
-			}
-			const totalPages = data.getNumber('totalPage', 1)
-			totalPage.value = totalPages > 0 ? totalPages : 1
-			const dataList = data.getArray<UTSJSONObject>('list')
-			const newData : Array<UTSJSONObject> = dataList != null ? dataList : []
+			const data = res.data
+			const totalPages = data.totalPage > 0 ? data.totalPage : 1
+			totalPage.value = totalPages
+			const newData : Array<UTSJSONObject> = data.list
 			if (isInit) {
 				msgList.value = newData
 				if (newData.length > 0) lastUpdateTime.value = new Date().getTime()
@@ -327,12 +320,12 @@
 	// 处理消息点击
 	const handleItemClick = async (item : UTSJSONObject) : Promise<void> => {
 		modalContent.value = item
-		modal.value?.open()
+		modal.value = true
 		if (item.getNumber('status', 0) == 1) {
 			try {
 				const messageId = item.getString('messageId', '')
-				const res = await setMsgState(messageId) as UTSJSONObject
-				if (res.getString('msg', '') == 'success') {
+				const res = await setMsgState(messageId)
+				if (res.code == 0 || res.msg == 'success') {
 					const index = msgList.value.findIndex((message : UTSJSONObject) : boolean => message.getString('messageId', '') == messageId)
 					if (index != -1) {
 						msgList.value[index].set('status', 0)
@@ -346,7 +339,7 @@
 	}
 
 	const ReadIt = () => {
-		modal.value?.close();
+		modal.value = false
 	}
 	
 	const getMessageId = (item : UTSJSONObject, index : number) : string => {

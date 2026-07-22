@@ -48,15 +48,19 @@ const _cache = __ins.renderCache;
 			} as UTSJSONObject
 			const res = await getUserDeviceList(data)
 
-			if (res.code == 0) {
+			const code = res.code
+			const list = res.data.list
+			const pageCount = res.data.totalPage
+
+			if (code == 0 && list != null) {
 				// 保存总页数
-				totalPage.value = res.data.totalPage
+				totalPage.value = pageCount
 
 				// 如果是第一页，直接赋值
 				if (currPage.value == 1) {
-					carList.value = res.data.list
+					carList.value = list
 				} else {
-					carList.value = [...carList.value, ...res.data.list]
+					carList.value = [...carList.value, ...list]
 				}
 
 				// 判断是否还有更多数据
@@ -73,7 +77,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:94")
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:98")
 			uni.showToast({
 				title: '加载失败，请重试',
 				icon: 'none'

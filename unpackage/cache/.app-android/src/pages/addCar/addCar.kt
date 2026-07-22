@@ -31,7 +31,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesAddCarAddCar
             val _cache = __ins.renderCache
-            val formRef = ref<FormInstance__1?>(null)
+            val formRef = ref<FormInstance?>(null)
             val deviceTypeSelect = ref<DeviceTypeSelectorInstance?>(null)
             val loading = ref<Boolean>(false)
             val formValid = ref<Boolean>(false)
@@ -105,7 +105,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
                             val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 208, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType)
                             console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:215")
-                            val res = await(addDevice(submitData)) as AddDeviceResponse
+                            val res = await(addDevice(submitData))
                             console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:218")
                             uni_hideLoading(null)
                             loading.value = false
@@ -139,7 +139,12 @@ open class GenPagesAddCarAddCar : BasePage {
             }
             )
             onShow(fun(){
-                val result = uni_getStorageSync("scanCodeResult") as String
+                val rawResult = uni_getStorageSync("scanCodeResult")
+                val result = if (rawResult != null) {
+                    rawResult.toString()
+                } else {
+                    ""
+                }
                 if (result.length > 0) {
                     uni_removeStorageSync("scanCodeResult")
                     handleScanResult(ScanResultData(result = result))

@@ -35,27 +35,28 @@ open class GenPagesLoginLogin : BasePage {
             val formValid = ref(false)
             val loading = ref(false)
             val form = ref<FormData>(FormData(username = "", password = ""))
-            val formRef = ref<FormInstance?>(null)
             val deviceModel = ref("")
-            val pswrules: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("pswrules", "pages/login/login.uvue", 120, 8), "username" to _uA(
-                _uO("required" to true, "message" to "请输入账号")
-            ), "password" to _uA(
-                _uO("required" to true, "message" to "请输入密码")
-            ))
+            val pswrules = _uA<UTSJSONObject>(_uO("name" to "username", "required" to true, "message" to "请输入账号"), _uO("name" to "password", "required" to true, "message" to "请输入密码"))
             val updateFormValid = fun(valid: Boolean): Unit {
                 formValid.value = valid
             }
             fun gen_loadSavedAccount_fn(): Unit {
                 try {
-                    val savedAccount = uni_getStorageSync("savedEnterpriseAccount") as SavedAccount?
-                    if (savedAccount != null) {
-                        form.value.username = savedAccount.username
-                        form.value.password = savedAccount.password
-                        rememberPassword.value = true
+                    val rawAccount = uni_getStorageSync("savedEnterpriseAccount")
+                    if (rawAccount == null || rawAccount == "") {
+                        return
                     }
+                    val account = if (UTSAndroid.`typeof`(rawAccount) == "string") {
+                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:122") as UTSJSONObject
+                    } else {
+                        rawAccount as UTSJSONObject
+                    }
+                    form.value.username = account.getString("username", "")
+                    form.value.password = account.getString("password", "")
+                    rememberPassword.value = form.value.username != "" || form.value.password != ""
                 }
                  catch (error: Throwable) {
-                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:138")
+                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:127")
                 }
             }
             val loadSavedAccount = ::gen_loadSavedAccount_fn
@@ -77,7 +78,7 @@ open class GenPagesLoginLogin : BasePage {
             val saveAccountPassword = fun(): Unit {
                 if (rememberPassword.value && form.value.username != "" && form.value.password != "") {
                     val accountInfo = SavedAccount(username = form.value.username, password = form.value.password)
-                    uni_setStorageSync("savedEnterpriseAccount", accountInfo)
+                    uni_setStorageSync("savedEnterpriseAccount", JSON.stringify(accountInfo))
                 } else if (!rememberPassword.value) {
                     uni_removeStorageSync("savedEnterpriseAccount")
                 }
@@ -91,15 +92,18 @@ open class GenPagesLoginLogin : BasePage {
             val getSystemInfo = fun(): Unit {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
-                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:181")
+                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:170")
             }
             val validateForm = fun(): Boolean {
-                val currentForm = formRef.value
-                if (currentForm == null) {
-                    uni_showToast(ShowToastOptions(title = "表单未初始化", icon = "none"))
+                if (form.value.username.length == 0) {
+                    uni_showToast(ShowToastOptions(title = "请输入账号", icon = "none"))
                     return false
                 }
-                return currentForm.validate()
+                if (form.value.password.length == 0) {
+                    uni_showToast(ShowToastOptions(title = "请输入密码", icon = "none"))
+                    return false
+                }
+                return true
             }
             val loginBt = fun(){
                 if (!docState.value) {
@@ -107,8 +111,9 @@ open class GenPagesLoginLogin : BasePage {
                     return
                 }
             }
-            val handleGetPhoneNumber = fun(): Unit {
-                uni_showToast(ShowToastOptions(title = "请使用企业账号登录", icon = "none"))
+            val handleGetPhoneNumber = fun(e: Any): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                })
             }
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
@@ -117,18 +122,18 @@ open class GenPagesLoginLogin : BasePage {
                             return@w1
                         }
                         try {
-                            console.log("准备验证表单...", " at pages/login/login.uvue:228")
+                            console.log("准备验证表单...", " at pages/login/login.uvue:298")
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:230")
-                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 233, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
-                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:239")
+                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:300")
+                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 303, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
+                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:309")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "登录中...", mask = true))
-                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:249")
-                            val res = await(login(newFormData)) as LoginResponse
-                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:251")
+                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:319")
+                            val res = await(login(newFormData))
+                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:321")
                             loading.value = false
                             uni_hideLoading(null)
                             val loginData = res.data
@@ -149,7 +154,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:280")
+                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:350")
                             loading.value = false
                             uni_hideLoading(null)
                             if (isTruthy(error) && isTruthy(error.message)) {
@@ -174,15 +179,7 @@ open class GenPagesLoginLogin : BasePage {
             onMounted(fun(){
                 getSystemInfo()
                 loadSavedAccount()
-                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:376")
-                console.log("formRef 初始值:", formRef.value, " at pages/login/login.uvue:377")
-                setTimeout(fun(){
-                    console.log("延迟检查 formRef.value:", formRef.value, " at pages/login/login.uvue:381")
-                    if (isTruthy(formRef.value)) {
-                        console.log("formRef 已初始化", " at pages/login/login.uvue:383")
-                    }
-                }
-                , 500)
+                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:446")
             }
             )
             return fun(): Any? {
@@ -201,7 +198,7 @@ open class GenPagesLoginLogin : BasePage {
                     _cE("view", _uM("class" to "content"), _uA(
                         if (isTrue(pswLogin.value)) {
                             _cE("view", _uM("key" to 0), _uA(
-                                _cV(_component_i_form, _uM("ref_key" to "formRef", "ref" to formRef, "modelValue" to form.value, "rules" to pswrules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to updateFormValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                _cV(_component_i_form, _uM("modelValue" to form.value, "rules" to pswrules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to updateFormValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                     return _uA(
                                         _cV(_component_i_form_item, _uM("name" to "username", "label" to "", "required" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                             return _uA(
@@ -287,7 +284,7 @@ open class GenPagesLoginLogin : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "100rpx", "paddingBottom" to "20rpx", "paddingLeft" to "100rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "marginLeft" to 10, "fontSize" to 10)), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "100rpx", "paddingBottom" to "20rpx", "paddingLeft" to "100rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "fontSize" to 10, "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

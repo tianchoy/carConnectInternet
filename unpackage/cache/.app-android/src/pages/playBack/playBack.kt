@@ -290,8 +290,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                         val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 496, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
-                        val res = await(getTrackPos(data)) as UTSJSONObject
-                        val trackData = res.getJSON("data")
+                        val res = await(getTrackPos(data))
+                        val trackData = res.data
                         val positions = trackData?.getArray<UTSJSONObject>("positions")
                         if (positions != null && positions.length > 0) {
                             processTrackData(positions)

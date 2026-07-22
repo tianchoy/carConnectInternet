@@ -26,7 +26,7 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
             val _cache = __ins.renderCache
             val userInfo = ref<UserInfo__1>(UserInfo__1(id = "", mobile = ""))
             val formData = ref(_uO("password" to "", "newPassword" to "", "confirmPassword" to ""))
-            val formRef = ref<FormInstance__2?>(null)
+            val formRef = ref<FormInstance__1?>(null)
             val validateConfirmPassword = fun(rule: UTSJSONObject, value: String, callback: (error: UTSError?) -> Unit): Unit {
                 if (value !== formData.value["newPassword"]) {
                     callback(UTSError("两次输入的密码不一致"))

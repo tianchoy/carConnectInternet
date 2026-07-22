@@ -156,7 +156,7 @@ function responseInterceptor(response, config) {
   return response.data;
 }
 function errorHandler(error, config) {
-  if (config.showLoading !== false) {
+  if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
   common_vendor.index.__f__("log", "at api/http.uts:111", "请求错误详情:", error);
@@ -204,7 +204,7 @@ function request(options) {
       method: options.method != null ? options.method : "GET",
       data: options.data != null ? options.data : new common_vendor.UTSJSONObject({}),
       header: options.header != null ? options.header : new common_vendor.UTSJSONObject(),
-      showLoading: options.showLoading !== false
+      showLoading: options.showLoading != false
     }
     // 处理完整URL
   );
@@ -220,7 +220,7 @@ function request(options) {
       header: processedConfig.header,
       success: (res) => {
         const statusCode = res.statusCode;
-        if (statusCode === 200) {
+        if (statusCode == 200) {
           const data = responseInterceptor(res);
           resolve(data);
         } else {

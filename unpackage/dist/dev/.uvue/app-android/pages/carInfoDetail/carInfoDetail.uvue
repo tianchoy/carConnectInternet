@@ -265,21 +265,21 @@ const __sfc__ = defineComponent({
                 try {
                     const res = await getDevicePos(data);
                     // 检查返回结果是否有效
-                    if (!(res != null) || !(res.data != null) || res.data.length === 0) {
+                    if (!(res != null) || !(res.data != null) || res.data.length == 0) {
                         throw new Error('返回数据为空');
                     }
                     console.log('接口请求成功', attempt, " at pages/carInfoDetail/carInfoDetail.uvue:343");
                     let foundDevice = false;
                     // 使用 for...of 替代 forEach，确保 await 生效
                     for (const item of res.data) {
-                        const itemImei = item['imei'] as string | null;
+                        const itemImei = item.getString('imei', '');
                         if (itemImei != null && itemImei == imei.value) {
                             foundDevice = true;
                             // item 已是 UTSJSONObject，直接赋值以保留正确类型。
                             datainfo.value = item;
-                            const latitude = item['latitude'] as string | number | null;
-                            const longitude = item['longitude'] as string | number | null;
-                            if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
+                            const latitude = item.getNumber('latitude', 0);
+                            const longitude = item.getNumber('longitude', 0);
+                            if (latitude == null || longitude == null || latitude.toString(10).length == 0 || longitude.toString(10).length == 0) {
                                 console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:359");
                                 uni.showToast({
                                     title: '位置信息缺失',
@@ -288,8 +288,8 @@ const __sfc__ = defineComponent({
                                 return false;
                             }
                             // 确保经纬度是数字类型
-                            const lat = parseFloat(latitude.toString());
-                            const lng = parseFloat(longitude.toString());
+                            const lat = parseFloat(latitude.toString(10));
+                            const lng = parseFloat(longitude.toString(10));
                             if (isNaN(lat) || isNaN(lng)) {
                                 console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:372");
                                 return false;

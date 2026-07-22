@@ -108,12 +108,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (from) {
             const params = new common_vendor.UTSJSONObject({ pageSize: 1e3 });
             const res = yield api_request.getUserDeviceList(params);
-            deviceList = res.data.list;
+            const list = res.data.list;
+            deviceList = list != null ? list : [];
           }
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:125", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:126", "获取设备列表失败:", err);
           common_vendor.index.showToast({ title: "获取设备列表失败", icon: "none" });
         }
       });
@@ -140,12 +141,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
         type: "wgs84",
         success: (res) => {
-          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:152", "获取位置成功:", res);
+          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:153", "获取位置成功:", res);
           userLocation.value.latitude = res.latitude;
           userLocation.value.longitude = res.longitude;
         },
         fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:157", "获取位置失败:", err);
+          common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:158", "获取位置失败:", err);
         }
       }));
     };
@@ -160,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return device["deviceId"] == markerId;
       });
       if (selectedDevice == null) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:186", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:187", "未找到对应的设备信息", markerId);
         return null;
       }
       const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";
@@ -191,44 +192,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: showMap.value
       }, showMap.value ? common_vendor.e({
         d: common_vendor.sei("myMap", "map"),
-        e: markers.value,
-        f: mapScale.value,
-        g: common_vendor.o(handleTap, "41"),
-        h: userLocation.value.latitude,
-        i: userLocation.value.longitude,
-        j: showMap.value
+        e: mapScale.value,
+        f: common_vendor.o(handleTap, "c8"),
+        g: userLocation.value.latitude,
+        h: userLocation.value.longitude,
+        i: showMap.value
       }, showMap.value ? {
-        k: common_vendor.o(($event) => {
+        j: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "e5"),
-        l: common_vendor.p({
+        }, "5a"),
+        k: common_vendor.p({
           type: "primary",
           text: `在线 ${onlineCount.value}`
         }),
-        m: common_vendor.o(($event) => {
+        l: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "d7"),
-        n: common_vendor.p({
+        }, "ce"),
+        m: common_vendor.p({
           type: "success",
           text: `在线 ${onlineCount.value}`
         }),
-        o: common_vendor.o(($event) => {
+        n: common_vendor.o(($event) => {
           return changeState("离线");
-        }, "e7"),
-        p: common_vendor.p({
+        }, "9a"),
+        o: common_vendor.p({
           type: "danger",
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "28"),
-        r: common_vendor.p({
+        p: common_vendor.o(unbindDevice, "c4"),
+        q: common_vendor.p({
           lists: originalDeviceList.value
         })
       }, {
-        s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`,
-        w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        s: `${_ctx.u_s_b_h}px`,
+        t: `${_ctx.u_s_a_i_b}px`,
+        v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

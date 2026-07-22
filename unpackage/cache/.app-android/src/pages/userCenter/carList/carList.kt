@@ -47,12 +47,15 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
-                            if (res.code == 0) {
-                                totalPage.value = res.data.totalPage
+                            val code = res.code
+                            val list = res.data.list
+                            val pageCount = res.data.totalPage
+                            if (code == 0 && list != null) {
+                                totalPage.value = pageCount
                                 if (currPage.value == 1) {
-                                    carList.value = res.data.list
+                                    carList.value = list
                                 } else {
-                                    carList.value = carList.value.concat(res.data.list)
+                                    carList.value = carList.value.concat(list)
                                 }
                                 hasMore.value = currPage.value < totalPage.value
                                 if (hasMore.value) {
@@ -68,7 +71,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:94")
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:98")
                             uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {

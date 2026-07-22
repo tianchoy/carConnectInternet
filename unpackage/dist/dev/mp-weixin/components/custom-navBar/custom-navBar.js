@@ -92,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         l: common_vendor.t(__props.rightText)
       }, {
-        m: common_vendor.o(handleCapsuleClick, "48")
+        m: common_vendor.o(handleCapsuleClick, "ba")
       }) : {}, {
         n: "200rpx",
         o: common_vendor.s(__props.isShowStyle ? {

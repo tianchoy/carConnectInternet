@@ -47,9 +47,9 @@ open class GenUniModulesLimePickerComponentsLPickerLPicker : VueComponent, Picke
         set(value) {
             setRefValue(this.`$exposed`, "confirm", value)
         }
-    open var getSelectedOptions: () -> PickerConfirmEvent__1
+    open var getSelectedOptions: () -> PickerConfirmEvent
         get() {
-            return unref(this.`$exposed`["getSelectedOptions"]) as () -> PickerConfirmEvent__1
+            return unref(this.`$exposed`["getSelectedOptions"]) as () -> PickerConfirmEvent
         }
         set(value) {
             setRefValue(this.`$exposed`, "getSelectedOptions", value)
@@ -188,7 +188,7 @@ open class GenUniModulesLimePickerComponentsLPickerLPicker : VueComponent, Picke
                 if (!arrayEqual(pickerValue.value, values)) {
                     pickerValue.value = values
                 }
-                val obj = PickerConfirmEvent__1(values = values, indexs = indexs, items = items)
+                val obj = PickerConfirmEvent(values = values, indexs = indexs, items = items)
                 emit("confirm", obj)
             }
             val stopPickerValue = watch(pickerValue, fun(){
@@ -234,7 +234,7 @@ open class GenUniModulesLimePickerComponentsLPickerLPicker : VueComponent, Picke
                 stopColumns()
             }
             )
-            __expose(_uM("confirm" to onConfirm, "getSelectedOptions" to fun(): PickerConfirmEvent__1 {
+            __expose(_uM("confirm" to onConfirm, "getSelectedOptions" to fun(): PickerConfirmEvent {
                 val values = curValueArray.value.slice()
                 val indexs = curIndexArray.value.slice()
                 val items = curItemArray.map(fun(item): PickerColumnItem {
@@ -244,7 +244,7 @@ open class GenUniModulesLimePickerComponentsLPickerLPicker : VueComponent, Picke
                 if (!arrayEqual(pickerValue.value, values)) {
                     pickerValue.value = values
                 }
-                val obj = PickerConfirmEvent__1(values = values, indexs = indexs, items = items)
+                val obj = PickerConfirmEvent(values = values, indexs = indexs, items = items)
                 return obj
             }
             ))

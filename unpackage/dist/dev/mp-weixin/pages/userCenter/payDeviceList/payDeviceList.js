@@ -36,12 +36,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             pageSize: pageSize.value
           });
           const res = yield api_request.getUserDeviceList(data);
-          if (res.code == 0) {
-            totalPage.value = res.data.totalPage;
+          const code = res.code;
+          const list = res.data.list;
+          const pageCount = res.data.totalPage;
+          if (code == 0 && list != null) {
+            totalPage.value = pageCount;
             if (currPage.value == 1) {
-              deviceList.value = res.data.list;
+              deviceList.value = list;
             } else {
-              deviceList.value = [...deviceList.value, ...res.data.list];
+              deviceList.value = [...deviceList.value, ...list];
             }
             hasMore.value = currPage.value < totalPage.value;
             if (hasMore.value) {
@@ -54,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:119", "加载车辆列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:123", "加载车辆列表失败:", error);
           common_vendor.index.showToast({
             title: "加载失败，请重试",
             icon: "none"
@@ -78,17 +81,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:150", iccid);
+      common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:154", iccid);
       needRefresh.value = true;
       common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:160", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:164", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:163", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:167", "打开小程序失败", res);
           needRefresh.value = false;
           common_vendor.index.showToast({
             title: "打开支付页面失败",

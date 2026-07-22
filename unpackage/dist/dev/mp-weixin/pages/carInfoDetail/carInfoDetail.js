@@ -257,7 +257,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             var e_1, _a;
             try {
               const res = yield api_request.getDevicePos(data);
-              if (!res || !res.data || res.data.length === 0) {
+              if (!res || !res.data || res.data.length == 0) {
                 throw new Error("返回数据为空");
               }
               common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:343", "接口请求成功", attempt);
@@ -265,12 +265,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               try {
                 for (var _b = common_vendor.__values(res.data), _c = _b.next(); !_c.done; _c = _b.next()) {
                   var item = _c.value;
-                  const itemImei = item["imei"];
+                  const itemImei = item.getString("imei", "");
                   if (itemImei != null && itemImei == imei.value) {
                     foundDevice = true;
                     datainfo.value = item;
-                    const latitude = item["latitude"];
-                    const longitude = item["longitude"];
+                    const latitude = item.getNumber("latitude", 0);
+                    const longitude = item.getNumber("longitude", 0);
                     if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
                       common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:359", "位置信息缺失", item);
                       common_vendor.index.showToast({

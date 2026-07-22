@@ -1,6 +1,6 @@
 <template>
     <scroll-view class="container" scroll-y="true" :show-scrollbar="false">
-        <view>
+        <view class="page-bg">
             <view class="top" :style="{paddingTop: statusBarHeight + 50 + 'px'}">
                 <view class="device-car">
                     <view class="current-car">
@@ -15,9 +15,9 @@
                         <view class="exit" @click="handleExit" v-if="false">
                             <image src="../../static/exit.png" mode="aspectFit" class="exit-icon"></image>
                         </view>
-                        <i-icon name="/static/reload.png" fontSize="20" @click="handleReload"></i-icon>
+                        <i-icon name="/static/reload.png" fontSize="18" @click="handleReload"></i-icon>
                         <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
-                        <i-icon class="nav-tool-spacing" name="/static/addNew.png" fontSize="20" @click="toAdd"></i-icon>
+                        <i-icon class="nav-tool-spacing" name="/static/addNew.png" fontSize="18" @click="toAdd"></i-icon>
                     </view>
                 </view> 
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
@@ -31,8 +31,8 @@
                 <view class="car-state">
                     <view class="state-item">
                         <text class="state-label">设备状态</text>
-                        <text class="state-value" :class="{'online': safeDeviceDetail.connectionStatus === 'online'}">
-                            {{safeDeviceDetail.connectionStatus === 'online' ? '在线' : '离线'}}
+                        <text class="state-value" :class="{'online': safeDeviceDetail.connectionStatus == 'online'}">
+                            {{safeDeviceDetail.connectionStatus == 'online' ? '在线' : '离线'}}
                         </text>
                     </view>
                     <view class="state-item">
@@ -51,18 +51,18 @@
                         <map 
                             v-if="isMapReady"
                             id="myMap" 
-                            :latitude="center.latitude" 
-                            :longitude="center.longitude" 
-                            :markers="markers"
-                            :scale="mapScale" 
+                            :latitude="center.latitude"
+                            :longitude="center.longitude"
+                            :scale="mapScale"
                             style="width:100%;height:100%"
                             :show-location="true" 
                             :enable-traffic="true"
                             :enable-overlooking="true" 
                             :enable-building="true" 
-                            :enable-3D="false" 
+                            :enable-3D="false"
+                            :markers="markers"
                             >
-                        </map>
+                            </map>
                     </view>
                 </view>
                 <view class="mile-record">
@@ -241,7 +241,7 @@ const deviceDetail = ref<DeviceDetailState>({
     connectionStatus: 'offline',
     lastUpdateTime: ''
 })
-const markers = ref<Array<any>>([])
+const markers = ref([] as Marker[])
 const lastUpdateTime = ref('--:--:--')
 
 // 本地存储key
@@ -262,12 +262,16 @@ const safeDeviceDetail = computed<DeviceDetailState>(() => {
     }
 })
 
-// 处理车辆列表显示 - 返回字符串数组
+// 处理车辆列表显示 - 返回 picker 选项
 const pickerColumns = computed(() => {
-    return [deviceList.value.map(device => {
+    return [deviceList.value.map((device): UTSJSONObject => {
         const displayName = device.deviceName || device.name || device.imei || '未命名设备'
-        const statusText = device.connectionStatus === 'online' ? '在线' : '离线'
-        return `${displayName} (${statusText})`
+        const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
+        return {
+            text: `${displayName} (${statusText})`,
+            value: device.imei || device.deviceId,
+            disabled: false
+        } as UTSJSONObject
     })]
 })
 
@@ -304,16 +308,18 @@ const saveSelectedDevice = (device: Device) => {
             simMerchant: device.simMerchant,
             connectionStatus: device.connectionStatus,
             carType: device.carType,
-            plateNo: device.plateNo
+            plateNo: device.plateNo,
+            latitude: device.latitude,
+            longitude: device.longitude
         }
-        uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, deviceInfo)
+        uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
         console.log('保存选中设备成功:', deviceInfo)
     } catch (error) {
         console.error('保存选中设备失败:', error)
     }
 }
 
-interface SavedDevice {
+type SavedDevice = {
     name: string
     deviceName: string
     imei: string
@@ -324,15 +330,48 @@ interface SavedDevice {
     connectionStatus: string
     carType: string
     plateNo: string
+    latitude: number
+    longitude: number
+}
+
+const decodeSavedDevice = (raw: any): SavedDevice | null => {
+    if (raw == null || raw == '') return null
+    let data: UTSJSONObject | null = null
+    if (typeof raw == 'string') {
+        try {
+            data = JSON.parse(raw) as UTSJSONObject
+        } catch (error) {
+            return null
+        }
+    } else {
+        data = raw as UTSJSONObject
+    }
+    if (data == null) return null
+    const imei = data.getString('imei', '')
+    if (imei == '') return null
+    const device: SavedDevice = {
+        name: data.getString('name', imei),
+        deviceName: data.getString('deviceName', data.getString('name', imei)),
+        imei: imei,
+        deptId: data.getString('deptId', ''),
+        deviceId: data.getString('deviceId', ''),
+        iccid: data.getString('iccid', ''),
+        simMerchant: data.getString('simMerchant', ''),
+        connectionStatus: data.getString('connectionStatus', ''),
+        carType: data.getString('carType', ''),
+        plateNo: data.getString('plateNo', ''),
+        latitude: data.getNumber('latitude', 0),
+        longitude: data.getNumber('longitude', 0)
+    }
+    return device
 }
 
 // 获取保存的选中设备
 const getSavedSelectedDevice = (): SavedDevice | null => {
     try {
-        const savedDevice = uni.getStorageSync(SELECTED_DEVICE_STORAGE_KEY) as SavedDevice | null
-        if (savedDevice != null && savedDevice.imei) {
-            return savedDevice
-        }
+        const rawDevice = uni.getStorageSync(SELECTED_DEVICE_STORAGE_KEY)
+        if (rawDevice == null) return null
+        return decodeSavedDevice(rawDevice)
     } catch (error) {
         console.error('获取保存设备失败:', error)
     }
@@ -361,9 +400,10 @@ const saveSelectedDeviceIndex = (index: number) => {
 // 获取保存的选中设备索引
 const getSavedSelectedDeviceIndex = (): number | null => {
     try {
-        const savedIndex = uni.getStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY) as number | null
-        if (savedIndex != null) {
-            return savedIndex
+        const savedIndex = uni.getStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
+        if (savedIndex != null && savedIndex.toString() != '') {
+            const index = parseInt(savedIndex.toString())
+            return isNaN(index) || index < 0 ? null : index
         }
     } catch (error) {
         console.error('获取保存设备索引失败:', error)
@@ -398,7 +438,7 @@ const setCurrentCarFromSavedDevice = (savedDevice: any) => {
 
 // 处理选择车辆 - 打开 picker
 const handlePicker = () => {
-    if (deviceList.value.length === 0) {
+    if (deviceList.value.length == 0) {
         uni.showToast({
             title: '暂无车辆数据',
             icon: 'none'
@@ -411,14 +451,14 @@ const handlePicker = () => {
     
     // 设置默认选中索引
     const savedIndex = getSavedSelectedDeviceIndex()
-    if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+    if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
         pickerDefaultIndex.value = [savedIndex]
     } else {
         // 根据当前选中的设备查找索引
         const currentIndex = deviceList.value.findIndex(
-            device => device.imei === currentCarImei.value || device.deviceId === currentCarDeviceId.value
+            device => device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
         )
-        if (currentIndex !== -1) {
+        if (currentIndex != -1) {
             pickerDefaultIndex.value = [currentIndex]
         } else {
             pickerDefaultIndex.value = [0]
@@ -432,28 +472,27 @@ const handlePicker = () => {
 }
 
 // 创建标记点
-const createMarker = (id: number, lat: number, lng: number, type: string, title?: string) => {
-    const isOnline = currentCarConnectionStatus.value === 'online'
-    const iconPath = getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value)
-    const marker = {
-        id,
+const createMarker = (id: number, lat: number, lng: number, type: string, title?: string): Marker => {
+    const isOnline = currentCarConnectionStatus.value == 'online'
+    const callout: MapMarkerCallout = {
+        content: title || '爱车位置',
+        color: isOnline ? '#ffffff' : '#999999',
+        borderRadius: 6,
+        bgColor: isOnline ? '#07C160' : '#CCCCCC',
+        padding: 4,
+        fontSize: 12,
+        display: 'ALWAYS'
+    }
+    return {
+        id: id,
         latitude: lat,
         longitude: lng,
+        iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
         width: 30,
         height: 30,
-        iconPath: iconPath,
-        callout: {
-            content: title || '爱车位置',
-            color: isOnline ? '#ffffff' : '#999999',
-            borderRadius: 6,
-            bgColor: isOnline ? '#07C160' : '#CCCCCC',
-            padding: 4,
-            fontSize: 12,
-            display: 'ALWAYS'
-        },
-        anchor: { x: 0.5, y: 0.5 }
+        anchor: { x: 0.5, y: 0.5 },
+        callout: callout
     }
-    return marker
 }
 
 // 加载车辆详情
@@ -517,8 +556,8 @@ const processTripData = (data : UTSJSONObject) : void => {
 
 const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
     try {
-        const res = await getTrackPos(data) as UTSJSONObject
-        if (res.getNumber('code', 0) == 401) {
+        const res = await getTrackPos(data)
+        if (res.code == 401) {
             uni.showToast({
                 title: '登录过期，请重新登录',
                 icon: 'none',
@@ -530,7 +569,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
             })
             return
         }
-        const trackData = res.getJSON('data')
+        const trackData = res.data
         if (trackData != null) {
             processTripData(trackData)
         }
@@ -573,19 +612,17 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
             await delay(100);
 
-            const deviceMarker = createMarker(
+            const nextMarker = createMarker(
                 1,
                 convertedCoord.lat,
                 convertedCoord.lng,
                 'device',
                 currentCarName.value
-            );
-            
-            markers.value = [];
-            await delay(50);
-            markers.value = [deviceMarker];
+            )
 
-            console.log('标记点更新完成');
+            markers.value = [nextMarker]
+
+            console.log('标记点更新完成')
             return true;
         } else {
             console.warn('获取设备位置失败')
@@ -639,26 +676,23 @@ const loadDeviceData = async (device: Device) => {
     }
 }
 
-interface PickerConfirmEvent {
-    indexs: number[]
-}
-
 // 处理选择车辆确认
-const handleConfirm = (e: PickerConfirmEvent) => {
+const handleConfirm = (e: UTSJSONObject) => {
 
     // 关闭 picker
     showPicker.value = false
 
     // i-picker 返回的第一列索引
-    let selectedIndex = e.indexs.length > 0 ? e.indexs[0] : -1
+    const indexs = e.getArray<number>('indexs')
+    let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1
     
     // 如果索引无效，使用当前设备
     if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
         console.warn('无法解析选中的索引，使用当前设备')
         const currentIndex = deviceList.value.findIndex(
-            device => device.imei === currentCarImei.value || device.deviceId === currentCarDeviceId.value
+            device => device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
         )
-        if (currentIndex !== -1) {
+        if (currentIndex != -1) {
             selectedIndex = currentIndex
             console.log('使用当前设备索引:', selectedIndex)
         } else {
@@ -677,16 +711,10 @@ const handleConfirm = (e: PickerConfirmEvent) => {
     }
     
     // 检查是否选择了不同的设备
-    if (selectedDevice.imei === currentCarImei.value && selectedDevice.deviceId === currentCarDeviceId.value) {
+    if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
         console.log('选择的设备与当前设备相同，不重复加载')
         return
     }
-    
-    console.log('最终选中的设备:', selectedDevice)
-    console.log('设备名称:', selectedDevice.deviceName || selectedDevice.name)
-    console.log('设备 IMEI:', selectedDevice.imei)
-    console.log('选中的索引:', selectedIndex)
-    console.log('============================================')
     
     // 更新当前选中的设备
     const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
@@ -703,7 +731,7 @@ const handleConfirm = (e: PickerConfirmEvent) => {
     center.longitude = selectedDevice.longitude
 
     // 保存选中索引到缓存
-    if (selectedIndex !== -1) {
+    if (selectedIndex != -1) {
         saveSelectedDeviceIndex(selectedIndex)
         pickerDefaultIndex.value = [selectedIndex]
     }
@@ -726,10 +754,12 @@ const loadDeviceList = async () => {
         const res = await getUserDeviceList({
             pageSize: 1000
         })
-        
-        if (res.code == 0 && res.data && res.data.list && res.data.list.length > 0) {
-            userDeviceList.value = res.data.list
-            deviceList.value = res.data.list.map((item: UTSJSONObject): Device => {
+        const code = res.code
+        const data = res.data
+        const list = data.list
+        if (code == 0 && list != null && list.length > 0) {
+            userDeviceList.value = list
+            deviceList.value = list.map((item: UTSJSONObject): Device => {
                 const imei = item.getString('imei', '')
                 const rawDeviceName = item.getString('deviceName', '')
                 const deviceName = rawDeviceName != '' ? rawDeviceName : (imei != '' ? imei : '未命名设备')
@@ -758,7 +788,7 @@ const loadDeviceList = async () => {
             let selectedIdx : number = -1
             
             // 优先使用保存的索引
-            if (savedIndex !== null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
+            if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
                 selectedDevice = deviceList.value[savedIndex]
                 selectedIdx = savedIndex
             }
@@ -766,8 +796,8 @@ const loadDeviceList = async () => {
             // 如果索引无效或设备不存在，尝试使用保存的设备信息
             if (selectedDevice == null && savedDevice != null && savedDevice.imei != '') {
                 selectedDevice = deviceList.value.find(device => 
-                    device.imei === savedDevice.imei || 
-                    device.value === savedDevice.imei
+                    device.imei == savedDevice.imei || 
+                    device.value == savedDevice.imei
                 )
                 if (selectedDevice) {
                     selectedIdx = deviceList.value.indexOf(selectedDevice)
@@ -805,7 +835,7 @@ const loadDeviceList = async () => {
                 center.longitude = device.longitude
                 
                 // 设置 picker 默认索引
-                if (selectedIdx !== -1) {
+                if (selectedIdx != -1) {
                     pickerDefaultIndex.value = [selectedIdx]
                 }
                 
@@ -858,17 +888,7 @@ const refreshLocation = async () => {
         mask: true
     })  
     try {
-        await loadDeviceDetail(currentCarDeviceId.value);
-        const success = await loadDevicePos({
-            deviceId: currentCarDeviceId.value,
-            deviceids: currentCarImei.value
-        })
-        if (success) {
-            uni.showToast({
-                title: '位置已更新',
-                icon: 'success'
-            })
-        }
+        await loadDeviceList()
     } catch (error) {
         console.error('刷新位置失败', error)
         uni.showToast({
@@ -909,7 +929,7 @@ const toDeviceList = () => {
     console.log('toDeviceList')
     if (!isLogin()) return 
     uni.navigateTo({
-        url: '/pages/deviceList/deviceList?userDeviceList=' + JSON.stringify(userDeviceList.value),
+        url: '/pages/deviceList/deviceList',
     })
 }
 
@@ -1131,10 +1151,18 @@ onLoad(() => {
 
 <style scoped lang="scss">
 .container {
-    background: linear-gradient(90deg, #E6F9E6, #E0F0FF);
-    padding: 0 30rpx 30rpx 30rpx;
     height: 100%;
-    
+    background-color: #E6F9E6;
+    // #ifdef MP-WEIXIN
+    background-image: linear-gradient(90deg, #E6F9E6, #E0F0FF);
+    // #endif
+     // #ifndef MP-WEIXIN
+     background-image: linear-gradient(to right, #E6F9E6, #E0F0FF);
+     // #endif
+
+    .page-bg {
+        padding: 0 30rpx 30rpx 30rpx;
+
     .loading-container {
         position: fixed;
         top: 50%;
@@ -1171,7 +1199,9 @@ onLoad(() => {
                     color: #000;
                     text-align: center;
                     position: relative;
+                    // #ifdef MP-WEIXIN
                     margin-right: 10rpx;
+                    // #endif
                 }
                 .login{
                     font-size: 36rpx;
@@ -1358,12 +1388,16 @@ onLoad(() => {
                 border-top-color: #4cd964;
                 border-right-color: #4cd964;
                 border-left-color: #4cd964;
+                border-bottom-color: #b3b5b01c;
+                border-bottom-width: 5px;
                 transform: rotate(135deg);
             }
             .ring-bg.orange {
                 border-top-color: #ff9500;
                 border-right-color: #ff9500;
                 border-left-color: #ff9500;
+                border-bottom-color: #b3b5b01c;
+                border-bottom-width: 5px;
                 transform: rotate(135deg);
             }
 
@@ -1480,6 +1514,7 @@ onLoad(() => {
                 }
             }
         }
+    }
     }
 }
 </style>

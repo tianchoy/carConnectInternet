@@ -478,7 +478,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           withTrip: false
         });
         const res = yield api_request.getTrackPos(data);
-        const trackData = res.getJSON("data");
+        const trackData = res.data;
         const positions = trackData === null || trackData === void 0 ? null : trackData.getArray("positions");
         if (positions != null && positions.length > 0) {
           processTrackData(positions);

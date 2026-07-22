@@ -91,7 +91,7 @@ open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
                             }
                             )
                         ), 4),
-                        _cE("view", _uM("class" to "capsule", "style" to _nS(_uM("right" to "200rpx"))), _uA(
+                        _cE("view", _uM("class" to "capsule", "style" to _nS(_uM("right" to "10rpx"))), _uA(
                             _cE("view", _uM("class" to "capsule-item"), _uA(
                                 if (isTrue(_ctx.showCapsule)) {
                                     _cE("view", _uM("key" to 0, "onClick" to handleCapsuleClick), _uA(

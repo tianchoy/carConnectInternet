@@ -65,9 +65,9 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                         val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 108, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
-                        val res = await(getTrackPos(data)) as UTSJSONObject
+                        val res = await(getTrackPos(data))
                         var stopsWithAddress: UTSArray<StopRecord> = _uA()
-                        val trackData = res.getJSON("data")
+                        val trackData = res.data
                         val stops = trackData?.getArray<UTSJSONObject>("stops") ?: _uA()
                         stops.forEach(fun(stop: UTSJSONObject): Unit {
                             val convertedCoord = CoordTransform.wgs84ToTencent(stop.getNumber("latitude", 0), stop.getNumber("longitude", 0))

@@ -44,12 +44,15 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 87, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
-                            if (res.code == 0) {
-                                totalPage.value = res.data.totalPage
+                            val code = res.code
+                            val list = res.data.list
+                            val pageCount = res.data.totalPage
+                            if (code == 0 && list != null) {
+                                totalPage.value = pageCount
                                 if (currPage.value == 1) {
-                                    deviceList.value = res.data.list
+                                    deviceList.value = list
                                 } else {
-                                    deviceList.value = deviceList.value.concat(res.data.list)
+                                    deviceList.value = deviceList.value.concat(list)
                                 }
                                 hasMore.value = currPage.value < totalPage.value
                                 if (hasMore.value) {
@@ -65,7 +68,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:119")
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:123")
                             uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
@@ -90,7 +93,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 if (simMerchant.toLowerCase() == "zddx") {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
-                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:150")
+                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:154")
                 needRefresh.value = true
                 needRefresh.value = false
                 uni_showToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))

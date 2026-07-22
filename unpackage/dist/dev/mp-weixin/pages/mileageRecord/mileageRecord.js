@@ -181,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           const res = yield api_request.getTrackPos(data);
           common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:197", "获取里程数据成功:", res);
-          const trackData = res.getJSON("data");
+          const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }

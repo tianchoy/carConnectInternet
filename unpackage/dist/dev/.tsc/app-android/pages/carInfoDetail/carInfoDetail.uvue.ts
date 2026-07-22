@@ -239,7 +239,7 @@ const _cache = __ins.renderCache;
 				const res = await getDevicePos(data);
 
 				// 检查返回结果是否有效
-				if (!res || !res.data || res.data.length === 0) {
+				if (!res || !res.data || res.data.length == 0) {
 					throw new Error('返回数据为空');
 				}
 
@@ -249,15 +249,15 @@ const _cache = __ins.renderCache;
 
 				// 使用 for...of 替代 forEach，确保 await 生效
 				for (const item of res.data) {
-					const itemImei = item['imei'] as string | null;
+					const itemImei = item.getString('imei', '');
 					if (itemImei != null && itemImei == imei.value) {
 						foundDevice = true;
 
 						// item 已是 UTSJSONObject，直接赋值以保留正确类型。
 						datainfo.value = item;
 
-						const latitude = item['latitude'] as string | number | null;
-						const longitude = item['longitude'] as string | number | null;
+						const latitude = item.getNumber('latitude', 0);
+						const longitude = item.getNumber('longitude', 0);
 						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
 							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:359");
 							uni.showToast({

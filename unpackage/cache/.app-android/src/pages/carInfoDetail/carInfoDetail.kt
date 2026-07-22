@@ -176,25 +176,25 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             return wrapUTSPromise(suspend w2@{
                                     try {
                                         val res = await(getDevicePos(data))
-                                        if (!(res != null) || !(res.data != null) || res.data.length === 0) {
+                                        if (!(res != null) || !(res.data != null) || res.data.length == 0) {
                                             throw UTSError("返回数据为空")
                                         }
                                         console.log("接口请求成功", attempt, " at pages/carInfoDetail/carInfoDetail.uvue:343")
                                         var foundDevice = false
                                         for(item in resolveUTSValueIterator(res.data)){
-                                            val itemImei = item["imei"] as String?
+                                            val itemImei = item.getString("imei", "")
                                             if (itemImei != null && itemImei == imei.value) {
                                                 foundDevice = true
                                                 datainfo.value = item
-                                                val latitude = item["latitude"] as Any?
-                                                val longitude = item["longitude"] as Any?
-                                                if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
+                                                val latitude = item.getNumber("latitude", 0)
+                                                val longitude = item.getNumber("longitude", 0)
+                                                if (latitude == null || longitude == null || latitude.toString(10).length == 0 || longitude.toString(10).length == 0) {
                                                     console.error("位置信息缺失", item, " at pages/carInfoDetail/carInfoDetail.uvue:359")
                                                     uni_showToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
                                                     return@w2 false
                                                 }
-                                                val lat = parseFloat(latitude.toString())
-                                                val lng = parseFloat(longitude.toString())
+                                                val lat = parseFloat(latitude.toString(10))
+                                                val lng = parseFloat(longitude.toString(10))
                                                 if (isNaN(lat) || isNaN(lng)) {
                                                     console.error("经纬度格式错误", latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:372")
                                                     return@w2 false

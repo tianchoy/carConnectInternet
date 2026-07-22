@@ -140,9 +140,9 @@ const _cache = __ins.renderCache;
 				withPos: false,
 				withTrip: true,
 			};
-			const res = await getTrackPos(data) as UTSJSONObject;
+			const res = await getTrackPos(data);
 			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:197");
-			const trackData = res.getJSON('data')
+			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}

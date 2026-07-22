@@ -22,7 +22,7 @@ open class GenPagesMessageMessage : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesMessageMessage
             val _cache = __ins.renderCache
-            val modal = ref<ModalInstance?>(null)
+            val modal = ref<Boolean>(false)
             val modalContent = ref(_uO())
             val refresherTriggered = ref(false)
             val msgList = ref(_uA<UTSJSONObject>())
@@ -61,16 +61,13 @@ open class GenPagesMessageMessage : BasePage {
                             return@w1
                         }
                         try {
-                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 1))) as UTSJSONObject
-                            val code = res.getNumber("code", -1)
+                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 1)))
+                            val code = res.code
                             if (code != 0) {
                                 return@w1
                             }
-                            val data = res.getJSON("data")
-                            if (data == null) {
-                                return@w1
-                            }
-                            val list = data.getArray<UTSJSONObject>("list")
+                            val data = res.data
+                            val list = data.list
                             if (list == null || list.length == 0) {
                                 return@w1
                             }
@@ -85,9 +82,8 @@ open class GenPagesMessageMessage : BasePage {
                             }
                             hasNewMessages.value = true
                             vibrateAlert()
-                            val countRes = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50))) as UTSJSONObject
-                            val countData = countRes.getJSON("data")
-                            val newList = countData?.getArray<UTSJSONObject>("list")
+                            val countRes = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
+                            val newList = countRes.data.list
                             if (newList != null) {
                                 var count: Number = 0
                                 newList.forEach(fun(message: UTSJSONObject): Unit {
@@ -100,7 +96,7 @@ open class GenPagesMessageMessage : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("检查新消息失败:", error, " at pages/message/message.uvue:141")
+                            console.error("检查新消息失败:", error, " at pages/message/message.uvue:139")
                         }
                 })
             }
@@ -109,10 +105,10 @@ open class GenPagesMessageMessage : BasePage {
                 if (checkTimer > 0) {
                     stopNewMessageCheck()
                 }
-                console.log("启动定时消息检查", " at pages/message/message.uvue:151")
+                console.log("启动定时消息检查", " at pages/message/message.uvue:149")
                 checkTimer = setInterval(fun(){
                     if (isPageActive.value) {
-                        console.log("定时检查新消息...", " at pages/message/message.uvue:155")
+                        console.log("定时检查新消息...", " at pages/message/message.uvue:153")
                         checkNewMessages()
                     }
                 }
@@ -134,28 +130,19 @@ open class GenPagesMessageMessage : BasePage {
                             if (!isInit) {
                                 loadStatus.value = "loading"
                             }
-                            val res = await(getUserMsgList(_uO("page" to currPage.value, "pageSize" to pageSize.value))) as UTSJSONObject
-                            if (res.getNumber("code", -1) != 0) {
+                            val res = await(getUserMsgList(_uO("page" to currPage.value, "pageSize" to pageSize.value)))
+                            if (res.code != 0) {
                                 loadStatus.value = "loadmore"
                                 return@w1
                             }
-                            val data = res.getJSON("data")
-                            if (data == null) {
-                                loadStatus.value = "nomore"
-                                return@w1
-                            }
-                            val totalPages = data.getNumber("totalPage", 1)
-                            totalPage.value = if (totalPages > 0) {
-                                totalPages
+                            val data = res.data
+                            val totalPages = if (data.totalPage > 0) {
+                                data.totalPage
                             } else {
                                 1
                             }
-                            val dataList = data.getArray<UTSJSONObject>("list")
-                            val newData: UTSArray<UTSJSONObject> = if (dataList != null) {
-                                dataList
-                            } else {
-                                _uA()
-                            }
+                            totalPage.value = totalPages
+                            val newData: UTSArray<UTSJSONObject> = data.list
                             if (isInit) {
                                 msgList.value = newData
                                 if (newData.length > 0) {
@@ -186,7 +173,7 @@ open class GenPagesMessageMessage : BasePage {
                         }
                          catch (error: Throwable) {
                             loadStatus.value = "loadmore"
-                            console.error("请求异常:", error, " at pages/message/message.uvue:207")
+                            console.error("请求异常:", error, " at pages/message/message.uvue:200")
                         }
                          finally {
                             isLoading.value = false
@@ -195,12 +182,12 @@ open class GenPagesMessageMessage : BasePage {
             }
             fun gen_loadNewMessages_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("加载新消息", " at pages/message/message.uvue:215")
+                        console.log("加载新消息", " at pages/message/message.uvue:208")
                         await(loadMsgList(true))
                         hasNewMessages.value = false
                         newMessageCount.value = 0
                         lastUpdateTime.value = Date().getTime()
-                        console.log("新消息加载完成", " at pages/message/message.uvue:220")
+                        console.log("新消息加载完成", " at pages/message/message.uvue:213")
                 })
             }
             val loadNewMessages = ::gen_loadNewMessages_fn
@@ -216,7 +203,7 @@ open class GenPagesMessageMessage : BasePage {
             )
             onShow(fun(){
                 if (Login.value) {
-                    console.log("页面显示 - 启动自动刷新", " at pages/message/message.uvue:244")
+                    console.log("页面显示 - 启动自动刷新", " at pages/message/message.uvue:237")
                     isPageActive.value = true
                     startNewMessageCheck()
                     checkNewMessages()
@@ -224,27 +211,27 @@ open class GenPagesMessageMessage : BasePage {
             }
             )
             onHide(fun(){
-                console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:254")
+                console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:247")
                 if (Login.value) {
-                    console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:256")
+                    console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:249")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             onUnload(fun(){
-                console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:264")
+                console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:257")
                 if (Login.value) {
-                    console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:266")
+                    console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:259")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             onActivated(fun(){
-                console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:273")
+                console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:266")
                 if (Login.value) {
-                    console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:275")
+                    console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:268")
                     isPageActive.value = true
                     startNewMessageCheck()
                     checkNewMessages()
@@ -252,16 +239,16 @@ open class GenPagesMessageMessage : BasePage {
             }
             )
             onDeactivated(fun(){
-                console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:284")
+                console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:277")
                 if (Login.value) {
-                    console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:286")
+                    console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:279")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             val onRefresherRefresh = fun(){
-                console.log("下拉刷新触发", " at pages/message/message.uvue:294")
+                console.log("下拉刷新触发", " at pages/message/message.uvue:287")
                 refresherTriggered.value = true
                 loadMsgList(true).then(fun(){
                     refresherTriggered.value = false
@@ -273,7 +260,7 @@ open class GenPagesMessageMessage : BasePage {
             }
             val loadMore = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:305")
+                        console.log("准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:298")
                         if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
                             if (currPage.value >= totalPage.value) {
                                 loadStatus.value = "nomore"
@@ -285,7 +272,7 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val onScrollToLower = fun(){
-                console.log("滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:319")
+                console.log("滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:312")
                 if (loadStatus.value == "loadmore" && !isLoading.value) {
                     loadMore()
                 }
@@ -293,12 +280,12 @@ open class GenPagesMessageMessage : BasePage {
             val handleItemClick = fun(item: UTSJSONObject): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         modalContent.value = item
-                        modal.value?.open()
+                        modal.value = true
                         if (item.getNumber("status", 0) == 1) {
                             try {
                                 val messageId = item.getString("messageId", "")
-                                val res = await(setMsgState(messageId)) as UTSJSONObject
-                                if (res.getString("msg", "") == "success") {
+                                val res = await(setMsgState(messageId))
+                                if (res.code == 0 || res.msg == "success") {
                                     val index = msgList.value.findIndex(fun(message: UTSJSONObject): Boolean {
                                         return message.getString("messageId", "") == messageId
                                     }
@@ -310,13 +297,13 @@ open class GenPagesMessageMessage : BasePage {
                                 }
                             }
                              catch (error: Throwable) {
-                                console.error("更新状态失败:", error, " at pages/message/message.uvue:343")
+                                console.error("更新状态失败:", error, " at pages/message/message.uvue:336")
                             }
                         }
                 })
             }
             val ReadIt = fun(){
-                modal.value?.close()
+                modal.value = false
             }
             val getMessageId = fun(item: UTSJSONObject, index: Number): String {
                 val messageId = item.getString("messageId", "")
@@ -442,7 +429,8 @@ open class GenPagesMessageMessage : BasePage {
                         ), 40, _uA(
                             "refresher-triggered"
                         )),
-                        _cV(_component_i_modal, _uM("ref_key" to "modal", "ref" to modal, "title" to getMessageTypeText(modalContent.value.getNumber("messageType", 0)), "content" to modalContent.value.getString("content", ""), "onConfirm" to ReadIt), null, 8, _uA(
+                        _cV(_component_i_modal, _uM("show" to modal.value, "title" to getMessageTypeText(modalContent.value.getNumber("messageType", 0)), "content" to modalContent.value.getString("content", ""), "onConfirm" to ReadIt), null, 8, _uA(
+                            "show",
                             "title",
                             "content"
                         ))

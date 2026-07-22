@@ -1,4 +1,5 @@
 import { get, post, put, remove } from "./http";
+import { asJSONObject, getResponseCode, getResponseDataArray, getResponseDataObject, getResponseMessage } from "./response";
 
 const loginUrl = '/sys/login'
 const customList = '/sys/dept/deps'
@@ -18,7 +19,6 @@ const carType = '/carType/listAll'
 const logoutUrl = '/sys/logout'
 const groupList = '/group/userGroupList'
 const sendcmd = '/command/sendCmd'
-
 const getGeofence = '/geofence'
 const deleteGeo = '/geofence/'
 const unbindDeviceList = '/device/unbindGeofenceList'
@@ -26,232 +26,163 @@ const bindDeviceList = '/device/bindGeofenceList'
 const bindGeofence = '/geofence/bind'
 const unbindGeofence = '/geofence/unbind'
 const deleteDevice = '/userDevice/del'
-
-// 指令相关的URL常量
 const cmdActionUrl = '/command/cmdAction'
 const cmdByMidUrl = '/command/cmdByMid'
 const cmdSendUrl = '/command/sendCmd'
 const cmdRecordByIdUrl = '/command/recordById?id='
 
-// 登陆接口
-export const login = (data: UTSJSONObject) => {
-    return post(loginUrl, data)
+export type BasicResponse = { code: number, msg: string }
+export type JsonDataResponse = { code: number, msg: string, data: UTSJSONObject }
+export type DevicePositionResponse = { code: number, message: string, data: Array<UTSJSONObject> }
+export type TrackPosResponse = { code: number, msg: string, data: UTSJSONObject }
+export type UserInfoResponse = { code: number, msg: string, data: UTSJSONObject }
+export type UserDeviceListData = { list: Array<UTSJSONObject>, totalPage: number, totalCount: number }
+export type UserDeviceListResponse = { code: number, msg: string, data: UserDeviceListData }
+export type DeviceDetailResponse = { code: number, msg: string, data: UTSJSONObject }
+export type GeofenceResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
+export type DevicePageData = { list: Array<UTSJSONObject>, totalPage: number, totalCount: number }
+export type DevicePageResponse = { code: number, msg: string, data: DevicePageData }
+export type CommandListResponse = { code: number, msg: string, data: Array<UTSJSONObject> }
+export type SendCmdResponse = { code: number, msg: string, data: string }
+export type ChangePasswordResponse = { code: number, msg: string }
+export type MessageResponse = { code: number, msg: string, data: UserDeviceListData }
+
+function basicResponse(raw: any): BasicResponse {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response) }
 }
 
-type BasicResponse = {
-    code: number
-    msg: string
+function jsonDataResponse(raw: any): JsonDataResponse {
+    const response = asJSONObject(raw)
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: getResponseDataObject(response)
+    }
 }
 
-// 退出接口
-export const logout = (): Promise<BasicResponse> => {
-    return post<BasicResponse>(logoutUrl)
+function devicePageResponse(raw: any): DevicePageResponse {
+    const response = asJSONObject(raw)
+    const data = getResponseDataObject(response)
+    const list = data.getArray<UTSJSONObject>('list')
+    return {
+        code: getResponseCode(response),
+        msg: getResponseMessage(response),
+        data: {
+            list: list != null ? list : [],
+            totalPage: data.getNumber('totalPage', 0),
+            totalCount: data.getNumber('totalCount', 0)
+        }
+    }
 }
 
-// 获取客户列表
-export const getCustomList = () => {
-    return get(customList)
+function userDevicePageResponse(raw: any): UserDeviceListResponse {
+    const page = devicePageResponse(raw)
+    return {
+        code: page.code,
+        msg: page.msg,
+        data: {
+            list: page.data.list,
+            totalPage: page.data.totalPage,
+            totalCount: page.data.totalCount
+        }
+    }
 }
 
-// 获取分组设备
-export const getCustomDeviceList = (deptId: string) => {
-    const params: UTSJSONObject = { deptId } as UTSJSONObject
-    return get(customDeviceList, params)
+function messagePageResponse(raw: any): MessageResponse {
+    const page = devicePageResponse(raw)
+    return {
+        code: page.code,
+        msg: page.msg,
+        data: {
+            list: page.data.list,
+            totalPage: page.data.totalPage,
+            totalCount: page.data.totalCount
+        }
+    }
 }
 
-// 获取用户分组设备
-export const getUserGroupList = () => {
-    return get(groupList)
+function userInfoResponse(raw: any): UserInfoResponse {
+    const response = jsonDataResponse(raw)
+    return { code: response.code, msg: response.msg, data: response.data }
 }
 
-// 发送远程指令
-type SendCommandResponse = {
-    code: number
-    msg: string
+function deviceDetailResponse(raw: any): DeviceDetailResponse {
+    const response = jsonDataResponse(raw)
+    return { code: response.code, msg: response.msg, data: response.data }
 }
 
-export const sendCommand = (data: UTSJSONObject): Promise<SendCommandResponse> => {
-    return post<SendCommandResponse>(sendcmd, data)
+function changePasswordResponse(raw: any): ChangePasswordResponse {
+    const response = basicResponse(raw)
+    return { code: response.code, msg: response.msg }
 }
 
-// 获取设备位置(跟踪也用此接口)
-type DevicePositionResponse = {
-    code: number
-    message: string
-    data: UTSJSONObject[]
-}
+export const login = (data: UTSJSONObject): Promise<JsonDataResponse> => post(loginUrl, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const logout = (): Promise<BasicResponse> => post(logoutUrl).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const getCustomList = (): Promise<JsonDataResponse> => get(customList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const getCustomDeviceList = (deptId: string): Promise<JsonDataResponse> => get(customDeviceList, { deptId } as UTSJSONObject).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const getUserGroupList = (): Promise<JsonDataResponse> => get(groupList).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const sendCommand = (data: UTSJSONObject): Promise<BasicResponse> => post(sendcmd, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 
-export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => {
-    return get<DevicePositionResponse>(devicePos, data)
-}
+export const getDevicePos = (data: UTSJSONObject): Promise<DevicePositionResponse> => get(devicePos, data).then((raw: any): DevicePositionResponse => {
+    const response = asJSONObject(raw)
+    return {
+        code: getResponseCode(response),
+        message: getResponseMessage(response),
+        data: getResponseDataArray(response)
+    }
+})
 
-// 轨迹查询。里程查询
-export const getTrackPos = (data: UTSJSONObject) => {
-    return get(trackPos, data)
-}
+export const getTrackPos = (data: UTSJSONObject): Promise<TrackPosResponse> => get(trackPos, data).then((raw: any): TrackPosResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataObject(response) }
+})
 
-type UserInfoResponse = {
-    data: UTSJSONObject
-}
+export const getUserInfo = (): Promise<UserInfoResponse> => get(userinfo).then((raw: any): UserInfoResponse => {
+    return userInfoResponse(raw)
+})
 
-// 获取用户信息
-export const getUserInfo = (): Promise<UserInfoResponse> => {
-    return get<UserInfoResponse>(userinfo)
-}
+export const addDevice = (data: UTSJSONObject): Promise<BasicResponse> => post(addDeviceUrl, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const delDevice = (imei: string): Promise<BasicResponse> => post(deleteDevice, { imei } as UTSJSONObject).then((raw: any): BasicResponse => { return basicResponse(raw) })
 
-// 添加设备
-export const addDevice = (data: UTSJSONObject) => {
-    return post(addDeviceUrl, data)
-}
+export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListResponse> => post(userDeviceList, data).then((raw: any): UserDeviceListResponse => {
+    return userDevicePageResponse(raw)
+})
 
-// 删除设备
-export const delDevice = (imei: string): Promise<BasicResponse> => {
-    const data: UTSJSONObject = { imei } as UTSJSONObject
-    return post<BasicResponse>(deleteDevice, data)
-}
+export const PostWechatlogin = (data: UTSJSONObject): Promise<JsonDataResponse> => post(wechatLogin, data).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
+export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => put(changePSW, data).then((raw: any): ChangePasswordResponse => { return changePasswordResponse(raw) })
+export const getUserMsgList = (data?: UTSJSONObject): Promise<MessageResponse> => (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw: any): MessageResponse => {
+    return messagePageResponse(raw)
+})
+export const setMsgState = (msgId: string): Promise<BasicResponse> => get(`${msgState}${msgId}`).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const editDeviceInfo = (data: UTSJSONObject): Promise<BasicResponse> => put(updateDevice, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => get(`${deviceDetail}${deviceId}`).then((raw: any): DeviceDetailResponse => {
+    return deviceDetailResponse(raw)
+})
+export const getCarType = (): Promise<JsonDataResponse> => get(carType).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })
 
-type UserDeviceListData = {
-    list: Array<UTSJSONObject>
-    totalPage: number
-    totalCount: number
-}
+export const getGeofenceList = (): Promise<GeofenceResponse> => get(getGeofence).then((raw: any): GeofenceResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+})
+export const addGeofence = (data: UTSJSONObject): Promise<BasicResponse> => post(getGeofence, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const updateGeofence = (data: UTSJSONObject): Promise<BasicResponse> => put(getGeofence, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const deleteGeofence = (id: string): Promise<BasicResponse> => remove(`${deleteGeo}${id}`).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const getUnboundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => get(unbindDeviceList, params).then((raw: any): DevicePageResponse => { return devicePageResponse(raw) })
+export const getBoundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => get(bindDeviceList, params).then((raw: any): DevicePageResponse => { return devicePageResponse(raw) })
+export const bindDevices = (data: UTSJSONObject): Promise<BasicResponse> => post(bindGeofence, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
+export const unbindDevices = (data: UTSJSONObject): Promise<BasicResponse> => remove(unbindGeofence, data).then((raw: any): BasicResponse => { return basicResponse(raw) })
 
-type UserDeviceListResponse = {
-    code: number
-    msg: string
-    data: UserDeviceListData
-}
-
-// 获取用户设备列表
-export const getUserDeviceList = (data: UTSJSONObject): Promise<UserDeviceListResponse> => {
-    return post<UserDeviceListResponse>(userDeviceList, data)
-}
-
-// 微信授权登陆
-export const PostWechatlogin = (data: UTSJSONObject) => {
-    return post(wechatLogin, data)
-}
-
-type ChangePasswordResponse = {
-    msg: string
-}
-
-// 修改密码
-export const changePassWord = (data: UTSJSONObject): Promise<ChangePasswordResponse> => {
-    return post<ChangePasswordResponse>(changePSW, data)
-}
-
-// 获取消息列表
-export const getUserMsgList = (data?: UTSJSONObject) => {
-    return data != null ? get(userMsgList, data) : get(userMsgList)
-}
-
-// 设置消息状态
-export const setMsgState = (msgId: string) => {
-    return get(`${msgState}${msgId}`)
-}
-
-// 编辑设备信息
-export const editDeviceInfo = (data: UTSJSONObject) => {
-    return put(updateDevice, data)
-}
-
-// 获取设备详情
-type DeviceDetailResponse = {
-    data: UTSJSONObject
-}
-
-export const getDeviceDetail = (deviceId: string): Promise<DeviceDetailResponse> => {
-    return get<DeviceDetailResponse>(`${deviceDetail}${deviceId}`)
-}
-
-// 获取车辆品牌型号
-export const getCarType = () => {
-    return get(carType)
-}
-
-type GeofenceResponse = {
-    code: number
-    msg: string
-    data: Array<UTSJSONObject>
-}
-
-type DevicePageData = {
-    list: Array<UTSJSONObject>
-}
-
-type DevicePageResponse = {
-    code: number
-    data: DevicePageData
-}
-
-// 获取地理围栏列表
-export const getGeofenceList = (): Promise<GeofenceResponse> => {
-    return get<GeofenceResponse>(getGeofence)
-}
-
-// 添加围栏
-export const addGeofence = (data: UTSJSONObject): Promise<BasicResponse> => {
-    return post<BasicResponse>(getGeofence, data)
-}
-
-// 修改围栏
-export const updateGeofence = (data: UTSJSONObject): Promise<BasicResponse> => {
-    return put<BasicResponse>(getGeofence, data)
-}
-
-// 删除围栏
-export const deleteGeofence = (id: string): Promise<BasicResponse> => {
-    return remove<BasicResponse>(`${deleteGeo}${id}`)
-}
-
-// 获取未绑定围栏设备列表
-export const getUnboundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => {
-    return get<DevicePageResponse>(unbindDeviceList, params)
-}
-
-// 获取围栏内绑定的设备列表
-export const getBoundDevices = (params: UTSJSONObject): Promise<DevicePageResponse> => {
-    return get<DevicePageResponse>(bindDeviceList, params)
-}
-
-// 设备绑定围栏
-export const bindDevices = (data: UTSJSONObject): Promise<BasicResponse> => {
-    return post<BasicResponse>(bindGeofence, data)
-}
-
-// 设备解绑围栏
-export const unbindDevices = (data: UTSJSONObject): Promise<BasicResponse> => {
-    return remove<BasicResponse>(unbindGeofence, data)
-}
-
-type CommandListResponse = {
-    code: number
-    data: Array<UTSJSONObject>
-}
-
-// 命令操作 - 获取指令类型列表
-export const getCmdAction = (): Promise<CommandListResponse> => {
-    return get<CommandListResponse>(cmdActionUrl)
-}
-
-// 根据类型ID获取指令列表
-export const getCmdByMid = (data: UTSJSONObject): Promise<CommandListResponse> => {
-    return get<CommandListResponse>(cmdByMidUrl, data)
-}
-
-type SendCmdResponse = {
-    code: number
-    msg: string
-    data: string
-}
-
-// 发送命令
-export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => {
-    return post<SendCmdResponse>(cmdSendUrl, data)
-}
-
-// 根据指令ID获取指令记录详情
-export const getCmdRecordById = (id: string) => {
-    return get(`${cmdRecordByIdUrl}${id}`)
-}
+export const getCmdAction = (): Promise<CommandListResponse> => get(cmdActionUrl).then((raw: any): CommandListResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+})
+export const getCmdByMid = (data: UTSJSONObject): Promise<CommandListResponse> => get(cmdByMidUrl, data).then((raw: any): CommandListResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) }
+})
+export const sendCmd = (data: UTSJSONObject): Promise<SendCmdResponse> => post(cmdSendUrl, data).then((raw: any): SendCmdResponse => {
+    const response = asJSONObject(raw)
+    return { code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString('data', '') }
+})
+export const getCmdRecordById = (id: string): Promise<JsonDataResponse> => get(`${cmdRecordByIdUrl}${id}`).then((raw: any): JsonDataResponse => { return jsonDataResponse(raw) })

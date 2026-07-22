@@ -150,9 +150,9 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                         }
                         try {
                             val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 187, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
-                            val res = await(getTrackPos(data)) as UTSJSONObject
+                            val res = await(getTrackPos(data))
                             console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:197")
-                            val trackData = res.getJSON("data")
+                            val trackData = res.data
                             if (trackData != null) {
                                 processTripData(trackData)
                             }
