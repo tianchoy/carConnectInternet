@@ -1568,7 +1568,7 @@ const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
                   key: 1,
                   class: "loading-tip"
                 }), [
-                  _cE("text", null, "正在加载更多...")
+                  _cE("text", _uM({ class: "empty-text" }), "正在加载更多...")
                 ])
               : _cC("v-if", true),
             isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)

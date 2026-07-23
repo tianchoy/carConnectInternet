@@ -66,16 +66,19 @@ const __sfc__ = defineComponent({
         // 轨迹回放相关
         const trackPoints = ref<Array<TrackPoint>>([]);
         const polyline = ref<Array<Polyline>>([]);
+        let unplayedPolyline: Polyline | null = null;
         let playedPolyline: Polyline | null = null;
         const isPlaying = ref(false);
+        const isTrackPlayable = ref(false);
         const playbackSpeed = ref(5);
         const totalDistance = ref(0);
         const currentSpeed = ref(0);
         const currentTime = ref('');
         const currentIndex = ref(0);
         const carMarker = ref<MapMarker | null>(null);
-        let playbackTimer: number | null = 0;
+        let playbackTimer: number | null = null;
         let lastTimestamp = 0;
+        let replaySessionId = 0;
         const startTime = ref('');
         const endTime = ref('');
         const lat = ref<string | null>('');
@@ -238,20 +241,25 @@ const __sfc__ = defineComponent({
         }
         function initPolyline() {
             if (trackPoints.value.length < 2) {
+                unplayedPolyline = null;
                 playedPolyline = null;
                 polyline.value = [];
                 return;
             }
-            const unplayedPolyline = new Polyline(toNativePoints(trackPoints.value), '#999999', 3, false, true, '', '#FFFFFF', 1, []);
-            const initialPlayedPolyline = new Polyline(toNativePoints(trackPoints.value.slice(0, 1)), '#1890FF', 6, true, false, '', '#FFFFFF', 1, []);
+            const initialUnplayedPolyline = new Polyline(toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []);
+            const initialPlayedPolyline = new Polyline(toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []);
+            unplayedPolyline = initialUnplayedPolyline;
             playedPolyline = initialPlayedPolyline;
-            polyline.value = [unplayedPolyline, initialPlayedPolyline];
+            polyline.value = [initialUnplayedPolyline, initialPlayedPolyline];
         }
         function updatePolyline() {
+            const currentUnplayedPolyline = unplayedPolyline;
             const currentPlayedPolyline = playedPolyline;
-            if (trackPoints.value.length == 0 || currentPlayedPolyline == null)
+            if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null)
                 return;
+            currentUnplayedPolyline.points = toNativePoints(trackPoints.value.slice(currentIndex.value));
             currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1));
+            polyline.value = [currentUnplayedPolyline, currentPlayedPolyline];
         }
         // 更新小车位置
         function updateCarPosition() {
@@ -289,16 +297,25 @@ const __sfc__ = defineComponent({
         }
         // 显示当前位置
         function showCurrentPosition() {
+            isTrackPlayable.value = false;
+            const originalLatText = lat.value ?? '';
+            const originalLngText = lng.value ?? '';
+            const originalLat = parseFloat(originalLatText);
+            const originalLng = parseFloat(originalLngText);
+            if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
+                uni.showToast({
+                    title: '这段时间没有数据',
+                    icon: 'none',
+                    duration: 2000
+                });
+                return;
+            }
             uni.showToast({
                 title: '这段时间没有数据',
                 icon: 'none',
                 duration: 2000
             });
             // 转换坐标到腾讯地图坐标系
-            const originalLatText = lat.value ?? '';
-            const originalLngText = lng.value ?? '';
-            const originalLat = parseFloat(originalLatText);
-            const originalLng = parseFloat(originalLngText);
             const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng);
             // 设置地图中心点
             center["latitude"] = convertedCoord.lat;
@@ -327,49 +344,85 @@ const __sfc__ = defineComponent({
             // 设置标记点
             markers.value = [marker];
         }
+        function clearTrackDisplay(): void {
+            trackPoints.value = [];
+            isTrackPlayable.value = false;
+            currentIndex.value = 0;
+            currentSpeed.value = 0;
+            currentTime.value = '';
+            totalDistance.value = 0;
+            carMarker.value = null;
+            markers.value = [];
+            unplayedPolyline = null;
+            playedPolyline = null;
+            polyline.value = [];
+        }
+        function pausePlayback() {
+            isPlaying.value = false;
+            const timer = playbackTimer;
+            if (timer != null) {
+                clearTimeout(timer);
+                playbackTimer = null;
+            }
+        }
+        function renderPlaybackIndex(): void {
+            if (trackPoints.value.length == 0)
+                return;
+            updateCarPosition();
+            updatePolyline();
+            const point = trackPoints.value[currentIndex.value];
+            currentSpeed.value = point.speed;
+            currentTime.value = point.deviceTime;
+        }
         // 处理轨迹数据
         function processTrackData(positions: Array<UTSJSONObject>): void {
             const processedPoints: Array<TrackPoint> = [];
             for (let i = 0; i < positions.length; i++) {
                 const point = positions[i];
                 const deviceTimeStr = point.getString('deviceTime', '');
-                // 获取原始坐标
                 const originalLat = point.getNumber('latitude', 0);
                 const originalLng = point.getNumber('longitude', 0);
-                // 转换坐标到腾讯地图坐标系
+                if (originalLat == 0 || originalLng == 0 ||
+                    !isFinite(originalLat) || !isFinite(originalLng) ||
+                    deviceTimeStr == '' || safeParseDate(deviceTimeStr) == 0) {
+                    continue;
+                }
                 const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng);
-                const processedPoint: TrackPoint = {
+                if (!isFinite(convertedCoord.lat) || !isFinite(convertedCoord.lng)) {
+                    continue;
+                }
+                processedPoints.push({
                     latitude: convertedCoord.lat,
                     longitude: convertedCoord.lng,
                     rotation: 0,
                     deviceTime: formatDateForDisplay(deviceTimeStr),
                     speed: point.getNumber('speed', 0)
-                };
-                if (i > 0) {
-                    const prevPoint = processedPoints[i - 1];
-                    processedPoint.rotation = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint.latitude, processedPoint.longitude);
-                }
-                else {
-                    processedPoint.rotation = 0;
-                }
-                processedPoints.push(processedPoint);
+                } as TrackPoint);
+            }
+            for (let i = 1; i < processedPoints.length; i++) {
+                const previousPoint = processedPoints[i - 1];
+                const currentPoint = processedPoints[i];
+                currentPoint.rotation = calculateBearing(previousPoint.latitude, previousPoint.longitude, currentPoint.latitude, currentPoint.longitude);
             }
             if (processedPoints.length > 1) {
                 processedPoints[processedPoints.length - 1].rotation =
                     processedPoints[processedPoints.length - 2].rotation;
             }
             trackPoints.value = processedPoints;
+            isTrackPlayable.value = processedPoints.length > 1;
+            currentIndex.value = 0;
             calculateTrackDistance();
             initCarMarker();
             initPolyline();
             adjustMapToFitTrack();
-            if (trackPoints.value.length > 0) {
-                currentTime.value = trackPoints.value[0].deviceTime;
-            }
+            renderPlaybackIndex();
         }
         const loadTrackPos = async (): Promise<void> => {
+            pausePlayback();
+            const requestId = ++replaySessionId;
+            clearTrackDisplay();
             uni.showLoading({ title: '加载中...' });
-            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 520, 9),
+            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 581, 9),
                 imei: imei.value,
                 startTime: startTime.value.replace(/\//g, '-'),
                 endTime: endTime.value.replace(/\//g, '-'),
@@ -380,66 +433,55 @@ const __sfc__ = defineComponent({
             } as UTSJSONObject;
             try {
                 const res = await getTrackPos(data);
+                if (requestId != replaySessionId)
+                    return;
                 const positions = res.data?.getArray<UTSJSONObject>('positions');
                 if (positions != null && positions.length > 0) {
                     processTrackData(positions);
+                    if (trackPoints.value.length == 0) {
+                        showCurrentPosition();
+                    }
                 }
                 else {
                     showCurrentPosition();
                 }
             }
             catch (error: any) {
-                console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:539");
+                if (requestId != replaySessionId)
+                    return;
+                console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:606");
                 uni.showToast({ title: '轨迹加载失败', icon: 'none' });
                 if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
                     showCurrentPosition();
                 }
             }
             finally {
-                uni.hideLoading();
+                if (requestId == replaySessionId) {
+                    uni.hideLoading();
+                }
             }
         };
-        // 暂停回放
-        function pausePlayback() {
-            isPlaying.value = false;
-            const timer = playbackTimer;
-            if (timer != null) {
-                clearTimeout(timer);
-                playbackTimer = null;
-            }
-        }
         function resetPlayback() {
             pausePlayback();
             currentIndex.value = 0;
-            currentSpeed.value = 0;
-            if (trackPoints.value.length > 0) {
-                currentTime.value = trackPoints.value[0].deviceTime;
-            }
-            updateCarPosition();
-            initPolyline();
+            renderPlaybackIndex();
         }
-        // 播放下一个点
-        function playNextPoint() {
+        function playNextPoint(): boolean {
             if (currentIndex.value >= trackPoints.value.length - 1) {
                 pausePlayback();
-                updatePolyline();
                 uni.showToast({
                     title: '轨迹回放完成',
                     icon: 'none',
                     duration: 1500
                 });
-                return;
+                return false;
             }
             currentIndex.value++;
-            updateCarPosition();
-            updatePolyline();
-            const point = trackPoints.value[currentIndex.value];
-            currentSpeed.value = point.speed;
-            currentTime.value = point.deviceTime;
+            renderPlaybackIndex();
+            return true;
         }
-        // 回放步骤
-        function playbackStep() {
-            if (!isPlaying.value)
+        function playbackStep(sessionId: number) {
+            if (!isPlaying.value || sessionId != replaySessionId)
                 return;
             const now = Date.now();
             const elapsed = now - lastTimestamp;
@@ -448,13 +490,12 @@ const __sfc__ = defineComponent({
                 playNextPoint();
                 lastTimestamp = now - (elapsed % interval);
             }
-            if (isPlaying.value) {
-                playbackTimer = setTimeout(() => { playbackStep(); }, 16); // 约60fps
+            if (isPlaying.value && sessionId == replaySessionId) {
+                playbackTimer = setTimeout(() => { playbackStep(sessionId); }, 16);
             }
         }
-        // 开始回放
         function startPlayback() {
-            if (trackPoints.value.length == 0) {
+            if (!isTrackPlayable.value) {
                 uni.showToast({ title: '没有轨迹数据', icon: 'none' });
                 return;
             }
@@ -462,8 +503,11 @@ const __sfc__ = defineComponent({
                 resetPlayback();
             }
             isPlaying.value = true;
+            const sessionId = ++replaySessionId;
+            if (!playNextPoint())
+                return;
             lastTimestamp = Date.now();
-            playbackStep();
+            playbackStep(sessionId);
         }
         // 播放控制
         function togglePlayback() {
@@ -515,7 +559,7 @@ const __sfc__ = defineComponent({
             lng.value = option["lng"] ?? null;
             sTime.value = option["startTime"] ?? '';
             eTime.value = option["endTime"] ?? '';
-            console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:687");
+            console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:728");
             if (sTime.value != '' && eTime.value != '') {
                 startTime.value = sTime.value;
                 endTime.value = eTime.value;
@@ -526,8 +570,13 @@ const __sfc__ = defineComponent({
                 loadTrackPos();
             }
         });
+        onHide(() => {
+            pausePlayback();
+            ++replaySessionId;
+        });
         onUnload(() => {
             pausePlayback();
+            ++replaySessionId;
         });
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
@@ -598,7 +647,8 @@ const __sfc__ = defineComponent({
                                 modelValue: playbackSpeed.value,
                                 "onUpdate:modelValue": ($event: number) => { (playbackSpeed).value = $event; },
                                 min: 1,
-                                max: 10,
+                                max: 50,
+                                step: 5,
                                 onChange: setPlaybackSpeed
                             }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
                         ]),

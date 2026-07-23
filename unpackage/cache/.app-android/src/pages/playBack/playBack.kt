@@ -36,16 +36,19 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val pickerTitle = ref("选择开始时间")
             val trackPoints = ref(_uA<TrackPoint>())
             val polyline = ref(_uA<Polyline>())
+            var unplayedPolyline: Polyline? = null
             var playedPolyline: Polyline? = null
             val isPlaying = ref(false)
+            val isTrackPlayable = ref(false)
             val playbackSpeed = ref(5)
             val totalDistance = ref(0)
             val currentSpeed = ref(0)
             val currentTime = ref("")
             val currentIndex = ref(0)
             val carMarker = ref<MapMarker?>(null)
-            var playbackTimer: Number? = 0
+            var playbackTimer: Number? = null
             var lastTimestamp: Number = 0
+            var replaySessionId: Number = 0
             val startTime = ref("")
             val endTime = ref("")
             val lat = ref<String?>("")
@@ -197,25 +200,33 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val toNativePoints = ::gen_toNativePoints_fn
             fun gen_initPolyline_fn() {
                 if (trackPoints.value.length < 2) {
+                    unplayedPolyline = null
                     playedPolyline = null
                     polyline.value = _uA()
                     return
                 }
-                val unplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#999999", 3, false, true, "", "#FFFFFF", 1, _uA())
-                val initialPlayedPolyline = Polyline(toNativePoints(trackPoints.value.slice(0, 1)), "#1890FF", 6, true, false, "", "#FFFFFF", 1, _uA())
+                val initialUnplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#888787", 3, true, false, "", "#888787", 0, _uA())
+                val initialPlayedPolyline = Polyline(toNativePoints(trackPoints.value.slice(0, 1)), "#3c5cff", 5, false, true, "", "#FFFFFF", 1, _uA())
+                unplayedPolyline = initialUnplayedPolyline
                 playedPolyline = initialPlayedPolyline
                 polyline.value = _uA(
-                    unplayedPolyline,
+                    initialUnplayedPolyline,
                     initialPlayedPolyline
                 )
             }
             val initPolyline = ::gen_initPolyline_fn
             fun gen_updatePolyline_fn() {
+                val currentUnplayedPolyline = unplayedPolyline
                 val currentPlayedPolyline = playedPolyline
-                if (trackPoints.value.length == 0 || currentPlayedPolyline == null) {
+                if (trackPoints.value.length == 0 || currentUnplayedPolyline == null || currentPlayedPolyline == null) {
                     return
                 }
+                currentUnplayedPolyline.points = toNativePoints(trackPoints.value.slice(currentIndex.value))
                 currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
+                polyline.value = _uA(
+                    currentUnplayedPolyline,
+                    currentPlayedPolyline
+                )
             }
             val updatePolyline = ::gen_updatePolyline_fn
             fun gen_updateCarPosition_fn() {
@@ -245,11 +256,16 @@ open class GenPagesPlayBackPlayBack : BasePage {
             }
             val showPicker = ::gen_showPicker_fn
             fun gen_showCurrentPosition_fn() {
-                uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                isTrackPlayable.value = false
                 val originalLatText = lat.value ?: ""
                 val originalLngText = lng.value ?: ""
                 val originalLat = parseFloat(originalLatText)
                 val originalLng = parseFloat(originalLngText)
+                if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
+                    uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                    return
+                }
+                uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
                 val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
                 center["latitude"] = convertedCoord.lat
                 center["longitude"] = convertedCoord.lng
@@ -262,65 +278,20 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 )
             }
             val showCurrentPosition = ::gen_showCurrentPosition_fn
-            fun gen_processTrackData_fn(positions: UTSArray<UTSJSONObject>): Unit {
-                val processedPoints: UTSArray<TrackPoint> = _uA()
-                run {
-                    var i: Number = 0
-                    while(i < positions.length){
-                        val point = positions[i]
-                        val deviceTimeStr = point.getString("deviceTime", "")
-                        val originalLat = point.getNumber("latitude", 0)
-                        val originalLng = point.getNumber("longitude", 0)
-                        val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
-                        val processedPoint = TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = formatDateForDisplay(deviceTimeStr), speed = point.getNumber("speed", 0))
-                        if (i > 0) {
-                            val prevPoint = processedPoints[i - 1]
-                            processedPoint.rotation = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint.latitude, processedPoint.longitude)
-                        } else {
-                            processedPoint.rotation = 0
-                        }
-                        processedPoints.push(processedPoint)
-                        i++
-                    }
-                }
-                if (processedPoints.length > 1) {
-                    processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation
-                }
-                trackPoints.value = processedPoints
-                calculateTrackDistance()
-                initCarMarker()
-                initPolyline()
-                adjustMapToFitTrack()
-                if (trackPoints.value.length > 0) {
-                    currentTime.value = trackPoints.value[0].deviceTime
-                }
+            fun gen_clearTrackDisplay_fn(): Unit {
+                trackPoints.value = _uA()
+                isTrackPlayable.value = false
+                currentIndex.value = 0
+                currentSpeed.value = 0
+                currentTime.value = ""
+                totalDistance.value = 0
+                carMarker.value = null
+                markers.value = _uA()
+                unplayedPolyline = null
+                playedPolyline = null
+                polyline.value = _uA()
             }
-            val processTrackData = ::gen_processTrackData_fn
-            val loadTrackPos = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 520, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
-                        try {
-                            val res = await(getTrackPos(data))
-                            val positions = res.data?.getArray<UTSJSONObject>("positions")
-                            if (positions != null && positions.length > 0) {
-                                processTrackData(positions)
-                            } else {
-                                showCurrentPosition()
-                            }
-                        }
-                         catch (error: Throwable) {
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:539")
-                            uni_showToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
-                            if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
-                                showCurrentPosition()
-                            }
-                        }
-                         finally {
-                            uni_hideLoading(null)
-                        }
-                })
-            }
+            val clearTrackDisplay = ::gen_clearTrackDisplay_fn
             fun gen_pausePlayback_fn() {
                 isPlaying.value = false
                 val timer = playbackTimer
@@ -330,34 +301,119 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             val pausePlayback = ::gen_pausePlayback_fn
-            fun gen_resetPlayback_fn() {
-                pausePlayback()
-                currentIndex.value = 0
-                currentSpeed.value = 0
-                if (trackPoints.value.length > 0) {
-                    currentTime.value = trackPoints.value[0].deviceTime
-                }
-                updateCarPosition()
-                initPolyline()
-            }
-            val resetPlayback = ::gen_resetPlayback_fn
-            fun gen_playNextPoint_fn() {
-                if (currentIndex.value >= trackPoints.value.length - 1) {
-                    pausePlayback()
-                    updatePolyline()
-                    uni_showToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
+            fun gen_renderPlaybackIndex_fn(): Unit {
+                if (trackPoints.value.length == 0) {
                     return
                 }
-                currentIndex.value++
                 updateCarPosition()
                 updatePolyline()
                 val point = trackPoints.value[currentIndex.value]
                 currentSpeed.value = point.speed
                 currentTime.value = point.deviceTime
             }
+            val renderPlaybackIndex = ::gen_renderPlaybackIndex_fn
+            fun gen_processTrackData_fn(positions: UTSArray<UTSJSONObject>): Unit {
+                val processedPoints: UTSArray<TrackPoint> = _uA()
+                run {
+                    var i: Number = 0
+                    while(i < positions.length){
+                        val point = positions[i]
+                        val deviceTimeStr = point.getString("deviceTime", "")
+                        val originalLat = point.getNumber("latitude", 0)
+                        val originalLng = point.getNumber("longitude", 0)
+                        if (originalLat == 0 || originalLng == 0 || !isFinite(originalLat) || !isFinite(originalLng) || deviceTimeStr == "" || safeParseDate(deviceTimeStr) == 0) {
+                            i++
+                            continue
+                        }
+                        val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
+                        if (!isFinite(convertedCoord.lat) || !isFinite(convertedCoord.lng)) {
+                            i++
+                            continue
+                        }
+                        processedPoints.push(TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = formatDateForDisplay(deviceTimeStr), speed = point.getNumber("speed", 0)))
+                        i++
+                    }
+                }
+                run {
+                    var i: Number = 1
+                    while(i < processedPoints.length){
+                        val previousPoint = processedPoints[i - 1]
+                        val currentPoint = processedPoints[i]
+                        currentPoint.rotation = calculateBearing(previousPoint.latitude, previousPoint.longitude, currentPoint.latitude, currentPoint.longitude)
+                        i++
+                    }
+                }
+                if (processedPoints.length > 1) {
+                    processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation
+                }
+                trackPoints.value = processedPoints
+                isTrackPlayable.value = processedPoints.length > 1
+                currentIndex.value = 0
+                calculateTrackDistance()
+                initCarMarker()
+                initPolyline()
+                adjustMapToFitTrack()
+                renderPlaybackIndex()
+            }
+            val processTrackData = ::gen_processTrackData_fn
+            val loadTrackPos = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        pausePlayback()
+                        val requestId = ++replaySessionId
+                        clearTrackDisplay()
+                        uni_showLoading(ShowLoadingOptions(title = "加载中..."))
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 581, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        try {
+                            val res = await(getTrackPos(data))
+                            if (requestId != replaySessionId) {
+                                return@w1
+                            }
+                            val positions = res.data?.getArray<UTSJSONObject>("positions")
+                            if (positions != null && positions.length > 0) {
+                                processTrackData(positions)
+                                if (trackPoints.value.length == 0) {
+                                    showCurrentPosition()
+                                }
+                            } else {
+                                showCurrentPosition()
+                            }
+                        }
+                         catch (error: Throwable) {
+                            if (requestId != replaySessionId) {
+                                return@w1
+                            }
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:606")
+                            uni_showToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
+                            if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
+                                showCurrentPosition()
+                            }
+                        }
+                         finally {
+                            if (requestId == replaySessionId) {
+                                uni_hideLoading(null)
+                            }
+                        }
+                })
+            }
+            fun gen_resetPlayback_fn() {
+                pausePlayback()
+                currentIndex.value = 0
+                renderPlaybackIndex()
+            }
+            val resetPlayback = ::gen_resetPlayback_fn
+            fun gen_playNextPoint_fn(): Boolean {
+                if (currentIndex.value >= trackPoints.value.length - 1) {
+                    pausePlayback()
+                    uni_showToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
+                    return false
+                }
+                currentIndex.value++
+                renderPlaybackIndex()
+                return true
+            }
             val playNextPoint = ::gen_playNextPoint_fn
-            fun gen_playbackStep_fn() {
-                if (!isPlaying.value) {
+            fun gen_playbackStep_fn(sessionId: Number) {
+                if (!isPlaying.value || sessionId != replaySessionId) {
                     return
                 }
                 val now = Date.now()
@@ -367,16 +423,16 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     playNextPoint()
                     lastTimestamp = now - (elapsed % interval)
                 }
-                if (isPlaying.value) {
+                if (isPlaying.value && sessionId == replaySessionId) {
                     playbackTimer = setTimeout(fun(){
-                        gen_playbackStep_fn()
+                        gen_playbackStep_fn(sessionId)
                     }
                     , 16)
                 }
             }
             val playbackStep = ::gen_playbackStep_fn
             fun gen_startPlayback_fn() {
-                if (trackPoints.value.length == 0) {
+                if (!isTrackPlayable.value) {
                     uni_showToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
                     return
                 }
@@ -384,8 +440,12 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     resetPlayback()
                 }
                 isPlaying.value = true
+                val sessionId = ++replaySessionId
+                if (!playNextPoint()) {
+                    return
+                }
                 lastTimestamp = Date.now()
-                playbackStep()
+                playbackStep(sessionId)
             }
             val startPlayback = ::gen_startPlayback_fn
             fun gen_togglePlayback_fn() {
@@ -435,7 +495,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:687")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:728")
                 if (sTime.value != "" && eTime.value != "") {
                     startTime.value = sTime.value
                     endTime.value = eTime.value
@@ -446,8 +506,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 }
             }
             )
+            onHide(fun(){
+                pausePlayback()
+                ++replaySessionId
+            }
+            )
             onUnload(fun(){
                 pausePlayback()
+                ++replaySessionId
             }
             )
             return fun(): Any? {
@@ -507,7 +573,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                 _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                     playbackSpeed.value = `$event`
                                 }
-                                , "min" to 1, "max" to 10, "onChange" to setPlaybackSpeed), null, 8, _uA(
+                                , "min" to 1, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeed), null, 8, _uA(
                                     "modelValue",
                                     "onUpdate:modelValue"
                                 ))

@@ -1398,7 +1398,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     ,
                                     if (isTrue(loadingMore.value)) {
                                         _cE("view", _uM("key" to 1, "class" to "loading-tip"), _uA(
-                                            _cE("text", null, "正在加载更多...")
+                                            _cE("text", _uM("class" to "empty-text"), "正在加载更多...")
                                         ))
                                     } else {
                                         _cC("v-if", true)
