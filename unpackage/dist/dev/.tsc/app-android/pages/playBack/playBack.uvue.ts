@@ -1,6 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue'
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
+import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_i_slider from '@/uni_modules/i-ui-x/components/i-slider/i-slider.uvue'
 import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
@@ -10,7 +11,11 @@ import { ref, reactive, onMounted, watch } from 'vue'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
-	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 67, 7>;
+	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
+	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
+
+
+	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 64, 7>;
 		latitude : number;
 		longitude : number;
 		rotation : number;
@@ -18,40 +23,30 @@ import { ref, reactive, onMounted, watch } from 'vue'
 		speed : number;
 	}
 
-	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 75, 7>;
+	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 72, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
 		maxLng : number;
 	}
 
-	type PolylineData = { __$originalPosition?: UTSSourceMapPosition<"PolylineData", "pages/playBack/playBack.uvue", 82, 7>;
-		points: Array<CoordinatePoint>
-		color: string
-		width: number
-		arrowLine: boolean
-		borderColor: string
-		borderWidth: number
-	}
-	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/playBack/playBack.uvue", 90, 7>;
+	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 79, 7>;
 		latitude: number
 		longitude: number
 	}
 
-	type polyData = Array<PolylineData>
-	// 地图状态
-	type CarMarker = { __$originalPosition?: UTSSourceMapPosition<"CarMarker", "pages/playBack/playBack.uvue", 113, 7>;
-		id: number
-		latitude: number
-		longitude: number
-		iconPath: string
+	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 84, 7>;
+		points: Array<MapPolylinePoint>
+		color: string
 		width: number
-		height: number
-		rotate: number
-		anchor: UTSJSONObject
-		callout: UTSJSONObject
-		animation: UTSJSONObject
+		dottedLine: boolean
+		arrowLine: boolean
+		borderColor: string
+		borderWidth: number
 	}
+
+	// 地图状态
+	type MapMarker = Marker
 
 	
 const __sfc__ = defineComponent({
@@ -78,14 +73,20 @@ const _cache = __ins.renderCache;
 
 	// 轨迹回放相关
 	const trackPoints = ref<Array<TrackPoint>>([])
-	const polyline = ref<Array<PolylineData>>([])
+
+	const polyline = ref<Array<Polyline>>([])
+	let playedPolyline : Polyline | null = null
+
+
+
+
 	const isPlaying = ref(false)
 	const playbackSpeed = ref(5)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
 	const currentIndex = ref(0)
-	const carMarker = ref<CarMarker | null>(null)
+	const carMarker = ref<MapMarker | null>(null)
 	let playbackTimer : number | null = 0
 	let lastTimestamp = 0
 
@@ -97,7 +98,7 @@ const _cache = __ins.renderCache;
 	const eTime = ref('')
 
 	// 标记点集合
-	const markers = ref<Array<UTSJSONObject>>([])
+	const markers = ref<Array<MapMarker>>([])
 
 	// 日期函数
 	function safeParseDate(dateStr : string) : number {
@@ -224,99 +225,121 @@ const _cache = __ins.renderCache;
 
 	// 初始化小车标记
 	function initCarMarker() {
-		if (trackPoints.value.length > 0) {
-			const firstPoint = trackPoints.value[0]
-				const marker : CarMarker = {
-					id: 999,
-					latitude: firstPoint.latitude,
-					longitude: firstPoint.longitude,
-					iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
-					width: 25,
-					height: 25,
-					rotate: firstPoint.rotation,
-					anchor: {},
-					callout: {},
-					animation: {}
-				}
-				carMarker.value = marker
+		if (trackPoints.value.length == 0) return
 
-			// 添加起点和终点标记
-			const startMarker = {__$originalPosition: new UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 290, 10),
-				id: 1000,
-				latitude: trackPoints.value[0].latitude,
-				longitude: trackPoints.value[0].longitude,
-				iconPath: '/static/start.png',
-				width: 24,
-				height: 24,
-				// anchor: { x: 0.5, y: 0.5 },
-				callout: {
-					content: '起点',
-					borderRadius: 5,
-					padding: 5,
-					display: 'BYCLICK'
-				}
-			}
-
-			const endMarker = {__$originalPosition: new UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 306, 10),
-				id: 1001,
-				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-				iconPath: '/static/end.png',
-				width: 24,
-				height: 24,
-				// anchor: { x: 0.5, y: 0.5 },
-				callout: {
-					content: '终点',
-					borderRadius: 5,
-					padding: 5,
-					display: 'BYCLICK'
-				}
-			}
-
-			markers.value = [marker as UTSJSONObject, startMarker as UTSJSONObject, endMarker as UTSJSONObject]
+		const firstPoint = trackPoints.value[0]
+		const marker : MapMarker = {
+			id: 999,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			width: 25,
+			height: 25,
+			rotate: firstPoint.rotation,
+			anchor: { x: 0.5, y: 0.5 }
 		}
+		carMarker.value = marker
+
+		const startMarker : MapMarker = {
+			id: 1000,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: '/static/start.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '起点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+		const endMarker : MapMarker = {
+			id: 1001,
+			latitude: lastPoint.latitude,
+			longitude: lastPoint.longitude,
+			iconPath: '/static/end.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '终点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		markers.value = [marker, startMarker, endMarker]
 	}
 
-	// 更新轨迹线
-	function updatePolyline() {
-		if (!trackPoints.value || trackPoints.value.length < 2) {
+
+	function toNativePoints(points : Array<TrackPoint>) : Array<LocationObject> {
+		return points.map((point : TrackPoint) : LocationObject => {
+			return new LocationObject(point.latitude, point.longitude)
+		})
+	}
+
+	function initPolyline() {
+		if (trackPoints.value.length < 2) {
+			playedPolyline = null
 			polyline.value = []
 			return
 		}
 
-		const newPolyline : Array<PolylineData> = []
-
-		// 已播放的轨迹部分（实线）
-		if (currentIndex.value > 0) {
-			const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-			if (playedPoints.length >= 2) {
-				newPolyline.push({
-					points: playedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
-					color: '#1890FF',
-					width: 6,
-					arrowLine: true,
-					borderColor: '#FFF',
-					borderWidth: 1
-				})
-			}
-		}
-
-		// 未播放的轨迹部分（虚线）
-		if (currentIndex.value < trackPoints.value.length - 1) {
-			const unplayedPoints = trackPoints.value.slice(currentIndex.value)
-			if (unplayedPoints.length >= 2) {
-				newPolyline.push({
-					points: unplayedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
-					color: '#999',
-					width: 3,
-					borderColor: '#FFF',
-					borderWidth: 1
-				})
-			}
-		}
-
-		polyline.value = newPolyline
+		const unplayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value), '#999999', 3, false, true, '', '#FFFFFF', 1, []
+		)
+		const initialPlayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value.slice(0, 1)), '#1890FF', 6, true, false, '', '#FFFFFF', 1, []
+		)
+		playedPolyline = initialPlayedPolyline
+		polyline.value = [unplayedPolyline, initialPlayedPolyline]
 	}
+
+	function updatePolyline() {
+		const currentPlayedPolyline = playedPolyline
+		if (trackPoints.value.length == 0 || currentPlayedPolyline == null) return
+		currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	// 更新小车位置
 	function updateCarPosition() {
@@ -324,9 +347,20 @@ const _cache = __ins.renderCache;
 		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
 			const point = trackPoints.value[currentIndex.value]
 
-			marker.latitude = point.latitude
-			marker.longitude = point.longitude
-			marker.rotate = point.rotation
+			const updatedMarker : MapMarker = {
+				id: marker.id,
+				latitude: point.latitude,
+				longitude: point.longitude,
+				iconPath: marker.iconPath,
+				width: marker.width,
+				height: marker.height,
+				rotate: point.rotation,
+				anchor: marker.anchor,
+				callout: marker.callout,
+				label: marker.label
+			}
+			carMarker.value = updatedMarker
+			markers.value = [updatedMarker, ...markers.value.slice(1)]
 
 			// 每5个点更新一次中心点
 			if (currentIndex.value % 5 == 0 ||
@@ -374,7 +408,7 @@ const _cache = __ins.renderCache;
 		}
 
 		// 初始化小车标记
-		const marker : CarMarker = {
+		const marker : MapMarker = {
 			id: 999,
 			latitude: currentPoint.latitude,
 			longitude: currentPoint.longitude,
@@ -382,14 +416,12 @@ const _cache = __ins.renderCache;
 			width: 25,
 			height: 25,
 			rotate: 0,
-			anchor: {},
-			callout: {},
-			animation: {}
+			anchor: { x: 0.5, y: 0.5 }
 		}
 		carMarker.value = marker
 
 		// 设置标记点
-		markers.value = [marker as UTSJSONObject]
+		markers.value = [marker]
 	}
 
 
@@ -437,7 +469,7 @@ const _cache = __ins.renderCache;
 		trackPoints.value = processedPoints
 		calculateTrackDistance()
 		initCarMarker()
-		updatePolyline()
+		initPolyline()
 		adjustMapToFitTrack()
 
 		if (trackPoints.value.length > 0) {
@@ -447,7 +479,7 @@ const _cache = __ins.renderCache;
 	}
 	const loadTrackPos = async () => {
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 496, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 520, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -457,16 +489,21 @@ const _cache = __ins.renderCache;
 			withTrip: false,
 		}
 
-		const res = await getTrackPos(data)
-		const trackData = res.data
-		const positions = trackData?.getArray<UTSJSONObject>('positions')
-		if (positions != null && positions.length > 0) {
-			processTrackData(positions)
-			uni.hideLoading()
-		}
-		else {
-			// 当轨迹数据为空时，使用传过来的经纬度 来标记当前位置
-			showCurrentPosition()
+		try {
+			const res = await getTrackPos(data)
+			const positions = res.data?.getArray<UTSJSONObject>('positions')
+			if (positions != null && positions.length > 0) {
+				processTrackData(positions)
+			} else {
+				showCurrentPosition()
+			}
+		} catch (error) {
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:539")
+			uni.showToast({ title: '轨迹加载失败', icon: 'none' })
+			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
+				showCurrentPosition()
+			}
+		} finally {
 			uni.hideLoading()
 		}
 	}
@@ -495,7 +532,7 @@ const _cache = __ins.renderCache;
 			currentTime.value = trackPoints.value[0].deviceTime
 		}
 		updateCarPosition()
-		updatePolyline()
+		initPolyline()
 	}
 
 
@@ -609,7 +646,7 @@ const _cache = __ins.renderCache;
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:658")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:687")
 		if(sTime.value != '' && eTime.value != '') {
 			startTime.value = sTime.value
 			endTime.value = eTime.value
@@ -631,10 +668,10 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
-const _component_marker = resolveComponent("marker")
-const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
 const _component_map = resolveComponent("map")
+const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
+const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_i_slider = resolveEasyComponent("i-slider",_easycom_i_slider)
 const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",_easycom_l_date_time_picker)
 const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
@@ -661,32 +698,13 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
         "enable-overlooking": true,
         "enable-building": true,
         "enable-3D": true
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          isTrue(carMarker.value)
-            ? _cV(_component_marker, _uM({
-                key: 0,
-                id: carMarker.value!.id,
-                latitude: carMarker.value!.latitude,
-                longitude: carMarker.value!.longitude,
-                iconPath: carMarker.value!.iconPath,
-                width: carMarker.value!.width,
-                height: carMarker.value!.height,
-                rotate: carMarker.value!.rotate,
-                anchor: carMarker.value!.anchor,
-                callout: carMarker.value!.callout,
-                animation: carMarker.value!.animation
-              }), null, 8 /* PROPS */, ["id", "latitude", "longitude", "iconPath", "width", "height", "rotate", "anchor", "callout", "animation"])
-            : _cC("v-if", true),
-          _cV(_component_sub_navBar, _uM({
-            showTime: false,
-            currentCar: plateNo.value,
-            showCar: true,
-            carStatus: carStatus.value
-          }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
+      }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+      _cV(_component_sub_navBar, _uM({
+        showTime: false,
+        currentCar: plateNo.value,
+        showCar: true,
+        carStatus: carStatus.value
+      }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
     ]),
     _cE("view", _uM({ class: "tools-panel" }), [
       _cE("view", _uM({ class: "Datetime-box" }), [
@@ -707,10 +725,12 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
         ])
       ]),
       _cE("view", _uM({ class: "tool-tag-item" }), [
-        _cE("view", _uM({
-          class: "play-btn",
-          onClick: togglePlayback
-        }), _tD(isPlaying.value ? '暂停':'播放'), 1 /* TEXT */),
+        _cV(_component_i_button, _uM({
+          type: "primary",
+          onClick: togglePlayback,
+          size: "small",
+          text: isPlaying.value ? '暂停':'播放'
+        }), null, 8 /* PROPS */, ["text"]),
         _cE("view", _uM({ class: "slider" }), [
           _cV(_component_i_slider, _uM({
             modelValue: playbackSpeed.value,
@@ -724,15 +744,15 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
       ]),
       _cE("view", _uM({ class: "play-back-info" }), [
         _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", null, _tD(currentTime.value), 1 /* TEXT */),
+          _cE("text", _uM({ class: "info-label" }), _tD(currentTime.value), 1 /* TEXT */),
           _cE("text", _uM({ class: "info-label" }), "时间")
         ]),
         _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", null, _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */),
+          _cE("text", _uM({ class: "info-label" }), _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */),
           _cE("text", _uM({ class: "info-label" }), "速度")
         ]),
         _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", null, _tD((totalDistance.value/1000).toFixed(1)) + "Km", 1 /* TEXT */),
+          _cE("text", _uM({ class: "info-label" }), _tD((totalDistance.value/1000).toFixed(1)) + "Km", 1 /* TEXT */),
           _cE("text", _uM({ class: "info-label" }), "里程")
         ])
       ]),
@@ -761,4 +781,4 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
 
 })
 export default __sfc__
-const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "25rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])]
+const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])]

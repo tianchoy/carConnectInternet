@@ -22,7 +22,7 @@
 		<!-- <view class="mileage_title">
 			<text>设备名称</text>
 		</view> -->
-		<scroll-view class="content-box" scroll-y>
+		<scroll-view class="content-box" scroll-y="true">
 			<i-empty text="当前时间暂无停车数据" :showButton="false" description="" v-if="sortedCarStopDetail.length == 0" ></i-empty>
 			<view class="content" v-else v-for="(item,index) in sortedCarStopDetail" :key="index">
 				<view class="item">
@@ -190,6 +190,8 @@
 <style lang="scss">
 	.container {
 		height: 100%;
+		display: flex;
+		flex-direction: column;
 		background-color: #f5f7fa;
 
 		.tools-panel {
@@ -230,7 +232,9 @@
 		}
 		
 		.content-box{
-			height: 80%;
+			flex: 1;
+			min-height: 0;
+			margin-bottom: 30rpx;
 		}
 
 		.content {

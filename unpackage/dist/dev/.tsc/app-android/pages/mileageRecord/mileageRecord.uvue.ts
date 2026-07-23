@@ -8,8 +8,8 @@ import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
-	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 72, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
-	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 73, 7>; date : string; trips : Array<UTSJSONObject>; }
+	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 74, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
+	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 75, 7>; date : string; trips : Array<UTSJSONObject>; }
 
 	
 const __sfc__ = defineComponent({
@@ -131,7 +131,7 @@ const _cache = __ins.renderCache;
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 187, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 189, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -141,13 +141,13 @@ const _cache = __ins.renderCache;
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:197");
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:199");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:203");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:205");
 			uni.showToast({
 				title: '数据加载失败',
 				icon: 'none',
@@ -239,7 +239,7 @@ const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
 const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
 const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
 
-  return _cE("view", _uM({ class: "container" }), [
+  return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
       title: "里程记录",
       "show-back": true,
@@ -247,125 +247,133 @@ const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
       textColor: "#333",
       showCapsule: false
     })),
-    _cE("view", _uM({ class: "tools-panel" }), [
-      _cE("view", _uM({ class: "Datetime-box" }), [
-        _cE("view", _uM({ class: "date-box" }), [
-          _cV(_component_i_icon, _uM({
-            name: "/static/rili.png",
-            fontSize: "15"
-          })),
-          _cE("text", _uM({
-            class: "Date",
-            onClick: () => {showPicker('start')}
-          }), _tD(formatDisplayTime(startTime.value)), 9 /* TEXT, PROPS */, ["onClick"]),
-          _cV(_component_i_icon, _uM({
-            name: "/static/xiangxia.png",
-            fontSize: "15",
-            onClick: () => {showPicker('start')}
-          }), null, 8 /* PROPS */, ["onClick"]),
-          _cE("text", _uM({
-            style: _nS(_uM({"padding":"0 10rpx"}))
-          }), "至", 4 /* STYLE */),
-          _cE("text", _uM({
-            class: "Date",
-            onClick: () => {showPicker('end')}
-          }), _tD(formatDisplayTime(endTime.value)), 9 /* TEXT, PROPS */, ["onClick"]),
-          _cV(_component_i_icon, _uM({
-            name: "/static/xiangxia.png",
-            fontSize: "15",
-            onClick: () => {showPicker('end')}
-          }), null, 8 /* PROPS */, ["onClick"])
+    _cE("view", _uM({ class: "container" }), [
+      _cE("view", _uM({ class: "tools-panel" }), [
+        _cE("view", _uM({ class: "Datetime-box" }), [
+          _cE("view", _uM({ class: "date-box" }), [
+            _cV(_component_i_icon, _uM({
+              name: "/static/rili.png",
+              fontSize: "15"
+            })),
+            _cE("text", _uM({
+              class: "Date",
+              onClick: () => {showPicker('start')}
+            }), _tD(formatDisplayTime(startTime.value)), 9 /* TEXT, PROPS */, ["onClick"]),
+            _cV(_component_i_icon, _uM({
+              name: "/static/xiangxia.png",
+              fontSize: "15",
+              onClick: () => {showPicker('start')}
+            }), null, 8 /* PROPS */, ["onClick"]),
+            _cE("text", _uM({
+              style: _nS(_uM({"padding":"0 10rpx"}))
+            }), "至", 4 /* STYLE */),
+            _cE("text", _uM({
+              class: "Date",
+              onClick: () => {showPicker('end')}
+            }), _tD(formatDisplayTime(endTime.value)), 9 /* TEXT, PROPS */, ["onClick"]),
+            _cV(_component_i_icon, _uM({
+              name: "/static/xiangxia.png",
+              fontSize: "15",
+              onClick: () => {showPicker('end')}
+            }), null, 8 /* PROPS */, ["onClick"])
+          ])
+        ]),
+        _cV(_component_l_popup, _uM({
+          modelValue: showDateTimePicker.value,
+          "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
+          position: "bottom",
+          closeable: false
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cV(_component_l_date_time_picker, _uM({
+              "confirm-btn": "确认",
+              "cancel-btn": "取消",
+              title: pickerTitle.value,
+              mode: 1|2|4|8|16|32,
+              onConfirm: onConfirm,
+              onCancel: onCancel
+            }), null, 8 /* PROPS */, ["title"])
+          ]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+      ]),
+      _cE("view", _uM({ class: "summary-panel" }), [
+        _cE("view", _uM({ class: "summary-item" }), [
+          _cE("text", _uM({ class: "label" }), "总里程"),
+          _cE("text", _uM({ class: "value" }), _tD((totalMileage.value/1000).toFixed(2)) + " Km", 1 /* TEXT */)
+        ]),
+        _cE("view", _uM({ class: "summary-item" }), [
+          _cE("text", _uM({ class: "label" }), "行程次数"),
+          _cE("text", _uM({ class: "value" }), _tD(totalTrips.value) + " 次", 1 /* TEXT */)
+        ]),
+        _cE("view", _uM({ class: "summary-item" }), [
+          _cE("text", _uM({ class: "label" }), "平均速度"),
+          _cE("text", _uM({ class: "value" }), _tD(averageSpeed.value.toFixed(1)) + " km/h", 1 /* TEXT */)
         ])
       ]),
-      _cV(_component_l_popup, _uM({
-        modelValue: showDateTimePicker.value,
-        "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
-        position: "bottom",
-        closeable: false
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cV(_component_l_date_time_picker, _uM({
-            "confirm-btn": "确认",
-            "cancel-btn": "取消",
-            title: pickerTitle.value,
-            mode: 1|2|4|8|16|32,
-            onConfirm: onConfirm,
-            onCancel: onCancel
-          }), null, 8 /* PROPS */, ["title"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-    ]),
-    _cE("view", _uM({ class: "summary-panel" }), [
-      _cE("view", _uM({ class: "summary-item" }), [
-        _cE("text", _uM({ class: "label" }), "总里程"),
-        _cE("text", _uM({ class: "value" }), _tD((totalMileage.value/1000).toFixed(2)) + " Km", 1 /* TEXT */)
-      ]),
-      _cE("view", _uM({ class: "summary-item" }), [
-        _cE("text", _uM({ class: "label" }), "行程次数"),
-        _cE("text", _uM({ class: "value" }), _tD(totalTrips.value) + " 次", 1 /* TEXT */)
-      ]),
-      _cE("view", _uM({ class: "summary-item" }), [
-        _cE("text", _uM({ class: "label" }), "平均速度"),
-        _cE("text", _uM({ class: "value" }), _tD(averageSpeed.value.toFixed(1)) + " km/h", 1 /* TEXT */)
-      ])
-    ]),
-    _cE("scroll-view", _uM({
-      class: "content",
-      "scroll-y": ""
-    }), [
-      groupedTrips.value.length == 0
-        ? _cV(_component_i_empty, _uM({
-            key: 0,
-            text: "当前时间点暂无行程数据",
-            showButton: false,
-            description: ""
-          }))
-        : _cE("view", _uM({
-            key: 1,
-            class: "trip-list"
-          }), [
-            _cE(Fragment, null, RenderHelpers.renderList(groupedTrips.value, (group, groupIndex, __index, _cached): any => {
-              return _cE("view", _uM({
-                key: groupIndex,
-                class: "trip-group"
-              }), [
-                _cE("view", _uM({ class: "group-header" }), [
-                  _cE("view", _uM({ class: "group-header-title" }), [
-                    _cE("text", _uM({ class: "group-date" }), _tD(group.date), 1 /* TEXT */),
-                    _cV(_component_i_tag, _uM({
-                      text: group.trips.length+'段',
-                      type: "success",
-                      size: "small"
-                    }), null, 8 /* PROPS */, ["text"])
+      _cE("scroll-view", _uM({
+        class: "content",
+        "scroll-y": "true",
+        "show-scrollbar": false,
+        "enable-flex": ""
+      }), [
+        groupedTrips.value.length == 0
+          ? _cV(_component_i_empty, _uM({
+              key: 0,
+              text: "当前时间点暂无行程数据",
+              showButton: false,
+              description: ""
+            }))
+          : _cE("view", _uM({
+              key: 1,
+              class: "trip-list"
+            }), [
+              _cE(Fragment, null, RenderHelpers.renderList(groupedTrips.value, (group, groupIndex, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: groupIndex,
+                  class: "trip-group"
+                }), [
+                  _cE("view", _uM({ class: "group-header" }), [
+                    _cE("view", _uM({ class: "group-header-title" }), [
+                      _cE("text", _uM({ class: "group-date" }), _tD(group.date), 1 /* TEXT */),
+                      _cV(_component_i_tag, _uM({
+                        text: group.trips.length+'段',
+                        type: "success",
+                        size: "small"
+                      }), null, 8 /* PROPS */, ["text"])
+                    ]),
+                    _cE("text", null, "里程 " + _tD((group.totalDistance/1000).toFixed(2)) + " km", 1 /* TEXT */)
                   ]),
-                  _cE("text", null, "里程 " + _tD((group.totalDistance/1000).toFixed(2)) + " km", 1 /* TEXT */)
-                ]),
-                _cE("view", _uM({ class: "group-separator" })),
-                _cE(Fragment, null, RenderHelpers.renderList(group.trips, (item, index, __index, _cached): any => {
-                  return _cE("view", _uM({
-                    key: index,
-                    class: "trip-item",
-                    onClick: () => {gotoTripDetail(getTripStartTime(item), getTripEndTime(item))}
-                  }), [
-                    _cE("view", _uM({ class: "trip-index" }), [
-                      _cE("text", _uM({ class: "icon" }), _tD(index + 1), 1 /* TEXT */),
-                      _cE("view", _uM({ class: "trip-distance-time" }), [
-                        _cE("text", null, _tD(getTripHourRange(item)), 1 /* TEXT */),
-                        _cE("text", null, _tD(getTripDistanceText(item)) + " km", 1 /* TEXT */),
-                        _cE("text", null, _tD(formatDuration(getTripDuration(item))), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "group-separator" })),
+                  _cE(Fragment, null, RenderHelpers.renderList(group.trips, (item, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                      key: index,
+                      class: "trip-item",
+                      onClick: () => {gotoTripDetail(getTripStartTime(item), getTripEndTime(item))}
+                    }), [
+                      _cE("view", _uM({ class: "trip-index" }), [
+                        _cE("view", _uM({ class: "icon" }), [
+                          _cE("text", _uM({
+                            style: _nS(_uM({"color":"#ffffff"}))
+                          }), _tD(index + 1), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "trip-distance-time" }), [
+                          _cE("text", null, _tD(getTripHourRange(item)), 1 /* TEXT */),
+                          _cE("text", null, _tD(getTripDistanceText(item)) + " km", 1 /* TEXT */),
+                          _cE("text", null, _tD(formatDuration(getTripDuration(item))), 1 /* TEXT */)
+                        ])
                       ])
-                    ])
-                  ], 8 /* PROPS */, ["onClick"])
-                }), 128 /* KEYED_FRAGMENT */)
-              ])
-            }), 128 /* KEYED_FRAGMENT */)
-          ])
+                    ], 8 /* PROPS */, ["onClick"])
+                  }), 128 /* KEYED_FRAGMENT */)
+                ])
+              }), 128 /* KEYED_FRAGMENT */)
+            ])
+      ])
     ])
-  ])
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 
 })
 export default __sfc__
-const GenPagesMileageRecordMileageRecordStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#f5f7fa"], ["paddingBottom", "20rpx"]]))], ["tools-panel", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#69c2f1"], ["borderRightColor", "#69c2f1"], ["borderBottomColor", "#69c2f1"], ["borderLeftColor", "#69c2f1"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["color", "#333333"]])]])], ["summary-panel", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["backgroundColor", "#ffffff"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"], ["boxShadow", "0 2rpx 10rpx rgba(0, 0, 0, 0.05)"]])]])], ["summary-item", _uM([[".container .summary-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["label", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginBottom", "10rpx"]])]])], ["value", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "28rpx"], ["color", "#333333"], ["fontWeight", "bold"]])]])], ["content", _uM([[".container ", _uM([["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", 0], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["trip-list", _uM([[".container .content ", _uM([["width", "100%"]])]])], ["trip-group", _uM([[".container .content .trip-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["group-header", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "15rpx"], ["paddingRight", 0], ["paddingBottom", "15rpx"], ["paddingLeft", 0]])]])], ["group-header-title", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["group-date", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["fontSize", "30rpx"], ["color", "#333333"], ["marginRight", "30rpx"]])]])], ["group-separator", _uM([[".container .content .trip-list .trip-group ", _uM([["height", "1rpx"], ["backgroundColor", "#eeeeee"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])], ["trip-item", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["paddingTop", "25rpx"], ["paddingRight", 0], ["paddingBottom", "25rpx"], ["paddingLeft", 0], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["trip-index", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "5rpx"]])]])], ["icon", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["width", "40rpx"], ["height", "40rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "24rpx"], ["marginRight", "20rpx"]])]])], ["trip-distance-time", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["trip-content", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["icons", _uM([[".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ", _uM([["width", "50rpx"], ["height", "50rpx"]])]])]])]
+const GenPagesMileageRecordMileageRecordStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"], ["paddingBottom", "20rpx"]]))], ["tools-panel", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#69c2f1"], ["borderRightColor", "#69c2f1"], ["borderBottomColor", "#69c2f1"], ["borderLeftColor", "#69c2f1"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["color", "#333333"]])]])], ["summary-panel", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-around"], ["backgroundColor", "#ffffff"], ["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"], ["boxShadow", "0 2rpx 10rpx rgba(0, 0, 0, 0.05)"]])]])], ["summary-item", _uM([[".container .summary-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["label", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginBottom", "10rpx"]])]])], ["value", _uM([[".container .summary-panel .summary-item ", _uM([["fontSize", "28rpx"], ["color", "#333333"], ["fontWeight", "bold"]])]])], ["content", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", 0], ["marginRight", "20rpx"], ["marginBottom", "20%"], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["trip-list", _uM([[".container .content ", _uM([["width", "100%"], ["paddingBottom", "20rpx"]])]])], ["trip-group", _uM([[".container .content .trip-list ", _uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["group-header", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "15rpx"], ["paddingRight", 0], ["paddingBottom", "15rpx"], ["paddingLeft", 0]])]])], ["group-header-title", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["group-date", _uM([[".container .content .trip-list .trip-group .group-header ", _uM([["fontSize", "30rpx"], ["color", "#333333"], ["marginRight", "30rpx"]])]])], ["group-separator", _uM([[".container .content .trip-list .trip-group ", _uM([["height", "1rpx"], ["backgroundColor", "#eeeeee"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])], ["trip-item", _uM([[".container .content .trip-list .trip-group ", _uM([["display", "flex"], ["paddingTop", "25rpx"], ["paddingRight", 0], ["paddingBottom", "25rpx"], ["paddingLeft", 0], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["trip-index", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "5rpx"]])]])], ["icon", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["width", "40rpx"], ["height", "40rpx"], ["backgroundColor", "#1296db"], ["color", "#ffffff"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "24rpx"], ["marginRight", "20rpx"]])]])], ["trip-distance-time", _uM([[".container .content .trip-list .trip-group .trip-item .trip-index ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["trip-content", _uM([[".container .content .trip-list .trip-group .trip-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["icons", _uM([[".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ", _uM([["width", "50rpx"], ["height", "50rpx"]])]])]])]

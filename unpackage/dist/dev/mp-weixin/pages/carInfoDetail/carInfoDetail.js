@@ -707,40 +707,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, !common_vendor.unref(address) ? {
         s: common_vendor.o(refreshAdress, "42")
       } : {}, {
-        t: common_vendor.unref(signalRssi) != null || common_vendor.unref(signalSat) != null
-      }, common_vendor.unref(signalRssi) != null || common_vendor.unref(signalSat) != null ? common_vendor.e({
-        v: common_vendor.unref(signalRssi) != null
+        t: common_vendor.unref(signalRssi) != null
       }, common_vendor.unref(signalRssi) != null ? {
-        w: getMobileSignalBarClass(0, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        x: getMobileSignalBarClass(1, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        y: getMobileSignalBarClass(2, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        z: getMobileSignalBarClass(3, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        A: getMobileSignalBarClass(4, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
-        B: common_vendor.t(getSignalDetail(common_vendor.unref(signalRssi)).experience),
-        C: getSignalDetail(common_vendor.unref(signalRssi)).color,
-        D: common_vendor.t(common_vendor.unref(signalRssi)),
-        E: getSignalDetail(common_vendor.unref(signalRssi)).color
+        v: getMobileSignalBarClass(0, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        w: getMobileSignalBarClass(1, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        x: getMobileSignalBarClass(2, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        y: getMobileSignalBarClass(3, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        z: getMobileSignalBarClass(4, common_vendor.unref(signalRssi)) == "bar-active" ? getSignalDetail(common_vendor.unref(signalRssi)).color : "#e8e8e8",
+        A: common_vendor.t(getSignalDetail(common_vendor.unref(signalRssi)).experience),
+        B: getSignalDetail(common_vendor.unref(signalRssi)).color,
+        C: common_vendor.t(common_vendor.unref(signalRssi)),
+        D: getSignalDetail(common_vendor.unref(signalRssi)).color
       } : {}, {
-        F: common_vendor.unref(signalSat) != null
+        E: common_vendor.unref(signalSat) != null
       }, common_vendor.unref(signalSat) != null ? {
-        G: common_assets._imports_0$1,
-        H: common_vendor.t(common_vendor.unref(signalSat))
+        F: common_assets._imports_0$1,
+        G: common_vendor.t(common_vendor.unref(signalSat))
       } : {}, {
-        I: common_vendor.unref(carVoltage)
+        H: common_vendor.unref(carVoltage)
       }, common_vendor.unref(carVoltage) ? {
-        J: common_assets._imports_1$1,
-        K: common_vendor.t(common_vendor.unref(carVoltage))
+        I: common_assets._imports_1$1,
+        J: common_vendor.t(common_vendor.unref(carVoltage))
       } : {}, {
-        L: common_vendor.unref(batteryPercent)
+        K: common_vendor.unref(batteryPercent)
       }, common_vendor.unref(batteryPercent) ? {
-        M: common_assets._imports_2$1,
-        N: common_vendor.t(common_vendor.unref(batteryPercent)),
-        O: getBatteryColor(common_vendor.unref(batteryPercent))
-      } : {}) : {}, {
-        P: common_vendor.o(($event) => {
+        L: common_assets._imports_2$1,
+        M: common_vendor.t(common_vendor.unref(batteryPercent)),
+        N: getBatteryColor(common_vendor.unref(batteryPercent))
+      } : {}, {
+        O: common_vendor.o(($event) => {
           return handleGridClick($event);
-        }, "0f"),
-        Q: common_vendor.p({
+        }, "36"),
+        P: common_vendor.p({
           items: common_vendor.unref(baseList),
           col: 5,
           itemHeight: "88",
@@ -750,25 +748,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#606266",
           showBorder: true
         }),
-        R: common_vendor.o(filterNonLatin, "26"),
-        S: common_vendor.o(($event) => {
+        Q: common_vendor.o(filterNonLatin, "a1"),
+        R: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "6e"),
-        T: common_vendor.p({
+        }, "4a"),
+        S: common_vendor.p({
           placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        U: common_vendor.o(confirm, "ec"),
-        V: common_vendor.p({
+        T: common_vendor.o(confirm, "84"),
+        U: common_vendor.p({
           show: common_vendor.unref(popupRef),
           title: common_vendor.unref(modalTitle)
         }),
-        W: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        X: `${_ctx.u_s_b_h}px`,
-        Y: `${_ctx.u_s_a_i_b}px`,
-        Z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        V: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        W: `${_ctx.u_s_b_h}px`,
+        X: `${_ctx.u_s_a_i_b}px`,
+        Y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

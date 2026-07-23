@@ -16,9 +16,9 @@
 		<view class="back-btn">
 			<image v-if="showBack" src="/static/back.png" mode="aspectFit" class="icon" @click="handleBack" />
 		</view>
-		<view class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
+		<text class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
 			<slot name="title">{{ title }}</slot>
-		</view>
+		</text>
 		<!-- #ifdef MP-WEIXIN-->
 		 <view class="capsule" :style="{
       right: 200+'rpx',
@@ -122,7 +122,6 @@
 	}
 
 	.capsule {
-		text-align: center;
 	}
 
 	.capsule-item {

@@ -180,13 +180,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:197", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:199", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:203", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:205", "获取里程数据失败:", e);
           common_vendor.index.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -263,10 +263,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(formatDisplayTime(startTime.value)),
         d: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "33"),
+        }, "43"),
         e: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "3f"),
+        }, "85"),
         f: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15"
@@ -274,16 +274,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.t(formatDisplayTime(endTime.value)),
         h: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "9c"),
+        }, "a0"),
         i: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "39"),
+        }, "6c"),
         j: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "30"),
-        l: common_vendor.o(onCancel, "ef"),
+        k: common_vendor.o(onConfirm, "db"),
+        l: common_vendor.o(onCancel, "ce"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -292,7 +292,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "3d"),
+        }, "9e"),
         o: common_vendor.p({
           position: "bottom",
           closeable: false,
@@ -335,10 +335,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }, {
-        w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        x: `${_ctx.u_s_b_h}px`,
-        y: `${_ctx.u_s_a_i_b}px`,
-        z: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        w: `${_ctx.u_s_b_h}px`,
+        x: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

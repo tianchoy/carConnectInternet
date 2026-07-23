@@ -237,8 +237,8 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             if (isTrue(showMap.value)) {
                                 _cE("view", _uM("key" to 0, "class" to "right-bar"), _uA(
                                     _cV(_component_i_tag, _uM("type" to "primary", "onClick" to fun(){
-                                        changeState("在线")
-                                    }, "text" to ("在线 " + onlineCount.value)), null, 8, _uA(
+                                        changeState("全部")
+                                    }, "text" to ("全部 " + totalCount.value)), null, 8, _uA(
                                         "onClick",
                                         "text"
                                     )),

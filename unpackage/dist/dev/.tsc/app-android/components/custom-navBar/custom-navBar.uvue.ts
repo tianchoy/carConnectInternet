@@ -94,7 +94,7 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
             }))
           : _cC("v-if", true)
       ]),
-      _cE("view", _uM({
+      _cE("text", _uM({
         class: "title",
         style: _nS(_uM({ color: _ctx.textColor,'line-height':unref(navBarHeight) + 'px'}))
       }), [
@@ -131,4 +131,4 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 })
 export default __sfc__
 export type CustomNavBarComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenComponentsCustomNavBarCustomNavBarStyles = [_uM([["navbar", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]]))], ["back-btn", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["width", "70rpx"], ["height", "40rpx"], ["zIndex", 10], ["justifyContent", "center"]]))], ["title", _pS(_uM([["textAlign", "center"], ["fontWeight", "bold"], ["fontSize", "36rpx"]]))], ["capsule", _pS(_uM([["textAlign", "center"]]))], ["capsule-item", _pS(_uM([["width", 40], ["height", "100%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["icon", _pS(_uM([["width", "40rpx"], ["height", "40rpx"]]))], ["menu-icon", _pS(_uM([["width", "60rpx"], ["height", "60rpx"]]))]])]
+const GenComponentsCustomNavBarCustomNavBarStyles = [_uM([["navbar", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]]))], ["back-btn", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["width", "70rpx"], ["height", "40rpx"], ["zIndex", 10], ["justifyContent", "center"]]))], ["title", _pS(_uM([["textAlign", "center"], ["fontWeight", "bold"], ["fontSize", "36rpx"]]))], ["capsule-item", _pS(_uM([["width", 40], ["height", "100%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["icon", _pS(_uM([["width", "40rpx"], ["height", "40rpx"]]))], ["menu-icon", _pS(_uM([["width", "60rpx"], ["height", "60rpx"]]))]])]

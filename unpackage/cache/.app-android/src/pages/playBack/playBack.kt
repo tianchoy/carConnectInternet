@@ -12,6 +12,8 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import uts.sdk.modules.DCloudUniMapTencent.Polyline
+import uts.sdk.modules.DCloudUniMapTencent.LocationObject as LocationObject__1
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
@@ -33,14 +35,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val currentPickerType = ref("start")
             val pickerTitle = ref("选择开始时间")
             val trackPoints = ref(_uA<TrackPoint>())
-            val polyline = ref(_uA<PolylineData>())
+            val polyline = ref(_uA<Polyline>())
+            var playedPolyline: Polyline? = null
             val isPlaying = ref(false)
             val playbackSpeed = ref(5)
             val totalDistance = ref(0)
             val currentSpeed = ref(0)
             val currentTime = ref("")
             val currentIndex = ref(0)
-            val carMarker = ref<CarMarker?>(null)
+            val carMarker = ref<MapMarker?>(null)
             var playbackTimer: Number? = 0
             var lastTimestamp: Number = 0
             val startTime = ref("")
@@ -49,7 +52,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val lng = ref<String?>("")
             val sTime = ref("")
             val eTime = ref("")
-            val markers = ref(_uA<UTSJSONObject>())
+            val markers = ref(_uA<MapMarker>())
             fun gen_safeParseDate_fn(dateStr: String): Number {
                 if (!(dateStr != "")) {
                     return 0
@@ -169,54 +172,61 @@ open class GenPagesPlayBackPlayBack : BasePage {
             }
             val initDateTime = ::gen_initDateTime_fn
             fun gen_initCarMarker_fn() {
-                if (trackPoints.value.length > 0) {
-                    val firstPoint = trackPoints.value[0]
-                    val marker = CarMarker(id = 999, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = firstPoint.rotation, anchor = _uO(), callout = _uO(), animation = _uO())
-                    carMarker.value = marker
-                    val startMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("startMarker", "pages/playBack/playBack.uvue", 290, 10), "id" to 1000, "latitude" to trackPoints.value[0].latitude, "longitude" to trackPoints.value[0].longitude, "iconPath" to "/static/start.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "起点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
-                    val endMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("endMarker", "pages/playBack/playBack.uvue", 306, 10), "id" to 1001, "latitude" to trackPoints.value[trackPoints.value.length - 1].latitude, "longitude" to trackPoints.value[trackPoints.value.length - 1].longitude, "iconPath" to "/static/end.png", "width" to 24, "height" to 24, "callout" to _uO("content" to "终点", "borderRadius" to 5, "padding" to 5, "display" to "BYCLICK"))
-                    markers.value = _uA(
-                        marker as UTSJSONObject,
-                        startMarker as UTSJSONObject,
-                        endMarker as UTSJSONObject
-                    )
+                if (trackPoints.value.length == 0) {
+                    return
                 }
+                val firstPoint = trackPoints.value[0]
+                val marker = MapMarker(id = 999, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = firstPoint.rotation, anchor = Anchor(x = 0.5, y = 0.5))
+                carMarker.value = marker
+                val startMarker = MapMarker(id = 1000, latitude = firstPoint.latitude, longitude = firstPoint.longitude, iconPath = "/static/start.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "起点", borderRadius = 5, padding = 5, display = "BYCLICK"))
+                val lastPoint = trackPoints.value[trackPoints.value.length - 1]
+                val endMarker = MapMarker(id = 1001, latitude = lastPoint.latitude, longitude = lastPoint.longitude, iconPath = "/static/end.png", width = 24, height = 24, anchor = Anchor(x = 0.5, y = 0.5), callout = MapMarkerCallout(content = "终点", borderRadius = 5, padding = 5, display = "BYCLICK"))
+                markers.value = _uA(
+                    marker,
+                    startMarker,
+                    endMarker
+                )
             }
             val initCarMarker = ::gen_initCarMarker_fn
-            fun gen_updatePolyline_fn() {
-                if (!(trackPoints.value != null) || trackPoints.value.length < 2) {
+            fun gen_toNativePoints_fn(points: UTSArray<TrackPoint>): UTSArray<LocationObject__1> {
+                return points.map(fun(point: TrackPoint): LocationObject__1 {
+                    return LocationObject__1(point.latitude, point.longitude)
+                }
+                )
+            }
+            val toNativePoints = ::gen_toNativePoints_fn
+            fun gen_initPolyline_fn() {
+                if (trackPoints.value.length < 2) {
+                    playedPolyline = null
                     polyline.value = _uA()
                     return
                 }
-                val newPolyline: UTSArray<PolylineData> = _uA()
-                if (currentIndex.value > 0) {
-                    val playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-                    if (playedPoints.length >= 2) {
-                        newPolyline.push(PolylineData(points = playedPoints.map(fun(point: TrackPoint): CoordinatePoint {
-                            return (CoordinatePoint(latitude = point.latitude, longitude = point.longitude))
-                        }
-                        ), color = "#1890FF", width = 6, arrowLine = true, borderColor = "#FFF", borderWidth = 1))
-                    }
+                val unplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#999999", 3, false, true, "", "#FFFFFF", 1, _uA())
+                val initialPlayedPolyline = Polyline(toNativePoints(trackPoints.value.slice(0, 1)), "#1890FF", 6, true, false, "", "#FFFFFF", 1, _uA())
+                playedPolyline = initialPlayedPolyline
+                polyline.value = _uA(
+                    unplayedPolyline,
+                    initialPlayedPolyline
+                )
+            }
+            val initPolyline = ::gen_initPolyline_fn
+            fun gen_updatePolyline_fn() {
+                val currentPlayedPolyline = playedPolyline
+                if (trackPoints.value.length == 0 || currentPlayedPolyline == null) {
+                    return
                 }
-                if (currentIndex.value < trackPoints.value.length - 1) {
-                    val unplayedPoints = trackPoints.value.slice(currentIndex.value)
-                    if (unplayedPoints.length >= 2) {
-                        newPolyline.push(PolylineData(points = unplayedPoints.map(fun(point: TrackPoint): CoordinatePoint {
-                            return (CoordinatePoint(latitude = point.latitude, longitude = point.longitude))
-                        }
-                        ), color = "#999", width = 3, borderColor = "#FFF", borderWidth = 1))
-                    }
-                }
-                polyline.value = newPolyline
+                currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
             }
             val updatePolyline = ::gen_updatePolyline_fn
             fun gen_updateCarPosition_fn() {
                 val marker = carMarker.value
                 if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
                     val point = trackPoints.value[currentIndex.value]
-                    marker.latitude = point.latitude
-                    marker.longitude = point.longitude
-                    marker.rotate = point.rotation
+                    val updatedMarker = MapMarker(id = marker.id, latitude = point.latitude, longitude = point.longitude, iconPath = marker.iconPath, width = marker.width, height = marker.height, rotate = point.rotation, anchor = marker.anchor, callout = marker.callout, label = marker.label)
+                    carMarker.value = updatedMarker
+                    markers.value = _uA(
+                        updatedMarker
+                    ).concat(markers.value.slice(1))
                     if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
                         center["latitude"] = point.latitude
                         center["longitude"] = point.longitude
@@ -245,10 +255,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 center["longitude"] = convertedCoord.lng
                 mapScale.value = 15
                 val currentPoint = TrackPoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng, rotation = 0, deviceTime = Date().toLocaleString(), speed = 0)
-                val marker = CarMarker(id = 999, latitude = currentPoint.latitude, longitude = currentPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = 0, anchor = _uO(), callout = _uO(), animation = _uO())
+                val marker = MapMarker(id = 999, latitude = currentPoint.latitude, longitude = currentPoint.longitude, iconPath = getDeviceIcon(carStatus.value ?: "", carType.value ?: ""), width = 25, height = 25, rotate = 0, anchor = Anchor(x = 0.5, y = 0.5))
                 carMarker.value = marker
                 markers.value = _uA(
-                    marker as UTSJSONObject
+                    marker
                 )
             }
             val showCurrentPosition = ::gen_showCurrentPosition_fn
@@ -279,7 +289,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 trackPoints.value = processedPoints
                 calculateTrackDistance()
                 initCarMarker()
-                updatePolyline()
+                initPolyline()
                 adjustMapToFitTrack()
                 if (trackPoints.value.length > 0) {
                     currentTime.value = trackPoints.value[0].deviceTime
@@ -289,15 +299,24 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val loadTrackPos = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 496, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
-                        val res = await(getTrackPos(data))
-                        val trackData = res.data
-                        val positions = trackData?.getArray<UTSJSONObject>("positions")
-                        if (positions != null && positions.length > 0) {
-                            processTrackData(positions)
-                            uni_hideLoading(null)
-                        } else {
-                            showCurrentPosition()
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 520, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        try {
+                            val res = await(getTrackPos(data))
+                            val positions = res.data?.getArray<UTSJSONObject>("positions")
+                            if (positions != null && positions.length > 0) {
+                                processTrackData(positions)
+                            } else {
+                                showCurrentPosition()
+                            }
+                        }
+                         catch (error: Throwable) {
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:539")
+                            uni_showToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
+                            if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
+                                showCurrentPosition()
+                            }
+                        }
+                         finally {
                             uni_hideLoading(null)
                         }
                 })
@@ -319,7 +338,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     currentTime.value = trackPoints.value[0].deviceTime
                 }
                 updateCarPosition()
-                updatePolyline()
+                initPolyline()
             }
             val resetPlayback = ::gen_resetPlayback_fn
             fun gen_playNextPoint_fn() {
@@ -416,7 +435,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:658")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:687")
                 if (sTime.value != "" && eTime.value != "") {
                     startTime.value = sTime.value
                     endTime.value = eTime.value
@@ -433,48 +452,27 @@ open class GenPagesPlayBackPlayBack : BasePage {
             )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
-                val _component_marker = resolveComponent("marker")
-                val _component_sub_navBar = resolveEasyComponent("sub-navBar", GenComponentsSubNavBarSubNavBarClass)
                 val _component_map = resolveComponent("map")
+                val _component_sub_navBar = resolveEasyComponent("sub-navBar", GenComponentsSubNavBarSubNavBarClass)
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
+                val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 val _component_i_slider = resolveEasyComponent("i-slider", GenUniModulesIUiXComponentsISliderISliderClass)
                 val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
                 val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
                 return _cE("view", _uM("class" to "container"), _uA(
                     _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                     _cE("view", _uM("class" to "map-container"), _uA(
-                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                if (isTrue(carMarker.value)) {
-                                    _cV(_component_marker, _uM("key" to 0, "id" to carMarker.value!!.id, "latitude" to carMarker.value!!.latitude, "longitude" to carMarker.value!!.longitude, "iconPath" to carMarker.value!!.iconPath, "width" to carMarker.value!!.width, "height" to carMarker.value!!.height, "rotate" to carMarker.value!!.rotate, "anchor" to carMarker.value!!.anchor, "callout" to carMarker.value!!.callout, "animation" to carMarker.value!!.animation), null, 8, _uA(
-                                        "id",
-                                        "latitude",
-                                        "longitude",
-                                        "iconPath",
-                                        "width",
-                                        "height",
-                                        "rotate",
-                                        "anchor",
-                                        "callout",
-                                        "animation"
-                                    ))
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                                ,
-                                _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to plateNo.value, "showCar" to true, "carStatus" to carStatus.value), null, 8, _uA(
-                                    "currentCar",
-                                    "carStatus"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
+                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
                             "latitude",
                             "longitude",
                             "markers",
                             "polyline",
                             "scale",
                             "style"
+                        )),
+                        _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to plateNo.value, "showCar" to true, "carStatus" to carStatus.value), null, 8, _uA(
+                            "currentCar",
+                            "carStatus"
                         ))
                     )),
                     _cE("view", _uM("class" to "tools-panel"), _uA(
@@ -497,12 +495,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             ))
                         )),
                         _cE("view", _uM("class" to "tool-tag-item"), _uA(
-                            _cE("view", _uM("class" to "play-btn", "onClick" to togglePlayback), _tD(if (isPlaying.value) {
+                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to togglePlayback, "size" to "small", "text" to if (isPlaying.value) {
                                 "暂停"
                             } else {
                                 "播放"
                             }
-                            ), 1),
+                            ), null, 8, _uA(
+                                "text"
+                            )),
                             _cE("view", _uM("class" to "slider"), _uA(
                                 _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                     playbackSpeed.value = `$event`
@@ -516,15 +516,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         )),
                         _cE("view", _uM("class" to "play-back-info"), _uA(
                             _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", null, _tD(currentTime.value), 1),
+                                _cE("text", _uM("class" to "info-label"), _tD(currentTime.value), 1),
                                 _cE("text", _uM("class" to "info-label"), "时间")
                             )),
                             _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", null, _tD(currentSpeed.value) + "Km/h", 1),
+                                _cE("text", _uM("class" to "info-label"), _tD(currentSpeed.value) + "Km/h", 1),
                                 _cE("text", _uM("class" to "info-label"), "速度")
                             )),
                             _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", null, _tD((totalDistance.value / 1000).toFixed(1)) + "Km", 1),
+                                _cE("text", _uM("class" to "info-label"), _tD((totalDistance.value / 1000).toFixed(1)) + "Km", 1),
                                 _cE("text", _uM("class" to "info-label"), "里程")
                             ))
                         )),
@@ -553,7 +553,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "25rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "25rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "25rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "24rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -3,8 +3,6 @@
 	// 添加热更新相关变量
 	let updateManager: any = null
 	let hasUpdate = false
-	
-	// 将checkForUpdates方法移到外部定义
 	function checkForUpdates() {
 		// 仅在小程序平台生效
 
@@ -72,19 +70,18 @@
 	
 	const __sfc__ = defineApp({
 		onLaunch: function () {
-			console.log('App onLaunch', " at App.uvue:75")
-			// 修改调用方式，直接调用外部函数
+			console.log('App onLaunch', " at App.uvue:73")
 			checkForUpdates()
 		},
 		onShow: function () {
-			console.log('App Show', " at App.uvue:80")
+			console.log('App Show', " at App.uvue:77")
 		},
 		onHide: function () {
-			console.log('App Hide', " at App.uvue:83")
+			console.log('App Hide', " at App.uvue:80")
 		},
 
 		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress', " at App.uvue:87")
+			console.log('App LastPageBackPress', " at App.uvue:84")
 			if (firstBackTime == 0) {
 				uni.showToast({
 					title: '再按一次退出应用',
@@ -101,7 +98,7 @@
 		},
 
 		onExit: function () {
-			console.log('App Exit', " at App.uvue:104")
+			console.log('App Exit', " at App.uvue:101")
 		}
 	})
 

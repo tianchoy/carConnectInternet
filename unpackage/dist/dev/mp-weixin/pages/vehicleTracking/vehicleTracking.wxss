@@ -59,5 +59,7 @@
   justify-content: flex-start;
   align-items: center;
   padding: 8rpx 0;
+}
+.container .tools-panel .pos-info-box .tracking-info-text {
   font-size: 28rpx;
 }

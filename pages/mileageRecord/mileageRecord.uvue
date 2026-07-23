@@ -1,7 +1,7 @@
 <template>
-	<view class="container">
-		<custom-navBar title="里程记录" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
-		</custom-navBar>
+	<custom-navBar title="里程记录" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
+	</custom-navBar>
+	<view class="container" >
 		<view class="tools-panel">
 			<view class="Datetime-box">
 				<view class="date-box">
@@ -35,7 +35,7 @@
 			</view>
 		</view>
 
-		<scroll-view class="content" scroll-y>
+		<scroll-view class="content" scroll-y="true" :show-scrollbar="false" enable-flex>
 			<i-empty text="当前时间点暂无行程数据" :showButton="false" description="" v-if="groupedTrips.length == 0" ></i-empty>
 			<view v-else class="trip-list">
 				<view v-for="(group, groupIndex) in groupedTrips" :key="groupIndex" class="trip-group">
@@ -50,7 +50,9 @@
 					<view v-for="(item, index) in group.trips" :key="index" class="trip-item"
 						@click="gotoTripDetail(getTripStartTime(item), getTripEndTime(item))">
 						<view class="trip-index">
-							<text class="icon">{{index + 1}}</text>
+							<view class="icon">
+								<text style="color: #ffffff;">{{index + 1}}</text>
+							</view>
 							<view class="trip-distance-time">
 								<text>{{getTripHourRange(item)}}</text>
 								<text>{{getTripDistanceText(item)}} km</text>
@@ -286,7 +288,12 @@
 
 <style lang="scss">
 	.container {
+		// #ifdef MP-WEIXIN
+		min-height: 100%;
+		// #endif
 		height: 100%;
+		display: flex;
+		flex-direction: column;
 		background-color: #f5f7fa;
 		padding-bottom: 20rpx;
 
@@ -348,12 +355,17 @@
 		}
 
 		.content {
+			flex: 1;
 			margin: 0 20rpx;
 			background-color: #fff;
 			border-radius: 20rpx;
+			// #ifndef MP-WEIXIN
+			margin-bottom: 20%;
+			// #endif
 
 			.trip-list {
 				width: 100%;
+				padding-bottom: 20rpx;
 
 				.trip-group {
 					padding: 20rpx;

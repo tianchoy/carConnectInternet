@@ -1,23 +1,23 @@
 <template>
-	<cover-view class="tools-box">
-		<cover-view class="second" @click="showPickerTime ? handleTime : null" v-if="showTime">
-			<cover-view class="times">
-				<cover-view>{{ currentTime }}</cover-view>
-				<cover-view v-if="!showPickerTime">刷新一次位置</cover-view>
-			</cover-view>
+	<view class="tools-box">
+		<view class="second" @click="showPickerTime ? handleTime : null" v-if="showTime">
+			<view class="times">
+				<text>{{ currentTime }}</text>
+				<text v-if="!showPickerTime">刷新一次位置</text>
+			</view>
 			<!-- <cover-image v-if="showPickerTime" class="down_icon" src="/static/down_icon.png"></cover-image> -->
-		</cover-view>
-		<cover-view class="slot" v-else></cover-view>
-		<cover-view class="car-box">
-			<cover-view class="selectCar" @click="showPicker? handleCar : null" v-if="showCar">
-				<cover-view class="plateNo">{{ currentCar }}</cover-view>
+		</view>
+		<view class="slot" v-else></view>
+		<view class="car-box">
+			<view class="selectCar" @click="showPicker? handleCar : null" v-if="showCar">
+				<text class="plateNo">{{ currentCar }}</text>
 				<!-- <cover-image class="down_icon" src="/static/down_icon.png"></cover-image> -->
-			</cover-view>
-			<cover-view class="car-state" :class="carStatus == 'online' ? 'success' : 'error'">
-				<cover-view class="state">{{carStatus == 'online' ? '在线' : '离线'}}</cover-view>
-			</cover-view>
-		</cover-view>
-	</cover-view>
+			</view>
+			<view class="car-state" :class="carStatus == 'online' ? 'success' : 'error'">
+				<text class="state">{{carStatus == 'online' ? '在线' : '离线'}}</text>
+			</view>
+		</view>
+	</view>
 
 	<!-- <uv-picker showPicker ref="picker" :columns="columns" keyName="label" @confirm="confirm"></uv-picker> -->
 </template>

@@ -111,18 +111,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, !__props.showPickerTime ? {} : {}, {
         d: common_vendor.o(($event) => {
           return __props.showPickerTime ? handleTime : null;
-        }, "02")
+        }, "51")
       }) : {}, {
         e: __props.showCar
       }, __props.showCar ? {
         f: common_vendor.t(__props.currentCar),
         g: common_vendor.o(($event) => {
           return __props.showPicker ? handleCar : null;
-        }, "8d")
+        }, "00")
       } : {}, {
         h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),
-        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "cover-view"),
+        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         k: `${_ctx.u_s_b_h}px`,
         l: `${_ctx.u_s_a_i_b}px`,
         m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)

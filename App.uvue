@@ -3,8 +3,6 @@
 	// 添加热更新相关变量
 	let updateManager: any = null
 	let hasUpdate = false
-	
-	// 将checkForUpdates方法移到外部定义
 	function checkForUpdates() {
 		// 仅在小程序平台生效
 		// #ifdef MP-WEIXIN
@@ -73,7 +71,6 @@
 	export default {
 		onLaunch: function () {
 			console.log('App onLaunch')
-			// 修改调用方式，直接调用外部函数
 			checkForUpdates()
 		},
 		onShow: function () {

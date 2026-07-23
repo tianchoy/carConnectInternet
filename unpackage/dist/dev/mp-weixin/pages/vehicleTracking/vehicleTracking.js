@@ -6,12 +6,14 @@ const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1)();
+  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_button_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
+const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_button)();
 }
 class CoordinatePoint extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -110,6 +112,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function handleCurrentTimeUpdate(value) {
       currentTime.value = value;
     }
+    function createVehicleMarker(iconPath) {
+      return {
+        id: 1,
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude,
+        iconPath,
+        width: 25,
+        height: 25,
+        rotate: currentRotation.value,
+        anchor: { x: 0.5, y: 0.5 },
+        alpha: 1
+      };
+    }
     function loadInitialPosition() {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
@@ -117,10 +132,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deptId: deptId.value,
             deviceids: imei.value
           });
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:124", "data", data);
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:136", "data", data);
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:128", "res", res);
-          if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:140", "res", res);
+          if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
             let foundDevice = false;
             res.data.forEach((item) => {
               const itemImei = item.getString("imei", "");
@@ -159,18 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 if (!markerInitialized.value) {
                   const iconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
                   lastIconPath = iconPath;
-                  markers.value = [new common_vendor.UTSJSONObject({
-                    id: 1,
-                    latitude: currentPosition.latitude,
-                    longitude: currentPosition.longitude,
-                    iconPath,
-                    width: 25,
-                    height: 25,
-                    rotate: currentRotation.value,
-                    anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 }),
-                    alpha: 1,
-                    fixed: false
-                  })];
+                  markers.value = [createVehicleMarker(iconPath)];
                   markerInitialized.value = true;
                 }
               }
@@ -188,7 +192,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:211", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:212", "获取初始位置失败:", err);
           common_vendor.index.showToast({
             title: "网络请求失败",
             icon: "none"
@@ -202,21 +206,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const iconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
       lastIconPath = iconPath;
-      const marker = new common_vendor.UTSJSONObject({
-        id: 1,
-        latitude: currentPosition.latitude,
-        longitude: currentPosition.longitude,
-        iconPath,
-        width: 25,
-        height: 25,
-        rotate: currentRotation.value,
-        anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 }),
-        alpha: 1,
-        fixed: false
-      });
+      const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:243", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:233", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -235,7 +228,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _e;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:264", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:254", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -277,24 +270,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return diff;
     }
     const updateMarkerSmooth = () => {
-      if (markers.value.length === 0) {
+      if (markers.value.length == 0) {
         initMarker();
         return null;
       }
       const newIconPath = utils_cars.getDeviceIcon(connectionStatus.value, carType.value);
-      const needUpdateIcon = newIconPath !== lastIconPath;
-      const updatedMarker = new common_vendor.UTSJSONObject({
-        id: 1,
-        latitude: currentPosition.latitude,
-        longitude: currentPosition.longitude,
-        iconPath: needUpdateIcon ? newIconPath : lastIconPath,
-        width: 25,
-        height: 25,
-        rotate: currentRotation.value,
-        anchor: new common_vendor.UTSJSONObject({ x: 0.5, y: 0.5 }),
-        alpha: 1,
-        fixed: false
-      });
+      const needUpdateIcon = newIconPath != lastIconPath;
+      const updatedMarker = createVehicleMarker(needUpdateIcon ? newIconPath : lastIconPath);
       markers.value = [updatedMarker];
       if (needUpdateIcon) {
         lastIconPath = newIconPath;
@@ -382,8 +364,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceids: imei.value
           });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:471", "222222");
-          if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:450", "222222");
+          if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
             const deviceData = common_vendor.UTS.arrayFind(res.data, (item) => {
               return item.getString("imei", "") == imei.value;
             });
@@ -395,10 +377,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               const status = deviceData.getString("connectionStatus", "unknown");
               const direction = deviceData.getNumber("direction", lastDirection.value);
               const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(latitude, longitude);
-              let newDirection = direction;
-              if (direction === lastDirection.value) {
-                newDirection = lastDirection.value;
-              }
+              const newDirection = direction;
               const animationData = new AnimationQueueItem({
                 position: new CoordinatePoint({
                   latitude: convertedCoord.lat,
@@ -414,7 +393,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:503", "获取跟踪位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:479", "获取跟踪位置失败:", err);
         }
       });
     };
@@ -466,7 +445,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:578", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:554", "页面隐藏时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value != null) {
         clearInterval(trackingInterval.value);
@@ -481,7 +460,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isAnimating.value = false;
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:599", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:575", "页面卸载时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value != null) {
         clearInterval(trackingInterval.value);
@@ -518,9 +497,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: center.longitude,
         g: markers.value,
         h: mapScale.value,
-        i: common_vendor.t(isTracking.value ? "停止跟踪" : "开始跟踪"),
-        j: common_vendor.o(toggleTracking, "f8"),
-        k: isTracking.value ? "#e64340" : "#1296db",
+        i: common_vendor.o(toggleTracking, "af"),
+        j: isTracking.value ? "#e64340" : "#1296db",
+        k: common_vendor.p({
+          type: isTracking.value ? "danger" : "primary",
+          size: "small",
+          text: isTracking.value ? "停止跟踪" : "开始跟踪",
+          style: common_vendor.normalizeStyle({
+            backgroundColor: isTracking.value ? "#e64340" : "#1296db"
+          })
+        }),
         l: common_vendor.t(currentSpeed.value),
         m: common_vendor.t(currentAddress.value),
         n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),

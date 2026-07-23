@@ -5,13 +5,8 @@
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
-				<marker v-if="carMarker" :id="carMarker!.id" :latitude="carMarker!.latitude"
-					:longitude="carMarker!.longitude" :iconPath="carMarker!.iconPath" :width="carMarker!.width"
-					:height="carMarker!.height" :rotate="carMarker!.rotate" :anchor="carMarker!.anchor"
-					:callout="carMarker!.callout" :animation="carMarker!.animation">
-				</marker>
+				</map>
 				<sub-navBar :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
-			</map>
 		</view>
 
 		<view class="tools-panel">
@@ -24,9 +19,7 @@
 				</view>
 			</view>
 			<view class="tool-tag-item">
-				<view class="play-btn" @click="togglePlayback">
-					{{isPlaying ? '暂停':'播放' }}
-				</view>
+				<i-button type="primary" @click="togglePlayback" size="small" :text="isPlaying ? '暂停':'播放'"></i-button>
 				<view class="slider">
 					<i-slider v-model="playbackSpeed"  :min="1" :max="10"
 						@change="setPlaybackSpeed">
@@ -36,15 +29,15 @@
 			</view>
 			<view class="play-back-info">
 				<view class="item-info">
-					<text>{{currentTime}}</text>
+					<text class="info-label">{{currentTime}}</text>
 					<text class="info-label">时间</text>
 				</view>
 				<view class="item-info">
-					<text>{{currentSpeed}}Km/h</text>
+					<text class="info-label">{{currentSpeed}}Km/h</text>
 					<text class="info-label">速度</text>
 				</view>
 				<view class="item-info">
-					<text>{{(totalDistance/1000).toFixed(1)}}Km</text>
+					<text class="info-label">{{(totalDistance/1000).toFixed(1)}}Km</text>
 					<text class="info-label">里程</text>
 				</view>
 			</view>
@@ -63,6 +56,10 @@
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
+	// #ifdef APP-ANDROID
+	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
+	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
+	// #endif
 
 	type TrackPoint = {
 		latitude : number;
@@ -79,20 +76,21 @@
 		maxLng : number;
 	}
 
-	type PolylineData = {
-		points: Array<CoordinatePoint>
-		color: string
-		width: number
-		arrowLine: boolean
-		borderColor: string
-		borderWidth: number
-	}
-	type CoordinatePoint = {
+	type MapPolylinePoint = {
 		latitude: number
 		longitude: number
 	}
 
-	type polyData = Array<PolylineData>
+	type MpPolylineData = {
+		points: Array<MapPolylinePoint>
+		color: string
+		width: number
+		dottedLine: boolean
+		arrowLine: boolean
+		borderColor: string
+		borderWidth: number
+	}
+
 	// 地图状态
 	const center = reactive({
 		latitude: 39.90469,
@@ -110,28 +108,23 @@
 	const pickerTitle = ref('选择开始时间')
 
 	// 轨迹回放相关
-	type CarMarker = {
-		id: number
-		latitude: number
-		longitude: number
-		iconPath: string
-		width: number
-		height: number
-		rotate: number
-		anchor: UTSJSONObject
-		callout: UTSJSONObject
-		animation: UTSJSONObject
-	}
+	type MapMarker = Marker
 
 	const trackPoints = ref<Array<TrackPoint>>([])
-	const polyline = ref<Array<PolylineData>>([])
+	// #ifdef APP-ANDROID
+	const polyline = ref<Array<Polyline>>([])
+	let playedPolyline : Polyline | null = null
+	// #endif
+	// #ifdef MP-WEIXIN
+	const polyline = ref<Array<MpPolylineData>>([])
+	// #endif
 	const isPlaying = ref(false)
 	const playbackSpeed = ref(5)
 	const totalDistance = ref(0)
 	const currentSpeed = ref(0)
 	const currentTime = ref('')
 	const currentIndex = ref(0)
-	const carMarker = ref<CarMarker | null>(null)
+	const carMarker = ref<MapMarker | null>(null)
 	let playbackTimer : number | null = 0
 	let lastTimestamp = 0
 
@@ -143,7 +136,7 @@
 	const eTime = ref('')
 
 	// 标记点集合
-	const markers = ref<Array<UTSJSONObject>>([])
+	const markers = ref<Array<MapMarker>>([])
 
 	// 日期函数
 	function safeParseDate(dateStr : string) : number {
@@ -270,99 +263,121 @@
 
 	// 初始化小车标记
 	function initCarMarker() {
-		if (trackPoints.value.length > 0) {
-			const firstPoint = trackPoints.value[0]
-				const marker : CarMarker = {
-					id: 999,
-					latitude: firstPoint.latitude,
-					longitude: firstPoint.longitude,
-					iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
-					width: 25,
-					height: 25,
-					rotate: firstPoint.rotation,
-					anchor: {},
-					callout: {},
-					animation: {}
-				}
-				carMarker.value = marker
+		if (trackPoints.value.length == 0) return
 
-			// 添加起点和终点标记
-			const startMarker = {
-				id: 1000,
-				latitude: trackPoints.value[0].latitude,
-				longitude: trackPoints.value[0].longitude,
-				iconPath: '/static/start.png',
-				width: 24,
-				height: 24,
-				// anchor: { x: 0.5, y: 0.5 },
-				callout: {
-					content: '起点',
-					borderRadius: 5,
-					padding: 5,
-					display: 'BYCLICK'
-				}
-			}
-
-			const endMarker = {
-				id: 1001,
-				latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-				longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-				iconPath: '/static/end.png',
-				width: 24,
-				height: 24,
-				// anchor: { x: 0.5, y: 0.5 },
-				callout: {
-					content: '终点',
-					borderRadius: 5,
-					padding: 5,
-					display: 'BYCLICK'
-				}
-			}
-
-			markers.value = [marker as UTSJSONObject, startMarker as UTSJSONObject, endMarker as UTSJSONObject]
+		const firstPoint = trackPoints.value[0]
+		const marker : MapMarker = {
+			id: 999,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: getDeviceIcon(carStatus.value ?? '', carType.value ?? ''),
+			width: 25,
+			height: 25,
+			rotate: firstPoint.rotation,
+			anchor: { x: 0.5, y: 0.5 }
 		}
+		carMarker.value = marker
+
+		const startMarker : MapMarker = {
+			id: 1000,
+			latitude: firstPoint.latitude,
+			longitude: firstPoint.longitude,
+			iconPath: '/static/start.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '起点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		const lastPoint = trackPoints.value[trackPoints.value.length - 1]
+		const endMarker : MapMarker = {
+			id: 1001,
+			latitude: lastPoint.latitude,
+			longitude: lastPoint.longitude,
+			iconPath: '/static/end.png',
+			width: 24,
+			height: 24,
+			anchor: { x: 0.5, y: 0.5 },
+			callout: { content: '终点', borderRadius: 5, padding: 5, display: 'BYCLICK' }
+		}
+		markers.value = [marker, startMarker, endMarker]
 	}
 
-	// 更新轨迹线
-	function updatePolyline() {
-		if (!trackPoints.value || trackPoints.value.length < 2) {
+	// #ifdef APP-ANDROID
+	function toNativePoints(points : Array<TrackPoint>) : Array<LocationObject> {
+		return points.map((point : TrackPoint) : LocationObject => {
+			return new LocationObject(point.latitude, point.longitude)
+		})
+	}
+
+	function initPolyline() {
+		if (trackPoints.value.length < 2) {
+			playedPolyline = null
 			polyline.value = []
 			return
 		}
 
-		const newPolyline : Array<PolylineData> = []
-
-		// 已播放的轨迹部分（实线）
-		if (currentIndex.value > 0) {
-			const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1)
-			if (playedPoints.length >= 2) {
-				newPolyline.push({
-					points: playedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
-					color: '#1890FF',
-					width: 6,
-					arrowLine: true,
-					borderColor: '#FFF',
-					borderWidth: 1
-				})
-			}
-		}
-
-		// 未播放的轨迹部分（虚线）
-		if (currentIndex.value < trackPoints.value.length - 1) {
-			const unplayedPoints = trackPoints.value.slice(currentIndex.value)
-			if (unplayedPoints.length >= 2) {
-				newPolyline.push({
-					points: unplayedPoints.map((point : TrackPoint) : CoordinatePoint => ({ latitude: point.latitude, longitude: point.longitude })),
-					color: '#999',
-					width: 3,
-					borderColor: '#FFF',
-					borderWidth: 1
-				})
-			}
-		}
-
-		polyline.value = newPolyline
+		const unplayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value), '#999999', 3, false, true, '', '#FFFFFF', 1, []
+		)
+		const initialPlayedPolyline = new Polyline(
+			toNativePoints(trackPoints.value.slice(0, 1)), '#1890FF', 6, true, false, '', '#FFFFFF', 1, []
+		)
+		playedPolyline = initialPlayedPolyline
+		polyline.value = [unplayedPolyline, initialPlayedPolyline]
 	}
+
+	function updatePolyline() {
+		const currentPlayedPolyline = playedPolyline
+		if (trackPoints.value.length == 0 || currentPlayedPolyline == null) return
+		currentPlayedPolyline.points = toNativePoints(trackPoints.value.slice(0, currentIndex.value + 1))
+	}
+	// #endif
+
+	// #ifdef MP-WEIXIN
+	function toMpPoints(points : Array<TrackPoint>) : Array<MapPolylinePoint> {
+		return points.map((point : TrackPoint) : MapPolylinePoint => ({
+			latitude: point.latitude,
+			longitude: point.longitude
+		}))
+	}
+
+	function updatePolyline() {
+		if (trackPoints.value.length < 2) {
+			polyline.value = []
+			return
+		}
+
+		const lines : Array<MpPolylineData> = []
+		const unplayedPoints = trackPoints.value.slice(currentIndex.value)
+		if (unplayedPoints.length >= 2) {
+			lines.push({
+				points: toMpPoints(unplayedPoints),
+				color: '#999999',
+				width: 3,
+				dottedLine: true,
+				arrowLine: false,
+				borderColor: '#FFFFFF',
+				borderWidth: 1
+			})
+		}
+		if (currentIndex.value > 0) {
+			lines.push({
+				points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
+				color: '#1890FF',
+				width: 6,
+				dottedLine: false,
+				arrowLine: true,
+				borderColor: '#FFFFFF',
+				borderWidth: 1
+			})
+		}
+		polyline.value = lines
+	}
+
+	function initPolyline() {
+		updatePolyline()
+	}
+	// #endif
 
 	// 更新小车位置
 	function updateCarPosition() {
@@ -370,9 +385,20 @@
 		if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
 			const point = trackPoints.value[currentIndex.value]
 
-			marker.latitude = point.latitude
-			marker.longitude = point.longitude
-			marker.rotate = point.rotation
+			const updatedMarker : MapMarker = {
+				id: marker.id,
+				latitude: point.latitude,
+				longitude: point.longitude,
+				iconPath: marker.iconPath,
+				width: marker.width,
+				height: marker.height,
+				rotate: point.rotation,
+				anchor: marker.anchor,
+				callout: marker.callout,
+				label: marker.label
+			}
+			carMarker.value = updatedMarker
+			markers.value = [updatedMarker, ...markers.value.slice(1)]
 
 			// 每5个点更新一次中心点
 			if (currentIndex.value % 5 == 0 ||
@@ -420,7 +446,7 @@
 		}
 
 		// 初始化小车标记
-		const marker : CarMarker = {
+		const marker : MapMarker = {
 			id: 999,
 			latitude: currentPoint.latitude,
 			longitude: currentPoint.longitude,
@@ -428,14 +454,12 @@
 			width: 25,
 			height: 25,
 			rotate: 0,
-			anchor: {},
-			callout: {},
-			animation: {}
+			anchor: { x: 0.5, y: 0.5 }
 		}
 		carMarker.value = marker
 
 		// 设置标记点
-		markers.value = [marker as UTSJSONObject]
+		markers.value = [marker]
 	}
 
 
@@ -483,7 +507,7 @@
 		trackPoints.value = processedPoints
 		calculateTrackDistance()
 		initCarMarker()
-		updatePolyline()
+		initPolyline()
 		adjustMapToFitTrack()
 
 		if (trackPoints.value.length > 0) {
@@ -503,16 +527,21 @@
 			withTrip: false,
 		}
 
-		const res = await getTrackPos(data)
-		const trackData = res.data
-		const positions = trackData?.getArray<UTSJSONObject>('positions')
-		if (positions != null && positions.length > 0) {
-			processTrackData(positions)
-			uni.hideLoading()
-		}
-		else {
-			// 当轨迹数据为空时，使用传过来的经纬度 来标记当前位置
-			showCurrentPosition()
+		try {
+			const res = await getTrackPos(data)
+			const positions = res.data?.getArray<UTSJSONObject>('positions')
+			if (positions != null && positions.length > 0) {
+				processTrackData(positions)
+			} else {
+				showCurrentPosition()
+			}
+		} catch (error) {
+			console.error('加载轨迹失败:', error)
+			uni.showToast({ title: '轨迹加载失败', icon: 'none' })
+			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
+				showCurrentPosition()
+			}
+		} finally {
 			uni.hideLoading()
 		}
 	}
@@ -541,7 +570,7 @@
 			currentTime.value = trackPoints.value[0].deviceTime
 		}
 		updateCarPosition()
-		updatePolyline()
+		initPolyline()
 	}
 
 
@@ -749,7 +778,6 @@
 				.play-btn {
 					font-size: 25rpx;
 					color: #fff;
-					
 					padding: 10rpx 25rpx;
 					border-radius: 10rpx;
 					margin-left: 20rpx;
@@ -776,7 +804,7 @@
 				}
 
 				.info-label {
-					font-size: 25rpx;
+					font-size: 24rpx;
 					padding: 10rpx 0;
 					color: #999;
 				}

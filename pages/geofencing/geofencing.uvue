@@ -5,15 +5,15 @@
 		<view class="map-container">
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :scale="mapScale"
 				style="width:100%;height:100%" :show-location="false" :polygons="polygons" :markers="markers"
-				:circles="circles" @click="handleMapTap" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
+				:circles="circles" @tap="handleMapTap" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				<sub-navBar :showTime="false" :currentCar="currentCar" :showCar="true"
 					:carStatus='connectionStatus'></sub-navBar>
 			</map>
 
 			<!-- 绘制提示 -->
 			<view v-if="isDrawing" class="drag-hint">
-				<text v-if="drawingMode === 'polygon'">点击地图添加围栏点,至少需要3个点</text>
-				<text v-if="drawingMode === 'circle'">点击地图确定圆心，再点一下地图确定半径</text>
+				<text v-if="drawingMode === 'polygon'" class="drag-hint-text">点击地图添加围栏点,至少需要3个点</text>
+				<text v-if="drawingMode === 'circle'" class="drag-hint-text">点击地图确定圆心，再点一下地图确定半径</text>
 			</view>
 		</view>
 
@@ -22,7 +22,7 @@
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ getSelectedFenceName() }}</text>
-					<i-icon name="close" @click="selectedFence = null; showFenceModal?.close()"></i-icon>
+					<i-icon name="close" @click="selectedFence = null; showFenceModal?.$callMethod('close')"></i-icon>
 				</view>
 				<view class="fence-actions">
 					<i-button size="small" @click="editSelectedFence">编辑</i-button>
@@ -37,7 +37,7 @@
 		<view class="tools-panel">
 			<!-- 绘制模式选择 -->
 			<view class="drawing-mode-selector" v-if="!isDrawing && !selectedFence">
-				<view class="mode-title">选择围栏类型:</view>
+				<text class="mode-title">选择围栏类型:</text>
 				<view class="mode-buttons">
 					<i-button :type="drawingMode == 'polygon' ? 'success' : 'default'" size="small"
 						customStyle="border:1rpx solid #ebedf0" @click="setDrawingMode('polygon')">
@@ -66,9 +66,9 @@
 			</view>
 
 			<view class="status-info">
-				<text>围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
-				<text v-if="drawingMode === 'polygon'">顶点数量: {{ points.length }}</text>
-				<text v-if="drawingMode === 'circle'">半径: {{ circleRadius.toFixed(2) }}米</text>
+				<text class="status-text">围栏类型: {{ drawingMode === 'polygon' ? '多边形' : '圆形' }}</text>
+				<text v-if="drawingMode === 'polygon'" class="status-text">顶点数量: {{ points.length }}</text>
+				<text v-if="drawingMode === 'circle'" class="status-text">半径: {{ circleRadius.toFixed(2) }}米</text>
 			</view>
 		</view>
 
@@ -89,17 +89,17 @@
 						<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 					</view>
 					<view v-if="fenceList.length === 0" class="empty">
-						暂无围栏数据
+						<text class="empty-text">暂无围栏数据</text>
 					</view>
 				</scroll-view>
 			</view>
 		</i-popup>
 
 		<!-- 围栏编辑弹窗 -->
-		<i-popup ref="editDialogPopup" mode="center" round="10">
+		<i-popup ref="editDialogPopup" mode="center" round="10" :contentDraggable="false">
 			<view class="edit-dialog">
 				<view class="dialog-header">
-					<text>{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
+					<text class="dialog-title">{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
 				</view>
 				<view class="dialog-content">
 					<i-input v-model="fenceForm.name" placeholder="请输入围栏名称" border="surround"></i-input>
@@ -119,10 +119,10 @@
 				</view>
 			</view>
 		</i-popup>
-		<i-popup ref="deviceDialogPopup" mode="bottom" round="10" :mask-click-able="false">
+		<i-popup ref="deviceDialogPopup" mode="bottom" round="10" :closeOnMask="false">
 			<view class="device-dialog">
 				<view class="dialog-header">
-					<text>设备绑定 - {{ currentFenceName }}</text>
+					<text class="dialog-title">设备绑定 - {{ currentFenceName }}</text>
 					<i-icon name="close" @click="closeDeviceDialog"></i-icon>
 				</view>
 				<view class="dialog-tabs">
@@ -152,7 +152,7 @@
 					</view>
 					
 					<view v-if="deviceList.length === 0 && !loading" class="empty">
-						{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}
+						<text class="empty-text">{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}</text>
 					</view>
 					<view v-if="loadingMore" class="loading-tip">
 						<text>正在加载更多...</text>
@@ -169,7 +169,7 @@
 <script setup>
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
-	import CoordTransform from '../../utils/coordTransform.uts'
+	import CoordTransform, { type Coordinate as TencentCoordinate } from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
 	const imei = ref<string | null>(null)
@@ -177,10 +177,7 @@
 	const deptId = ref<string | null>(null)
 	const carType = ref<string | null>(null)
 	const deviceName = ref<string | null>(null)
-	type Coordinate = {
-		latitude : number;
-		longitude : number;
-	};
+	type Coordinate = LocationObject;
 	type PaginationState = {
 		pageNum : number;
 		pageSize : number;
@@ -196,10 +193,6 @@
 		longitude : number;
 		radius : number;
 	};
-	type PopupInstance = {
-		open: () => void;
-		close: () => void;
-	};
 	type ModalResult = {
 		confirm : boolean;
 	};
@@ -211,26 +204,8 @@
 		code : number;
 		msg : string;
 	};
-	type MapTapEventDetail = {
-		latitude : number;
-		longitude : number;
-	};
-	type MapTapEvent = {
-		detail : MapTapEventDetail;
-	};
 	type SwitchChangeEvent = {
 		value : boolean;
-	};
-	type CircleOverlay = {
-		id : number;
-		latitude : number;
-		longitude : number;
-		radius : number;
-		strokeWidth : number;
-		strokeColor : string;
-		fillColor : string;
-		zIndex : number;
-		centerMarker : boolean;
 	};
 	// 地图状态
 	const center = reactive({
@@ -238,29 +213,29 @@
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
-	const markers = ref<Array<UTSJSONObject>>([]) // 标记点
-	const carMarker = ref<UTSJSONObject | null>(null) // 车辆标记点
-	const circles = ref<Array<CircleOverlay>>([]) // 圆形围栏
+	const markers = ref<Array<Marker>>([]) // 标记点
+	const carMarker = ref<Marker | null>(null) // 车辆标记点
+	const circles = ref<Array<Circle>>([]) // 圆形围栏
 	const carInFence = ref(false) // 车辆是否在围栏内
 
 	// 电子围栏相关状态
 	const isDrawing = ref(false)
 	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
 	const points = ref<Array<Coordinate>>([])
-	const polygons = ref<Array<any>>([]) // 存储地理围栏多边形数据
+	const polygons = ref<Array<Polygon>>([]) // 存储地理围栏多边形数据
 	const circleCenter = ref<Coordinate | null>(null);
 	const circleRadius = ref(0) // 圆形围栏半径（米）
 	const currentSpeed = ref(0)
 	const currentAddress = ref('获取中...')
 	const currentCar = ref<string | null>('京A12345')
 	const lastDirection = ref(0)
-	const showFenceModal = ref<PopupInstance | null>(null)
+	const showFenceModal = ref<ComponentPublicInstance | null>(null)
 
 	// 围栏管理状态
 	const fenceList = ref<Array<UTSJSONObject>>([])
 	const selectedFence = ref<UTSJSONObject | null>(null)
-	const fencesPopup = ref<PopupInstance | null>(null)
-	const editDialogPopup = ref<PopupInstance | null>(null)
+	const fencesPopup = ref<ComponentPublicInstance | null>(null)
+	const editDialogPopup = ref<ComponentPublicInstance | null>(null)
 	const editingFence = ref<UTSJSONObject | null>(null)
 	const alarmTypeOptions = ['0', '1', '2', '3']
 	const fenceForm = reactive<FenceForm>({
@@ -269,7 +244,7 @@
 	})
 
 	// 设备绑定状态
-	const deviceDialogPopup = ref<PopupInstance | null>(null)
+	const deviceDialogPopup = ref<ComponentPublicInstance | null>(null)
 	const activeTab = ref('bind')
 	const deviceList = ref<Array<UTSJSONObject>>([]) // 当前显示的设备列表
 	const boundDevices = ref<Array<UTSJSONObject>>([]) // 已绑定设备完整列表
@@ -338,7 +313,7 @@
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
-					const position = {
+					const position : LocationObject = {
 						latitude: convertedCoord.lat,
 						longitude: convertedCoord.lng
 					}
@@ -363,7 +338,7 @@
 							borderRadius: 4,
 							display: 'ALWAYS'
 						}
-					}
+					} as Marker
 
 					// 更新标记点数组，保留车辆标记点
 					const marker = carMarker.value
@@ -457,7 +432,7 @@
 	}
 
 	function updateMarkers() : void {
-		const newMarkers : Array<UTSJSONObject> = []
+		const newMarkers : Array<Marker> = []
 
 		// 首先添加车辆标记点
 		if (carMarker.value) {
@@ -478,7 +453,7 @@
 						height: 32,
 						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
 						anchor: { x: 0.5, y: 0.5 }
-					})
+					} as Marker)
 				})
 			} else if (drawingMode.value === 'circle' && circleCenter.value) {
 				// 圆形圆心标记
@@ -491,7 +466,7 @@
 					height: 32,
 					callout: { content: '圆心', display: 'ALWAYS' },
 					anchor: { x: 0.5, y: 0.5 }
-				})
+				} as Marker)
 			}
 		} else {
 			const selected = selectedFence.value
@@ -514,7 +489,7 @@
 						height: 32,
 						callout: { content: '圆心', display: 'ALWAYS' },
 						anchor: { x: 0.5, y: 0.5 }
-					})
+					} as Marker)
 				}
 			} else {
 				const fencePoints = parsePolygon(area)
@@ -528,7 +503,7 @@
 						height: 32,
 						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
 						anchor: { x: 0.5, y: 0.5 }
-					})
+					} as Marker)
 				})
 			}
 		}
@@ -545,8 +520,8 @@
 			return;
 		}
 
-		const fencePolygons : Array<any> = []
-		const fenceCircles : Array<CircleOverlay> = []
+		const fencePolygons : Array<Polygon> = []
+		const fenceCircles : Array<Circle> = []
 		let colorIndex = 0
 
 		// 为每个围栏创建多边形或圆形
@@ -561,29 +536,25 @@
 					const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
 
 					fenceCircles.push({
-						id: fence.getNumber('id', 0),
 						latitude: circleData.latitude,
 						longitude: circleData.longitude,
 						radius: displayRadius,
 						strokeWidth: 2,
-						strokeColor: '#FF0000',
-						fillColor: `rgba(255,0,0,0.2)`,
-						zIndex: 1,
-						centerMarker: true
-					})
+						color: '#FF0000',
+						fillColor: `rgba(255,0,0,0.2)`
+					} as Circle)
 				}
 			} else {
 				// 处理多边形围栏
 				const fencePoints = parsePolygon(fence.getString('area', ''))
 				if (fencePoints.length >= 3) {
 					fencePolygons.push({
-						id: fence.getNumber('id', 0),
 						points: fencePoints,
 						strokeWidth: 2,
 						strokeColor: '#FF0000',
-						fillColor: colorIndex++ === 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+						fillColor: colorIndex++ == 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
 						zIndex: 1
-					})
+					} as Polygon)
 				}
 			}
 		})
@@ -613,22 +584,19 @@
 					strokeColor: '#FF0000',
 					fillColor: 'rgba(255,0,0,0.2)',
 					zIndex: 1
-				}] : []
+				} as Polygon] : []
 				circles.value = []
 			} else if (drawingMode.value === 'circle') {
 				const drawingCenter = circleCenter.value
 				if (drawingCenter != null && circleRadius.value > 0) {
-					const drawingCircle : CircleOverlay = {
-						id: 0,
+					const drawingCircle : Circle = {
 						latitude: drawingCenter.latitude,
 						longitude: drawingCenter.longitude,
 						radius: circleRadius.value,
 						strokeWidth: 2,
-						strokeColor: '#FF0000',
-						fillColor: 'rgba(255,0,0,0.2)',
-						zIndex: 1,
-						centerMarker: false
-					}
+						color: '#FF0000',
+						fillColor: 'rgba(255,0,0,0.2)'
+					} as Circle
 					circles.value = [drawingCircle]
 				} else {
 					circles.value = []
@@ -644,7 +612,7 @@
 	const loadGeofenceList = async () => {
 		try {
 			const res = await getGeofenceList()
-			if (res.code === 0) {
+			if (res.code == 0) {
 				fenceList.value = res.data;
 			} else {
 				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
@@ -741,7 +709,7 @@
 			}
 		} else {
 			const fencePoints = parsePolygon(area)
-			if (fencePoints.length === 0) return
+			if (fencePoints.length == 0) return
 
 			// 计算中心点
 			let totalLat = 0
@@ -770,14 +738,14 @@
 
 	// 显示围栏列表
 	const showFenceList = () => {
-		fencesPopup.value?.open()
+		fencesPopup.value?.$callMethod('open')
 	}
 
 	// 选择围栏
 	const selectFence = (fence : UTSJSONObject) : void => {
 		selectedFence.value = fence
-		fencesPopup.value?.close()
-		showFenceModal.value?.open()
+		fencesPopup.value?.$callMethod('close')
+		showFenceModal.value?.$callMethod('open')
 
 		// 根据围栏类型显示
 		const fenceType = getFenceType(fence)
@@ -836,13 +804,13 @@
 		updateMapDisplay()
 		
 		// 打开编辑对话框
-		editDialogPopup.value?.open()
+		editDialogPopup.value?.$callMethod('open')
 	}
 
 	async function deleteFenceById(id : string) : Promise<void> {
 		try {
 			const result = await deleteGeofence(id)
-			if (result.code === 0) {
+			if (result.code == 0) {
 				uni.showToast({ title: '删除成功' })
 				selectedFence.value = null
 				points.value = []
@@ -852,7 +820,7 @@
 				polygons.value = []
 				circles.value = []
 				updateMarkers()
-				showFenceModal.value?.close()
+				showFenceModal.value?.$callMethod('close')
 				await loadGeofenceList()
 			} else {
 				uni.showToast({ title: '删除失败', icon: 'none' })
@@ -944,9 +912,9 @@
 
 			uni.hideLoading()
 
-			if (result.code === 0) {
+			if (result.code == 0) {
 				uni.showToast({ title: editingFence.value ? '更新成功' : '保存成功' })
-				editDialogPopup.value?.close()
+				editDialogPopup.value?.$callMethod('close')
 				
 				// 重置状态
 				const tempFence = editingFence.value
@@ -962,7 +930,7 @@
 				// 如果是在编辑模式下关闭，取消选中状态
 				if (tempFence) {
 					selectedFence.value = null
-					showFenceModal.value?.close()
+					showFenceModal.value?.$callMethod('close')
 				}
 			} else {
 				uni.showToast({ title: result.msg || '保存失败', icon: 'none' })
@@ -998,7 +966,7 @@
 				geoId: fenceId
 			})
 
-			if (res.code === 0) {
+			if (res.code == 0) {
 				const dataList = res.data.list || []
 				if (page.pageNum === 1) {
 					boundDevices.value = dataList
@@ -1029,7 +997,7 @@
 				pageSize: page.pageSize
 			})
 
-			if (res.code === 0) {
+			if (res.code == 0) {
 				const dataList = res.data.list || []
 				if (page.pageNum === 1) {
 					deviceList.value = dataList
@@ -1053,7 +1021,7 @@
 		currentFenceId.value = fenceId
 		const selected = selectedFence.value
 		currentFenceName.value = selected != null ? selected.getString('name', '') : ''
-		deviceDialogPopup.value?.open()
+		deviceDialogPopup.value?.$callMethod('open')
 		activeTab.value = 'bind'
 		scrollTop.value = 0
 		// 初始化分页状态并加载第一页
@@ -1063,7 +1031,7 @@
 
 	// 关闭设备绑定弹窗
 	const closeDeviceDialog = () => {
-		deviceDialogPopup.value?.close()
+		deviceDialogPopup.value?.$callMethod('close')
 		scrollTop.value = 0
 	}
 
@@ -1117,7 +1085,7 @@
 				result = await unbindDevices(params)
 			}
 
-			if (result.code === 0) {
+			if (result.code == 0) {
 				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)
@@ -1185,11 +1153,11 @@
 	}
 
 	function closeFenceList() : void {
-		fencesPopup.value?.close()
+		fencesPopup.value?.$callMethod('close')
 	}
 
 	function closeEditDialog() : void {
-		editDialogPopup.value?.close()
+		editDialogPopup.value?.$callMethod('close')
 	}
 
 	function getSelectedFenceName() : string {
@@ -1249,16 +1217,21 @@
 	}
 
 	// 处理地图点击事件
-	const handleMapTap = (e : MapTapEvent) : void => {
+	const handleMapTap = (e : UniMapTapEvent) : void => {
+		const detail = e.detail
+		if (!isDrawing.value || detail == null || detail.latitude == null || detail.longitude == null) return
+
+		const latitude = detail.latitude
+		const longitude = detail.longitude
 		if (isDrawing.value) {
 			if (drawingMode.value === 'polygon') {
-				addNewPoint(e.detail.latitude, e.detail.longitude)
+				addNewPoint(latitude, longitude)
 			} else if (drawingMode.value === 'circle') {
 				if (!circleCenter.value) {
 					// 第一次点击设置圆心
 					circleCenter.value = {
-						latitude: e.detail.latitude,
-						longitude: e.detail.longitude
+						latitude: latitude,
+						longitude: longitude
 					}
 					// 添加圆心标记
 					updateMapDisplay()
@@ -1267,8 +1240,8 @@
 					const radius = calculateDistance(
 						circleCenter.value.latitude,
 						circleCenter.value.longitude,
-						e.detail.latitude,
-						e.detail.longitude
+						latitude,
+						longitude
 					)
 					// 限制最小半径为10米
 					circleRadius.value = radius < 10 ? 10 : radius
@@ -1292,7 +1265,7 @@
 
 		// 弹出编辑对话框
 		fenceForm.name = `${drawingMode.value === 'circle' ? '圆形' : '多边形'}围栏${fenceList.value.length + 1}`
-		editDialogPopup.value?.open()
+		editDialogPopup.value?.$callMethod('open')
 	}
 
 	// 更新标记点数组，保留车辆标记点
@@ -1309,7 +1282,7 @@
 				strokeColor: '#FF0000',
 				fillColor: 'rgba(255,0,0,0.2)',
 				zIndex: 1
-			}] : []
+			} as Polygon] : []
 		} else {
 			polygons.value = []
 		}
@@ -1323,10 +1296,9 @@
 				longitude: circleCenter.value.longitude,
 				radius: circleRadius.value,
 				strokeWidth: 2,
-				strokeColor: '#FF0000',
-				fillColor: 'rgba(255,0,0,0.2)',
-				zIndex: 1
-			}]
+				color: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)'
+			} as Circle]
 		} else {
 			circles.value = []
 		}
@@ -1383,11 +1355,8 @@
 				z-index: 100;
 				background-color: rgba(255, 255, 255, 0.9);
 				padding: 16rpx;
-				text-align: center;
-				font-size: 28rpx;
-				color: #00aa00;
-				font-weight: bold;
 				box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
+
 			}
 
 		}
@@ -1463,15 +1432,14 @@
 				display: flex;
 				flex-direction: column;
 				padding: 20rpx 0;
-				font-size: 28rpx;
-				color: #333;
 				border-top: 1rpx solid #eee;
+
 
 			}
 		}
 
 		.fence-list {
-			height: 70%;
+			height: 100%;
 			background-color: #fff;
 
 			.list-header {
@@ -1539,10 +1507,14 @@
 
 			.dialog-header {
 				padding: 30rpx;
+				border-bottom: 1rpx solid #eee;
+			}
+
+			.dialog-title {
+				display: block;
 				text-align: center;
 				font-size: 32rpx;
 				font-weight: bold;
-				border-bottom: 1rpx solid #eee;
 			}
 
 			.dialog-content {

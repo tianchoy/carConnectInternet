@@ -4,7 +4,7 @@
  * 坐标转换工具类
  * 提供WGS84与腾讯地图坐标系之间的高精度转换
  */
-type Coordinate = {
+export type Coordinate = {
     lat: number
     lng: number
 }

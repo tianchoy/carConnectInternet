@@ -5,22 +5,23 @@ const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  const _component_marker = common_vendor.resolveComponent("marker");
   const _easycom_sub_navBar_1 = common_vendor.resolveComponent("sub-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
   const _easycom_i_slider_1 = common_vendor.resolveComponent("i-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _component_marker + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 const _easycom_i_slider = () => "../../uni_modules/i-ui-x/components/i-slider/i-slider.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
 }
 class TrackPoint extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -74,36 +75,7 @@ class TrackBounds extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class PolylineData extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          points: { type: "Unknown", optional: false },
-          color: { type: String, optional: false },
-          width: { type: Number, optional: false },
-          arrowLine: { type: Boolean, optional: false },
-          borderColor: { type: String, optional: false },
-          borderWidth: { type: Number, optional: false }
-        };
-      },
-      name: "PolylineData"
-    };
-  }
-  constructor(options, metadata = PolylineData.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.points = this.__props__.points;
-    this.color = this.__props__.color;
-    this.width = this.__props__.width;
-    this.arrowLine = this.__props__.arrowLine;
-    this.borderColor = this.__props__.borderColor;
-    this.borderWidth = this.__props__.borderWidth;
-    delete this.__props__;
-  }
-}
-class CoordinatePoint extends common_vendor.UTS.UTSType {
+class MapPolylinePoint extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -113,10 +85,10 @@ class CoordinatePoint extends common_vendor.UTS.UTSType {
           longitude: { type: Number, optional: false }
         };
       },
-      name: "CoordinatePoint"
+      name: "MapPolylinePoint"
     };
   }
-  constructor(options, metadata = CoordinatePoint.get$UTSMetadata$(), isJSONParse = false) {
+  constructor(options, metadata = MapPolylinePoint.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.latitude = this.__props__.latitude;
@@ -124,40 +96,34 @@ class CoordinatePoint extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class CarMarker extends common_vendor.UTS.UTSType {
+class MpPolylineData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
       get fields() {
         return {
-          id: { type: Number, optional: false },
-          latitude: { type: Number, optional: false },
-          longitude: { type: Number, optional: false },
-          iconPath: { type: String, optional: false },
+          points: { type: "Unknown", optional: false },
+          color: { type: String, optional: false },
           width: { type: Number, optional: false },
-          height: { type: Number, optional: false },
-          rotate: { type: Number, optional: false },
-          anchor: { type: "Unknown", optional: false },
-          callout: { type: "Unknown", optional: false },
-          animation: { type: "Unknown", optional: false }
+          dottedLine: { type: Boolean, optional: false },
+          arrowLine: { type: Boolean, optional: false },
+          borderColor: { type: String, optional: false },
+          borderWidth: { type: Number, optional: false }
         };
       },
-      name: "CarMarker"
+      name: "MpPolylineData"
     };
   }
-  constructor(options, metadata = CarMarker.get$UTSMetadata$(), isJSONParse = false) {
+  constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.id = this.__props__.id;
-    this.latitude = this.__props__.latitude;
-    this.longitude = this.__props__.longitude;
-    this.iconPath = this.__props__.iconPath;
+    this.points = this.__props__.points;
+    this.color = this.__props__.color;
     this.width = this.__props__.width;
-    this.height = this.__props__.height;
-    this.rotate = this.__props__.rotate;
-    this.anchor = this.__props__.anchor;
-    this.callout = this.__props__.callout;
-    this.animation = this.__props__.animation;
+    this.dottedLine = this.__props__.dottedLine;
+    this.arrowLine = this.__props__.arrowLine;
+    this.borderColor = this.__props__.borderColor;
+    this.borderWidth = this.__props__.borderWidth;
     delete this.__props__;
   }
 }
@@ -286,99 +252,103 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function initCarMarker() {
       var _a, _b;
-      if (trackPoints.value.length > 0) {
-        const firstPoint = trackPoints.value[0];
-        const marker = new CarMarker({
-          id: 999,
-          latitude: firstPoint.latitude,
-          longitude: firstPoint.longitude,
-          iconPath: utils_cars.getDeviceIcon((_a = carStatus.value) !== null && _a !== void 0 ? _a : "", (_b = carType.value) !== null && _b !== void 0 ? _b : ""),
-          width: 25,
-          height: 25,
-          rotate: firstPoint.rotation,
-          anchor: new common_vendor.UTSJSONObject({}),
-          callout: new common_vendor.UTSJSONObject({}),
-          animation: new common_vendor.UTSJSONObject({})
+      if (trackPoints.value.length == 0)
+        return null;
+      const firstPoint = trackPoints.value[0];
+      const marker = {
+        id: 999,
+        latitude: firstPoint.latitude,
+        longitude: firstPoint.longitude,
+        iconPath: utils_cars.getDeviceIcon((_a = carStatus.value) !== null && _a !== void 0 ? _a : "", (_b = carType.value) !== null && _b !== void 0 ? _b : ""),
+        width: 25,
+        height: 25,
+        rotate: firstPoint.rotation,
+        anchor: { x: 0.5, y: 0.5 }
+      };
+      carMarker.value = marker;
+      const startMarker = {
+        id: 1e3,
+        latitude: firstPoint.latitude,
+        longitude: firstPoint.longitude,
+        iconPath: "/static/start.png",
+        width: 24,
+        height: 24,
+        anchor: { x: 0.5, y: 0.5 },
+        callout: new common_vendor.UTSJSONObject({ content: "起点", borderRadius: 5, padding: 5, display: "BYCLICK" })
+      };
+      const lastPoint = trackPoints.value[trackPoints.value.length - 1];
+      const endMarker = {
+        id: 1001,
+        latitude: lastPoint.latitude,
+        longitude: lastPoint.longitude,
+        iconPath: "/static/end.png",
+        width: 24,
+        height: 24,
+        anchor: { x: 0.5, y: 0.5 },
+        callout: new common_vendor.UTSJSONObject({ content: "终点", borderRadius: 5, padding: 5, display: "BYCLICK" })
+      };
+      markers.value = [marker, startMarker, endMarker];
+    }
+    function toMpPoints(points) {
+      return points.map((point) => {
+        return new MapPolylinePoint({
+          latitude: point.latitude,
+          longitude: point.longitude
         });
-        carMarker.value = marker;
-        const startMarker = new common_vendor.UTSJSONObject({
-          id: 1e3,
-          latitude: trackPoints.value[0].latitude,
-          longitude: trackPoints.value[0].longitude,
-          iconPath: "/static/start.png",
-          width: 24,
-          height: 24,
-          // anchor: { x: 0.5, y: 0.5 },
-          callout: new common_vendor.UTSJSONObject({
-            content: "起点",
-            borderRadius: 5,
-            padding: 5,
-            display: "BYCLICK"
-          })
-        });
-        const endMarker = new common_vendor.UTSJSONObject({
-          id: 1001,
-          latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-          longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-          iconPath: "/static/end.png",
-          width: 24,
-          height: 24,
-          // anchor: { x: 0.5, y: 0.5 },
-          callout: new common_vendor.UTSJSONObject({
-            content: "终点",
-            borderRadius: 5,
-            padding: 5,
-            display: "BYCLICK"
-          })
-        });
-        markers.value = [marker, startMarker, endMarker];
-      }
+      });
     }
     function updatePolyline() {
-      if (!trackPoints.value || trackPoints.value.length < 2) {
+      if (trackPoints.value.length < 2) {
         polyline.value = [];
         return null;
       }
-      const newPolyline = [];
+      const lines = [];
+      const unplayedPoints = trackPoints.value.slice(currentIndex.value);
+      if (unplayedPoints.length >= 2) {
+        lines.push(new MpPolylineData({
+          points: toMpPoints(unplayedPoints),
+          color: "#999999",
+          width: 3,
+          dottedLine: true,
+          arrowLine: false,
+          borderColor: "#FFFFFF",
+          borderWidth: 1
+        }));
+      }
       if (currentIndex.value > 0) {
-        const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
-        if (playedPoints.length >= 2) {
-          newPolyline.push(new PolylineData({
-            points: playedPoints.map((point) => {
-              return new CoordinatePoint({ latitude: point.latitude, longitude: point.longitude });
-            }),
-            color: "#1890FF",
-            width: 6,
-            arrowLine: true,
-            borderColor: "#FFF",
-            borderWidth: 1
-          }));
-        }
+        lines.push(new MpPolylineData({
+          points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
+          color: "#1890FF",
+          width: 6,
+          dottedLine: false,
+          arrowLine: true,
+          borderColor: "#FFFFFF",
+          borderWidth: 1
+        }));
       }
-      if (currentIndex.value < trackPoints.value.length - 1) {
-        const unplayedPoints = trackPoints.value.slice(currentIndex.value);
-        if (unplayedPoints.length >= 2) {
-          newPolyline.push(new PolylineData({
-            arrowLine: null,
-            points: unplayedPoints.map((point) => {
-              return new CoordinatePoint({ latitude: point.latitude, longitude: point.longitude });
-            }),
-            color: "#999",
-            width: 3,
-            borderColor: "#FFF",
-            borderWidth: 1
-          }));
-        }
-      }
-      polyline.value = newPolyline;
+      polyline.value = lines;
+    }
+    function initPolyline() {
+      updatePolyline();
     }
     function updateCarPosition() {
       const marker = carMarker.value;
       if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
         const point = trackPoints.value[currentIndex.value];
-        marker.latitude = point.latitude;
-        marker.longitude = point.longitude;
-        marker.rotate = point.rotation;
+        const updatedMarker = {
+          id: marker.id,
+          latitude: point.latitude,
+          longitude: point.longitude,
+          iconPath: marker.iconPath,
+          width: marker.width,
+          height: marker.height,
+          rotate: point.rotation,
+          anchor: marker.anchor,
+          callout: marker.callout,
+          label: marker.label
+        };
+        carMarker.value = updatedMarker;
+        markers.value = [updatedMarker, ...markers.value.slice(1)];
         if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
           center.latitude = point.latitude;
           center.longitude = point.longitude;
@@ -415,7 +385,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         // 初始化小车标记
       );
-      const marker = new CarMarker({
+      const marker = {
         id: 999,
         latitude: currentPoint.latitude,
         longitude: currentPoint.longitude,
@@ -423,10 +393,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         width: 25,
         height: 25,
         rotate: 0,
-        anchor: new common_vendor.UTSJSONObject({}),
-        callout: new common_vendor.UTSJSONObject({}),
-        animation: new common_vendor.UTSJSONObject({})
-      });
+        anchor: { x: 0.5, y: 0.5 }
+      };
       carMarker.value = marker;
       markers.value = [marker];
     }
@@ -459,7 +427,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       trackPoints.value = processedPoints;
       calculateTrackDistance();
       initCarMarker();
-      updatePolyline();
+      initPolyline();
       adjustMapToFitTrack();
       if (trackPoints.value.length > 0) {
         currentTime.value = trackPoints.value[0].deviceTime;
@@ -467,6 +435,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     const loadTrackPos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c;
         common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中..." }));
         const data = new common_vendor.UTSJSONObject({
           imei: imei.value,
@@ -477,14 +446,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           withPos: true,
           withTrip: false
         });
-        const res = yield api_request.getTrackPos(data);
-        const trackData = res.data;
-        const positions = trackData === null || trackData === void 0 ? null : trackData.getArray("positions");
-        if (positions != null && positions.length > 0) {
-          processTrackData(positions);
-          common_vendor.index.hideLoading();
-        } else {
-          showCurrentPosition();
+        try {
+          const res = yield api_request.getTrackPos(data);
+          const positions = (_a = res.data) === null || _a === void 0 ? null : _a.getArray("positions");
+          if (positions != null && positions.length > 0) {
+            processTrackData(positions);
+          } else {
+            showCurrentPosition();
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:539", "加载轨迹失败:", error);
+          common_vendor.index.showToast({ title: "轨迹加载失败", icon: "none" });
+          if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
+            showCurrentPosition();
+          }
+        } finally {
           common_vendor.index.hideLoading();
         }
       });
@@ -505,7 +481,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentTime.value = trackPoints.value[0].deviceTime;
       }
       updateCarPosition();
-      updatePolyline();
+      initPolyline();
     }
     function playNextPoint() {
       if (currentIndex.value >= trackPoints.value.length - 1) {
@@ -588,16 +564,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     common_vendor.onLoad((option) => {
-      var _a, _b, _c, _d, _f, _g, _h, _j;
+      var _a, _b, _c, _d, _e, _f, _g, _h;
       imei.value = (_a = option.imei) !== null && _a !== void 0 ? _a : null;
       carStatus.value = (_b = option.connectionStatus) !== null && _b !== void 0 ? _b : "";
       plateNo.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "";
       carType.value = (_d = option.carType) !== null && _d !== void 0 ? _d : "";
-      lat.value = (_f = option.lat) !== null && _f !== void 0 ? _f : null;
-      lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
-      sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
-      eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:658", sTime.value, eTime.value);
+      lat.value = (_e = option.lat) !== null && _e !== void 0 ? _e : null;
+      lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
+      sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
+      eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:687", sTime.value, eTime.value);
       if (sTime.value != "" && eTime.value != "") {
         startTime.value = sTime.value;
         endTime.value = eTime.value;
@@ -612,7 +588,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = common_vendor.e({
+      const __returned__ = {
         a: common_vendor.p({
           title: "轨迹回放",
           ["show-back"]: true,
@@ -620,82 +596,70 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: carMarker.value
-      }, carMarker.value ? {
-        c: carMarker.value.id,
-        d: common_vendor.p({
-          id: carMarker.value.id,
-          latitude: carMarker.value.latitude,
-          longitude: carMarker.value.longitude,
-          iconPath: carMarker.value.iconPath,
-          width: carMarker.value.width,
-          height: carMarker.value.height,
-          rotate: carMarker.value.rotate,
-          anchor: carMarker.value.anchor,
-          callout: carMarker.value.callout,
-          animation: carMarker.value.animation
-        })
-      } : {}, {
-        e: common_vendor.p({
+        b: common_vendor.sei("myMap", "map"),
+        c: center.latitude,
+        d: center.longitude,
+        e: markers.value,
+        f: polyline.value,
+        g: mapScale.value,
+        h: common_vendor.p({
           showTime: false,
           currentCar: plateNo.value,
           showCar: true,
           carStatus: carStatus.value
         }),
-        f: common_vendor.sei("myMap", "map"),
-        g: center.latitude,
-        h: center.longitude,
-        i: markers.value,
-        j: polyline.value,
-        k: mapScale.value,
-        l: common_vendor.p({
+        i: common_vendor.p({
           name: "/static/rili.png",
           fontSize: "15"
         }),
-        m: common_vendor.t(startTime.value),
-        n: common_vendor.o(($event) => {
+        j: common_vendor.t(startTime.value),
+        k: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "6b"),
-        o: common_vendor.t(endTime.value),
-        p: common_vendor.o(($event) => {
+        }, "ca"),
+        l: common_vendor.t(endTime.value),
+        m: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "9b"),
-        q: common_vendor.t(isPlaying.value ? "暂停" : "播放"),
-        r: common_vendor.o(togglePlayback, "7b"),
-        s: common_vendor.o(setPlaybackSpeed, "c6"),
-        t: common_vendor.o(($event) => {
+        }, "49"),
+        n: common_vendor.o(togglePlayback, "2e"),
+        o: common_vendor.p({
+          type: "primary",
+          size: "small",
+          text: isPlaying.value ? "暂停" : "播放"
+        }),
+        p: common_vendor.o(setPlaybackSpeed, "75"),
+        q: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "f7"),
-        v: common_vendor.p({
+        }, "63"),
+        r: common_vendor.p({
           min: 1,
           max: 10,
           modelValue: playbackSpeed.value
         }),
-        w: common_vendor.t(playbackSpeed.value),
-        x: common_vendor.t(currentTime.value),
-        y: common_vendor.t(currentSpeed.value),
-        z: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        A: common_vendor.o(onConfirm, "af"),
-        B: common_vendor.o(onCancel, "ae"),
-        C: common_vendor.p({
+        s: common_vendor.t(playbackSpeed.value),
+        t: common_vendor.t(currentTime.value),
+        v: common_vendor.t(currentSpeed.value),
+        w: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
+        x: common_vendor.o(onConfirm, "82"),
+        y: common_vendor.o(onCancel, "c9"),
+        z: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
           mode: 1 | 2 | 4 | 8 | 16 | 32
         }),
-        D: common_vendor.o(($event) => {
+        A: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "ed"),
-        E: common_vendor.p({
+        }, "93"),
+        B: common_vendor.p({
           position: "bottom",
           closeable: false,
           modelValue: showDateTimePicker.value
         }),
-        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        G: `${_ctx.u_s_b_h}px`,
-        H: `${_ctx.u_s_a_i_b}px`,
-        I: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
-      });
+        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        D: `${_ctx.u_s_b_h}px`,
+        E: `${_ctx.u_s_a_i_b}px`,
+        F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      };
       return __returned__;
     };
   }

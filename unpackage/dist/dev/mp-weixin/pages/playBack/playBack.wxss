@@ -112,7 +112,7 @@
   align-items: center;
 }
 .container .tools-panel .play-back-info .info-label {
-  font-size: 25rpx;
+  font-size: 24rpx;
   padding: 10rpx 0;
   color: #999;
 }

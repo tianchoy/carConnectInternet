@@ -26,7 +26,10 @@
 /* 透明度 */
 /* 文章场景相关 */
 .container {
+  min-height: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: #f5f7fa;
   padding-bottom: 20rpx;
 }
@@ -80,12 +83,14 @@
   font-weight: bold;
 }
 .container .content {
+  flex: 1;
   margin: 0 20rpx;
   background-color: #fff;
   border-radius: 20rpx;
 }
 .container .content .trip-list {
   width: 100%;
+  padding-bottom: 20rpx;
 }
 .container .content .trip-list .trip-group {
   padding: 20rpx;

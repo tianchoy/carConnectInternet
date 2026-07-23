@@ -27,6 +27,8 @@
 /* 文章场景相关 */
 .container {
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: #f5f7fa;
 }
 .container .tools-panel {
@@ -62,7 +64,9 @@
   align-items: center;
 }
 .container .content-box {
-  height: 80%;
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 30rpx;
 }
 .container .content {
   background-color: #fff;

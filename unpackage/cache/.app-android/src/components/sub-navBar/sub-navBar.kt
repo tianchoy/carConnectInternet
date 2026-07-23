@@ -42,19 +42,19 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
                 currentPickerType.value = "car"
             }
             return fun(): Any? {
-                return _cE("cover-view", _uM("class" to "tools-box"), _uA(
+                return _cE("view", _uM("class" to "tools-box"), _uA(
                     if (isTrue(_ctx.showTime)) {
-                        _cE("cover-view", _uM("key" to 0, "class" to "second", "onClick" to fun(){
+                        _cE("view", _uM("key" to 0, "class" to "second", "onClick" to fun(){
                             if (_ctx.showPickerTime) {
                                 handleTime
                             } else {
                                 null
                             }
                         }), _uA(
-                            _cE("cover-view", _uM("class" to "times"), _uA(
-                                _cE("cover-view", null, _tD(_ctx.currentTime), 1),
+                            _cE("view", _uM("class" to "times"), _uA(
+                                _cE("text", null, _tD(_ctx.currentTime), 1),
                                 if (isTrue(!_ctx.showPickerTime)) {
-                                    _cE("cover-view", _uM("key" to 0), "刷新一次位置")
+                                    _cE("text", _uM("key" to 0), "刷新一次位置")
                                 } else {
                                     _cC("v-if", true)
                                 }
@@ -63,19 +63,19 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
                             "onClick"
                         ))
                     } else {
-                        _cE("cover-view", _uM("key" to 1, "class" to "slot"))
+                        _cE("view", _uM("key" to 1, "class" to "slot"))
                     }
                     ,
-                    _cE("cover-view", _uM("class" to "car-box"), _uA(
+                    _cE("view", _uM("class" to "car-box"), _uA(
                         if (isTrue(_ctx.showCar)) {
-                            _cE("cover-view", _uM("key" to 0, "class" to "selectCar", "onClick" to fun(){
+                            _cE("view", _uM("key" to 0, "class" to "selectCar", "onClick" to fun(){
                                 if (_ctx.showPicker) {
                                     handleCar
                                 } else {
                                     null
                                 }
                             }), _uA(
-                                _cE("cover-view", _uM("class" to "plateNo"), _tD(_ctx.currentCar), 1)
+                                _cE("text", _uM("class" to "plateNo"), _tD(_ctx.currentCar), 1)
                             ), 8, _uA(
                                 "onClick"
                             ))
@@ -83,7 +83,7 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
                             _cC("v-if", true)
                         }
                         ,
-                        _cE("cover-view", _uM("class" to _nC(_uA(
+                        _cE("view", _uM("class" to _nC(_uA(
                             "car-state",
                             if (_ctx.carStatus == "online") {
                                 "success"
@@ -91,7 +91,7 @@ open class GenComponentsSubNavBarSubNavBar : VueComponent {
                                 "error"
                             }
                         ))), _uA(
-                            _cE("cover-view", _uM("class" to "state"), _tD(if (_ctx.carStatus == "online") {
+                            _cE("text", _uM("class" to "state"), _tD(if (_ctx.carStatus == "online") {
                                 "在线"
                             } else {
                                 "离线"

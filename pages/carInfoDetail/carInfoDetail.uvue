@@ -36,7 +36,7 @@
 					</view>
 				</view>
 				<!-- 信号强度显示区域 -->
-				<view class="signal-container" v-if="signalRssi != null || signalSat != null">
+				<view class="signal-container">
 					<view v-if="signalRssi != null" class="signal-item">
 						<view class="mobile-signal">
 							<view class="signal-bars-horizontal">
@@ -1010,7 +1010,7 @@
 				.pos-adress {
 					display: flex;
 					flex-direction: row;
-					justify-content: flex-start;
+					justify-content: space-between;
 					align-items: center;
 					
 

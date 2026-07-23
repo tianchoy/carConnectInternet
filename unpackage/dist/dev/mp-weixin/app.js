@@ -30,16 +30,16 @@ function checkForUpdates() {
     updateManager = common_vendor.index.getUpdateManager();
     if (updateManager) {
       updateManager.onCheckForUpdate((res = null) => {
-        common_vendor.index.__f__("log", "at App.uvue:18", "检查更新结果:", res);
+        common_vendor.index.__f__("log", "at App.uvue:16", "检查更新结果:", res);
         if (res.hasUpdate) {
-          common_vendor.index.__f__("log", "at App.uvue:21", "发现新版本，正在后台下载...");
+          common_vendor.index.__f__("log", "at App.uvue:19", "发现新版本，正在后台下载...");
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "下载新版本中"
           }));
         }
       });
       updateManager.onUpdateReady(() => {
-        common_vendor.index.__f__("log", "at App.uvue:30", "新版本下载完成");
+        common_vendor.index.__f__("log", "at App.uvue:28", "新版本下载完成");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新提示",
@@ -54,7 +54,7 @@ function checkForUpdates() {
         }));
       });
       updateManager.onUpdateFailed(() => {
-        common_vendor.index.__f__("error", "at App.uvue:50", "新版本下载失败");
+        common_vendor.index.__f__("error", "at App.uvue:48", "新版本下载失败");
         common_vendor.index.hideLoading();
         common_vendor.index.showModal(new common_vendor.UTSJSONObject({
           title: "更新失败",
@@ -74,17 +74,17 @@ function checkForUpdates() {
 }
 const _sfc_main = common_vendor.defineComponent({
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.uvue:75", "App onLaunch");
+    common_vendor.index.__f__("log", "at App.uvue:73", "App onLaunch");
     checkForUpdates();
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.uvue:80", "App Show");
+    common_vendor.index.__f__("log", "at App.uvue:77", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.uvue:83", "App Hide");
+    common_vendor.index.__f__("log", "at App.uvue:80", "App Hide");
   },
   onExit: function() {
-    common_vendor.index.__f__("log", "at App.uvue:104", "App Exit");
+    common_vendor.index.__f__("log", "at App.uvue:101", "App Exit");
   }
 });
 function createApp() {

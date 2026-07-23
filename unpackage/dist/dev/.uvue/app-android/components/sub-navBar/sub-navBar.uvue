@@ -81,38 +81,38 @@ const __sfc__ = defineComponent({
             __ins.emit(event, ...do_not_transform_spread);
         }
         return (): any | null => {
-            return _cE("cover-view", _uM({ class: "tools-box" }), [
+            return _cE("view", _uM({ class: "tools-box" }), [
                 isTrue(_ctx.showTime)
-                    ? _cE("cover-view", _uM({
+                    ? _cE("view", _uM({
                         key: 0,
                         class: "second",
                         onClick: () => { _ctx.showPickerTime ? handleTime : null; }
                     }), [
-                        _cE("cover-view", _uM({ class: "times" }), [
-                            _cE("cover-view", null, _tD(_ctx.currentTime), 1 /* TEXT */),
+                        _cE("view", _uM({ class: "times" }), [
+                            _cE("text", null, _tD(_ctx.currentTime), 1 /* TEXT */),
                             isTrue(!_ctx.showPickerTime)
-                                ? _cE("cover-view", _uM({ key: 0 }), "刷新一次位置")
+                                ? _cE("text", _uM({ key: 0 }), "刷新一次位置")
                                 : _cC("v-if", true)
                         ])
                     ], 8 /* PROPS */, ["onClick"])
-                    : _cE("cover-view", _uM({
+                    : _cE("view", _uM({
                         key: 1,
                         class: "slot"
                     })),
-                _cE("cover-view", _uM({ class: "car-box" }), [
+                _cE("view", _uM({ class: "car-box" }), [
                     isTrue(_ctx.showCar)
-                        ? _cE("cover-view", _uM({
+                        ? _cE("view", _uM({
                             key: 0,
                             class: "selectCar",
                             onClick: () => { _ctx.showPicker ? handleCar : null; }
                         }), [
-                            _cE("cover-view", _uM({ class: "plateNo" }), _tD(_ctx.currentCar), 1 /* TEXT */)
+                            _cE("text", _uM({ class: "plateNo" }), _tD(_ctx.currentCar), 1 /* TEXT */)
                         ], 8 /* PROPS */, ["onClick"])
                         : _cC("v-if", true),
-                    _cE("cover-view", _uM({
+                    _cE("view", _uM({
                         class: _nC(["car-state", _ctx.carStatus == 'online' ? 'success' : 'error'])
                     }), [
-                        _cE("cover-view", _uM({ class: "state" }), _tD(_ctx.carStatus == 'online' ? '在线' : '离线'), 1 /* TEXT */)
+                        _cE("text", _uM({ class: "state" }), _tD(_ctx.carStatus == 'online' ? '在线' : '离线'), 1 /* TEXT */)
                     ], 2 /* CLASS */)
                 ])
             ]);

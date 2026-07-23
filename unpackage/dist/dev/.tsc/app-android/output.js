@@ -2,6 +2,8 @@
 
 require('vue');
 require('java.math.BigDecimal');
+require('uts.sdk.modules.DCloudUniMapTencent.Polyline');
+require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');
 
 const iIcon_uvue_vue_type_style_index_0_lang = {};
 

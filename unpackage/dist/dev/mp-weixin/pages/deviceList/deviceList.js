@@ -232,28 +232,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: showMap.value
       }, showMap.value ? {
         k: common_vendor.o(($event) => {
-          return changeState("在线");
-        }, "e5"),
+          return changeState("全部");
+        }, "4c"),
         l: common_vendor.p({
           type: "primary",
-          text: `在线 ${onlineCount.value}`
+          text: `全部 ${totalCount.value}`
         }),
         m: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "d7"),
+        }, "c1"),
         n: common_vendor.p({
           type: "success",
           text: `在线 ${onlineCount.value}`
         }),
         o: common_vendor.o(($event) => {
           return changeState("离线");
-        }, "e7"),
+        }, "c7"),
         p: common_vendor.p({
           type: "danger",
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "a3"),
+        q: common_vendor.o(unbindDevice, "1d"),
         r: common_vendor.p({
           lists: deviceListItems.value
         })

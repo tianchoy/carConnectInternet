@@ -263,8 +263,8 @@ const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_i
               }), [
                 _cV(_component_i_tag, _uM({
                   type: "primary",
-                  onClick: () => {changeState('在线')},
-                  text: `在线 ${onlineCount.value}`
+                  onClick: () => {changeState('全部')},
+                  text: `全部 ${totalCount.value}`
                 }), null, 8 /* PROPS */, ["onClick", "text"]),
                 _cV(_component_i_tag, _uM({
                   type: "success",

@@ -8,7 +8,7 @@
 				@markertap="handleTap" :latitude="userLocation.latitude" :longitude="userLocation.longitude" :markers="markers" :enable-traffic="true" >
 			</map>
             <view class="right-bar" v-if="showMap">
-				<i-tag type="primary" @click="changeState('在线')" :text="`在线 ${onlineCount}`"></i-tag>
+				<i-tag type="primary" @click="changeState('全部')" :text="`全部 ${totalCount}`"></i-tag>
 			<i-tag type="success" @click="changeState('在线')" :text="`在线 ${onlineCount}`"></i-tag>
 			<i-tag type="danger" @click="changeState('离线')" :text="`离线 ${offlineCount}`"></i-tag>
             </view>

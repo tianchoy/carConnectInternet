@@ -137,20 +137,20 @@ fun checkForUpdates() {}
 open class GenApp : BaseApp {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onLaunch(fun(_: OnLaunchOptions) {
-            console.log("App onLaunch", " at App.uvue:75")
+            console.log("App onLaunch", " at App.uvue:73")
             checkForUpdates()
         }
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
-            console.log("App Show", " at App.uvue:80")
+            console.log("App Show", " at App.uvue:77")
         }
         , __ins)
         onAppHide(fun() {
-            console.log("App Hide", " at App.uvue:83")
+            console.log("App Hide", " at App.uvue:80")
         }
         , __ins)
         onLastPageBackPress(fun() {
-            console.log("App LastPageBackPress", " at App.uvue:87")
+            console.log("App LastPageBackPress", " at App.uvue:84")
             if (firstBackTime == 0) {
                 uni_showToast(ShowToastOptions(title = "再按一次退出应用", position = "bottom"))
                 firstBackTime = Date.now()
@@ -164,7 +164,7 @@ open class GenApp : BaseApp {
         }
         , __ins)
         onExit(fun() {
-            console.log("App Exit", " at App.uvue:104")
+            console.log("App Exit", " at App.uvue:101")
         }
         , __ins)
     }
@@ -847,7 +847,7 @@ open class Coordinate (
     open var lng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Coordinate", "utils/coordTransform.uts", 6, 6)
+        return UTSSourceMapPosition("Coordinate", "utils/coordTransform.uts", 6, 13)
     }
 }
 open class CoordTransform : IUTSSourceMap {
@@ -7175,7 +7175,7 @@ open class TrackPoint (
     open var speed: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 67, 7)
+        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 64, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return TrackPointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7267,333 +7267,10 @@ open class TrackBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 75, 7)
+        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 72, 7)
     }
 }
-open class PolylineData (
-    @JsonNotNull
-    open var points: UTSArray<CoordinatePoint>,
-    @JsonNotNull
-    open var color: String,
-    @JsonNotNull
-    open var width: Number,
-    @JsonNotNull
-    open var arrowLine: Boolean = false,
-    @JsonNotNull
-    open var borderColor: String,
-    @JsonNotNull
-    open var borderWidth: Number,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PolylineData", "pages/playBack/playBack.uvue", 82, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PolylineDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PolylineDataReactiveObject : PolylineData, IUTSReactive<PolylineData> {
-    override var __v_raw: PolylineData
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PolylineData, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(points = __v_raw.points, color = __v_raw.color, width = __v_raw.width, arrowLine = __v_raw.arrowLine, borderColor = __v_raw.borderColor, borderWidth = __v_raw.borderWidth) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PolylineDataReactiveObject {
-        return PolylineDataReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var points: UTSArray<CoordinatePoint>
-        get() {
-            return _tRG(__v_raw, "points", __v_raw.points, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("points")) {
-                return
-            }
-            val oldValue = __v_raw.points
-            __v_raw.points = value
-            _tRS(__v_raw, "points", oldValue, value)
-        }
-    override var color: String
-        get() {
-            return _tRG(__v_raw, "color", __v_raw.color, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("color")) {
-                return
-            }
-            val oldValue = __v_raw.color
-            __v_raw.color = value
-            _tRS(__v_raw, "color", oldValue, value)
-        }
-    override var width: Number
-        get() {
-            return _tRG(__v_raw, "width", __v_raw.width, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("width")) {
-                return
-            }
-            val oldValue = __v_raw.width
-            __v_raw.width = value
-            _tRS(__v_raw, "width", oldValue, value)
-        }
-    override var arrowLine: Boolean
-        get() {
-            return _tRG(__v_raw, "arrowLine", __v_raw.arrowLine, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("arrowLine")) {
-                return
-            }
-            val oldValue = __v_raw.arrowLine
-            __v_raw.arrowLine = value
-            _tRS(__v_raw, "arrowLine", oldValue, value)
-        }
-    override var borderColor: String
-        get() {
-            return _tRG(__v_raw, "borderColor", __v_raw.borderColor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("borderColor")) {
-                return
-            }
-            val oldValue = __v_raw.borderColor
-            __v_raw.borderColor = value
-            _tRS(__v_raw, "borderColor", oldValue, value)
-        }
-    override var borderWidth: Number
-        get() {
-            return _tRG(__v_raw, "borderWidth", __v_raw.borderWidth, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("borderWidth")) {
-                return
-            }
-            val oldValue = __v_raw.borderWidth
-            __v_raw.borderWidth = value
-            _tRS(__v_raw, "borderWidth", oldValue, value)
-        }
-}
-open class CoordinatePoint (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinatePoint", "pages/playBack/playBack.uvue", 90, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return CoordinatePointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class CoordinatePointReactiveObject : CoordinatePoint, IUTSReactive<CoordinatePoint> {
-    override var __v_raw: CoordinatePoint
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: CoordinatePoint, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CoordinatePointReactiveObject {
-        return CoordinatePointReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-}
-open class CarMarker (
-    @JsonNotNull
-    open var id: Number,
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-    @JsonNotNull
-    open var iconPath: String,
-    @JsonNotNull
-    open var width: Number,
-    @JsonNotNull
-    open var height: Number,
-    @JsonNotNull
-    open var rotate: Number,
-    @JsonNotNull
-    open var anchor: UTSJSONObject,
-    @JsonNotNull
-    open var callout: UTSJSONObject,
-    @JsonNotNull
-    open var animation: UTSJSONObject,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarMarker", "pages/playBack/playBack.uvue", 113, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return CarMarkerReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class CarMarkerReactiveObject : CarMarker, IUTSReactive<CarMarker> {
-    override var __v_raw: CarMarker
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: CarMarker, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(id = __v_raw.id, latitude = __v_raw.latitude, longitude = __v_raw.longitude, iconPath = __v_raw.iconPath, width = __v_raw.width, height = __v_raw.height, rotate = __v_raw.rotate, anchor = __v_raw.anchor, callout = __v_raw.callout, animation = __v_raw.animation) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CarMarkerReactiveObject {
-        return CarMarkerReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var id: Number
-        get() {
-            return _tRG(__v_raw, "id", __v_raw.id, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("id")) {
-                return
-            }
-            val oldValue = __v_raw.id
-            __v_raw.id = value
-            _tRS(__v_raw, "id", oldValue, value)
-        }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-    override var iconPath: String
-        get() {
-            return _tRG(__v_raw, "iconPath", __v_raw.iconPath, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("iconPath")) {
-                return
-            }
-            val oldValue = __v_raw.iconPath
-            __v_raw.iconPath = value
-            _tRS(__v_raw, "iconPath", oldValue, value)
-        }
-    override var width: Number
-        get() {
-            return _tRG(__v_raw, "width", __v_raw.width, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("width")) {
-                return
-            }
-            val oldValue = __v_raw.width
-            __v_raw.width = value
-            _tRS(__v_raw, "width", oldValue, value)
-        }
-    override var height: Number
-        get() {
-            return _tRG(__v_raw, "height", __v_raw.height, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("height")) {
-                return
-            }
-            val oldValue = __v_raw.height
-            __v_raw.height = value
-            _tRS(__v_raw, "height", oldValue, value)
-        }
-    override var rotate: Number
-        get() {
-            return _tRG(__v_raw, "rotate", __v_raw.rotate, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("rotate")) {
-                return
-            }
-            val oldValue = __v_raw.rotate
-            __v_raw.rotate = value
-            _tRS(__v_raw, "rotate", oldValue, value)
-        }
-    override var anchor: UTSJSONObject
-        get() {
-            return _tRG(__v_raw, "anchor", __v_raw.anchor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("anchor")) {
-                return
-            }
-            val oldValue = __v_raw.anchor
-            __v_raw.anchor = value
-            _tRS(__v_raw, "anchor", oldValue, value)
-        }
-    override var callout: UTSJSONObject
-        get() {
-            return _tRG(__v_raw, "callout", __v_raw.callout, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("callout")) {
-                return
-            }
-            val oldValue = __v_raw.callout
-            __v_raw.callout = value
-            _tRS(__v_raw, "callout", oldValue, value)
-        }
-    override var animation: UTSJSONObject
-        get() {
-            return _tRG(__v_raw, "animation", __v_raw.animation, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("animation")) {
-                return
-            }
-            val oldValue = __v_raw.animation
-            __v_raw.animation = value
-            _tRS(__v_raw, "animation", oldValue, value)
-        }
-}
+typealias MapMarker = Marker
 val GenPagesPlayBackPlayBackClass = CreateVueComponent(GenPagesPlayBackPlayBack::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesPlayBackPlayBack.inheritAttrs, inject = GenPagesPlayBackPlayBack.inject, props = GenPagesPlayBackPlayBack.props, propsNeedCastKeys = GenPagesPlayBackPlayBack.propsNeedCastKeys, emits = GenPagesPlayBackPlayBack.emits, components = GenPagesPlayBackPlayBack.components, styles = GenPagesPlayBackPlayBack.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesPlayBackPlayBack.setup(props as GenPagesPlayBackPlayBack)
@@ -7772,32 +7449,32 @@ val GenUniModulesLimeActionSheetPagesIndexClass = CreateVueComponent(GenUniModul
     return GenUniModulesLimeActionSheetPagesIndex(instance, renderer)
 }
 )
-open class CoordinatePoint__1 (
+open class CoordinatePoint (
     @JsonNotNull
     open var latitude: Number,
     @JsonNotNull
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 42, 7)
+        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 40, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return CoordinatePoint__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+        return CoordinatePointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
     }
 }
-class CoordinatePoint__1ReactiveObject : CoordinatePoint__1, IUTSReactive<CoordinatePoint__1> {
-    override var __v_raw: CoordinatePoint__1
+class CoordinatePointReactiveObject : CoordinatePoint, IUTSReactive<CoordinatePoint> {
+    override var __v_raw: CoordinatePoint
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: CoordinatePoint__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
+    constructor(__v_raw: CoordinatePoint, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
         this.__v_skip = __v_skip
     }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CoordinatePoint__1ReactiveObject {
-        return CoordinatePoint__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CoordinatePointReactiveObject {
+        return CoordinatePointReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
     override var latitude: Number
         get() {
@@ -7826,7 +7503,7 @@ class CoordinatePoint__1ReactiveObject : CoordinatePoint__1, IUTSReactive<Coordi
 }
 open class AnimationQueueItem (
     @JsonNotNull
-    open var position: CoordinatePoint__1,
+    open var position: CoordinatePoint,
     @JsonNotNull
     open var rotation: Number,
     @JsonNotNull
@@ -7837,7 +7514,7 @@ open class AnimationQueueItem (
     open var connectionStatus: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7)
+        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 45, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return AnimationQueueItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7857,7 +7534,7 @@ class AnimationQueueItemReactiveObject : AnimationQueueItem, IUTSReactive<Animat
     override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): AnimationQueueItemReactiveObject {
         return AnimationQueueItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
     }
-    override var position: CoordinatePoint__1
+    override var position: CoordinatePoint
         get() {
             return _tRG(__v_raw, "position", __v_raw.position, __v_isReadonly, __v_isShallow)
         }
@@ -7957,7 +7634,7 @@ open class GroupType (
     open var totalDistance: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("GroupType", "pages/mileageRecord/mileageRecord.uvue", 72, 7)
+        return UTSSourceMapPosition("GroupType", "pages/mileageRecord/mileageRecord.uvue", 74, 7)
     }
 }
 open class DateTripGroup (
@@ -7967,7 +7644,7 @@ open class DateTripGroup (
     open var trips: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 73, 7)
+        return UTSSourceMapPosition("DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 75, 7)
     }
 }
 val GenPagesMileageRecordMileageRecordClass = CreateVueComponent(GenPagesMileageRecordMileageRecord::class.java, fun(): VueComponentOptions {
@@ -8208,58 +7885,7 @@ val GenUniModulesIUiXComponentsISwitchISwitchClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsISwitchISwitch(instance)
 }
 )
-open class Coordinate__1 (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Coordinate", "pages/geofencing/geofencing.uvue", 180, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return Coordinate__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class Coordinate__1ReactiveObject : Coordinate__1, IUTSReactive<Coordinate__1> {
-    override var __v_raw: Coordinate__1
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: Coordinate__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(latitude = __v_raw.latitude, longitude = __v_raw.longitude) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): Coordinate__1ReactiveObject {
-        return Coordinate__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-}
+typealias Coordinate__1 = LocationObject
 open class PaginationState (
     @JsonNotNull
     open var pageNum: Number,
@@ -8271,7 +7897,7 @@ open class PaginationState (
     open var loadingMore: Boolean = false,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 184, 7)
+        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 181, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8347,7 +7973,7 @@ open class Pagination (
     open var unbind: PaginationState,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 190, 7)
+        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 187, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8401,33 +8027,7 @@ open class CircleData (
     open var radius: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 194, 7)
-    }
-}
-open class PopupInstance (
-    open var open: () -> Unit,
-    open var close: () -> Unit,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PopupInstance", "pages/geofencing/geofencing.uvue", 199, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return PopupInstanceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class PopupInstanceReactiveObject : PopupInstance, IUTSReactive<PopupInstance> {
-    override var __v_raw: PopupInstance
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: PopupInstance, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(open = __v_raw.open, close = __v_raw.close) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PopupInstanceReactiveObject {
-        return PopupInstanceReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 191, 7)
     }
 }
 open class FenceForm (
@@ -8437,7 +8037,7 @@ open class FenceForm (
     open var alarmType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 206, 7)
+        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 199, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FenceFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8482,174 +8082,6 @@ class FenceFormReactiveObject : FenceForm, IUTSReactive<FenceForm> {
             _tRS(__v_raw, "alarmType", oldValue, value)
         }
 }
-open class MapTapEventDetail (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapTapEventDetail", "pages/geofencing/geofencing.uvue", 214, 7)
-    }
-}
-open class MapTapEvent (
-    @JsonNotNull
-    open var detail: MapTapEventDetail,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapTapEvent", "pages/geofencing/geofencing.uvue", 218, 7)
-    }
-}
-open class CircleOverlay (
-    @JsonNotNull
-    open var id: Number,
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-    @JsonNotNull
-    open var radius: Number,
-    @JsonNotNull
-    open var strokeWidth: Number,
-    @JsonNotNull
-    open var strokeColor: String,
-    @JsonNotNull
-    open var fillColor: String,
-    @JsonNotNull
-    open var zIndex: Number,
-    @JsonNotNull
-    open var centerMarker: Boolean = false,
-) : UTSReactiveObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CircleOverlay", "pages/geofencing/geofencing.uvue", 224, 7)
-    }
-    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
-        return CircleOverlayReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-}
-class CircleOverlayReactiveObject : CircleOverlay, IUTSReactive<CircleOverlay> {
-    override var __v_raw: CircleOverlay
-    override var __v_isReadonly: Boolean
-    override var __v_isShallow: Boolean
-    override var __v_skip: Boolean
-    constructor(__v_raw: CircleOverlay, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(id = __v_raw.id, latitude = __v_raw.latitude, longitude = __v_raw.longitude, radius = __v_raw.radius, strokeWidth = __v_raw.strokeWidth, strokeColor = __v_raw.strokeColor, fillColor = __v_raw.fillColor, zIndex = __v_raw.zIndex, centerMarker = __v_raw.centerMarker) {
-        this.__v_raw = __v_raw
-        this.__v_isReadonly = __v_isReadonly
-        this.__v_isShallow = __v_isShallow
-        this.__v_skip = __v_skip
-    }
-    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): CircleOverlayReactiveObject {
-        return CircleOverlayReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
-    }
-    override var id: Number
-        get() {
-            return _tRG(__v_raw, "id", __v_raw.id, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("id")) {
-                return
-            }
-            val oldValue = __v_raw.id
-            __v_raw.id = value
-            _tRS(__v_raw, "id", oldValue, value)
-        }
-    override var latitude: Number
-        get() {
-            return _tRG(__v_raw, "latitude", __v_raw.latitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("latitude")) {
-                return
-            }
-            val oldValue = __v_raw.latitude
-            __v_raw.latitude = value
-            _tRS(__v_raw, "latitude", oldValue, value)
-        }
-    override var longitude: Number
-        get() {
-            return _tRG(__v_raw, "longitude", __v_raw.longitude, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("longitude")) {
-                return
-            }
-            val oldValue = __v_raw.longitude
-            __v_raw.longitude = value
-            _tRS(__v_raw, "longitude", oldValue, value)
-        }
-    override var radius: Number
-        get() {
-            return _tRG(__v_raw, "radius", __v_raw.radius, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("radius")) {
-                return
-            }
-            val oldValue = __v_raw.radius
-            __v_raw.radius = value
-            _tRS(__v_raw, "radius", oldValue, value)
-        }
-    override var strokeWidth: Number
-        get() {
-            return _tRG(__v_raw, "strokeWidth", __v_raw.strokeWidth, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("strokeWidth")) {
-                return
-            }
-            val oldValue = __v_raw.strokeWidth
-            __v_raw.strokeWidth = value
-            _tRS(__v_raw, "strokeWidth", oldValue, value)
-        }
-    override var strokeColor: String
-        get() {
-            return _tRG(__v_raw, "strokeColor", __v_raw.strokeColor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("strokeColor")) {
-                return
-            }
-            val oldValue = __v_raw.strokeColor
-            __v_raw.strokeColor = value
-            _tRS(__v_raw, "strokeColor", oldValue, value)
-        }
-    override var fillColor: String
-        get() {
-            return _tRG(__v_raw, "fillColor", __v_raw.fillColor, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("fillColor")) {
-                return
-            }
-            val oldValue = __v_raw.fillColor
-            __v_raw.fillColor = value
-            _tRS(__v_raw, "fillColor", oldValue, value)
-        }
-    override var zIndex: Number
-        get() {
-            return _tRG(__v_raw, "zIndex", __v_raw.zIndex, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("zIndex")) {
-                return
-            }
-            val oldValue = __v_raw.zIndex
-            __v_raw.zIndex = value
-            _tRS(__v_raw, "zIndex", oldValue, value)
-        }
-    override var centerMarker: Boolean
-        get() {
-            return _tRG(__v_raw, "centerMarker", __v_raw.centerMarker, __v_isReadonly, __v_isShallow)
-        }
-        set(value) {
-            if (!__v_canSet("centerMarker")) {
-                return
-            }
-            val oldValue = __v_raw.centerMarker
-            __v_raw.centerMarker = value
-            _tRS(__v_raw, "centerMarker", oldValue, value)
-        }
-}
 open class CoordinateBounds (
     @JsonNotNull
     open var minLat: Number,
@@ -8661,7 +8093,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 690, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 658, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {

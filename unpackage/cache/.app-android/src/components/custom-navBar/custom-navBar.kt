@@ -83,7 +83,7 @@ open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
                                 _cC("v-if", true)
                             }
                         )),
-                        _cE("view", _uM("class" to "title", "style" to _nS(_uM("color" to _ctx.textColor, "line-height" to (unref(navBarHeight) + "px")))), _uA(
+                        _cE("text", _uM("class" to "title", "style" to _nS(_uM("color" to _ctx.textColor, "line-height" to (unref(navBarHeight) + "px")))), _uA(
                             renderSlot(_ctx.`$slots`, "title", _uO(), fun(): UTSArray<Any> {
                                 return _uA(
                                     _tD(_ctx.title)
@@ -119,7 +119,7 @@ open class GenComponentsCustomNavBarCustomNavBar : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("navbar" to _pS(_uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "back-btn" to _pS(_uM("display" to "flex", "alignItems" to "center", "width" to "70rpx", "height" to "40rpx", "zIndex" to 10, "justifyContent" to "center")), "title" to _pS(_uM("textAlign" to "center", "fontWeight" to "bold", "fontSize" to "36rpx")), "capsule" to _pS(_uM("textAlign" to "center")), "capsule-item" to _pS(_uM("width" to 40, "height" to "100%", "display" to "flex", "justifyContent" to "center", "alignItems" to "center")), "icon" to _pS(_uM("width" to "40rpx", "height" to "40rpx")), "menu-icon" to _pS(_uM("width" to "60rpx", "height" to "60rpx")))
+                return _uM("navbar" to _pS(_uM("position" to "relative", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "back-btn" to _pS(_uM("display" to "flex", "alignItems" to "center", "width" to "70rpx", "height" to "40rpx", "zIndex" to 10, "justifyContent" to "center")), "title" to _pS(_uM("textAlign" to "center", "fontWeight" to "bold", "fontSize" to "36rpx")), "capsule-item" to _pS(_uM("width" to 40, "height" to "100%", "display" to "flex", "justifyContent" to "center", "alignItems" to "center")), "icon" to _pS(_uM("width" to "40rpx", "height" to "40rpx")), "menu-icon" to _pS(_uM("width" to "60rpx", "height" to "60rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

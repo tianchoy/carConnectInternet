@@ -30,13 +30,13 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val mapScale = ref(15)
             val isAnimating = ref(false)
             val animationTimer = ref<Number?>(null)
-            val currentPosition = reactive<CoordinatePoint__1>(CoordinatePoint__1(latitude = 39.90469, longitude = 116.40717))
-            val targetPosition = reactive<CoordinatePoint__1>(CoordinatePoint__1(latitude = 39.90469, longitude = 116.40717))
+            val currentPosition = reactive<CoordinatePoint>(CoordinatePoint(latitude = 39.90469, longitude = 116.40717))
+            val targetPosition = reactive<CoordinatePoint>(CoordinatePoint(latitude = 39.90469, longitude = 116.40717))
             val currentRotation = ref(0)
             val targetRotation = ref(0)
             val animationQueue = ref(_uA<AnimationQueueItem>())
             val isProcessingQueue = ref(false)
-            val markers = ref(_uA<Any>())
+            val markers = ref(_uA<Marker>())
             val markerInitialized = ref(false)
             var lastIconPath = ""
             val MARKER_UPDATE_INTERVAL: Number = 100
@@ -59,14 +59,18 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 currentTime.value = value
             }
             val handleCurrentTimeUpdate = ::gen_handleCurrentTimeUpdate_fn
+            fun gen_createVehicleMarker_fn(iconPath: String): Marker {
+                return Marker(id = 1, latitude = currentPosition.latitude, longitude = currentPosition.longitude, iconPath = iconPath, width = 25, height = 25, rotate = currentRotation.value, anchor = Anchor(x = 0.5, y = 0.5), alpha = 1)
+            }
+            val createVehicleMarker = ::gen_createVehicleMarker_fn
             fun gen_loadInitialPosition_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 119, 10), "deptId" to deptId.value, "deviceids" to imei.value)
-                            console.log("data", data, " at pages/vehicleTracking/vehicleTracking.uvue:124")
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 131, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            console.log("data", data, " at pages/vehicleTracking/vehicleTracking.uvue:136")
                             val res = await(getDevicePos(data))
-                            console.log("res", res, " at pages/vehicleTracking/vehicleTracking.uvue:128")
-                            if (res?.code === 0 && res.data != null && res.data.length > 0) {
+                            console.log("res", res, " at pages/vehicleTracking/vehicleTracking.uvue:140")
+                            if (res?.code == 0 && res.data != null && res.data.length > 0) {
                                 var foundDevice = false
                                 res.data.forEach(fun(item: UTSJSONObject){
                                     val itemImei = item.getString("imei", "")
@@ -103,7 +107,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                             val iconPath = getDeviceIcon(connectionStatus.value, carType.value)
                                             lastIconPath = iconPath
                                             markers.value = _uA(
-                                                _uO("id" to 1, "latitude" to currentPosition.latitude, "longitude" to currentPosition.longitude, "iconPath" to iconPath, "width" to 25, "height" to 25, "rotate" to currentRotation.value, "anchor" to _uO("x" to 0.5, "y" to 0.5), "alpha" to 1, "fixed" to false)
+                                                createVehicleMarker(iconPath)
                                             )
                                             markerInitialized.value = true
                                         }
@@ -117,7 +121,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             }
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:211")
+                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:212")
                             uni_showToast(ShowToastOptions(title = "网络请求失败", icon = "none"))
                         }
                 })
@@ -129,12 +133,12 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 }
                 val iconPath = getDeviceIcon(connectionStatus.value, carType.value)
                 lastIconPath = iconPath
-                val marker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("marker", "pages/vehicleTracking/vehicleTracking.uvue", 228, 9), "id" to 1, "latitude" to currentPosition.latitude, "longitude" to currentPosition.longitude, "iconPath" to iconPath, "width" to 25, "height" to 25, "rotate" to currentRotation.value, "anchor" to _uO("x" to 0.5, "y" to 0.5), "alpha" to 1, "fixed" to false)
+                val marker = createVehicleMarker(iconPath)
                 markers.value = _uA(
                     marker
                 )
                 markerInitialized.value = true
-                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:243")
+                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:233")
             }
             val initMarker = ::gen_initMarker_fn
             fun gen_calculateMapRotation_fn(direction: Number): Number {
@@ -157,7 +161,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             val normalizeRotation = ::gen_normalizeRotation_fn
             onLoad(fun(option){
-                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:264")
+                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:254")
                 connectionStatus.value = option["connectionStatus"] ?: ""
                 imei.value = option["imei"] ?: ""
                 currentCar.value = option["plateNo"] ?: "未知车辆"
@@ -203,18 +207,18 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             val calculateShortestRotation = ::gen_calculateShortestRotation_fn
             val updateMarkerSmooth = fun(){
-                if (markers.value.length === 0) {
+                if (markers.value.length == 0) {
                     initMarker()
                     return
                 }
                 val newIconPath = getDeviceIcon(connectionStatus.value, carType.value)
-                val needUpdateIcon = newIconPath !== lastIconPath
-                val updatedMarker: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("updatedMarker", "pages/vehicleTracking/vehicleTracking.uvue", 334, 9), "id" to 1, "latitude" to currentPosition.latitude, "longitude" to currentPosition.longitude, "iconPath" to if (needUpdateIcon) {
+                val needUpdateIcon = newIconPath != lastIconPath
+                val updatedMarker = createVehicleMarker(if (needUpdateIcon) {
                     newIconPath
                 } else {
                     lastIconPath
                 }
-                , "width" to 25, "height" to 25, "rotate" to currentRotation.value, "anchor" to _uO("x" to 0.5, "y" to 0.5), "alpha" to 1, "fixed" to false)
+                )
                 markers.value = _uA(
                     updatedMarker
                 )
@@ -303,10 +307,10 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val loadTrackData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 465, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 444, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            console.log("222222", " at pages/vehicleTracking/vehicleTracking.uvue:471")
-                            if (res?.code === 0 && res.data != null && res.data.length > 0) {
+                            console.log("222222", " at pages/vehicleTracking/vehicleTracking.uvue:450")
+                            if (res?.code == 0 && res.data != null && res.data.length > 0) {
                                 val deviceData = res.data.find(fun(item: UTSJSONObject): Boolean {
                                     return item.getString("imei", "") == imei.value
                                 }
@@ -319,18 +323,15 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                     val status = deviceData.getString("connectionStatus", "unknown")
                                     val direction = deviceData.getNumber("direction", lastDirection.value)
                                     val convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
-                                    var newDirection: Number = direction
-                                    if (direction === lastDirection.value) {
-                                        newDirection = lastDirection.value
-                                    }
-                                    val animationData = AnimationQueueItem(position = CoordinatePoint__1(latitude = convertedCoord.lat, longitude = convertedCoord.lng), rotation = normalizeRotation(calculateMapRotation(newDirection)), speed = speed, address = address, connectionStatus = status)
+                                    val newDirection = direction
+                                    val animationData = AnimationQueueItem(position = CoordinatePoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng), rotation = normalizeRotation(calculateMapRotation(newDirection)), speed = speed, address = address, connectionStatus = status)
                                     addToAnimationQueue(animationData)
                                     lastDirection.value = newDirection
                                 }
                             }
                         }
                          catch (err: Throwable) {
-                            console.error("获取跟踪位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:503")
+                            console.error("获取跟踪位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:479")
                         }
                 })
             }
@@ -377,7 +378,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 }
             }
             onHide(fun(){
-                console.log("页面隐藏时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:578")
+                console.log("页面隐藏时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:554")
                 isTracking.value = false
                 if (trackingInterval.value != null) {
                     clearInterval(trackingInterval.value as Number)
@@ -393,7 +394,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             )
             onUnmounted(fun(){
-                console.log("页面卸载时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:599")
+                console.log("页面卸载时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:575")
                 isTracking.value = false
                 if (trackingInterval.value != null) {
                     clearInterval(trackingInterval.value as Number)
@@ -412,6 +413,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_sub_navBar = resolveEasyComponent("sub-navBar", GenComponentsSubNavBarSubNavBarClass)
                 val _component_map = resolveComponent("map")
+                val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 return _cE("view", _uM("class" to "container"), _uA(
                     _cV(_component_custom_navBar, _uM("title" to "车辆跟踪", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                     _cE("view", _uM("class" to "map-container"), _uA(
@@ -435,26 +437,35 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     )),
                     _cE("view", _uM("class" to "tools-panel"), _uA(
                         _cE("view", _uM("class" to "btn"), _uA(
-                            _cE("button", _uM("onClick" to toggleTracking, "style" to _nS(_uM("backgroundColor" to if (isTracking.value) {
+                            _cV(_component_i_button, _uM("type" to if (isTracking.value) {
+                                "danger"
+                            } else {
+                                "primary"
+                            }
+                            , "size" to "small", "onClick" to toggleTracking, "style" to _nS(_uM("backgroundColor" to if (isTracking.value) {
                                 "#e64340"
                             } else {
                                 "#1296db"
                             }
-                            ))), _tD(if (isTracking.value) {
+                            )), "text" to if (isTracking.value) {
                                 "停止跟踪"
                             } else {
                                 "开始跟踪"
                             }
-                            ), 5)
+                            ), null, 8, _uA(
+                                "type",
+                                "style",
+                                "text"
+                            ))
                         )),
                         _cE("view", _uM("class" to "pos-info-box"), _uA(
                             _cE("view", _uM("class" to "speed"), _uA(
-                                _cE("text", null, "时速："),
-                                _cE("text", null, _tD(currentSpeed.value) + "Km/h", 1)
+                                _cE("text", _uM("class" to "tracking-info-text"), "时速："),
+                                _cE("text", _uM("class" to "tracking-info-text"), _tD(currentSpeed.value) + "Km/h", 1)
                             )),
                             _cE("view", _uM("class" to "address"), _uA(
-                                _cE("text", null, "定位时间："),
-                                _cE("text", null, _tD(currentAddress.value), 1)
+                                _cE("text", _uM("class" to "tracking-info-text"), "定位时间："),
+                                _cE("text", _uM("class" to "tracking-info-text"), _tD(currentAddress.value), 1)
                             ))
                         ))
                     ))
@@ -468,7 +479,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "40rpx", "paddingBottom" to "20rpx", "paddingLeft" to "40rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "btn" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx")), "pos-info-box" to _uM(".container .tools-panel " to _uM("paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0)), "speed" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")), "address" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0, "fontSize" to "28rpx")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "40rpx", "paddingBottom" to "20rpx", "paddingLeft" to "40rpx", "display" to "flex", "flexDirection" to "column", "boxShadow" to "0 -2px 10px rgba(0, 0, 0, 0.1)")), "btn" to _uM(".container .tools-panel " to _uM("marginBottom" to "20rpx")), "pos-info-box" to _uM(".container .tools-panel " to _uM("paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0)), "speed" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0)), "address" to _uM(".container .tools-panel .pos-info-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "paddingTop" to "8rpx", "paddingRight" to 0, "paddingBottom" to "8rpx", "paddingLeft" to 0)), "tracking-info-text" to _uM(".container .tools-panel .pos-info-box " to _uM("fontSize" to "28rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

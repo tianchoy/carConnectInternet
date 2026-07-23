@@ -13,18 +13,16 @@
 
 		<view class="tools-panel">
 			<view class="btn">
-				<button @click="toggleTracking" :style="{backgroundColor: isTracking ? '#e64340' : '#1296db'}">
-					{{isTracking ? '停止跟踪' : '开始跟踪'}}
-				</button>
+				<i-button :type="isTracking ? 'danger' : 'primary'" size="small" @click="toggleTracking" :style="{backgroundColor: isTracking ? '#e64340' : '#1296db'}" :text="isTracking ? '停止跟踪' : '开始跟踪'"></i-button>
 			</view>
 			<view class="pos-info-box">
 				<view class="speed">
-					<text>时速：</text>
-					<text>{{currentSpeed}}Km/h</text>
+					<text class="tracking-info-text">时速：</text>
+					<text class="tracking-info-text">{{currentSpeed}}Km/h</text>
 				</view>
 				<view class="address">
-					<text>定位时间：</text>
-					<text>{{currentAddress}}</text>
+					<text class="tracking-info-text">定位时间：</text>
+					<text class="tracking-info-text">{{currentAddress}}</text>
 				</view>
 			</view>
 		</view>
@@ -84,7 +82,7 @@
 	const isProcessingQueue = ref(false)
 
 	// 标记点集合
-	const markers = ref<Array<any>>([])
+	const markers = ref<Array<Marker>>([])
 	const markerInitialized = ref(false)
 	let lastIconPath = ''
 	let lastMarkerUpdateTime = 0
@@ -114,6 +112,20 @@
 		currentTime.value = value
 	}
 
+	function createVehicleMarker(iconPath : string) : Marker {
+		return {
+			id: 1,
+			latitude: currentPosition.latitude,
+			longitude: currentPosition.longitude,
+			iconPath: iconPath,
+			width: 25,
+			height: 25,
+			rotate: currentRotation.value,
+			anchor: { x: 0.5, y: 0.5 },
+			alpha: 1
+		} as Marker
+	}
+
 	async function loadInitialPosition() {
 		try {
 			const data = {
@@ -127,7 +139,7 @@
 
 			console.log('res', res)
 
-			if (res?.code === 0 && res.data && res.data.length > 0) {
+			if (res?.code == 0 && res.data && res.data.length > 0) {
 				let foundDevice = false
 				res.data.forEach((item : UTSJSONObject) => {
 					const itemImei = item.getString('imei', '')
@@ -177,18 +189,7 @@
 						if (!markerInitialized.value) {
 							const iconPath = getDeviceIcon(connectionStatus.value, carType.value)
 							lastIconPath = iconPath
-							markers.value = [{
-								id: 1,
-								latitude: currentPosition.latitude,
-								longitude: currentPosition.longitude,
-								iconPath: iconPath,
-								width: 25,
-								height: 25,
-								rotate: currentRotation.value,
-								anchor: { x: 0.5, y: 0.5 },
-								alpha: 1,
-								fixed: false
-							}]
+							markers.value = [createVehicleMarker(iconPath)]
 							markerInitialized.value = true
 						}
 					}
@@ -225,18 +226,7 @@
 		const iconPath = getDeviceIcon(connectionStatus.value, carType.value)
 		lastIconPath = iconPath
 
-		const marker = {
-			id: 1,
-			latitude: currentPosition.latitude,
-			longitude: currentPosition.longitude,
-			iconPath: iconPath,
-			width: 25,
-			height: 25,
-			rotate: currentRotation.value,
-			anchor: { x: 0.5, y: 0.5 },
-			alpha: 1,
-			fixed: false
-		}
+		const marker = createVehicleMarker(iconPath)
 
 		markers.value = [marker]
 		markerInitialized.value = true
@@ -322,27 +312,16 @@
 
 	// 更新标记点
 	const updateMarkerSmooth = () => {
-		if (markers.value.length === 0) {
+		if (markers.value.length == 0) {
 			initMarker()
 			return
 		}
 
 		const newIconPath = getDeviceIcon(connectionStatus.value, carType.value)
-		const needUpdateIcon = newIconPath !== lastIconPath
+		const needUpdateIcon = newIconPath != lastIconPath
 
 		// 创建新的标记点对象
-		const updatedMarker = {
-			id: 1,
-			latitude: currentPosition.latitude,
-			longitude: currentPosition.longitude,
-			iconPath: needUpdateIcon ? newIconPath : lastIconPath,
-			width: 25,
-			height: 25,
-			rotate: currentRotation.value,
-			anchor: { x: 0.5, y: 0.5 },
-			alpha: 1,
-			fixed: false
-		}
+		const updatedMarker = createVehicleMarker(needUpdateIcon ? newIconPath : lastIconPath)
 
 		markers.value = [updatedMarker]
 
@@ -469,7 +448,7 @@
 
 			const res = await getDevicePos(data)
 			console.log('222222')
-			if (res?.code === 0 && res.data && res.data.length > 0) {
+			if (res?.code == 0 && res.data && res.data.length > 0) {
 				const deviceData = res.data.find((item : UTSJSONObject) => item.getString('imei', '') == imei.value)
 				if (deviceData != null) {
 					const latitude = deviceData.getNumber('latitude', 0)
@@ -480,10 +459,7 @@
 					const direction = deviceData.getNumber('direction', lastDirection.value)
 					const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
 
-					let newDirection : number = direction
-					if (direction === lastDirection.value) {
-						newDirection = lastDirection.value
-					}
+					const newDirection = direction
 
 					const animationData : AnimationQueueItem = {
 						position: {
@@ -655,9 +631,13 @@
 					justify-content: flex-start;
 					align-items: center;
 					padding: 8rpx 0;
+
+
+
+				}
+
+				.tracking-info-text {
 					font-size: 28rpx;
-
-
 				}
 			}
 		}
