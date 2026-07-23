@@ -162,14 +162,10 @@ const __sfc__ = defineComponent({
                 ';');
         });
         const dotStyle = computed((): string => {
-            const fontSize = props.shape == 'check' ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize);
-            return ('background-color:' +
-                props.activeColor +
-                ';color:' +
-                props.iconColor +
-                ';font-size:' +
-                fontSize +
-                ';');
+            return 'background-color:' + props.activeColor + ';';
+        });
+        const checkStyle = computed((): string => {
+            return 'background-color:' + props.activeColor + ';color:' + props.iconColor + ';font-size:' + formatSize(parseFloat(props.iconSize.toString()) + 2) + ';';
         });
         const labelStyle = computed((): string => {
             let color = props.labelColor;
@@ -213,7 +209,7 @@ const __sfc__ = defineComponent({
                                 ? _cE("text", _uM({
                                     key: 1,
                                     class: "i-radio__check",
-                                    style: _nS(dotStyle.value)
+                                    style: _nS(checkStyle.value)
                                 }), "✓", 4 /* STYLE */)
                                 : _cC("v-if", true)
                         ], 4 /* STYLE */)

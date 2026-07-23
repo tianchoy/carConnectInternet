@@ -18,7 +18,7 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		<i-popup ref="showFenceModal" mode="center" round='10'>
+		<i-popup ref="showFenceModal"  mode="bottom" round="10" :showClose="true">
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ getSelectedFenceName() }}</text>
@@ -51,7 +51,7 @@
 			</view>
 
 			<view class="tool-tag-item">
-				<i-button @click="startDrawing" :disabled="isDrawing || selectedFence" size="small">
+				<i-button @click="startDrawing" :disabled="isDrawing || selectedFence != null" size="small">
 					开始绘制
 				</i-button>
 				<i-button @click="finishDrawing" :disabled="!isDrawing || !canFinishDrawing" size="small">
@@ -73,13 +73,12 @@
 		</view>
 
 		<!-- 围栏列表弹窗 -->
-		<i-popup ref="fencesPopup" mode="bottom" round="10">
+		<i-popup ref="fencesPopup" mode="bottom" round="10" height="800rpx" :disabledScroll="true" contentMargin="0" :showClose="true">
 			<view class="fence-list">
 				<view class="list-header">
 					<text class="title">围栏列表</text>
-					<i-icon name="/static/close.png" fontSize="15" @click="closeFenceList"></i-icon>
 				</view>
-				<scroll-view class="list-content" scroll-y>
+				<scroll-view class="list-content" scroll-y="true" :show-scrollbar="false">
 					<view v-for="fence in fenceList" :key="fence.id" class="fence-item" @click="selectFence(fence)">
 						<view class="fence-info">
 							<text class="name">{{ fence.name }}</text>
@@ -88,7 +87,7 @@
 						</view>
 						<i-icon name="/static/arrow-right.png" fontSize="15"></i-icon>
 					</view>
-					<view v-if="fenceList.length === 0" class="empty">
+					<view v-if="fenceList.length == 0" class="empty">
 						<text class="empty-text">暂无围栏数据</text>
 					</view>
 				</scroll-view>
@@ -96,7 +95,7 @@
 		</i-popup>
 
 		<!-- 围栏编辑弹窗 -->
-		<i-popup ref="editDialogPopup" mode="center" round="10" :contentDraggable="false">
+		<i-popup ref="editDialogPopup" mode="bottom" round="10" :contentDraggable="false" :showClose="true">
 			<view class="edit-dialog">
 				<view class="dialog-header">
 					<text class="dialog-title">{{ editingFence ? '编辑围栏' : '新增围栏' }}</text>
@@ -119,23 +118,19 @@
 				</view>
 			</view>
 		</i-popup>
-		<i-popup ref="deviceDialogPopup" mode="bottom" round="10" :closeOnMask="false">
+		<i-popup ref="deviceDialogPopup" mode="bottom" round="10" :closeOnMask="true" :showClose="true">
 			<view class="device-dialog">
 				<view class="dialog-header">
 					<text class="dialog-title">设备绑定 - {{ currentFenceName }}</text>
-					<i-icon name="close" @click="closeDeviceDialog"></i-icon>
 				</view>
 				<view class="dialog-tabs">
-					<view :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="switchTab('bind')">
-						已绑定设备
-					</view>
-					<view :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="switchTab('unbind')">
-						未绑定设备
-					</view>
+					<text :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="switchTab('bind')">已绑定设备</text>
+					<text :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="switchTab('unbind')">未绑定设备</text>
 				</view>
 				<scroll-view 
 					class="device-list" 
-					scroll-y 
+					 scroll-y="true" 
+					 :show-scrollbar="false"
 					:scroll-top="scrollTop"
 					@scrolltolower="handleLoadMore"
 					:lower-threshold="150"
@@ -151,14 +146,14 @@
 						</i-switch>
 					</view>
 					
-					<view v-if="deviceList.length === 0 && !loading" class="empty">
+					<view v-if="deviceList.length == 0 && !loading" class="empty">
 						<text class="empty-text">{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}</text>
 					</view>
 					<view v-if="loadingMore" class="loading-tip">
 						<text>正在加载更多...</text>
 					</view>
-					<view v-if="deviceList.length > 0 && !hasMore && !loadingMore" class="no-more">
-						暂无更多数据
+					<view v-if="deviceList.length > 0 && !hasMore && !loadingMore" class="empty-text-box">
+						<text class="empty-text">暂无更多数据</text>
 					</view>
 				</scroll-view>
 			</view>
@@ -169,7 +164,7 @@
 <script setup>
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
-	import CoordTransform, { type Coordinate as TencentCoordinate } from '../../utils/coordTransform.uts'
+	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
 	const imei = ref<string | null>(null)
@@ -772,7 +767,10 @@
 	const editFence = (fence : UTSJSONObject) : void => {
 		editingFence.value = fence
 		fenceForm.name = fence.getString('name', '')
-		const alarmType = fence.getString('alarmType', '')
+		const alarmTypeText = fence.getString('alarmType', '')
+		const alarmType = alarmTypeText.length > 0
+			? alarmTypeText
+			: fence.getNumber('alarmType', 1).toString()
 		fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : '1'
 
 		// 设置当前绘制模式为围栏实际类型
@@ -942,14 +940,20 @@
 		}
 	}
 
+	function resetPagination(page : PaginationState) : void {
+		page.pageNum = 1
+		page.pageSize = 10
+		page.hasMore = true
+		page.loadingMore = false
+	}
+
 	function initPagination(tabType : string) : void {
-		pagination[tabType] = {
-			pageNum: 1,
-			pageSize: 10,
-			hasMore: true,
-			loadingMore: false
+		if (tabType == 'bind') {
+			resetPagination(pagination.bind)
+		} else {
+			resetPagination(pagination.unbind)
 		}
-		if (activeTab.value === tabType) {
+		if (activeTab.value == tabType) {
 			deviceList.value = []
 		}
 	}
@@ -968,7 +972,7 @@
 
 			if (res.code == 0) {
 				const dataList = res.data.list || []
-				if (page.pageNum === 1) {
+				if (page.pageNum == 1) {
 					boundDevices.value = dataList
 					deviceList.value = dataList
 				} else {
@@ -999,7 +1003,7 @@
 
 			if (res.code == 0) {
 				const dataList = res.data.list || []
-				if (page.pageNum === 1) {
+				if (page.pageNum == 1) {
 					deviceList.value = dataList
 				} else {
 					deviceList.value = [...deviceList.value, ...dataList]
@@ -1027,12 +1031,6 @@
 		// 初始化分页状态并加载第一页
 		initPagination('bind')
 		await loadBoundDevices(fenceId)
-	}
-
-	// 关闭设备绑定弹窗
-	const closeDeviceDialog = () => {
-		deviceDialogPopup.value?.$callMethod('close')
-		scrollTop.value = 0
 	}
 
 	// 切换标签页
@@ -1150,10 +1148,6 @@
 	function getDeviceDisplayName(device : UTSJSONObject) : string {
 		const deviceName = device.getString('deviceName', '')
 		return deviceName ? deviceName : device.getString('plateNo', '')
-	}
-
-	function closeFenceList() : void {
-		fencesPopup.value?.$callMethod('close')
 	}
 
 	function closeEditDialog() : void {
@@ -1364,8 +1358,6 @@
 		.fence-operations {
 			background-color: #fff;
 			padding: 20rpx 20rpx 50rpx 20rpx;
-			width: 500rpx;
-			height: 200rpx;
 
 			.fence-header {
 				display: flex;
@@ -1440,9 +1432,12 @@
 
 		.fence-list {
 			height: 100%;
+			display: flex;
+			flex-direction: column;
 			background-color: #fff;
 
 			.list-header {
+				flex-shrink: 0;
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
@@ -1457,6 +1452,8 @@
 			}
 
 			.list-content {
+				height: 640rpx;
+				box-sizing: border-box;
 				padding: 20rpx;
 
 				.fence-item {
@@ -1493,9 +1490,7 @@
 				}
 
 				.empty {
-					text-align: center;
 					padding: 100rpx 0;
-					color: #999;
 				}
 			}
 		}
@@ -1511,7 +1506,6 @@
 			}
 
 			.dialog-title {
-				display: block;
 				text-align: center;
 				font-size: 32rpx;
 				font-weight: bold;
@@ -1561,8 +1555,6 @@
 				align-items: center;
 				padding: 30rpx;
 				border-bottom: 1rpx solid #eee;
-				font-size: 32rpx;
-				font-weight: bold;
 			}
 
 			.dialog-tabs {
@@ -1613,9 +1605,7 @@
 				}
 
 				.empty {
-					text-align: center;
 					padding: 100rpx 0;
-					color: #999;
 				}
 
 				.loading-tip {
@@ -1638,6 +1628,29 @@
 				padding: 20rpx 30rpx;
 				border-top: 1rpx solid #eee;
 			}
+		}
+
+
+		.drag-hint-text {
+			font-size: 28rpx;
+			color: #00aa00;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.status-text {
+			font-size: 28rpx;
+			color: #333;
+		}
+
+		.empty-text-box{
+			margin-top: 30rpx;
+		}
+
+		.empty-text {
+			text-align: center;
+			font-size: 22rpx;
+			color: #999;
 		}
 
 		.i-popup__content {

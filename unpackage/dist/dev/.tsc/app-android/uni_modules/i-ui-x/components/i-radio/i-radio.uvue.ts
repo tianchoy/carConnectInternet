@@ -166,16 +166,11 @@ const boxStyle = computed(() => {
 })
 
 const dotStyle = computed(() => {
-  const fontSize = props.shape == 'check' ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize)
-  return (
-    'background-color:' +
-    props.activeColor +
-    ';color:' +
-    props.iconColor +
-    ';font-size:' +
-    fontSize +
-    ';'
-  )
+  return 'background-color:' + props.activeColor + ';'
+})
+
+const checkStyle = computed(() => {
+  return 'background-color:' + props.activeColor + ';color:' + props.iconColor + ';font-size:' + formatSize(parseFloat(props.iconSize.toString()) + 2) + ';'
 })
 
 const labelStyle = computed(() => {
@@ -222,7 +217,7 @@ return (): any | null => {
               ? _cE("text", _uM({
                   key: 1,
                   class: "i-radio__check",
-                  style: _nS(dotStyle.value)
+                  style: _nS(checkStyle.value)
                 }), "✓", 4 /* STYLE */)
               : _cC("v-if", true)
           ], 4 /* STYLE */)

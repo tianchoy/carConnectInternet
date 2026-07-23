@@ -422,7 +422,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       animationQueue.value = [];
       isProcessingQueue.value = false;
-      const interval = 1e4;
+      const interval = 3e3;
       isTracking.value = true;
       if (trackingInterval.value != null) {
         clearInterval(trackingInterval.value);

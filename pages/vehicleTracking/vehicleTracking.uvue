@@ -517,7 +517,7 @@
 		animationQueue.value = []
 		isProcessingQueue.value = false
 
-		const interval = 10000
+		const interval = 3000
 		isTracking.value = true
 
 		// 清除之前的定时器
@@ -635,11 +635,11 @@
 
 
 				}
-
-				.tracking-info-text {
-					font-size: 28rpx;
-				}
 			}
+		}
+
+		.tracking-info-text {
+			font-size: 28rpx;
 		}
 	}
 </style>

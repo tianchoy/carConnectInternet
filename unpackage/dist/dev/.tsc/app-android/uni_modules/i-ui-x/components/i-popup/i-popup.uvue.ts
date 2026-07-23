@@ -607,11 +607,13 @@ return (): any | null => {
               ? _cE("view", _uM({
                   key: 2,
                   class: _nC(closeClass.value),
-                  style: _nS(closeStyle.value),
                   onClick: close
                 }), [
-                  _cE("text", _uM({ class: "i-popup__close-text" }), _tD(closeIconText.value), 1 /* TEXT */)
-                ], 6 /* CLASS, STYLE */)
+                  _cE("text", _uM({
+                    class: "i-popup__close-text",
+                    style: _nS(closeStyle.value)
+                  }), _tD(closeIconText.value), 5 /* TEXT, STYLE */)
+                ], 2 /* CLASS */)
               : _cC("v-if", true),
             isTrue(_ctx.disabledScroll)
               ? _cE("view", _uM({
@@ -669,11 +671,13 @@ return (): any | null => {
               ? _cE("view", _uM({
                   key: 5,
                   class: _nC(closeClass.value),
-                  style: _nS(closeStyle.value),
                   onClick: close
                 }), [
-                  _cE("text", _uM({ class: "i-popup__close-text" }), _tD(closeIconText.value), 1 /* TEXT */)
-                ], 6 /* CLASS, STYLE */)
+                  _cE("text", _uM({
+                    class: "i-popup__close-text",
+                    style: _nS(closeStyle.value)
+                  }), _tD(closeIconText.value), 5 /* TEXT, STYLE */)
+                ], 2 /* CLASS */)
               : _cC("v-if", true)
           ], 14 /* CLASS, STYLE, PROPS */, ["onClick"])
         ], 4 /* STYLE */)

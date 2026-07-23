@@ -7897,7 +7897,7 @@ open class PaginationState (
     open var loadingMore: Boolean = false,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 181, 7)
+        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 176, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7973,7 +7973,7 @@ open class Pagination (
     open var unbind: PaginationState,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 187, 7)
+        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 182, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8027,7 +8027,7 @@ open class CircleData (
     open var radius: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 191, 7)
+        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 186, 7)
     }
 }
 open class FenceForm (
@@ -8037,7 +8037,7 @@ open class FenceForm (
     open var alarmType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 199, 7)
+        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 194, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FenceFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8093,7 +8093,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 658, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 653, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {

@@ -42,10 +42,9 @@
         <view
           v-if="showClose"
           :class="closeClass"
-          :style="closeStyle"
           @click="close"
         >
-          <text class="i-popup__close-text">{{ closeIconText }}</text>
+          <text class="i-popup__close-text" :style="closeStyle">{{ closeIconText }}</text>
         </view>
 
         <view v-if="disabledScroll" class="i-popup__body" :style="bodyStyle">
@@ -87,10 +86,9 @@
         <view
           v-if="closeable && !showClose"
           :class="closeClass"
-          :style="closeStyle"
           @click="close"
         >
-          <text class="i-popup__close-text">{{ closeIconText }}</text>
+          <text class="i-popup__close-text" :style="closeStyle">{{ closeIconText }}</text>
         </view>
       </view>
     </view>

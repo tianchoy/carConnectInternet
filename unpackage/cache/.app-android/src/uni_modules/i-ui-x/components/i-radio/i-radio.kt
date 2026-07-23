@@ -126,12 +126,11 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
             }
             )
             val dotStyle = computed(fun(): String {
-                val fontSize = if (props.shape == "check") {
-                    formatSize(parseFloat(props.iconSize.toString()) + 2)
-                } else {
-                    formatSize(props.iconSize)
-                }
-                return ("background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + fontSize + ";")
+                return "background-color:" + props.activeColor + ";"
+            }
+            )
+            val checkStyle = computed(fun(): String {
+                return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + formatSize(parseFloat(props.iconSize.toString()) + 2) + ";"
             }
             )
             val labelStyle = computed(fun(): String {
@@ -171,7 +170,7 @@ open class GenUniModulesIUiXComponentsIRadioIRadio : VueComponent {
                                         _cC("v-if", true)
                                     },
                                     if (isTrue(checked.value && _ctx.shape == "check")) {
-                                        _cE("text", _uM("key" to 1, "class" to "i-radio__check", "style" to _nS(dotStyle.value)), "✓", 4)
+                                        _cE("text", _uM("key" to 1, "class" to "i-radio__check", "style" to _nS(checkStyle.value)), "✓", 4)
                                     } else {
                                         _cC("v-if", true)
                                     }

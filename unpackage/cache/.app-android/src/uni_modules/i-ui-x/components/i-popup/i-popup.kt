@@ -679,9 +679,9 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                                     )
                                 }),
                                 if (isTrue(_ctx.showClose)) {
-                                    _cE("view", _uM("key" to 2, "class" to _nC(closeClass.value), "style" to _nS(closeStyle.value), "onClick" to close), _uA(
-                                        _cE("text", _uM("class" to "i-popup__close-text"), _tD(closeIconText.value), 1)
-                                    ), 6)
+                                    _cE("view", _uM("key" to 2, "class" to _nC(closeClass.value), "onClick" to close), _uA(
+                                        _cE("text", _uM("class" to "i-popup__close-text", "style" to _nS(closeStyle.value)), _tD(closeIconText.value), 5)
+                                    ), 2)
                                 } else {
                                     _cC("v-if", true)
                                 },
@@ -731,9 +731,9 @@ open class GenUniModulesIUiXComponentsIPopupIPopup : VueComponent {
                                 } else {
                                     _ctx.closeable
                                 })) {
-                                    _cE("view", _uM("key" to 5, "class" to _nC(closeClass.value), "style" to _nS(closeStyle.value), "onClick" to close), _uA(
-                                        _cE("text", _uM("class" to "i-popup__close-text"), _tD(closeIconText.value), 1)
-                                    ), 6)
+                                    _cE("view", _uM("key" to 5, "class" to _nC(closeClass.value), "onClick" to close), _uA(
+                                        _cE("text", _uM("class" to "i-popup__close-text", "style" to _nS(closeStyle.value)), _tD(closeIconText.value), 5)
+                                    ), 2)
                                 } else {
                                     _cC("v-if", true)
                                 }

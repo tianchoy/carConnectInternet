@@ -51,8 +51,6 @@
 .container .fence-operations {
   background-color: #fff;
   padding: 20rpx 20rpx 50rpx 20rpx;
-  width: 500rpx;
-  height: 200rpx;
 }
 .container .fence-operations .fence-header {
   display: flex;
@@ -115,9 +113,12 @@
 }
 .container .fence-list {
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
 }
 .container .fence-list .list-header {
+  flex-shrink: 0;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -130,6 +131,8 @@
   font-weight: bold;
 }
 .container .fence-list .list-content {
+  height: 640rpx;
+  box-sizing: border-box;
   padding: 20rpx;
 }
 .container .fence-list .list-content .fence-item {
@@ -160,9 +163,7 @@
   color: #999;
 }
 .container .fence-list .list-content .empty {
-  text-align: center;
   padding: 100rpx 0;
-  color: #999;
 }
 .container .edit-dialog {
   background-color: #fff;
@@ -174,7 +175,6 @@
   border-bottom: 1rpx solid #eee;
 }
 .container .edit-dialog .dialog-title {
-  display: block;
   text-align: center;
   font-size: 32rpx;
   font-weight: bold;
@@ -214,8 +214,6 @@
   align-items: center;
   padding: 30rpx;
   border-bottom: 1rpx solid #eee;
-  font-size: 32rpx;
-  font-weight: bold;
 }
 .container .device-dialog .dialog-tabs {
   display: flex;
@@ -258,9 +256,7 @@
   color: #999;
 }
 .container .device-dialog .device-list .empty {
-  text-align: center;
   padding: 100rpx 0;
-  color: #999;
 }
 .container .device-dialog .device-list .loading-tip {
   display: flex;
@@ -277,6 +273,24 @@
 .container .device-dialog .dialog-actions {
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
+}
+.container .drag-hint-text {
+  font-size: 28rpx;
+  color: #00aa00;
+  font-weight: bold;
+  text-align: center;
+}
+.container .status-text {
+  font-size: 28rpx;
+  color: #333;
+}
+.container .empty-text-box {
+  margin-top: 30rpx;
+}
+.container .empty-text {
+  text-align: center;
+  font-size: 22rpx;
+  color: #999;
 }
 .container .i-popup__content {
   border-radius: 20rpx;

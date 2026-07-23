@@ -10,7 +10,7 @@
         <text
           v-if="checked && shape == 'check'"
           class="i-radio__check"
-          :style="dotStyle"
+          :style="checkStyle"
           >✓</text
         >
       </view>
@@ -183,16 +183,11 @@ const boxStyle = computed(() => {
 })
 
 const dotStyle = computed(() => {
-  const fontSize = props.shape == 'check' ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize)
-  return (
-    'background-color:' +
-    props.activeColor +
-    ';color:' +
-    props.iconColor +
-    ';font-size:' +
-    fontSize +
-    ';'
-  )
+  return 'background-color:' + props.activeColor + ';'
+})
+
+const checkStyle = computed(() => {
+  return 'background-color:' + props.activeColor + ';color:' + props.iconColor + ';font-size:' + formatSize(parseFloat(props.iconSize.toString()) + 2) + ';'
 })
 
 const labelStyle = computed(() => {

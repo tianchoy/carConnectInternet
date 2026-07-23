@@ -468,9 +468,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       o: __props.showClose
     }, __props.showClose ? {
       p: common_vendor.t(closeIconText.value),
-      q: common_vendor.n(closeClass.value),
-      r: common_vendor.s(closeStyle.value),
-      s: common_vendor.o(close, "62")
+      q: common_vendor.s(closeStyle.value),
+      r: common_vendor.n(closeClass.value),
+      s: common_vendor.o(close, "f8")
     } : {}, {
       t: __props.disabledScroll
     }, __props.disabledScroll ? common_vendor.e({
@@ -487,20 +487,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
       A: __props.showCancel
     }, __props.showCancel ? {
       B: common_vendor.t(cancelTextValue.value),
-      C: common_vendor.o(cancel, "70")
+      C: common_vendor.o(cancel, "e4")
     } : {}, {
       D: common_vendor.t(confirmTextValue.value),
       E: common_vendor.s(confirmTextStyle.value),
       F: common_vendor.n(__props.disabledConfirm ? "i-popup__footer-button i-popup__footer-button--confirm i-popup__footer-button--disabled" : "i-popup__footer-button i-popup__footer-button--confirm"),
-      G: common_vendor.o(confirm, "b4"),
+      G: common_vendor.o(confirm, "47"),
       H: common_vendor.s(footerStyle.value)
     }) : {}, {
       I: __props.closeable && !__props.showClose
     }, __props.closeable && !__props.showClose ? {
       J: common_vendor.t(closeIconText.value),
-      K: common_vendor.n(closeClass.value),
-      L: common_vendor.s(closeStyle.value),
-      M: common_vendor.o(close, "80")
+      K: common_vendor.s(closeStyle.value),
+      L: common_vendor.n(closeClass.value),
+      M: common_vendor.o(close, "49")
     } : {}, {
       N: common_vendor.n(panelClass.value),
       O: common_vendor.s(panelStyle.value),
