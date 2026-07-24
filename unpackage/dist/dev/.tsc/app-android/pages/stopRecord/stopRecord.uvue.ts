@@ -210,7 +210,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               "confirm-btn": "确认",
               "cancel-btn": "取消",
               title: pickerTitle.value,
-              mode: 1|2|4|8|16|32,
+              mode: 63,
               onConfirm: onConfirm,
               onCancel: onCancel
             }), null, 8 /* PROPS */, ["title"])

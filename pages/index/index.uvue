@@ -1032,7 +1032,7 @@ const toFindCar = () => {
 const toFence = () => {
     if (!isLogin()) return
     uni.navigateTo({
-        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
+        url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarName.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
 }
 
@@ -1469,6 +1469,7 @@ onLoad(() => {
             }
             .ring-stroke--track {
                 border-color: #dceaf3;
+                border-width: 5rpx;
             }
             .ring-stroke--active {
                 border-color: #4cd964;

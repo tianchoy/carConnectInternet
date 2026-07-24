@@ -173,13 +173,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "53"),
-        l: common_vendor.o(onCancel, "45"),
+        k: common_vendor.o(onConfirm, "a3"),
+        l: common_vendor.o(onCancel, "d4"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
-          mode: 1 | 2 | 4 | 8 | 16 | 32
+          mode: 63
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;

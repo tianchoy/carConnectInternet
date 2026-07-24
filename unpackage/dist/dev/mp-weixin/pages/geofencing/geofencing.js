@@ -346,19 +346,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return "polygon";
     }
+    function isValidCoordinate(latitude, longitude) {
+      return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    }
     function parsePolygon(polygonStr) {
       if (!polygonStr)
         return [];
       const coordStr = polygonStr.replace(/POLYGON \(\(/, "").replace(/\)\)/, "");
-      const coordPoints = coordStr.split(",");
-      return coordPoints.map((point) => {
-        const values = point.trim().split(" ");
-        const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]));
-        return {
+      const points2 = [];
+      coordStr.split(",").forEach((point) => {
+        const values = point.trim().split(/\s+/);
+        if (values.length != 2)
+          return null;
+        const latitude = parseFloat(values[0]);
+        const longitude = parseFloat(values[1]);
+        if (!isValidCoordinate(latitude, longitude))
+          return null;
+        const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(latitude, longitude);
+        points2.push({
           latitude: convertedCoord.lat,
           longitude: convertedCoord.lng
-        };
+        });
       });
+      return points2;
     }
     function parseCircle(circleStr) {
       if (!circleStr || !circleStr.startsWith("CIRCLE"))
@@ -368,12 +378,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const parts = coordStr.split(",");
         if (parts.length != 2)
           return null;
-        const centerValues = parts[0].trim().split(" ");
+        const centerValues = parts[0].trim().split(/\s+/);
+        if (centerValues.length != 2)
+          return null;
         const lat = parseFloat(centerValues[0]);
         const lng = parseFloat(centerValues[1]);
         const radius = parseFloat(parts[1].trim());
-        if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:417", "无效的圆形围栏数据:", circleStr);
+        if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:427", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -383,7 +395,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         };
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:427", "解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:437", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     }
@@ -550,7 +562,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           renderFencesOnMap();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:622", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:632", "加载围栏列表失败:", error);
           utils_toast.showAppToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -716,7 +728,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: "删除失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:830", "删除围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:840", "删除围栏失败:", error);
           utils_toast.showAppToast({ title: "删除失败", icon: "none" });
         }
       });
@@ -805,7 +817,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:941", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:951", "保存围栏失败:", error);
           utils_toast.showAppToast({ title: "保存失败，请重试", icon: "none" });
         }
       });
@@ -905,7 +917,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const switchTab = (tab) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1042", "switchTab", tab, currentFenceId.value);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1052", "switchTab", tab, currentFenceId.value);
         if (activeTab.value === tab)
           return Promise.resolve(null);
         activeTab.value = tab;
@@ -913,7 +925,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceList.value = [];
         initPagination(tab);
         if (tab === "bind") {
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1054", "switchTab,bind:", currentFenceId.value);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1064", "switchTab,bind:", currentFenceId.value);
           yield loadBoundDevices(currentFenceId.value);
         } else {
           yield loadUnboundDevices();
@@ -931,14 +943,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toggleDeviceBinding = (deviceImei, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1074", "toggleDeviceBinding", deviceImei, bound);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1084", "toggleDeviceBinding", deviceImei, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
             geofenceId: currentFenceId.value,
             imeis: [deviceImei]
           });
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1081", "toggleDeviceBindingparams", params);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1091", "toggleDeviceBindingparams", params);
           let result = null;
           if (bound) {
             result = yield api_request.bindDevices(params);
@@ -958,7 +970,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1104", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1114", "设备绑定操作失败:", error);
           utils_toast.showAppToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -1016,10 +1028,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function deleteSelectedFence() {
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1174", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1184", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1178", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1188", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {

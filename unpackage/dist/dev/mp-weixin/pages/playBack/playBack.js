@@ -712,13 +712,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         t: common_vendor.t(currentTime.value),
         v: common_vendor.t(currentSpeed.value),
         w: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        x: common_vendor.o(onConfirm, "2f"),
-        y: common_vendor.o(onCancel, "df"),
+        x: common_vendor.o(onConfirm, "77"),
+        y: common_vendor.o(onCancel, "92"),
         z: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
           title: pickerTitle.value,
-          mode: 1 | 2 | 4 | 8 | 16 | 32
+          mode: 63
         }),
         A: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;

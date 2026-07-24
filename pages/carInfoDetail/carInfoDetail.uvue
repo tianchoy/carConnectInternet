@@ -8,7 +8,7 @@
 				:enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				</map>
 			<sub-navBar class="sub-nav-overlay" :currentTime="currentTime" :showTime="true" :showPickerTime="false"
-				@update:current-time="onCurrentTimeChange" :currentCar="currentCarInfo.plateNo"
+				@update:current-time="onCurrentTimeChange" :currentCar="currentCarInfo.deviceName"
 				:times="times" :carStatus="datainfo.connectionStatus" :showPicker="false"
 				:showCar="true"></sub-navBar>
 

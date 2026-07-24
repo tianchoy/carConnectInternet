@@ -685,7 +685,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           currentTime: common_vendor.unref(currentTime),
           showTime: true,
           showPickerTime: false,
-          currentCar: common_vendor.unref(currentCarInfo).plateNo,
+          currentCar: common_vendor.unref(currentCarInfo).deviceName,
           times: common_vendor.unref(times),
           carStatus: common_vendor.unref(datainfo).connectionStatus,
           showPicker: false,
@@ -697,7 +697,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/arrow-right.png",
           fontSize: "16"
         }),
-        k: common_vendor.o(carDetail, "7c"),
+        k: common_vendor.o(carDetail, "56"),
         l: common_vendor.t(common_vendor.unref(datainfo).positionUpdateTime),
         m: common_vendor.t(common_vendor.unref(datainfo).signalUpdateTime),
         n: common_vendor.unref(address)
@@ -709,7 +709,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         r: !common_vendor.unref(address)
       }, !common_vendor.unref(address) ? {
-        s: common_vendor.o(refreshAdress, "92")
+        s: common_vendor.o(refreshAdress, "84")
       } : {}, {
         t: common_vendor.unref(signalRssi) != null
       }, common_vendor.unref(signalRssi) != null ? {
@@ -741,7 +741,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         O: common_vendor.o(($event) => {
           return handleGridClick($event);
-        }, "c5"),
+        }, "f4"),
         P: common_vendor.p({
           items: common_vendor.unref(baseList),
           col: 5,
@@ -752,17 +752,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#606266",
           showBorder: true
         }),
-        Q: common_vendor.o(filterNonLatin, "98"),
+        Q: common_vendor.o(filterNonLatin, "34"),
         R: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "0e"),
+        }, "09"),
         S: common_vendor.p({
           placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        T: common_vendor.o(confirm, "8b"),
+        T: common_vendor.o(confirm, "47"),
         U: common_vendor.p({
           show: common_vendor.unref(popupRef),
           title: common_vendor.unref(modalTitle)

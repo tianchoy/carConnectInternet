@@ -414,7 +414,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: refresherTriggered.value,
         k: common_vendor.o(onRefresherRefresh, "4b"),
         l: common_vendor.o(onScrollToLower, "fb"),
-        m: common_vendor.o(ReadIt, "4d"),
+        m: common_vendor.o(ReadIt, "7c"),
         n: common_vendor.p({
           show: modal.value,
           title: getMessageTypeText(modalContent.value.getNumber("messageType", 0)),

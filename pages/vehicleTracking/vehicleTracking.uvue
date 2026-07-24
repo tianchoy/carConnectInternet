@@ -136,12 +136,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				deviceids: imei.value
 			}
 
-			console.log('data', data)
-
 			const res = await getDevicePos(data)
-
-			console.log('res', res)
-
 			if (res?.code == 0 && res.data && res.data.length > 0) {
 				let foundDevice = false
 				res.data.forEach((item : UTSJSONObject) => {

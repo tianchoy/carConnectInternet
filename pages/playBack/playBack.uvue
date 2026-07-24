@@ -42,7 +42,7 @@
 				</view>
 			</view>
 			<l-popup v-model="showDateTimePicker" position="bottom" :closeable="false">
-				<l-date-time-picker confirm-btn="确认" cancel-btn="取消"  :title="pickerTitle" :mode="1|2|4|8|16|32"
+				<l-date-time-picker confirm-btn="确认" cancel-btn="取消"  :title="pickerTitle" :mode="63"
 					@confirm="onConfirm" @cancel="onCancel">
 				</l-date-time-picker>
 			</l-popup>

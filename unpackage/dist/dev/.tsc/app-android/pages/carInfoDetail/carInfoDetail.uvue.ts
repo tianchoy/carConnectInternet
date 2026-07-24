@@ -821,7 +821,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           showTime: true,
           showPickerTime: false,
           "onUpdate:currentTime": onCurrentTimeChange,
-          currentCar: unref(currentCarInfo).plateNo,
+          currentCar: unref(currentCarInfo).deviceName,
           times: unref(times),
           carStatus: unref(datainfo).connectionStatus,
           showPicker: false,

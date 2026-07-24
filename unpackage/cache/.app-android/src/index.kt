@@ -1780,7 +1780,7 @@ open class MapCenter__1 (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 123, 7)
+        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 124, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenter__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1836,7 +1836,7 @@ open class SignalDetail (
     open var level: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 201, 7)
+        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 202, 7)
     }
 }
 val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfoDetailCarInfoDetail::class.java, fun(): VueComponentOptions {
@@ -7476,7 +7476,7 @@ open class CoordinatePoint (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 42, 7)
+        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 43, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return CoordinatePointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7534,7 +7534,7 @@ open class AnimationQueueItem (
     open var connectionStatus: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7)
+        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 48, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return AnimationQueueItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8026,7 +8026,7 @@ open class PaginationState (
     open var loadingMore: Boolean = false,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 178, 7)
+        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 179, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8102,7 +8102,7 @@ open class Pagination (
     open var unbind: PaginationState,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 184, 7)
+        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 185, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8156,7 +8156,7 @@ open class CircleData (
     open var radius: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 188, 7)
+        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 189, 7)
     }
 }
 open class FenceForm (
@@ -8166,7 +8166,7 @@ open class FenceForm (
     open var alarmType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 196, 7)
+        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 197, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FenceFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8222,7 +8222,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 655, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 666, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {

@@ -44,7 +44,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		value : boolean;
 	};
 	// 地图状态
-	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 656, 7>;
+	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 666, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
@@ -248,18 +248,27 @@ const imei = ref<string | null>(null)
 		return 'polygon'
 	}
 
+	function isValidCoordinate(latitude : number, longitude : number) : boolean {
+		return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
+	}
+
 	function parsePolygon(polygonStr : string) : Array<Coordinate> {
 		if (!polygonStr) return []
 		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
-		const coordPoints = coordStr.split(',')
-		return coordPoints.map((point : string) : Coordinate => {
-			const values = point.trim().split(' ')
-			const convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]))
-			return {
+		const points : Array<Coordinate> = []
+		coordStr.split(',').forEach((point : string) => {
+			const values = point.trim().split(/\s+/)
+			if (values.length != 2) return
+			const latitude = parseFloat(values[0])
+			const longitude = parseFloat(values[1])
+			if (!isValidCoordinate(latitude, longitude)) return
+			const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
+			points.push({
 				latitude: convertedCoord.lat,
 				longitude: convertedCoord.lng
-			}
+			})
 		})
+		return points
 	}
 
 	function parseCircle(circleStr : string) : CircleData | null {
@@ -268,12 +277,13 @@ const imei = ref<string | null>(null)
 			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
 			const parts = coordStr.split(',')
 			if (parts.length != 2) return null
-			const centerValues = parts[0].trim().split(' ')
+			const centerValues = parts[0].trim().split(/\s+/)
+			if (centerValues.length != 2) return null
 			const lat = parseFloat(centerValues[0])
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
-			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:417")
+			if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
+				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:427")
 				return null
 			}
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -283,7 +293,7 @@ const imei = ref<string | null>(null)
 				radius: radius
 			}
 		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:427")
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:437")
 			return null
 		}
 	}
@@ -478,7 +488,7 @@ const imei = ref<string | null>(null)
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
-			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:622")
+			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:632")
 			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
@@ -678,7 +688,7 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: '删除失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:830")
+			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:840")
 			showAppToast({ title: '删除失败', icon: 'none' })
 		}
 	}
@@ -743,7 +753,7 @@ const imei = ref<string | null>(null)
 			return
 		}
 
-		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 895, 9),
+		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 905, 9),
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
@@ -789,7 +799,7 @@ const imei = ref<string | null>(null)
 			}
 		} catch (error) {
 			uni.hideLoading()
-			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:941")
+			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:951")
 			showAppToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
@@ -890,7 +900,7 @@ const imei = ref<string | null>(null)
 	// 切换标签页
 	const switchTab = async (tab : string) : Promise<void> => {
 
-		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1042")
+		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1052")
 		if (activeTab.value === tab) return
 
 		activeTab.value = tab
@@ -902,7 +912,7 @@ const imei = ref<string | null>(null)
 
 		// 加载对应数据
 		if (tab === 'bind') {
-			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1054")
+			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1064")
 			await loadBoundDevices(currentFenceId.value)
 		} else {
 			await loadUnboundDevices()
@@ -922,14 +932,14 @@ const imei = ref<string | null>(null)
 
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1074")
+		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1084")
 		loading.value = true
 		try {
-			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1077, 10),
+			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1087, 10),
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1081")
+			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1091")
 			let result : any
 			if (bound) {
 				result = await bindDevices(params)
@@ -952,7 +962,7 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1104")
+			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1114")
 			showAppToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
@@ -1022,11 +1032,11 @@ const imei = ref<string | null>(null)
 
 	function deleteSelectedFence(): void {
 		const fence = selectedFence.value;
-		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1174");
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1184");
 
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
-			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1178");
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1188");
 
 			if (fenceId !== '') {
 				deleteFence(fenceId);

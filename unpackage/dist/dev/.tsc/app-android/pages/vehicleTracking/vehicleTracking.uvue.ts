@@ -113,12 +113,7 @@ const imei = ref<string>('')
 				deviceids: imei.value
 			}
 
-			console.log('data', data, " at pages/vehicleTracking/vehicleTracking.uvue:139")
-
 			const res = await getDevicePos(data)
-
-			console.log('res', res, " at pages/vehicleTracking/vehicleTracking.uvue:143")
-
 			if (res?.code == 0 && res.data && res.data.length > 0) {
 				let foundDevice = false
 				res.data.forEach((item : UTSJSONObject) => {
@@ -189,7 +184,7 @@ const imei = ref<string>('')
 			}
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:215")
+			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:210")
 			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
@@ -210,7 +205,7 @@ const imei = ref<string>('')
 
 		markers.value = [marker]
 		markerInitialized.value = true
-		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:236")
+		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:231")
 	}
 
 	// 计算地图上的旋转角度
@@ -231,7 +226,7 @@ const imei = ref<string>('')
 	}
 
 	onLoad((option) => {
-		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:257")
+		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:252")
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
 		currentCar.value = option.plateNo ?? '未知车辆'
@@ -421,13 +416,13 @@ const imei = ref<string>('')
 	// 请求位置数据
 	const loadTrackData = async () => {
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 447, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 442, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			}
 
 			const res = await getDevicePos(data)
-			console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:453")
+			console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:448")
 			if (res?.code == 0 && res.data && res.data.length > 0) {
 				const deviceData = res.data.find((item : UTSJSONObject) => item.getString('imei', '') == imei.value)
 				if (deviceData != null) {
@@ -456,7 +451,7 @@ const imei = ref<string>('')
 				}
 			}
 		} catch (err) {
-			console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:482")
+			console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:477")
 		}
 	}
 
@@ -531,7 +526,7 @@ const imei = ref<string>('')
 
 
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:557")
+		console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:552")
 		isTracking.value = false
 
 		// 清除定时器
@@ -552,7 +547,7 @@ const imei = ref<string>('')
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:578")
+		console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:573")
 		isTracking.value = false
 
 		// 清除定时器

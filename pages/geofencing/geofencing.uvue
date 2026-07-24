@@ -389,18 +389,27 @@ import { showAppToast } from '../../utils/toast.uts'
 		return 'polygon'
 	}
 
+	function isValidCoordinate(latitude : number, longitude : number) : boolean {
+		return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
+	}
+
 	function parsePolygon(polygonStr : string) : Array<Coordinate> {
 		if (!polygonStr) return []
 		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
-		const coordPoints = coordStr.split(',')
-		return coordPoints.map((point : string) : Coordinate => {
-			const values = point.trim().split(' ')
-			const convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]))
-			return {
+		const points : Array<Coordinate> = []
+		coordStr.split(',').forEach((point : string) => {
+			const values = point.trim().split(/\s+/)
+			if (values.length != 2) return
+			const latitude = parseFloat(values[0])
+			const longitude = parseFloat(values[1])
+			if (!isValidCoordinate(latitude, longitude)) return
+			const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
+			points.push({
 				latitude: convertedCoord.lat,
 				longitude: convertedCoord.lng
-			}
+			})
 		})
+		return points
 	}
 
 	function parseCircle(circleStr : string) : CircleData | null {
@@ -409,11 +418,12 @@ import { showAppToast } from '../../utils/toast.uts'
 			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
 			const parts = coordStr.split(',')
 			if (parts.length != 2) return null
-			const centerValues = parts[0].trim().split(' ')
+			const centerValues = parts[0].trim().split(/\s+/)
+			if (centerValues.length != 2) return null
 			const lat = parseFloat(centerValues[0])
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
-			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+			if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
 				console.error('无效的圆形围栏数据:', circleStr)
 				return null
 			}

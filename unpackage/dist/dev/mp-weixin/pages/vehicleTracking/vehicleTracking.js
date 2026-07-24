@@ -135,9 +135,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deptId: deptId.value,
             deviceids: imei.value
           });
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:139", "data", data);
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:143", "res", res);
           if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
             let foundDevice = false;
             res.data.forEach((item) => {
@@ -195,7 +193,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:215", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:210", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -212,7 +210,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:236", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:231", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -231,7 +229,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _e;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:257", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:252", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -367,7 +365,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             deviceids: imei.value
           });
           const res = yield api_request.getDevicePos(data);
-          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:453", "222222");
+          common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:448", "222222");
           if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
             const deviceData = common_vendor.UTS.arrayFind(res.data, (item) => {
               return item.getString("imei", "") == imei.value;
@@ -396,7 +394,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:482", "获取跟踪位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:477", "获取跟踪位置失败:", err);
         }
       });
     };
@@ -448,7 +446,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:557", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:552", "页面隐藏时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value != null) {
         clearInterval(trackingInterval.value);
@@ -463,7 +461,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       isAnimating.value = false;
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:578", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:573", "页面卸载时停止自动刷新");
       isTracking.value = false;
       if (trackingInterval.value != null) {
         clearInterval(trackingInterval.value);

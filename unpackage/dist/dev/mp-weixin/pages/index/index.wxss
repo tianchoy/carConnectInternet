@@ -282,6 +282,7 @@
 }
 .container .page-bg .content .mile-record .ring-stroke--track.data-v-00a60067 {
   border-color: #dceaf3;
+  border-width: 5rpx;
 }
 .container .page-bg .content .mile-record .ring-stroke--active.data-v-00a60067 {
   border-color: #4cd964;
