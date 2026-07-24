@@ -38,6 +38,13 @@
   width: 100%;
   position: relative;
 }
+.container .map-container .sub-nav-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
 .container .tools-panel {
   width: 100%;
   background-color: #fff;

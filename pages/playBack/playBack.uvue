@@ -6,7 +6,7 @@
 			<map id="myMap" :latitude="center.latitude" :longitude="center.longitude" :markers="markers"
 				:polyline="polyline" :scale="mapScale" style="width:100%;height:100%" :show-location="true" :enable-traffic="true" :enable-overlooking="true" :enable-building="true" :enable-3D="true">
 				</map>
-				<sub-navBar :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
+				<sub-navBar class="sub-nav-overlay" :showTime="false" :currentCar="plateNo" :showCar="true" :carStatus='carStatus'></sub-navBar>
 		</view>
 
 		<view class="tools-panel">
@@ -786,6 +786,14 @@ import { showAppToast } from '../../utils/toast.uts'
 			flex: 1;
 			width: 100%;
 			position: relative;
+
+			.sub-nav-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 100;
+			}
 		}
 
 		.tools-panel {

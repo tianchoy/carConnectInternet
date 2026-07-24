@@ -677,7 +677,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showTime: false,
           currentCar: plateNo.value,
           showCar: true,
-          carStatus: carStatus.value
+          carStatus: carStatus.value,
+          class: "sub-nav-overlay"
         }),
         i: common_vendor.p({
           name: "/static/rili.png",
@@ -686,21 +687,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.t(startTime.value),
         k: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "ca"),
+        }, "7a"),
         l: common_vendor.t(endTime.value),
         m: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "49"),
-        n: common_vendor.o(togglePlayback, "2e"),
+        }, "b0"),
+        n: common_vendor.o(togglePlayback, "3b"),
         o: common_vendor.p({
           type: "primary",
           size: "small",
           text: isPlaying.value ? "暂停" : "播放"
         }),
-        p: common_vendor.o(setPlaybackSpeed, "9d"),
+        p: common_vendor.o(setPlaybackSpeed, "6d"),
         q: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "63"),
+        }, "06"),
         r: common_vendor.p({
           min: 1,
           max: 50,
@@ -711,8 +712,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         t: common_vendor.t(currentTime.value),
         v: common_vendor.t(currentSpeed.value),
         w: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        x: common_vendor.o(onConfirm, "2c"),
-        y: common_vendor.o(onCancel, "12"),
+        x: common_vendor.o(onConfirm, "2f"),
+        y: common_vendor.o(onCancel, "df"),
         z: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -721,7 +722,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         A: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "b1"),
+        }, "da"),
         B: common_vendor.p({
           position: "bottom",
           closeable: false,

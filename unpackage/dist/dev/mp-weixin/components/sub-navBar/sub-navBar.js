@@ -118,7 +118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.t(__props.currentCar),
         g: common_vendor.o(($event) => {
           return __props.showPicker ? handleCar : null;
-        }, "00")
+        }, "c1")
       } : {}, {
         h: common_vendor.t(__props.carStatus == "online" ? "在线" : "离线"),
         i: common_vendor.n(__props.carStatus == "online" ? "success" : "error"),

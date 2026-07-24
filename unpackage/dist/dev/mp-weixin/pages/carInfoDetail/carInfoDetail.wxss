@@ -38,6 +38,13 @@
   width: 100%;
   position: relative;
 }
+.container .map-container .sub-nav-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
 .container .map-container .drag-hint {
   position: absolute;
   top: 20rpx;

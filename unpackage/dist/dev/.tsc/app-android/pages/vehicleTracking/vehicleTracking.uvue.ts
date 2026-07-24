@@ -9,12 +9,12 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
-	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 42, 7>;
+	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 43, 7>;
 		latitude : number
 		longitude : number
 	}
 
-	type AnimationQueueItem = { __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7>;
+	type AnimationQueueItem = { __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 48, 7>;
 		position : CoordinatePoint
 		rotation : number
 		speed : number
@@ -108,16 +108,16 @@ const imei = ref<string>('')
 
 	async function loadInitialPosition() {
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 133, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 134, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			}
 
-			console.log('data', data, " at pages/vehicleTracking/vehicleTracking.uvue:138")
+			console.log('data', data, " at pages/vehicleTracking/vehicleTracking.uvue:139")
 
 			const res = await getDevicePos(data)
 
-			console.log('res', res, " at pages/vehicleTracking/vehicleTracking.uvue:142")
+			console.log('res', res, " at pages/vehicleTracking/vehicleTracking.uvue:143")
 
 			if (res?.code == 0 && res.data && res.data.length > 0) {
 				let foundDevice = false
@@ -189,7 +189,7 @@ const imei = ref<string>('')
 			}
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:214")
+			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:215")
 			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
@@ -210,7 +210,7 @@ const imei = ref<string>('')
 
 		markers.value = [marker]
 		markerInitialized.value = true
-		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:235")
+		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:236")
 	}
 
 	// 计算地图上的旋转角度
@@ -231,7 +231,7 @@ const imei = ref<string>('')
 	}
 
 	onLoad((option) => {
-		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:256")
+		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:257")
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
 		currentCar.value = option.plateNo ?? '未知车辆'
@@ -421,13 +421,13 @@ const imei = ref<string>('')
 	// 请求位置数据
 	const loadTrackData = async () => {
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 446, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 447, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			}
 
 			const res = await getDevicePos(data)
-			console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:452")
+			console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:453")
 			if (res?.code == 0 && res.data && res.data.length > 0) {
 				const deviceData = res.data.find((item : UTSJSONObject) => item.getString('imei', '') == imei.value)
 				if (deviceData != null) {
@@ -456,7 +456,7 @@ const imei = ref<string>('')
 				}
 			}
 		} catch (err) {
-			console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:481")
+			console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:482")
 		}
 	}
 
@@ -531,7 +531,7 @@ const imei = ref<string>('')
 
 
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:556")
+		console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:557")
 		isTracking.value = false
 
 		// 清除定时器
@@ -552,7 +552,7 @@ const imei = ref<string>('')
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:577")
+		console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:578")
 		isTracking.value = false
 
 		// 清除定时器
@@ -575,8 +575,8 @@ const imei = ref<string>('')
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
-const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
 const _component_map = resolveComponent("map")
+const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
 const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
@@ -602,19 +602,16 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           "enable-overlooking": true,
           "enable-building": true,
           "enable-3D": true
-        }), _uM({
-          default: withSlotCtx((): any[] => [
-            _cV(_component_sub_navBar, _uM({
-              currentTime: currentTime.value,
-              currentCar: currentCar.value,
-              times: times.value,
-              showCar: true,
-              "onUpdate:currentTime": handleCurrentTimeUpdate,
-              carStatus: connectionStatus.value
-            }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
-          ]),
-          _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
+        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"]),
+        _cV(_component_sub_navBar, _uM({
+          class: "sub-nav-overlay",
+          currentTime: currentTime.value,
+          currentCar: currentCar.value,
+          times: times.value,
+          showCar: true,
+          "onUpdate:currentTime": handleCurrentTimeUpdate,
+          carStatus: connectionStatus.value
+        }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
       ]),
       _cE("view", _uM({ class: "tools-panel" }), [
         _cE("view", _uM({ class: "btn" }), [
@@ -645,4 +642,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesVehicleTrackingVehicleTrackingStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "40rpx"], ["display", "flex"], ["flexDirection", "column"], ["boxShadow", "0 -2px 10px rgba(0, 0, 0, 0.1)"]])]])], ["btn", _uM([[".container .tools-panel ", _uM([["marginBottom", "20rpx"]])]])], ["pos-info-box", _uM([[".container .tools-panel ", _uM([["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0]])]])], ["speed", _uM([[".container .tools-panel .pos-info-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "8rpx"], ["paddingRight", 0], ["paddingBottom", "8rpx"], ["paddingLeft", 0]])]])], ["address", _uM([[".container .tools-panel .pos-info-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "8rpx"], ["paddingRight", 0], ["paddingBottom", "8rpx"], ["paddingLeft", 0]])]])], ["tracking-info-text", _uM([[".container ", _uM([["fontSize", "28rpx"]])]])]])]
+const GenPagesVehicleTrackingVehicleTrackingStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["sub-nav-overlay", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", 0], ["left", 0], ["right", 0], ["zIndex", 100]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "40rpx"], ["display", "flex"], ["flexDirection", "column"], ["boxShadow", "0 -2px 10px rgba(0, 0, 0, 0.1)"]])]])], ["btn", _uM([[".container .tools-panel ", _uM([["marginBottom", "20rpx"]])]])], ["pos-info-box", _uM([[".container .tools-panel ", _uM([["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0]])]])], ["speed", _uM([[".container .tools-panel .pos-info-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "8rpx"], ["paddingRight", 0], ["paddingBottom", "8rpx"], ["paddingLeft", 0]])]])], ["address", _uM([[".container .tools-panel .pos-info-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["paddingTop", "8rpx"], ["paddingRight", 0], ["paddingBottom", "8rpx"], ["paddingLeft", 0]])]])], ["tracking-info-text", _uM([[".container ", _uM([["fontSize", "28rpx"]])]])]])]

@@ -40,22 +40,22 @@
 }
 .tools-box .car-box .selectCar.data-v-f630fc82 {
   margin-right: 20rpx;
-  color: #fff;
   background-color: rgba(3, 109, 246, 0.71);
   padding: 10rpx;
   border-radius: 10rpx;
 }
 .tools-box .car-box .selectCar .plateNo.data-v-f630fc82 {
   font-size: 30rpx;
+  color: #fff;
 }
 .tools-box .car-box .car-state.data-v-f630fc82 {
   border-radius: 10rpx;
-  color: #fff;
   padding: 10rpx 15rpx;
   font-size: 25rpx;
 }
 .tools-box .car-box .car-state .state.data-v-f630fc82 {
   font-size: 25rpx;
+  color: #fff;
 }
 .tools-box .car-box .success.data-v-f630fc82 {
   background-color: #5ac725;
@@ -75,6 +75,9 @@
   justify-content: flex-start;
   align-items: center;
   font-size: 30rpx;
+}
+.tools-box .second .times .refresh.data-v-f630fc82 {
+  color: #fff;
 }
 .tools-box .down_icon.data-v-f630fc82 {
   width: 30rpx;

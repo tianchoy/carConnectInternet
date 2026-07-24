@@ -2,8 +2,8 @@
 	<view class="tools-box">
 		<view class="second" @click="showPickerTime ? handleTime : null" v-if="showTime">
 			<view class="times">
-				<text>{{ currentTime }}</text>
-				<text v-if="!showPickerTime">刷新一次位置</text>
+				<text class="refresh">{{ currentTime }}</text>
+				<text class="refresh" v-if="!showPickerTime">刷新一次位置</text>
 			</view>
 			<!-- <cover-image v-if="showPickerTime" class="down_icon" src="/static/down_icon.png"></cover-image> -->
 		</view>
@@ -122,25 +122,25 @@
 			.selectCar {
 				@extend .tools-box;
 				margin-right: 20rpx;
-				color: #fff;
 				background-color: rgba(3, 109, 246, 0.71);
 				padding: 10rpx;
 				border-radius: 10rpx;
 
 				.plateNo {
 					font-size: 30rpx;
+					color: #fff;
 				}
 			}
 
 			.car-state {
 				@extend .tools-box;
 				border-radius: 10rpx;
-				color: #fff;
 				padding: 10rpx 15rpx;
 				font-size: 25rpx;
 
 				.state {
 					font-size: 25rpx;
+					color: #fff;
 				}
 			}
 
@@ -166,6 +166,9 @@
 				justify-content: flex-start;
 				align-items: center;
 				font-size: 30rpx;
+				.refresh{
+					color: #fff;
+				}
 			}
 		}
 
