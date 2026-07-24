@@ -1,7 +1,23 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
+import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
+import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { ref, computed } from 'vue'
-	import { getDeviceDetail } from '../../../api/request.uts'
+import { computed, ref } from 'vue'
+	import { editDeviceInfo, getDeviceDetail } from '../../../api/request.uts'
+	import carIcons from '../../../components/car-icons/car-icons.uvue'
+	import { showAppToast } from '../../../utils/toast.uts'
+
+	type VehicleEditInfo = { __$originalPosition?: UTSSourceMapPosition<"VehicleEditInfo", "pages/userCenter/carDetail/carDetail.uvue", 59, 7>;
+		deviceName: string
+		carType: string
+		carTypeValue: string
+		plateNo: string
+		carVin: string
+		engineNum: string
+	}
+
+	type CarIconItem = UTSJSONObject
 
 	
 const __sfc__ = defineComponent({
@@ -13,14 +29,149 @@ const _cache = __ins.renderCache;
 
 	const deviceId = ref<string>('')
 	const carInfo = ref<UTSJSONObject>({})
+	const isEditing = ref<boolean>(false)
+	const saving = ref<boolean>(false)
+	const loadingDetail = ref<boolean>(false)
+	const detailLoaded = ref<boolean>(false)
+	const carIconSelectorVisible = ref<boolean>(false)
+	const editInfo = ref<VehicleEditInfo>({
+		deviceName: '',
+		carType: '',
+		carTypeValue: '',
+		plateNo: '',
+		carVin: '',
+		engineNum: ''
+	})
+
 	const carTitle = computed((): string => carInfo.value.getString('carType', '未知'))
 	const formattedPlateNo = computed((): string => carInfo.value.getString('plateNo', '京A'))
-	const toggleEdit = () => {}
 
-	const loadCarListData = async () : Promise<void> => {
-		const res = await getDeviceDetail(deviceId.value)
-		const data = res.data
-		if (data != null) carInfo.value = data
+	const getCarTypeText = (carType: string): string => {
+		const carTypeNames = { __$originalPosition: new UTSSourceMapPosition("carTypeNames", "pages/userCenter/carDetail/carDetail.uvue", 90, 9), 
+			car: '轿车',
+			suv: '越野车',
+			bus: '公交车',
+			huoche: '货车',
+			train: '火车',
+			diandong: '电动车',
+			moto: '摩托车',
+			bike: '自行车',
+			sanlun: '三轮车',
+			tuola: '拖拉机',
+			wajue: '挖掘机',
+			tuiche: '手推车',
+			baby: '婴儿车',
+			muma: '木马',
+			tank: '坦克',
+			zhuangjia: '装甲车',
+			plan: '飞机',
+			hangmu: '航母',
+			junjian: '军舰',
+			walk: '步行'
+		} as UTSJSONObject
+		return carTypeNames.getString(carType, carType)
+	}
+
+	const createEditInfo = (): VehicleEditInfo => {
+		const carType = carInfo.value.getString('carType', '')
+		return {
+			deviceName: carInfo.value.getString('deviceName', ''),
+			carType: carType,
+			carTypeValue: carType,
+			plateNo: carInfo.value.getString('plateNo', ''),
+			carVin: carInfo.value.getString('carVin', ''),
+			engineNum: carInfo.value.getString('engineNum', '')
+		}
+	}
+
+	const toggleEdit = (): void => {
+		if (loadingDetail.value || saving.value) return
+		if (!detailLoaded.value || deviceId.value.length == 0) {
+			showAppToast({ title: '车辆信息尚未加载完成', icon: 'none' })
+			return
+		}
+		editInfo.value = createEditInfo()
+		isEditing.value = true
+	}
+
+	const updateCarIconSelectorVisible = (visible: boolean): void => {
+		carIconSelectorVisible.value = visible
+	}
+
+	const openCarIconSelector = (): void => {
+		if (!saving.value) carIconSelectorVisible.value = true
+	}
+
+	const selectIcon = (item: CarIconItem): void => {
+		editInfo.value.carType = item.getString('name', '')
+		editInfo.value.carTypeValue = item.getString('text', '')
+		carIconSelectorVisible.value = false
+	}
+
+	const normalizePlateNo = (value: string): string => value.replace(/\s/g, '')
+
+	const cancelEdit = (): void => {
+		if (saving.value) return
+		carIconSelectorVisible.value = false
+		isEditing.value = false
+	}
+
+	const saveChanges = async (): Promise<void> => {
+		if (saving.value) return
+		if (deviceId.value.length == 0) {
+			showAppToast({ title: '设备ID不能为空', icon: 'none' })
+			return
+		}
+
+		const plateNo = normalizePlateNo(editInfo.value.plateNo)
+		const payload = { __$originalPosition: new UTSSourceMapPosition("payload", "pages/userCenter/carDetail/carDetail.uvue", 167, 9), 
+			deviceId: deviceId.value,
+			deviceName: editInfo.value.deviceName,
+			carType: editInfo.value.carType,
+			plateNo: plateNo,
+			carVin: editInfo.value.carVin,
+			engineNum: editInfo.value.engineNum
+		} as UTSJSONObject
+
+		saving.value = true
+		uni.showLoading({ title: '保存中...', mask: true })
+		try {
+			const res = await editDeviceInfo(payload)
+			if (res.code == 0) {
+				carInfo.value = payload
+				editInfo.value.plateNo = plateNo
+				isEditing.value = false
+				carIconSelectorVisible.value = false
+				showAppToast({ title: '保存成功', icon: 'success' })
+			} else {
+				showAppToast({ title: res.msg || '保存失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('保存车辆信息失败:', error, " at pages/userCenter/carDetail/carDetail.uvue:190")
+			showAppToast({ title: '保存失败，请重试', icon: 'none' })
+		} finally {
+			uni.hideLoading()
+			saving.value = false
+		}
+	}
+
+	const loadCarListData = async (): Promise<void> => {
+		if (deviceId.value.length == 0) return
+		loadingDetail.value = true
+		try {
+			const res = await getDeviceDetail(deviceId.value)
+			if (res.code == 0 && res.data != null) {
+				carInfo.value = res.data
+				detailLoaded.value = true
+			} else {
+				showAppToast({ title: res.msg || '获取车辆详情失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('获取车辆详情失败:', error, " at pages/userCenter/carDetail/carDetail.uvue:210")
+			showAppToast({ title: '获取车辆详情失败', icon: 'none' })
+		} finally {
+			loadingDetail.value = false
+		}
 	}
 
 	onLoad((option) => {
@@ -34,6 +185,9 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
+const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
+const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
@@ -43,11 +197,11 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         "show-back": true,
         backgroundColor: "#fff",
         textColor: "#333",
-        showCapsule: false,
+        showCapsule: !isEditing.value && !loadingDetail.value,
         isIcon: true,
         onCapsuleClick: toggleEdit,
         Icon: "/static/edit-pen.png"
-      })),
+      }), null, 8 /* PROPS */, ["showCapsule"]),
       _cE("view", _uM({ class: "content" }), [
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "设备ID"),
@@ -55,25 +209,123 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "设备名称"),
-          _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceName', '')), 1 /* TEXT */)
+          isTrue(!isEditing.value)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "info"
+              }), _tD(carInfo.value.getString('deviceName', '')), 1 /* TEXT */)
+            : _cV(_component_i_input, _uM({
+                key: 1,
+                modelValue: editInfo.value.deviceName,
+                "onUpdate:modelValue": $event => {(editInfo.value.deviceName) = $event},
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入设备名称"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "车标"),
-          _cE("text", _uM({ class: "info" }), _tD(carTitle.value), 1 /* TEXT */)
+          isTrue(!isEditing.value)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "info"
+              }), _tD(carTitle.value), 1 /* TEXT */)
+            : _cE("view", _uM({
+                key: 1,
+                class: "car-type-selector",
+                onClick: openCarIconSelector
+              }), [
+                _cE("text", _uM({
+                  class: _nC(_uM({ placeholder: editInfo.value.carTypeValue.length == 0 }))
+                }), _tD(editInfo.value.carTypeValue || '请选择车标'), 3 /* TEXT, CLASS */),
+                _cV(_component_i_icon, _uM({
+                  name: "/static/xiangxia.png",
+                  fontSize: "18"
+                }))
+              ])
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "车牌号"),
-          _cE("text", _uM({ class: "info" }), _tD(formattedPlateNo.value), 1 /* TEXT */)
+          isTrue(!isEditing.value)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "info"
+              }), _tD(formattedPlateNo.value), 1 /* TEXT */)
+            : _cV(_component_i_input, _uM({
+                key: 1,
+                modelValue: editInfo.value.plateNo,
+                "onUpdate:modelValue": $event => {(editInfo.value.plateNo) = $event},
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入车牌号"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "车架号"),
-          _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('carVin', '')), 1 /* TEXT */)
+          isTrue(!isEditing.value)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "info"
+              }), _tD(carInfo.value.getString('carVin', '')), 1 /* TEXT */)
+            : _cV(_component_i_input, _uM({
+                key: 1,
+                modelValue: editInfo.value.carVin,
+                "onUpdate:modelValue": $event => {(editInfo.value.carVin) = $event},
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入车架号"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
         ]),
         _cE("view", _uM({ class: "list" }), [
           _cE("text", _uM({ class: "title" }), "发动机号"),
-          _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('engineNum', '')), 1 /* TEXT */)
+          isTrue(!isEditing.value)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "info"
+              }), _tD(carInfo.value.getString('engineNum', '')), 1 /* TEXT */)
+            : _cV(_component_i_input, _uM({
+                key: 1,
+                modelValue: editInfo.value.engineNum,
+                "onUpdate:modelValue": $event => {(editInfo.value.engineNum) = $event},
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入发动机号"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
         ])
-      ])
+      ]),
+      isTrue(isEditing.value)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "button-group"
+          }), [
+            _cV(_component_i_button, _uM({
+              class: "action-button save-btn",
+              type: "primary",
+              loading: saving.value,
+              onClick: saveChanges
+            }), _uM({
+              default: withSlotCtx((): any[] => ["保存"]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["loading"]),
+            _cV(_component_i_button, _uM({
+              class: "action-button cancel-btn",
+              disabled: saving.value,
+              onClick: cancelEdit
+            }), _uM({
+              default: withSlotCtx((): any[] => ["取消"]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["disabled"])
+          ])
+        : _cC("v-if", true),
+      _cV(unref(carIcons), _uM({
+        show: carIconSelectorVisible.value,
+        "onUpdate:show": updateCarIconSelectorVisible,
+        onSelect: selectIcon
+      }), null, 8 /* PROPS */, ["show"])
     ]),
     _cV(_component_app_toast)
   ], 64 /* STABLE_FRAGMENT */)
@@ -82,4 +334,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesUserCenterCarDetailCarDetailStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#f5f5f5"]]))], ["content", _pS(_uM([["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["paddingTop", "40rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "40rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]]))], ["list", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "10rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]]))], ["title", _pS(_uM([["width", "30%"], ["color", "#999999"]]))], ["info", _pS(_uM([["color", "#333333"], ["textAlign", "right"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))]])]
+const GenPagesUserCenterCarDetailCarDetailStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#f5f5f5"]]))], ["content", _pS(_uM([["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["paddingTop", "40rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "40rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]]))], ["list", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["minHeight", "76rpx"], ["paddingTop", "20rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "10rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]]))], ["title", _pS(_uM([["width", "30%"], ["color", "#999999"]]))], ["info", _pS(_uM([["color", "#333333"], ["textAlign", "right"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["input", _pS(_uM([["textAlign", "right"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"], ["width", "60%"]]))], ["car-type-selector", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "flex-end"]]))], ["button-group", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "40rpx"], ["marginRight", "40rpx"], ["marginBottom", 0], ["marginLeft", "40rpx"]]))], ["action-button", _pS(_uM([["width", "40%"], ["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"], ["fontSize", "32rpx"], ["height", "80rpx"], ["lineHeight", "80rpx"]]))], ["save-btn", _pS(_uM([["backgroundColor", "#007AFF"], ["color", "#FFFFFF"]]))], ["cancel-btn", _pS(_uM([["backgroundColor", "#f5f5f5"], ["color", "#333333"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dddddd"], ["borderRightColor", "#dddddd"], ["borderBottomColor", "#dddddd"], ["borderLeftColor", "#dddddd"]]))]])]

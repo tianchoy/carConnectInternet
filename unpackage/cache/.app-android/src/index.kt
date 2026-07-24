@@ -470,6 +470,7 @@ val userDeviceList = "/userDevice/list"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
+val updateDevice = "/device/update"
 val deviceDetail = "/device/info/"
 val logoutUrl = "/sys/logout"
 val sendcmd = "/command/sendCmd"
@@ -773,6 +774,12 @@ val getUserMsgList = fun(data: UTSJSONObject?): UTSPromise<MessageResponse> {
 }
 val setMsgState = fun(msgId: String): UTSPromise<BasicResponse> {
     return get("" + msgState + msgId).then(fun(raw: Any): BasicResponse {
+        return basicResponse(raw)
+    }
+    )
+}
+val editDeviceInfo = fun(data: UTSJSONObject): UTSPromise<BasicResponse> {
+    return put(updateDevice, data).then(fun(raw: Any): BasicResponse {
         return basicResponse(raw)
     }
     )
@@ -1885,7 +1892,7 @@ open class CarFormData (
     open var carType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 51, 7)
+        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 55, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return CarFormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1983,7 +1990,7 @@ open class ScanResultData (
     open var result: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 60, 7)
+        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 64, 7)
     }
 }
 typealias CarIconItem__1 = UTSJSONObject
@@ -7868,6 +7875,115 @@ val GenPagesUserCenterCarListCarListClass = CreateVueComponent(GenPagesUserCente
     return GenPagesUserCenterCarListCarList(instance, renderer)
 }
 )
+open class VehicleEditInfo (
+    @JsonNotNull
+    open var deviceName: String,
+    @JsonNotNull
+    open var carType: String,
+    @JsonNotNull
+    open var carTypeValue: String,
+    @JsonNotNull
+    open var plateNo: String,
+    @JsonNotNull
+    open var carVin: String,
+    @JsonNotNull
+    open var engineNum: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("VehicleEditInfo", "pages/userCenter/carDetail/carDetail.uvue", 59, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return VehicleEditInfoReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class VehicleEditInfoReactiveObject : VehicleEditInfo, IUTSReactive<VehicleEditInfo> {
+    override var __v_raw: VehicleEditInfo
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: VehicleEditInfo, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(deviceName = __v_raw.deviceName, carType = __v_raw.carType, carTypeValue = __v_raw.carTypeValue, plateNo = __v_raw.plateNo, carVin = __v_raw.carVin, engineNum = __v_raw.engineNum) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): VehicleEditInfoReactiveObject {
+        return VehicleEditInfoReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var deviceName: String
+        get() {
+            return _tRG(__v_raw, "deviceName", __v_raw.deviceName, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("deviceName")) {
+                return
+            }
+            val oldValue = __v_raw.deviceName
+            __v_raw.deviceName = value
+            _tRS(__v_raw, "deviceName", oldValue, value)
+        }
+    override var carType: String
+        get() {
+            return _tRG(__v_raw, "carType", __v_raw.carType, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("carType")) {
+                return
+            }
+            val oldValue = __v_raw.carType
+            __v_raw.carType = value
+            _tRS(__v_raw, "carType", oldValue, value)
+        }
+    override var carTypeValue: String
+        get() {
+            return _tRG(__v_raw, "carTypeValue", __v_raw.carTypeValue, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("carTypeValue")) {
+                return
+            }
+            val oldValue = __v_raw.carTypeValue
+            __v_raw.carTypeValue = value
+            _tRS(__v_raw, "carTypeValue", oldValue, value)
+        }
+    override var plateNo: String
+        get() {
+            return _tRG(__v_raw, "plateNo", __v_raw.plateNo, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("plateNo")) {
+                return
+            }
+            val oldValue = __v_raw.plateNo
+            __v_raw.plateNo = value
+            _tRS(__v_raw, "plateNo", oldValue, value)
+        }
+    override var carVin: String
+        get() {
+            return _tRG(__v_raw, "carVin", __v_raw.carVin, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("carVin")) {
+                return
+            }
+            val oldValue = __v_raw.carVin
+            __v_raw.carVin = value
+            _tRS(__v_raw, "carVin", oldValue, value)
+        }
+    override var engineNum: String
+        get() {
+            return _tRG(__v_raw, "engineNum", __v_raw.engineNum, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("engineNum")) {
+                return
+            }
+            val oldValue = __v_raw.engineNum
+            __v_raw.engineNum = value
+            _tRS(__v_raw, "engineNum", oldValue, value)
+        }
+}
+typealias CarIconItem__2 = UTSJSONObject
 val GenPagesUserCenterCarDetailCarDetailClass = CreateVueComponent(GenPagesUserCenterCarDetailCarDetail::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesUserCenterCarDetailCarDetail.inheritAttrs, inject = GenPagesUserCenterCarDetailCarDetail.inject, props = GenPagesUserCenterCarDetailCarDetail.props, propsNeedCastKeys = GenPagesUserCenterCarDetailCarDetail.propsNeedCastKeys, emits = GenPagesUserCenterCarDetailCarDetail.emits, components = GenPagesUserCenterCarDetailCarDetail.components, styles = GenPagesUserCenterCarDetailCarDetail.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesUserCenterCarDetailCarDetail.setup(props as GenPagesUserCenterCarDetailCarDetail)

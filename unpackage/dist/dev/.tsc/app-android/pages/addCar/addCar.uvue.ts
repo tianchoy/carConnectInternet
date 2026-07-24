@@ -10,7 +10,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import { addDevice, getCarType } from '../../api/request'
 	import carIcons from '../../components/car-icons/car-icons.uvue'
 
-	type CarFormData = { __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 51, 7>;
+	type CarFormData = { __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 55, 7>;
 		deviceName: string
 		imei: string
 		deviceType: string
@@ -19,13 +19,13 @@ import { showAppToast } from '../../utils/toast.uts'
 		carType: string
 	}
 
-	type ScanResultData = { __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 60, 7>;
+	type ScanResultData = { __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 64, 7>;
 		result: string
 	}
 
 	type CarIconItem = UTSJSONObject
 
-	type AddDeviceResponse = { __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 66, 7>;
+	type AddDeviceResponse = { __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 70, 7>;
 		code: number
 		msg: string
 		data: CarFormData
@@ -80,7 +80,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 
 	// 扫码结果事件处理
 	const handleScanResult = (data: ScanResultData) => {
-		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:113")
+		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:117")
 		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
 		if (data.result.length == 15) {
 			carInfo.value.imei = '0' + data.result.slice(4, 15)
@@ -102,7 +102,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 	const selectIcon = (item: CarIconItem) => {
 		const name = item.getString('name', '')
 		const text = item.getString('text', '')
-		console.log(name, " at pages/addCar/addCar.uvue:135")
+		console.log(name, " at pages/addCar/addCar.uvue:139")
 		carInfo.value.deviceType = name
 		carInfo.value.deviceTypeValue = text
 		carIconSelectorVisible.value = false
@@ -139,12 +139,12 @@ const carIconSelectorVisible = ref<boolean>(false)
 
 	// ===== 提交表单 =====
 	const submit = async () => {
-		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:172")
+		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:176")
 
 		try {
 			// 表单验证
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:177")
+			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:181")
 
 			loading.value = true
 			uni.showLoading({
@@ -152,17 +152,17 @@ const carIconSelectorVisible = ref<boolean>(false)
 				mask: true
 			})
 
-			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 185, 10),
+			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 189, 10),
 				deviceName: carInfo.value.deviceName,
 				imei: carInfo.value.imei,
 				carType: carInfo.value.deviceType,
-				// plateNo: carInfo.value.plateNo
+				plateNo: carInfo.value.plateNo
 			}
 
-			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:192")
+			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:196")
 
 			const res = await addDevice(submitData)
-			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:195")
+			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:199")
 
 			uni.hideLoading()
 			loading.value = false
@@ -189,7 +189,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 				})
 			}
 		} catch (error: any) {
-			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:222")
+			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:226")
 			uni.hideLoading()
 			loading.value = false
 			showAppToast({
@@ -325,6 +325,21 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                     class: _nC(["clickable", _uM({ 'placeholder': !carInfo.value.deviceTypeValue })])
                   }), _tD(carInfo.value.deviceTypeValue || '请选择设备图标(必选)'), 3 /* TEXT, CLASS */)
                 ])
+              ]),
+              _: 1 /* STABLE */
+            })),
+            _cV(_component_i_form_item, _uM({
+              label: "车牌名",
+              name: "plateNo",
+              labelDirection: "horizontal"
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cV(_component_i_input, _uM({
+                  border: "none",
+                  modelValue: carInfo.value.plateNo,
+                  "onUpdate:modelValue": $event => {(carInfo.value.plateNo) = $event},
+                  placeholder: "请输入车牌名"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ]),
               _: 1 /* STABLE */
             })),

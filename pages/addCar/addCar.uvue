@@ -31,6 +31,10 @@
 						</text>
 					</view>
 				</i-form-item>
+				<i-form-item label="车牌名" name="plateNo"  labelDirection="horizontal">
+					<i-input border="none" v-model="carInfo.plateNo" placeholder="请输入车牌名">
+					</i-input>
+				</i-form-item>
 				<carIcons :show="carIconSelectorVisible" @update:show="updateCarIconSelectorVisible" @select="selectIcon"></carIcons>
 			</i-form>
 		</view>
@@ -186,7 +190,7 @@ import { showAppToast } from '../../utils/toast.uts'
 				deviceName: carInfo.value.deviceName,
 				imei: carInfo.value.imei,
 				carType: carInfo.value.deviceType,
-				// plateNo: carInfo.value.plateNo
+				plateNo: carInfo.value.plateNo
 			}
 
 			console.log('📤 提交数据:', submitData)

@@ -135,15 +135,13 @@
   padding: 20rpx;
   border-radius: 30rpx;
 }
-.container .page-bg .top .car-state .state-item .state-value.data-v-00a60067 {
-  margin-top: 12rpx;
-}
 .container .page-bg .top .car-state .state-item .state-label.data-v-00a60067 {
   font-size: 24rpx;
   color: #999;
 }
 .container .page-bg .top .car-state .state-item .state-value.data-v-00a60067 {
-  font-size: 28rpx;
+  margin-top: 12rpx;
+  font-size: 25rpx;
   font-weight: bold;
   color: #333;
 }

@@ -2084,6 +2084,7 @@
   const changePSW = "/sys/user/password";
   const userMsgList = "/usermessage/listForUser";
   const msgState = "/usermessage/detail/";
+  const updateDevice = "/device/update";
   const deviceDetail = "/device/info/";
   const logoutUrl = "/sys/logout";
   const sendcmd = "/command/sendCmd";
@@ -2563,6 +2564,11 @@
   };
   const setMsgState = (msgId) => {
     return get("".concat(msgState).concat(msgId)).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const editDeviceInfo = (data) => {
+    return put(updateDevice, data).then((raw = null) => {
       return basicResponse(raw);
     });
   };
@@ -3815,7 +3821,7 @@
   const _imports_6 = "/static/pay.png";
   const _imports_7 = "/static/online.png";
   const _imports_8 = "/static/del.png";
-  const _style_0$H = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "marginLeft": "30rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-container": { ".container .page-bg .content .map-box ": { "height": "300rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const _style_0$H = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "marginLeft": "30rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-container": { ".container .page-bg .content .map-box ": { "height": "300rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
   function _sfc_render$H(_ctx, _cache, $props, $setup, $data, $options) {
     var _a;
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
@@ -10147,7 +10153,7 @@
         });
       };
       const handleScanResult = (data) => {
-        uni.__log__("log", "at pages/addCar/addCar.uvue:113", "接收到扫码结果:", data.result);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:117", "接收到扫码结果:", data.result);
         if (data.result.length == 15) {
           carInfo.value.imei = "0" + data.result.slice(4, 15);
         } else if (data.result.length == 11) {
@@ -10165,7 +10171,7 @@
       const selectIcon = (item) => {
         const name = item.getString("name", "");
         const text = item.getString("text", "");
-        uni.__log__("log", "at pages/addCar/addCar.uvue:135", name);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:139", name);
         carInfo.value.deviceType = name;
         carInfo.value.deviceTypeValue = text;
         carIconSelectorVisible.value = false;
@@ -10195,11 +10201,11 @@
       };
       const submit = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/addCar/addCar.uvue:172", "=== 开始提交设备 ===");
+          uni.__log__("log", "at pages/addCar/addCar.uvue:176", "=== 开始提交设备 ===");
           try {
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:177", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/addCar/addCar.uvue:181", "✅ 表单验证通过");
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "添加中...",
@@ -10208,12 +10214,12 @@
             const submitData = new UTSJSONObject({
               deviceName: carInfo.value.deviceName,
               imei: carInfo.value.imei,
-              carType: carInfo.value.deviceType
-              // plateNo: carInfo.value.plateNo
+              carType: carInfo.value.deviceType,
+              plateNo: carInfo.value.plateNo
             });
-            uni.__log__("log", "at pages/addCar/addCar.uvue:192", "📤 提交数据:", submitData);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:196", "📤 提交数据:", submitData);
             const res = yield addDevice(submitData);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:195", "✅ 添加设备返回:", res);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:199", "✅ 添加设备返回:", res);
             uni.hideLoading();
             loading.value = false;
             if (res.code == 0) {
@@ -10234,7 +10240,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:222", "❌ 添加设备失败:", error);
+            uni.__log__("error", "at pages/addCar/addCar.uvue:226", "❌ 添加设备失败:", error);
             uni.hideLoading();
             loading.value = false;
             showAppToast({
@@ -10358,6 +10364,22 @@
                         /* TEXT, CLASS */
                       )
                     ])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                vue.createVNode(_component_i_form_item, {
+                  label: "车牌名",
+                  name: "plateNo",
+                  labelDirection: "horizontal"
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      border: "none",
+                      modelValue: $setup.carInfo.plateNo,
+                      "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.carInfo.plateNo = $event),
+                      placeholder: "请输入车牌名"
+                    }, null, 8, ["modelValue"])
                   ]),
                   _: 1
                   /* STABLE */
@@ -18923,6 +18945,35 @@
     );
   }
   const PagesUserCenterCarListCarList = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["styles", [_style_0$b]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/carList/carList.uvue"]]);
+  class VehicleEditInfo extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            deviceName: { type: String, optional: false },
+            carType: { type: String, optional: false },
+            carTypeValue: { type: String, optional: false },
+            plateNo: { type: String, optional: false },
+            carVin: { type: String, optional: false },
+            engineNum: { type: String, optional: false }
+          };
+        },
+        name: "VehicleEditInfo"
+      };
+    }
+    constructor(options, metadata = VehicleEditInfo.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.deviceName = this.__props__.deviceName;
+      this.carType = this.__props__.carType;
+      this.carTypeValue = this.__props__.carTypeValue;
+      this.plateNo = this.__props__.plateNo;
+      this.carVin = this.__props__.carVin;
+      this.engineNum = this.__props__.engineNum;
+      delete this.__props__;
+    }
+  }
   const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "carDetail",
     setup(__props, _a) {
@@ -18930,20 +18981,150 @@
       __expose();
       const deviceId = vue.ref("");
       const carInfo = vue.ref(new UTSJSONObject({}));
+      const isEditing = vue.ref(false);
+      const saving = vue.ref(false);
+      const loadingDetail = vue.ref(false);
+      const detailLoaded = vue.ref(false);
+      const carIconSelectorVisible = vue.ref(false);
+      const editInfo = vue.ref(new VehicleEditInfo({
+        deviceName: "",
+        carType: "",
+        carTypeValue: "",
+        plateNo: "",
+        carVin: "",
+        engineNum: ""
+      }));
       const carTitle = vue.computed(() => {
         return carInfo.value.getString("carType", "未知");
       });
       const formattedPlateNo = vue.computed(() => {
         return carInfo.value.getString("plateNo", "京A");
       });
+      const getCarTypeText = (carType) => {
+        const carTypeNames = new UTSJSONObject({
+          car: "轿车",
+          suv: "越野车",
+          bus: "公交车",
+          huoche: "货车",
+          train: "火车",
+          diandong: "电动车",
+          moto: "摩托车",
+          bike: "自行车",
+          sanlun: "三轮车",
+          tuola: "拖拉机",
+          wajue: "挖掘机",
+          tuiche: "手推车",
+          baby: "婴儿车",
+          muma: "木马",
+          tank: "坦克",
+          zhuangjia: "装甲车",
+          plan: "飞机",
+          hangmu: "航母",
+          junjian: "军舰",
+          walk: "步行"
+        });
+        return carTypeNames.getString(carType, carType);
+      };
+      const createEditInfo = () => {
+        const carType = carInfo.value.getString("carType", "");
+        return new VehicleEditInfo({
+          deviceName: carInfo.value.getString("deviceName", ""),
+          carType,
+          carTypeValue: carType,
+          plateNo: carInfo.value.getString("plateNo", ""),
+          carVin: carInfo.value.getString("carVin", ""),
+          engineNum: carInfo.value.getString("engineNum", "")
+        });
+      };
       const toggleEdit = () => {
+        if (loadingDetail.value || saving.value)
+          return null;
+        if (!detailLoaded.value || deviceId.value.length == 0) {
+          showAppToast({ title: "车辆信息尚未加载完成", icon: "none" });
+          return null;
+        }
+        editInfo.value = createEditInfo();
+        isEditing.value = true;
+      };
+      const updateCarIconSelectorVisible = (visible) => {
+        carIconSelectorVisible.value = visible;
+      };
+      const openCarIconSelector = () => {
+        if (!saving.value)
+          carIconSelectorVisible.value = true;
+      };
+      const selectIcon = (item) => {
+        editInfo.value.carType = item.getString("name", "");
+        editInfo.value.carTypeValue = item.getString("text", "");
+        carIconSelectorVisible.value = false;
+      };
+      const normalizePlateNo = (value) => {
+        return value.replace(/\s/g, "");
+      };
+      const cancelEdit = () => {
+        if (saving.value)
+          return null;
+        carIconSelectorVisible.value = false;
+        isEditing.value = false;
+      };
+      const saveChanges = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (saving.value)
+            return Promise.resolve(null);
+          if (deviceId.value.length == 0) {
+            showAppToast({ title: "设备ID不能为空", icon: "none" });
+            return Promise.resolve(null);
+          }
+          const plateNo = normalizePlateNo(editInfo.value.plateNo);
+          const payload = new UTSJSONObject({
+            deviceId: deviceId.value,
+            deviceName: editInfo.value.deviceName,
+            carType: editInfo.value.carType,
+            plateNo,
+            carVin: editInfo.value.carVin,
+            engineNum: editInfo.value.engineNum
+          });
+          saving.value = true;
+          uni.showLoading(new UTSJSONObject({ title: "保存中...", mask: true }));
+          try {
+            const res = yield editDeviceInfo(payload);
+            if (res.code == 0) {
+              carInfo.value = payload;
+              editInfo.value.plateNo = plateNo;
+              isEditing.value = false;
+              carIconSelectorVisible.value = false;
+              showAppToast({ title: "保存成功", icon: "success" });
+            } else {
+              showAppToast({ title: res.msg || "保存失败", icon: "none" });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/userCenter/carDetail/carDetail.uvue:190", "保存车辆信息失败:", error);
+            showAppToast({ title: "保存失败，请重试", icon: "none" });
+          } finally {
+            uni.hideLoading();
+            saving.value = false;
+          }
+        });
       };
       const loadCarListData = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          const res = yield getDeviceDetail(deviceId.value);
-          const data = res.data;
-          if (data != null)
-            carInfo.value = data;
+          if (deviceId.value.length == 0)
+            return Promise.resolve(null);
+          loadingDetail.value = true;
+          try {
+            const res = yield getDeviceDetail(deviceId.value);
+            if (res.code == 0 && res.data != null) {
+              carInfo.value = res.data;
+              detailLoaded.value = true;
+            } else {
+              showAppToast({ title: res.msg || "获取车辆详情失败", icon: "none" });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/userCenter/carDetail/carDetail.uvue:210", "获取车辆详情失败:", error);
+            showAppToast({ title: "获取车辆详情失败", icon: "none" });
+          } finally {
+            loadingDetail.value = false;
+          }
         });
       };
       vue.onLoad((option) => {
@@ -18953,14 +19134,19 @@
           loadCarListData();
         }
       });
-      const __returned__ = { deviceId, carInfo, carTitle, formattedPlateNo, toggleEdit, loadCarListData };
+      const __returned__ = { deviceId, carInfo, isEditing, saving, loadingDetail, detailLoaded, carIconSelectorVisible, editInfo, carTitle, formattedPlateNo, getCarTypeText, createEditInfo, toggleEdit, updateCarIconSelectorVisible, openCarIconSelector, selectIcon, normalizePlateNo, cancelEdit, saveChanges, loadCarListData, get carIcons() {
+        return carIcons;
+      } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$a = { "container": { "": { "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { "": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "paddingTop": "40rpx", "paddingRight": "40rpx", "paddingBottom": "40rpx", "paddingLeft": "40rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "list": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { "": { "width": "30%", "color": "#999999" } }, "info": { "": { "color": "#333333", "textAlign": "right", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+  const _style_0$a = { "container": { "": { "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { "": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "paddingTop": "40rpx", "paddingRight": "40rpx", "paddingBottom": "40rpx", "paddingLeft": "40rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "list": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "minHeight": "76rpx", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { "": { "width": "30%", "color": "#999999" } }, "info": { "": { "color": "#333333", "textAlign": "right", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "input": { "": { "textAlign": "right", "paddingTop": 0, "paddingRight": "10rpx", "paddingBottom": 0, "paddingLeft": "10rpx", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "width": "60%" } }, "car-type-selector": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "flex-end" } }, "button-group": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "40rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "action-button": { "": { "width": "40%", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "fontSize": "32rpx", "height": "80rpx", "lineHeight": "80rpx" } }, "save-btn": { "": { "backgroundColor": "#007AFF", "color": "#FFFFFF" } }, "cancel-btn": { "": { "backgroundColor": "#f5f5f5", "color": "#333333", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dddddd", "borderRightColor": "#dddddd", "borderBottomColor": "#dddddd", "borderLeftColor": "#dddddd" } } };
   function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+    const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+    const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
+    const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
     const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -18972,11 +19158,11 @@
             "show-back": true,
             backgroundColor: "#fff",
             textColor: "#333",
-            showCapsule: false,
+            showCapsule: !$setup.isEditing && !$setup.loadingDetail,
             isIcon: true,
             onCapsuleClick: $setup.toggleEdit,
             Icon: "/static/edit-pen.png"
-          }),
+          }, null, 8, ["showCapsule"]),
           vue.createElementVNode("view", { class: "content" }, [
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "设备ID"),
@@ -18990,55 +19176,153 @@
             ]),
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "设备名称"),
-              vue.createElementVNode(
+              !$setup.isEditing ? (vue.openBlock(), vue.createElementBlock(
                 "text",
-                { class: "info" },
+                {
+                  key: 0,
+                  class: "info"
+                },
                 vue.toDisplayString($setup.carInfo.getString("deviceName", "")),
                 1
                 /* TEXT */
-              )
+              )) : (vue.openBlock(), vue.createBlock(_component_i_input, {
+                key: 1,
+                modelValue: $setup.editInfo.deviceName,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.editInfo.deviceName = $event),
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入设备名称"
+              }, null, 8, ["modelValue"]))
             ]),
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "车标"),
-              vue.createElementVNode(
+              !$setup.isEditing ? (vue.openBlock(), vue.createElementBlock(
                 "text",
-                { class: "info" },
+                {
+                  key: 0,
+                  class: "info"
+                },
                 vue.toDisplayString($setup.carTitle),
                 1
                 /* TEXT */
-              )
+              )) : (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "car-type-selector",
+                onClick: $setup.openCarIconSelector
+              }, [
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: vue.normalizeClass({ placeholder: $setup.editInfo.carTypeValue.length == 0 })
+                  },
+                  vue.toDisplayString($setup.editInfo.carTypeValue || "请选择车标"),
+                  3
+                  /* TEXT, CLASS */
+                ),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/xiangxia.png",
+                  fontSize: "18"
+                })
+              ]))
             ]),
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "车牌号"),
-              vue.createElementVNode(
+              !$setup.isEditing ? (vue.openBlock(), vue.createElementBlock(
                 "text",
-                { class: "info" },
+                {
+                  key: 0,
+                  class: "info"
+                },
                 vue.toDisplayString($setup.formattedPlateNo),
                 1
                 /* TEXT */
-              )
+              )) : (vue.openBlock(), vue.createBlock(_component_i_input, {
+                key: 1,
+                modelValue: $setup.editInfo.plateNo,
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.editInfo.plateNo = $event),
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入车牌号"
+              }, null, 8, ["modelValue"]))
             ]),
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "车架号"),
-              vue.createElementVNode(
+              !$setup.isEditing ? (vue.openBlock(), vue.createElementBlock(
                 "text",
-                { class: "info" },
+                {
+                  key: 0,
+                  class: "info"
+                },
                 vue.toDisplayString($setup.carInfo.getString("carVin", "")),
                 1
                 /* TEXT */
-              )
+              )) : (vue.openBlock(), vue.createBlock(_component_i_input, {
+                key: 1,
+                modelValue: $setup.editInfo.carVin,
+                "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.editInfo.carVin = $event),
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入车架号"
+              }, null, 8, ["modelValue"]))
             ]),
             vue.createElementVNode("view", { class: "list" }, [
               vue.createElementVNode("text", { class: "title" }, "发动机号"),
-              vue.createElementVNode(
+              !$setup.isEditing ? (vue.openBlock(), vue.createElementBlock(
                 "text",
-                { class: "info" },
+                {
+                  key: 0,
+                  class: "info"
+                },
                 vue.toDisplayString($setup.carInfo.getString("engineNum", "")),
                 1
                 /* TEXT */
-              )
+              )) : (vue.openBlock(), vue.createBlock(_component_i_input, {
+                key: 1,
+                modelValue: $setup.editInfo.engineNum,
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.editInfo.engineNum = $event),
+                border: "none",
+                inputAlign: "right",
+                class: "input",
+                placeholder: "请输入发动机号"
+              }, null, 8, ["modelValue"]))
             ])
-          ])
+          ]),
+          $setup.isEditing ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "button-group"
+          }, [
+            vue.createVNode(_component_i_button, {
+              class: "action-button save-btn",
+              type: "primary",
+              loading: $setup.saving,
+              onClick: $setup.saveChanges
+            }, {
+              default: vue.withCtx(() => [
+                vue.createTextVNode("保存")
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["loading"]),
+            vue.createVNode(_component_i_button, {
+              class: "action-button cancel-btn",
+              disabled: $setup.saving,
+              onClick: $setup.cancelEdit
+            }, {
+              default: vue.withCtx(() => [
+                vue.createTextVNode("取消")
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["disabled"])
+          ])) : vue.createCommentVNode("v-if", true),
+          vue.createVNode($setup["carIcons"], {
+            show: $setup.carIconSelectorVisible,
+            "onUpdate:show": $setup.updateCarIconSelectorVisible,
+            onSelect: $setup.selectIcon
+          }, null, 8, ["show"])
         ]),
         vue.createVNode(_component_app_toast)
       ],

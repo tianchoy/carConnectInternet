@@ -12,6 +12,7 @@ const wechatLogin = "/authLogin";
 const changePSW = "/sys/user/password";
 const userMsgList = "/usermessage/listForUser";
 const msgState = "/usermessage/detail/";
+const updateDevice = "/device/update";
 const deviceDetail = "/device/info/";
 const logoutUrl = "/sys/logout";
 const sendcmd = "/command/sendCmd";
@@ -499,6 +500,11 @@ const setMsgState = (msgId) => {
     return basicResponse(raw);
   });
 };
+const editDeviceInfo = (data) => {
+  return api_http.put(updateDevice, data).then((raw = null) => {
+    return basicResponse(raw);
+  });
+};
 const getDeviceDetail = (deviceId) => {
   return api_http.get(`${deviceDetail}${deviceId}`).then((raw = null) => {
     return deviceDetailResponse(raw);
@@ -570,6 +576,7 @@ exports.bindDevices = bindDevices;
 exports.changePassWord = changePassWord;
 exports.delDevice = delDevice;
 exports.deleteGeofence = deleteGeofence;
+exports.editDeviceInfo = editDeviceInfo;
 exports.getBoundDevices = getBoundDevices;
 exports.getCmdAction = getCmdAction;
 exports.getCmdByMid = getCmdByMid;

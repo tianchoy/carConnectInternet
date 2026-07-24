@@ -1311,15 +1311,14 @@ onLoad(() => {
                 background-color: #fff;
                 padding: 20rpx;
                 border-radius: 30rpx;
-
-                .state-value { margin-top: 12rpx; }
                 .state-label {
                     font-size: 24rpx;
                     color: #999;
                 }
 
                 .state-value {
-                    font-size: 28rpx;
+                    margin-top: 12rpx; 
+                    font-size: 25rpx;
                     font-weight: bold;
                     color: #333;
 

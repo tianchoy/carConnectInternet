@@ -43,7 +43,7 @@ open class GenPagesAddCarAddCar : BasePage {
                 uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar"))
             }
             val handleScanResult = fun(data: ScanResultData){
-                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:113")
+                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:117")
                 if (data.result.length == 15) {
                     carInfo.value.imei = "0" + data.result.slice(4, 15)
                 } else if (data.result.length == 11) {
@@ -58,7 +58,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val selectIcon = fun(item: CarIconItem__1){
                 val name = item.getString("name", "")
                 val text = item.getString("text", "")
-                console.log(name, " at pages/addCar/addCar.uvue:135")
+                console.log(name, " at pages/addCar/addCar.uvue:139")
                 carInfo.value.deviceType = name
                 carInfo.value.deviceTypeValue = text
                 carIconSelectorVisible.value = false
@@ -82,18 +82,18 @@ open class GenPagesAddCarAddCar : BasePage {
             }
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:172")
+                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:176")
                         try {
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:177")
+                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:181")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 185, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType)
-                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:192")
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 189, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
+                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:196")
                             val res = await(addDevice(submitData))
-                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:195")
+                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:199")
                             uni_hideLoading(null)
                             loading.value = false
                             if (res.code == 0) {
@@ -113,7 +113,7 @@ open class GenPagesAddCarAddCar : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:222")
+                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:226")
                             uni_hideLoading(null)
                             loading.value = false
                             showAppToast(ShowToastOptions(title = "添加设备失败", icon = "none"))
@@ -196,6 +196,18 @@ open class GenPagesAddCarAddCar : BasePage {
                                                     "请选择设备图标(必选)"
                                                 }
                                                 ), 3)
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(_component_i_form_item, _uM("label" to "车牌名", "name" to "plateNo", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.plateNo, "onUpdate:modelValue" to fun(`$event`: String){
+                                                carInfo.value.plateNo = `$event`
+                                            }
+                                            , "placeholder" to "请输入车牌名"), null, 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
                                             ))
                                         )
                                     }

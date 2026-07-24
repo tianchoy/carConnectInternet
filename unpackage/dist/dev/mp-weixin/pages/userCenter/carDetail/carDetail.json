@@ -2,6 +2,10 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "custom-nav-bar": "../../../components/custom-navBar/custom-navBar",
-    "app-toast": "../../../components/app-toast/app-toast"
+    "i-input": "../../../uni_modules/i-ui-x/components/i-input/i-input",
+    "i-icon": "../../../uni_modules/i-ui-x/components/i-icon/i-icon",
+    "i-button": "../../../uni_modules/i-ui-x/components/i-button/i-button",
+    "app-toast": "../../../components/app-toast/app-toast",
+    "car-icons": "../../../components/car-icons/car-icons"
   }
 }
