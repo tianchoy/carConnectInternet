@@ -525,7 +525,7 @@ const loadDeviceData = async (device: Device) => {
         })
         showAppToast({
             title: '切换成功',
-            icon: 'success'
+            icon: 'none'
         })
     } catch (error) {
         console.error('切换车辆失败', error, " at pages/index/index.uvue:703")
@@ -937,7 +937,7 @@ async function unbindCurrentDevice() : Promise<void> {
     if (result.code == 0) {
         showAppToast({
             title: '解绑成功',
-            icon: 'success'
+            icon: 'none'
         })
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()

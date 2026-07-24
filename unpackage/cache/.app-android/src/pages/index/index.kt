@@ -411,7 +411,7 @@ open class GenPagesIndexIndex : BasePage {
                                 device.value
                             }
                             , "startTime" to formatTimes(todayZero), "endTime" to formatTimes(nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)))
-                            showAppToast(ShowToastOptions(title = "切换成功", icon = "success"))
+                            showAppToast(ShowToastOptions(title = "切换成功", icon = "none"))
                         }
                          catch (error: Throwable) {
                             console.error("切换车辆失败", error, " at pages/index/index.uvue:703")
@@ -716,7 +716,7 @@ open class GenPagesIndexIndex : BasePage {
                 return wrapUTSPromise(suspend {
                         val result = await(delDevice(currentCarImei.value))
                         if (result.code == 0) {
-                            showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
+                            showAppToast(ShowToastOptions(title = "解绑成功", icon = "none"))
                             clearSavedSelectedDevice()
                             clearSavedSelectedDeviceIndex()
                         } else {

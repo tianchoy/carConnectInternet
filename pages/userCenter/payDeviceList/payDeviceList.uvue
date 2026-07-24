@@ -40,7 +40,7 @@
 			</view>
 
 			<!-- 空状态 -->
-			<view class="empty" v-if="!loading && deviceList.length === 0">
+			<view class="empty" v-if="!loading && deviceList.length == 0">
 				<text>暂无设备数据</text>
 			</view>
 		</view>
@@ -134,7 +134,7 @@ import { showAppToast } from '../../../utils/toast.uts'
 
 	// 页面显示时加载或刷新设备列表
 	onShow(() => {
-		if (needRefresh.value || deviceList.value.length === 0) {
+		if (needRefresh.value || deviceList.value.length == 0) {
 			resetData()
 			loadPayDeviceListData()
 			needRefresh.value = false

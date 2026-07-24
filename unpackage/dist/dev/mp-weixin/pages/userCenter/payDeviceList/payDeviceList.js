@@ -71,7 +71,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onShow(() => {
-      if (needRefresh.value || deviceList.value.length === 0) {
+      if (needRefresh.value || deviceList.value.length == 0) {
         resetData();
         loadPayDeviceListData();
         needRefresh.value = false;
@@ -152,8 +152,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(loading) ? {} : {}, {
         d: !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0
       }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) && common_vendor.unref(deviceList).length > 0 ? {} : {}, {
-        e: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0
-      }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length === 0 ? {} : {}, {
+        e: !common_vendor.unref(loading) && common_vendor.unref(deviceList).length == 0
+      }, !common_vendor.unref(loading) && common_vendor.unref(deviceList).length == 0 ? {} : {}, {
         f: `${_ctx.u_s_b_h}px`,
         g: `${_ctx.u_s_a_i_b}px`,
         h: common_vendor.p({

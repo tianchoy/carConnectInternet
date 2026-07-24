@@ -271,10 +271,7 @@ defineExpose({
 
 .i-toast {
   position: fixed;
-  left: 50px;
-  right: 50px;
-  min-width: 96px;
-  min-height: 44px;
+  align-self: center;
   padding: 10px 16px;
   border-radius: 8px;
   flex-direction: row;

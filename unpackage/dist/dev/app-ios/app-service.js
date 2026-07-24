@@ -1550,7 +1550,7 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$I = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "left": 50, "right": 50, "minWidth": 96, "minHeight": 44, "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  const _style_0$I = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
   function _sfc_render$J(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -3399,7 +3399,7 @@
             }));
             showAppToast({
               title: "切换成功",
-              icon: "success"
+              icon: "none"
             });
           } catch (error) {
             uni.__log__("error", "at pages/index/index.uvue:703", "切换车辆失败", error);
@@ -3726,7 +3726,7 @@
           if (result.code == 0) {
             showAppToast({
               title: "解绑成功",
-              icon: "success"
+              icon: "none"
             });
             clearSavedSelectedDevice();
             clearSavedSelectedDeviceIndex();
@@ -21302,7 +21302,7 @@
         });
       };
       vue.onShow(() => {
-        if (needRefresh.value || deviceList.value.length === 0) {
+        if (needRefresh.value || deviceList.value.length == 0) {
           resetData();
           loadPayDeviceListData();
           needRefresh.value = false;
@@ -21430,7 +21430,7 @@
             }, [
               vue.createElementVNode("text", null, "没有更多数据了")
             ])) : vue.createCommentVNode("v-if", true),
-            !$setup.loading && $setup.deviceList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            !$setup.loading && $setup.deviceList.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
               key: 2,
               class: "empty"
             }, [

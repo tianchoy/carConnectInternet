@@ -493,7 +493,7 @@ const __sfc__ = defineComponent({
                 });
                 showAppToast({
                     title: '切换成功',
-                    icon: 'success'
+                    icon: 'none'
                 } as ShowToastOptions);
             }
             catch (error: any) {
@@ -849,7 +849,7 @@ const __sfc__ = defineComponent({
             if (result.code == 0) {
                 showAppToast({
                     title: '解绑成功',
-                    icon: 'success'
+                    icon: 'none'
                 } as ShowToastOptions);
                 clearSavedSelectedDevice();
                 clearSavedSelectedDeviceIndex();

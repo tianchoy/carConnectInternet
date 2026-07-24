@@ -567,7 +567,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           utils_toast.showAppToast({
             title: "切换成功",
-            icon: "success"
+            icon: "none"
           });
         } catch (error) {
           common_vendor.index.__f__("error", "at pages/index/index.uvue:703", "切换车辆失败", error);
@@ -905,7 +905,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (result.code == 0) {
           utils_toast.showAppToast({
             title: "解绑成功",
-            icon: "success"
+            icon: "none"
           });
           clearSavedSelectedDevice();
           clearSavedSelectedDeviceIndex();

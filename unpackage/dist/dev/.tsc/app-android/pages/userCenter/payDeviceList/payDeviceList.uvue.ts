@@ -93,7 +93,7 @@ const deviceList = ref<Array<UTSJSONObject>>([])
 
 	// 页面显示时加载或刷新设备列表
 	onShow(() => {
-		if (needRefresh.value || deviceList.value.length === 0) {
+		if (needRefresh.value || deviceList.value.length == 0) {
 			resetData()
 			loadPayDeviceListData()
 			needRefresh.value = false
@@ -231,7 +231,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               _cE("text", null, "没有更多数据了")
             ])
           : _cC("v-if", true),
-        isTrue(!unref(loading) && unref(deviceList).length === 0)
+        isTrue(!unref(loading) && unref(deviceList).length == 0)
           ? _cE("view", _uM({
               key: 2,
               class: "empty"

@@ -76,7 +76,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 })
             }
             onShow(fun(){
-                if (needRefresh.value || deviceList.value.length === 0) {
+                if (needRefresh.value || deviceList.value.length == 0) {
                     resetData()
                     loadPayDeviceListData()
                     needRefresh.value = false
@@ -176,7 +176,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                 _cC("v-if", true)
                             }
                             ,
-                            if (isTrue(!unref(loading) && unref(deviceList).length === 0)) {
+                            if (isTrue(!unref(loading) && unref(deviceList).length == 0)) {
                                 _cE("view", _uM("key" to 2, "class" to "empty"), _uA(
                                     _cE("text", null, "暂无设备数据")
                                 ))
