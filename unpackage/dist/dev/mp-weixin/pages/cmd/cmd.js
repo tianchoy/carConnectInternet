@@ -1,17 +1,20 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_button_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_button_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_button)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_button + _easycom_app_toast)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cmd",
@@ -43,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         return common_vendor.UTS.JSON.parse(details);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:101", "解析参数配置失败:", e);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:103", "解析参数配置失败:", e);
         return [];
       }
     });
@@ -72,18 +75,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           loading.value = true;
           const response = yield api_request.getCmdAction();
-          common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:133", "加载指令类型响应:", response);
+          common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:135", "加载指令类型响应:", response);
           if (response.code == 0) {
             commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
           } else {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "加载指令类型失败",
               icon: "none"
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:144", "加载指令类型出错:", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:146", "加载指令类型出错:", error);
+          utils_toast.showAppToast({
             title: "网络错误",
             icon: "none"
           });
@@ -116,11 +119,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (response.code == 0) {
             commands.value = response.data;
           } else {
-            common_vendor.index.showToast({ title: "加载指令列表失败", icon: "none" });
+            utils_toast.showAppToast({ title: "加载指令列表失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:179", "加载指令列表出错:", error);
-          common_vendor.index.showToast({ title: "网络错误", icon: "none" });
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:181", "加载指令列表出错:", error);
+          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
         } finally {
           loading.value = false;
         }
@@ -154,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         paramValues.value = values;
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:214", "初始化参数值失败:", e);
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:216", "初始化参数值失败:", e);
         paramValues.value = [];
       }
     };
@@ -180,7 +183,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         if (!isFormValid.value || selectedCommand.value == null) {
-          common_vendor.index.showToast({ title: "请填写所有参数", icon: "none" });
+          utils_toast.showAppToast({ title: "请填写所有参数", icon: "none" });
           return Promise.resolve(null);
         }
         const command = selectedCommand.value;
@@ -202,13 +205,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             predictCmdId: command["predictCmdId"]
           }));
           if (response.code == 0) {
-            common_vendor.index.showToast({ title: "指令发送成功", icon: "success" });
+            utils_toast.showAppToast({ title: "指令发送成功", icon: "success" });
           } else {
-            common_vendor.index.showToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
+            utils_toast.showAppToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:271", "发送指令出错:", error);
-          common_vendor.index.showToast({ title: "网络错误", icon: "none" });
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:273", "发送指令出错:", error);
+          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
         } finally {
           loading.value = false;
         }
@@ -316,10 +319,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: loading.value
       }, loading.value ? {} : commands.value.length == 0 && selectedTypeId.value != null ? {} : {}, {
         n: commands.value.length == 0 && selectedTypeId.value != null,
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`,
-        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`,
+        q: common_vendor.p({
+          class: "data-v-c4271740"
+        })
       });
       return __returned__;
     };

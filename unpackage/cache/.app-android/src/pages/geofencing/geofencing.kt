@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesGeofencingGeofencing : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -96,7 +95,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 297, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 299, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             res.data.forEach(fun(item){
                                 if (item.getString("imei", "") == imei.value) {
@@ -157,8 +156,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             )
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:354")
-                            uni_showToast(ShowToastOptions(title = "获取车辆位置失败", icon = "none"))
+                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:356")
+                            showAppToast(ShowToastOptions(title = "获取车辆位置失败", icon = "none"))
                         }
                          finally {
                             uni_hideLoading(null)
@@ -219,14 +218,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     val lng = parseFloat(centerValues[1])
                     val radius = parseFloat(parts[1].trim())
                     if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:414")
+                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:416")
                         return null
                     }
                     val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
                     return CircleData(latitude = convertedCoord.lat, longitude = convertedCoord.lng, radius = radius)
                 }
                  catch (error: Throwable) {
-                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:424")
+                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:426")
                     return null
                 }
             }
@@ -380,14 +379,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             if (res.code == 0) {
                                 fenceList.value = res.data
                             } else {
-                                uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
                                 fenceList.value = _uA()
                             }
                             renderFencesOnMap()
                         }
                          catch (error: Throwable) {
-                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:619")
-                            uni_showToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
+                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:621")
+                            showAppToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
                             fenceList.value = _uA()
                             renderFencesOnMap()
                         }
@@ -555,7 +554,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         try {
                             val result = await(deleteGeofence(id))
                             if (result.code == 0) {
-                                uni_showToast(ShowToastOptions(title = "删除成功"))
+                                showAppToast(ShowToastOptions(title = "删除成功"))
                                 selectedFence.value = null
                                 points.value = _uA()
                                 circleCenter.value = null
@@ -567,12 +566,12 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 showFenceModal.value?.`$callMethod`("close")
                                 await(loadGeofenceList())
                             } else {
-                                uni_showToast(ShowToastOptions(title = "删除失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = "删除失败", icon = "none"))
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:827")
-                            uni_showToast(ShowToastOptions(title = "删除失败", icon = "none"))
+                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:829")
+                            showAppToast(ShowToastOptions(title = "删除失败", icon = "none"))
                         }
                 })
             }
@@ -588,7 +587,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val saveFence = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!(fenceForm.name != "")) {
-                            uni_showToast(ShowToastOptions(title = "请输入围栏名称", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "请输入围栏名称", icon = "none"))
                             return@w1
                         }
                         var area = ""
@@ -602,10 +601,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         } else {
                             if (drawingMode.value === "polygon" && points.value.length < 3) {
-                                uni_showToast(ShowToastOptions(title = "请绘制有效的围栏区域（至少3个顶点）", icon = "none"))
+                                showAppToast(ShowToastOptions(title = "请绘制有效的围栏区域（至少3个顶点）", icon = "none"))
                                 return@w1
                             } else if (drawingMode.value === "circle" && (!isTruthy(circleCenter.value) || circleRadius.value <= 0)) {
-                                uni_showToast(ShowToastOptions(title = "请绘制有效的圆形围栏", icon = "none"))
+                                showAppToast(ShowToastOptions(title = "请绘制有效的圆形围栏", icon = "none"))
                                 return@w1
                             }
                             if (drawingMode.value === "polygon") {
@@ -615,14 +614,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         }
                         if (!(area != "")) {
-                            uni_showToast(ShowToastOptions(title = "围栏数据无效，请重新绘制", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "围栏数据无效，请重新绘制", icon = "none"))
                             return@w1
                         }
                         if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
-                            uni_showToast(ShowToastOptions(title = "请选择有效的告警类型", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "请选择有效的告警类型", icon = "none"))
                             return@w1
                         }
-                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 892, 9), "name" to fenceForm.name, "area" to area, "alarmType" to parseInt(fenceForm.alarmType), "type" to drawingMode.value)
+                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 894, 9), "name" to fenceForm.name, "area" to area, "alarmType" to parseInt(fenceForm.alarmType), "type" to drawingMode.value)
                         try {
                             var result: Any
                             if (isTruthy(editingFence.value)) {
@@ -634,7 +633,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                             uni_hideLoading(null)
                             if (result.code == 0) {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
+                                showAppToast(ShowToastOptions(title = if (isTruthy(editingFence.value)) {
                                     "更新成功"
                                 } else {
                                     "保存成功"
@@ -652,7 +651,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     showFenceModal.value?.`$callMethod`("close")
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
+                                showAppToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
                                     result.msg
                                 } else {
                                     "保存失败"
@@ -662,8 +661,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:938")
-                            uni_showToast(ShowToastOptions(title = "保存失败，请重试", icon = "none"))
+                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:940")
+                            showAppToast(ShowToastOptions(title = "保存失败，请重试", icon = "none"))
                         }
                 })
             }
@@ -778,7 +777,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val switchTab = fun(tab: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("switchTab", tab, currentFenceId.value, " at pages/geofencing/geofencing.uvue:1039")
+                        console.log("switchTab", tab, currentFenceId.value, " at pages/geofencing/geofencing.uvue:1041")
                         if (activeTab.value === tab) {
                             return@w1
                         }
@@ -787,7 +786,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         deviceList.value = _uA()
                         initPagination(tab)
                         if (tab === "bind") {
-                            console.log("switchTab,bind:", currentFenceId.value, " at pages/geofencing/geofencing.uvue:1051")
+                            console.log("switchTab,bind:", currentFenceId.value, " at pages/geofencing/geofencing.uvue:1053")
                             await(loadBoundDevices(currentFenceId.value))
                         } else {
                             await(loadUnboundDevices())
@@ -806,13 +805,13 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val toggleDeviceBinding = fun(deviceImei: String, bound: Boolean): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("toggleDeviceBinding", deviceImei, bound, " at pages/geofencing/geofencing.uvue:1071")
+                        console.log("toggleDeviceBinding", deviceImei, bound, " at pages/geofencing/geofencing.uvue:1073")
                         loading.value = true
                         try {
-                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1074, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
+                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1076, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
                                 deviceImei
                             ))
-                            console.log("toggleDeviceBindingparams", params, " at pages/geofencing/geofencing.uvue:1078")
+                            console.log("toggleDeviceBindingparams", params, " at pages/geofencing/geofencing.uvue:1080")
                             var result: Any
                             if (bound) {
                                 result = await(bindDevices(params))
@@ -820,7 +819,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 result = await(unbindDevices(params))
                             }
                             if (result.code == 0) {
-                                uni_showToast(ShowToastOptions(title = if (bound) {
+                                showAppToast(ShowToastOptions(title = if (bound) {
                                     "绑定成功"
                                 } else {
                                     "解绑成功"
@@ -833,7 +832,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     await(loadUnboundDevices())
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
+                                showAppToast(ShowToastOptions(title = if (isTruthy(result.msg)) {
                                     result.msg
                                 } else {
                                     "操作失败"
@@ -842,8 +841,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:1101")
-                            uni_showToast(ShowToastOptions(title = "操作失败", icon = "none"))
+                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:1103")
+                            showAppToast(ShowToastOptions(title = "操作失败", icon = "none"))
                         }
                          finally {
                             loading.value = false
@@ -916,14 +915,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val editSelectedFence = ::gen_editSelectedFence_fn
             fun gen_deleteSelectedFence_fn(): Unit {
                 val fence = selectedFence.value
-                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1171")
+                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1173")
                 if (fence != null) {
                     val fenceId = fence.getString("id", "")
-                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1175")
+                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1177")
                     if (fenceId !== "") {
                         deleteFence(fenceId)
                     } else {
-                        uni_showToast(ShowToastOptions(title = "围栏ID无效", icon = "none"))
+                        showAppToast(ShowToastOptions(title = "围栏ID无效", icon = "none"))
                     }
                 }
             }
@@ -978,10 +977,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val finishDrawing = fun(){
                 if (drawingMode.value === "polygon" && points.value.length < 3) {
-                    uni_showToast(ShowToastOptions(title = "至少需要3个顶点", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "至少需要3个顶点", icon = "none"))
                     return
                 } else if (drawingMode.value === "circle" && (!isTruthy(circleCenter.value) || circleRadius.value <= 0)) {
-                    uni_showToast(ShowToastOptions(title = "请设置有效的圆形围栏", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请设置有效的圆形围栏", icon = "none"))
                     return
                 }
                 isDrawing.value = false
@@ -1025,400 +1024,404 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 val _component_i_input = resolveEasyComponent("i-input", GenUniModulesIUiXComponentsIInputIInputClass)
                 val _component_i_radio = resolveEasyComponent("i-radio", GenUniModulesIUiXComponentsIRadioIRadioClass)
                 val _component_i_switch = resolveEasyComponent("i-switch", GenUniModulesIUiXComponentsISwitchISwitchClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "map-container"), _uA(
-                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "polygons" to polygons.value, "markers" to markers.value, "circles" to circles.value, "onTap" to handleMapTap, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to currentCar.value, "showCar" to true, "carStatus" to connectionStatus.value), null, 8, _uA(
-                                    "currentCar",
-                                    "carStatus"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "latitude",
-                            "longitude",
-                            "scale",
-                            "style",
-                            "polygons",
-                            "markers",
-                            "circles"
-                        )),
-                        if (isTrue(isDrawing.value)) {
-                            _cE("view", _uM("key" to 0, "class" to "drag-hint"), _uA(
-                                if (drawingMode.value === "polygon") {
-                                    _cE("text", _uM("key" to 0, "class" to "drag-hint-text"), "点击地图添加围栏点,至少需要3个点")
-                                } else {
-                                    _cC("v-if", true)
-                                },
-                                if (drawingMode.value === "circle") {
-                                    _cE("text", _uM("key" to 1, "class" to "drag-hint-text"), "点击地图确定圆心，再点一下地图确定半径")
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                            ))
-                        } else {
-                            _cC("v-if", true)
-                        }
-                    )),
-                    _cV(_component_i_popup, _uM("ref_key" to "showFenceModal", "ref" to showFenceModal, "mode" to "bottom", "round" to "10", "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                        return _uA(
-                            if (isTrue(selectedFence.value)) {
-                                _cE("view", _uM("key" to 0, "class" to "fence-operations"), _uA(
-                                    _cE("view", _uM("class" to "fence-header"), _uA(
-                                        _cE("text", _uM("class" to "fence-name"), _tD(getSelectedFenceName()), 1),
-                                        _cV(_component_i_icon, _uM("name" to "close", "onClick" to fun(){
-                                            selectedFence.value = null
-                                            showFenceModal.value?.`$callMethod`("close")
-                                        }), null, 8, _uA(
-                                            "onClick"
-                                        ))
-                                    )),
-                                    _cE("view", _uM("class" to "fence-actions"), _uA(
-                                        _cV(_component_i_button, _uM("size" to "small", "onClick" to editSelectedFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                "编辑"
-                                            )
-                                        }), "_" to 1)),
-                                        _cV(_component_i_button, _uM("size" to "small", "type" to "error", "onClick" to deleteSelectedFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                "删除"
-                                            )
-                                        }), "_" to 1)),
-                                        _cV(_component_i_button, _uM("size" to "small", "type" to "primary", "onClick" to showSelectedFenceDevices), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                "绑定设备"
-                                            )
-                                        }), "_" to 1))
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "map-container"), _uA(
+                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "polygons" to polygons.value, "markers" to markers.value, "circles" to circles.value, "onTap" to handleMapTap, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to currentCar.value, "showCar" to true, "carStatus" to connectionStatus.value), null, 8, _uA(
+                                        "currentCar",
+                                        "carStatus"
                                     ))
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "latitude",
+                                "longitude",
+                                "scale",
+                                "style",
+                                "polygons",
+                                "markers",
+                                "circles"
+                            )),
+                            if (isTrue(isDrawing.value)) {
+                                _cE("view", _uM("key" to 0, "class" to "drag-hint"), _uA(
+                                    if (drawingMode.value === "polygon") {
+                                        _cE("text", _uM("key" to 0, "class" to "drag-hint-text"), "点击地图添加围栏点,至少需要3个点")
+                                    } else {
+                                        _cC("v-if", true)
+                                    },
+                                    if (drawingMode.value === "circle") {
+                                        _cE("text", _uM("key" to 1, "class" to "drag-hint-text"), "点击地图确定圆心，再点一下地图确定半径")
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
                                 ))
                             } else {
                                 _cC("v-if", true)
                             }
-                        )
-                    }
-                    ), "_" to 1), 512),
-                    _cE("view", _uM("class" to "tools-panel"), _uA(
-                        if (isTrue(!isDrawing.value && !isTruthy(selectedFence.value))) {
-                            _cE("view", _uM("key" to 0, "class" to "drawing-mode-selector"), _uA(
-                                _cE("text", _uM("class" to "mode-title"), "选择围栏类型:"),
-                                _cE("view", _uM("class" to "mode-buttons"), _uA(
-                                    _cV(_component_i_button, _uM("type" to if (drawingMode.value == "polygon") {
-                                        "success"
-                                    } else {
-                                        "default"
-                                    }, "size" to "small", "customStyle" to "border:1rpx solid #ebedf0", "onClick" to fun(){
-                                        setDrawingMode("polygon")
-                                    }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            " 多边形 "
-                                        )
-                                    }), "_" to 1), 8, _uA(
-                                        "type",
-                                        "onClick"
-                                    )),
-                                    _cV(_component_i_button, _uM("class" to "mode-button-spacing", "type" to if (drawingMode.value == "circle") {
-                                        "success"
-                                    } else {
-                                        "default"
-                                    }, "size" to "small", "customStyle" to "border:1rpx solid #ebedf0", "onClick" to fun(){
-                                        setDrawingMode("circle")
-                                    }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            " 圆形 "
-                                        )
-                                    }), "_" to 1), 8, _uA(
-                                        "type",
-                                        "onClick"
+                        )),
+                        _cV(_component_i_popup, _uM("ref_key" to "showFenceModal", "ref" to showFenceModal, "mode" to "bottom", "round" to "10", "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                if (isTrue(selectedFence.value)) {
+                                    _cE("view", _uM("key" to 0, "class" to "fence-operations"), _uA(
+                                        _cE("view", _uM("class" to "fence-header"), _uA(
+                                            _cE("text", _uM("class" to "fence-name"), _tD(getSelectedFenceName()), 1),
+                                            _cV(_component_i_icon, _uM("name" to "close", "onClick" to fun(){
+                                                selectedFence.value = null
+                                                showFenceModal.value?.`$callMethod`("close")
+                                            }), null, 8, _uA(
+                                                "onClick"
+                                            ))
+                                        )),
+                                        _cE("view", _uM("class" to "fence-actions"), _uA(
+                                            _cV(_component_i_button, _uM("size" to "small", "onClick" to editSelectedFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    "编辑"
+                                                )
+                                            }), "_" to 1)),
+                                            _cV(_component_i_button, _uM("size" to "small", "type" to "error", "onClick" to deleteSelectedFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    "删除"
+                                                )
+                                            }), "_" to 1)),
+                                            _cV(_component_i_button, _uM("size" to "small", "type" to "primary", "onClick" to showSelectedFenceDevices), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    "绑定设备"
+                                                )
+                                            }), "_" to 1))
+                                        ))
+                                    ))
+                                } else {
+                                    _cC("v-if", true)
+                                }
+                            )
+                        }
+                        ), "_" to 1), 512),
+                        _cE("view", _uM("class" to "tools-panel"), _uA(
+                            if (isTrue(!isDrawing.value && !isTruthy(selectedFence.value))) {
+                                _cE("view", _uM("key" to 0, "class" to "drawing-mode-selector"), _uA(
+                                    _cE("text", _uM("class" to "mode-title"), "选择围栏类型:"),
+                                    _cE("view", _uM("class" to "mode-buttons"), _uA(
+                                        _cV(_component_i_button, _uM("type" to if (drawingMode.value == "polygon") {
+                                            "success"
+                                        } else {
+                                            "default"
+                                        }, "size" to "small", "customStyle" to "border:1rpx solid #ebedf0", "onClick" to fun(){
+                                            setDrawingMode("polygon")
+                                        }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                            return _uA(
+                                                " 多边形 "
+                                            )
+                                        }), "_" to 1), 8, _uA(
+                                            "type",
+                                            "onClick"
+                                        )),
+                                        _cV(_component_i_button, _uM("class" to "mode-button-spacing", "type" to if (drawingMode.value == "circle") {
+                                            "success"
+                                        } else {
+                                            "default"
+                                        }, "size" to "small", "customStyle" to "border:1rpx solid #ebedf0", "onClick" to fun(){
+                                            setDrawingMode("circle")
+                                        }), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                            return _uA(
+                                                " 圆形 "
+                                            )
+                                        }), "_" to 1), 8, _uA(
+                                            "type",
+                                            "onClick"
+                                        ))
                                     ))
                                 ))
-                            ))
-                        } else {
-                            _cC("v-if", true)
-                        }
-                        ,
-                        _cE("view", _uM("class" to "tool-tag-item"), _uA(
-                            _cV(_component_i_button, _uM("onClick" to startDrawing, "disabled" to (isDrawing.value || selectedFence.value != null), "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " 开始绘制 "
-                                )
-                            }
-                            ), "_" to 1), 8, _uA(
-                                "disabled"
-                            )),
-                            _cV(_component_i_button, _uM("onClick" to finishDrawing, "disabled" to (!isDrawing.value || !canFinishDrawing.value), "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " 完成绘制 "
-                                )
-                            }
-                            ), "_" to 1), 8, _uA(
-                                "disabled"
-                            )),
-                            _cV(_component_i_button, _uM("onClick" to clearDrawing, "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " 重置绘制 "
-                                )
-                            }
-                            ), "_" to 1)),
-                            _cV(_component_i_button, _uM("onClick" to showFenceList, "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " 围栏列表 "
-                                )
-                            }
-                            ), "_" to 1))
-                        )),
-                        _cE("view", _uM("class" to "status-info"), _uA(
-                            _cE("text", _uM("class" to "status-text"), "围栏类型: " + _tD(if (drawingMode.value === "polygon") {
-                                "多边形"
-                            } else {
-                                "圆形"
-                            }
-                            ), 1),
-                            if (drawingMode.value === "polygon") {
-                                _cE("text", _uM("key" to 0, "class" to "status-text"), "顶点数量: " + _tD(points.value.length), 1)
                             } else {
                                 _cC("v-if", true)
                             }
                             ,
-                            if (drawingMode.value === "circle") {
-                                _cE("text", _uM("key" to 1, "class" to "status-text"), "半径: " + _tD(circleRadius.value.toFixed(2)) + "米", 1)
-                            } else {
-                                _cC("v-if", true)
-                            }
-                        ))
-                    )),
-                    _cV(_component_i_popup, _uM("ref_key" to "fencesPopup", "ref" to fencesPopup, "mode" to "bottom", "round" to "10", "height" to "800rpx", "disabledScroll" to true, "contentMargin" to "0", "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                        return _uA(
-                            _cE("view", _uM("class" to "fence-list"), _uA(
-                                _cE("view", _uM("class" to "list-header"), _uA(
-                                    _cE("text", _uM("class" to "title"), "围栏列表")
+                            _cE("view", _uM("class" to "tool-tag-item"), _uA(
+                                _cV(_component_i_button, _uM("onClick" to startDrawing, "disabled" to (isDrawing.value || selectedFence.value != null), "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    return _uA(
+                                        " 开始绘制 "
+                                    )
+                                }
+                                ), "_" to 1), 8, _uA(
+                                    "disabled"
                                 )),
-                                _cE("scroll-view", _uM("class" to "list-content", "scroll-y" to "true", "show-scrollbar" to false), _uA(
-                                    _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, fun(fence, __key, __index, _cached): Any {
-                                        return _cE("view", _uM("key" to fence["id"], "class" to "fence-item", "onClick" to fun(){
-                                            selectFence(fence)
+                                _cV(_component_i_button, _uM("onClick" to finishDrawing, "disabled" to (!isDrawing.value || !canFinishDrawing.value), "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    return _uA(
+                                        " 完成绘制 "
+                                    )
+                                }
+                                ), "_" to 1), 8, _uA(
+                                    "disabled"
+                                )),
+                                _cV(_component_i_button, _uM("onClick" to clearDrawing, "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    return _uA(
+                                        " 重置绘制 "
+                                    )
+                                }
+                                ), "_" to 1)),
+                                _cV(_component_i_button, _uM("onClick" to showFenceList, "size" to "small"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    return _uA(
+                                        " 围栏列表 "
+                                    )
+                                }
+                                ), "_" to 1))
+                            )),
+                            _cE("view", _uM("class" to "status-info"), _uA(
+                                _cE("text", _uM("class" to "status-text"), "围栏类型: " + _tD(if (drawingMode.value === "polygon") {
+                                    "多边形"
+                                } else {
+                                    "圆形"
+                                }
+                                ), 1),
+                                if (drawingMode.value === "polygon") {
+                                    _cE("text", _uM("key" to 0, "class" to "status-text"), "顶点数量: " + _tD(points.value.length), 1)
+                                } else {
+                                    _cC("v-if", true)
+                                }
+                                ,
+                                if (drawingMode.value === "circle") {
+                                    _cE("text", _uM("key" to 1, "class" to "status-text"), "半径: " + _tD(circleRadius.value.toFixed(2)) + "米", 1)
+                                } else {
+                                    _cC("v-if", true)
+                                }
+                            ))
+                        )),
+                        _cV(_component_i_popup, _uM("ref_key" to "fencesPopup", "ref" to fencesPopup, "mode" to "bottom", "round" to "10", "height" to "800rpx", "disabledScroll" to true, "contentMargin" to "0", "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                _cE("view", _uM("class" to "fence-list"), _uA(
+                                    _cE("view", _uM("class" to "list-header"), _uA(
+                                        _cE("text", _uM("class" to "title"), "围栏列表")
+                                    )),
+                                    _cE("scroll-view", _uM("class" to "list-content", "scroll-y" to "true", "show-scrollbar" to false), _uA(
+                                        _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, fun(fence, __key, __index, _cached): Any {
+                                            return _cE("view", _uM("key" to fence["id"], "class" to "fence-item", "onClick" to fun(){
+                                                selectFence(fence)
+                                            }
+                                            ), _uA(
+                                                _cE("view", _uM("class" to "fence-info"), _uA(
+                                                    _cE("text", _uM("class" to "name"), _tD(fence["name"]), 1),
+                                                    _cE("text", _uM("class" to "type"), _tD(if (getFenceType(fence) === "circle") {
+                                                        "圆形"
+                                                    } else {
+                                                        "多边形"
+                                                    }
+                                                    ), 1),
+                                                    _cE("text", _uM("class" to "devices"), "绑定设备: " + _tD(if (isTruthy(fence["deviceCount"])) {
+                                                        fence["deviceCount"]
+                                                    } else {
+                                                        0
+                                                    }
+                                                    ) + "台", 1)
+                                                )),
+                                                _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                                            ), 8, _uA(
+                                                "onClick"
+                                            ))
                                         }
-                                        ), _uA(
-                                            _cE("view", _uM("class" to "fence-info"), _uA(
-                                                _cE("text", _uM("class" to "name"), _tD(fence["name"]), 1),
-                                                _cE("text", _uM("class" to "type"), _tD(if (getFenceType(fence) === "circle") {
-                                                    "圆形"
-                                                } else {
-                                                    "多边形"
+                                        ), 128),
+                                        if (fenceList.value.length == 0) {
+                                            _cE("view", _uM("key" to 0, "class" to "empty"), _uA(
+                                                _cE("text", _uM("class" to "empty-text"), "暂无围栏数据")
+                                            ))
+                                        } else {
+                                            _cC("v-if", true)
+                                        }
+                                    ))
+                                ))
+                            )
+                        }
+                        ), "_" to 1), 512),
+                        _cV(_component_i_popup, _uM("ref_key" to "editDialogPopup", "ref" to editDialogPopup, "mode" to "bottom", "round" to "10", "contentDraggable" to false, "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                _cE("view", _uM("class" to "edit-dialog"), _uA(
+                                    _cE("view", _uM("class" to "dialog-header"), _uA(
+                                        _cE("text", _uM("class" to "dialog-title"), _tD(if (isTruthy(editingFence.value)) {
+                                            "编辑围栏"
+                                        } else {
+                                            "新增围栏"
+                                        }
+                                        ), 1)
+                                    )),
+                                    _cE("view", _uM("class" to "dialog-content"), _uA(
+                                        _cV(_component_i_input, _uM("modelValue" to fenceForm.name, "onUpdate:modelValue" to fun(`$event`: String){
+                                            fenceForm.name = `$event`
+                                        }
+                                        , "placeholder" to "请输入围栏名称", "border" to "surround"), null, 8, _uA(
+                                            "modelValue",
+                                            "onUpdate:modelValue"
+                                        )),
+                                        _cE("view", _uM("class" to "radio-group"), _uA(
+                                            _cE("text", _uM("class" to "label"), "告警类型:"),
+                                            _cE("view", _uM("class" to "radio-options"), _uA(
+                                                _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
+                                                    fenceForm.alarmType = `$event`
                                                 }
-                                                ), 1),
-                                                _cE("text", _uM("class" to "devices"), "绑定设备: " + _tD(if (isTruthy(fence["deviceCount"])) {
-                                                    fence["deviceCount"]
-                                                } else {
-                                                    0
+                                                , "name" to "0", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                    return _uA(
+                                                        "不告警"
+                                                    )
                                                 }
-                                                ) + "台", 1)
-                                            )),
-                                            _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
-                                        ), 8, _uA(
+                                                ), "_" to 1), 8, _uA(
+                                                    "modelValue",
+                                                    "onUpdate:modelValue"
+                                                )),
+                                                _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
+                                                    fenceForm.alarmType = `$event`
+                                                }
+                                                , "name" to "1", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                    return _uA(
+                                                        "出入告警"
+                                                    )
+                                                }
+                                                ), "_" to 1), 8, _uA(
+                                                    "modelValue",
+                                                    "onUpdate:modelValue"
+                                                )),
+                                                _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
+                                                    fenceForm.alarmType = `$event`
+                                                }
+                                                , "name" to "2", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                    return _uA(
+                                                        "出告警"
+                                                    )
+                                                }
+                                                ), "_" to 1), 8, _uA(
+                                                    "modelValue",
+                                                    "onUpdate:modelValue"
+                                                )),
+                                                _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
+                                                    fenceForm.alarmType = `$event`
+                                                }
+                                                , "name" to "3", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                    return _uA(
+                                                        "入告警"
+                                                    )
+                                                }
+                                                ), "_" to 1), 8, _uA(
+                                                    "modelValue",
+                                                    "onUpdate:modelValue"
+                                                ))
+                                            ))
+                                        ))
+                                    )),
+                                    _cE("view", _uM("class" to "dialog-actions"), _uA(
+                                        _cV(_component_i_button, _uM("onClick" to closeEditDialog), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                            return _uA(
+                                                "取消"
+                                            )
+                                        }
+                                        ), "_" to 1)),
+                                        _cV(_component_i_button, _uM("type" to "primary", "onClick" to saveFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                            return _uA(
+                                                "保存"
+                                            )
+                                        }
+                                        ), "_" to 1))
+                                    ))
+                                ))
+                            )
+                        }
+                        ), "_" to 1), 512),
+                        _cV(_component_i_popup, _uM("ref_key" to "deviceDialogPopup", "ref" to deviceDialogPopup, "mode" to "bottom", "round" to "10", "closeOnMask" to true, "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                _cE("view", _uM("class" to "device-dialog"), _uA(
+                                    _cE("view", _uM("class" to "dialog-header"), _uA(
+                                        _cE("text", _uM("class" to "dialog-title"), "设备绑定 - " + _tD(currentFenceName.value), 1)
+                                    )),
+                                    _cE("view", _uM("class" to "dialog-tabs"), _uA(
+                                        _cE("text", _uM("class" to _nC(_uA(
+                                            "tab",
+                                            if (activeTab.value === "bind") {
+                                                "active"
+                                            } else {
+                                                ""
+                                            }
+                                        )), "onClick" to fun(){
+                                            switchTab("bind")
+                                        }
+                                        ), "已绑定设备", 10, _uA(
+                                            "onClick"
+                                        )),
+                                        _cE("text", _uM("class" to _nC(_uA(
+                                            "tab",
+                                            if (activeTab.value === "unbind") {
+                                                "active"
+                                            } else {
+                                                ""
+                                            }
+                                        )), "onClick" to fun(){
+                                            switchTab("unbind")
+                                        }
+                                        ), "未绑定设备", 10, _uA(
                                             "onClick"
                                         ))
-                                    }
-                                    ), 128),
-                                    if (fenceList.value.length == 0) {
-                                        _cE("view", _uM("key" to 0, "class" to "empty"), _uA(
-                                            _cE("text", _uM("class" to "empty-text"), "暂无围栏数据")
-                                        ))
-                                    } else {
-                                        _cC("v-if", true)
-                                    }
-                                ))
-                            ))
-                        )
-                    }
-                    ), "_" to 1), 512),
-                    _cV(_component_i_popup, _uM("ref_key" to "editDialogPopup", "ref" to editDialogPopup, "mode" to "bottom", "round" to "10", "contentDraggable" to false, "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                        return _uA(
-                            _cE("view", _uM("class" to "edit-dialog"), _uA(
-                                _cE("view", _uM("class" to "dialog-header"), _uA(
-                                    _cE("text", _uM("class" to "dialog-title"), _tD(if (isTruthy(editingFence.value)) {
-                                        "编辑围栏"
-                                    } else {
-                                        "新增围栏"
-                                    }
-                                    ), 1)
-                                )),
-                                _cE("view", _uM("class" to "dialog-content"), _uA(
-                                    _cV(_component_i_input, _uM("modelValue" to fenceForm.name, "onUpdate:modelValue" to fun(`$event`: String){
-                                        fenceForm.name = `$event`
-                                    }
-                                    , "placeholder" to "请输入围栏名称", "border" to "surround"), null, 8, _uA(
-                                        "modelValue",
-                                        "onUpdate:modelValue"
                                     )),
-                                    _cE("view", _uM("class" to "radio-group"), _uA(
-                                        _cE("text", _uM("class" to "label"), "告警类型:"),
-                                        _cE("view", _uM("class" to "radio-options"), _uA(
-                                            _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
-                                                fenceForm.alarmType = `$event`
-                                            }
-                                            , "name" to "0", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    "不告警"
-                                                )
-                                            }
-                                            ), "_" to 1), 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            )),
-                                            _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
-                                                fenceForm.alarmType = `$event`
-                                            }
-                                            , "name" to "1", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    "出入告警"
-                                                )
-                                            }
-                                            ), "_" to 1), 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            )),
-                                            _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
-                                                fenceForm.alarmType = `$event`
-                                            }
-                                            , "name" to "2", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    "出告警"
-                                                )
-                                            }
-                                            ), "_" to 1), 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            )),
-                                            _cV(_component_i_radio, _uM("modelValue" to fenceForm.alarmType, "onUpdate:modelValue" to fun(`$event`: String){
-                                                fenceForm.alarmType = `$event`
-                                            }
-                                            , "name" to "3", "iconPlacement" to "left"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                                return _uA(
-                                                    "入告警"
-                                                )
-                                            }
-                                            ), "_" to 1), 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            ))
-                                        ))
-                                    ))
-                                )),
-                                _cE("view", _uM("class" to "dialog-actions"), _uA(
-                                    _cV(_component_i_button, _uM("onClick" to closeEditDialog), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            "取消"
-                                        )
-                                    }
-                                    ), "_" to 1)),
-                                    _cV(_component_i_button, _uM("type" to "primary", "onClick" to saveFence), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            "保存"
-                                        )
-                                    }
-                                    ), "_" to 1))
-                                ))
-                            ))
-                        )
-                    }
-                    ), "_" to 1), 512),
-                    _cV(_component_i_popup, _uM("ref_key" to "deviceDialogPopup", "ref" to deviceDialogPopup, "mode" to "bottom", "round" to "10", "closeOnMask" to true, "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                        return _uA(
-                            _cE("view", _uM("class" to "device-dialog"), _uA(
-                                _cE("view", _uM("class" to "dialog-header"), _uA(
-                                    _cE("text", _uM("class" to "dialog-title"), "设备绑定 - " + _tD(currentFenceName.value), 1)
-                                )),
-                                _cE("view", _uM("class" to "dialog-tabs"), _uA(
-                                    _cE("text", _uM("class" to _nC(_uA(
-                                        "tab",
-                                        if (activeTab.value === "bind") {
-                                            "active"
-                                        } else {
-                                            ""
-                                        }
-                                    )), "onClick" to fun(){
-                                        switchTab("bind")
-                                    }
-                                    ), "已绑定设备", 10, _uA(
-                                        "onClick"
-                                    )),
-                                    _cE("text", _uM("class" to _nC(_uA(
-                                        "tab",
-                                        if (activeTab.value === "unbind") {
-                                            "active"
-                                        } else {
-                                            ""
-                                        }
-                                    )), "onClick" to fun(){
-                                        switchTab("unbind")
-                                    }
-                                    ), "未绑定设备", 10, _uA(
-                                        "onClick"
-                                    ))
-                                )),
-                                _cE("scroll-view", _uM("class" to "device-list", "scroll-y" to "true", "show-scrollbar" to false, "scroll-top" to scrollTop.value, "onScrolltolower" to handleLoadMore, "lower-threshold" to 150), _uA(
-                                    _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, fun(device, __key, __index, _cached): Any {
-                                        return _cE("view", _uM("key" to getDeviceImei(device), "class" to "device-item"), _uA(
-                                            _cE("view", _uM("class" to "device-info"), _uA(
-                                                _cE("text", _uM("class" to "name"), _tD(getDeviceDisplayName(device)), 1),
-                                                if (isTrue(getDeviceImei(device))) {
-                                                    _cE("text", _uM("key" to 0, "class" to "status"), _tD(if (isDeviceOnline(device)) {
-                                                        "在线"
+                                    _cE("scroll-view", _uM("class" to "device-list", "scroll-y" to "true", "show-scrollbar" to false, "scroll-top" to scrollTop.value, "onScrolltolower" to handleLoadMore, "lower-threshold" to 150), _uA(
+                                        _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, fun(device, __key, __index, _cached): Any {
+                                            return _cE("view", _uM("key" to getDeviceImei(device), "class" to "device-item"), _uA(
+                                                _cE("view", _uM("class" to "device-info"), _uA(
+                                                    _cE("text", _uM("class" to "name"), _tD(getDeviceDisplayName(device)), 1),
+                                                    if (isTrue(getDeviceImei(device))) {
+                                                        _cE("text", _uM("key" to 0, "class" to "status"), _tD(if (isDeviceOnline(device)) {
+                                                            "在线"
+                                                        } else {
+                                                            "离线"
+                                                        }), 1)
                                                     } else {
-                                                        "离线"
-                                                    }), 1)
-                                                } else {
-                                                    _cC("v-if", true)
+                                                        _cC("v-if", true)
+                                                    }
+                                                )),
+                                                _cV(_component_i_switch, _uM("model-value" to isDeviceBound(getDeviceImei(device)), "onChange" to fun(`$event`: Any){
+                                                    handleDeviceBindingChange(getDeviceImei(device), `$event` as Boolean)
                                                 }
-                                            )),
-                                            _cV(_component_i_switch, _uM("model-value" to isDeviceBound(getDeviceImei(device)), "onChange" to fun(`$event`: Any){
-                                                handleDeviceBindingChange(getDeviceImei(device), `$event` as Boolean)
-                                            }
-                                            , "disabled" to (loading.value || loadingMore.value), "size" to "20"), null, 8, _uA(
-                                                "model-value",
-                                                "onChange",
-                                                "disabled"
+                                                , "disabled" to (loading.value || loadingMore.value), "size" to "20"), null, 8, _uA(
+                                                    "model-value",
+                                                    "onChange",
+                                                    "disabled"
+                                                ))
                                             ))
-                                        ))
-                                    }
-                                    ), 128),
-                                    if (isTrue(deviceList.value.length == 0 && !loading.value)) {
-                                        _cE("view", _uM("key" to 0, "class" to "empty"), _uA(
-                                            _cE("text", _uM("class" to "empty-text"), _tD(if (activeTab.value === "bind") {
-                                                "暂无绑定设备"
-                                            } else {
-                                                "暂无可用设备"
-                                            }), 1)
-                                        ))
-                                    } else {
-                                        _cC("v-if", true)
-                                    }
-                                    ,
-                                    if (isTrue(loadingMore.value)) {
-                                        _cE("view", _uM("key" to 1, "class" to "loading-tip"), _uA(
-                                            _cE("text", _uM("class" to "empty-text"), "正在加载更多...")
-                                        ))
-                                    } else {
-                                        _cC("v-if", true)
-                                    }
-                                    ,
-                                    if (isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)) {
-                                        _cE("view", _uM("key" to 2, "class" to "empty-text-box"), _uA(
-                                            _cE("text", _uM("class" to "empty-text"), "暂无更多数据")
-                                        ))
-                                    } else {
-                                        _cC("v-if", true)
-                                    }
-                                ), 40, _uA(
-                                    "scroll-top"
+                                        }
+                                        ), 128),
+                                        if (isTrue(deviceList.value.length == 0 && !loading.value)) {
+                                            _cE("view", _uM("key" to 0, "class" to "empty"), _uA(
+                                                _cE("text", _uM("class" to "empty-text"), _tD(if (activeTab.value === "bind") {
+                                                    "暂无绑定设备"
+                                                } else {
+                                                    "暂无可用设备"
+                                                }), 1)
+                                            ))
+                                        } else {
+                                            _cC("v-if", true)
+                                        }
+                                        ,
+                                        if (isTrue(loadingMore.value)) {
+                                            _cE("view", _uM("key" to 1, "class" to "loading-tip"), _uA(
+                                                _cE("text", _uM("class" to "empty-text"), "正在加载更多...")
+                                            ))
+                                        } else {
+                                            _cC("v-if", true)
+                                        }
+                                        ,
+                                        if (isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)) {
+                                            _cE("view", _uM("key" to 2, "class" to "empty-text-box"), _uA(
+                                                _cE("text", _uM("class" to "empty-text"), "暂无更多数据")
+                                            ))
+                                        } else {
+                                            _cC("v-if", true)
+                                        }
+                                    ), 40, _uA(
+                                        "scroll-top"
+                                    ))
                                 ))
-                            ))
-                        )
-                    }
-                    ), "_" to 1), 512)
-                ))
+                            )
+                        }
+                        ), "_" to 1), 512)
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

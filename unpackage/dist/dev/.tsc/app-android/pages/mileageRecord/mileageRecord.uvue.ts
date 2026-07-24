@@ -4,12 +4,14 @@ import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/com
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
-import { ref, reactive, onMounted, computed } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
-	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 74, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
-	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 75, 7>; date : string; trips : Array<UTSJSONObject>; }
+	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 76, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
+	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 77, 7>; date : string; trips : Array<UTSJSONObject>; }
 
 	
 const __sfc__ = defineComponent({
@@ -19,7 +21,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const carStatus = ref('在线')
+const carStatus = ref('在线')
 	const plateNo = ref('')
 	const carType = ref('')
 	const totalMileage = ref(0)
@@ -131,7 +133,7 @@ const _cache = __ins.renderCache;
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 189, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 191, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -141,14 +143,14 @@ const _cache = __ins.renderCache;
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:199");
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:201");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:205");
-			uni.showToast({
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:207");
+			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',
 			});
@@ -238,6 +240,7 @@ const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",
 const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
 const _component_i_empty = resolveEasyComponent("i-empty",_easycom_i_empty)
 const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
@@ -354,7 +357,7 @@ const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
                       _cE("view", _uM({ class: "trip-index" }), [
                         _cE("view", _uM({ class: "icon" }), [
                           _cE("text", _uM({
-                            style: _nS(_uM({"color":"#ffffff"}))
+                            style: _nS(_uM({"color":"#ffffff","font-size":"24rpx"}))
                           }), _tD(index + 1), 5 /* TEXT, STYLE */)
                         ]),
                         _cE("view", _uM({ class: "trip-distance-time" }), [
@@ -369,7 +372,8 @@ const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
               }), 128 /* KEYED_FRAGMENT */)
             ])
       ])
-    ])
+    ]),
+    _cV(_component_app_toast)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

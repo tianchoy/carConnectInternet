@@ -22,7 +22,6 @@ import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesAddCarAddCar : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -44,13 +43,13 @@ open class GenPagesAddCarAddCar : BasePage {
                 uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar"))
             }
             val handleScanResult = fun(data: ScanResultData){
-                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:111")
+                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:113")
                 if (data.result.length == 15) {
                     carInfo.value.imei = "0" + data.result.slice(4, 15)
                 } else if (data.result.length == 11) {
                     carInfo.value.imei = "0" + data.result
                 } else {
-                    uni_showToast(ShowToastOptions(title = "请输入正确的设备ID", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请输入正确的设备ID", icon = "none"))
                 }
             }
             val updateCarIconSelectorVisible = fun(visible: Boolean){
@@ -59,7 +58,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val selectIcon = fun(item: CarIconItem__1){
                 val name = item.getString("name", "")
                 val text = item.getString("text", "")
-                console.log(name, " at pages/addCar/addCar.uvue:133")
+                console.log(name, " at pages/addCar/addCar.uvue:135")
                 carInfo.value.deviceType = name
                 carInfo.value.deviceTypeValue = text
                 carIconSelectorVisible.value = false
@@ -72,40 +71,40 @@ open class GenPagesAddCarAddCar : BasePage {
             }
             val validateForm = fun(): Boolean {
                 if (carInfo.value.imei.length == 0) {
-                    uni_showToast(ShowToastOptions(title = "请输入设备ID", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请输入设备ID", icon = "none"))
                     return false
                 }
                 if (carInfo.value.deviceType.length == 0) {
-                    uni_showToast(ShowToastOptions(title = "请选择设备图标", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请选择设备图标", icon = "none"))
                     return false
                 }
                 return true
             }
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:170")
+                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:172")
                         try {
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:175")
+                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:177")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 183, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType)
-                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:190")
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 185, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType)
+                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:192")
                             val res = await(addDevice(submitData))
-                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:193")
+                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:195")
                             uni_hideLoading(null)
                             loading.value = false
                             if (res.code == 0) {
-                                uni_showToast(ShowToastOptions(title = "添加成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = "添加成功", icon = "success"))
                                 uni_setStorageSync("needRefreshHome", true)
                                 refreshDeviceList()
                                 setTimeout(fun(){
                                     uni_navigateBack(null)
                                 }, 1500)
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "添加失败"
@@ -114,10 +113,10 @@ open class GenPagesAddCarAddCar : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:220")
+                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:222")
                             uni_hideLoading(null)
                             loading.value = false
-                            uni_showToast(ShowToastOptions(title = "添加设备失败", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "添加设备失败", icon = "none"))
                         }
                 })
             }
@@ -149,76 +148,80 @@ open class GenPagesAddCarAddCar : BasePage {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_i_form = resolveEasyComponent("i-form", GenUniModulesIUiXComponentsIFormIFormClass)
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "添加设备", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "content"), _uA(
-                        _cV(_component_i_form, _uM("labelPosition" to "left", "modelValue" to carInfo.value, "rules" to rules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to handleModelValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_i_form_item, _uM("label" to "设备名称", "name" to "deviceName", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.deviceName, "onUpdate:modelValue" to fun(`$event`: String){
-                                            carInfo.value.deviceName = `$event`
-                                        }
-                                        , "placeholder" to "请输入设备名称"), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_i_form_item, _uM("label" to "*设备ID", "name" to "imei", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.imei, "onUpdate:modelValue" to fun(`$event`: String){
-                                            carInfo.value.imei = `$event`
-                                        }
-                                        , "placeholder" to "请输入设备ID(必填)"), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                _cV(_component_i_icon, _uM("name" to "/static/sancode.png", "fontSize" to "20", "onClick" to scanCode))
-                                            )
-                                        }
-                                        ), "_" to 1), 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_i_form_item, _uM("label" to "车标", "name" to "deviceType", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cE("view", _uM("class" to "car-type-selector", "onClick" to deviceTypeSelectFun), _uA(
-                                            _cE("text", _uM("class" to _nC(_uA(
-                                                "clickable",
-                                                _uM("placeholder" to !(carInfo.value.deviceTypeValue != ""))
-                                            ))), _tD(if (carInfo.value.deviceTypeValue != "") {
-                                                carInfo.value.deviceTypeValue
-                                            } else {
-                                                "请选择设备图标(必选)"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "添加设备", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "content"), _uA(
+                            _cV(_component_i_form, _uM("labelPosition" to "left", "modelValue" to carInfo.value, "rules" to rules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to handleModelValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_i_form_item, _uM("label" to "设备名称", "name" to "deviceName", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.deviceName, "onUpdate:modelValue" to fun(`$event`: String){
+                                                carInfo.value.deviceName = `$event`
                                             }
-                                            ), 3)
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(unref(GenComponentsCarIconsCarIconsClass), _uM("show" to carIconSelectorVisible.value, "onUpdate:show" to updateCarIconSelectorVisible, "onSelect" to selectIcon), null, 8, _uA(
-                                    "show"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue"
+                                            , "placeholder" to "请输入设备名称"), null, 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(_component_i_form_item, _uM("label" to "*设备ID", "name" to "imei", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.imei, "onUpdate:modelValue" to fun(`$event`: String){
+                                                carInfo.value.imei = `$event`
+                                            }
+                                            , "placeholder" to "请输入设备ID(必填)"), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    _cV(_component_i_icon, _uM("name" to "/static/sancode.png", "fontSize" to "20", "onClick" to scanCode))
+                                                )
+                                            }
+                                            ), "_" to 1), 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(_component_i_form_item, _uM("label" to "车标", "name" to "deviceType", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cE("view", _uM("class" to "car-type-selector", "onClick" to deviceTypeSelectFun), _uA(
+                                                _cE("text", _uM("class" to _nC(_uA(
+                                                    "clickable",
+                                                    _uM("placeholder" to !(carInfo.value.deviceTypeValue != ""))
+                                                ))), _tD(if (carInfo.value.deviceTypeValue != "") {
+                                                    carInfo.value.deviceTypeValue
+                                                } else {
+                                                    "请选择设备图标(必选)"
+                                                }
+                                                ), 3)
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(unref(GenComponentsCarIconsCarIconsClass), _uM("show" to carIconSelectorVisible.value, "onUpdate:show" to updateCarIconSelectorVisible, "onSelect" to selectIcon), null, 8, _uA(
+                                        "show"
+                                    ))
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "modelValue"
+                            ))
+                        )),
+                        _cE("view", _uM("class" to "btn"), _uA(
+                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    "提交"
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "loading"
+                            ))
                         ))
                     )),
-                    _cE("view", _uM("class" to "btn"), _uA(
-                        _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                "提交"
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "loading"
-                        ))
-                    ))
-                ))
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

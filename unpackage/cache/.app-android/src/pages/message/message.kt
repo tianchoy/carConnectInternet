@@ -39,7 +39,7 @@ open class GenPagesMessageMessage : BasePage {
             val isPageActive = ref(false)
             fun gen_stopNewMessageCheck_fn(): Unit {
                 if (checkTimer > 0) {
-                    console.log("停止定时消息检查", " at pages/message/message.uvue:99")
+                    console.log("停止定时消息检查", " at pages/message/message.uvue:100")
                     clearInterval(checkTimer)
                     checkTimer = 0
                 }
@@ -96,7 +96,7 @@ open class GenPagesMessageMessage : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("检查新消息失败:", error, " at pages/message/message.uvue:139")
+                            console.error("检查新消息失败:", error, " at pages/message/message.uvue:140")
                         }
                 })
             }
@@ -105,10 +105,10 @@ open class GenPagesMessageMessage : BasePage {
                 if (checkTimer > 0) {
                     stopNewMessageCheck()
                 }
-                console.log("启动定时消息检查", " at pages/message/message.uvue:149")
+                console.log("启动定时消息检查", " at pages/message/message.uvue:150")
                 checkTimer = setInterval(fun(){
                     if (isPageActive.value) {
-                        console.log("定时检查新消息...", " at pages/message/message.uvue:153")
+                        console.log("定时检查新消息...", " at pages/message/message.uvue:154")
                         checkNewMessages()
                     }
                 }
@@ -173,7 +173,7 @@ open class GenPagesMessageMessage : BasePage {
                         }
                          catch (error: Throwable) {
                             loadStatus.value = "loadmore"
-                            console.error("请求异常:", error, " at pages/message/message.uvue:200")
+                            console.error("请求异常:", error, " at pages/message/message.uvue:201")
                         }
                          finally {
                             isLoading.value = false
@@ -182,12 +182,12 @@ open class GenPagesMessageMessage : BasePage {
             }
             fun gen_loadNewMessages_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("加载新消息", " at pages/message/message.uvue:208")
+                        console.log("加载新消息", " at pages/message/message.uvue:209")
                         await(loadMsgList(true))
                         hasNewMessages.value = false
                         newMessageCount.value = 0
                         lastUpdateTime.value = Date().getTime()
-                        console.log("新消息加载完成", " at pages/message/message.uvue:213")
+                        console.log("新消息加载完成", " at pages/message/message.uvue:214")
                 })
             }
             val loadNewMessages = ::gen_loadNewMessages_fn
@@ -203,7 +203,7 @@ open class GenPagesMessageMessage : BasePage {
             )
             onShow(fun(){
                 if (Login.value) {
-                    console.log("页面显示 - 启动自动刷新", " at pages/message/message.uvue:237")
+                    console.log("页面显示 - 启动自动刷新", " at pages/message/message.uvue:238")
                     isPageActive.value = true
                     startNewMessageCheck()
                     checkNewMessages()
@@ -211,27 +211,27 @@ open class GenPagesMessageMessage : BasePage {
             }
             )
             onHide(fun(){
-                console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:247")
+                console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:248")
                 if (Login.value) {
-                    console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:249")
+                    console.log("页面隐藏 - 停止自动刷新", " at pages/message/message.uvue:250")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             onUnload(fun(){
-                console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:257")
+                console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:258")
                 if (Login.value) {
-                    console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:259")
+                    console.log("页面卸载 - 清理资源", " at pages/message/message.uvue:260")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             onActivated(fun(){
-                console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:266")
+                console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:267")
                 if (Login.value) {
-                    console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:268")
+                    console.log("页面激活 - 启动自动刷新", " at pages/message/message.uvue:269")
                     isPageActive.value = true
                     startNewMessageCheck()
                     checkNewMessages()
@@ -239,16 +239,16 @@ open class GenPagesMessageMessage : BasePage {
             }
             )
             onDeactivated(fun(){
-                console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:277")
+                console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:278")
                 if (Login.value) {
-                    console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:279")
+                    console.log("页面停用 - 停止自动刷新", " at pages/message/message.uvue:280")
                     isPageActive.value = false
                     stopNewMessageCheck()
                 }
             }
             )
             val onRefresherRefresh = fun(){
-                console.log("下拉刷新触发", " at pages/message/message.uvue:287")
+                console.log("下拉刷新触发", " at pages/message/message.uvue:288")
                 refresherTriggered.value = true
                 loadMsgList(true).then(fun(){
                     refresherTriggered.value = false
@@ -260,7 +260,7 @@ open class GenPagesMessageMessage : BasePage {
             }
             val loadMore = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:298")
+                        console.log("准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:299")
                         if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
                             if (currPage.value >= totalPage.value) {
                                 loadStatus.value = "nomore"
@@ -272,7 +272,7 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val onScrollToLower = fun(){
-                console.log("滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:312")
+                console.log("滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value, " at pages/message/message.uvue:313")
                 if (loadStatus.value == "loadmore" && !isLoading.value) {
                     loadMore()
                 }
@@ -297,7 +297,7 @@ open class GenPagesMessageMessage : BasePage {
                                 }
                             }
                              catch (error: Throwable) {
-                                console.error("更新状态失败:", error, " at pages/message/message.uvue:336")
+                                console.error("更新状态失败:", error, " at pages/message/message.uvue:337")
                             }
                         }
                 })
@@ -367,6 +367,7 @@ open class GenPagesMessageMessage : BasePage {
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_modal = resolveEasyComponent("i-modal", GenUniModulesIUiXComponentsIModalIModalClass)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "消息中心", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isShowStyle" to true)),
                     _cE("view", _uM("class" to "container"), _uA(
@@ -434,7 +435,8 @@ open class GenPagesMessageMessage : BasePage {
                             "title",
                             "content"
                         ))
-                    ))
+                    )),
+                    _cV(_component_app_toast)
                 ), 64)
             }
         }

@@ -10,6 +10,7 @@
 			<view class="list"><text class="title">发动机号</text><text class="info">{{carInfo.getString('engineNum', '')}}</text></view>
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">

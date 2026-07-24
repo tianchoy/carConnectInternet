@@ -1,5 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
-import { getUserDeviceList } from '../../../api/request.uts'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../../utils/toast.uts'
+	import { getUserDeviceList } from '../../../api/request.uts'
 
 	
 const __sfc__ = defineComponent({
@@ -9,7 +11,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const deviceList = ref<Array<UTSJSONObject>>([])
+const deviceList = ref<Array<UTSJSONObject>>([])
 	// 当前页码
 	const currPage = ref(1)
 	// 每页条数
@@ -43,7 +45,7 @@ const _cache = __ins.renderCache;
 
 		loading.value = true
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 87, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 89, 10),
 				page: currPage.value,
 				pageSize: pageSize.value
 			}
@@ -73,14 +75,14 @@ const _cache = __ins.renderCache;
 				}
 
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:123")
-			uni.showToast({
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:125")
+			showAppToast({
 				title: '加载失败，请重试',
 				icon: 'none'
 			})
@@ -109,11 +111,11 @@ const _cache = __ins.renderCache;
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
 		// iccid = iccid.substring(0,iccid.length-1)
-		
-		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:154")
+
+		console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:156")
 		// 设置需要刷新的标志
 		needRefresh.value = true
-		
+
 
 
 
@@ -135,7 +137,7 @@ const _cache = __ins.renderCache;
 
 
 		needRefresh.value = false
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中完成充值',
 			icon: 'none'
 		})
@@ -153,7 +155,7 @@ const _cache = __ins.renderCache;
 		resetData()
 		loadPayDeviceListData().finally(() => {
 			uni.stopPullDownRefresh()
-			uni.showToast({
+			showAppToast({
 				title: '刷新成功',
 				icon: 'success'
 			})
@@ -163,6 +165,7 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
@@ -237,7 +240,8 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
             ])
           : _cC("v-if", true)
       ])
-    ])
+    ]),
+    _cV(_component_app_toast)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

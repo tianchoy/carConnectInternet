@@ -51,7 +51,7 @@
 						@click="gotoTripDetail(getTripStartTime(item), getTripEndTime(item))">
 						<view class="trip-index">
 							<view class="icon">
-								<text style="color: #ffffff;">{{index + 1}}</text>
+								<text style="color: #ffffff;font-size: 24rpx;">{{index + 1}}</text>
 							</view>
 							<view class="trip-distance-time">
 								<text>{{getTripHourRange(item)}}</text>
@@ -64,9 +64,11 @@
 			</view>
 		</scroll-view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
@@ -203,7 +205,7 @@
 			}
 		} catch (e) {
 			console.error('获取里程数据失败:', e);
-			uni.showToast({
+			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',
 			});

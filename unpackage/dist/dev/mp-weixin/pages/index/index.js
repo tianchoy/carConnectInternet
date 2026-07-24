@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 const utils_gettime = require("../../utils/gettime.js");
@@ -10,13 +11,15 @@ if (!Array) {
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_i_line_progress_1 = common_vendor.resolveComponent("i-line-progress");
   const _easycom_i_picker_1 = common_vendor.resolveComponent("i-picker");
-  (_easycom_i_icon_1 + _easycom_i_line_progress_1 + _easycom_i_picker_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_i_icon_1 + _easycom_i_line_progress_1 + _easycom_i_picker_1 + _easycom_app_toast_1)();
 }
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_i_line_progress = () => "../../uni_modules/i-ui-x/components/i-line-progress/i-line-progress.js";
 const _easycom_i_picker = () => "../../uni_modules/i-ui-x/components/i-picker/i-picker.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_i_icon + _easycom_i_line_progress + _easycom_i_picker)();
+  (_easycom_i_icon + _easycom_i_line_progress + _easycom_i_picker + _easycom_app_toast)();
 }
 class Device extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -284,9 +287,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           longitude: device.longitude
         });
         common_vendor.index.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, common_vendor.UTS.JSON.stringify(deviceInfo));
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:321", "保存选中设备成功:", deviceInfo);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:350", "保存选中设备成功:", deviceInfo);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:323", "保存选中设备失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:352", "保存选中设备失败:", error);
       }
     };
     const decodeSavedDevice = (raw = null) => {
@@ -330,23 +333,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return null;
         return decodeSavedDevice(rawDevice);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:381", "获取保存设备失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:410", "获取保存设备失败:", error);
       }
       return null;
     };
     const clearSavedSelectedDevice = () => {
       try {
         common_vendor.index.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:390", "清除保存设备成功");
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:419", "清除保存设备成功");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:392", "清除保存设备失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:421", "清除保存设备失败:", error);
       }
     };
     const saveSelectedDeviceIndex = (index) => {
       try {
         common_vendor.index.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:401", "保存选中设备索引失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:430", "保存选中设备索引失败:", error);
       }
     };
     const getSavedSelectedDeviceIndex = () => {
@@ -357,7 +360,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return isNaN(index) || index < 0 ? null : index;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:414", "获取保存设备索引失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:443", "获取保存设备索引失败:", error);
       }
       return null;
     };
@@ -365,12 +368,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         common_vendor.index.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.uvue:424", "清除保存设备索引失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.uvue:453", "清除保存设备索引失败:", error);
       }
     };
     const handlePicker = () => {
       if (deviceList.value.length == 0) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "暂无车辆数据",
           icon: "none"
         });
@@ -440,7 +443,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:527", "加载设备详情失败", error);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:556", "加载设备详情失败", error);
         }
       });
     };
@@ -473,7 +476,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const res = yield api_request.getTrackPos(data);
           if (res.code == 401) {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "登录过期，请重新登录",
               icon: "none",
               duration: 2e3
@@ -490,7 +493,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           common_vendor.index.hideLoading();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:583", "加载轨迹失败", error);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:612", "加载轨迹失败", error);
         }
       });
     };
@@ -509,8 +512,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const lat = position.getNumber("latitude", 0);
             const lng = position.getNumber("longitude", 0);
             if (isNaN(lat) || isNaN(lng)) {
-              common_vendor.index.__f__("error", "at pages/index/index.uvue:604", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
-              common_vendor.index.showToast({
+              common_vendor.index.__f__("error", "at pages/index/index.uvue:633", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              utils_toast.showAppToast({
                 title: "定位数据异常",
                 icon: "none"
               });
@@ -523,20 +526,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            common_vendor.index.__f__("log", "at pages/index/index.uvue:630", "标记点更新完成");
+            common_vendor.index.__f__("log", "at pages/index/index.uvue:659", "标记点更新完成");
             return true;
           } else {
-            common_vendor.index.__f__("warn", "at pages/index/index.uvue:633", "获取设备位置失败");
+            common_vendor.index.__f__("warn", "at pages/index/index.uvue:662", "获取设备位置失败");
             isMapReady.value = false;
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "获取位置失败",
               icon: "none"
             });
             return false;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:642", "加载设备位置失败", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:671", "加载设备位置失败", error);
+          utils_toast.showAppToast({
             title: "定位失败，请重试",
             icon: "none"
           });
@@ -546,7 +549,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadDeviceData = (device) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:653", "开始加载设备数据:", device);
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:682", "开始加载设备数据:", device);
         try {
           yield loadDeviceDetail(device.deviceId);
           yield loadDevicePos(new common_vendor.UTSJSONObject({
@@ -562,13 +565,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withPos: false,
             withTrip: true
           }));
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "切换成功",
             icon: "success"
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:674", "切换车辆失败", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:703", "切换车辆失败", error);
+          utils_toast.showAppToast({
             title: "切换失败，请重试",
             icon: "none"
           });
@@ -582,28 +585,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const indexs = e.getArray("indexs");
       let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
       if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-        common_vendor.index.__f__("warn", "at pages/index/index.uvue:696", "无法解析选中的索引，使用当前设备");
+        common_vendor.index.__f__("warn", "at pages/index/index.uvue:725", "无法解析选中的索引，使用当前设备");
         const currentIndex = deviceList.value.findIndex((device) => {
           return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
         });
         if (currentIndex != -1) {
           selectedIndex = currentIndex;
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:702", "使用当前设备索引:", selectedIndex);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:731", "使用当前设备索引:", selectedIndex);
         } else {
           selectedIndex = 0;
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:705", "使用默认索引: 0");
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:734", "使用默认索引: 0");
         }
       }
       const selectedDevice = deviceList.value[selectedIndex];
       if (!selectedDevice) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "选择设备失败",
           icon: "none"
         });
         return null;
       }
       if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-        common_vendor.index.__f__("log", "at pages/index/index.uvue:720", "选择的设备与当前设备相同，不重复加载");
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:749", "选择的设备与当前设备相同，不重复加载");
         return null;
       }
       const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -684,7 +687,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               selectedIdx = 0;
               saveSelectedDevice(selectedDevice);
               saveSelectedDeviceIndex(0);
-              common_vendor.index.__f__("log", "at pages/index/index.uvue:823", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+              common_vendor.index.__f__("log", "at pages/index/index.uvue:852", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
             }
             if (selectedDevice != null) {
               const device = selectedDevice;
@@ -719,14 +722,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }));
             }
           } else {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "暂无车辆数据",
               icon: "none"
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:869", "加载车辆列表失败", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:898", "加载车辆列表失败", error);
+          utils_toast.showAppToast({
             title: "加载失败，请下拉重试",
             icon: "none"
           });
@@ -739,7 +742,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const refreshLocation = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!currentCarDeviceId.value) {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "请先选择车辆",
             icon: "none"
           });
@@ -752,8 +755,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           yield loadDeviceList();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:898", "刷新位置失败", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:927", "刷新位置失败", error);
+          utils_toast.showAppToast({
             title: "刷新失败",
             icon: "none"
           });
@@ -768,7 +771,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function isLogin() {
       if (!checkToken()) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请先登录",
           icon: "none"
         });
@@ -783,12 +786,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:930", "跳转轨迹详情失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:959", "跳转轨迹详情失败:", err);
         }
       });
     };
     const toDeviceList = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:937", "toDeviceList");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:966", "toDeviceList");
       if (!isLogin())
         return null;
       common_vendor.index.navigateTo({
@@ -799,7 +802,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!isLogin())
         return null;
       if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请先选择车辆",
           icon: "none"
         });
@@ -816,7 +819,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/addCar/addCar",
         fail: (err) => {
           if (err.errMsg.indexOf("locked") < 0)
-            common_vendor.index.__f__("error", "at pages/index/index.uvue:965", "跳转添加设备失败:", err);
+            common_vendor.index.__f__("error", "at pages/index/index.uvue:994", "跳转添加设备失败:", err);
         }
       });
     };
@@ -836,17 +839,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         name: currentCarName.value,
         scale: 18,
         success: () => {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "成功调起地图",
             icon: "none"
           });
         },
         fail: (err) => {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "调起地图失败",
             icon: "none"
           });
-          common_vendor.index.__f__("error", "at pages/index/index.uvue:997", "调起地图失败:", err);
+          common_vendor.index.__f__("error", "at pages/index/index.uvue:1026", "调起地图失败:", err);
         }
       });
     };
@@ -862,7 +865,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1017", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1046", res);
         }
       }));
     };
@@ -873,19 +876,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (simMerchant.toLowerCase() == "zddx") {
         iccid = iccid.substring(0, iccid.length - 1);
       }
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:1039", iccid);
       needRefresh.value = true;
       common_vendor.index.openEmbeddedMiniProgram(new common_vendor.UTSJSONObject({
         appId: "wx1d647f2cfdc089e6",
         path: "/pages/home/userSimRecharge?iccid=" + iccid,
         envVersion: "release",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1048", "打开小程序成功", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1075", "打开小程序成功", res);
         },
         fail(res = null) {
-          common_vendor.index.__f__("log", "at pages/index/index.uvue:1051", "打开小程序失败", res);
+          common_vendor.index.__f__("log", "at pages/index/index.uvue:1078", "打开小程序失败", res);
           needRefresh.value = false;
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "打开支付页面失败",
             icon: "none"
           });
@@ -901,14 +903,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const result = yield api_request.delDevice(currentCarImei.value);
         if (result.code == 0) {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "解绑成功",
             icon: "success"
           });
           clearSavedSelectedDevice();
           clearSavedSelectedDeviceIndex();
         } else {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "解绑失败",
             icon: "error"
           });
@@ -1010,7 +1012,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         y: safeDeviceDetail.value.connectionStatus == "online" ? 1 : "",
         z: common_vendor.t(devicePositionUpdateTime.value),
         A: statusBarHeight.value + 43 + "px",
-        B: common_vendor.o(refreshLocation, "c3"),
+        B: common_vendor.o(refreshLocation, "49"),
         C: isMapReady.value
       }, isMapReady.value ? {
         D: common_vendor.sei("myMap", "map"),
@@ -1019,7 +1021,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         G: mapScale.value,
         H: markers.value
       } : {}, {
-        I: common_vendor.o(toRecordDetail, "e5"),
+        I: common_vendor.o(toRecordDetail, "e3"),
         J: common_vendor.t(totalTrips.value),
         K: common_vendor.t((totalMileage.value / 1e3).toFixed(2)),
         L: common_assets._imports_2,
@@ -1028,37 +1030,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        N: common_vendor.o(toDeviceDetail, "64"),
+        N: common_vendor.o(toDeviceDetail, "b9"),
         O: common_assets._imports_3,
         P: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        Q: common_vendor.o(toFindCar, "ed"),
+        Q: common_vendor.o(toFindCar, "a4"),
         R: common_assets._imports_4,
         S: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15",
           class: "data-v-00a60067"
         }),
-        T: common_vendor.o(toFence, "a1"),
+        T: common_vendor.o(toFence, "7f"),
         U: common_assets._imports_5,
-        V: common_vendor.o(toMsgCenter, "9e"),
+        V: common_vendor.o(toMsgCenter, "fd"),
         W: common_assets._imports_6,
         X: common_vendor.o(($event) => {
           return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-        }, "c1"),
+        }, "e7"),
         Y: common_assets._imports_7,
-        Z: common_vendor.o(contactCustomerService, "74"),
+        Z: common_vendor.o(contactCustomerService, "40"),
         aa: common_assets._imports_8,
-        ab: common_vendor.o(unbindDevice, "20"),
+        ab: common_vendor.o(unbindDevice, "2e"),
         ac: showPicker.value
       }, showPicker.value ? {
         ad: pickerKey.value,
-        ae: common_vendor.o(handleConfirm, "8a"),
-        af: common_vendor.o(closePicker, "c5"),
-        ag: common_vendor.o(closePicker, "93"),
+        ae: common_vendor.o(handleConfirm, "67"),
+        af: common_vendor.o(closePicker, "53"),
+        ag: common_vendor.o(closePicker, "bd"),
         ah: common_vendor.p({
           show: showPicker.value,
           columns: pickerColumns.value,
@@ -1067,10 +1069,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-00a60067"
         })
       } : {}, {
-        ai: common_vendor.sei(common_vendor.gei(_ctx, ""), "scroll-view"),
-        aj: `${_ctx.u_s_b_h}px`,
-        ak: `${_ctx.u_s_a_i_b}px`,
-        al: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        ai: `${_ctx.u_s_b_h}px`,
+        aj: `${_ctx.u_s_a_i_b}px`,
+        ak: common_vendor.p({
+          class: "data-v-00a60067"
+        })
       });
       return __returned__;
     };

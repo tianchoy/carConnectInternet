@@ -17,9 +17,11 @@
 			<indexListMode :lists="deviceListItems" @unbindDevice="unbindDevice" />
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, computed, watchEffect } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -31,7 +33,7 @@
 	const markers = ref<Array<Marker>>([])
 	const iconColor = ref('#1296db')
 	const userLocation = ref({
-		latitude: 0, 
+		latitude: 0,
 		longitude: 0
 	})
 
@@ -156,20 +158,20 @@
 			console.error('获取设备列表失败:', err)
 			originalDeviceList.value = []
 			markers.value = []
-			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
+			showAppToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
 		// 解绑设备
 	const unbindDevice = async (imei : string) => {
 		const res = await delDevice(imei)
 		if (res.code == 0) {
-			uni.showToast({
+			showAppToast({
 				title: '解绑成功',
 				icon: 'success'
 			})
 			uni.setStorageSync('needRefreshHome', true)
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '解绑失败',
 				icon: 'error'
 			})

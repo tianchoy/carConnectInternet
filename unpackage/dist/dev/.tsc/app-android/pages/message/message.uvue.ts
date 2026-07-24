@@ -1,19 +1,20 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { ref, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
-	
-	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 61, 7>;
+
+	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 62, 7>;
 		open: () => void
 		close: () => void
 	}
 
-	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 85, 7>;
+	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 86, 7>;
 		list: Array<UTSJSONObject>
 		total: number
 		totalPage: number
 	};
-	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 90, 7>;
+	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 91, 7>;
 		code: number
 		msg: string
 		data: MessageData
@@ -31,7 +32,7 @@ const _cache = __ins.renderCache;
 	const modal = ref<boolean>(false)
 	const modalContent = ref<UTSJSONObject>({})
 	const refresherTriggered = ref(false)
-	
+
 	// 消息列表相关
 	const msgList = ref<UTSJSONObject[]>([])
 	const currPage = ref(1)          // 当前页码
@@ -43,25 +44,25 @@ const _cache = __ins.renderCache;
 	const newMessageCount = ref(0)   // 新消息数量
 	const lastUpdateTime = ref(new Date().getTime()) // 最后更新时间
 	const Login = ref(false)
-	
+
 	// 定时器相关
 	let checkTimer: number = 0
 	const isPageActive = ref(false)
 	function stopNewMessageCheck() : void {
 		if (checkTimer > 0) {
-			console.log('停止定时消息检查', " at pages/message/message.uvue:99")
+			console.log('停止定时消息检查', " at pages/message/message.uvue:100")
 			clearInterval(checkTimer)
 			checkTimer = 0
 		}
 	}
-	
+
 	// 震动报警函数
 	function vibrateAlert() : void {
 		for (let i = 0; i < 3; i++) {
 			uni.vibrateLong({})
 		}
 	}
-	
+
 	// 检查新消息
 	async function checkNewMessages() : Promise<void> {
 		if (!isPageActive.value || isLoading.value) return
@@ -89,7 +90,7 @@ const _cache = __ins.renderCache;
 				newMessageCount.value = count
 			}
 		} catch (error) {
-			console.error('检查新消息失败:', error, " at pages/message/message.uvue:139")
+			console.error('检查新消息失败:', error, " at pages/message/message.uvue:140")
 		}
 	}
 
@@ -98,17 +99,17 @@ const _cache = __ins.renderCache;
 		if (checkTimer > 0) {
 			stopNewMessageCheck()
 		}
-		
-		console.log('启动定时消息检查', " at pages/message/message.uvue:149")
+
+		console.log('启动定时消息检查', " at pages/message/message.uvue:150")
 		// 每10秒检查一次新消息
 		checkTimer = setInterval(() => {
 			if (isPageActive.value) {
-				console.log('定时检查新消息...', " at pages/message/message.uvue:153")
+				console.log('定时检查新消息...', " at pages/message/message.uvue:154")
 				checkNewMessages()
 			}
 		}, 10000)
 	}
-	
+
 
 	// 加载消息列表
 	async function loadMsgList(isInit : boolean = false) : Promise<void> {
@@ -150,7 +151,7 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			loadStatus.value = 'loadmore'
-			console.error('请求异常:', error, " at pages/message/message.uvue:200")
+			console.error('请求异常:', error, " at pages/message/message.uvue:201")
 		} finally {
 			isLoading.value = false
 		}
@@ -158,14 +159,14 @@ const _cache = __ins.renderCache;
 
 	// 加载新消息
 	async function loadNewMessages() : Promise<void> {
-		console.log('加载新消息', " at pages/message/message.uvue:208")
+		console.log('加载新消息', " at pages/message/message.uvue:209")
 		await loadMsgList(true)
 		hasNewMessages.value = false
 		newMessageCount.value = 0
 		lastUpdateTime.value = new Date().getTime()
-		console.log('新消息加载完成', " at pages/message/message.uvue:213")
+		console.log('新消息加载完成', " at pages/message/message.uvue:214")
 	}
-	
+
 
 	// 页面加载时初始化数据
 	onLoad(() => {
@@ -183,61 +184,61 @@ const _cache = __ins.renderCache;
 		const gotoLogin = () => {
 			uni.redirectTo({ url: '/pages/login/login' })
 		}
-	
+
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:237")
+			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:238")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
 			checkNewMessages()
 		}
 	})
-	
+
 	// 页面隐藏时停止定时器
 	onHide(() => {
-		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:247")
+		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:248")
 		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:249")
+			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:250")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
-	
+
 	// 页面卸载时清理资源
 	onUnload(() => {
-		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:257")
+		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:258")
 		if (Login.value) {
-			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:259")
+			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:260")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
-	
+
 	onActivated(() => {
-		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:266")
+		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:267")
 		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:268")
+			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:269")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
 			checkNewMessages()
 		}
 	})
-	
+
 	onDeactivated(() => {
-		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:277")
+		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:278")
 		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:279")
+			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:280")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
-	
+
 	// 下拉刷新处理
 	const onRefresherRefresh = () => {
-		console.log('下拉刷新触发', " at pages/message/message.uvue:287")
+		console.log('下拉刷新触发', " at pages/message/message.uvue:288")
 		refresherTriggered.value = true
 		loadMsgList(true).then(() => {
 			refresherTriggered.value = false
@@ -245,10 +246,10 @@ const _cache = __ins.renderCache;
 			refresherTriggered.value = false
 		})
 	}
-	
+
 	// 加载更多
 	const loadMore = async () => {
-		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:298")
+		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:299")
 		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
 			if (currPage.value >= totalPage.value) {
 				loadStatus.value = 'nomore'
@@ -259,15 +260,15 @@ const _cache = __ins.renderCache;
 		currPage.value++
 		await loadMsgList()
 	}
-	
+
 	// 滚动到底部加载更多
 	const onScrollToLower = () => {
-		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:312")
+		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:313")
 		if (loadStatus.value == 'loadmore' && !isLoading.value) {
 			loadMore()
 		}
 	}
-	
+
 
 
 	// 处理消息点击
@@ -286,7 +287,7 @@ const _cache = __ins.renderCache;
 					}
 				}
 			} catch (error) {
-				console.error('更新状态失败:', error, " at pages/message/message.uvue:336")
+				console.error('更新状态失败:', error, " at pages/message/message.uvue:337")
 			}
 		}
 	}
@@ -294,7 +295,7 @@ const _cache = __ins.renderCache;
 	const ReadIt = () => {
 		modal.value = false
 	}
-	
+
 	const getMessageId = (item : UTSJSONObject, index : number) : string => {
 		const messageId = item.getString('messageId', '')
 		return messageId != '' ? messageId : index.toString()
@@ -334,12 +335,12 @@ const _cache = __ins.renderCache;
 			const minutes = Math.floor(diff / 60000)
 			const hours = Math.floor(diff / 3600000)
 			const days = Math.floor(diff / 86400000)
-			
+
 			if (minutes < 1) return '刚刚'
 			if (minutes < 60) return `${minutes}分钟前`
 			if (hours < 24) return `${hours}小时前`
 			if (days < 7) return `${days}天前`
-			
+
 			return `${date.getMonth() + 1}-${date.getDate()}`
 		} catch (error) {
 			return timeString
@@ -350,6 +351,7 @@ return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
@@ -429,7 +431,8 @@ const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
         content: modalContent.value.getString('content', ''),
         onConfirm: ReadIt
       }), null, 8 /* PROPS */, ["show", "title", "content"])
-    ])
+    ]),
+    _cV(_component_app_toast)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

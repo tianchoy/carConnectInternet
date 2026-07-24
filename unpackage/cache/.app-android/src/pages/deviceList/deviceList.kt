@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getLocation as uni_getLocation
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesDeviceListDeviceList : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -135,7 +134,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                         try {
                             var deviceList: UTSArray<UTSJSONObject> = data
                             if (from) {
-                                val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 141, 11), "pageSize" to 1000)
+                                val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11), "pageSize" to 1000)
                                 val res = await(getUserDeviceList(params))
                                 val list = if (res.code == 0 && res.data != null) {
                                     res.data.list
@@ -144,7 +143,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                                 }
                                  as UTSArray<UTSJSONObject>?
                                 if (list == null || !UTSArray.isArray(list)) {
-                                    console.warn("获取设备列表返回异常:", res, " at pages/deviceList/deviceList.uvue:145")
+                                    console.warn("获取设备列表返回异常:", res, " at pages/deviceList/deviceList.uvue:147")
                                     originalDeviceList.value = _uA()
                                     markers.value = _uA()
                                     return@w1
@@ -158,10 +157,10 @@ open class GenPagesDeviceListDeviceList : BasePage {
                             updateMarkers(originalDeviceList.value)
                         }
                          catch (err: Throwable) {
-                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:156")
+                            console.error("获取设备列表失败:", err, " at pages/deviceList/deviceList.uvue:158")
                             originalDeviceList.value = _uA()
                             markers.value = _uA()
-                            uni_showToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
+                            showAppToast(ShowToastOptions(title = "获取设备列表失败", icon = "none"))
                         }
                 })
             }
@@ -169,22 +168,22 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 return wrapUTSPromise(suspend {
                         val res = await(delDevice(imei))
                         if (res.code == 0) {
-                            uni_showToast(ShowToastOptions(title = "解绑成功", icon = "success"))
+                            showAppToast(ShowToastOptions(title = "解绑成功", icon = "success"))
                             uni_setStorageSync("needRefreshHome", true)
                         } else {
-                            uni_showToast(ShowToastOptions(title = "解绑失败", icon = "error"))
+                            showAppToast(ShowToastOptions(title = "解绑失败", icon = "error"))
                         }
                         await(loadUserDeviceList(_uA(), true))
                 })
             }
             val getLocation = fun(){
                 uni_getLocation(GetLocationOptions(type = "wgs84", success = fun(res){
-                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:185")
+                    console.log("获取位置成功:", res, " at pages/deviceList/deviceList.uvue:187")
                     userLocation.value["latitude"] = res.latitude
                     userLocation.value["longitude"] = res.longitude
                 }
                 , fail = fun(err){
-                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:190")
+                    console.log("获取位置失败:", err, " at pages/deviceList/deviceList.uvue:192")
                 }
                 ))
             }
@@ -203,7 +202,7 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 }
                 )
                 if (selectedDevice == null) {
-                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:220")
+                    console.warn("未找到对应的设备信息", markerId, " at pages/deviceList/deviceList.uvue:222")
                     return
                 }
                 val imeiValue = (selectedDevice["imei"] as String?) ?: ""
@@ -221,52 +220,56 @@ open class GenPagesDeviceListDeviceList : BasePage {
                 val _component_map = resolveComponent("map")
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
                 val _component_indexListMode = resolveEasyComponent("indexListMode", GenComponentsIndexListModeIndexListModeClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "全部设备", "show-back" to true, "backgroundColor" to "#f1f1f1", "textColor" to "#333", "showCapsule" to true, "isIcon" to true, "onCapsuleClick" to showWhat, "Icon" to "/static/maps.png", "iconColor" to iconColor.value), null, 8, _uA(
-                        "iconColor"
-                    )),
-                    if (isTrue(showMap.value)) {
-                        _cE("view", _uM("key" to 0, "class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "onMarkertap" to handleTap, "latitude" to userLocation.value["latitude"], "longitude" to userLocation.value["longitude"], "markers" to markers.value, "enable-traffic" to true), null, 8, _uA(
-                                "scale",
-                                "style",
-                                "latitude",
-                                "longitude",
-                                "markers"
-                            )),
-                            if (isTrue(showMap.value)) {
-                                _cE("view", _uM("key" to 0, "class" to "right-bar"), _uA(
-                                    _cV(_component_i_tag, _uM("type" to "primary", "onClick" to fun(){
-                                        changeState("全部")
-                                    }, "text" to ("全部 " + totalCount.value)), null, 8, _uA(
-                                        "onClick",
-                                        "text"
-                                    )),
-                                    _cV(_component_i_tag, _uM("type" to "success", "onClick" to fun(){
-                                        changeState("在线")
-                                    }, "text" to ("在线 " + onlineCount.value)), null, 8, _uA(
-                                        "onClick",
-                                        "text"
-                                    )),
-                                    _cV(_component_i_tag, _uM("type" to "danger", "onClick" to fun(){
-                                        changeState("离线")
-                                    }, "text" to ("离线 " + offlineCount.value)), null, 8, _uA(
-                                        "onClick",
-                                        "text"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "全部设备", "show-back" to true, "backgroundColor" to "#f1f1f1", "textColor" to "#333", "showCapsule" to true, "isIcon" to true, "onCapsuleClick" to showWhat, "Icon" to "/static/maps.png", "iconColor" to iconColor.value), null, 8, _uA(
+                            "iconColor"
+                        )),
+                        if (isTrue(showMap.value)) {
+                            _cE("view", _uM("key" to 0, "class" to "map-container"), _uA(
+                                _cV(_component_map, _uM("id" to "myMap", "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "onMarkertap" to handleTap, "latitude" to userLocation.value["latitude"], "longitude" to userLocation.value["longitude"], "markers" to markers.value, "enable-traffic" to true), null, 8, _uA(
+                                    "scale",
+                                    "style",
+                                    "latitude",
+                                    "longitude",
+                                    "markers"
+                                )),
+                                if (isTrue(showMap.value)) {
+                                    _cE("view", _uM("key" to 0, "class" to "right-bar"), _uA(
+                                        _cV(_component_i_tag, _uM("type" to "primary", "onClick" to fun(){
+                                            changeState("全部")
+                                        }, "text" to ("全部 " + totalCount.value)), null, 8, _uA(
+                                            "onClick",
+                                            "text"
+                                        )),
+                                        _cV(_component_i_tag, _uM("type" to "success", "onClick" to fun(){
+                                            changeState("在线")
+                                        }, "text" to ("在线 " + onlineCount.value)), null, 8, _uA(
+                                            "onClick",
+                                            "text"
+                                        )),
+                                        _cV(_component_i_tag, _uM("type" to "danger", "onClick" to fun(){
+                                            changeState("离线")
+                                        }, "text" to ("离线 " + offlineCount.value)), null, 8, _uA(
+                                            "onClick",
+                                            "text"
+                                        ))
                                     ))
-                                ))
-                            } else {
-                                _cC("v-if", true)
-                            }
-                        ))
-                    } else {
-                        _cE("view", _uM("key" to 1), _uA(
-                            _cV(_component_indexListMode, _uM("lists" to deviceListItems.value, "onUnbindDevice" to unbindDevice), null, 8, _uA(
-                                "lists"
+                                } else {
+                                    _cC("v-if", true)
+                                }
                             ))
-                        ))
-                    }
-                ))
+                        } else {
+                            _cE("view", _uM("key" to 1), _uA(
+                                _cV(_component_indexListMode, _uM("lists" to deviceListItems.value, "onUnbindDevice" to unbindDevice), null, 8, _uA(
+                                    "lists"
+                                ))
+                            ))
+                        }
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

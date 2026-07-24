@@ -3,6 +3,7 @@
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "sub-nav-bar": "../../components/sub-navBar/sub-navBar",
-    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button"
+    "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
+    "app-toast": "../../components/app-toast/app-toast"
   }
 }

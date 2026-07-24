@@ -19,7 +19,7 @@
 				</view>
 			</view>
 		</scroll-view>
-		
+
 		<view class="empty" v-else>
 			暂无数据
 		</view>
@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { getCustomList } from '../../api/request.uts'
 	import { DeviceItem } from '../../utils/device.uts'
 	const props = defineProps<{
@@ -47,11 +48,11 @@
 		if(simMerchant.toLowerCase() == 'zddx'){
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
-		
+
 		console.log(iccid)
 		// 设置需要刷新的标志
 		needRefresh.value = true
-		
+
 		//#ifdef MP-WEIXIN
 		//拉起半屏小程序
 		uni.openEmbeddedMiniProgram({
@@ -67,18 +68,18 @@
 				console.log('打开小程序失败', res)
 				// 如果打开失败，取消刷新标志
 				needRefresh.value = false
-				uni.showToast({
+				showAppToast({
 					title: '打开支付页面失败',
 					icon: 'none'
 				})
 			}
 		})
-		
+
 		//#endif
 
 		//#ifndef MP-WEIXIN
 		needRefresh.value = false
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中完成充值',
 			icon: 'none'
 		})

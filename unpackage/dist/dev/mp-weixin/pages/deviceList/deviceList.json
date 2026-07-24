@@ -3,6 +3,7 @@
   "usingComponents": {
     "custom-nav-bar": "../../components/custom-navBar/custom-navBar",
     "i-tag": "../../uni_modules/i-ui-x/components/i-tag/i-tag",
-    "index-list-mode": "../../components/indexListMode/indexListMode"
+    "index-list-mode": "../../components/indexListMode/indexListMode",
+    "app-toast": "../../components/app-toast/app-toast"
   }
 }

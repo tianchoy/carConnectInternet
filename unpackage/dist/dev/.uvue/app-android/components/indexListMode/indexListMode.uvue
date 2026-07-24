@@ -1,5 +1,6 @@
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue';
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue';
+import { showAppToast } from '../../utils/toast.uts';
 import { getCustomList } from '../../api/request.uts';
 import { DeviceItem } from '../../utils/device.uts';
 const __sfc__ = defineComponent({
@@ -27,14 +28,14 @@ const __sfc__ = defineComponent({
             if (simMerchant.toLowerCase() == 'zddx') {
                 iccid = iccid.substring(0, iccid.length - 1); //电信卡
             }
-            console.log(iccid, " at components/indexListMode/indexListMode.uvue:51");
+            console.log(iccid, " at components/indexListMode/indexListMode.uvue:52");
             // 设置需要刷新的标志
             needRefresh.value = true;
             needRefresh.value = false;
-            uni.showToast({
+            showAppToast({
                 title: '请在微信小程序中完成充值',
                 icon: 'none'
-            });
+            } as ShowToastOptions);
         };
         // 解绑设备
         const unbindDevice = (imei: string) => {

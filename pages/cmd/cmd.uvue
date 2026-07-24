@@ -68,8 +68,10 @@
 			<text class="empty-text">暂无指令</text>
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, computed, onMounted } from 'vue'
 	import { getCmdAction, getCmdByMid, sendCmd, getCmdRecordById } from '@/api/request'
 	const imei = ref('')
@@ -135,14 +137,14 @@
 			if (response.code == 0) {
 				commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '加载指令类型失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
 			console.error('加载指令类型出错:', error)
-			uni.showToast({
+			showAppToast({
 				title: '网络错误',
 				icon: 'none'
 			})
@@ -173,11 +175,11 @@
 			if (response.code == 0) {
 				commands.value = response.data
 			} else {
-				uni.showToast({ title: '加载指令列表失败', icon: 'none' })
+				showAppToast({ title: '加载指令列表失败', icon: 'none' })
 			}
 		} catch (error) {
 			console.error('加载指令列表出错:', error)
-			uni.showToast({ title: '网络错误', icon: 'none' })
+			showAppToast({ title: '网络错误', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -237,7 +239,7 @@
 
 	const sendCommand = async (): Promise<void> => {
 		if (!isFormValid.value || selectedCommand.value == null) {
-			uni.showToast({ title: '请填写所有参数', icon: 'none' })
+			showAppToast({ title: '请填写所有参数', icon: 'none' })
 			return
 		}
 
@@ -263,13 +265,13 @@
 				predictCmdId: command['predictCmdId']
 			} as UTSJSONObject)
 			if (response.code == 0) {
-				uni.showToast({ title: '指令发送成功', icon: 'success' })
+				showAppToast({ title: '指令发送成功', icon: 'success' })
 			} else {
-				uni.showToast({ title: '指令发送失败', icon: 'none', duration: 3000 })
+				showAppToast({ title: '指令发送失败', icon: 'none', duration: 3000 })
 			}
 		} catch (error) {
 			console.error('发送指令出错:', error)
-			uni.showToast({ title: '网络错误', icon: 'none' })
+			showAppToast({ title: '网络错误', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -315,7 +317,7 @@
 		font-weight: bold;
 		color: #333;
 		margin-bottom: 20rpx;
-		
+
 	}
 
 	.record-list {
@@ -382,14 +384,14 @@
 	.command-name {
 		font-size: 30rpx;
 		color: #333;
-		
+
 		margin-bottom: 10rpx;
 	}
 
 	.command-descr {
 		font-size: 24rpx;
 		color: #999;
-		
+
 	}
 
 	.param-form {

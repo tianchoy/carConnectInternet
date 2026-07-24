@@ -1,15 +1,18 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const utils_toast = require("../../../utils/toast.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
+const _easycom_app_toast = () => "../../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_app_toast)();
 }
 class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -59,9 +62,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             type: type != null ? type : 0,
             createTime: createTime != null ? createTime : ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:80", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:82", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:82", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:84", "解析用户信息失败:", e);
         }
       }
     });
@@ -79,7 +82,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             url: "/pages/login/login"
           });
         } else {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "退出账户失败"
           });
         }
@@ -110,10 +113,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.o(editPassword, "1b")
       } : {}, {
         j: common_vendor.o(logoutBtn, "4e"),
-        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`,
-        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        k: `${_ctx.u_s_b_h}px`,
+        l: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesUserCenterUserInfoUserInfo : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -28,7 +27,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             onLoad(fun(options){
                 if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:69") as String), " at pages/userCenter/userInfo/userInfo.uvue:69") as UTSJSONObject
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:71") as String), " at pages/userCenter/userInfo/userInfo.uvue:71") as UTSJSONObject
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         val type = parsedInfo.getNumber("type")
@@ -54,10 +53,10 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:80")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:82")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:82")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:84")
                     }
                 }
             }
@@ -72,70 +71,74 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                             uni_removeStorageSync("token")
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
                         } else {
-                            uni_showToast(ShowToastOptions(title = "退出账户失败"))
+                            showAppToast(ShowToastOptions(title = "退出账户失败"))
                         }
                 })
             }
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "个人信息", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "content"), _uA(
-                        _cE("view", _uM("class" to "title"), " 基本信息 "),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("view", _uM("class" to "item"), _uA(
-                                _cE("text", null, "账号"),
-                                _cE("view", _uM("class" to "right"), _uA(
-                                    _cE("text", _uM("class" to "info"), _tD(unref(userInfo).id), 1)
-                                ))
-                            )),
-                            _cE("view", _uM("class" to "item"), _uA(
-                                _cE("text", null, "手机号"),
-                                _cE("view", _uM("class" to "right"), _uA(
-                                    _cE("text", _uM("class" to "info"), _tD(unref(userInfo).mobile), 1)
-                                ))
-                            )),
-                            _cE("view", _uM("class" to "item"), _uA(
-                                _cE("text", null, "类型"),
-                                _cE("view", _uM("class" to "right"), _uA(
-                                    _cE("text", _uM("class" to "info"), _tD(if (unref(userInfo).type == 1) {
-                                        "公司用户"
-                                    } else {
-                                        "个人用户"
-                                    }
-                                    ), 1)
-                                ))
-                            )),
-                            _cE("view", _uM("class" to "item"), _uA(
-                                _cE("text", null, "创建时间"),
-                                _cE("view", _uM("class" to "right"), _uA(
-                                    _cE("text", _uM("class" to "info"), _tD(unref(userInfo).createTime), 1)
-                                ))
-                            ))
-                        )),
-                        if (unref(userInfo).type == 1) {
-                            _cE("view", _uM("key" to 0, "class" to "title"), " 安全信息 ")
-                        } else {
-                            _cC("v-if", true)
-                        }
-                        ,
-                        if (unref(userInfo).type == 1) {
-                            _cE("view", _uM("key" to 1, "class" to "list", "onClick" to editPassword), _uA(
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "个人信息", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "content"), _uA(
+                            _cE("view", _uM("class" to "title"), " 基本信息 "),
+                            _cE("view", _uM("class" to "list"), _uA(
                                 _cE("view", _uM("class" to "item"), _uA(
-                                    _cE("text", null, "修改密码"),
-                                    _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                                    _cE("text", null, "账号"),
+                                    _cE("view", _uM("class" to "right"), _uA(
+                                        _cE("text", _uM("class" to "info"), _tD(unref(userInfo).id), 1)
+                                    ))
+                                )),
+                                _cE("view", _uM("class" to "item"), _uA(
+                                    _cE("text", null, "手机号"),
+                                    _cE("view", _uM("class" to "right"), _uA(
+                                        _cE("text", _uM("class" to "info"), _tD(unref(userInfo).mobile), 1)
+                                    ))
+                                )),
+                                _cE("view", _uM("class" to "item"), _uA(
+                                    _cE("text", null, "类型"),
+                                    _cE("view", _uM("class" to "right"), _uA(
+                                        _cE("text", _uM("class" to "info"), _tD(if (unref(userInfo).type == 1) {
+                                            "公司用户"
+                                        } else {
+                                            "个人用户"
+                                        }
+                                        ), 1)
+                                    ))
+                                )),
+                                _cE("view", _uM("class" to "item"), _uA(
+                                    _cE("text", null, "创建时间"),
+                                    _cE("view", _uM("class" to "right"), _uA(
+                                        _cE("text", _uM("class" to "info"), _tD(unref(userInfo).createTime), 1)
+                                    ))
                                 ))
+                            )),
+                            if (unref(userInfo).type == 1) {
+                                _cE("view", _uM("key" to 0, "class" to "title"), " 安全信息 ")
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
+                            if (unref(userInfo).type == 1) {
+                                _cE("view", _uM("key" to 1, "class" to "list", "onClick" to editPassword), _uA(
+                                    _cE("view", _uM("class" to "item"), _uA(
+                                        _cE("text", null, "修改密码"),
+                                        _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                                    ))
+                                ))
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
+                            _cE("view", _uM("class" to "footer"), _uA(
+                                _cE("view", _uM("class" to "logout", "onClick" to logoutBtn), "退出登录")
                             ))
-                        } else {
-                            _cC("v-if", true)
-                        }
-                        ,
-                        _cE("view", _uM("class" to "footer"), _uA(
-                            _cE("view", _uM("class" to "logout", "onClick" to logoutBtn), "退出登录")
                         ))
-                    ))
-                ))
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

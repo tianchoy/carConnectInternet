@@ -28,9 +28,11 @@
 		</view>
 
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, onUnmounted } from 'vue'
 	import { getDevicePos } from '../../api/request.uts'
 	import { getDeviceIcon } from '../../utils/cars'
@@ -149,7 +151,7 @@
 						const latitude = item.getNumber('latitude', 0)
 						const longitude = item.getNumber('longitude', 0)
 						if (latitude == 0 || longitude == 0) {
-							uni.showToast({
+							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
 							})
@@ -196,13 +198,13 @@
 				})
 
 				if (!foundDevice) {
-					uni.showToast({
+					showAppToast({
 						title: '未找到车辆设备',
 						icon: 'none'
 					})
 				}
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '获取位置失败',
 					icon: 'none'
 				})
@@ -210,7 +212,7 @@
 
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
-			uni.showToast({
+			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
 			})
@@ -500,7 +502,7 @@
 		}
 		isAnimating.value = false
 
-		uni.showToast({
+		showAppToast({
 			title: '停止跟踪',
 			icon: 'success',
 			duration: 1500
@@ -533,7 +535,7 @@
 			loadTrackData()
 		}, interval) as number
 
-		uni.showToast({
+		showAppToast({
 			title: '开始跟踪',
 			icon: 'success',
 			duration: 1500

@@ -7,6 +7,7 @@
     "i-button": "../../uni_modules/i-ui-x/components/i-button/i-button",
     "i-slider": "../../uni_modules/i-ui-x/components/i-slider/i-slider",
     "l-date-time-picker": "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker",
-    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup"
+    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup",
+    "app-toast": "../../components/app-toast/app-toast"
   }
 }

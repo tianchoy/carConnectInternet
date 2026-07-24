@@ -6,6 +6,7 @@
     "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
     "i-grid": "../../uni_modules/i-ui-x/components/i-grid/i-grid",
     "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
-    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal"
+    "i-modal": "../../uni_modules/i-ui-x/components/i-modal/i-modal",
+    "app-toast": "../../components/app-toast/app-toast"
   }
 }

@@ -1,3 +1,4 @@
+import { showAppToast } from '../utils/toast.uts'
 // 定义类型
 type RequestOptions = {
     url?: string
@@ -41,7 +42,7 @@ function handleTokenExpired(): void {
     uni.removeStorageSync('token')
     
     // 显示提示
-    uni.showToast({
+    showAppToast({
         title: '登录已过期，请重新登录',
         icon: 'none',
         duration: 2000
@@ -117,32 +118,32 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
                 handleTokenExpired()
                 break
             case 403:
-                uni.showToast({
+                showAppToast({
                     title: '没有权限访问',
                     icon: 'none'
                 })
                 break
             case 404:
-                uni.showToast({
+                showAppToast({
                     title: '请求资源不存在',
                     icon: 'none'
                 })
                 break
             case 500:
-                uni.showToast({
+                showAppToast({
                     title: '服务器错误',
                     icon: 'none'
                 })
                 break
             default:
-                uni.showToast({
+                showAppToast({
                     title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
                     icon: 'none'
                 })
         }
     } else {
         // 网络错误等
-        uni.showToast({
+        showAppToast({
             title: '网络错误，请检查网络连接',
             icon: 'none'
         })

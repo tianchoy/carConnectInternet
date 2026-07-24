@@ -1,7 +1,9 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
-import { ref, reactive, computed, onMounted } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, computed, onMounted } from 'vue'
 	import { getCmdAction, getCmdByMid, sendCmd, getCmdRecordById } from '@/api/request'
 	
 const __sfc__ = defineComponent({
@@ -11,7 +13,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const imei = ref('')
+const imei = ref('')
 	const commandTypes = ref<Array<UTSJSONObject>>([])
 	const selectedTypeId = ref<string | number | null>(null)
 	const commands = ref<Array<UTSJSONObject>>([])
@@ -35,9 +37,9 @@ const _cache = __ins.renderCache;
 		if (details == null || details.length == 0) return []
 
 		try {
-			return UTSAndroid.consoleDebugError(JSON.parse(details), " at pages/cmd/cmd.uvue:99") as Array<UTSJSONObject>
+			return UTSAndroid.consoleDebugError(JSON.parse(details), " at pages/cmd/cmd.uvue:101") as Array<UTSJSONObject>
 		} catch (e) {
-			console.error('解析参数配置失败:', e, " at pages/cmd/cmd.uvue:101")
+			console.error('解析参数配置失败:', e, " at pages/cmd/cmd.uvue:103")
 			return []
 		}
 	})
@@ -69,19 +71,19 @@ const _cache = __ins.renderCache;
 			loading.value = true
 			const response = await getCmdAction()
 
-			console.log('加载指令类型响应:', response, " at pages/cmd/cmd.uvue:133")
+			console.log('加载指令类型响应:', response, " at pages/cmd/cmd.uvue:135")
 
 			if (response.code == 0) {
 				commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '加载指令类型失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
-			console.error('加载指令类型出错:', error, " at pages/cmd/cmd.uvue:144")
-			uni.showToast({
+			console.error('加载指令类型出错:', error, " at pages/cmd/cmd.uvue:146")
+			showAppToast({
 				title: '网络错误',
 				icon: 'none'
 			})
@@ -112,11 +114,11 @@ const _cache = __ins.renderCache;
 			if (response.code == 0) {
 				commands.value = response.data
 			} else {
-				uni.showToast({ title: '加载指令列表失败', icon: 'none' })
+				showAppToast({ title: '加载指令列表失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('加载指令列表出错:', error, " at pages/cmd/cmd.uvue:179")
-			uni.showToast({ title: '网络错误', icon: 'none' })
+			console.error('加载指令列表出错:', error, " at pages/cmd/cmd.uvue:181")
+			showAppToast({ title: '网络错误', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -131,7 +133,7 @@ const _cache = __ins.renderCache;
 		if (details == null || details.length == 0) return
 
 		try {
-			const configs = UTSAndroid.consoleDebugError(JSON.parse(details), " at pages/cmd/cmd.uvue:195") as Array<UTSJSONObject>
+			const configs = UTSAndroid.consoleDebugError(JSON.parse(details), " at pages/cmd/cmd.uvue:197") as Array<UTSJSONObject>
 			const values: Array<string> = []
 			for (let index = 0; index < configs.length; index++) {
 				const config = configs[index]
@@ -150,7 +152,7 @@ const _cache = __ins.renderCache;
 			}
 			paramValues.value = values
 		} catch (e) {
-			console.error('初始化参数值失败:', e, " at pages/cmd/cmd.uvue:214")
+			console.error('初始化参数值失败:', e, " at pages/cmd/cmd.uvue:216")
 			paramValues.value = []
 		}
 	}
@@ -176,7 +178,7 @@ const _cache = __ins.renderCache;
 
 	const sendCommand = async (): Promise<void> => {
 		if (!isFormValid.value || selectedCommand.value == null) {
-			uni.showToast({ title: '请填写所有参数', icon: 'none' })
+			showAppToast({ title: '请填写所有参数', icon: 'none' })
 			return
 		}
 
@@ -198,17 +200,17 @@ const _cache = __ins.renderCache;
 				imei: imei.value,
 				type: (command['cmdCode'] as string | null) ?? '',
 				password: null,
-				cmdData: UTSAndroid.consoleDebugError(encodeURIComponent(cmdData), " at pages/cmd/cmd.uvue:262"),
+				cmdData: UTSAndroid.consoleDebugError(encodeURIComponent(cmdData), " at pages/cmd/cmd.uvue:264"),
 				predictCmdId: command['predictCmdId']
 			} as UTSJSONObject)
 			if (response.code == 0) {
-				uni.showToast({ title: '指令发送成功', icon: 'success' })
+				showAppToast({ title: '指令发送成功', icon: 'success' })
 			} else {
-				uni.showToast({ title: '指令发送失败', icon: 'none', duration: 3000 })
+				showAppToast({ title: '指令发送失败', icon: 'none', duration: 3000 })
 			}
 		} catch (error) {
-			console.error('发送指令出错:', error, " at pages/cmd/cmd.uvue:271")
-			uni.showToast({ title: '网络错误', icon: 'none' })
+			console.error('发送指令出错:', error, " at pages/cmd/cmd.uvue:273")
+			showAppToast({ title: '网络错误', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -219,154 +221,158 @@ return (): any | null => {
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
 const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "指令",
-      "show-back": true,
-      backgroundColor: "#fff",
-      textColor: "#333",
-      showCapsule: false
-    })),
-    _cE("view", _uM({ class: "device-info" }), [
-      _cE("text", _uM({ class: "device-label" }), "设备ID: " + _tD(imei.value), 1 /* TEXT */)
-    ]),
-    _cE("view", _uM({ class: "section" }), [
-      _cE("text", _uM({ class: "section-title" }), "指令类型"),
-      _cE("view", _uM({ class: "type-container" }), [
-        _cE("view", _uM({ class: "type-list" }), [
-          _cE(Fragment, null, RenderHelpers.renderList(commandTypes.value, (type, index, __index, _cached): any => {
-            return _cE("view", _uM({
-              key: type.cmdmId,
-              class: _nC(["type-item", _uM({ active: selectedTypeId.value == type.cmdmId })]),
-              onClick: () => {selectTypeByItem(type)}
-            }), [
-              _cE("text", _uM({ class: "type-name" }), _tD(type.cmdName), 1 /* TEXT */)
-            ], 10 /* CLASS, PROPS */, ["onClick"])
-          }), 128 /* KEYED_FRAGMENT */)
-        ])
-      ])
-    ]),
-    isTrue(commands.value.length)
-      ? _cE("view", _uM({
-          key: 0,
-          class: "section"
-        }), [
-          _cE("text", _uM({ class: "section-title" }), "指令列表"),
-          _cE("view", _uM({ class: "command-list" }), [
-            _cE(Fragment, null, RenderHelpers.renderList(commands.value, (cmd, index, __index, _cached): any => {
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "指令",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "device-info" }), [
+        _cE("text", _uM({ class: "device-label" }), "设备ID: " + _tD(imei.value), 1 /* TEXT */)
+      ]),
+      _cE("view", _uM({ class: "section" }), [
+        _cE("text", _uM({ class: "section-title" }), "指令类型"),
+        _cE("view", _uM({ class: "type-container" }), [
+          _cE("view", _uM({ class: "type-list" }), [
+            _cE(Fragment, null, RenderHelpers.renderList(commandTypes.value, (type, index, __index, _cached): any => {
               return _cE("view", _uM({
-                key: cmd.predictCmdId,
-                class: _nC(["command-item", _uM({ active: selectedCommandId.value == cmd.predictCmdId })]),
-                onClick: () => {selectCommand(cmd)}
+                key: type.cmdmId,
+                class: _nC(["type-item", _uM({ active: selectedTypeId.value == type.cmdmId })]),
+                onClick: () => {selectTypeByItem(type)}
               }), [
-                _cE("text", _uM({ class: "command-name" }), _tD(cmd.cmdName), 1 /* TEXT */),
-                _cE("text", _uM({ class: "command-descr" }), _tD(cmd.remarks), 1 /* TEXT */)
+                _cE("text", _uM({ class: "type-name" }), _tD(type.cmdName), 1 /* TEXT */)
               ], 10 /* CLASS, PROPS */, ["onClick"])
             }), 128 /* KEYED_FRAGMENT */)
           ])
         ])
-      : _cC("v-if", true),
-    isTrue(selectedCommandDetails.value)
-      ? _cE("view", _uM({
-          key: 1,
-          class: "section"
-        }), [
-          _cE("view", _uM({ class: "param-form" }), [
-            _cE(Fragment, null, RenderHelpers.renderList(paramConfigs.value, (param, index, __index, _cached): any => {
-              return _cE("view", _uM({
-                key: 'param_' + index,
-                class: "param-item"
-              }), [
-                _cE("text", _uM({ class: "section-title" }), _tD(param.label), 1 /* TEXT */),
-                param.type == 'input'
-                  ? _cV(_component_i_input, _uM({
-                      key: 0,
-                      class: "param-input",
-                      modelValue: paramValues.value[index],
-                      "onUpdate:modelValue": $event => {(paramValues.value[index]) = $event},
-                      placeholder: '请输入' + param.label,
-                      "placeholder-class": "placeholder"
-                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "placeholder"])
-                  : _cC("v-if", true),
-                param.type == 'number'
-                  ? _cV(_component_i_input, _uM({
-                      key: 1,
-                      class: "param-input",
-                      type: "number",
-                      modelValue: paramValues.value[index],
-                      "onUpdate:modelValue": $event => {(paramValues.value[index]) = $event},
-                      placeholder: '请输入' + param.label,
-                      "placeholder-class": "placeholder",
-                      maxlength: param.max
-                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "placeholder", "maxlength"])
-                  : _cC("v-if", true),
-                param.type == 'radio'
-                  ? _cE("view", _uM({
-                      key: 2,
-                      class: "radio-group"
-                    }), [
-                      _cE(Fragment, null, RenderHelpers.renderList(getRadioItems(param), (item, __key, __index, _cached): any => {
-                        return _cE("view", _uM({
-                          key: 'radio_' + item.value,
-                          class: "radio-item",
-                          onClick: () => {selectRadio(index, getRadioValue(item))}
-                        }), [
-                          _cE("view", _uM({ class: "radio-icon" }), [
-                            _cE("view", _uM({
-                              class: _nC(["radio-inner", _uM({ checked: paramValues.value[index] == getRadioValue(item) })])
-                            }), null, 2 /* CLASS */)
-                          ]),
-                          _cE("text", _uM({ class: "radio-label" }), _tD(getRadioDescription(item)), 1 /* TEXT */)
-                        ], 8 /* PROPS */, ["onClick"])
-                      }), 128 /* KEYED_FRAGMENT */)
-                    ])
-                  : _cC("v-if", true)
-              ])
-            }), 128 /* KEYED_FRAGMENT */),
-            _cV(_component_i_button, _uM({
-              type: "primary",
-              text: "发送指令",
-              class: "submit-btn",
-              disabled: !isFormValid.value,
-              onClick: sendCommand
-            }), null, 8 /* PROPS */, ["disabled"])
-          ])
-        ])
-      : _cC("v-if", true),
-    isTrue(commandRecords.value)
-      ? _cE("view", _uM({
-          key: 2,
-          class: "section"
-        }), [
-          _cE("text", _uM({ class: "section-title" }), "指令记录"),
-          _cE("view", _uM({ class: "record-list" }), _tD(commandRecordReason.value), 1 /* TEXT */)
-        ])
-      : _cC("v-if", true),
-    isTrue(!selectedTypeId.value)
-      ? _cE("view", _uM({
-          key: 3,
-          class: "empty-state"
-        }), [
-          _cE("text", _uM({ class: "empty-text" }), "请先选择指令类型")
-        ])
-      : _cC("v-if", true),
-    isTrue(loading.value)
-      ? _cE("view", _uM({
-          key: 4,
-          class: "loading"
-        }), [
-          _cE("text", _uM({ class: "loading-text" }), "加载中...")
-        ])
-      : isTrue(commands.value.length == 0 && selectedTypeId.value != null)
+      ]),
+      isTrue(commands.value.length)
         ? _cE("view", _uM({
-            key: 5,
+            key: 0,
+            class: "section"
+          }), [
+            _cE("text", _uM({ class: "section-title" }), "指令列表"),
+            _cE("view", _uM({ class: "command-list" }), [
+              _cE(Fragment, null, RenderHelpers.renderList(commands.value, (cmd, index, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: cmd.predictCmdId,
+                  class: _nC(["command-item", _uM({ active: selectedCommandId.value == cmd.predictCmdId })]),
+                  onClick: () => {selectCommand(cmd)}
+                }), [
+                  _cE("text", _uM({ class: "command-name" }), _tD(cmd.cmdName), 1 /* TEXT */),
+                  _cE("text", _uM({ class: "command-descr" }), _tD(cmd.remarks), 1 /* TEXT */)
+                ], 10 /* CLASS, PROPS */, ["onClick"])
+              }), 128 /* KEYED_FRAGMENT */)
+            ])
+          ])
+        : _cC("v-if", true),
+      isTrue(selectedCommandDetails.value)
+        ? _cE("view", _uM({
+            key: 1,
+            class: "section"
+          }), [
+            _cE("view", _uM({ class: "param-form" }), [
+              _cE(Fragment, null, RenderHelpers.renderList(paramConfigs.value, (param, index, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: 'param_' + index,
+                  class: "param-item"
+                }), [
+                  _cE("text", _uM({ class: "section-title" }), _tD(param.label), 1 /* TEXT */),
+                  param.type == 'input'
+                    ? _cV(_component_i_input, _uM({
+                        key: 0,
+                        class: "param-input",
+                        modelValue: paramValues.value[index],
+                        "onUpdate:modelValue": $event => {(paramValues.value[index]) = $event},
+                        placeholder: '请输入' + param.label,
+                        "placeholder-class": "placeholder"
+                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "placeholder"])
+                    : _cC("v-if", true),
+                  param.type == 'number'
+                    ? _cV(_component_i_input, _uM({
+                        key: 1,
+                        class: "param-input",
+                        type: "number",
+                        modelValue: paramValues.value[index],
+                        "onUpdate:modelValue": $event => {(paramValues.value[index]) = $event},
+                        placeholder: '请输入' + param.label,
+                        "placeholder-class": "placeholder",
+                        maxlength: param.max
+                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "placeholder", "maxlength"])
+                    : _cC("v-if", true),
+                  param.type == 'radio'
+                    ? _cE("view", _uM({
+                        key: 2,
+                        class: "radio-group"
+                      }), [
+                        _cE(Fragment, null, RenderHelpers.renderList(getRadioItems(param), (item, __key, __index, _cached): any => {
+                          return _cE("view", _uM({
+                            key: 'radio_' + item.value,
+                            class: "radio-item",
+                            onClick: () => {selectRadio(index, getRadioValue(item))}
+                          }), [
+                            _cE("view", _uM({ class: "radio-icon" }), [
+                              _cE("view", _uM({
+                                class: _nC(["radio-inner", _uM({ checked: paramValues.value[index] == getRadioValue(item) })])
+                              }), null, 2 /* CLASS */)
+                            ]),
+                            _cE("text", _uM({ class: "radio-label" }), _tD(getRadioDescription(item)), 1 /* TEXT */)
+                          ], 8 /* PROPS */, ["onClick"])
+                        }), 128 /* KEYED_FRAGMENT */)
+                      ])
+                    : _cC("v-if", true)
+                ])
+              }), 128 /* KEYED_FRAGMENT */),
+              _cV(_component_i_button, _uM({
+                type: "primary",
+                text: "发送指令",
+                class: "submit-btn",
+                disabled: !isFormValid.value,
+                onClick: sendCommand
+              }), null, 8 /* PROPS */, ["disabled"])
+            ])
+          ])
+        : _cC("v-if", true),
+      isTrue(commandRecords.value)
+        ? _cE("view", _uM({
+            key: 2,
+            class: "section"
+          }), [
+            _cE("text", _uM({ class: "section-title" }), "指令记录"),
+            _cE("view", _uM({ class: "record-list" }), _tD(commandRecordReason.value), 1 /* TEXT */)
+          ])
+        : _cC("v-if", true),
+      isTrue(!selectedTypeId.value)
+        ? _cE("view", _uM({
+            key: 3,
             class: "empty-state"
           }), [
-            _cE("text", _uM({ class: "empty-text" }), "暂无指令")
+            _cE("text", _uM({ class: "empty-text" }), "请先选择指令类型")
           ])
-        : _cC("v-if", true)
-  ])
+        : _cC("v-if", true),
+      isTrue(loading.value)
+        ? _cE("view", _uM({
+            key: 4,
+            class: "loading"
+          }), [
+            _cE("text", _uM({ class: "loading-text" }), "加载中...")
+          ])
+        : isTrue(commands.value.length == 0 && selectedTypeId.value != null)
+          ? _cE("view", _uM({
+              key: 5,
+              class: "empty-state"
+            }), [
+              _cE("text", _uM({ class: "empty-text" }), "暂无指令")
+            ])
+          : _cC("v-if", true)
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

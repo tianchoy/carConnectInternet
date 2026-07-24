@@ -12,7 +12,6 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesVehicleTrackingVehicleTracking : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -66,10 +65,10 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             fun gen_loadInitialPosition_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 131, 10), "deptId" to deptId.value, "deviceids" to imei.value)
-                            console.log("data", data, " at pages/vehicleTracking/vehicleTracking.uvue:136")
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 133, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            console.log("data", data, " at pages/vehicleTracking/vehicleTracking.uvue:138")
                             val res = await(getDevicePos(data))
-                            console.log("res", res, " at pages/vehicleTracking/vehicleTracking.uvue:140")
+                            console.log("res", res, " at pages/vehicleTracking/vehicleTracking.uvue:142")
                             if (res?.code == 0 && res.data != null && res.data.length > 0) {
                                 var foundDevice = false
                                 res.data.forEach(fun(item: UTSJSONObject){
@@ -79,7 +78,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                         val latitude = item.getNumber("latitude", 0)
                                         val longitude = item.getNumber("longitude", 0)
                                         if (latitude == 0 || longitude == 0) {
-                                            uni_showToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
+                                            showAppToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
                                             return
                                         }
                                         val direction = item.getNumber("direction", 0)
@@ -114,15 +113,15 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                     }
                                 })
                                 if (!foundDevice) {
-                                    uni_showToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
+                                    showAppToast(ShowToastOptions(title = "未找到车辆设备", icon = "none"))
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
+                                showAppToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
                             }
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:212")
-                            uni_showToast(ShowToastOptions(title = "网络请求失败", icon = "none"))
+                            console.error("获取初始位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:214")
+                            showAppToast(ShowToastOptions(title = "网络请求失败", icon = "none"))
                         }
                 })
             }
@@ -138,7 +137,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     marker
                 )
                 markerInitialized.value = true
-                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:233")
+                console.log("初始化标记点完成", " at pages/vehicleTracking/vehicleTracking.uvue:235")
             }
             val initMarker = ::gen_initMarker_fn
             fun gen_calculateMapRotation_fn(direction: Number): Number {
@@ -161,7 +160,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             val normalizeRotation = ::gen_normalizeRotation_fn
             onLoad(fun(option){
-                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:254")
+                console.log("option", option, " at pages/vehicleTracking/vehicleTracking.uvue:256")
                 connectionStatus.value = option["connectionStatus"] ?: ""
                 imei.value = option["imei"] ?: ""
                 currentCar.value = option["plateNo"] ?: "未知车辆"
@@ -307,9 +306,9 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val loadTrackData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 444, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 446, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
-                            console.log("222222", " at pages/vehicleTracking/vehicleTracking.uvue:450")
+                            console.log("222222", " at pages/vehicleTracking/vehicleTracking.uvue:452")
                             if (res?.code == 0 && res.data != null && res.data.length > 0) {
                                 val deviceData = res.data.find(fun(item: UTSJSONObject): Boolean {
                                     return item.getString("imei", "") == imei.value
@@ -331,7 +330,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                             }
                         }
                          catch (err: Throwable) {
-                            console.error("获取跟踪位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:479")
+                            console.error("获取跟踪位置失败:", err, " at pages/vehicleTracking/vehicleTracking.uvue:481")
                         }
                 })
             }
@@ -348,7 +347,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     animationTimer.value = null
                 }
                 isAnimating.value = false
-                uni_showToast(ShowToastOptions(title = "停止跟踪", icon = "success", duration = 1500))
+                showAppToast(ShowToastOptions(title = "停止跟踪", icon = "success", duration = 1500))
             }
             val stopTracking = ::gen_stopTracking_fn
             fun gen_startTracking_fn(): Unit {
@@ -367,7 +366,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     loadTrackData()
                 }
                 , interval) as Number
-                uni_showToast(ShowToastOptions(title = "开始跟踪", icon = "success", duration = 1500))
+                showAppToast(ShowToastOptions(title = "开始跟踪", icon = "success", duration = 1500))
             }
             val startTracking = ::gen_startTracking_fn
             val toggleTracking = fun(){
@@ -378,7 +377,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 }
             }
             onHide(fun(){
-                console.log("页面隐藏时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:554")
+                console.log("页面隐藏时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:556")
                 isTracking.value = false
                 if (trackingInterval.value != null) {
                     clearInterval(trackingInterval.value as Number)
@@ -394,7 +393,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             }
             )
             onUnmounted(fun(){
-                console.log("页面卸载时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:575")
+                console.log("页面卸载时停止自动刷新", " at pages/vehicleTracking/vehicleTracking.uvue:577")
                 isTracking.value = false
                 if (trackingInterval.value != null) {
                     clearInterval(trackingInterval.value as Number)
@@ -414,62 +413,66 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 val _component_sub_navBar = resolveEasyComponent("sub-navBar", GenComponentsSubNavBarSubNavBarClass)
                 val _component_map = resolveComponent("map")
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "车辆跟踪", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "map-container"), _uA(
-                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_sub_navBar, _uM("currentTime" to currentTime.value, "currentCar" to currentCar.value, "times" to times.value, "showCar" to true, "onUpdate:currentTime" to handleCurrentTimeUpdate, "carStatus" to connectionStatus.value), null, 8, _uA(
-                                    "currentTime",
-                                    "currentCar",
-                                    "times",
-                                    "carStatus"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "latitude",
-                            "longitude",
-                            "markers",
-                            "scale",
-                            "style"
-                        ))
-                    )),
-                    _cE("view", _uM("class" to "tools-panel"), _uA(
-                        _cE("view", _uM("class" to "btn"), _uA(
-                            _cV(_component_i_button, _uM("type" to if (isTracking.value) {
-                                "danger"
-                            } else {
-                                "primary"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "车辆跟踪", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "map-container"), _uA(
+                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_sub_navBar, _uM("currentTime" to currentTime.value, "currentCar" to currentCar.value, "times" to times.value, "showCar" to true, "onUpdate:currentTime" to handleCurrentTimeUpdate, "carStatus" to connectionStatus.value), null, 8, _uA(
+                                        "currentTime",
+                                        "currentCar",
+                                        "times",
+                                        "carStatus"
+                                    ))
+                                )
                             }
-                            , "size" to "small", "onClick" to toggleTracking, "style" to _nS(_uM("backgroundColor" to if (isTracking.value) {
-                                "#e64340"
-                            } else {
-                                "#1296db"
-                            }
-                            )), "text" to if (isTracking.value) {
-                                "停止跟踪"
-                            } else {
-                                "开始跟踪"
-                            }
-                            ), null, 8, _uA(
-                                "type",
-                                "style",
-                                "text"
+                            ), "_" to 1), 8, _uA(
+                                "latitude",
+                                "longitude",
+                                "markers",
+                                "scale",
+                                "style"
                             ))
                         )),
-                        _cE("view", _uM("class" to "pos-info-box"), _uA(
-                            _cE("view", _uM("class" to "speed"), _uA(
-                                _cE("text", _uM("class" to "tracking-info-text"), "时速："),
-                                _cE("text", _uM("class" to "tracking-info-text"), _tD(currentSpeed.value) + "Km/h", 1)
+                        _cE("view", _uM("class" to "tools-panel"), _uA(
+                            _cE("view", _uM("class" to "btn"), _uA(
+                                _cV(_component_i_button, _uM("type" to if (isTracking.value) {
+                                    "danger"
+                                } else {
+                                    "primary"
+                                }
+                                , "size" to "small", "onClick" to toggleTracking, "style" to _nS(_uM("backgroundColor" to if (isTracking.value) {
+                                    "#e64340"
+                                } else {
+                                    "#1296db"
+                                }
+                                )), "text" to if (isTracking.value) {
+                                    "停止跟踪"
+                                } else {
+                                    "开始跟踪"
+                                }
+                                ), null, 8, _uA(
+                                    "type",
+                                    "style",
+                                    "text"
+                                ))
                             )),
-                            _cE("view", _uM("class" to "address"), _uA(
-                                _cE("text", _uM("class" to "tracking-info-text"), "定位时间："),
-                                _cE("text", _uM("class" to "tracking-info-text"), _tD(currentAddress.value), 1)
+                            _cE("view", _uM("class" to "pos-info-box"), _uA(
+                                _cE("view", _uM("class" to "speed"), _uA(
+                                    _cE("text", _uM("class" to "tracking-info-text"), "时速："),
+                                    _cE("text", _uM("class" to "tracking-info-text"), _tD(currentSpeed.value) + "Km/h", 1)
+                                )),
+                                _cE("view", _uM("class" to "address"), _uA(
+                                    _cE("text", _uM("class" to "tracking-info-text"), "定位时间："),
+                                    _cE("text", _uM("class" to "tracking-info-text"), _tD(currentAddress.value), 1)
+                                ))
                             ))
                         ))
-                    ))
-                ))
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

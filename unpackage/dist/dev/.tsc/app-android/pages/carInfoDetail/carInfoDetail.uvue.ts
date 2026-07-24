@@ -4,17 +4,19 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_grid from '@/uni_modules/i-ui-x/components/i-grid/i-grid.uvue'
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
-import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
-	type MapCenter = { __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 121, 7>;
+	type MapCenter = { __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 123, 7>;
 		latitude: number
 		longitude: number
 	}
-	type SignalDetail = { __$originalPosition?: UTSSourceMapPosition<"SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 199, 7>;
+	type SignalDetail = { __$originalPosition?: UTSSourceMapPosition<"SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 201, 7>;
 		experience: string
 		quality: string
 		color: string
@@ -30,7 +32,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const deptId = ref<string | null>('')
+const deptId = ref<string | null>('')
 	const imei = ref<string | null>('')
 	const deviceId = ref<string | null>('')
 	// 地图状态
@@ -256,8 +258,8 @@ const _cache = __ins.renderCache;
 						const latitude = item.getNumber('latitude', 0);
 						const longitude = item.getNumber('longitude', 0);
 						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:355");
-							uni.showToast({
+							console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:357");
+							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
 							})
@@ -269,7 +271,7 @@ const _cache = __ins.renderCache;
 						const lng = parseFloat(longitude.toString());
 
 						if (isNaN(lat) || isNaN(lng)) {
-							console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:368");
+							console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:370");
 							return false;
 						}
 
@@ -281,7 +283,7 @@ const _cache = __ins.renderCache;
 							convertedLat = coord.lat;
 							convertedLng = coord.lng;
 						} catch (transformError) {
-							console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:380");
+							console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:382");
 						}
 
 						center.latitude = convertedLat;
@@ -313,7 +315,7 @@ const _cache = __ins.renderCache;
 				}
 							refreshTimer.value = null;
 							isRefreshing.value = false;
-							uni.showToast({
+							showAppToast({
 								title: '设备已离线，停止自动刷新',
 								icon: 'none'
 							});
@@ -323,7 +325,7 @@ const _cache = __ins.renderCache;
 						if (signalRssi.value != null) {
 							const signalExp = getSignalDetail(signalRssi.value).experience;
 							if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
-								console.warn(`设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:422");
+								console.warn(`设备 ${imei.value} 信号较弱: ${signalRssi.value}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:424");
 							}
 						}
 					}
@@ -337,20 +339,20 @@ const _cache = __ins.renderCache;
 				return true; // 成功标志
 
 			} catch (error) {
-				console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:436");
+				console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:438");
 
 				// 如果不是最后一次重试，则继续重试
 				if (attempt < retry) {
 					// 等待一段时间后重试（指数退避）
 					const delayMs = Math.pow(2, attempt) * 1000; // 2^attempt 秒
-					console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:442");
+					console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:444");
 
 					await delay(delayMs);
 
 					return false;
 				} else {
 					// 所有重试都失败了
-					uni.showToast({
+					showAppToast({
 						title: '数据加载失败，请稍后重试',
 						icon: 'none',
 						duration: 2000
@@ -364,7 +366,7 @@ const _cache = __ins.renderCache;
 							}
 						refreshTimer.value = null;
 						isRefreshing.value = false;
-						uni.showToast({
+						showAppToast({
 							title: '数据加载失败，停止自动刷新',
 							icon: 'none'
 						});
@@ -394,19 +396,19 @@ const _cache = __ins.renderCache;
 
 			if (success) {
 
-				uni.showToast({
+				showAppToast({
 					title: '刷新成功',
 					icon: 'success'
 				});
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '刷新失败',
 					icon: 'none'
 				});
 			}
 		} catch (error) {
-			console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:504");
-			uni.showToast({
+			console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:506");
+			showAppToast({
 				title: '刷新失败',
 				icon: 'none'
 			});
@@ -509,17 +511,17 @@ const _cache = __ins.renderCache;
 		image: '/static/offpower.png',
 		text: '断开油电'
 	}]
-	
+
 	// 根据 productId 决定是否添加发送指令选项
 	const productId = currentCarInfo.value.productId
-	if (productId === 'product-1141811865601576960' || 
+	if (productId === 'product-1141811865601576960' ||
 		productId === 'product-1183161303028600832') {
 		list.push({
 			image: '/static/cmd.png',
 			text: '发送指令'
 		})
 	}
-	
+
 	return list
 })
 
@@ -538,7 +540,7 @@ const _cache = __ins.renderCache;
 			predictCmdId = 1
 			type = 1
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '操作类型错误',
 				icon: 'none'
 			})
@@ -566,7 +568,7 @@ const _cache = __ins.renderCache;
 
 			// 根据响应处理结果
 			if (res.code == 0) {
-				uni.showToast({
+				showAppToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
 				})
@@ -574,7 +576,7 @@ const _cache = __ins.renderCache;
 				// 清空密码
 				psw.value = ''
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg.length > 0 ? res.msg : '操作失败',
 					icon: 'none'
 				})
@@ -583,8 +585,8 @@ const _cache = __ins.renderCache;
 			// 隐藏加载中
 			uni.hideLoading()
 
-			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:682")
-			uni.showToast({
+			console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:684")
+			showAppToast({
 				title: '操作失败，请重试',
 				icon: 'none'
 			})
@@ -593,7 +595,7 @@ const _cache = __ins.renderCache;
 
 	const confirm = async () => {
 		if (userType.value == '1' && psw.value == '') {
-			uni.showToast({
+			showAppToast({
 				title: '请输入密码',
 				icon: 'none'
 			})
@@ -619,7 +621,7 @@ const _cache = __ins.renderCache;
 			const addr = await getAddress(center.latitude, center.longitude);
 			address.value = addr.result.formatted_address;
 		} catch (error) {
-			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:718");
+			console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:720");
 		}
 	}
 
@@ -634,17 +636,17 @@ const _cache = __ins.renderCache;
 			name: address.value || '当前位置',
 			scale: 18,
 			success: () => {
-				uni.showToast({
+				showAppToast({
 					title: '成功调起地图',
 					icon: 'none'
 				});
 			},
 			fail: (err) => {
-				uni.showToast({
+				showAppToast({
 					title: '调起地图失败',
 					icon: 'none'
 				});
-				console.error('调起地图失败:', err, " at pages/carInfoDetail/carInfoDetail.uvue:743");
+				console.error('调起地图失败:', err, " at pages/carInfoDetail/carInfoDetail.uvue:745");
 			}
 		});
 	}
@@ -727,7 +729,7 @@ const _cache = __ins.renderCache;
 			const res = await getDeviceDetail(deviceId.value)
 			currentCarInfo.value = res.data
 		} else {
-			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:826")
+			console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:828")
 		}
 	}
 
@@ -739,7 +741,7 @@ const _cache = __ins.renderCache;
 		userType.value = storedUserType ?? '';
 
 		loadDeviceDetail().then(() => {
-			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 838, 10),
+			const data: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 840, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			};
@@ -753,7 +755,7 @@ const _cache = __ins.renderCache;
 			});
 		});
 
-	
+
 	})
 
 
@@ -761,7 +763,7 @@ const _cache = __ins.renderCache;
 
 
 	onShow(() => {
-		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:860")
+		console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:862")
 		// 如果设备在线且没有在刷新，重新启动自动刷新
 		if (datainfo.value.connectionStatus == 'online' && !isRefreshing.value) {
 			setupAutoRefresh(currentTime.value)
@@ -770,12 +772,12 @@ const _cache = __ins.renderCache;
 
 	// 新增页面隐藏时的处理
 	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:869")
+		console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:871")
 		stopAutoRefresh()
 	})
 
 	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:874")
+		console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:876")
 		stopAutoRefresh()
 	})
 
@@ -788,203 +790,207 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 const _component_i_grid = resolveEasyComponent("i-grid",_easycom_i_grid)
 const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_i_modal = resolveEasyComponent("i-modal",_easycom_i_modal)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "详情",
-      "show-back": true,
-      backgroundColor: "#fff",
-      textColor: "#333",
-      showCapsule: false
-    })),
-    _cE("view", _uM({ class: "map-container" }), [
-      _cV(_component_map, _uM({
-        id: "myMap",
-        latitude: unref(center).latitude,
-        longitude: unref(center).longitude,
-        markers: unref(markers),
-        scale: unref(mapScale),
-        style: _nS(_uM({"width":"100%","height":"100%"})),
-        "show-location": false,
-        "enable-traffic": true,
-        "enable-overlooking": true,
-        "enable-building": true,
-        "enable-3D": true
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cV(_component_sub_navBar, _uM({
-            currentTime: unref(currentTime),
-            showTime: true,
-            showPickerTime: false,
-            "onUpdate:currentTime": onCurrentTimeChange,
-            currentCar: unref(currentCarInfo).plateNo,
-            times: unref(times),
-            carStatus: unref(datainfo).connectionStatus,
-            showPicker: false,
-            showCar: true
-          }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
-    ]),
-    _cE("view", _uM({ class: "tools-panel" }), [
-      _cE("view", _uM({ class: "Imei-box" }), [
-        _cE("view", _uM({
-          class: "imei-info",
-          onClick: carDetail
-        }), [
-          _cE("view", _uM({ class: "imeis" }), [
-            _cE("text", null, "ID: " + _tD(unref(imei)), 1 /* TEXT */),
-            _cE("text", _uM({ class: "pos-time" }))
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "详情",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "map-container" }), [
+        _cV(_component_map, _uM({
+          id: "myMap",
+          latitude: unref(center).latitude,
+          longitude: unref(center).longitude,
+          markers: unref(markers),
+          scale: unref(mapScale),
+          style: _nS(_uM({"width":"100%","height":"100%"})),
+          "show-location": false,
+          "enable-traffic": true,
+          "enable-overlooking": true,
+          "enable-building": true,
+          "enable-3D": true
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cV(_component_sub_navBar, _uM({
+              currentTime: unref(currentTime),
+              showTime: true,
+              showPickerTime: false,
+              "onUpdate:currentTime": onCurrentTimeChange,
+              currentCar: unref(currentCarInfo).plateNo,
+              times: unref(times),
+              carStatus: unref(datainfo).connectionStatus,
+              showPicker: false,
+              showCar: true
+            }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
           ]),
-          _cV(_component_i_icon, _uM({
-            name: "/static/arrow-right.png",
-            fontSize: "16"
-          }))
-        ]),
-        _cE("view", _uM({ class: "pos-date" }), [
-          _cE("text", _uM({ class: "addree-box" }), "定位时间: " + _tD(unref(datainfo).positionUpdateTime), 1 /* TEXT */),
-          _cE("text", _uM({ class: "addree-box" }), "通信时间: " + _tD(unref(datainfo).signalUpdateTime), 1 /* TEXT */)
-        ]),
-        _cE("view", _uM({ class: "pos-adress" }), [
-          _cE("view", _uM({ class: "addree-box" }), [
-            _cE("text", _uM({
-              style: _nS(_uM({"margin-right":"10rpx","font-size":"22rpx"}))
-            }), "当前位置:", 4 /* STYLE */),
-            isTrue(unref(address))
-              ? _cE("text", _uM({
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
+      ]),
+      _cE("view", _uM({ class: "tools-panel" }), [
+        _cE("view", _uM({ class: "Imei-box" }), [
+          _cE("view", _uM({
+            class: "imei-info",
+            onClick: carDetail
+          }), [
+            _cE("view", _uM({ class: "imeis" }), [
+              _cE("text", null, "ID: " + _tD(unref(imei)), 1 /* TEXT */),
+              _cE("text", _uM({ class: "pos-time" }))
+            ]),
+            _cV(_component_i_icon, _uM({
+              name: "/static/arrow-right.png",
+              fontSize: "16"
+            }))
+          ]),
+          _cE("view", _uM({ class: "pos-date" }), [
+            _cE("text", _uM({ class: "addree-box" }), "定位时间: " + _tD(unref(datainfo).positionUpdateTime), 1 /* TEXT */),
+            _cE("text", _uM({ class: "addree-box" }), "通信时间: " + _tD(unref(datainfo).signalUpdateTime), 1 /* TEXT */)
+          ]),
+          _cE("view", _uM({ class: "pos-adress" }), [
+            _cE("view", _uM({ class: "addree-box" }), [
+              _cE("text", _uM({
+                style: _nS(_uM({"margin-right":"10rpx","font-size":"22rpx"}))
+              }), "当前位置:", 4 /* STYLE */),
+              isTrue(unref(address))
+                ? _cE("text", _uM({
+                    key: 0,
+                    class: "address-text"
+                  }), _tD(unref(address)), 1 /* TEXT */)
+                : _cE("text", _uM({
+                    key: 1,
+                    class: "address-text"
+                  }), _tD(unref(center).latitude) + " , " + _tD(unref(center).longitude), 1 /* TEXT */),
+              isTrue(!unref(address))
+                ? _cE("text", _uM({
+                    key: 2,
+                    style: _nS(_uM({"color":"#007AFF","margin-left":"20rpx","font-weight":"bold","font-size":"22rpx"})),
+                    onClick: refreshAdress
+                  }), "中文地址", 4 /* STYLE */)
+                : _cC("v-if", true)
+            ])
+          ]),
+          _cE("view", _uM({ class: "signal-container" }), [
+            unref(signalRssi) != null
+              ? _cE("view", _uM({
                   key: 0,
-                  class: "address-text"
-                }), _tD(unref(address)), 1 /* TEXT */)
-              : _cE("text", _uM({
+                  class: "signal-item"
+                }), [
+                  _cE("view", _uM({ class: "mobile-signal" }), [
+                    _cE("view", _uM({ class: "signal-bars-horizontal" }), [
+                      _cE("view", _uM({
+                        class: "signal-bar-h signal-bar-h-1",
+                        style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(0, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
+                      }), null, 4 /* STYLE */),
+                      _cE("view", _uM({
+                        class: "signal-bar-h signal-bar-h-2",
+                        style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(1, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
+                      }), null, 4 /* STYLE */),
+                      _cE("view", _uM({
+                        class: "signal-bar-h signal-bar-h-3",
+                        style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(2, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
+                      }), null, 4 /* STYLE */),
+                      _cE("view", _uM({
+                        class: "signal-bar-h signal-bar-h-4",
+                        style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(3, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
+                      }), null, 4 /* STYLE */),
+                      _cE("view", _uM({
+                        class: "signal-bar-h signal-bar-h-5",
+                        style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(4, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
+                      }), null, 4 /* STYLE */)
+                    ]),
+                    _cE("view", _uM({ class: "signal-info-h" }), [
+                      _cE("text", _uM({
+                        class: "experience",
+                        style: _nS(_uM({ color: getSignalDetail(unref(signalRssi)).color }))
+                      }), _tD(getSignalDetail(unref(signalRssi)).experience), 5 /* TEXT, STYLE */),
+                      _cE("text", _uM({
+                        class: "signal-value",
+                        style: _nS(_uM({ color: getSignalDetail(unref(signalRssi)).color }))
+                      }), "CSQ " + _tD(unref(signalRssi)), 5 /* TEXT, STYLE */)
+                    ])
+                  ])
+                ])
+              : _cC("v-if", true),
+            unref(signalSat) != null
+              ? _cE("view", _uM({
                   key: 1,
-                  class: "address-text"
-                }), _tD(unref(center).latitude) + " , " + _tD(unref(center).longitude), 1 /* TEXT */),
-            isTrue(!unref(address))
-              ? _cE("text", _uM({
+                  class: "satellite-item-h"
+                }), [
+                  _cE("image", _uM({
+                    class: "satellite-icon",
+                    src: "/static/sate.png"
+                  })),
+                  _cE("text", _uM({ class: "satellite-text" }), _tD(unref(signalSat)), 1 /* TEXT */)
+                ])
+              : _cC("v-if", true),
+            isTrue(unref(carVoltage))
+              ? _cE("view", _uM({
                   key: 2,
-                  style: _nS(_uM({"color":"#007AFF","margin-left":"20rpx","font-weight":"bold","font-size":"22rpx"})),
-                  onClick: refreshAdress
-                }), "中文地址", 4 /* STYLE */)
+                  class: "power"
+                }), [
+                  _cE("image", _uM({
+                    class: "power-icon",
+                    src: "/static/v.png"
+                  })),
+                  _cE("text", null, _tD(unref(carVoltage)) + "V", 1 /* TEXT */)
+                ])
+              : _cC("v-if", true),
+            isTrue(unref(batteryPercent))
+              ? _cE("view", _uM({
+                  key: 3,
+                  class: "battery",
+                  style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
+                }), [
+                  _cE("image", _uM({
+                    class: "battery-icon",
+                    src: "/static/pow.png",
+                    alt: ""
+                  })),
+                  _cE("text", null, _tD(unref(batteryPercent)) + "%", 1 /* TEXT */)
+                ], 4 /* STYLE */)
               : _cC("v-if", true)
           ])
         ]),
-        _cE("view", _uM({ class: "signal-container" }), [
-          unref(signalRssi) != null
-            ? _cE("view", _uM({
-                key: 0,
-                class: "signal-item"
-              }), [
-                _cE("view", _uM({ class: "mobile-signal" }), [
-                  _cE("view", _uM({ class: "signal-bars-horizontal" }), [
-                    _cE("view", _uM({
-                      class: "signal-bar-h signal-bar-h-1",
-                      style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(0, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
-                    }), null, 4 /* STYLE */),
-                    _cE("view", _uM({
-                      class: "signal-bar-h signal-bar-h-2",
-                      style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(1, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
-                    }), null, 4 /* STYLE */),
-                    _cE("view", _uM({
-                      class: "signal-bar-h signal-bar-h-3",
-                      style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(2, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
-                    }), null, 4 /* STYLE */),
-                    _cE("view", _uM({
-                      class: "signal-bar-h signal-bar-h-4",
-                      style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(3, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
-                    }), null, 4 /* STYLE */),
-                    _cE("view", _uM({
-                      class: "signal-bar-h signal-bar-h-5",
-                      style: _nS(_uM({ backgroundColor: getMobileSignalBarClass(4, unref(signalRssi)) == 'bar-active' ? getSignalDetail(unref(signalRssi)).color : '#e8e8e8' }))
-                    }), null, 4 /* STYLE */)
-                  ]),
-                  _cE("view", _uM({ class: "signal-info-h" }), [
-                    _cE("text", _uM({
-                      class: "experience",
-                      style: _nS(_uM({ color: getSignalDetail(unref(signalRssi)).color }))
-                    }), _tD(getSignalDetail(unref(signalRssi)).experience), 5 /* TEXT, STYLE */),
-                    _cE("text", _uM({
-                      class: "signal-value",
-                      style: _nS(_uM({ color: getSignalDetail(unref(signalRssi)).color }))
-                    }), "CSQ " + _tD(unref(signalRssi)), 5 /* TEXT, STYLE */)
-                  ])
-                ])
-              ])
-            : _cC("v-if", true),
-          unref(signalSat) != null
-            ? _cE("view", _uM({
-                key: 1,
-                class: "satellite-item-h"
-              }), [
-                _cE("image", _uM({
-                  class: "satellite-icon",
-                  src: "/static/sate.png"
-                })),
-                _cE("text", _uM({ class: "satellite-text" }), _tD(unref(signalSat)), 1 /* TEXT */)
-              ])
-            : _cC("v-if", true),
-          isTrue(unref(carVoltage))
-            ? _cE("view", _uM({
-                key: 2,
-                class: "power"
-              }), [
-                _cE("image", _uM({
-                  class: "power-icon",
-                  src: "/static/v.png"
-                })),
-                _cE("text", null, _tD(unref(carVoltage)) + "V", 1 /* TEXT */)
-              ])
-            : _cC("v-if", true),
-          isTrue(unref(batteryPercent))
-            ? _cE("view", _uM({
-                key: 3,
-                class: "battery",
-                style: _nS(_uM({ color: getBatteryColor(unref(batteryPercent)) }))
-              }), [
-                _cE("image", _uM({
-                  class: "battery-icon",
-                  src: "/static/pow.png",
-                  alt: ""
-                })),
-                _cE("text", null, _tD(unref(batteryPercent)) + "%", 1 /* TEXT */)
-              ], 4 /* STYLE */)
-            : _cC("v-if", true)
-        ])
+        _cV(_component_i_grid, _uM({
+          items: unref(baseList),
+          col: 5,
+          itemHeight: "88",
+          round: "8",
+          imageSize: 30,
+          iconColor: "#3c9cff",
+          textColor: "#606266",
+          showBorder: true,
+          onClick: ($event: any) => {handleGridClick($event)}
+        }), null, 8 /* PROPS */, ["items", "onClick"])
       ]),
-      _cV(_component_i_grid, _uM({
-        items: unref(baseList),
-        col: 5,
-        itemHeight: "88",
-        round: "8",
-        imageSize: 30,
-        iconColor: "#3c9cff",
-        textColor: "#606266",
-        showBorder: true,
-        onClick: ($event: any) => {handleGridClick($event)}
-      }), null, 8 /* PROPS */, ["items", "onClick"])
+      _cE("view", null, [
+        _cV(_component_i_modal, _uM({
+          show: unref(popupRef),
+          title: unref(modalTitle),
+          onConfirm: confirm
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cE("view", null, [
+              _cV(_component_i_input, _uM({
+                modelValue: unref(psw),
+                "onUpdate:modelValue": $event => {trySetRefValue(psw, $event)},
+                onInput: filterNonLatin,
+                placeholder: "请输入密码",
+                clearable: "",
+                password: true
+              }), null, 8 /* PROPS */, ["modelValue"])
+            ])
+          ]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["show", "title"])
+      ])
     ]),
-    _cE("view", null, [
-      _cV(_component_i_modal, _uM({
-        show: unref(popupRef),
-        title: unref(modalTitle),
-        onConfirm: confirm
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cE("view", null, [
-            _cV(_component_i_input, _uM({
-              modelValue: unref(psw),
-              "onUpdate:modelValue": $event => {trySetRefValue(psw, $event)},
-              onInput: filterNonLatin,
-              placeholder: "请输入密码",
-              clearable: "",
-              password: true
-            }), null, 8 /* PROPS */, ["modelValue"])
-          ])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["show", "title"])
-    ])
-  ])
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

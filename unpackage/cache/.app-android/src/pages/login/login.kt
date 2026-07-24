@@ -20,7 +20,6 @@ import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesLoginLogin : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -47,7 +46,7 @@ open class GenPagesLoginLogin : BasePage {
                         return
                     }
                     val account = if (UTSAndroid.`typeof`(rawAccount) == "string") {
-                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:122") as UTSJSONObject
+                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:124") as UTSJSONObject
                     } else {
                         rawAccount as UTSJSONObject
                     }
@@ -56,7 +55,7 @@ open class GenPagesLoginLogin : BasePage {
                     rememberPassword.value = form.value.username != "" || form.value.password != ""
                 }
                  catch (error: Throwable) {
-                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:127")
+                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:129")
                 }
             }
             val loadSavedAccount = ::gen_loadSavedAccount_fn
@@ -92,22 +91,22 @@ open class GenPagesLoginLogin : BasePage {
             val getSystemInfo = fun(): Unit {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
-                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:170")
+                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:172")
             }
             val validateForm = fun(): Boolean {
                 if (form.value.username.length == 0) {
-                    uni_showToast(ShowToastOptions(title = "请输入账号", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请输入账号", icon = "none"))
                     return false
                 }
                 if (form.value.password.length == 0) {
-                    uni_showToast(ShowToastOptions(title = "请输入密码", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请输入密码", icon = "none"))
                     return false
                 }
                 return true
             }
             val loginBt = fun(){
                 if (!docState.value) {
-                    uni_showToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
+                    showAppToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
                     return
                 }
             }
@@ -118,22 +117,22 @@ open class GenPagesLoginLogin : BasePage {
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!docState.value) {
-                            uni_showToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
+                            showAppToast(ShowToastOptions(title = "请先阅读并同意用户协议", icon = "error"))
                             return@w1
                         }
                         try {
-                            console.log("准备验证表单...", " at pages/login/login.uvue:298")
+                            console.log("准备验证表单...", " at pages/login/login.uvue:300")
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:300")
-                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 303, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
-                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:309")
+                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:302")
+                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 305, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
+                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:311")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "登录中...", mask = true))
-                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:319")
+                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:321")
                             val res = await(login(newFormData))
-                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:321")
+                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:323")
                             loading.value = false
                             uni_hideLoading(null)
                             val loginData = res.data
@@ -145,22 +144,22 @@ open class GenPagesLoginLogin : BasePage {
                             if (token != "") {
                                 saveAccountPassword()
                                 uni_setStorageSync("token", token)
-                                uni_showToast(ShowToastOptions(title = "登录成功", icon = "success"))
+                                showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
                                 setTimeout(fun(){
                                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
                                 }, 500)
                             } else {
-                                uni_showToast(ShowToastOptions(title = "登录失败，请重试", icon = "error"))
+                                showAppToast(ShowToastOptions(title = "登录失败，请重试", icon = "error"))
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:350")
+                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:352")
                             loading.value = false
                             uni_hideLoading(null)
                             if (isTruthy(error) && isTruthy(error.message)) {
-                                uni_showToast(ShowToastOptions(icon = "error", title = "登录失败，请检查账号、密码或网络"))
+                                showAppToast(ShowToastOptions(icon = "error", title = "登录失败，请检查账号、密码或网络"))
                             } else {
-                                uni_showToast(ShowToastOptions(icon = "error", title = "登录失败，请检查网络后重试"))
+                                showAppToast(ShowToastOptions(icon = "error", title = "登录失败，请检查网络后重试"))
                             }
                         }
                 })
@@ -179,7 +178,7 @@ open class GenPagesLoginLogin : BasePage {
             onMounted(fun(){
                 getSystemInfo()
                 loadSavedAccount()
-                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:446")
+                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:448")
             }
             )
             return fun(): Any? {
@@ -189,92 +188,96 @@ open class GenPagesLoginLogin : BasePage {
                 val _component_i_checkbox = resolveEasyComponent("i-checkbox", GenUniModulesIUiXComponentsICheckboxICheckboxClass)
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 val _component_i_form = resolveEasyComponent("i-form", GenUniModulesIUiXComponentsIFormIFormClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "登陆", "show-back" to false, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "banner"), _uA(
-                        _cE("image", _uM("src" to "/static/car_location.png", "class" to "banner-image", "mode" to "aspectFill")),
-                        _cE("text", _uM("class" to "title"), "车联网")
-                    )),
-                    _cE("view", _uM("class" to "content"), _uA(
-                        if (isTrue(pswLogin.value)) {
-                            _cE("view", _uM("key" to 0), _uA(
-                                _cV(_component_i_form, _uM("modelValue" to form.value, "rules" to pswrules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to updateFormValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_form_item, _uM("name" to "username", "label" to "", "required" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                _cV(_component_i_input, _uM("modelValue" to form.value.username, "onUpdate:modelValue" to fun(`$event`: String){
-                                                    form.value.username = `$event`
-                                                }, "placeholder" to "请输入账号", "clearable" to "", "prefixIcon" to "account-fill"), null, 8, _uA(
-                                                    "modelValue",
-                                                    "onUpdate:modelValue"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "登陆", "show-back" to false, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "banner"), _uA(
+                            _cE("image", _uM("src" to "/static/car_location.png", "class" to "banner-image", "mode" to "aspectFill")),
+                            _cE("text", _uM("class" to "title"), "车联网")
+                        )),
+                        _cE("view", _uM("class" to "content"), _uA(
+                            if (isTrue(pswLogin.value)) {
+                                _cE("view", _uM("key" to 0), _uA(
+                                    _cV(_component_i_form, _uM("modelValue" to form.value, "rules" to pswrules, "labelDirection" to "horizontal", "watchValidStatus" to "", "onUpdate:modelValid" to updateFormValid), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_form_item, _uM("name" to "username", "label" to "", "required" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    _cV(_component_i_input, _uM("modelValue" to form.value.username, "onUpdate:modelValue" to fun(`$event`: String){
+                                                        form.value.username = `$event`
+                                                    }, "placeholder" to "请输入账号", "clearable" to "", "prefixIcon" to "account-fill"), null, 8, _uA(
+                                                        "modelValue",
+                                                        "onUpdate:modelValue"
+                                                    ))
+                                                )
+                                            }), "_" to 1)),
+                                            _cV(_component_i_form_item, _uM("name" to "password", "label" to "", "required" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    _cV(_component_i_input, _uM("modelValue" to form.value.password, "onUpdate:modelValue" to fun(`$event`: String){
+                                                        form.value.password = `$event`
+                                                    }, "onInput" to filterNonLatin, "placeholder" to "请输入密码", "password" to true), null, 8, _uA(
+                                                        "modelValue",
+                                                        "onUpdate:modelValue"
+                                                    ))
+                                                )
+                                            }), "_" to 1)),
+                                            _cE("view", _uM("class" to "remember-password"), _uA(
+                                                _cV(_component_i_checkbox, _uM("checked" to rememberPassword.value, "onChange" to toggleRememberPassword, "label" to "记住密码"), null, 8, _uA(
+                                                    "checked"
                                                 ))
-                                            )
-                                        }), "_" to 1)),
-                                        _cV(_component_i_form_item, _uM("name" to "password", "label" to "", "required" to "", "labelDirection" to "horizontal", "labelWidth" to "0"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                _cV(_component_i_input, _uM("modelValue" to form.value.password, "onUpdate:modelValue" to fun(`$event`: String){
-                                                    form.value.password = `$event`
-                                                }, "onInput" to filterNonLatin, "placeholder" to "请输入密码", "password" to true), null, 8, _uA(
-                                                    "modelValue",
-                                                    "onUpdate:modelValue"
-                                                ))
-                                            )
-                                        }), "_" to 1)),
-                                        _cE("view", _uM("class" to "remember-password"), _uA(
-                                            _cV(_component_i_checkbox, _uM("checked" to rememberPassword.value, "onChange" to toggleRememberPassword, "label" to "记住密码"), null, 8, _uA(
-                                                "checked"
+                                            )),
+                                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                                return _uA(
+                                                    "提交"
+                                                )
+                                            }), "_" to 1), 8, _uA(
+                                                "loading"
                                             ))
-                                        )),
-                                        _cV(_component_i_button, _uM("type" to "primary", "onClick" to submit, "loading" to loading.value), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                "提交"
-                                            )
-                                        }), "_" to 1), 8, _uA(
-                                            "loading"
-                                        ))
-                                    )
-                                }), "_" to 1), 8, _uA(
-                                    "modelValue"
+                                        )
+                                    }), "_" to 1), 8, _uA(
+                                        "modelValue"
+                                    ))
+                                ))
+                            } else {
+                                _cE("view", _uM("key" to 1), _uA(
+                                    if (isTrue(!docState.value)) {
+                                        _cE("button", _uM("key" to 0, "type" to "primary", "plain" to "true", "onClick" to loginBt), " 个人用户登录 ")
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                    ,
+                                    if (isTrue(docState.value)) {
+                                        _cE("button", _uM("key" to 1, "open-type" to "getPhoneNumber", "type" to "primary", "plain" to "true", "onGetphonenumber" to handleGetPhoneNumber), " 个人用户登录 ", 32)
+                                    } else {
+                                        _cC("v-if", true)
+                                    }
+                                ))
+                            }
+                            ,
+                            _cE("view", _uM("class" to "documents"), _uA(
+                                _cV(_component_i_checkbox, _uM("checked" to docState.value, "onChange" to isDocState), null, 8, _uA(
+                                    "checked"
+                                )),
+                                _cE("view", _uM("class" to "doc-info-box"), _uA(
+                                    _cE("text", _uM("class" to "doc-text"), "已阅读并同意"),
+                                    _cE("text", _uM("class" to "doc-link", "onClick" to gotoAgreement), "《用户协议》"),
+                                    _cE("text", _uM("class" to "doc-text"), "和"),
+                                    _cE("text", _uM("class" to "doc-link", "onClick" to gotoPrivacy), "《隐私政策》")
                                 ))
                             ))
-                        } else {
-                            _cE("view", _uM("key" to 1), _uA(
-                                if (isTrue(!docState.value)) {
-                                    _cE("button", _uM("key" to 0, "type" to "primary", "plain" to "true", "onClick" to loginBt), " 个人用户登录 ")
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                                ,
-                                if (isTrue(docState.value)) {
-                                    _cE("button", _uM("key" to 1, "open-type" to "getPhoneNumber", "type" to "primary", "plain" to "true", "onGetphonenumber" to handleGetPhoneNumber), " 个人用户登录 ", 32)
-                                } else {
-                                    _cC("v-if", true)
-                                }
-                            ))
-                        }
-                        ,
-                        _cE("view", _uM("class" to "documents"), _uA(
-                            _cV(_component_i_checkbox, _uM("checked" to docState.value, "onChange" to isDocState), null, 8, _uA(
-                                "checked"
-                            )),
-                            _cE("view", _uM("class" to "doc-info-box"), _uA(
-                                _cE("text", _uM("class" to "doc-text"), "已阅读并同意"),
-                                _cE("text", _uM("class" to "doc-link", "onClick" to gotoAgreement), "《用户协议》"),
-                                _cE("text", _uM("class" to "doc-text"), "和"),
-                                _cE("text", _uM("class" to "doc-link", "onClick" to gotoPrivacy), "《隐私政策》")
-                            ))
+                        )),
+                        _cE("view", _uM("class" to "other-way"), _uA(
+                            _cE("view", _uM("class" to "noLogin", "onClick" to gotoIndex), "暂不登录"),
+                            _cE("view", _uM("class" to "BLogin", "onClick" to isPswLogin), _tD(if (pswLogin.value) {
+                                "个人用户登录"
+                            } else {
+                                "企业用户登录"
+                            }
+                            ), 1)
                         ))
                     )),
-                    _cE("view", _uM("class" to "other-way"), _uA(
-                        _cE("view", _uM("class" to "noLogin", "onClick" to gotoIndex), "暂不登录"),
-                        _cE("view", _uM("class" to "BLogin", "onClick" to isPswLogin), _tD(if (pswLogin.value) {
-                            "个人用户登录"
-                        } else {
-                            "企业用户登录"
-                        }
-                        ), 1)
-                    ))
-                ))
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

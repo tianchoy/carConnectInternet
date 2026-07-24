@@ -38,16 +38,18 @@
 			<view class="no-more" v-if="!hasMore && !loading && deviceList.length > 0">
 				<text>没有更多数据了</text>
 			</view>
-			
+
 			<!-- 空状态 -->
 			<view class="empty" v-if="!loading && deviceList.length === 0">
 				<text>暂无设备数据</text>
 			</view>
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../../utils/toast.uts'
 	import { getUserDeviceList } from '../../../api/request.uts'
 
 	const deviceList = ref<Array<UTSJSONObject>>([])
@@ -114,14 +116,14 @@
 				}
 
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
 			console.error('加载车辆列表失败:', error)
-			uni.showToast({
+			showAppToast({
 				title: '加载失败，请重试',
 				icon: 'none'
 			})
@@ -150,11 +152,11 @@
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
 		// iccid = iccid.substring(0,iccid.length-1)
-		
+
 		console.log(iccid)
 		// 设置需要刷新的标志
 		needRefresh.value = true
-		
+
 		//#ifdef MP-WEIXIN
 		uni.openEmbeddedMiniProgram({
 			appId: 'wx1d647f2cfdc089e6',
@@ -166,7 +168,7 @@
 			fail(res: any) {
 				console.log('打开小程序失败', res)
 				needRefresh.value = false
-				uni.showToast({
+				showAppToast({
 					title: '打开支付页面失败',
 					icon: 'none'
 				})
@@ -176,7 +178,7 @@
 
 		//#ifndef MP-WEIXIN
 		needRefresh.value = false
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中完成充值',
 			icon: 'none'
 		})
@@ -194,7 +196,7 @@
 		resetData()
 		loadPayDeviceListData().finally(() => {
 			uni.stopPullDownRefresh()
-			uni.showToast({
+			showAppToast({
 				title: '刷新成功',
 				icon: 'success'
 			})
@@ -224,7 +226,7 @@
 					align-items: center;
 					font-size: 28rpx;
 					padding: 10rpx 0;
-					
+
 					.label {
 						color: #666;
 					}
@@ -234,11 +236,11 @@
 						font-size: 32rpx;
 						color: #000;
 					}
-					
+
 					.value {
 						color: #333;
 					}
-					
+
 					.pay-btn{
 						padding: 10rpx 15rpx;
 						font-size: 25rpx;
@@ -257,7 +259,7 @@
 				color: #999;
 				font-size: 24rpx;
 			}
-			
+
 			// 空状态样式
 			.empty {
 				text-align: center;

@@ -94,9 +94,9 @@
 		<view>
 			<i-modal :show="popupRef" :title="modalTitle" @confirm="confirm">
 				<view>
-					<i-input 
-						v-model="psw" 
-						@input="filterNonLatin" 
+					<i-input
+						v-model="psw"
+						@input="filterNonLatin"
 						placeholder="请输入密码"
 						clearable
 						:password="true"
@@ -106,8 +106,10 @@
 			</i-modal>
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	import { getDeviceIcon } from '../../utils/cars'
@@ -353,7 +355,7 @@
 						const longitude = item.getNumber('longitude', 0);
 						if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
 							console.error('位置信息缺失', item);
-							uni.showToast({
+							showAppToast({
 								title: '位置信息缺失',
 								icon: 'none'
 							})
@@ -409,7 +411,7 @@
 				}
 							refreshTimer.value = null;
 							isRefreshing.value = false;
-							uni.showToast({
+							showAppToast({
 								title: '设备已离线，停止自动刷新',
 								icon: 'none'
 							});
@@ -446,7 +448,7 @@
 					return false;
 				} else {
 					// 所有重试都失败了
-					uni.showToast({
+					showAppToast({
 						title: '数据加载失败，请稍后重试',
 						icon: 'none',
 						duration: 2000
@@ -460,7 +462,7 @@
 							}
 						refreshTimer.value = null;
 						isRefreshing.value = false;
-						uni.showToast({
+						showAppToast({
 							title: '数据加载失败，停止自动刷新',
 							icon: 'none'
 						});
@@ -490,19 +492,19 @@
 
 			if (success) {
 
-				uni.showToast({
+				showAppToast({
 					title: '刷新成功',
 					icon: 'success'
 				});
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '刷新失败',
 					icon: 'none'
 				});
 			}
 		} catch (error) {
 			console.error('手动刷新失败:', error);
-			uni.showToast({
+			showAppToast({
 				title: '刷新失败',
 				icon: 'none'
 			});
@@ -605,17 +607,17 @@
 		image: '/static/offpower.png',
 		text: '断开油电'
 	}]
-	
+
 	// 根据 productId 决定是否添加发送指令选项
 	const productId = currentCarInfo.value.productId
-	if (productId === 'product-1141811865601576960' || 
+	if (productId === 'product-1141811865601576960' ||
 		productId === 'product-1183161303028600832') {
 		list.push({
 			image: '/static/cmd.png',
 			text: '发送指令'
 		})
 	}
-	
+
 	return list
 })
 
@@ -634,7 +636,7 @@
 			predictCmdId = 1
 			type = 1
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '操作类型错误',
 				icon: 'none'
 			})
@@ -662,7 +664,7 @@
 
 			// 根据响应处理结果
 			if (res.code == 0) {
-				uni.showToast({
+				showAppToast({
 					title: operationType == 1 ? '恢复油电成功' : '断开油电成功',
 					icon: 'success'
 				})
@@ -670,7 +672,7 @@
 				// 清空密码
 				psw.value = ''
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg.length > 0 ? res.msg : '操作失败',
 					icon: 'none'
 				})
@@ -680,7 +682,7 @@
 			uni.hideLoading()
 
 			console.error('操作失败:', error)
-			uni.showToast({
+			showAppToast({
 				title: '操作失败，请重试',
 				icon: 'none'
 			})
@@ -689,7 +691,7 @@
 
 	const confirm = async () => {
 		if (userType.value == '1' && psw.value == '') {
-			uni.showToast({
+			showAppToast({
 				title: '请输入密码',
 				icon: 'none'
 			})
@@ -730,13 +732,13 @@
 			name: address.value || '当前位置',
 			scale: 18,
 			success: () => {
-				uni.showToast({
+				showAppToast({
 					title: '成功调起地图',
 					icon: 'none'
 				});
 			},
 			fail: (err) => {
-				uni.showToast({
+				showAppToast({
 					title: '调起地图失败',
 					icon: 'none'
 				});
@@ -849,7 +851,7 @@
 			});
 		});
 
-	
+
 	})
 
 
@@ -971,7 +973,7 @@
 
 					&.refreshing {
 						color: #1890ff;
-						
+
 					}
 				}
 
@@ -1012,7 +1014,7 @@
 					flex-direction: row;
 					justify-content: space-between;
 					align-items: center;
-					
+
 
 					.addree-box {
 						display: flex;
@@ -1024,11 +1026,11 @@
 						color: #999;
 
 						.address-text {
-							
+
 							font-size: 22rpx;
-							
+
 							max-width: 490rpx;
-							
+
 							line-height: 1.4;
 						}
 
@@ -1046,7 +1048,7 @@
 					flex-direction: row;
 					align-items: center;
 					padding: 20rpx 0;
-					
+
 
 					.signal-item {
 						display: flex;

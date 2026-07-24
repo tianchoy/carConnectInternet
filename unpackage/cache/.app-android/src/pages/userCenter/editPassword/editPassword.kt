@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -36,30 +35,30 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                                 throw UTSError("表单验证失败")
                             }
                             uni_showLoading(ShowLoadingOptions(title = "提交中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 76, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/userCenter/editPassword/editPassword.uvue", 78, 10), "password" to formData.value["password"], "newPassword" to formData.value["newPassword"])
                             val res = await(changePassWord(submitData))
                             if (res.msg == "success") {
                                 uni_hideLoading(null)
-                                uni_showToast(ShowToastOptions(title = "密码修改成功", icon = "success", duration = 2000))
+                                showAppToast(ShowToastOptions(title = "密码修改成功", icon = "success", duration = 2000))
                                 setTimeout(fun(){
                                     uni_navigateBack(null)
                                 }, 1500)
                             } else {
                                 uni_hideLoading(null)
-                                uni_showToast(ShowToastOptions(title = "密码修改失败", icon = "error", duration = 2000))
+                                showAppToast(ShowToastOptions(title = "密码修改失败", icon = "error", duration = 2000))
                             }
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            uni_showToast(ShowToastOptions(title = "表单验证失败", icon = "none", duration = 2000))
+                            showAppToast(ShowToastOptions(title = "表单验证失败", icon = "none", duration = 2000))
                         }
                 })
             }
             onLoad(fun(options){
                 if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/editPassword/editPassword.uvue:117") as String), " at pages/userCenter/editPassword/editPassword.uvue:117") as UTSJSONObject
-                        console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:118")
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/editPassword/editPassword.uvue:119") as String), " at pages/userCenter/editPassword/editPassword.uvue:119") as UTSJSONObject
+                        console.log(parsedInfo, " at pages/userCenter/editPassword/editPassword.uvue:120")
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         userInfo.value = UserInfo__1(id = if (userId != null) {
@@ -73,10 +72,10 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:125")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/editPassword/editPassword.uvue:127")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:127")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/editPassword/editPassword.uvue:129")
                     }
                 }
             }
@@ -87,57 +86,61 @@ open class GenPagesUserCenterEditPasswordEditPassword : BasePage {
                 val _component_i_form_item = resolveEasyComponent("i-form-item", GenUniModulesIUiXComponentsIFormItemIFormItemClass)
                 val _component_i_form = resolveEasyComponent("i-form", GenUniModulesIUiXComponentsIFormIFormClass)
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "修改密码", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "content"), _uA(
-                        _cV(_component_i_form, _uM("modelValue" to unref(formData), "rules" to rules, "ref_key" to "formRef", "ref" to formRef), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_i_form_item, _uM("label" to "原密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "password", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_input, _uM("modelValue" to unref(formData)["password"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            unref(formData)["password"] = `$event`
-                                        }
-                                        , "placeholder" to "请输入原密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_i_form_item, _uM("label" to "新密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "newPassword", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_input, _uM("modelValue" to unref(formData)["newPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            unref(formData)["newPassword"] = `$event`
-                                        }
-                                        , "placeholder" to "请输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_i_form_item, _uM("label" to "确认密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "confirmPassword"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_i_input, _uM("modelValue" to unref(formData)["confirmPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            unref(formData)["confirmPassword"] = `$event`
-                                        }
-                                        , "placeholder" to "请再次输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "修改密码", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "content"), _uA(
+                            _cV(_component_i_form, _uM("modelValue" to unref(formData), "rules" to rules, "ref_key" to "formRef", "ref" to formRef), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_i_form_item, _uM("label" to "原密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "password", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["password"], "onUpdate:modelValue" to fun(`$event`: Any?){
+                                                unref(formData)["password"] = `$event`
+                                            }
+                                            , "placeholder" to "请输入原密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(_component_i_form_item, _uM("label" to "新密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "newPassword", "borderBottom" to ""), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["newPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
+                                                unref(formData)["newPassword"] = `$event`
+                                            }
+                                            , "placeholder" to "请输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1)),
+                                    _cV(_component_i_form_item, _uM("label" to "确认密码", "labelDirection" to "horizontal", "labelWidth" to "80", "name" to "confirmPassword"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                        return _uA(
+                                            _cV(_component_i_input, _uM("modelValue" to unref(formData)["confirmPassword"], "onUpdate:modelValue" to fun(`$event`: Any?){
+                                                unref(formData)["confirmPassword"] = `$event`
+                                            }
+                                            , "placeholder" to "请再次输入新密码", "border" to "none", "type" to "password", "password" to "", "customStyle" to "padding:20rpx"), null, 8, _uA(
+                                                "modelValue",
+                                                "onUpdate:modelValue"
+                                            ))
+                                        )
+                                    }
+                                    ), "_" to 1))
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "modelValue"
+                            ))
+                        )),
+                        _cE("view", _uM("class" to "btn"), _uA(
+                            _cV(_component_i_button, _uM("type" to "primary", "text" to "提交修改", "onClick" to handleSubmit))
                         ))
                     )),
-                    _cE("view", _uM("class" to "btn"), _uA(
-                        _cV(_component_i_button, _uM("type" to "primary", "text" to "提交修改", "onClick" to handleSubmit))
-                    ))
-                ))
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

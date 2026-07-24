@@ -1,13 +1,16 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const utils_toast = require("../../../utils/toast.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  _easycom_custom_navBar_1();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
+const _easycom_app_toast = () => "../../../components/app-toast/app-toast.js";
 if (!Math) {
-  _easycom_custom_navBar();
+  (_easycom_custom_navBar + _easycom_app_toast)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carList",
@@ -31,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const loadCarListData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:58", currPage.value, totalPage.value);
+        common_vendor.index.__f__("log", "at pages/userCenter/carList/carList.uvue:60", currPage.value, totalPage.value);
         if (loading.value || !hasMore.value)
           return Promise.resolve(null);
         loading.value = true;
@@ -56,14 +59,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               currPage.value++;
             }
           } else {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: res.msg || "加载失败",
               icon: "none"
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:98", "加载车辆列表失败:", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/userCenter/carList/carList.uvue:100", "加载车辆列表失败:", error);
+          utils_toast.showAppToast({
             title: "加载失败，请重试",
             icon: "none"
           });
@@ -87,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(addCar, "a5"),
+        a: common_vendor.o(addCar, "f4"),
         b: common_vendor.p({
           title: "车辆管理",
           ["show-back"]: true,
@@ -114,7 +117,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: !common_vendor.unref(hasMore) && !common_vendor.unref(loading)
       }, !common_vendor.unref(hasMore) && !common_vendor.unref(loading) ? {} : {}, {
         f: `${_ctx.u_s_b_h}px`,
-        g: `${_ctx.u_s_a_i_b}px`
+        g: `${_ctx.u_s_a_i_b}px`,
+        h: common_vendor.p({
+          class: "data-v-4d1d23ef"
+        })
       });
       return __returned__;
     };

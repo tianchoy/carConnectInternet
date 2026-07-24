@@ -22,9 +22,11 @@
 			</view>
 		</view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../../utils/toast.uts'
 	import { getUserDeviceList } from '../../../api/request.uts'
 
 	const carList = ref<Array<UTSJSONObject>>([])
@@ -89,14 +91,14 @@
 					currPage.value++
 				}
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
 			console.error('加载车辆列表失败:', error)
-			uni.showToast({
+			showAppToast({
 				title: '加载失败，请重试',
 				icon: 'none'
 			})

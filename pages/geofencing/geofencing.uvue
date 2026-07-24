@@ -127,9 +127,9 @@
 					<text :class="['tab', activeTab === 'bind' ? 'active' : '']" @click="switchTab('bind')">已绑定设备</text>
 					<text :class="['tab', activeTab === 'unbind' ? 'active' : '']" @click="switchTab('unbind')">未绑定设备</text>
 				</view>
-				<scroll-view 
-					class="device-list" 
-					 scroll-y="true" 
+				<scroll-view
+					class="device-list"
+					 scroll-y="true"
 					 :show-scrollbar="false"
 					:scroll-top="scrollTop"
 					@scrolltolower="handleLoadMore"
@@ -145,7 +145,7 @@
 							size="20">
 						</i-switch>
 					</view>
-					
+
 					<view v-if="deviceList.length == 0 && !loading" class="empty">
 						<text class="empty-text">{{ activeTab === 'bind' ? '暂无绑定设备' : '暂无可用设备' }}</text>
 					</view>
@@ -159,9 +159,11 @@
 			</view>
 		</i-popup>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup>
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -352,7 +354,7 @@
 
 		} catch (err) {
 			console.error('获取初始位置失败:', err)
-			uni.showToast({
+			showAppToast({
 				title: '获取车辆位置失败',
 				icon: 'none'
 			})
@@ -610,14 +612,14 @@
 			if (res.code == 0) {
 				fenceList.value = res.data;
 			} else {
-				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+				showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 				fenceList.value = []; // 失败时也清空列表
 			}
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
 			console.error('加载围栏列表失败:', error)
-			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
 		}
@@ -797,10 +799,10 @@
 				circleRadius.value = 0
 			}
 		}
-		
+
 		// 更新地图显示，让用户看到围栏
 		updateMapDisplay()
-		
+
 		// 打开编辑对话框
 		editDialogPopup.value?.$callMethod('open')
 	}
@@ -809,7 +811,7 @@
 		try {
 			const result = await deleteGeofence(id)
 			if (result.code == 0) {
-				uni.showToast({ title: '删除成功' })
+				showAppToast({ title: '删除成功' })
 				selectedFence.value = null
 				points.value = []
 				circleCenter.value = null
@@ -821,11 +823,11 @@
 				showFenceModal.value?.$callMethod('close')
 				await loadGeofenceList()
 			} else {
-				uni.showToast({ title: '删除失败', icon: 'none' })
+				showAppToast({ title: '删除失败', icon: 'none' })
 			}
 		} catch (error) {
 			console.error('删除围栏失败:', error)
-			uni.showToast({ title: '删除失败', icon: 'none' })
+			showAppToast({ title: '删除失败', icon: 'none' })
 		}
 	}
 
@@ -845,12 +847,12 @@
 	// 保存围栏 - 修复版本
 	const saveFence = async () => {
 		if (!fenceForm.name) {
-			uni.showToast({ title: '请输入围栏名称', icon: 'none' })
+			showAppToast({ title: '请输入围栏名称', icon: 'none' })
 			return
 		}
 
 		let area = ''
-		
+
 		// 判断是新增还是编辑
 		if (editingFence.value) {
 			// 【编辑模式】优先使用新绘制的数据，如果没有则使用原有数据
@@ -865,10 +867,10 @@
 		} else {
 			// 【新增模式】必须绘制
 			if (drawingMode.value === 'polygon' && points.value.length < 3) {
-				uni.showToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
+				showAppToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
 				return
 			} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
-				uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+				showAppToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
 				return
 			}
 
@@ -880,12 +882,12 @@
 		}
 
 		if (!area) {
-			uni.showToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
+			showAppToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
 			return
 		}
 
 		if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
-			uni.showToast({ title: '请选择有效的告警类型', icon: 'none' })
+			showAppToast({ title: '请选择有效的告警类型', icon: 'none' })
 			return
 		}
 
@@ -911,9 +913,9 @@
 			uni.hideLoading()
 
 			if (result.code == 0) {
-				uni.showToast({ title: editingFence.value ? '更新成功' : '保存成功' })
+				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
 				editDialogPopup.value?.$callMethod('close')
-				
+
 				// 重置状态
 				const tempFence = editingFence.value
 				editingFence.value = null
@@ -921,22 +923,22 @@
 				points.value = []
 				circleCenter.value = null
 				circleRadius.value = 0
-				
+
 				// 重新加载围栏列表
 				await loadGeofenceList()
-				
+
 				// 如果是在编辑模式下关闭，取消选中状态
 				if (tempFence) {
 					selectedFence.value = null
 					showFenceModal.value?.$callMethod('close')
 				}
 			} else {
-				uni.showToast({ title: result.msg || '保存失败', icon: 'none' })
+				showAppToast({ title: result.msg || '保存失败', icon: 'none' })
 			}
 		} catch (error) {
 			uni.hideLoading()
 			console.error('保存围栏失败:', error)
-			uni.showToast({ title: '保存失败，请重试', icon: 'none' })
+			showAppToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
 
@@ -1038,14 +1040,14 @@
 
 		console.log('switchTab', tab,currentFenceId.value)
 		if (activeTab.value === tab) return
-		
+
 		activeTab.value = tab
 		scrollTop.value = 0
 		deviceList.value = [] // 清空列表
-		
+
 		// 重置分页
 		initPagination(tab)
-		
+
 		// 加载对应数据
 		if (tab === 'bind') {
 			console.log('switchTab,bind:', currentFenceId.value)
@@ -1058,7 +1060,7 @@
 	// 处理滚动到底部加载更多
 	const handleLoadMore = () => {
 		if (loadingMore.value || !hasMore.value) return
-		
+
 		if (activeTab.value === 'bind') {
 			loadBoundDevices(currentFenceId.value)
 		} else {
@@ -1084,22 +1086,22 @@
 			}
 
 			if (result.code == 0) {
-				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
+				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)
 				scrollTop.value = 0
-				
+
 				if (activeTab.value === 'bind') {
 					await loadBoundDevices(currentFenceId.value)
 				} else {
 					await loadUnboundDevices()
 				}
 			} else {
-				uni.showToast({ title: result.msg || '操作失败', icon: 'none' })
+				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
 			console.error('设备绑定操作失败:', error)
-			uni.showToast({ title: '操作失败', icon: 'none' })
+			showAppToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -1169,15 +1171,15 @@
 	function deleteSelectedFence(): void {
 		const fence = selectedFence.value;
 		console.log('删除电子围栏', fence);
-		
+
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
 			console.log('删除电子围栏ID', fenceId);
-			
+
 			if (fenceId !== '') {
 				deleteFence(fenceId);
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '围栏ID无效',
 					icon: 'none'
 				});
@@ -1248,10 +1250,10 @@
 	// 完成绘制
 	const finishDrawing = () => {
 		if (drawingMode.value === 'polygon' && points.value.length < 3) {
-			uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
+			showAppToast({ title: '至少需要3个顶点', icon: 'none' })
 			return
 		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
-			uni.showToast({ title: '请设置有效的圆形围栏', icon: 'none' })
+			showAppToast({ title: '请设置有效的圆形围栏', icon: 'none' })
 			return
 		}
 
@@ -1518,7 +1520,7 @@
 					margin-top: 30rpx;
 
 					.label {
-						
+
 						margin-bottom: 30rpx;
 						font-size: 28rpx;
 						font-weight: 500;
@@ -1613,7 +1615,7 @@
 					align-items: center;
 					justify-content: center;
 					padding: 30rpx 0;
-					
+
 				}
 
 				.no-more {

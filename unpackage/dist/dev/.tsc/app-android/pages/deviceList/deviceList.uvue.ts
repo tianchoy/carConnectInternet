@@ -1,7 +1,9 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_indexListMode from '@/components/indexListMode/indexListMode.uvue'
-import { ref, computed, watchEffect } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, computed, watchEffect } from 'vue'
 	import { getUserDeviceList,delDevice} from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
@@ -15,12 +17,12 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const mapScale = ref(4)
+const mapScale = ref(4)
 	const showMap = ref(true)
 	const markers = ref<Array<Marker>>([])
 	const iconColor = ref('#1296db')
 	const userLocation = ref({
-		latitude: 0, 
+		latitude: 0,
 		longitude: 0
 	})
 
@@ -127,11 +129,11 @@ const _cache = __ins.renderCache;
 		try {
 			let deviceList: Array<UTSJSONObject> = data
 			if (from) {
-				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 141, 11),  pageSize: 1000 } as UTSJSONObject
+				const params: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("params", "pages/deviceList/deviceList.uvue", 143, 11),  pageSize: 1000 } as UTSJSONObject
 				const res = await getUserDeviceList(params)
 				const list = (res.code == 0 && res.data != null ? res.data.list : null) as Array<UTSJSONObject> | null
 				if (list == null || !Array.isArray(list)) {
-					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:145")
+					console.warn('获取设备列表返回异常:', res, " at pages/deviceList/deviceList.uvue:147")
 					originalDeviceList.value = []
 					markers.value = []
 					return
@@ -142,23 +144,23 @@ const _cache = __ins.renderCache;
 			originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, 'tencent')
 			updateMarkers(originalDeviceList.value)
 		} catch (err) {
-			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:156")
+			console.error('获取设备列表失败:', err, " at pages/deviceList/deviceList.uvue:158")
 			originalDeviceList.value = []
 			markers.value = []
-			uni.showToast({ title: '获取设备列表失败', icon: 'none' })
+			showAppToast({ title: '获取设备列表失败', icon: 'none' })
 		}
 	}
 		// 解绑设备
 	const unbindDevice = async (imei : string) => {
 		const res = await delDevice(imei)
 		if (res.code == 0) {
-			uni.showToast({
+			showAppToast({
 				title: '解绑成功',
 				icon: 'success'
 			})
 			uni.setStorageSync('needRefreshHome', true)
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '解绑失败',
 				icon: 'error'
 			})
@@ -171,26 +173,26 @@ const _cache = __ins.renderCache;
 		uni.getLocation({
 			type: 'wgs84',
 			success: (res) => {
-				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:185")
+				console.log('获取位置成功:', res, " at pages/deviceList/deviceList.uvue:187")
 				userLocation.value.latitude = res.latitude
 				userLocation.value.longitude = res.longitude
 			},
 			fail: (err) => {
-				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:190")
+				console.log('获取位置失败:', err, " at pages/deviceList/deviceList.uvue:192")
 			}
 		})
 	}
 
 	// 订阅消息
 	const subMsg = () => {
-		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:197")
+		console.log('订阅消息', " at pages/deviceList/deviceList.uvue:199")
 		uni.requestSubscribeMessage({
 			tmplIds: ['VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc'],
 			success: (res) => {
-				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:201")
+				console.log('订阅成功:', res, " at pages/deviceList/deviceList.uvue:203")
 			},
 			fail: (err) => {
-				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:204")
+				console.log('订阅失败:', err, " at pages/deviceList/deviceList.uvue:206")
 			}
 		})
 	}
@@ -206,7 +208,7 @@ const _cache = __ins.renderCache;
 		const markerId = detail != null ? detail['markerId'] : null
 		const selectedDevice = originalDeviceList.value.find((device: UTSJSONObject) => device['deviceId'] == markerId)
 		if (selectedDevice == null) {
-			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:220")
+			console.warn('未找到对应的设备信息', markerId, " at pages/deviceList/deviceList.uvue:222")
 			return
 		}
 		const imeiValue = (selectedDevice['imei'] as string | null) ?? ''
@@ -228,64 +230,68 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
 const _component_map = resolveComponent("map")
 const _component_i_tag = resolveEasyComponent("i-tag",_easycom_i_tag)
 const _component_indexListMode = resolveEasyComponent("indexListMode",_easycom_indexListMode)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "全部设备",
-      "show-back": true,
-      backgroundColor: "#f1f1f1",
-      textColor: "#333",
-      showCapsule: true,
-      isIcon: true,
-      onCapsuleClick: showWhat,
-      Icon: "/static/maps.png",
-      iconColor: iconColor.value
-    }), null, 8 /* PROPS */, ["iconColor"]),
-    isTrue(showMap.value)
-      ? _cE("view", _uM({
-          key: 0,
-          class: "map-container"
-        }), [
-          _cV(_component_map, _uM({
-            id: "myMap",
-            scale: mapScale.value,
-            style: _nS(_uM({"width":"100%","height":"100%"})),
-            onMarkertap: handleTap,
-            latitude: userLocation.value.latitude,
-            longitude: userLocation.value.longitude,
-            markers: markers.value,
-            "enable-traffic": true
-          }), null, 8 /* PROPS */, ["scale", "style", "latitude", "longitude", "markers"]),
-          isTrue(showMap.value)
-            ? _cE("view", _uM({
-                key: 0,
-                class: "right-bar"
-              }), [
-                _cV(_component_i_tag, _uM({
-                  type: "primary",
-                  onClick: () => {changeState('全部')},
-                  text: `全部 ${totalCount.value}`
-                }), null, 8 /* PROPS */, ["onClick", "text"]),
-                _cV(_component_i_tag, _uM({
-                  type: "success",
-                  onClick: () => {changeState('在线')},
-                  text: `在线 ${onlineCount.value}`
-                }), null, 8 /* PROPS */, ["onClick", "text"]),
-                _cV(_component_i_tag, _uM({
-                  type: "danger",
-                  onClick: () => {changeState('离线')},
-                  text: `离线 ${offlineCount.value}`
-                }), null, 8 /* PROPS */, ["onClick", "text"])
-              ])
-            : _cC("v-if", true)
-        ])
-      : _cE("view", _uM({ key: 1 }), [
-          _cV(_component_indexListMode, _uM({
-            lists: deviceListItems.value,
-            onUnbindDevice: unbindDevice
-          }), null, 8 /* PROPS */, ["lists"])
-        ])
-  ])
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "全部设备",
+        "show-back": true,
+        backgroundColor: "#f1f1f1",
+        textColor: "#333",
+        showCapsule: true,
+        isIcon: true,
+        onCapsuleClick: showWhat,
+        Icon: "/static/maps.png",
+        iconColor: iconColor.value
+      }), null, 8 /* PROPS */, ["iconColor"]),
+      isTrue(showMap.value)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "map-container"
+          }), [
+            _cV(_component_map, _uM({
+              id: "myMap",
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              onMarkertap: handleTap,
+              latitude: userLocation.value.latitude,
+              longitude: userLocation.value.longitude,
+              markers: markers.value,
+              "enable-traffic": true
+            }), null, 8 /* PROPS */, ["scale", "style", "latitude", "longitude", "markers"]),
+            isTrue(showMap.value)
+              ? _cE("view", _uM({
+                  key: 0,
+                  class: "right-bar"
+                }), [
+                  _cV(_component_i_tag, _uM({
+                    type: "primary",
+                    onClick: () => {changeState('全部')},
+                    text: `全部 ${totalCount.value}`
+                  }), null, 8 /* PROPS */, ["onClick", "text"]),
+                  _cV(_component_i_tag, _uM({
+                    type: "success",
+                    onClick: () => {changeState('在线')},
+                    text: `在线 ${onlineCount.value}`
+                  }), null, 8 /* PROPS */, ["onClick", "text"]),
+                  _cV(_component_i_tag, _uM({
+                    type: "danger",
+                    onClick: () => {changeState('离线')},
+                    text: `离线 ${offlineCount.value}`
+                  }), null, 8 /* PROPS */, ["onClick", "text"])
+                ])
+              : _cC("v-if", true)
+          ])
+        : _cE("view", _uM({ key: 1 }), [
+            _cV(_component_indexListMode, _uM({
+              lists: deviceListItems.value,
+              onUnbindDevice: unbindDevice
+            }), null, 8 /* PROPS */, ["lists"])
+          ])
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

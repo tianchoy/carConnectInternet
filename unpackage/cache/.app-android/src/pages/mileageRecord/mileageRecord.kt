@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesMileageRecordMileageRecord : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -149,17 +148,17 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                             return@w1
                         }
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 189, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 191, 10), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
                             val res = await(getTrackPos(data))
-                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:199")
+                            console.log("获取里程数据成功:", res, " at pages/mileageRecord/mileageRecord.uvue:201")
                             val trackData = res.data
                             if (trackData != null) {
                                 processTripData(trackData)
                             }
                         }
                          catch (e: Throwable) {
-                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:205")
-                            uni_showToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
+                            console.error("获取里程数据失败:", e, " at pages/mileageRecord/mileageRecord.uvue:207")
+                            showAppToast(ShowToastOptions(title = "数据加载失败", icon = "none"))
                         }
                          finally {
                             uni_hideLoading(null)
@@ -227,6 +226,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
                 val _component_i_tag = resolveEasyComponent("i-tag", GenUniModulesIUiXComponentsITagITagClass)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "里程记录", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                     _cE("view", _uM("class" to "container"), _uA(
@@ -314,7 +314,7 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                                 ), _uA(
                                                     _cE("view", _uM("class" to "trip-index"), _uA(
                                                         _cE("view", _uM("class" to "icon"), _uA(
-                                                            _cE("text", _uM("style" to _nS(_uM("color" to "#ffffff"))), _tD(index + 1), 5)
+                                                            _cE("text", _uM("style" to _nS(_uM("color" to "#ffffff", "font-size" to "24rpx"))), _tD(index + 1), 5)
                                                         )),
                                                         _cE("view", _uM("class" to "trip-distance-time"), _uA(
                                                             _cE("text", null, _tD(getTripHourRange(item)), 1),
@@ -333,7 +333,8 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                                 ))
                             }
                         ))
-                    ))
+                    )),
+                    _cV(_component_app_toast)
                 ), 64)
             }
         }

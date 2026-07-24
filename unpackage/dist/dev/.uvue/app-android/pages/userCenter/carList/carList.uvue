@@ -1,4 +1,6 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../../utils/toast.uts';
 import { getUserDeviceList } from '../../../api/request.uts';
 const __sfc__ = defineComponent({
     __name: 'carList',
@@ -31,12 +33,12 @@ const __sfc__ = defineComponent({
         };
         // 加载车辆列表数据
         const loadCarListData = async (): Promise<void> => {
-            console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:58");
+            console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:60");
             if (loading.value || !hasMore.value)
                 return;
             loading.value = true;
             try {
-                const data: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10),
+                const data: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 65, 10),
                     page: currPage.value,
                     pageSize: pageSize.value
                 } as UTSJSONObject;
@@ -62,18 +64,18 @@ const __sfc__ = defineComponent({
                     }
                 }
                 else {
-                    uni.showToast({
+                    showAppToast({
                         title: res.msg != "" ? res.msg : '加载失败',
                         icon: 'none'
-                    });
+                    } as ShowToastOptions);
                 }
             }
             catch (error: any) {
-                console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:98");
-                uni.showToast({
+                console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:100");
+                showAppToast({
                     title: '加载失败，请重试',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
             }
             finally {
                 loading.value = false;
@@ -94,6 +96,7 @@ const __sfc__ = defineComponent({
         };
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
             return _cE(Fragment, null, [
                 _cV(_component_custom_navBar, _uM({
                     title: "车辆管理",
@@ -137,7 +140,8 @@ const __sfc__ = defineComponent({
                             ])
                             : _cC("v-if", true)
                     ])
-                ])
+                ]),
+                _cV(_component_app_toast)
             ], 64 /* STABLE_FRAGMENT */);
         };
     }

@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -8,7 +9,8 @@ if (!Array) {
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
   const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1 + _easycom_i_tag_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1 + _easycom_i_tag_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
@@ -16,8 +18,9 @@ const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-pick
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
 const _easycom_i_tag = () => "../../uni_modules/i-ui-x/components/i-tag/i-tag.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty + _easycom_i_tag)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty + _easycom_i_tag + _easycom_app_toast)();
 }
 class GroupType extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -180,14 +183,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:199", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:201", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:205", "获取里程数据失败:", e);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:207", "获取里程数据失败:", e);
+          utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"
           });

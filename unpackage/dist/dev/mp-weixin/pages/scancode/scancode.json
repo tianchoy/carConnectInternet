@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "",
-  "usingComponents": {}
+  "usingComponents": {
+    "app-toast": "../../components/app-toast/app-toast"
+  }
 }

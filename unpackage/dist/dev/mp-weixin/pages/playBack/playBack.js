@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
@@ -11,7 +12,8 @@ if (!Array) {
   const _easycom_i_slider_1 = common_vendor.resolveComponent("i-slider");
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
-  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_sub_navBar_1 + _easycom_i_icon_1 + _easycom_i_button_1 + _easycom_i_slider_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_sub_navBar = () => "../../components/sub-navBar/sub-navBar.js";
@@ -20,8 +22,9 @@ const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-
 const _easycom_i_slider = () => "../../uni_modules/i-ui-x/components/i-slider/i-slider.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup)();
+  (_easycom_custom_navBar + _easycom_sub_navBar + _easycom_i_icon + _easycom_i_button + _easycom_i_slider + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_app_toast)();
 }
 class TrackPoint extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -177,10 +180,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return date.getTime();
     }
-    function formatDateForDisplay(dateStr) {
+    function normalizeDateTime(dateStr) {
       if (!dateStr)
         return "";
-      return dateStr.replace(/\//g, "-");
+      let normalized = dateStr.replace(/-/g, "/");
+      const parts = normalized.split(" ");
+      if (parts.length < 2)
+        return normalized;
+      const timeParts = parts[1].split(":");
+      if (timeParts.length == 2)
+        normalized += ":00";
+      return normalized;
+    }
+    function formatDateForDisplay(dateStr) {
+      return normalizeDateTime(dateStr).replace(/\//g, "-");
     }
     function calculateBearing(lat1, lng1, lat2, lng2) {
       const degToRad = (d) => {
@@ -385,14 +398,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const originalLat = parseFloat(originalLatText);
       const originalLng = parseFloat(originalLngText);
       if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "这段时间没有数据",
           icon: "none",
           duration: 2e3
         });
         return null;
       }
-      common_vendor.index.showToast({
+      utils_toast.showAppToast({
         title: "这段时间没有数据",
         icon: "none",
         duration: 2e3
@@ -523,8 +536,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:606", "加载轨迹失败:", error);
-          common_vendor.index.showToast({ title: "轨迹加载失败", icon: "none" });
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:631", "加载轨迹失败:", error);
+          utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
             showCurrentPosition();
           }
@@ -543,7 +556,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function playNextPoint() {
       if (currentIndex.value >= trackPoints.value.length - 1) {
         pausePlayback();
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "轨迹回放完成",
           icon: "none",
           duration: 1500
@@ -572,7 +585,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function startPlayback() {
       if (!isTrackPlayable.value) {
-        common_vendor.index.showToast({ title: "没有轨迹数据", icon: "none" });
+        utils_toast.showAppToast({ title: "没有轨迹数据", icon: "none" });
         return null;
       }
       if (currentIndex.value >= trackPoints.value.length - 1) {
@@ -593,10 +606,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function onConfirm(value) {
-      let formattedValue = value;
-      if (formattedValue.includes("-")) {
-        formattedValue = formattedValue.replace(/-/g, "/");
-      }
+      const formattedValue = normalizeDateTime(value);
       if (currentPickerType.value == "start") {
         startTime.value = formattedValue;
       } else {
@@ -629,10 +639,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
       sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
       eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:728", sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:750", sTime.value, eTime.value);
       if (sTime.value != "" && eTime.value != "") {
-        startTime.value = sTime.value;
-        endTime.value = eTime.value;
+        startTime.value = normalizeDateTime(sTime.value);
+        endTime.value = normalizeDateTime(eTime.value);
         loadTrackPos();
       } else {
         initDateTime();
@@ -717,10 +727,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           closeable: false,
           modelValue: showDateTimePicker.value
         }),
-        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        D: `${_ctx.u_s_b_h}px`,
-        E: `${_ctx.u_s_a_i_b}px`,
-        F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        C: `${_ctx.u_s_b_h}px`,
+        D: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

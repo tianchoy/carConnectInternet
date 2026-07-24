@@ -24,7 +24,7 @@
                         <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
                         <i-icon class="nav-tool-spacing" name="/static/addNew.png" fontSize="18" @click="toAdd"></i-icon>
                     </view>
-                </view> 
+                </view>
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
                     <i-line-progress v-if="safeDeviceDetail.deviceStatus.batteryPercent" :percent="safeDeviceDetail.deviceStatus.batteryPercent"></i-line-progress>
                     <view class="info" v-if="safeDeviceDetail.deviceStatus.batteryPercent">电量: {{safeDeviceDetail.deviceStatus.batteryPercent}}%</view>
@@ -53,17 +53,17 @@
                         <text class="map-refresh" @click="refreshLocation">刷新位置</text>
                     </view>
                     <view class="map-container">
-                        <map 
+                        <map
                             v-if="isMapReady"
-                            id="myMap" 
+                            id="myMap"
                             :latitude="center.latitude"
                             :longitude="center.longitude"
                             :scale="mapScale"
                             style="width:100%;height:100%"
-                            :show-location="true" 
+                            :show-location="true"
                             :enable-traffic="true"
-                            :enable-overlooking="true" 
-                            :enable-building="true" 
+                            :enable-overlooking="true"
+                            :enable-building="true"
                             :enable-3D="false"
                             :markers="markers"
                             >
@@ -77,20 +77,46 @@
                     </view>
                     <view class="ring-container">
                         <view class="ring-item">
-                        <view class="ring-bg green"></view>
-                        <view class="ring-text">
-                            <text class="unit">条</text>
-                            <text class="num">{{totalTrips}}</text>
-                            <text class="label">今日轨迹</text>
-                        </view>
+                            <view class="ring-bg green">
+                                <view class="ring-quarter ring-quarter--top-left">
+                                    <view class="ring-stroke ring-stroke--track"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--top-right">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--bottom-right">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--bottom-left">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                            </view>
+                            <view class="ring-text">
+                                <text class="unit">条</text>
+                                <text class="num">{{totalTrips}}</text>
+                                <text class="label">今日轨迹</text>
+                            </view>
                         </view>
                         <view class="ring-item">
-                        <view class="ring-bg orange"></view>
-                        <view class="ring-text">
-                            <text class="unit">km</text>
-                            <text class="num">{{(totalMileage/1000).toFixed(2)}}</text>
-                            <text class="label">今日里程</text>
-                        </view>
+                            <view class="ring-bg orange">
+                                <view class="ring-quarter ring-quarter--top-left">
+                                    <view class="ring-stroke ring-stroke--track"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--top-right">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--bottom-right">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                                <view class="ring-quarter ring-quarter--bottom-left">
+                                    <view class="ring-stroke ring-stroke--active"></view>
+                                </view>
+                            </view>
+                            <view class="ring-text">
+                                <text class="unit">km</text>
+                                <text class="num">{{(totalMileage/1000).toFixed(2)}}</text>
+                                <text class="label">今日里程</text>
+                            </view>
                         </view>
                     </view>
                 </view>
@@ -133,7 +159,7 @@
                             <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">警报消息</text>
                         </view>
-                        <view class="service-item" @click="toPay(currentCarIccId,currentCarSimMerchant)">
+                        <view class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
                             <image src="../../static/pay.png" mode="aspectFill" class="icon-image"></image>
                             <text class="item-title">一键续费</text>
                         </view>
@@ -161,9 +187,11 @@
             @close="closePicker"
         ></i-picker>
     </scroll-view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="ts">
+import { showAppToast } from '../../utils/toast.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
@@ -225,6 +253,7 @@ const currentCarSimMerchant = ref('')
 const currentCarConnectionStatus = ref('')
 const currentCarCarType = ref('')
 const currentCarPlateNo = ref('')
+
 type DeviceStatus = {
     batteryPercent: number
     voltage: number
@@ -253,7 +282,7 @@ const lastUpdateTime = ref('--:--:--')
 const SELECTED_DEVICE_STORAGE_KEY: string = 'selected_device_info'
 const SELECTED_DEVICE_INDEX_STORAGE_KEY: string = 'selected_device_index'
 
-// 计算属性 
+// 计算属性
 const safeDeviceDetail = computed<DeviceDetailState>(() => {
     const detail = deviceDetail.value
     return {
@@ -444,16 +473,16 @@ const setCurrentCarFromSavedDevice = (savedDevice: any) => {
 // 处理选择车辆 - 打开 picker
 const handlePicker = () => {
     if (deviceList.value.length == 0) {
-        uni.showToast({
+        showAppToast({
             title: '暂无车辆数据',
             icon: 'none'
         })
         return
     }
-    
+
     // 更新 picker 的 key 强制刷新
     pickerKey.value++
-    
+
     // 设置默认选中索引
     const savedIndex = getSavedSelectedDeviceIndex()
     if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
@@ -469,7 +498,7 @@ const handlePicker = () => {
             pickerDefaultIndex.value = [0]
         }
     }
-    
+
     // 延迟打开 picker，确保数据更新完成
     nextTick(() => {
         showPicker.value = true
@@ -563,7 +592,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
     try {
         const res = await getTrackPos(data)
         if (res.code == 401) {
-            uni.showToast({
+            showAppToast({
                 title: '登录过期，请重新登录',
                 icon: 'none',
                 duration: 2000
@@ -602,7 +631,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
 
             if (isNaN(lat) || isNaN(lng)) {
                 console.error('经纬度格式错误', position.getString('latitude', ''), position.getString('longitude', ''))
-                uni.showToast({
+                showAppToast({
                     title: '定位数据异常',
                     icon: 'none'
                 })
@@ -632,7 +661,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         } else {
             console.warn('获取设备位置失败')
             isMapReady.value = false
-            uni.showToast({
+            showAppToast({
                 title: '获取位置失败',
                 icon: 'none'
             })
@@ -640,7 +669,7 @@ const loadDevicePos = async (data: UTSJSONObject) : Promise<boolean> => {
         }
     } catch (error) {
         console.error('加载设备位置失败', error)
-        uni.showToast({
+        showAppToast({
             title: '定位失败，请重试',
             icon: 'none'
         })
@@ -666,13 +695,13 @@ const loadDeviceData = async (device: Device) => {
             withPos: false,
             withTrip: true,
         })
-        uni.showToast({
+        showAppToast({
             title: '切换成功',
             icon: 'success'
         })
     } catch (error) {
         console.error('切换车辆失败', error)
-        uni.showToast({
+        showAppToast({
             title: '切换失败，请重试',
             icon: 'none'
         })
@@ -690,7 +719,7 @@ const handleConfirm = (e: UTSJSONObject) => {
     // i-picker 返回的第一列索引
     const indexs = e.getArray<number>('indexs')
     let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1
-    
+
     // 如果索引无效，使用当前设备
     if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
         console.warn('无法解析选中的索引，使用当前设备')
@@ -705,22 +734,22 @@ const handleConfirm = (e: UTSJSONObject) => {
             console.log('使用默认索引: 0')
         }
     }
-    
+
     const selectedDevice = deviceList.value[selectedIndex]
     if (!selectedDevice) {
-        uni.showToast({
+        showAppToast({
             title: '选择设备失败',
             icon: 'none'
         })
         return
     }
-    
+
     // 检查是否选择了不同的设备
     if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
         console.log('选择的设备与当前设备相同，不重复加载')
         return
     }
-    
+
     // 更新当前选中的设备
     const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
     currentCarName.value = deviceName
@@ -740,15 +769,15 @@ const handleConfirm = (e: UTSJSONObject) => {
         saveSelectedDeviceIndex(selectedIndex)
         pickerDefaultIndex.value = [selectedIndex]
     }
-    
+
     // 保存选中的设备信息
     saveSelectedDevice(selectedDevice)
-    
+
     uni.showLoading({
         title: '加载车辆数据...',
         mask: true
     })
-    
+
     // 加载新设备数据
     loadDeviceData(selectedDevice)
 }
@@ -784,24 +813,24 @@ const loadDeviceList = async () => {
                     longitude: item.getNumber('longitude', 0)
                 }
             })
-            
+
             // 获取保存的设备
             const savedDevice = getSavedSelectedDevice()
             const savedIndex = getSavedSelectedDeviceIndex()
-            
+
             let selectedDevice : Device | null = null
             let selectedIdx : number = -1
-            
+
             // 优先使用保存的索引
             if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
                 selectedDevice = deviceList.value[savedIndex]
                 selectedIdx = savedIndex
             }
-            
+
             // 如果索引无效或设备不存在，尝试使用保存的设备信息
             if (selectedDevice == null && savedDevice != null && savedDevice.imei != '') {
-                selectedDevice = deviceList.value.find(device => 
-                    device.imei == savedDevice.imei || 
+                selectedDevice = deviceList.value.find(device =>
+                    device.imei == savedDevice.imei ||
                     device.value == savedDevice.imei
                 )
                 if (selectedDevice) {
@@ -812,7 +841,7 @@ const loadDeviceList = async () => {
                     clearSavedSelectedDeviceIndex()
                 }
             }
-            
+
             // 如果没有保存的设备或保存的设备无效，使用第一个设备
             if (!selectedDevice && deviceList.value.length > 0) {
                 selectedDevice = deviceList.value[0]
@@ -822,7 +851,7 @@ const loadDeviceList = async () => {
                 saveSelectedDeviceIndex(0)
                 console.log('使用第一个设备作为默认:', selectedDevice?.deviceName)
             }
-            
+
             if (selectedDevice != null) {
                 const device = selectedDevice
                 // 设置当前车辆信息
@@ -838,12 +867,12 @@ const loadDeviceList = async () => {
                 currentCarPlateNo.value = device.plateNo
                 center.latitude = device.latitude
                 center.longitude = device.longitude
-                
+
                 // 设置 picker 默认索引
                 if (selectedIdx != -1) {
                     pickerDefaultIndex.value = [selectedIdx]
                 }
-                
+
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
                     deviceId: device.deviceId,
@@ -860,18 +889,18 @@ const loadDeviceList = async () => {
                 })
             }
         } else {
-            uni.showToast({
+            showAppToast({
                 title: '暂无车辆数据',
                 icon: 'none'
             })
         }
     } catch (error) {
         console.error('加载车辆列表失败', error)
-        uni.showToast({
+        showAppToast({
             title: '加载失败，请下拉重试',
             icon: 'none'
         })
-    } 
+    }
 }
 
 // 计算属性：总行程数
@@ -882,7 +911,7 @@ const totalTrips = computed(() => {
 // 刷新位置
 const refreshLocation = async () => {
     if (!currentCarDeviceId.value) {
-        uni.showToast({
+        showAppToast({
             title: '请先选择车辆',
             icon: 'none'
         })
@@ -891,12 +920,12 @@ const refreshLocation = async () => {
     uni.showLoading({
         title: '刷新位置中...',
         mask: true
-    })  
+    })
     try {
         await loadDeviceList()
     } catch (error) {
         console.error('刷新位置失败', error)
-        uni.showToast({
+        showAppToast({
             title: '刷新失败',
             icon: 'none'
         })
@@ -912,7 +941,7 @@ function checkToken() : boolean {
 
 function isLogin() : boolean {
     if (!checkToken()) {
-        uni.showToast({
+        showAppToast({
             title: '请先登录',
             icon: 'none'
         })
@@ -932,10 +961,10 @@ const toRecordDetail = () => {
     })
 }
 
-// 跳转全部设备 
+// 跳转全部设备
 const toDeviceList = () => {
     console.log('toDeviceList')
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.navigateTo({
         url: '/pages/deviceList/deviceList',
     })
@@ -943,9 +972,9 @@ const toDeviceList = () => {
 
 // 跳转设备详情
 const toDeviceDetail = (e: any) => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-        uni.showToast({
+        showAppToast({
             title: '请先选择车辆',
             icon: 'none'
         })
@@ -969,7 +998,7 @@ const toAdd = () => {
 
 // 跳转消息中心
 const toMsgCenter = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.switchTab({
         url: '/pages/message/message',
     })
@@ -977,20 +1006,20 @@ const toMsgCenter = () => {
 
 // 跳转查找车辆
 const toFindCar = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
         name: currentCarName.value,
         scale: 18,
         success: () => {
-            uni.showToast({
+            showAppToast({
                 title: '成功调起地图',
                 icon: 'none'
             });
         },
         fail: (err) => {
-            uni.showToast({
+            showAppToast({
                 title: '调起地图失败',
                 icon: 'none'
             });
@@ -1001,7 +1030,7 @@ const toFindCar = () => {
 
 // 跳转围栏
 const toFence = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.navigateTo({
         url: '/pages/geofencing/geofencing?imei=' + currentCarImei.value + '&connectionStatus=' + currentCarConnectionStatus.value + '&plateNo=' + currentCarPlateNo.value + '&carType=' + currentCarCarType.value + '&deptId=' + currentCarDeptId.value + '&deviceName=' + currentCarName.value
     })
@@ -1019,9 +1048,9 @@ const contactCustomerService = () => {
     })
 }
 // #endif
-// #ifndef MP-WEIXIN
+// #ifdef APP-IOS || APP-ANDROID
 const contactCustomerService = () => {
-    uni.showToast({
+    showAppToast({
         title: '请在微信小程序中联系客服',
         icon: 'none'
     })
@@ -1031,14 +1060,12 @@ const contactCustomerService = () => {
 // 支付
 const needRefresh = ref(false)
 const toPay = (iccid : string,simMerchant : string) => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     if(simMerchant.toLowerCase() == 'zddx'){
         iccid = iccid.substring(0,iccid.length-1)
     }
-    
-    console.log(iccid)
     needRefresh.value = true
-    
+
     //#ifdef MP-WEIXIN
     uni.openEmbeddedMiniProgram({
         appId: 'wx1d647f2cfdc089e6',
@@ -1050,7 +1077,7 @@ const toPay = (iccid : string,simMerchant : string) => {
         fail(res: any) {
             console.log('打开小程序失败', res)
             needRefresh.value = false
-            uni.showToast({
+            showAppToast({
                 title: '打开支付页面失败',
                 icon: 'none'
             })
@@ -1059,10 +1086,13 @@ const toPay = (iccid : string,simMerchant : string) => {
     //#endif
 
     //#ifndef MP-WEIXIN
+    console.log('iccid',iccid)
     needRefresh.value = false
-    uni.showToast({
+    showAppToast({
         title: '请在微信小程序中完成充值',
-        icon: 'none'
+        icon: 'none',
+        duration: 2000,
+        mask: true
     })
     //#endif
 }
@@ -1077,14 +1107,14 @@ const gotoLogin = () => {
 async function unbindCurrentDevice() : Promise<void> {
     const result = await delDevice(currentCarImei.value)
     if (result.code == 0) {
-        uni.showToast({
+        showAppToast({
             title: '解绑成功',
             icon: 'success'
         })
         clearSavedSelectedDevice()
         clearSavedSelectedDeviceIndex()
     } else {
-        uni.showToast({
+        showAppToast({
             title: '解绑失败',
             icon: 'error'
         })
@@ -1108,7 +1138,7 @@ const unbindDevice = () : void => {
 
 // 退出登录
 const handleExit = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     uni.showModal({
         title: '退出登录',
         content: '确定退出登录吗？',
@@ -1123,7 +1153,7 @@ const handleExit = () => {
                         url:'/pages/login/login'
                     })
                 }else{
-                    uni.showToast({
+                    showAppToast({
                         title:'退出账户失败'
                     })
                 }
@@ -1144,7 +1174,7 @@ onShow(async () => {
 
 // 刷新设备列表
 const handleReload = () => {
-    if (!isLogin()) return 
+    if (!isLogin()) return
     loadDeviceList()
 }
 
@@ -1152,7 +1182,7 @@ const handleReload = () => {
 onLoad(() => {
     uni.hideTabBar()
     initDimensions()
-    
+
     if (checkToken()) {
         loadDeviceList()
     }
@@ -1183,27 +1213,27 @@ onLoad(() => {
         flex-direction: column;
         align-items: center;
         z-index: 999;
-        
+
         .loading-text {
             margin-top: 20rpx;
             font-size: 28rpx;
             color: #666;
         }
     }
-    
+
     .top {
         .device-car {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            
+
             .current-car {
                 position: relative;
                 display: flex;
                 flex-direction: row;
                 align-items: flex-end;
-                
+
                 .car-id {
                     font-size: 36rpx;
                     font-weight: bold;
@@ -1222,7 +1252,7 @@ onLoad(() => {
                     padding-right: 30rpx;
                 }
             }
-            
+
             .nav-tools {
                 display: flex;
                 flex-direction: row;
@@ -1237,7 +1267,7 @@ onLoad(() => {
                     background-color: rgba(0, 0, 0, 0.05);
                     transition: all 0.2s ease;
                     border-radius: 50%;
-                    
+
                     .exit-icon {
                         width: 40rpx;
                         height: 40rpx;
@@ -1245,14 +1275,14 @@ onLoad(() => {
                 }
             }
         }
-        
+
         .device-info {
             display: flex;
             flex-direction: column;
             padding: 20rpx;
             border-radius: 16rpx;
             width: 50%;
-            
+
             .info + .info { margin-top: 16rpx; }
             .info {
                 font-size: 26rpx;
@@ -1263,7 +1293,7 @@ onLoad(() => {
                 width: 100%;
                 height: 300rpx;
             }
-        
+
         .car-state {
             display: flex;
             flex-direction: row;
@@ -1271,7 +1301,7 @@ onLoad(() => {
             align-items: center;
             padding: 20rpx 0;
             border-radius: 16rpx;
-            
+
             .state-item + .state-item { margin-left: 20rpx; }
             .state-item {
                 flex: 1;
@@ -1281,18 +1311,18 @@ onLoad(() => {
                 background-color: #fff;
                 padding: 20rpx;
                 border-radius: 30rpx;
-                
+
                 .state-value { margin-top: 12rpx; }
                 .state-label {
                     font-size: 24rpx;
                     color: #999;
                 }
-                
+
                 .state-value {
                     font-size: 28rpx;
                     font-weight: bold;
                     color: #333;
-                    
+
                     &.online {
                         color: #07C160;
                     }
@@ -1300,7 +1330,7 @@ onLoad(() => {
             }
         }
     }
-    
+
     .content {
         .map-box {
             width: 100%;
@@ -1312,7 +1342,7 @@ onLoad(() => {
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-            
+
             .map-header {
                 display: flex;
                 flex-direction: row;
@@ -1320,13 +1350,13 @@ onLoad(() => {
                 align-items: center;
                 padding:20rpx 30rpx;
                 border-bottom: 1rpx solid #f0f0f0;
-                
+
                 .map-title {
                     font-size: 32rpx;
                     font-weight: bold;
                     color: #333;
                 }
-                
+
                 .map-refresh {
                     font-size: 26rpx;
                     color: #07C160;
@@ -1335,7 +1365,7 @@ onLoad(() => {
                     border-radius: 8rpx;
                 }
             }
-            
+
             .map-container {
                 height: 300rpx;
             }
@@ -1355,7 +1385,7 @@ onLoad(() => {
                 align-items: center;
                 padding:20rpx 30rpx;
                 border-bottom: 1rpx solid #f0f0f0;
-                
+
                 .record-title {
                     font-size: 32rpx;
                     font-weight: bold;
@@ -1388,28 +1418,64 @@ onLoad(() => {
             }
             .ring-bg {
                 position: absolute;
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
+                width: 250rpx;
+                height: 250rpx;
                 z-index: 2;
+            }
+            .ring-quarter {
+                position: absolute;
+                width: 125rpx;
+                height: 125rpx;
+                overflow: hidden;
+            }
+            .ring-quarter--top-left {
+                top: 0;
+                left: 0;
+            }
+            .ring-quarter--top-right {
+                top: 0;
+                right: 0;
+            }
+            .ring-quarter--bottom-right {
+                right: 0;
+                bottom: 0;
+            }
+            .ring-quarter--bottom-left {
+                bottom: 0;
+                left: 0;
+            }
+            .ring-stroke {
+                position: absolute;
+                width: 250rpx;
+                height: 250rpx;
                 box-sizing: border-box;
-                border: 16rpx solid transparent; 
+                border: 16rpx solid;
+                border-radius: 999px;
             }
-            .ring-bg.green {
-                border-top-color: #4cd964;
-                border-right-color: #4cd964;
-                border-left-color: #4cd964;
-                border-bottom-color: #b3b5b01c;
-                border-bottom-width: 5px;
-                transform: rotate(135deg);
+            .ring-quarter--top-left .ring-stroke {
+                top: 0;
+                left: 0;
             }
-            .ring-bg.orange {
-                border-top-color: #ff9500;
-                border-right-color: #ff9500;
-                border-left-color: #ff9500;
-                border-bottom-color: #b3b5b01c;
-                border-bottom-width: 5px;
-                transform: rotate(135deg);
+            .ring-quarter--top-right .ring-stroke {
+                top: 0;
+                right: 0;
+            }
+            .ring-quarter--bottom-right .ring-stroke {
+                right: 0;
+                bottom: 0;
+            }
+            .ring-quarter--bottom-left .ring-stroke {
+                bottom: 0;
+                left: 0;
+            }
+            .ring-stroke--track {
+                border-color: #dceaf3;
+            }
+            .ring-stroke--active {
+                border-color: #4cd964;
+            }
+            .ring-bg.orange .ring-stroke--active {
+                border-color: #ff9500;
             }
 
             .ring-text {
@@ -1428,7 +1494,7 @@ onLoad(() => {
                 text-align: right;
             }
             .label {
-                
+
                 font-size: 25rpx;
                 color: #666;
                 margin-top: 12rpx;

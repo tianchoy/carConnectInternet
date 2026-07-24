@@ -232,28 +232,64 @@
 }
 .container .page-bg .content .mile-record .ring-bg.data-v-00a60067 {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
+  width: 250rpx;
+  height: 250rpx;
   z-index: 2;
+}
+.container .page-bg .content .mile-record .ring-quarter.data-v-00a60067 {
+  position: absolute;
+  width: 125rpx;
+  height: 125rpx;
+  overflow: hidden;
+}
+.container .page-bg .content .mile-record .ring-quarter--top-left.data-v-00a60067 {
+  top: 0;
+  left: 0;
+}
+.container .page-bg .content .mile-record .ring-quarter--top-right.data-v-00a60067 {
+  top: 0;
+  right: 0;
+}
+.container .page-bg .content .mile-record .ring-quarter--bottom-right.data-v-00a60067 {
+  right: 0;
+  bottom: 0;
+}
+.container .page-bg .content .mile-record .ring-quarter--bottom-left.data-v-00a60067 {
+  bottom: 0;
+  left: 0;
+}
+.container .page-bg .content .mile-record .ring-stroke.data-v-00a60067 {
+  position: absolute;
+  width: 250rpx;
+  height: 250rpx;
   box-sizing: border-box;
-  border: 16rpx solid transparent;
+  border: 16rpx solid;
+  border-radius: 999px;
 }
-.container .page-bg .content .mile-record .ring-bg.green.data-v-00a60067 {
-  border-top-color: #4cd964;
-  border-right-color: #4cd964;
-  border-left-color: #4cd964;
-  border-bottom-color: #b3b5b01c;
-  border-bottom-width: 5px;
-  transform: rotate(135deg);
+.container .page-bg .content .mile-record .ring-quarter--top-left .ring-stroke.data-v-00a60067 {
+  top: 0;
+  left: 0;
 }
-.container .page-bg .content .mile-record .ring-bg.orange.data-v-00a60067 {
-  border-top-color: #ff9500;
-  border-right-color: #ff9500;
-  border-left-color: #ff9500;
-  border-bottom-color: #b3b5b01c;
-  border-bottom-width: 5px;
-  transform: rotate(135deg);
+.container .page-bg .content .mile-record .ring-quarter--top-right .ring-stroke.data-v-00a60067 {
+  top: 0;
+  right: 0;
+}
+.container .page-bg .content .mile-record .ring-quarter--bottom-right .ring-stroke.data-v-00a60067 {
+  right: 0;
+  bottom: 0;
+}
+.container .page-bg .content .mile-record .ring-quarter--bottom-left .ring-stroke.data-v-00a60067 {
+  bottom: 0;
+  left: 0;
+}
+.container .page-bg .content .mile-record .ring-stroke--track.data-v-00a60067 {
+  border-color: #dceaf3;
+}
+.container .page-bg .content .mile-record .ring-stroke--active.data-v-00a60067 {
+  border-color: #4cd964;
+}
+.container .page-bg .content .mile-record .ring-bg.orange .ring-stroke--active.data-v-00a60067 {
+  border-color: #ff9500;
 }
 .container .page-bg .content .mile-record .ring-text.data-v-00a60067 {
   position: relative;

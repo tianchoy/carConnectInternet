@@ -1,5 +1,7 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
-import { getUserDeviceList } from '../../../api/request.uts'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../../utils/toast.uts'
+	import { getUserDeviceList } from '../../../api/request.uts'
 
 	
 const __sfc__ = defineComponent({
@@ -9,7 +11,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const carList = ref<Array<UTSJSONObject>>([])
+const carList = ref<Array<UTSJSONObject>>([])
 	// 当前页码
 	const currPage = ref(1)
 	// 每页条数
@@ -37,12 +39,12 @@ const _cache = __ins.renderCache;
 
 	// 加载车辆列表数据
 	const loadCarListData = async () => {
-		console.log(currPage.value,totalPage.value, " at pages/userCenter/carList/carList.uvue:58")
+		console.log(currPage.value,totalPage.value, " at pages/userCenter/carList/carList.uvue:60")
 		if (loading.value || !hasMore.value) return
 
 		loading.value = true
 		try {
-			const data : UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10), 
+			const data : UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 65, 10), 
 				page: currPage.value,
 				pageSize: pageSize.value
 			} as UTSJSONObject
@@ -71,14 +73,14 @@ const _cache = __ins.renderCache;
 					currPage.value++
 				}
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg || '加载失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
-			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:98")
-			uni.showToast({
+			console.error('加载车辆列表失败:', error, " at pages/userCenter/carList/carList.uvue:100")
+			showAppToast({
 				title: '加载失败，请重试',
 				icon: 'none'
 			})
@@ -106,6 +108,7 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
   return _cE(Fragment, null, [
     _cV(_component_custom_navBar, _uM({
@@ -150,7 +153,8 @@ const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_c
             ])
           : _cC("v-if", true)
       ])
-    ])
+    ]),
+    _cV(_component_app_toast)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

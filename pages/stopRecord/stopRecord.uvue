@@ -45,9 +45,11 @@
 			</view>
 		</scroll-view>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
@@ -177,7 +179,7 @@
 				console.log('成功调起地图')
 			},
 			fail: (err) => {
-				uni.showToast({
+				showAppToast({
 					title: '调起地图失败',
 					icon: 'none'
 				});
@@ -230,7 +232,7 @@
 			justify-content: space-between;
 			align-items: center;
 		}
-		
+
 		.content-box{
 			flex: 1;
 			min-height: 0;

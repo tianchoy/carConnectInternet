@@ -1,8 +1,10 @@
 <template>
 	<view></view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref } from 'vue'
 
 	const scanFunctionIsUseable = ref(true)
@@ -17,7 +19,7 @@
 		console.log('扫码结果:', scanResult)
 		uni.setStorageSync('scanCodeResult', scanResult)
 		uni.$emit('scanCodeResult', { result: scanResult })
-		uni.showToast({
+		showAppToast({
 			title: '扫码成功',
 			icon: 'success',
 			duration: 1000
@@ -38,7 +40,7 @@
 			},
 			fail: (err) => {
 				console.log('扫码失败:', err)
-				uni.showToast({ title: '扫码失败', icon: 'none' })
+				showAppToast({ title: '扫码失败', icon: 'none' })
 				goBack()
 			}
 		})

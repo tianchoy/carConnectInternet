@@ -3,11 +3,13 @@ const common_vendor = require("../../../common/vendor.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
-  _easycom_custom_navBar_1();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
+const _easycom_app_toast = () => "../../../components/app-toast/app-toast.js";
 if (!Math) {
-  _easycom_custom_navBar();
+  (_easycom_custom_navBar + _easycom_app_toast)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "carDetail",
@@ -57,10 +59,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.t(formattedPlateNo.value),
         g: common_vendor.t(carInfo.value.getString("carVin", "")),
         h: common_vendor.t(carInfo.value.getString("engineNum", "")),
-        i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        j: `${_ctx.u_s_b_h}px`,
-        k: `${_ctx.u_s_a_i_b}px`,
-        l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        i: `${_ctx.u_s_b_h}px`,
+        j: `${_ctx.u_s_a_i_b}px`,
+        k: common_vendor.p({
+          class: "data-v-36223569"
+        })
       };
       return __returned__;
     };

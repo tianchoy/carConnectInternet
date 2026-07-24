@@ -1,6 +1,7 @@
 import _easycom_i_tag from '@/uni_modules/i-ui-x/components/i-tag/i-tag.uvue'
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
-import { getCustomList } from '../../api/request.uts'
+import { showAppToast } from '../../utils/toast.uts'
+	import { getCustomList } from '../../api/request.uts'
 	import { DeviceItem } from '../../utils/device.uts'
 	
 const __sfc__ = defineComponent({
@@ -14,7 +15,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const props = __props
+const props = __props
 		// 解绑设备
 	// 定义emit事件
 	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
@@ -29,11 +30,11 @@ __ins.emit(event, ...do_not_transform_spread)
 		if(simMerchant.toLowerCase() == 'zddx'){
 			iccid = iccid.substring(0,iccid.length-1) //电信卡
 		}
-		
-		console.log(iccid, " at components/indexListMode/indexListMode.uvue:51")
+
+		console.log(iccid, " at components/indexListMode/indexListMode.uvue:52")
 		// 设置需要刷新的标志
 		needRefresh.value = true
-		
+
 
 
 
@@ -60,7 +61,7 @@ __ins.emit(event, ...do_not_transform_spread)
 
 
 		needRefresh.value = false
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中完成充值',
 			icon: 'none'
 		})

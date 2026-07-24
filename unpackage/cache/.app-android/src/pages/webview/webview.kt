@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
 import io.dcloud.uniapp.extapi.setNavigationBarTitle as uni_setNavigationBarTitle
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesWebviewWebview : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -43,18 +42,18 @@ open class GenPagesWebviewWebview : BasePage {
             }
             val extractTitleFromUrl = ::gen_extractTitleFromUrl_fn
             onLoad(fun(options){
-                console.log("接收到的参数:", options, " at pages/webview/webview.uvue:42")
+                console.log("接收到的参数:", options, " at pages/webview/webview.uvue:44")
                 val optionData = options as UTSJSONObject
                 val url: String = optionData.getString("url", "") ?: ""
                 val pageTitle: String = optionData.getString("title", "") ?: ""
                 if (url != "") {
-                    var decodedUrl: String = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:49") ?: ""
+                    var decodedUrl: String = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:51") ?: ""
                     if (!decodedUrl.startsWith("http://") && !decodedUrl.startsWith("https://")) {
                         decodedUrl = "https://" + decodedUrl
                     }
                     webviewUrl.value = decodedUrl
                     if (pageTitle != "") {
-                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:61") ?: ""))
+                        uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:63") ?: ""))
                     } else {
                         val extractedTitle = extractTitleFromUrl(decodedUrl)
                         uni_setNavigationBarTitle(SetNavigationBarTitleOptions(title = if (extractedTitle != "") {
@@ -64,21 +63,21 @@ open class GenPagesWebviewWebview : BasePage {
                         }))
                     }
                 } else {
-                    uni_showToast(ShowToastOptions(title = "链接地址无效", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "链接地址无效", icon = "none"))
                 }
             }
             )
             val handleLoad = fun(e: Any): Unit {
-                console.log("网页加载成功", e, " at pages/webview/webview.uvue:79")
+                console.log("网页加载成功", e, " at pages/webview/webview.uvue:81")
                 uni_hideLoading(null)
             }
             val handleError = fun(e: Any): Unit {
-                console.error("网页加载失败", e, " at pages/webview/webview.uvue:85")
-                uni_showToast(ShowToastOptions(title = "页面加载失败", icon = "none"))
+                console.error("网页加载失败", e, " at pages/webview/webview.uvue:87")
+                showAppToast(ShowToastOptions(title = "页面加载失败", icon = "none"))
             }
             val handleMessage = fun(e: UTSJSONObject): Unit {
                 val detail = e.getJSON("detail")
-                console.log("接收网页消息:", detail, " at pages/webview/webview.uvue:95")
+                console.log("接收网页消息:", detail, " at pages/webview/webview.uvue:97")
             }
             val goBack = fun(){
                 uni_navigateBack(NavigateBackOptions(delta = 1))
@@ -86,18 +85,22 @@ open class GenPagesWebviewWebview : BasePage {
             return fun(): Any? {
                 val _component_web_view = resolveComponent("web-view")
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
-                return _cE("view", _uM("class" to "webview-container"), _uA(
-                    if (isTrue(webviewUrl.value)) {
-                        _cV(_component_web_view, _uM("key" to 0, "src" to webviewUrl.value, "onMessage" to handleMessage, "onLoad" to handleLoad, "onError" to handleError), null, 8, _uA(
-                            "src"
-                        ))
-                    } else {
-                        _cE("view", _uM("key" to 1, "class" to "error-page"), _uA(
-                            _cV(_component_i_empty, _uM("text" to "页面加载失败", "showButton" to false, "description" to "", "image" to emptyImage)),
-                            _cE("button", _uM("class" to "back-btn", "onClick" to goBack), "返回上一页")
-                        ))
-                    }
-                ))
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "webview-container"), _uA(
+                        if (isTrue(webviewUrl.value)) {
+                            _cV(_component_web_view, _uM("key" to 0, "src" to webviewUrl.value, "onMessage" to handleMessage, "onLoad" to handleLoad, "onError" to handleError), null, 8, _uA(
+                                "src"
+                            ))
+                        } else {
+                            _cE("view", _uM("key" to 1, "class" to "error-page"), _uA(
+                                _cV(_component_i_empty, _uM("text" to "页面加载失败", "showButton" to false, "description" to "", "image" to emptyImage)),
+                                _cE("button", _uM("class" to "back-btn", "onClick" to goBack), "返回上一页")
+                            ))
+                        }
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

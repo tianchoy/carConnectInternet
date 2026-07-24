@@ -1,12 +1,15 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_toast = require("../../utils/toast.js");
 if (!Array) {
   const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
-  _easycom_i_empty_1();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_i_empty_1 + _easycom_app_toast_1)();
 }
 const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  _easycom_i_empty();
+  (_easycom_i_empty + _easycom_app_toast)();
 }
 const emptyImage = "/static/empty.png";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -30,7 +33,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((options) => {
       var _a, _b, _c, _d;
-      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:42", "接收到的参数:", options);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:44", "接收到的参数:", options);
       const optionData = options;
       const url = (_a = optionData.getString("url", "")) !== null && _a !== void 0 ? _a : "";
       const pageTitle = (_b = optionData.getString("title", "")) !== null && _b !== void 0 ? _b : "";
@@ -51,26 +54,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }
       } else {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "链接地址无效",
           icon: "none"
         });
       }
     });
     const handleLoad = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:79", "网页加载成功", e);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e);
       common_vendor.index.hideLoading();
     };
     const handleError = (e = null) => {
-      common_vendor.index.__f__("error", "at pages/webview/webview.uvue:85", "网页加载失败", e);
-      common_vendor.index.showToast({
+      common_vendor.index.__f__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e);
+      utils_toast.showAppToast({
         title: "页面加载失败",
         icon: "none"
       });
     };
     const handleMessage = (e) => {
       const detail = e.getJSON("detail");
-      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:95", "接收网页消息:", detail);
+      common_vendor.index.__f__("log", "at pages/webview/webview.uvue:97", "接收网页消息:", detail);
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -83,9 +86,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: webviewUrl.value
       }, webviewUrl.value ? {
         b: webviewUrl.value,
-        c: common_vendor.o(handleMessage, "b4"),
-        d: common_vendor.o(handleLoad, "51"),
-        e: common_vendor.o(handleError, "dc")
+        c: common_vendor.o(handleMessage, "a7"),
+        d: common_vendor.o(handleLoad, "13"),
+        e: common_vendor.o(handleError, "c0")
       } : {
         f: common_vendor.p({
           text: "页面加载失败",
@@ -94,12 +97,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           image: emptyImage,
           class: "data-v-fa7ac34d"
         }),
-        g: common_vendor.o(goBack, "3f")
+        g: common_vendor.o(goBack, "1e")
       }, {
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        i: `${_ctx.u_s_b_h}px`,
-        j: `${_ctx.u_s_a_i_b}px`,
-        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        h: `${_ctx.u_s_b_h}px`,
+        i: `${_ctx.u_s_a_i_b}px`,
+        j: common_vendor.p({
+          class: "data-v-fa7ac34d"
+        })
       });
       return __returned__;
     };

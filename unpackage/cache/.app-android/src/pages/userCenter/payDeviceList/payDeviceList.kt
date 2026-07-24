@@ -12,7 +12,6 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 import io.dcloud.uniapp.extapi.stopPullDownRefresh as uni_stopPullDownRefresh
 open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -42,7 +41,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                         }
                         loading.value = true
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 87, 10), "page" to currPage.value, "pageSize" to pageSize.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/payDeviceList/payDeviceList.uvue", 89, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
                             val code = res.code
                             val list = res.data.list
@@ -59,7 +58,7 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                     currPage.value++
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "加载失败"
@@ -68,8 +67,8 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:123")
-                            uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/payDeviceList/payDeviceList.uvue:125")
+                            showAppToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
                             loading.value = false
@@ -93,10 +92,10 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 if (simMerchant.toLowerCase() == "zddx") {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
-                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:154")
+                console.log(iccid, " at pages/userCenter/payDeviceList/payDeviceList.uvue:156")
                 needRefresh.value = true
                 needRefresh.value = false
-                uni_showToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))
+                showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none"))
             }
             val pay = ::gen_pay_fn
             val payDevice = fun(item: UTSJSONObject){
@@ -108,13 +107,14 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                 resetData()
                 loadPayDeviceListData().`finally`(fun(){
                     uni_stopPullDownRefresh()
-                    uni_showToast(ShowToastOptions(title = "刷新成功", icon = "success"))
+                    showAppToast(ShowToastOptions(title = "刷新成功", icon = "success"))
                 }
                 )
             }
             )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "续费管理", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isIcon" to true, "isShowStyle" to true)),
                     _cE("view", _uM("class" to "container"), _uA(
@@ -184,7 +184,8 @@ open class GenPagesUserCenterPayDeviceListPayDeviceList : BasePage {
                                 _cC("v-if", true)
                             }
                         ))
-                    ))
+                    )),
+                    _cV(_component_app_toast)
                 ), 64)
             }
         }

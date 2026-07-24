@@ -1,3 +1,4 @@
+import { showAppToast } from '../utils/toast.uts';
 // 定义类型
 type RequestOptions = {
     url?: string;
@@ -29,25 +30,25 @@ const BASE_URL = 'https://car.zdiot.cn:18443/api';
 // const BASE_URL = 'http://192.168.3.7:8085/api'
 // 处理token过期的函数
 function handleTokenExpired(): void {
-    __f__('log', 'at api/http.uts:38', '检测到token过期，执行跳转登录页逻辑');
+    __f__('log', 'at api/http.uts:39', '检测到token过期，执行跳转登录页逻辑');
     // 清除本地token
     uni.removeStorageSync('token');
     // 显示提示
-    uni.showToast({
+    showAppToast({
         title: '登录已过期，请重新登录',
         icon: 'none',
         duration: 2000
-    });
+    } as ShowToastOptions);
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log', 'at api/http.uts:52', '正在跳转到登录页...');
+        __f__('log', 'at api/http.uts:53', '正在跳转到登录页...');
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log', 'at api/http.uts:56', '跳转登录页成功');
+                __f__('log', 'at api/http.uts:57', '跳转登录页成功');
             },
             fail: (err) => {
-                __f__('log', 'at api/http.uts:59', '跳转登录页失败:', err);
+                __f__('log', 'at api/http.uts:60', '跳转登录页失败:', err);
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
@@ -84,7 +85,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
     if (config.showLoading != false) {
         uni.hideLoading();
     }
-    __f__('log', 'at api/http.uts:111', '请求错误详情:', error);
+    __f__('log', 'at api/http.uts:112', '请求错误详情:', error);
     // 处理错误状态码
     if (error.statusCode != 0) {
         switch (error.statusCode) {
@@ -92,36 +93,36 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
                 handleTokenExpired();
                 break;
             case 403:
-                uni.showToast({
+                showAppToast({
                     title: '没有权限访问',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
                 break;
             case 404:
-                uni.showToast({
+                showAppToast({
                     title: '请求资源不存在',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
                 break;
             case 500:
-                uni.showToast({
+                showAppToast({
                     title: '服务器错误',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
                 break;
             default:
-                uni.showToast({
+                showAppToast({
                     title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
                     icon: 'none'
-                });
+                } as ShowToastOptions);
         }
     }
     else {
         // 网络错误等
-        uni.showToast({
+        showAppToast({
             title: '网络错误，请检查网络连接',
             icon: 'none'
-        });
+        } as ShowToastOptions);
     }
 }
 // 封装uni.request

@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -9,7 +10,8 @@ if (!Array) {
   const _easycom_i_checkbox_1 = common_vendor.resolveComponent("i-checkbox");
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
   const _easycom_i_form_1 = common_vendor.resolveComponent("i-form");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_checkbox_1 + _easycom_i_button_1 + _easycom_i_form_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_checkbox_1 + _easycom_i_button_1 + _easycom_i_form_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
@@ -17,8 +19,9 @@ const _easycom_i_form_item = () => "../../uni_modules/i-ui-x/components/i-form-i
 const _easycom_i_checkbox = () => "../../uni_modules/i-ui-x/components/i-checkbox/i-checkbox.js";
 const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 const _easycom_i_form = () => "../../uni_modules/i-ui-x/components/i-form/i-form.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_checkbox + _easycom_i_button + _easycom_i_form)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_checkbox + _easycom_i_button + _easycom_i_form + _easycom_app_toast)();
 }
 class FormData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -138,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:127", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:129", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -175,22 +178,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:170", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:172", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
-        common_vendor.index.showToast({ title: "请输入账号", icon: "none" });
+        utils_toast.showAppToast({ title: "请输入账号", icon: "none" });
         return false;
       }
       if (form.value.password.length == 0) {
-        common_vendor.index.showToast({ title: "请输入密码", icon: "none" });
+        utils_toast.showAppToast({ title: "请输入密码", icon: "none" });
         return false;
       }
       return true;
     };
     const loginBt = () => {
       if (!docState.value) {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请先阅读并同意用户协议",
           icon: "error"
         });
@@ -200,21 +203,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleGetPhoneNumber = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!docState.value) {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "请先阅读并同意用户协议",
             icon: "error"
           });
           return Promise.resolve(null);
         }
         if (e.detail.errMsg === "getPhoneNumber:fail user deny") {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "您拒绝了授权",
             icon: "none"
           });
           return Promise.resolve(null);
         }
         if (e.detail.errMsg !== "getPhoneNumber:ok") {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "获取手机号失败",
             icon: "none"
           });
@@ -236,7 +239,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }));
           const loginData = res.data;
           if (loginData == null) {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: res.msg || "登录失败",
               icon: "none"
             });
@@ -244,14 +247,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           const token = loginData.getString("token", "");
           if (token == "") {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "登录失败: 未获取到token",
               icon: "none"
             });
             return Promise.resolve(null);
           }
           common_vendor.index.setStorageSync("token", token);
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "登录成功",
             icon: "success"
           });
@@ -261,8 +264,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }, 500);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:273", "微信登录失败:", error);
-          common_vendor.index.showToast({
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:275", "微信登录失败:", error);
+          utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
           });
@@ -274,32 +277,32 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const submit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!docState.value) {
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "请先阅读并同意用户协议",
             icon: "error"
           });
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:298", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:300", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:300", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:302", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:309", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:311", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:319", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:321", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:321", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:323", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
@@ -307,7 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (token != "") {
             saveAccountPassword();
             common_vendor.index.setStorageSync("token", token);
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "登录成功",
               icon: "success"
             });
@@ -317,22 +320,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             }, 500);
           } else {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "登录失败，请重试",
               icon: "error"
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:350", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:352", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               icon: "error",
               title: "登录失败，请检查账号、密码或网络"
             });
           } else {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               icon: "error",
               title: "登录失败，请检查网络后重试"
             });
@@ -362,7 +365,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:446", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:448", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -380,7 +383,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pswLogin.value ? {
         d: common_vendor.o(($event) => {
           return form.value.username = $event;
-        }, "ae"),
+        }, "b6"),
         e: common_vendor.p({
           placeholder: "请输入账号",
           clearable: true,
@@ -396,10 +399,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelWidth: "0",
           class: "data-v-27a30816"
         }),
-        g: common_vendor.o(filterNonLatin, "ec"),
+        g: common_vendor.o(filterNonLatin, "da"),
         h: common_vendor.o(($event) => {
           return form.value.password = $event;
-        }, "11"),
+        }, "e2"),
         i: common_vendor.p({
           placeholder: "请输入密码",
           password: true,
@@ -414,19 +417,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           labelWidth: "0",
           class: "data-v-27a30816"
         }),
-        k: common_vendor.o(toggleRememberPassword, "b6"),
+        k: common_vendor.o(toggleRememberPassword, "5e"),
         l: common_vendor.p({
           checked: rememberPassword.value,
           label: "记住密码",
           class: "data-v-27a30816"
         }),
-        m: common_vendor.o(submit, "b1"),
+        m: common_vendor.o(submit, "79"),
         n: common_vendor.p({
           type: "primary",
           loading: loading.value,
           class: "data-v-27a30816"
         }),
-        o: common_vendor.o(updateFormValid, "e5"),
+        o: common_vendor.o(updateFormValid, "00"),
         p: common_vendor.p({
           modelValue: form.value,
           rules: pswrules,
@@ -437,26 +440,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : common_vendor.e({
         q: !docState.value
       }, !docState.value ? {
-        r: common_vendor.o(loginBt, "33")
+        r: common_vendor.o(loginBt, "f1")
       } : {}, {
         s: docState.value
       }, docState.value ? {
-        t: common_vendor.o(handleGetPhoneNumber, "11")
+        t: common_vendor.o(handleGetPhoneNumber, "41")
       } : {}), {
-        v: common_vendor.o(isDocState, "fe"),
+        v: common_vendor.o(isDocState, "73"),
         w: common_vendor.p({
           checked: docState.value,
           class: "data-v-27a30816"
         }),
-        x: common_vendor.o(gotoAgreement, "67"),
-        y: common_vendor.o(gotoPrivacy, "74"),
-        z: common_vendor.o(gotoIndex, "d9"),
+        x: common_vendor.o(gotoAgreement, "a9"),
+        y: common_vendor.o(gotoPrivacy, "11"),
+        z: common_vendor.o(gotoIndex, "e5"),
         A: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        B: common_vendor.o(isPswLogin, "38"),
-        C: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        D: `${_ctx.u_s_b_h}px`,
-        E: `${_ctx.u_s_a_i_b}px`,
-        F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        B: common_vendor.o(isPswLogin, "be"),
+        C: `${_ctx.u_s_b_h}px`,
+        D: `${_ctx.u_s_a_i_b}px`,
+        E: common_vendor.p({
+          class: "data-v-27a30816"
+        })
       });
       return __returned__;
     };

@@ -3,6 +3,8 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue';
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue';
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue';
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../utils/toast.uts';
 import { ref, reactive, onMounted, computed } from 'vue';
 import { getTrackPos } from '../../api/request.uts';
 import { getAddress } from '../../utils/getAdress.uts';
@@ -58,7 +60,7 @@ const __sfc__ = defineComponent({
             uni.showLoading({
                 title: '加载中...'
             });
-            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 108, 9),
+            const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9),
                 imei: imei.value,
                 startTime: startTime.value,
                 endTime: endTime.value,
@@ -113,21 +115,21 @@ const __sfc__ = defineComponent({
             return `${hours}小时${minutes}分${seconds}秒`;
         };
         const showAddress = async (latitude: number, longitude: number): Promise<void> => {
-            console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:170");
+            console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:172");
             uni.openLocation({
                 latitude: latitude,
                 longitude: longitude,
                 name: '当前位置',
                 scale: 18,
                 success: () => {
-                    console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:177");
+                    console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:179");
                 },
                 fail: (err) => {
-                    uni.showToast({
+                    showAppToast({
                         title: '调起地图失败',
                         icon: 'none'
-                    });
-                    console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:184");
+                    } as ShowToastOptions);
+                    console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:186");
                 }
             });
         };
@@ -137,123 +139,127 @@ const __sfc__ = defineComponent({
             const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", _easycom_l_date_time_picker);
             const _component_l_popup = resolveEasyComponent("l-popup", _easycom_l_popup);
             const _component_i_empty = resolveEasyComponent("i-empty", _easycom_i_empty);
-            return _cE("view", _uM({ class: "container" }), [
-                _cV(_component_custom_navBar, _uM({
-                    title: "停车记录",
-                    "show-back": true,
-                    backgroundColor: "#fff",
-                    textColor: "#333",
-                    showCapsule: false
-                })),
-                _cE("view", _uM({ class: "tools-panel" }), [
-                    _cE("view", _uM({ class: "Datetime-box" }), [
-                        _cE("view", _uM({ class: "date-box" }), [
-                            _cV(_component_i_icon, _uM({
-                                name: "/static/rili.png",
-                                fontSize: "15"
-                            })),
-                            _cE("text", _uM({
-                                class: "Date",
-                                onClick: () => { showPicker('start'); }
-                            }), _tD(startTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
-                            _cV(_component_i_icon, _uM({
-                                name: "/static/xiangxia.png",
-                                fontSize: "15",
-                                onClick: () => { showPicker('start'); }
-                            }), null, 8 /* PROPS */, ["onClick"]),
-                            _cE("text", _uM({
-                                style: _nS(_uM({ "padding": "0 10rpx" }))
-                            }), "至", 4 /* STYLE */),
-                            _cE("text", _uM({
-                                class: "Date",
-                                onClick: () => { showPicker('end'); }
-                            }), _tD(endTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
-                            _cV(_component_i_icon, _uM({
-                                name: "/static/xiangxia.png",
-                                fontSize: "15",
-                                onClick: () => { showPicker('end'); }
-                            }), null, 8 /* PROPS */, ["onClick"])
-                        ])
-                    ]),
-                    _cV(_component_l_popup, _uM({
-                        modelValue: showDateTimePicker.value,
-                        "onUpdate:modelValue": ($event: boolean) => { (showDateTimePicker).value = $event; },
-                        position: "bottom",
-                        closeable: false
-                    }), _uM({
-                        default: withSlotCtx((): any[] => [
-                            _cV(_component_l_date_time_picker, _uM({
-                                "confirm-btn": "确认",
-                                "cancel-btn": "取消",
-                                title: pickerTitle.value,
-                                mode: 1 | 2 | 4 | 8 | 16 | 32,
-                                onConfirm: onConfirm,
-                                onCancel: onCancel
-                            }), null, 8 /* PROPS */, ["title"])
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
+            return _cE(Fragment, null, [
+                _cE("view", _uM({ class: "container" }), [
+                    _cV(_component_custom_navBar, _uM({
+                        title: "停车记录",
+                        "show-back": true,
+                        backgroundColor: "#fff",
+                        textColor: "#333",
+                        showCapsule: false
+                    })),
+                    _cE("view", _uM({ class: "tools-panel" }), [
+                        _cE("view", _uM({ class: "Datetime-box" }), [
+                            _cE("view", _uM({ class: "date-box" }), [
+                                _cV(_component_i_icon, _uM({
+                                    name: "/static/rili.png",
+                                    fontSize: "15"
+                                })),
+                                _cE("text", _uM({
+                                    class: "Date",
+                                    onClick: () => { showPicker('start'); }
+                                }), _tD(startTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
+                                _cV(_component_i_icon, _uM({
+                                    name: "/static/xiangxia.png",
+                                    fontSize: "15",
+                                    onClick: () => { showPicker('start'); }
+                                }), null, 8 /* PROPS */, ["onClick"]),
+                                _cE("text", _uM({
+                                    style: _nS(_uM({ "padding": "0 10rpx" }))
+                                }), "至", 4 /* STYLE */),
+                                _cE("text", _uM({
+                                    class: "Date",
+                                    onClick: () => { showPicker('end'); }
+                                }), _tD(endTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
+                                _cV(_component_i_icon, _uM({
+                                    name: "/static/xiangxia.png",
+                                    fontSize: "15",
+                                    onClick: () => { showPicker('end'); }
+                                }), null, 8 /* PROPS */, ["onClick"])
+                            ])
                         ]),
-                        _: 1 /* STABLE */
-                    }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                        _cV(_component_l_popup, _uM({
+                            modelValue: showDateTimePicker.value,
+                            "onUpdate:modelValue": ($event: boolean) => { (showDateTimePicker).value = $event; },
+                            position: "bottom",
+                            closeable: false
+                        }), _uM({
+                            default: withSlotCtx((): any[] => [
+                                _cV(_component_l_date_time_picker, _uM({
+                                    "confirm-btn": "确认",
+                                    "cancel-btn": "取消",
+                                    title: pickerTitle.value,
+                                    mode: 1 | 2 | 4 | 8 | 16 | 32,
+                                    onConfirm: onConfirm,
+                                    onCancel: onCancel
+                                }), null, 8 /* PROPS */, ["title"])
+                            ]),
+                            _: 1 /* STABLE */
+                        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                    ]),
+                    _cE("scroll-view", _uM({
+                        class: "content-box",
+                        "scroll-y": "true"
+                    }), [
+                        sortedCarStopDetail.value.length == 0
+                            ? _cV(_component_i_empty, _uM({
+                                key: 0,
+                                text: "当前时间暂无停车数据",
+                                showButton: false,
+                                description: ""
+                            }))
+                            : _cE(Fragment, _uM({ key: 1 }), RenderHelpers.renderList(sortedCarStopDetail.value, (item, index, __index, _cached): any => {
+                                return _cE("view", _uM({
+                                    class: "content",
+                                    key: index
+                                }), [
+                                    _cE("view", _uM({ class: "item" }), [
+                                        _cE("image", _uM({
+                                            class: "icons",
+                                            mode: "aspectFit",
+                                            src: "/static/startTime.png"
+                                        })),
+                                        _cE("text", null, _tD(item["startTime"]), 1 /* TEXT */)
+                                    ]),
+                                    _cE("view", _uM({ class: "item" }), [
+                                        _cE("image", _uM({
+                                            class: "icons",
+                                            mode: "aspectFit",
+                                            src: "/static/endTime.png"
+                                        })),
+                                        _cE("text", null, _tD(item["endTime"]), 1 /* TEXT */)
+                                    ]),
+                                    _cE("view", _uM({ class: "item" }), [
+                                        _cE("image", _uM({
+                                            class: "icons",
+                                            mode: "aspectFit",
+                                            src: "/static/stopTime.png"
+                                        })),
+                                        _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber('duration', 0))), 1 /* TEXT */)
+                                    ]),
+                                    _cE("view", _uM({ class: "item" }), [
+                                        _cE("image", _uM({
+                                            class: "icons",
+                                            mode: "aspectFit",
+                                            src: "/static/user_location.png"
+                                        })),
+                                        isTrue(item["address"])
+                                            ? _cE("text", _uM({
+                                                key: 0,
+                                                class: "address"
+                                            }), _tD(isTruthy(item["address"]) ? item["address"] : '加载中...'), 1 /* TEXT */)
+                                            : _cE("text", _uM({
+                                                key: 1,
+                                                onClick: () => { showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0)); }
+                                            }), "点击查看停车位置", 8 /* PROPS */, ["onClick"])
+                                    ])
+                                ]);
+                            }), 128 /* KEYED_FRAGMENT */)
+                    ])
                 ]),
-                _cE("scroll-view", _uM({
-                    class: "content-box",
-                    "scroll-y": "true"
-                }), [
-                    sortedCarStopDetail.value.length == 0
-                        ? _cV(_component_i_empty, _uM({
-                            key: 0,
-                            text: "当前时间暂无停车数据",
-                            showButton: false,
-                            description: ""
-                        }))
-                        : _cE(Fragment, _uM({ key: 1 }), RenderHelpers.renderList(sortedCarStopDetail.value, (item, index, __index, _cached): any => {
-                            return _cE("view", _uM({
-                                class: "content",
-                                key: index
-                            }), [
-                                _cE("view", _uM({ class: "item" }), [
-                                    _cE("image", _uM({
-                                        class: "icons",
-                                        mode: "aspectFit",
-                                        src: "/static/startTime.png"
-                                    })),
-                                    _cE("text", null, _tD(item["startTime"]), 1 /* TEXT */)
-                                ]),
-                                _cE("view", _uM({ class: "item" }), [
-                                    _cE("image", _uM({
-                                        class: "icons",
-                                        mode: "aspectFit",
-                                        src: "/static/endTime.png"
-                                    })),
-                                    _cE("text", null, _tD(item["endTime"]), 1 /* TEXT */)
-                                ]),
-                                _cE("view", _uM({ class: "item" }), [
-                                    _cE("image", _uM({
-                                        class: "icons",
-                                        mode: "aspectFit",
-                                        src: "/static/stopTime.png"
-                                    })),
-                                    _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber('duration', 0))), 1 /* TEXT */)
-                                ]),
-                                _cE("view", _uM({ class: "item" }), [
-                                    _cE("image", _uM({
-                                        class: "icons",
-                                        mode: "aspectFit",
-                                        src: "/static/user_location.png"
-                                    })),
-                                    isTrue(item["address"])
-                                        ? _cE("text", _uM({
-                                            key: 0,
-                                            class: "address"
-                                        }), _tD(isTruthy(item["address"]) ? item["address"] : '加载中...'), 1 /* TEXT */)
-                                        : _cE("text", _uM({
-                                            key: 1,
-                                            onClick: () => { showAddress(item.getNumber('latitude', 0), item.getNumber('longitude', 0)); }
-                                        }), "点击查看停车位置", 8 /* PROPS */, ["onClick"])
-                                ])
-                            ]);
-                        }), 128 /* KEYED_FRAGMENT */)
-                ])
-            ]);
+                _cV(_component_app_toast)
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });

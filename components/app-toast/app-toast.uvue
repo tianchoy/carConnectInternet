@@ -1,0 +1,42 @@
+<template>
+	<!--#ifdef APP-IOS -->
+	<i-toast ref="toastRef"></i-toast>
+	<!--#endif -->
+</template>
+
+<script setup lang="uts">
+import { onUnmounted, ref } from 'vue'
+import { registerIosToastHandler, unregisterIosToastHandler } from '../../utils/toast.uts'
+
+defineOptions({ name: 'app-toast' })
+
+// #ifdef APP-IOS
+const toastRef = ref<any>(null)
+
+const handleToast = (options: ShowToastOptions): void => {
+	const toast = toastRef.value
+	if (toast == null) return
+
+	const toastOptions = {
+		title: options.title,
+		duration: options.duration ?? 2000,
+		position: options.position ?? 'center',
+		mask: options.mask ?? false
+	}
+
+	if (options.icon == 'success') {
+		toast.success(toastOptions)
+	} else if (options.icon == 'error') {
+		toast.error(toastOptions)
+	} else {
+		toast.open(toastOptions)
+	}
+}
+
+registerIosToastHandler(handleToast)
+
+onUnmounted(() => {
+	unregisterIosToastHandler(handleToast)
+})
+// #endif
+</script>

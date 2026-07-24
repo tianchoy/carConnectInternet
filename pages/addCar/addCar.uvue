@@ -3,9 +3,9 @@
 		<custom-navBar title="添加设备" :show-back="true" backgroundColor="#fff" textColor="#333" :showCapsule="false">
 		</custom-navBar>
 		<view class="content">
-			<i-form 
-				labelPosition="left" 
-				:modelValue="carInfo" 
+			<i-form
+				labelPosition="left"
+				:modelValue="carInfo"
 				:rules="rules"
 				labelDirection="horizontal"
 				watchValidStatus
@@ -15,7 +15,7 @@
 					<i-input border="none" v-model="carInfo.deviceName" placeholder="请输入设备名称">
 					</i-input>
 				</i-form-item>
-				
+
 				<i-form-item label="*设备ID" name="imei"  labelDirection="horizontal">
 					<i-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
 						<template v-slot:suffix>
@@ -23,7 +23,7 @@
 						</template>
 					</i-input>
 				</i-form-item>
-				
+
 				<i-form-item label="车标" name="deviceType" labelDirection="horizontal">
 					<view class="car-type-selector" @click="deviceTypeSelectFun">
 						<text class="clickable" :class="{ 'placeholder': !carInfo.deviceTypeValue }">
@@ -37,11 +37,13 @@
 		<view class="btn">
 			<i-button  type="primary" @click="submit" :loading="loading">提交</i-button>
 		</view>
-		
+
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="ts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { ref } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
 	import carIcons from '../../components/car-icons/car-icons.uvue'
@@ -115,7 +117,7 @@
 		} else if (data.result.length == 11) {
 			carInfo.value.imei = '0' + data.result
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请输入正确的设备ID',
 				icon: 'none'
 			})
@@ -149,14 +151,14 @@
 	// ===== 表单验证 =====
 	const validateForm = (): boolean => {
 		if (carInfo.value.imei.length == 0) {
-			uni.showToast({
+			showAppToast({
 				title: '请输入设备ID',
 				icon: 'none'
 			})
 			return false
 		}
 		if (carInfo.value.deviceType.length == 0) {
-			uni.showToast({
+			showAppToast({
 				title: '请选择设备图标',
 				icon: 'none'
 			})
@@ -168,18 +170,18 @@
 	// ===== 提交表单 =====
 	const submit = async () => {
 		console.log('=== 开始提交设备 ===')
-		
+
 		try {
 			// 表单验证
 			if (!validateForm()) return
 			console.log('✅ 表单验证通过')
-			
+
 			loading.value = true
 			uni.showLoading({
 				title: '添加中...',
 				mask: true
 			})
-			
+
 			const submitData = {
 				deviceName: carInfo.value.deviceName,
 				imei: carInfo.value.imei,
@@ -196,13 +198,13 @@
 			loading.value = false
 
 			if (res.code == 0) {
-				uni.showToast({
+				showAppToast({
 					title: '添加成功',
 					icon: 'success'
 				})
 
 				uni.setStorageSync('needRefreshHome', true)
-				
+
 				// 添加成功后触发首页刷新
 				refreshDeviceList()
 
@@ -210,7 +212,7 @@
 					uni.navigateBack()
 				}, 1500)
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: res.msg || '添加失败',
 					icon: 'none',
 					duration: 2000
@@ -220,7 +222,7 @@
 			console.error('❌ 添加设备失败:', error)
 			uni.hideLoading()
 			loading.value = false
-			uni.showToast({
+			showAppToast({
 				title: '添加设备失败',
 				icon: 'none'
 			})
@@ -258,13 +260,13 @@
 	// 				value: item.id.toString()
 	// 			}))
 	// 		} else {
-	// 			uni.showToast({
+	// 			showAppToast({
 	// 				title: '获取车辆品牌失败',
 	// 				icon: 'none'
 	// 			})
 	// 		}
 	// 	} catch (error) {
-	// 		uni.showToast({
+	// 		showAppToast({
 	// 			title: '请求失败，请重试',
 	// 			icon: 'none'
 	// 		})

@@ -1,18 +1,20 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
 import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue';
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue';
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../utils/toast.uts';
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { getDevicePos } from '../../api/request.uts';
 import { getDeviceIcon } from '../../utils/cars';
 // 导入坐标转换插件
 import CoordTransform from '../../utils/coordTransform.uts';
 type CoordinatePoint = {
-    __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 40, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 42, 7>;
     latitude: number;
     longitude: number;
 };
 type AnimationQueueItem = {
-    __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 45, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7>;
     position: CoordinatePoint;
     rotation: number;
     speed: number;
@@ -93,13 +95,13 @@ const __sfc__ = defineComponent({
         }
         async function loadInitialPosition(): Promise<void> {
             try {
-                const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 131, 10),
+                const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 133, 10),
                     deptId: deptId.value,
                     deviceids: imei.value
                 } as UTSJSONObject;
-                console.log('data', data, " at pages/vehicleTracking/vehicleTracking.uvue:136");
+                console.log('data', data, " at pages/vehicleTracking/vehicleTracking.uvue:138");
                 const res = await getDevicePos(data);
-                console.log('res', res, " at pages/vehicleTracking/vehicleTracking.uvue:140");
+                console.log('res', res, " at pages/vehicleTracking/vehicleTracking.uvue:142");
                 if (res?.code == 0 && res.data != null && res.data.length > 0) {
                     let foundDevice = false;
                     res.data.forEach((item: UTSJSONObject) => {
@@ -109,10 +111,10 @@ const __sfc__ = defineComponent({
                             const latitude = item.getNumber('latitude', 0);
                             const longitude = item.getNumber('longitude', 0);
                             if (latitude == 0 || longitude == 0) {
-                                uni.showToast({
+                                showAppToast({
                                     title: '位置信息缺失',
                                     icon: 'none'
-                                });
+                                } as ShowToastOptions);
                                 return;
                             }
                             const direction = item.getNumber('direction', 0);
@@ -150,25 +152,25 @@ const __sfc__ = defineComponent({
                         }
                     });
                     if (!foundDevice) {
-                        uni.showToast({
+                        showAppToast({
                             title: '未找到车辆设备',
                             icon: 'none'
-                        });
+                        } as ShowToastOptions);
                     }
                 }
                 else {
-                    uni.showToast({
+                    showAppToast({
                         title: '获取位置失败',
                         icon: 'none'
-                    });
+                    } as ShowToastOptions);
                 }
             }
             catch (err: any) {
-                console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:212");
-                uni.showToast({
+                console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:214");
+                showAppToast({
                     title: '网络请求失败',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
             }
         }
         // 初始化标记点
@@ -181,7 +183,7 @@ const __sfc__ = defineComponent({
             const marker = createVehicleMarker(iconPath);
             markers.value = [marker];
             markerInitialized.value = true;
-            console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:233");
+            console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:235");
         }
         // 计算地图上的旋转角度
         function calculateMapRotation(direction: number): number {
@@ -201,7 +203,7 @@ const __sfc__ = defineComponent({
             return normalized;
         }
         onLoad((option) => {
-            console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:254");
+            console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:256");
             connectionStatus.value = option["connectionStatus"] ?? '';
             imei.value = option["imei"] ?? '';
             currentCar.value = option["plateNo"] ?? '未知车辆';
@@ -355,12 +357,12 @@ const __sfc__ = defineComponent({
         // 请求位置数据
         const loadTrackData = async (): Promise<void> => {
             try {
-                const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 444, 10),
+                const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 446, 10),
                     deptId: deptId.value,
                     deviceids: imei.value
                 } as UTSJSONObject;
                 const res = await getDevicePos(data);
-                console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:450");
+                console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:452");
                 if (res?.code == 0 && res.data != null && res.data.length > 0) {
                     const deviceData = res.data.find((item: UTSJSONObject): boolean => item.getString('imei', '') == imei.value);
                     if (deviceData != null) {
@@ -388,7 +390,7 @@ const __sfc__ = defineComponent({
                 }
             }
             catch (err: any) {
-                console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:479");
+                console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:481");
             }
         };
         // 停止跟踪
@@ -407,11 +409,11 @@ const __sfc__ = defineComponent({
                 animationTimer.value = null;
             }
             isAnimating.value = false;
-            uni.showToast({
+            showAppToast({
                 title: '停止跟踪',
                 icon: 'success',
                 duration: 1500
-            });
+            } as ShowToastOptions);
         }
         // 开始跟踪
         function startTracking(): void {
@@ -433,11 +435,11 @@ const __sfc__ = defineComponent({
             trackingInterval.value = setInterval(() => {
                 loadTrackData();
             }, interval) as number;
-            uni.showToast({
+            showAppToast({
                 title: '开始跟踪',
                 icon: 'success',
                 duration: 1500
-            });
+            } as ShowToastOptions);
         }
         // 开始/停止跟踪
         const toggleTracking = () => {
@@ -449,7 +451,7 @@ const __sfc__ = defineComponent({
             }
         };
         onHide(() => {
-            console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:554");
+            console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:556");
             isTracking.value = false;
             // 清除定时器
             if (trackingInterval.value != null) {
@@ -466,7 +468,7 @@ const __sfc__ = defineComponent({
             isAnimating.value = false;
         });
         onUnmounted(() => {
-            console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:575");
+            console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:577");
             isTracking.value = false;
             // 清除定时器
             if (trackingInterval.value != null) {
@@ -487,63 +489,67 @@ const __sfc__ = defineComponent({
             const _component_sub_navBar = resolveEasyComponent("sub-navBar", _easycom_sub_navBar);
             const _component_map = resolveComponent("map");
             const _component_i_button = resolveEasyComponent("i-button", _easycom_i_button);
-            return _cE("view", _uM({ class: "container" }), [
-                _cV(_component_custom_navBar, _uM({
-                    title: "车辆跟踪",
-                    "show-back": true,
-                    backgroundColor: "#fff",
-                    textColor: "#333",
-                    showCapsule: false
-                })),
-                _cE("view", _uM({ class: "map-container" }), [
-                    _cV(_component_map, _uM({
-                        id: "myMap",
-                        latitude: center["latitude"],
-                        longitude: center["longitude"],
-                        markers: markers.value,
-                        scale: mapScale.value,
-                        style: _nS(_uM({ "width": "100%", "height": "100%" })),
-                        "show-location": false,
-                        "enable-traffic": true,
-                        "enable-overlooking": true,
-                        "enable-building": true,
-                        "enable-3D": true
-                    }), _uM({
-                        default: withSlotCtx((): any[] => [
-                            _cV(_component_sub_navBar, _uM({
-                                currentTime: currentTime.value,
-                                currentCar: currentCar.value,
-                                times: times.value,
-                                showCar: true,
-                                "onUpdate:currentTime": handleCurrentTimeUpdate,
-                                carStatus: connectionStatus.value
-                            }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
-                        ]),
-                        _: 1 /* STABLE */
-                    }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
-                ]),
-                _cE("view", _uM({ class: "tools-panel" }), [
-                    _cE("view", _uM({ class: "btn" }), [
-                        _cV(_component_i_button, _uM({
-                            type: isTracking.value ? 'danger' : 'primary',
-                            size: "small",
-                            onClick: toggleTracking,
-                            style: _nS(_uM({ backgroundColor: isTracking.value ? '#e64340' : '#1296db' })),
-                            text: isTracking.value ? '停止跟踪' : '开始跟踪'
-                        }), null, 8 /* PROPS */, ["type", "style", "text"])
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
+            return _cE(Fragment, null, [
+                _cE("view", _uM({ class: "container" }), [
+                    _cV(_component_custom_navBar, _uM({
+                        title: "车辆跟踪",
+                        "show-back": true,
+                        backgroundColor: "#fff",
+                        textColor: "#333",
+                        showCapsule: false
+                    })),
+                    _cE("view", _uM({ class: "map-container" }), [
+                        _cV(_component_map, _uM({
+                            id: "myMap",
+                            latitude: center["latitude"],
+                            longitude: center["longitude"],
+                            markers: markers.value,
+                            scale: mapScale.value,
+                            style: _nS(_uM({ "width": "100%", "height": "100%" })),
+                            "show-location": false,
+                            "enable-traffic": true,
+                            "enable-overlooking": true,
+                            "enable-building": true,
+                            "enable-3D": true
+                        }), _uM({
+                            default: withSlotCtx((): any[] => [
+                                _cV(_component_sub_navBar, _uM({
+                                    currentTime: currentTime.value,
+                                    currentCar: currentCar.value,
+                                    times: times.value,
+                                    showCar: true,
+                                    "onUpdate:currentTime": handleCurrentTimeUpdate,
+                                    carStatus: connectionStatus.value
+                                }), null, 8 /* PROPS */, ["currentTime", "currentCar", "times", "carStatus"])
+                            ]),
+                            _: 1 /* STABLE */
+                        }), 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"])
                     ]),
-                    _cE("view", _uM({ class: "pos-info-box" }), [
-                        _cE("view", _uM({ class: "speed" }), [
-                            _cE("text", _uM({ class: "tracking-info-text" }), "时速："),
-                            _cE("text", _uM({ class: "tracking-info-text" }), _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */)
+                    _cE("view", _uM({ class: "tools-panel" }), [
+                        _cE("view", _uM({ class: "btn" }), [
+                            _cV(_component_i_button, _uM({
+                                type: isTracking.value ? 'danger' : 'primary',
+                                size: "small",
+                                onClick: toggleTracking,
+                                style: _nS(_uM({ backgroundColor: isTracking.value ? '#e64340' : '#1296db' })),
+                                text: isTracking.value ? '停止跟踪' : '开始跟踪'
+                            }), null, 8 /* PROPS */, ["type", "style", "text"])
                         ]),
-                        _cE("view", _uM({ class: "address" }), [
-                            _cE("text", _uM({ class: "tracking-info-text" }), "定位时间："),
-                            _cE("text", _uM({ class: "tracking-info-text" }), _tD(currentAddress.value), 1 /* TEXT */)
+                        _cE("view", _uM({ class: "pos-info-box" }), [
+                            _cE("view", _uM({ class: "speed" }), [
+                                _cE("text", _uM({ class: "tracking-info-text" }), "时速："),
+                                _cE("text", _uM({ class: "tracking-info-text" }), _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */)
+                            ]),
+                            _cE("view", _uM({ class: "address" }), [
+                                _cE("text", _uM({ class: "tracking-info-text" }), "定位时间："),
+                                _cE("text", _uM({ class: "tracking-info-text" }), _tD(currentAddress.value), 1 /* TEXT */)
+                            ])
                         ])
                     ])
-                ])
-            ]);
+                ]),
+                _cV(_component_app_toast)
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });

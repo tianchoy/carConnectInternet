@@ -1,4 +1,5 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import { ref, computed } from 'vue';
 import { getDeviceDetail } from '../../../api/request.uts';
 const __sfc__ = defineComponent({
@@ -27,44 +28,48 @@ const __sfc__ = defineComponent({
         });
         return (): any | null => {
             const _component_custom_navBar = resolveEasyComponent("custom-navBar", _easycom_custom_navBar);
-            return _cE("view", _uM({ class: "container" }), [
-                _cV(_component_custom_navBar, _uM({
-                    title: "车辆详情",
-                    "show-back": true,
-                    backgroundColor: "#fff",
-                    textColor: "#333",
-                    showCapsule: false,
-                    isIcon: true,
-                    onCapsuleClick: toggleEdit,
-                    Icon: "/static/edit-pen.png"
-                })),
-                _cE("view", _uM({ class: "content" }), [
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "设备ID"),
-                        _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceId', '')), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "设备名称"),
-                        _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceName', '')), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "车标"),
-                        _cE("text", _uM({ class: "info" }), _tD(carTitle.value), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "车牌号"),
-                        _cE("text", _uM({ class: "info" }), _tD(formattedPlateNo.value), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "车架号"),
-                        _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('carVin', '')), 1 /* TEXT */)
-                    ]),
-                    _cE("view", _uM({ class: "list" }), [
-                        _cE("text", _uM({ class: "title" }), "发动机号"),
-                        _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('engineNum', '')), 1 /* TEXT */)
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
+            return _cE(Fragment, null, [
+                _cE("view", _uM({ class: "container" }), [
+                    _cV(_component_custom_navBar, _uM({
+                        title: "车辆详情",
+                        "show-back": true,
+                        backgroundColor: "#fff",
+                        textColor: "#333",
+                        showCapsule: false,
+                        isIcon: true,
+                        onCapsuleClick: toggleEdit,
+                        Icon: "/static/edit-pen.png"
+                    })),
+                    _cE("view", _uM({ class: "content" }), [
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "设备ID"),
+                            _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceId', '')), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "设备名称"),
+                            _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('deviceName', '')), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "车标"),
+                            _cE("text", _uM({ class: "info" }), _tD(carTitle.value), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "车牌号"),
+                            _cE("text", _uM({ class: "info" }), _tD(formattedPlateNo.value), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "车架号"),
+                            _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('carVin', '')), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "list" }), [
+                            _cE("text", _uM({ class: "title" }), "发动机号"),
+                            _cE("text", _uM({ class: "info" }), _tD(carInfo.value.getString('engineNum', '')), 1 /* TEXT */)
+                        ])
                     ])
-                ])
-            ]);
+                ]),
+                _cV(_component_app_toast)
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });

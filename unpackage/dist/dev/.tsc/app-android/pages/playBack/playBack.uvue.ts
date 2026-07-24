@@ -5,7 +5,9 @@ import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button
 import _easycom_i_slider from '@/uni_modules/i-ui-x/components/i-slider/i-slider.uvue'
 import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.uvue'
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
-import { ref, reactive, onMounted, watch } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
@@ -15,7 +17,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
 
 
-	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 64, 7>;
+	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 66, 7>;
 		latitude : number;
 		longitude : number;
 		rotation : number;
@@ -23,19 +25,19 @@ import { ref, reactive, onMounted, watch } from 'vue'
 		speed : number;
 	}
 
-	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 72, 7>;
+	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 74, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
 		maxLng : number;
 	}
 
-	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 79, 7>;
+	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 81, 7>;
 		latitude: number
 		longitude: number
 	}
 
-	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 84, 7>;
+	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 86, 7>;
 		points: Array<MapPolylinePoint>
 		color: string
 		width: number
@@ -56,7 +58,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const center = reactive({
+const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
@@ -119,10 +121,20 @@ const _cache = __ins.renderCache;
 		return date.getTime()
 	}
 
+	// 规范化日期时间，确保展示和接口查询均精确到秒
+	function normalizeDateTime(dateStr : string) : string {
+		if (!dateStr) return ''
+		let normalized = dateStr.replace(/-/g, '/')
+		const parts = normalized.split(' ')
+		if (parts.length < 2) return normalized
+		const timeParts = parts[1].split(':')
+		if (timeParts.length == 2) normalized += ':00'
+		return normalized
+	}
+
 	// 格式化日期显示
 	function formatDateForDisplay(dateStr : string) : string {
-		if (!dateStr) return ''
-		return dateStr.replace(/\//g, '-')
+		return normalizeDateTime(dateStr).replace(/\//g, '-')
 	}
 
 	// 计算两点之间的方向角
@@ -285,9 +297,22 @@ const _cache = __ins.renderCache;
 		const initialUnplayedPolyline = new Polyline(
 			toNativePoints(trackPoints.value), '#888787', 3, true, false, '', '#888787', 0, []
 		)
+		initialUnplayedPolyline.color = '#888787'
+		initialUnplayedPolyline.width = 3
+		initialUnplayedPolyline.dottedLine = true
+		initialUnplayedPolyline.arrowLine = false
+		initialUnplayedPolyline.borderColor = '#888787'
+		initialUnplayedPolyline.borderWidth = 0
+
 		const initialPlayedPolyline = new Polyline(
 			toNativePoints(trackPoints.value.slice(0, 1)), '#3c5cff', 5, false, true, '', '#FFFFFF', 1, []
 		)
+		initialPlayedPolyline.color = '#3c5cff'
+		initialPlayedPolyline.width = 5
+		initialPlayedPolyline.dottedLine = false
+		initialPlayedPolyline.arrowLine = true
+		initialPlayedPolyline.borderColor = '#FFFFFF'
+		initialPlayedPolyline.borderWidth = 1
 		unplayedPolyline = initialUnplayedPolyline
 		playedPolyline = initialPlayedPolyline
 		polyline.value = [initialUnplayedPolyline, initialPlayedPolyline]
@@ -396,7 +421,7 @@ const _cache = __ins.renderCache;
 		const originalLat = parseFloat(originalLatText)
 		const originalLng = parseFloat(originalLngText)
 		if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
-			uni.showToast({
+			showAppToast({
 				title: '这段时间没有数据',
 				icon: 'none',
 				duration: 2000
@@ -404,7 +429,7 @@ const _cache = __ins.renderCache;
 			return
 		}
 
-		uni.showToast({
+		showAppToast({
 			title: '这段时间没有数据',
 			icon: 'none',
 			duration: 2000
@@ -540,7 +565,7 @@ const _cache = __ins.renderCache;
 		const requestId = ++replaySessionId
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 581, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 606, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -565,8 +590,8 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:606")
-			uni.showToast({ title: '轨迹加载失败', icon: 'none' })
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:631")
+			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
 			}
@@ -586,7 +611,7 @@ const _cache = __ins.renderCache;
 	function playNextPoint() : boolean {
 		if (currentIndex.value >= trackPoints.value.length - 1) {
 			pausePlayback()
-			uni.showToast({
+			showAppToast({
 				title: '轨迹回放完成',
 				icon: 'none',
 				duration: 1500
@@ -618,7 +643,7 @@ const _cache = __ins.renderCache;
 
 	function startPlayback() {
 		if (!isTrackPlayable.value) {
-			uni.showToast({ title: '没有轨迹数据', icon: 'none' })
+			showAppToast({ title: '没有轨迹数据', icon: 'none' })
 			return
 		}
 
@@ -643,10 +668,7 @@ const _cache = __ins.renderCache;
 
 	// 确认选择时间
 	function onConfirm(value : string) {
-		let formattedValue = value
-		if (formattedValue.includes('-')) {
-			formattedValue = formattedValue.replace(/-/g, '/')
-		}
+		const formattedValue = normalizeDateTime(value)
 
 		if (currentPickerType.value == 'start') {
 			startTime.value = formattedValue
@@ -687,16 +709,16 @@ const _cache = __ins.renderCache;
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:728")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:750")
 		if(sTime.value != '' && eTime.value != '') {
-			startTime.value = sTime.value
-			endTime.value = eTime.value
+			startTime.value = normalizeDateTime(sTime.value)
+			endTime.value = normalizeDateTime(eTime.value)
 			loadTrackPos()
 		}else{
 			initDateTime()
 			loadTrackPos()
 		}
-		
+
 	})
 
 	onHide(() => {
@@ -722,111 +744,115 @@ const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_i_slider = resolveEasyComponent("i-slider",_easycom_i_slider)
 const _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker",_easycom_l_date_time_picker)
 const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "轨迹回放",
-      "show-back": true,
-      backgroundColor: "#fff",
-      textColor: "#333",
-      showCapsule: false
-    })),
-    _cE("view", _uM({ class: "map-container" }), [
-      _cV(_component_map, _uM({
-        id: "myMap",
-        latitude: center.latitude,
-        longitude: center.longitude,
-        markers: markers.value,
-        polyline: polyline.value,
-        scale: mapScale.value,
-        style: _nS(_uM({"width":"100%","height":"100%"})),
-        "show-location": true,
-        "enable-traffic": true,
-        "enable-overlooking": true,
-        "enable-building": true,
-        "enable-3D": true
-      }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
-      _cV(_component_sub_navBar, _uM({
-        showTime: false,
-        currentCar: plateNo.value,
-        showCar: true,
-        carStatus: carStatus.value
-      }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "轨迹回放",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "map-container" }), [
+        _cV(_component_map, _uM({
+          id: "myMap",
+          latitude: center.latitude,
+          longitude: center.longitude,
+          markers: markers.value,
+          polyline: polyline.value,
+          scale: mapScale.value,
+          style: _nS(_uM({"width":"100%","height":"100%"})),
+          "show-location": true,
+          "enable-traffic": true,
+          "enable-overlooking": true,
+          "enable-building": true,
+          "enable-3D": true
+        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+        _cV(_component_sub_navBar, _uM({
+          showTime: false,
+          currentCar: plateNo.value,
+          showCar: true,
+          carStatus: carStatus.value
+        }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
+      ]),
+      _cE("view", _uM({ class: "tools-panel" }), [
+        _cE("view", _uM({ class: "Datetime-box" }), [
+          _cE("view", _uM({ class: "date-box" }), [
+            _cV(_component_i_icon, _uM({
+              name: "/static/rili.png",
+              fontSize: "15"
+            })),
+            _cE("text", _uM({
+              class: "Date",
+              onClick: () => {showPicker('start')}
+            }), _tD(startTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
+            _cE("text", null, "至"),
+            _cE("text", _uM({
+              class: "Date",
+              onClick: () => {showPicker('end')}
+            }), _tD(endTime.value), 9 /* TEXT, PROPS */, ["onClick"])
+          ])
+        ]),
+        _cE("view", _uM({ class: "tool-tag-item" }), [
+          _cV(_component_i_button, _uM({
+            type: "primary",
+            onClick: togglePlayback,
+            size: "small",
+            text: isPlaying.value ? '暂停':'播放'
+          }), null, 8 /* PROPS */, ["text"]),
+          _cE("view", _uM({ class: "slider" }), [
+            _cV(_component_i_slider, _uM({
+              modelValue: playbackSpeed.value,
+              "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
+              min: 1,
+              max: 50,
+              step: 5,
+              onChange: setPlaybackSpeed
+            }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+          ]),
+          _cE("text", _uM({ class: "speed-label" }), _tD(playbackSpeed.value) + "x", 1 /* TEXT */)
+        ]),
+        _cE("view", _uM({ class: "play-back-info" }), [
+          _cE("view", _uM({ class: "item-info" }), [
+            _cE("text", _uM({ class: "info-label" }), _tD(currentTime.value), 1 /* TEXT */),
+            _cE("text", _uM({ class: "info-label" }), "时间")
+          ]),
+          _cE("view", _uM({ class: "item-info" }), [
+            _cE("text", _uM({ class: "info-label" }), _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */),
+            _cE("text", _uM({ class: "info-label" }), "速度")
+          ]),
+          _cE("view", _uM({ class: "item-info" }), [
+            _cE("text", _uM({ class: "info-label" }), _tD((totalDistance.value/1000).toFixed(1)) + "Km", 1 /* TEXT */),
+            _cE("text", _uM({ class: "info-label" }), "里程")
+          ])
+        ]),
+        _cV(_component_l_popup, _uM({
+          modelValue: showDateTimePicker.value,
+          "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
+          position: "bottom",
+          closeable: false
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cV(_component_l_date_time_picker, _uM({
+              "confirm-btn": "确认",
+              "cancel-btn": "取消",
+              title: pickerTitle.value,
+              mode: 1|2|4|8|16|32,
+              onConfirm: onConfirm,
+              onCancel: onCancel
+            }), null, 8 /* PROPS */, ["title"])
+          ]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+      ])
     ]),
-    _cE("view", _uM({ class: "tools-panel" }), [
-      _cE("view", _uM({ class: "Datetime-box" }), [
-        _cE("view", _uM({ class: "date-box" }), [
-          _cV(_component_i_icon, _uM({
-            name: "/static/rili.png",
-            fontSize: "15"
-          })),
-          _cE("text", _uM({
-            class: "Date",
-            onClick: () => {showPicker('start')}
-          }), _tD(startTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
-          _cE("text", null, "至"),
-          _cE("text", _uM({
-            class: "Date",
-            onClick: () => {showPicker('end')}
-          }), _tD(endTime.value), 9 /* TEXT, PROPS */, ["onClick"])
-        ])
-      ]),
-      _cE("view", _uM({ class: "tool-tag-item" }), [
-        _cV(_component_i_button, _uM({
-          type: "primary",
-          onClick: togglePlayback,
-          size: "small",
-          text: isPlaying.value ? '暂停':'播放'
-        }), null, 8 /* PROPS */, ["text"]),
-        _cE("view", _uM({ class: "slider" }), [
-          _cV(_component_i_slider, _uM({
-            modelValue: playbackSpeed.value,
-            "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
-            min: 1,
-            max: 50,
-            step: 5,
-            onChange: setPlaybackSpeed
-          }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-        ]),
-        _cE("text", _uM({ class: "speed-label" }), _tD(playbackSpeed.value) + "x", 1 /* TEXT */)
-      ]),
-      _cE("view", _uM({ class: "play-back-info" }), [
-        _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", _uM({ class: "info-label" }), _tD(currentTime.value), 1 /* TEXT */),
-          _cE("text", _uM({ class: "info-label" }), "时间")
-        ]),
-        _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", _uM({ class: "info-label" }), _tD(currentSpeed.value) + "Km/h", 1 /* TEXT */),
-          _cE("text", _uM({ class: "info-label" }), "速度")
-        ]),
-        _cE("view", _uM({ class: "item-info" }), [
-          _cE("text", _uM({ class: "info-label" }), _tD((totalDistance.value/1000).toFixed(1)) + "Km", 1 /* TEXT */),
-          _cE("text", _uM({ class: "info-label" }), "里程")
-        ])
-      ]),
-      _cV(_component_l_popup, _uM({
-        modelValue: showDateTimePicker.value,
-        "onUpdate:modelValue": $event => {(showDateTimePicker).value = $event},
-        position: "bottom",
-        closeable: false
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cV(_component_l_date_time_picker, _uM({
-            "confirm-btn": "确认",
-            "cancel-btn": "取消",
-            title: pickerTitle.value,
-            mode: 1|2|4|8|16|32,
-            onConfirm: onConfirm,
-            onCancel: onCancel
-          }), null, 8 /* PROPS */, ["title"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-    ])
-  ])
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 
 })
 export default __sfc__
-const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "25rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])]
+const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "30rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])]

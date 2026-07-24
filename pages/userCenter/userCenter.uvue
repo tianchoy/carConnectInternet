@@ -27,7 +27,7 @@
 		</view>
 		<view class="version" v-if="version">当前版本：{{version}}</view>
 		<movable-area class="movable-area">
-			<movable-view 
+			<movable-view
 				class="movable-view"
 				direction="all"
 				:x="moveX"
@@ -42,11 +42,13 @@
 			</movable-view>
 		</movable-area>
 	</view>
+	<app-toast></app-toast>
 </template>
 
 <script setup lang="uts">
+import { showAppToast } from '../../utils/toast.uts'
 	import { getUserInfo, getUserDeviceList } from '../../api/request';
-	
+
 	const userInfo = ref({
 		avatar: '/static/avatar.png',
 		nickname: '',
@@ -54,15 +56,15 @@
 	const carsnumber = ref(0)
 	const Login = ref(false)
 	const version = ref('')
-	
+
 	// 可拖拽相关变量
 	const moveX = ref(0)
 	const moveY = ref(0)
 	const windowWidth = ref(0)
 	const windowHeight = ref(0)
-	const buttonWidth = 120 
+	const buttonWidth = 120
 	const buttonHeight = 200
-	
+
 	// 加载数据
 	const loadData = async () => {
 		const params = {} as UTSJSONObject
@@ -81,11 +83,11 @@
 		const systemInfo = uni.getSystemInfoSync()
 		windowWidth.value = systemInfo.windowWidth
 		windowHeight.value = systemInfo.windowHeight
-		
+
 		// 设置初始位置
 		moveX.value = windowWidth.value - buttonWidth - 20
 		moveY.value = windowHeight.value - buttonHeight - 20
-		
+
 		// 如果有 token，加载用户信息
 		const token = uni.getStorageSync('token')
 		if (token) {
@@ -94,7 +96,7 @@
 		} else {
 			Login.value = false
 		}
-		
+
 		// 获取小程序版本号
 		//#ifdef MP-WEIXIN
 		const accountInfo = wx.getAccountInfoSync();
@@ -115,13 +117,13 @@
 		//#endif
 
 		//#ifndef MP-WEIXIN
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中联系人工客服',
 			icon: 'none'
 		})
 		//#endif
 	}
-	
+
 
 	const onMoveChange = (e : UTSJSONObject) => {
 		const detail = e.getJSON('detail')
@@ -136,7 +138,7 @@
 			moveY.value = Math.max(0, Math.min(maxY, y))
 		}
 	}
-	
+
 	// 用户信息详情
 	const userInfoDetail = () => {
 		if (Login.value) {
@@ -149,7 +151,7 @@
 			})
 		}
 	}
-	
+
 	// 我的车辆
 	const carList = () => {
 		if (Login.value) {
@@ -157,13 +159,13 @@
 				url: '/pages/userCenter/carList/carList'
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
 		}
 	}
-	
+
 	// 平台续费
 	const platformRenewal = () => {
 		if (Login.value) {
@@ -171,7 +173,7 @@
 				url: '/pages/userCenter/payDeviceList/payDeviceList'
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
@@ -186,7 +188,7 @@
 				url: '/pages/webview/webview?url=' + encodeURIComponent('https://shop.zdiot.cn/')
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
@@ -241,13 +243,13 @@
 				flex-direction: row;
 				justify-content: space-between;
 				align-items: center;
-				
+
 				.badge {
 					margin-left: 20rpx;
 				}
 			}
 		}
-		
+
 		.version {
 			position: fixed;
 			bottom: 50rpx;
@@ -258,7 +260,7 @@
 			color: #c3c2c2ff;
 			margin: 20rpx 40rpx 0;
 		}
-		
+
 		// 可移动区域样式
 		.movable-area {
 			position: fixed;
@@ -270,7 +272,7 @@
 			height: 100%;
 			pointer-events: none;
 			z-index: 999;
-			
+
 		}
 	}
 </style>

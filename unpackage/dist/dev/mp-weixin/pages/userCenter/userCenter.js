@@ -1,17 +1,20 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
   const _easycom_i_badge_1 = common_vendor.resolveComponent("i-badge");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_i_badge_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_i_badge_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_i_badge = () => "../../uni_modules/i-ui-x/components/i-badge/i-badge.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon + _easycom_i_badge)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_i_badge + _easycom_app_toast)();
 }
 const buttonWidth = 120;
 const buttonHeight = 200;
@@ -63,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         extInfo: new common_vendor.UTSJSONObject({ url: "https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a" }),
         corpId: "ww686122ec6a4db85a",
         success(res = null) {
-          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:112", res);
+          common_vendor.index.__f__("log", "at pages/userCenter/userCenter.uvue:114", res);
         }
       }));
     };
@@ -95,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: "/pages/userCenter/carList/carList"
         });
       } else {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请先登录",
           icon: "none"
         });
@@ -107,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: "/pages/userCenter/payDeviceList/payDeviceList"
         });
       } else {
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请先登录",
           icon: "none"
         });
@@ -135,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/arrow-right.png",
           fontSize: "15"
         }),
-        f: common_vendor.o(userInfoDetail, "0c"),
+        f: common_vendor.o(userInfoDetail, "b5"),
         g: common_vendor.unref(Login)
       }, common_vendor.unref(Login) ? {
         h: common_vendor.p({
@@ -147,8 +150,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/arrow-right.png",
           fontSize: "15"
         }),
-        j: common_vendor.o(carList, "66"),
-        k: common_vendor.o(platformRenewal, "57")
+        j: common_vendor.o(carList, "3e"),
+        k: common_vendor.o(platformRenewal, "11")
       } : {}, {
         l: common_vendor.unref(version)
       }, common_vendor.unref(version) ? {
@@ -158,14 +161,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           name: "/static/server-man.png",
           fontSize: "20"
         }),
-        o: common_vendor.o(contactCustomerService, "f1"),
+        o: common_vendor.o(contactCustomerService, "0d"),
         p: common_vendor.unref(moveX),
         q: common_vendor.unref(moveY),
-        r: common_vendor.o(onMoveChange, "ee"),
-        s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`,
-        w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        r: common_vendor.o(onMoveChange, "de"),
+        s: `${_ctx.u_s_b_h}px`,
+        t: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

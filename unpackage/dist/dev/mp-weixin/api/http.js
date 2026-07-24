@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const utils_toast = require("../utils/toast.js");
 class RequestOptions extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -119,22 +120,22 @@ class RequestFailure extends common_vendor.UTS.UTSType {
 }
 const BASE_URL = "https://car.zdiot.cn:18443/api";
 function handleTokenExpired() {
-  common_vendor.index.__f__("log", "at api/http.uts:38", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:39", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
-  common_vendor.index.showToast({
+  utils_toast.showAppToast({
     title: "登录已过期，请重新登录",
     icon: "none",
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:52", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:53", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:56", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:57", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:59", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:60", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -159,38 +160,38 @@ function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:111", "请求错误详情:", error);
+  common_vendor.index.__f__("log", "at api/http.uts:112", "请求错误详情:", error);
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 401:
         handleTokenExpired();
         break;
       case 403:
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "没有权限访问",
           icon: "none"
         });
         break;
       case 404:
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "请求资源不存在",
           icon: "none"
         });
         break;
       case 500:
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: "服务器错误",
           icon: "none"
         });
         break;
       default:
-        common_vendor.index.showToast({
+        utils_toast.showAppToast({
           title: error.message != null ? error.message : `请求错误: ${error.statusCode}`,
           icon: "none"
         });
     }
   } else {
-    common_vendor.index.showToast({
+    utils_toast.showAppToast({
       title: "网络错误，请检查网络连接",
       icon: "none"
     });

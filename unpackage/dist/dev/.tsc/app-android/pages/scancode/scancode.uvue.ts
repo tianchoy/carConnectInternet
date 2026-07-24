@@ -1,4 +1,6 @@
-import { ref } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref } from 'vue'
 
 	
 const __sfc__ = defineComponent({
@@ -8,7 +10,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const scanFunctionIsUseable = ref(true)
+const scanFunctionIsUseable = ref(true)
 
 	const goBack = () => {
 		uni.navigateBack({ delta: 1 })
@@ -17,10 +19,10 @@ const _cache = __ins.renderCache;
 	const handleScanResult = (scanResult : string) => {
 		if (!scanFunctionIsUseable.value || scanResult.length == 0) return
 		scanFunctionIsUseable.value = false
-		console.log('扫码结果:', scanResult, " at pages/scancode/scancode.uvue:17")
+		console.log('扫码结果:', scanResult, " at pages/scancode/scancode.uvue:19")
 		uni.setStorageSync('scanCodeResult', scanResult)
 		uni.$emit('scanCodeResult', { result: scanResult })
-		uni.showToast({
+		showAppToast({
 			title: '扫码成功',
 			icon: 'success',
 			duration: 1000
@@ -35,13 +37,13 @@ const _cache = __ins.renderCache;
 		uni.scanCode({
 			onlyFromCamera: true,
 			success: (res) => {
-				console.log('扫码成功res:', res, " at pages/scancode/scancode.uvue:35")
+				console.log('扫码成功res:', res, " at pages/scancode/scancode.uvue:37")
 				const result = res.result
 				if (result != null) handleScanResult(result)
 			},
 			fail: (err) => {
-				console.log('扫码失败:', err, " at pages/scancode/scancode.uvue:40")
-				uni.showToast({ title: '扫码失败', icon: 'none' })
+				console.log('扫码失败:', err, " at pages/scancode/scancode.uvue:42")
+				showAppToast({ title: '扫码失败', icon: 'none' })
 				goBack()
 			}
 		})
@@ -53,7 +55,12 @@ const _cache = __ins.renderCache;
 
 return (): any | null => {
 
-  return _cE("view")
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+
+  return _cE(Fragment, null, [
+    _cE("view"),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

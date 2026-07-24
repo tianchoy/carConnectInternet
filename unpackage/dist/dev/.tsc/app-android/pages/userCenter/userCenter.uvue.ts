@@ -1,8 +1,10 @@
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_badge from '@/uni_modules/i-ui-x/components/i-badge/i-badge.uvue'
-import { getUserInfo, getUserDeviceList } from '../../api/request';
-	
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { getUserInfo, getUserDeviceList } from '../../api/request';
+
 	
 const __sfc__ = defineComponent({
   __name: 'userCenter',
@@ -11,25 +13,25 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const userInfo = ref({
+const userInfo = ref({
 		avatar: '/static/avatar.png',
 		nickname: '',
 	})
 	const carsnumber = ref(0)
 	const Login = ref(false)
 	const version = ref('')
-	
+
 	// 可拖拽相关变量
 	const moveX = ref(0)
 	const moveY = ref(0)
 	const windowWidth = ref(0)
 	const windowHeight = ref(0)
-	const buttonWidth = 120 
+	const buttonWidth = 120
 	const buttonHeight = 200
-	
+
 	// 加载数据
 	const loadData = async () => {
-		const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 9), } as UTSJSONObject
+		const params = { __$originalPosition: new UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 70, 9), } as UTSJSONObject
 		const res = await getUserInfo()
 		userInfo.value = {
 			avatar: res.data.getString('avatar', '/static/avatar.png'),
@@ -45,11 +47,11 @@ const _cache = __ins.renderCache;
 		const systemInfo = uni.getSystemInfoSync()
 		windowWidth.value = systemInfo.windowWidth
 		windowHeight.value = systemInfo.windowHeight
-		
+
 		// 设置初始位置
 		moveX.value = windowWidth.value - buttonWidth - 20
 		moveY.value = windowHeight.value - buttonHeight - 20
-		
+
 		// 如果有 token，加载用户信息
 		const token = uni.getStorageSync('token')
 		if (token) {
@@ -58,7 +60,7 @@ const _cache = __ins.renderCache;
 		} else {
 			Login.value = false
 		}
-		
+
 		// 获取小程序版本号
 
 
@@ -79,13 +81,13 @@ const _cache = __ins.renderCache;
 
 
 
-		uni.showToast({
+		showAppToast({
 			title: '请在微信小程序中联系人工客服',
 			icon: 'none'
 		})
 
 	}
-	
+
 
 	const onMoveChange = (e : UTSJSONObject) => {
 		const detail = e.getJSON('detail')
@@ -100,12 +102,12 @@ const _cache = __ins.renderCache;
 			moveY.value = Math.max(0, Math.min(maxY, y))
 		}
 	}
-	
+
 	// 用户信息详情
 	const userInfoDetail = () => {
 		if (Login.value) {
 			uni.navigateTo({
-				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:144")
+				url: '/pages/userCenter/userInfo/userInfo?userInfo=' + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:146")
 			})
 		} else {
 			uni.navigateTo({
@@ -113,7 +115,7 @@ const _cache = __ins.renderCache;
 			})
 		}
 	}
-	
+
 	// 我的车辆
 	const carList = () => {
 		if (Login.value) {
@@ -121,13 +123,13 @@ const _cache = __ins.renderCache;
 				url: '/pages/userCenter/carList/carList'
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
 		}
 	}
-	
+
 	// 平台续费
 	const platformRenewal = () => {
 		if (Login.value) {
@@ -135,7 +137,7 @@ const _cache = __ins.renderCache;
 				url: '/pages/userCenter/payDeviceList/payDeviceList'
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
@@ -147,10 +149,10 @@ const _cache = __ins.renderCache;
 		if (Login.value) {
 			// 跳转到网页容器页面
 			uni.navigateTo({
-				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:186")
+				url: '/pages/webview/webview?url=' + UTSAndroid.consoleDebugError(encodeURIComponent('https://shop.zdiot.cn/'), " at pages/userCenter/userCenter.uvue:188")
 			})
 		} else {
-			uni.showToast({
+			showAppToast({
 				title: '请先登录',
 				icon: 'none',
 			})
@@ -164,98 +166,102 @@ const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 const _component_i_badge = resolveEasyComponent("i-badge",_easycom_i_badge)
 const _component_movable_view = resolveComponent("movable-view")
 const _component_movable_area = resolveComponent("movable-area")
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "个人中心",
-      "show-back": false,
-      backgroundColor: "#fff",
-      textColor: "#333",
-      showCapsule: false
-    })),
-    _cE("view", _uM({
-      class: "user-info-box",
-      onClick: userInfoDetail
-    }), [
-      _cE("view", _uM({ class: "userinfo" }), [
-        _cE("view", null, [
-          _cV(_component_i_icon, _uM({
-            name: "/static/avatar.png",
-            fontSize: "40"
-          }))
-        ]),
-        _cE("view", _uM({ class: "user-info" }), [
-          isTrue(unref(Login))
-            ? _cE("text", _uM({ key: 0 }), _tD(unref(userInfo).mobile), 1 /* TEXT */)
-            : _cE("text", _uM({ key: 1 }), "点击登录")
-        ])
-      ]),
-      _cV(_component_i_icon, _uM({
-        name: "/static/arrow-right.png",
-        fontSize: "15"
-      }))
-    ]),
-    isTrue(unref(Login))
-      ? _cE("view", _uM({ key: 0 }), [
-          _cE("view", _uM({
-            class: "list",
-            onClick: carList
-          }), [
-            _cE("view", _uM({ class: "left" }), [
-              _cE("text", null, "我的车辆"),
-              _cE("text", _uM({ class: "badge" }), [
-                _cV(_component_i_badge, _uM({
-                  type: "danger",
-                  maxCount: "99",
-                  count: unref(carsnumber)
-                }), null, 8 /* PROPS */, ["count"])
-              ])
-            ]),
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "个人中心",
+        "show-back": false,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({
+        class: "user-info-box",
+        onClick: userInfoDetail
+      }), [
+        _cE("view", _uM({ class: "userinfo" }), [
+          _cE("view", null, [
             _cV(_component_i_icon, _uM({
-              name: "/static/arrow-right.png",
-              fontSize: "15"
+              name: "/static/avatar.png",
+              fontSize: "40"
             }))
           ]),
-          _cE("view", _uM({
-            class: "list",
-            onClick: platformRenewal
-          }), "平台续费")
-        ])
-      : _cC("v-if", true),
-    isTrue(unref(version))
-      ? _cE("view", _uM({
-          key: 1,
-          class: "version"
-        }), "当前版本：" + _tD(unref(version)), 1 /* TEXT */)
-      : _cC("v-if", true),
-    _cV(_component_movable_area, _uM({ class: "movable-area" }), _uM({
-      default: withSlotCtx((): any[] => [
-        _cV(_component_movable_view, _uM({
-          class: "movable-view",
-          direction: "all",
-          x: unref(moveX),
-          y: unref(moveY),
-          onChange: onMoveChange
-        }), _uM({
-          default: withSlotCtx((): any[] => [
-            _cE("view", _uM({
-              class: "contact-button-movable",
-              onClick: contactCustomerService
-            }), [
-              _cV(_component_i_icon, _uM({
-                name: "/static/server-man.png",
-                fontSize: "20"
-              })),
-              _cE("text", _uM({ class: "contact-text" }), "人工客服"),
-              _cE("text", _uM({ class: "contact-text" }), "08:00-24:00")
-            ])
-          ]),
-          _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["x", "y"])
+          _cE("view", _uM({ class: "user-info" }), [
+            isTrue(unref(Login))
+              ? _cE("text", _uM({ key: 0 }), _tD(unref(userInfo).mobile), 1 /* TEXT */)
+              : _cE("text", _uM({ key: 1 }), "点击登录")
+          ])
+        ]),
+        _cV(_component_i_icon, _uM({
+          name: "/static/arrow-right.png",
+          fontSize: "15"
+        }))
       ]),
-      _: 1 /* STABLE */
-    }))
-  ])
+      isTrue(unref(Login))
+        ? _cE("view", _uM({ key: 0 }), [
+            _cE("view", _uM({
+              class: "list",
+              onClick: carList
+            }), [
+              _cE("view", _uM({ class: "left" }), [
+                _cE("text", null, "我的车辆"),
+                _cE("text", _uM({ class: "badge" }), [
+                  _cV(_component_i_badge, _uM({
+                    type: "danger",
+                    maxCount: "99",
+                    count: unref(carsnumber)
+                  }), null, 8 /* PROPS */, ["count"])
+                ])
+              ]),
+              _cV(_component_i_icon, _uM({
+                name: "/static/arrow-right.png",
+                fontSize: "15"
+              }))
+            ]),
+            _cE("view", _uM({
+              class: "list",
+              onClick: platformRenewal
+            }), "平台续费")
+          ])
+        : _cC("v-if", true),
+      isTrue(unref(version))
+        ? _cE("view", _uM({
+            key: 1,
+            class: "version"
+          }), "当前版本：" + _tD(unref(version)), 1 /* TEXT */)
+        : _cC("v-if", true),
+      _cV(_component_movable_area, _uM({ class: "movable-area" }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cV(_component_movable_view, _uM({
+            class: "movable-view",
+            direction: "all",
+            x: unref(moveX),
+            y: unref(moveY),
+            onChange: onMoveChange
+          }), _uM({
+            default: withSlotCtx((): any[] => [
+              _cE("view", _uM({
+                class: "contact-button-movable",
+                onClick: contactCustomerService
+              }), [
+                _cV(_component_i_icon, _uM({
+                  name: "/static/server-man.png",
+                  fontSize: "20"
+                })),
+                _cE("text", _uM({ class: "contact-text" }), "人工客服"),
+                _cE("text", _uM({ class: "contact-text" }), "08:00-24:00")
+              ])
+            ]),
+            _: 1 /* STABLE */
+          }), 8 /* PROPS */, ["x", "y"])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

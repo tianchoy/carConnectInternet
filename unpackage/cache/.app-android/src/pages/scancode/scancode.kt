@@ -16,7 +16,6 @@ import io.dcloud.uniapp.extapi.`$emit` as uni__emit
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
 import io.dcloud.uniapp.extapi.scanCode as uni_scanCode
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesScancodeScancode : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -34,10 +33,10 @@ open class GenPagesScancodeScancode : BasePage {
                     return
                 }
                 scanFunctionIsUseable.value = false
-                console.log("扫码结果:", scanResult, " at pages/scancode/scancode.uvue:17")
+                console.log("扫码结果:", scanResult, " at pages/scancode/scancode.uvue:19")
                 uni_setStorageSync("scanCodeResult", scanResult)
                 uni__emit("scanCodeResult", _uO("result" to scanResult))
-                uni_showToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 1000))
+                showAppToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 1000))
                 setTimeout(fun(){
                     uni_navigateBack(NavigateBackOptions(delta = 1))
                 }
@@ -48,15 +47,15 @@ open class GenPagesScancodeScancode : BasePage {
                     return
                 }
                 uni_scanCode(ScanCodeOptions(onlyFromCamera = true, success = fun(res){
-                    console.log("扫码成功res:", res, " at pages/scancode/scancode.uvue:35")
+                    console.log("扫码成功res:", res, " at pages/scancode/scancode.uvue:37")
                     val result = res.result
                     if (result != null) {
                         handleScanResult(result)
                     }
                 }
                 , fail = fun(err){
-                    console.log("扫码失败:", err, " at pages/scancode/scancode.uvue:40")
-                    uni_showToast(ShowToastOptions(title = "扫码失败", icon = "none"))
+                    console.log("扫码失败:", err, " at pages/scancode/scancode.uvue:42")
+                    showAppToast(ShowToastOptions(title = "扫码失败", icon = "none"))
                     goBack()
                 }
                 ))
@@ -66,7 +65,11 @@ open class GenPagesScancodeScancode : BasePage {
             }
             )
             return fun(): Any? {
-                return _cE("view")
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view"),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

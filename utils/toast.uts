@@ -1,0 +1,26 @@
+const iosToastHandlers: Array<(options: ShowToastOptions) => void> = []
+
+export function registerIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+	// #ifdef APP-IOS
+	const index = iosToastHandlers.indexOf(handler)
+	if (index == -1) iosToastHandlers.push(handler)
+	// #endif
+}
+
+export function unregisterIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+	// #ifdef APP-IOS
+	const index = iosToastHandlers.indexOf(handler)
+	if (index >= 0) iosToastHandlers.splice(index, 1)
+	// #endif
+}
+
+export function showAppToast(options: ShowToastOptions): void {
+	// #ifdef APP-IOS
+	const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null
+	if (handler != null) handler(options)
+	// #endif
+
+	// #ifndef APP-IOS
+	uni.showToast(options)
+	// #endif
+}

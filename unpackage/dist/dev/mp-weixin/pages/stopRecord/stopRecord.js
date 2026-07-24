@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
 require("../../utils/getAdress.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
@@ -10,15 +11,17 @@ if (!Array) {
   const _easycom_l_date_time_picker_1 = common_vendor.resolveComponent("l-date-time-picker");
   const _easycom_l_popup_1 = common_vendor.resolveComponent("l-popup");
   const _easycom_i_empty_1 = common_vendor.resolveComponent("i-empty");
-  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_icon_1 + _easycom_l_date_time_picker_1 + _easycom_l_popup_1 + _easycom_i_empty_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_icon = () => "../../uni_modules/i-ui-x/components/i-icon/i-icon.js";
 const _easycom_l_date_time_picker = () => "../../uni_modules/lime-date-time-picker/components/l-date-time-picker/l-date-time-picker.js";
 const _easycom_l_popup = () => "../../uni_modules/lime-popup/components/l-popup/l-popup.js";
 const _easycom_i_empty = () => "../../uni_modules/i-ui-x/components/i-empty/i-empty.js";
+const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty)();
+  (_easycom_custom_navBar + _easycom_i_icon + _easycom_l_date_time_picker + _easycom_l_popup + _easycom_i_empty + _easycom_app_toast)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "stopRecord",
@@ -115,21 +118,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const showAddress = (latitude, longitude) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:170", latitude, longitude);
+        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:172", latitude, longitude);
         common_vendor.index.openLocation({
           latitude,
           longitude,
           name: "当前位置",
           scale: 18,
           success: () => {
-            common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:177", "成功调起地图");
+            common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:179", "成功调起地图");
           },
           fail: (err) => {
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "调起地图失败",
               icon: "none"
             });
-            common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:184", "调起地图失败:", err);
+            common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:186", "调起地图失败:", err);
           }
         });
       });
@@ -151,10 +154,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(startTime.value),
         d: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "f1"),
+        }, "33"),
         e: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "4c"),
+        }, "24"),
         f: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15"
@@ -162,16 +165,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.t(endTime.value),
         h: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "c6"),
+        }, "d2"),
         i: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "14"),
+        }, "bd"),
         j: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15"
         }),
-        k: common_vendor.o(onConfirm, "3c"),
-        l: common_vendor.o(onCancel, "94"),
+        k: common_vendor.o(onConfirm, "53"),
+        l: common_vendor.o(onCancel, "45"),
         m: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -180,7 +183,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "d5"),
+        }, "62"),
         o: common_vendor.p({
           position: "bottom",
           closeable: false,
@@ -215,10 +218,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         v: common_assets._imports_2$2,
         w: common_assets._imports_3$1
       }, {
-        x: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        y: `${_ctx.u_s_b_h}px`,
-        z: `${_ctx.u_s_a_i_b}px`,
-        A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        x: `${_ctx.u_s_b_h}px`,
+        y: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

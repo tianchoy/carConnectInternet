@@ -3,6 +3,7 @@
   "usingComponents": {
     "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
     "i-line-progress": "../../uni_modules/i-ui-x/components/i-line-progress/i-line-progress",
-    "i-picker": "../../uni_modules/i-ui-x/components/i-picker/i-picker"
+    "i-picker": "../../uni_modules/i-ui-x/components/i-picker/i-picker",
+    "app-toast": "../../components/app-toast/app-toast"
   }
 }

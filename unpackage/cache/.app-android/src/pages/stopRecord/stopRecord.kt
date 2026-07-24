@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.openLocation as uni_openLocation
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesStopRecordStopRecord : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -64,7 +63,7 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 108, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
                         val res = await(getTrackPos(data))
                         var stopsWithAddress: UTSArray<StopRecord> = _uA()
                         val trackData = res.data
@@ -114,13 +113,13 @@ open class GenPagesStopRecordStopRecord : BasePage {
             }
             val showAddress = fun(latitude: Number, longitude: Number): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:170")
+                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:172")
                         uni_openLocation(OpenLocationOptions(latitude = latitude, longitude = longitude, name = "当前位置", scale = 18, success = fun(_){
-                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:177")
+                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:179")
                         }
                         , fail = fun(err){
-                            uni_showToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:184")
+                            showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
+                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:186")
                         }
                         ))
                 })
@@ -131,95 +130,99 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
                 val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
                 val _component_i_empty = resolveEasyComponent("i-empty", GenUniModulesIUiXComponentsIEmptyIEmptyClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "停车记录", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "tools-panel"), _uA(
-                        _cE("view", _uM("class" to "Datetime-box"), _uA(
-                            _cE("view", _uM("class" to "date-box"), _uA(
-                                _cV(_component_i_icon, _uM("name" to "/static/rili.png", "fontSize" to "15")),
-                                _cE("text", _uM("class" to "Date", "onClick" to fun(){
-                                    showPicker("start")
-                                }
-                                ), _tD(startTime.value), 9, _uA(
-                                    "onClick"
-                                )),
-                                _cV(_component_i_icon, _uM("name" to "/static/xiangxia.png", "fontSize" to "15", "onClick" to fun(){
-                                    showPicker("start")
-                                }
-                                ), null, 8, _uA(
-                                    "onClick"
-                                )),
-                                _cE("text", _uM("style" to _nS(_uM("padding" to "0 10rpx"))), "至", 4),
-                                _cE("text", _uM("class" to "Date", "onClick" to fun(){
-                                    showPicker("end")
-                                }
-                                ), _tD(endTime.value), 9, _uA(
-                                    "onClick"
-                                )),
-                                _cV(_component_i_icon, _uM("name" to "/static/xiangxia.png", "fontSize" to "15", "onClick" to fun(){
-                                    showPicker("end")
-                                }
-                                ), null, 8, _uA(
-                                    "onClick"
-                                ))
-                            ))
-                        )),
-                        _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                            showDateTimePicker.value = `$event`
-                        }
-                        , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                    "title"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue",
-                            "onUpdate:modelValue"
-                        ))
-                    )),
-                    _cE("scroll-view", _uM("class" to "content-box", "scroll-y" to "true"), _uA(
-                        if (sortedCarStopDetail.value.length == 0) {
-                            _cV(_component_i_empty, _uM("key" to 0, "text" to "当前时间暂无停车数据", "showButton" to false, "description" to ""))
-                        } else {
-                            _cE(Fragment, _uM("key" to 1), RenderHelpers.renderList(sortedCarStopDetail.value, fun(item, index, __index, _cached): Any {
-                                return _cE("view", _uM("class" to "content", "key" to index), _uA(
-                                    _cE("view", _uM("class" to "item"), _uA(
-                                        _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/startTime.png")),
-                                        _cE("text", null, _tD(item["startTime"]), 1)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "停车记录", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "tools-panel"), _uA(
+                            _cE("view", _uM("class" to "Datetime-box"), _uA(
+                                _cE("view", _uM("class" to "date-box"), _uA(
+                                    _cV(_component_i_icon, _uM("name" to "/static/rili.png", "fontSize" to "15")),
+                                    _cE("text", _uM("class" to "Date", "onClick" to fun(){
+                                        showPicker("start")
+                                    }
+                                    ), _tD(startTime.value), 9, _uA(
+                                        "onClick"
                                     )),
-                                    _cE("view", _uM("class" to "item"), _uA(
-                                        _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/endTime.png")),
-                                        _cE("text", null, _tD(item["endTime"]), 1)
+                                    _cV(_component_i_icon, _uM("name" to "/static/xiangxia.png", "fontSize" to "15", "onClick" to fun(){
+                                        showPicker("start")
+                                    }
+                                    ), null, 8, _uA(
+                                        "onClick"
                                     )),
-                                    _cE("view", _uM("class" to "item"), _uA(
-                                        _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/stopTime.png")),
-                                        _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber("duration", 0))), 1)
+                                    _cE("text", _uM("style" to _nS(_uM("padding" to "0 10rpx"))), "至", 4),
+                                    _cE("text", _uM("class" to "Date", "onClick" to fun(){
+                                        showPicker("end")
+                                    }
+                                    ), _tD(endTime.value), 9, _uA(
+                                        "onClick"
                                     )),
-                                    _cE("view", _uM("class" to "item"), _uA(
-                                        _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/user_location.png")),
-                                        if (isTrue(item["address"])) {
-                                            _cE("text", _uM("key" to 0, "class" to "address"), _tD(if (isTruthy(item["address"])) {
-                                                item["address"]
-                                            } else {
-                                                "加载中..."
-                                            }), 1)
-                                        } else {
-                                            _cE("text", _uM("key" to 1, "onClick" to fun(){
-                                                showAddress(item.getNumber("latitude", 0), item.getNumber("longitude", 0))
-                                            }
-                                            ), "点击查看停车位置", 8, _uA(
-                                                "onClick"
-                                            ))
-                                        }
+                                    _cV(_component_i_icon, _uM("name" to "/static/xiangxia.png", "fontSize" to "15", "onClick" to fun(){
+                                        showPicker("end")
+                                    }
+                                    ), null, 8, _uA(
+                                        "onClick"
                                     ))
                                 ))
+                            )),
+                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
+                                showDateTimePicker.value = `$event`
                             }
-                            ), 128)
-                        }
-                    ))
-                ))
+                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                        "title"
+                                    ))
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "modelValue",
+                                "onUpdate:modelValue"
+                            ))
+                        )),
+                        _cE("scroll-view", _uM("class" to "content-box", "scroll-y" to "true"), _uA(
+                            if (sortedCarStopDetail.value.length == 0) {
+                                _cV(_component_i_empty, _uM("key" to 0, "text" to "当前时间暂无停车数据", "showButton" to false, "description" to ""))
+                            } else {
+                                _cE(Fragment, _uM("key" to 1), RenderHelpers.renderList(sortedCarStopDetail.value, fun(item, index, __index, _cached): Any {
+                                    return _cE("view", _uM("class" to "content", "key" to index), _uA(
+                                        _cE("view", _uM("class" to "item"), _uA(
+                                            _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/startTime.png")),
+                                            _cE("text", null, _tD(item["startTime"]), 1)
+                                        )),
+                                        _cE("view", _uM("class" to "item"), _uA(
+                                            _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/endTime.png")),
+                                            _cE("text", null, _tD(item["endTime"]), 1)
+                                        )),
+                                        _cE("view", _uM("class" to "item"), _uA(
+                                            _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/stopTime.png")),
+                                            _cE("text", null, "停留 " + _tD(calculateDuration(item.getNumber("duration", 0))), 1)
+                                        )),
+                                        _cE("view", _uM("class" to "item"), _uA(
+                                            _cE("image", _uM("class" to "icons", "mode" to "aspectFit", "src" to "/static/user_location.png")),
+                                            if (isTrue(item["address"])) {
+                                                _cE("text", _uM("key" to 0, "class" to "address"), _tD(if (isTruthy(item["address"])) {
+                                                    item["address"]
+                                                } else {
+                                                    "加载中..."
+                                                }), 1)
+                                            } else {
+                                                _cE("text", _uM("key" to 1, "onClick" to fun(){
+                                                    showAddress(item.getNumber("latitude", 0), item.getNumber("longitude", 0))
+                                                }
+                                                ), "点击查看停车位置", 8, _uA(
+                                                    "onClick"
+                                                ))
+                                            }
+                                        ))
+                                    ))
+                                }
+                                ), 128)
+                            }
+                        ))
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

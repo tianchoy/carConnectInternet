@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesUserCenterUserCenter : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -36,7 +35,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
             val buttonHeight: Number = 200
             val loadData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 68, 9))
+                        val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/userCenter/userCenter.uvue", 70, 9))
                         val res = await(getUserInfo())
                         userInfo.value = _uO("avatar" to res.data.getString("avatar", "/static/avatar.png"), "nickname" to res.data.getString("nickname", ""))
                         val resCars = await(getUserDeviceList(params))
@@ -59,7 +58,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
             }
             )
             val contactCustomerService = fun(){
-                uni_showToast(ShowToastOptions(title = "请在微信小程序中联系人工客服", icon = "none"))
+                showAppToast(ShowToastOptions(title = "请在微信小程序中联系人工客服", icon = "none"))
             }
             val onMoveChange = fun(e: UTSJSONObject){
                 val detail = e.getJSON("detail")
@@ -82,7 +81,7 @@ open class GenPagesUserCenterUserCenter : BasePage {
             }
             val userInfoDetail = fun(){
                 if (Login.value) {
-                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:144")))
+                    uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/userInfo/userInfo?userInfo=" + UTSAndroid.consoleDebugError(encodeURIComponent(JSON.stringify(userInfo.value)), " at pages/userCenter/userCenter.uvue:146")))
                 } else {
                     uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
                 }
@@ -91,14 +90,14 @@ open class GenPagesUserCenterUserCenter : BasePage {
                 if (Login.value) {
                     uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/carList/carList"))
                 } else {
-                    uni_showToast(ShowToastOptions(title = "请先登录", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请先登录", icon = "none"))
                 }
             }
             val platformRenewal = fun(){
                 if (Login.value) {
                     uni_navigateTo(NavigateToOptions(url = "/pages/userCenter/payDeviceList/payDeviceList"))
                 } else {
-                    uni_showToast(ShowToastOptions(title = "请先登录", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "请先登录", icon = "none"))
                 }
             }
             return fun(): Any? {
@@ -107,67 +106,71 @@ open class GenPagesUserCenterUserCenter : BasePage {
                 val _component_i_badge = resolveEasyComponent("i-badge", GenUniModulesIUiXComponentsIBadgeIBadgeClass)
                 val _component_movable_view = resolveComponent("movable-view")
                 val _component_movable_area = resolveComponent("movable-area")
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "个人中心", "show-back" to false, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "user-info-box", "onClick" to userInfoDetail), _uA(
-                        _cE("view", _uM("class" to "userinfo"), _uA(
-                            _cE("view", null, _uA(
-                                _cV(_component_i_icon, _uM("name" to "/static/avatar.png", "fontSize" to "40"))
-                            )),
-                            _cE("view", _uM("class" to "user-info"), _uA(
-                                if (isTrue(unref(Login))) {
-                                    _cE("text", _uM("key" to 0), _tD(unref(userInfo)["mobile"]), 1)
-                                } else {
-                                    _cE("text", _uM("key" to 1), "点击登录")
-                                }
-                            ))
-                        )),
-                        _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
-                    )),
-                    if (isTrue(unref(Login))) {
-                        _cE("view", _uM("key" to 0), _uA(
-                            _cE("view", _uM("class" to "list", "onClick" to carList), _uA(
-                                _cE("view", _uM("class" to "left"), _uA(
-                                    _cE("text", null, "我的车辆"),
-                                    _cE("text", _uM("class" to "badge"), _uA(
-                                        _cV(_component_i_badge, _uM("type" to "danger", "maxCount" to "99", "count" to unref(carsnumber)), null, 8, _uA(
-                                            "count"
-                                        ))
-                                    ))
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "个人中心", "show-back" to false, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "user-info-box", "onClick" to userInfoDetail), _uA(
+                            _cE("view", _uM("class" to "userinfo"), _uA(
+                                _cE("view", null, _uA(
+                                    _cV(_component_i_icon, _uM("name" to "/static/avatar.png", "fontSize" to "40"))
                                 )),
-                                _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                                _cE("view", _uM("class" to "user-info"), _uA(
+                                    if (isTrue(unref(Login))) {
+                                        _cE("text", _uM("key" to 0), _tD(unref(userInfo)["mobile"]), 1)
+                                    } else {
+                                        _cE("text", _uM("key" to 1), "点击登录")
+                                    }
+                                ))
                             )),
-                            _cE("view", _uM("class" to "list", "onClick" to platformRenewal), "平台续费")
-                        ))
-                    } else {
-                        _cC("v-if", true)
-                    }
-                    ,
-                    if (isTrue(unref(version))) {
-                        _cE("view", _uM("key" to 1, "class" to "version"), "当前版本：" + _tD(unref(version)), 1)
-                    } else {
-                        _cC("v-if", true)
-                    }
-                    ,
-                    _cV(_component_movable_area, _uM("class" to "movable-area"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                        return _uA(
-                            _cV(_component_movable_view, _uM("class" to "movable-view", "direction" to "all", "x" to unref(moveX), "y" to unref(moveY), "onChange" to onMoveChange), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    _cE("view", _uM("class" to "contact-button-movable", "onClick" to contactCustomerService), _uA(
-                                        _cV(_component_i_icon, _uM("name" to "/static/server-man.png", "fontSize" to "20")),
-                                        _cE("text", _uM("class" to "contact-text"), "人工客服"),
-                                        _cE("text", _uM("class" to "contact-text"), "08:00-24:00")
-                                    ))
-                                )
-                            }
-                            ), "_" to 1), 8, _uA(
-                                "x",
-                                "y"
+                            _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                        )),
+                        if (isTrue(unref(Login))) {
+                            _cE("view", _uM("key" to 0), _uA(
+                                _cE("view", _uM("class" to "list", "onClick" to carList), _uA(
+                                    _cE("view", _uM("class" to "left"), _uA(
+                                        _cE("text", null, "我的车辆"),
+                                        _cE("text", _uM("class" to "badge"), _uA(
+                                            _cV(_component_i_badge, _uM("type" to "danger", "maxCount" to "99", "count" to unref(carsnumber)), null, 8, _uA(
+                                                "count"
+                                            ))
+                                        ))
+                                    )),
+                                    _cV(_component_i_icon, _uM("name" to "/static/arrow-right.png", "fontSize" to "15"))
+                                )),
+                                _cE("view", _uM("class" to "list", "onClick" to platformRenewal), "平台续费")
                             ))
-                        )
-                    }
-                    ), "_" to 1))
-                ))
+                        } else {
+                            _cC("v-if", true)
+                        }
+                        ,
+                        if (isTrue(unref(version))) {
+                            _cE("view", _uM("key" to 1, "class" to "version"), "当前版本：" + _tD(unref(version)), 1)
+                        } else {
+                            _cC("v-if", true)
+                        }
+                        ,
+                        _cV(_component_movable_area, _uM("class" to "movable-area"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                _cV(_component_movable_view, _uM("class" to "movable-view", "direction" to "all", "x" to unref(moveX), "y" to unref(moveY), "onChange" to onMoveChange), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    return _uA(
+                                        _cE("view", _uM("class" to "contact-button-movable", "onClick" to contactCustomerService), _uA(
+                                            _cV(_component_i_icon, _uM("name" to "/static/server-man.png", "fontSize" to "20")),
+                                            _cE("text", _uM("class" to "contact-text"), "人工客服"),
+                                            _cE("text", _uM("class" to "contact-text"), "08:00-24:00")
+                                        ))
+                                    )
+                                }
+                                ), "_" to 1), 8, _uA(
+                                    "x",
+                                    "y"
+                                ))
+                            )
+                        }
+                        ), "_" to 1))
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

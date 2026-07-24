@@ -16,7 +16,6 @@ import uts.sdk.modules.DCloudUniMapTencent.Polyline
 import uts.sdk.modules.DCloudUniMapTencent.LocationObject as LocationObject__1
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesPlayBackPlayBack : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -73,11 +72,24 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return date.getTime()
             }
             val safeParseDate = ::gen_safeParseDate_fn
-            fun gen_formatDateForDisplay_fn(dateStr: String): String {
+            fun gen_normalizeDateTime_fn(dateStr: String): String {
                 if (!(dateStr != "")) {
                     return ""
                 }
-                return dateStr.replace(UTSRegExp("\\/", "g"), "-")
+                var normalized = dateStr.replace(UTSRegExp("-", "g"), "/")
+                val parts = normalized.split(" ")
+                if (parts.length < 2) {
+                    return normalized
+                }
+                val timeParts = parts[1].split(":")
+                if (timeParts.length == 2) {
+                    normalized += ":00"
+                }
+                return normalized
+            }
+            val normalizeDateTime = ::gen_normalizeDateTime_fn
+            fun gen_formatDateForDisplay_fn(dateStr: String): String {
+                return normalizeDateTime(dateStr).replace(UTSRegExp("\\/", "g"), "-")
             }
             val formatDateForDisplay = ::gen_formatDateForDisplay_fn
             fun gen_calculateBearing_fn(lat1: Number, lng1: Number, lat2: Number, lng2: Number): Number {
@@ -206,7 +218,19 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     return
                 }
                 val initialUnplayedPolyline = Polyline(toNativePoints(trackPoints.value), "#888787", 3, true, false, "", "#888787", 0, _uA())
+                initialUnplayedPolyline.color = "#888787"
+                initialUnplayedPolyline.width = 3
+                initialUnplayedPolyline.dottedLine = true
+                initialUnplayedPolyline.arrowLine = false
+                initialUnplayedPolyline.borderColor = "#888787"
+                initialUnplayedPolyline.borderWidth = 0
                 val initialPlayedPolyline = Polyline(toNativePoints(trackPoints.value.slice(0, 1)), "#3c5cff", 5, false, true, "", "#FFFFFF", 1, _uA())
+                initialPlayedPolyline.color = "#3c5cff"
+                initialPlayedPolyline.width = 5
+                initialPlayedPolyline.dottedLine = false
+                initialPlayedPolyline.arrowLine = true
+                initialPlayedPolyline.borderColor = "#FFFFFF"
+                initialPlayedPolyline.borderWidth = 1
                 unplayedPolyline = initialUnplayedPolyline
                 playedPolyline = initialPlayedPolyline
                 polyline.value = _uA(
@@ -262,10 +286,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val originalLat = parseFloat(originalLatText)
                 val originalLng = parseFloat(originalLngText)
                 if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
-                    uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                    showAppToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
                     return
                 }
-                uni_showToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
+                showAppToast(ShowToastOptions(title = "这段时间没有数据", icon = "none", duration = 2000))
                 val convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng)
                 center["latitude"] = convertedCoord.lat
                 center["longitude"] = convertedCoord.lng
@@ -362,7 +386,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 581, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 606, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -382,8 +406,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:606")
-                            uni_showToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:631")
+                            showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
                             }
@@ -404,7 +428,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_playNextPoint_fn(): Boolean {
                 if (currentIndex.value >= trackPoints.value.length - 1) {
                     pausePlayback()
-                    uni_showToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
+                    showAppToast(ShowToastOptions(title = "轨迹回放完成", icon = "none", duration = 1500))
                     return false
                 }
                 currentIndex.value++
@@ -433,7 +457,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val playbackStep = ::gen_playbackStep_fn
             fun gen_startPlayback_fn() {
                 if (!isTrackPlayable.value) {
-                    uni_showToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
+                    showAppToast(ShowToastOptions(title = "没有轨迹数据", icon = "none"))
                     return
                 }
                 if (currentIndex.value >= trackPoints.value.length - 1) {
@@ -457,10 +481,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             }
             val togglePlayback = ::gen_togglePlayback_fn
             fun gen_onConfirm_fn(value: String) {
-                var formattedValue = value
-                if (formattedValue.includes("-")) {
-                    formattedValue = formattedValue.replace(UTSRegExp("-", "g"), "/")
-                }
+                val formattedValue = normalizeDateTime(value)
                 if (currentPickerType.value == "start") {
                     startTime.value = formattedValue
                 } else {
@@ -495,10 +516,10 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:728")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:750")
                 if (sTime.value != "" && eTime.value != "") {
-                    startTime.value = sTime.value
-                    endTime.value = eTime.value
+                    startTime.value = normalizeDateTime(sTime.value)
+                    endTime.value = normalizeDateTime(eTime.value)
                     loadTrackPos()
                 } else {
                     initDateTime()
@@ -525,91 +546,95 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val _component_i_slider = resolveEasyComponent("i-slider", GenUniModulesIUiXComponentsISliderISliderClass)
                 val _component_l_date_time_picker = resolveEasyComponent("l-date-time-picker", GenUniModulesLimeDateTimePickerComponentsLDateTimePickerLDateTimePickerClass)
                 val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
-                    _cE("view", _uM("class" to "map-container"), _uA(
-                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
-                            "latitude",
-                            "longitude",
-                            "markers",
-                            "polyline",
-                            "scale",
-                            "style"
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
+                        _cE("view", _uM("class" to "map-container"), _uA(
+                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                                "latitude",
+                                "longitude",
+                                "markers",
+                                "polyline",
+                                "scale",
+                                "style"
+                            )),
+                            _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to plateNo.value, "showCar" to true, "carStatus" to carStatus.value), null, 8, _uA(
+                                "currentCar",
+                                "carStatus"
+                            ))
                         )),
-                        _cV(_component_sub_navBar, _uM("showTime" to false, "currentCar" to plateNo.value, "showCar" to true, "carStatus" to carStatus.value), null, 8, _uA(
-                            "currentCar",
-                            "carStatus"
+                        _cE("view", _uM("class" to "tools-panel"), _uA(
+                            _cE("view", _uM("class" to "Datetime-box"), _uA(
+                                _cE("view", _uM("class" to "date-box"), _uA(
+                                    _cV(_component_i_icon, _uM("name" to "/static/rili.png", "fontSize" to "15")),
+                                    _cE("text", _uM("class" to "Date", "onClick" to fun(){
+                                        showPicker("start")
+                                    }
+                                    ), _tD(startTime.value), 9, _uA(
+                                        "onClick"
+                                    )),
+                                    _cE("text", null, "至"),
+                                    _cE("text", _uM("class" to "Date", "onClick" to fun(){
+                                        showPicker("end")
+                                    }
+                                    ), _tD(endTime.value), 9, _uA(
+                                        "onClick"
+                                    ))
+                                ))
+                            )),
+                            _cE("view", _uM("class" to "tool-tag-item"), _uA(
+                                _cV(_component_i_button, _uM("type" to "primary", "onClick" to togglePlayback, "size" to "small", "text" to if (isPlaying.value) {
+                                    "暂停"
+                                } else {
+                                    "播放"
+                                }
+                                ), null, 8, _uA(
+                                    "text"
+                                )),
+                                _cE("view", _uM("class" to "slider"), _uA(
+                                    _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
+                                        playbackSpeed.value = `$event`
+                                    }
+                                    , "min" to 1, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeed), null, 8, _uA(
+                                        "modelValue",
+                                        "onUpdate:modelValue"
+                                    ))
+                                )),
+                                _cE("text", _uM("class" to "speed-label"), _tD(playbackSpeed.value) + "x", 1)
+                            )),
+                            _cE("view", _uM("class" to "play-back-info"), _uA(
+                                _cE("view", _uM("class" to "item-info"), _uA(
+                                    _cE("text", _uM("class" to "info-label"), _tD(currentTime.value), 1),
+                                    _cE("text", _uM("class" to "info-label"), "时间")
+                                )),
+                                _cE("view", _uM("class" to "item-info"), _uA(
+                                    _cE("text", _uM("class" to "info-label"), _tD(currentSpeed.value) + "Km/h", 1),
+                                    _cE("text", _uM("class" to "info-label"), "速度")
+                                )),
+                                _cE("view", _uM("class" to "item-info"), _uA(
+                                    _cE("text", _uM("class" to "info-label"), _tD((totalDistance.value / 1000).toFixed(1)) + "Km", 1),
+                                    _cE("text", _uM("class" to "info-label"), "里程")
+                                ))
+                            )),
+                            _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
+                                showDateTimePicker.value = `$event`
+                            }
+                            , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                return _uA(
+                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                        "title"
+                                    ))
+                                )
+                            }
+                            ), "_" to 1), 8, _uA(
+                                "modelValue",
+                                "onUpdate:modelValue"
+                            ))
                         ))
                     )),
-                    _cE("view", _uM("class" to "tools-panel"), _uA(
-                        _cE("view", _uM("class" to "Datetime-box"), _uA(
-                            _cE("view", _uM("class" to "date-box"), _uA(
-                                _cV(_component_i_icon, _uM("name" to "/static/rili.png", "fontSize" to "15")),
-                                _cE("text", _uM("class" to "Date", "onClick" to fun(){
-                                    showPicker("start")
-                                }
-                                ), _tD(startTime.value), 9, _uA(
-                                    "onClick"
-                                )),
-                                _cE("text", null, "至"),
-                                _cE("text", _uM("class" to "Date", "onClick" to fun(){
-                                    showPicker("end")
-                                }
-                                ), _tD(endTime.value), 9, _uA(
-                                    "onClick"
-                                ))
-                            ))
-                        )),
-                        _cE("view", _uM("class" to "tool-tag-item"), _uA(
-                            _cV(_component_i_button, _uM("type" to "primary", "onClick" to togglePlayback, "size" to "small", "text" to if (isPlaying.value) {
-                                "暂停"
-                            } else {
-                                "播放"
-                            }
-                            ), null, 8, _uA(
-                                "text"
-                            )),
-                            _cE("view", _uM("class" to "slider"), _uA(
-                                _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
-                                    playbackSpeed.value = `$event`
-                                }
-                                , "min" to 1, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeed), null, 8, _uA(
-                                    "modelValue",
-                                    "onUpdate:modelValue"
-                                ))
-                            )),
-                            _cE("text", _uM("class" to "speed-label"), _tD(playbackSpeed.value) + "x", 1)
-                        )),
-                        _cE("view", _uM("class" to "play-back-info"), _uA(
-                            _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", _uM("class" to "info-label"), _tD(currentTime.value), 1),
-                                _cE("text", _uM("class" to "info-label"), "时间")
-                            )),
-                            _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", _uM("class" to "info-label"), _tD(currentSpeed.value) + "Km/h", 1),
-                                _cE("text", _uM("class" to "info-label"), "速度")
-                            )),
-                            _cE("view", _uM("class" to "item-info"), _uA(
-                                _cE("text", _uM("class" to "info-label"), _tD((totalDistance.value / 1000).toFixed(1)) + "Km", 1),
-                                _cE("text", _uM("class" to "info-label"), "里程")
-                            ))
-                        )),
-                        _cV(_component_l_popup, _uM("modelValue" to showDateTimePicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
-                            showDateTimePicker.value = `$event`
-                        }
-                        , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
-                                    "title"
-                                ))
-                            )
-                        }
-                        ), "_" to 1), 8, _uA(
-                            "modelValue",
-                            "onUpdate:modelValue"
-                        ))
-                    ))
-                ))
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
@@ -619,7 +644,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "25rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "24rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "30rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "24rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

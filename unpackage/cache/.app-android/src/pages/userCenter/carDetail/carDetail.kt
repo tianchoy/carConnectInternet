@@ -50,35 +50,39 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
             )
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
-                return _cE("view", _uM("class" to "container"), _uA(
-                    _cV(_component_custom_navBar, _uM("title" to "车辆详情", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isIcon" to true, "onCapsuleClick" to toggleEdit, "Icon" to "/static/edit-pen.png")),
-                    _cE("view", _uM("class" to "content"), _uA(
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "设备ID"),
-                            _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceId", "")), 1)
-                        )),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "设备名称"),
-                            _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceName", "")), 1)
-                        )),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "车标"),
-                            _cE("text", _uM("class" to "info"), _tD(carTitle.value), 1)
-                        )),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "车牌号"),
-                            _cE("text", _uM("class" to "info"), _tD(formattedPlateNo.value), 1)
-                        )),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "车架号"),
-                            _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("carVin", "")), 1)
-                        )),
-                        _cE("view", _uM("class" to "list"), _uA(
-                            _cE("text", _uM("class" to "title"), "发动机号"),
-                            _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("engineNum", "")), 1)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                return _cE(Fragment, null, _uA(
+                    _cE("view", _uM("class" to "container"), _uA(
+                        _cV(_component_custom_navBar, _uM("title" to "车辆详情", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isIcon" to true, "onCapsuleClick" to toggleEdit, "Icon" to "/static/edit-pen.png")),
+                        _cE("view", _uM("class" to "content"), _uA(
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "设备ID"),
+                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceId", "")), 1)
+                            )),
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "设备名称"),
+                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("deviceName", "")), 1)
+                            )),
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "车标"),
+                                _cE("text", _uM("class" to "info"), _tD(carTitle.value), 1)
+                            )),
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "车牌号"),
+                                _cE("text", _uM("class" to "info"), _tD(formattedPlateNo.value), 1)
+                            )),
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "车架号"),
+                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("carVin", "")), 1)
+                            )),
+                            _cE("view", _uM("class" to "list"), _uA(
+                                _cE("text", _uM("class" to "title"), "发动机号"),
+                                _cE("text", _uM("class" to "info"), _tD(carInfo.value.getString("engineNum", "")), 1)
+                            ))
                         ))
-                    ))
-                ))
+                    )),
+                    _cV(_component_app_toast)
+                ), 64)
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {

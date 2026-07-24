@@ -6,43 +6,45 @@ import _easycom_i_popup from '@/uni_modules/i-ui-x/components/i-popup/i-popup.uv
 import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
 import _easycom_i_radio from '@/uni_modules/i-ui-x/components/i-radio/i-radio.uvue'
 import _easycom_i_switch from '@/uni_modules/i-ui-x/components/i-switch/i-switch.uvue'
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
 	type Coordinate = LocationObject;
-	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 176, 7>;
+	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 178, 7>;
 		pageNum : number;
 		pageSize : number;
 		hasMore : boolean;
 		loadingMore : boolean;
 	};
-	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 182, 7>;
+	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 184, 7>;
 		bind : PaginationState;
 		unbind : PaginationState;
 	};
-	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 186, 7>;
+	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 188, 7>;
 		latitude : number;
 		longitude : number;
 		radius : number;
 	};
-	type ModalResult = { __$originalPosition?: UTSSourceMapPosition<"ModalResult", "pages/geofencing/geofencing.uvue", 191, 7>;
+	type ModalResult = { __$originalPosition?: UTSSourceMapPosition<"ModalResult", "pages/geofencing/geofencing.uvue", 193, 7>;
 		confirm : boolean;
 	};
-	type FenceForm = { __$originalPosition?: UTSSourceMapPosition<"FenceForm", "pages/geofencing/geofencing.uvue", 194, 7>;
+	type FenceForm = { __$originalPosition?: UTSSourceMapPosition<"FenceForm", "pages/geofencing/geofencing.uvue", 196, 7>;
 		name : string;
 		alarmType : string;
 	};
-	type FenceResponse = { __$originalPosition?: UTSSourceMapPosition<"FenceResponse", "pages/geofencing/geofencing.uvue", 198, 7>;
+	type FenceResponse = { __$originalPosition?: UTSSourceMapPosition<"FenceResponse", "pages/geofencing/geofencing.uvue", 200, 7>;
 		code : number;
 		msg : string;
 	};
-	type SwitchChangeEvent = { __$originalPosition?: UTSSourceMapPosition<"SwitchChangeEvent", "pages/geofencing/geofencing.uvue", 202, 7>;
+	type SwitchChangeEvent = { __$originalPosition?: UTSSourceMapPosition<"SwitchChangeEvent", "pages/geofencing/geofencing.uvue", 204, 7>;
 		value : boolean;
 	};
 	// 地图状态
-	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 653, 7>;
+	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 655, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
@@ -58,7 +60,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const imei = ref<string | null>(null)
+const imei = ref<string | null>(null)
 	const connectionStatus = ref<string | null>(null)
 	const deptId = ref<string | null>(null)
 	const carType = ref<string | null>(null)
@@ -154,7 +156,7 @@ const _cache = __ins.renderCache;
 		})
 
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 297, 10), deptId: deptId.value, deviceids: imei.value }
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 299, 10), deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			res.data.forEach(item => {
@@ -211,8 +213,8 @@ const _cache = __ins.renderCache;
 			})
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:354")
-			uni.showToast({
+			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:356")
+			showAppToast({
 				title: '获取车辆位置失败',
 				icon: 'none'
 			})
@@ -271,7 +273,7 @@ const _cache = __ins.renderCache;
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
 			if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:414")
+				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:416")
 				return null
 			}
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -281,7 +283,7 @@ const _cache = __ins.renderCache;
 				radius: radius
 			}
 		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:424")
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:426")
 			return null
 		}
 	}
@@ -470,14 +472,14 @@ const _cache = __ins.renderCache;
 			if (res.code == 0) {
 				fenceList.value = res.data;
 			} else {
-				uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+				showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 				fenceList.value = []; // 失败时也清空列表
 			}
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
-			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:619")
-			uni.showToast({ title: '获取围栏列表失败', icon: 'none' })
+			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:621")
+			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
 		}
@@ -649,10 +651,10 @@ const _cache = __ins.renderCache;
 				circleRadius.value = 0
 			}
 		}
-		
+
 		// 更新地图显示，让用户看到围栏
 		updateMapDisplay()
-		
+
 		// 打开编辑对话框
 		editDialogPopup.value?.$callMethod('open')
 	}
@@ -661,7 +663,7 @@ const _cache = __ins.renderCache;
 		try {
 			const result = await deleteGeofence(id)
 			if (result.code == 0) {
-				uni.showToast({ title: '删除成功' })
+				showAppToast({ title: '删除成功' })
 				selectedFence.value = null
 				points.value = []
 				circleCenter.value = null
@@ -673,11 +675,11 @@ const _cache = __ins.renderCache;
 				showFenceModal.value?.$callMethod('close')
 				await loadGeofenceList()
 			} else {
-				uni.showToast({ title: '删除失败', icon: 'none' })
+				showAppToast({ title: '删除失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:827")
-			uni.showToast({ title: '删除失败', icon: 'none' })
+			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:829")
+			showAppToast({ title: '删除失败', icon: 'none' })
 		}
 	}
 
@@ -697,12 +699,12 @@ const _cache = __ins.renderCache;
 	// 保存围栏 - 修复版本
 	const saveFence = async () => {
 		if (!fenceForm.name) {
-			uni.showToast({ title: '请输入围栏名称', icon: 'none' })
+			showAppToast({ title: '请输入围栏名称', icon: 'none' })
 			return
 		}
 
 		let area = ''
-		
+
 		// 判断是新增还是编辑
 		if (editingFence.value) {
 			// 【编辑模式】优先使用新绘制的数据，如果没有则使用原有数据
@@ -717,10 +719,10 @@ const _cache = __ins.renderCache;
 		} else {
 			// 【新增模式】必须绘制
 			if (drawingMode.value === 'polygon' && points.value.length < 3) {
-				uni.showToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
+				showAppToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
 				return
 			} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
-				uni.showToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+				showAppToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
 				return
 			}
 
@@ -732,16 +734,16 @@ const _cache = __ins.renderCache;
 		}
 
 		if (!area) {
-			uni.showToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
+			showAppToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
 			return
 		}
 
 		if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
-			uni.showToast({ title: '请选择有效的告警类型', icon: 'none' })
+			showAppToast({ title: '请选择有效的告警类型', icon: 'none' })
 			return
 		}
 
-		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 892, 9),
+		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 894, 9),
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
@@ -763,9 +765,9 @@ const _cache = __ins.renderCache;
 			uni.hideLoading()
 
 			if (result.code == 0) {
-				uni.showToast({ title: editingFence.value ? '更新成功' : '保存成功' })
+				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
 				editDialogPopup.value?.$callMethod('close')
-				
+
 				// 重置状态
 				const tempFence = editingFence.value
 				editingFence.value = null
@@ -773,22 +775,22 @@ const _cache = __ins.renderCache;
 				points.value = []
 				circleCenter.value = null
 				circleRadius.value = 0
-				
+
 				// 重新加载围栏列表
 				await loadGeofenceList()
-				
+
 				// 如果是在编辑模式下关闭，取消选中状态
 				if (tempFence) {
 					selectedFence.value = null
 					showFenceModal.value?.$callMethod('close')
 				}
 			} else {
-				uni.showToast({ title: result.msg || '保存失败', icon: 'none' })
+				showAppToast({ title: result.msg || '保存失败', icon: 'none' })
 			}
 		} catch (error) {
 			uni.hideLoading()
-			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:938")
-			uni.showToast({ title: '保存失败，请重试', icon: 'none' })
+			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:940")
+			showAppToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
 
@@ -888,19 +890,19 @@ const _cache = __ins.renderCache;
 	// 切换标签页
 	const switchTab = async (tab : string) : Promise<void> => {
 
-		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1039")
+		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1041")
 		if (activeTab.value === tab) return
-		
+
 		activeTab.value = tab
 		scrollTop.value = 0
 		deviceList.value = [] // 清空列表
-		
+
 		// 重置分页
 		initPagination(tab)
-		
+
 		// 加载对应数据
 		if (tab === 'bind') {
-			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1051")
+			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1053")
 			await loadBoundDevices(currentFenceId.value)
 		} else {
 			await loadUnboundDevices()
@@ -910,7 +912,7 @@ const _cache = __ins.renderCache;
 	// 处理滚动到底部加载更多
 	const handleLoadMore = () => {
 		if (loadingMore.value || !hasMore.value) return
-		
+
 		if (activeTab.value === 'bind') {
 			loadBoundDevices(currentFenceId.value)
 		} else {
@@ -920,14 +922,14 @@ const _cache = __ins.renderCache;
 
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1071")
+		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1073")
 		loading.value = true
 		try {
-			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1074, 10),
+			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1076, 10),
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1078")
+			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1080")
 			let result : any
 			if (bound) {
 				result = await bindDevices(params)
@@ -936,22 +938,22 @@ const _cache = __ins.renderCache;
 			}
 
 			if (result.code == 0) {
-				uni.showToast({ title: bound ? '绑定成功' : '解绑成功' })
+				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
 				// 刷新当前标签页数据，重置分页
 				initPagination(activeTab.value)
 				scrollTop.value = 0
-				
+
 				if (activeTab.value === 'bind') {
 					await loadBoundDevices(currentFenceId.value)
 				} else {
 					await loadUnboundDevices()
 				}
 			} else {
-				uni.showToast({ title: result.msg || '操作失败', icon: 'none' })
+				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1101")
-			uni.showToast({ title: '操作失败', icon: 'none' })
+			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1103")
+			showAppToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
 		}
@@ -1020,16 +1022,16 @@ const _cache = __ins.renderCache;
 
 	function deleteSelectedFence(): void {
 		const fence = selectedFence.value;
-		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1171");
-		
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1173");
+
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
-			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1175");
-			
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1177");
+
 			if (fenceId !== '') {
 				deleteFence(fenceId);
 			} else {
-				uni.showToast({
+				showAppToast({
 					title: '围栏ID无效',
 					icon: 'none'
 				});
@@ -1100,10 +1102,10 @@ const _cache = __ins.renderCache;
 	// 完成绘制
 	const finishDrawing = () => {
 		if (drawingMode.value === 'polygon' && points.value.length < 3) {
-			uni.showToast({ title: '至少需要3个顶点', icon: 'none' })
+			showAppToast({ title: '至少需要3个顶点', icon: 'none' })
 			return
 		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
-			uni.showToast({ title: '请设置有效的圆形围栏', icon: 'none' })
+			showAppToast({ title: '请设置有效的圆形围栏', icon: 'none' })
 			return
 		}
 
@@ -1189,402 +1191,406 @@ const _component_i_popup = resolveEasyComponent("i-popup",_easycom_i_popup)
 const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_i_radio = resolveEasyComponent("i-radio",_easycom_i_radio)
 const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 
-  return _cE("view", _uM({ class: "container" }), [
-    _cV(_component_custom_navBar, _uM({
-      title: "地理围栏",
-      "show-back": true,
-      backgroundColor: "#fff",
-      textColor: "#333",
-      showCapsule: false
-    })),
-    _cE("view", _uM({ class: "map-container" }), [
-      _cV(_component_map, _uM({
-        id: "myMap",
-        latitude: center.latitude,
-        longitude: center.longitude,
-        scale: mapScale.value,
-        style: _nS(_uM({"width":"100%","height":"100%"})),
-        "show-location": false,
-        polygons: polygons.value,
-        markers: markers.value,
-        circles: circles.value,
-        onTap: handleMapTap,
-        "enable-traffic": true,
-        "enable-overlooking": true,
-        "enable-building": true,
-        "enable-3D": true
-      }), _uM({
-        default: withSlotCtx((): any[] => [
-          _cV(_component_sub_navBar, _uM({
-            showTime: false,
-            currentCar: currentCar.value,
-            showCar: true,
-            carStatus: connectionStatus.value
-          }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
-        ]),
-        _: 1 /* STABLE */
-      }), 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"]),
-      isTrue(isDrawing.value)
-        ? _cE("view", _uM({
-            key: 0,
-            class: "drag-hint"
-          }), [
-            drawingMode.value === 'polygon'
-              ? _cE("text", _uM({
-                  key: 0,
-                  class: "drag-hint-text"
-                }), "点击地图添加围栏点,至少需要3个点")
-              : _cC("v-if", true),
-            drawingMode.value === 'circle'
-              ? _cE("text", _uM({
-                  key: 1,
-                  class: "drag-hint-text"
-                }), "点击地图确定圆心，再点一下地图确定半径")
-              : _cC("v-if", true)
-          ])
-        : _cC("v-if", true)
-    ]),
-    _cV(_component_i_popup, _uM({
-      ref_key: "showFenceModal",
-      ref: showFenceModal,
-      mode: "bottom",
-      round: "10",
-      showClose: true
-    }), _uM({
-      default: withSlotCtx((): any[] => [
-        isTrue(selectedFence.value)
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "地理围栏",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "map-container" }), [
+        _cV(_component_map, _uM({
+          id: "myMap",
+          latitude: center.latitude,
+          longitude: center.longitude,
+          scale: mapScale.value,
+          style: _nS(_uM({"width":"100%","height":"100%"})),
+          "show-location": false,
+          polygons: polygons.value,
+          markers: markers.value,
+          circles: circles.value,
+          onTap: handleMapTap,
+          "enable-traffic": true,
+          "enable-overlooking": true,
+          "enable-building": true,
+          "enable-3D": true
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cV(_component_sub_navBar, _uM({
+              showTime: false,
+              currentCar: currentCar.value,
+              showCar: true,
+              carStatus: connectionStatus.value
+            }), null, 8 /* PROPS */, ["currentCar", "carStatus"])
+          ]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"]),
+        isTrue(isDrawing.value)
           ? _cE("view", _uM({
               key: 0,
-              class: "fence-operations"
+              class: "drag-hint"
             }), [
-              _cE("view", _uM({ class: "fence-header" }), [
-                _cE("text", _uM({ class: "fence-name" }), _tD(getSelectedFenceName()), 1 /* TEXT */),
-                _cV(_component_i_icon, _uM({
-                  name: "close",
-                  onClick: () => {selectedFence.value = null; showFenceModal.value?.$callMethod('close')}
-                }), null, 8 /* PROPS */, ["onClick"])
-              ]),
-              _cE("view", _uM({ class: "fence-actions" }), [
-                _cV(_component_i_button, _uM({
-                  size: "small",
-                  onClick: editSelectedFence
-                }), _uM({
-                  default: withSlotCtx((): any[] => ["编辑"]),
-                  _: 1 /* STABLE */
-                })),
-                _cV(_component_i_button, _uM({
-                  size: "small",
-                  type: "error",
-                  onClick: deleteSelectedFence
-                }), _uM({
-                  default: withSlotCtx((): any[] => ["删除"]),
-                  _: 1 /* STABLE */
-                })),
-                _cV(_component_i_button, _uM({
-                  size: "small",
-                  type: "primary",
-                  onClick: showSelectedFenceDevices
-                }), _uM({
-                  default: withSlotCtx((): any[] => ["绑定设备"]),
-                  _: 1 /* STABLE */
-                }))
-              ])
+              drawingMode.value === 'polygon'
+                ? _cE("text", _uM({
+                    key: 0,
+                    class: "drag-hint-text"
+                  }), "点击地图添加围栏点,至少需要3个点")
+                : _cC("v-if", true),
+              drawingMode.value === 'circle'
+                ? _cE("text", _uM({
+                    key: 1,
+                    class: "drag-hint-text"
+                  }), "点击地图确定圆心，再点一下地图确定半径")
+                : _cC("v-if", true)
             ])
           : _cC("v-if", true)
       ]),
-      _: 1 /* STABLE */
-    }), 512 /* NEED_PATCH */),
-    _cE("view", _uM({ class: "tools-panel" }), [
-      isTrue(!isDrawing.value && !selectedFence.value)
-        ? _cE("view", _uM({
-            key: 0,
-            class: "drawing-mode-selector"
-          }), [
-            _cE("text", _uM({ class: "mode-title" }), "选择围栏类型:"),
-            _cE("view", _uM({ class: "mode-buttons" }), [
-              _cV(_component_i_button, _uM({
-                type: drawingMode.value == 'polygon' ? 'success' : 'default',
-                size: "small",
-                customStyle: "border:1rpx solid #ebedf0",
-                onClick: () => {setDrawingMode('polygon')}
-              }), _uM({
-                default: withSlotCtx((): any[] => [" 多边形 "]),
-                _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["type", "onClick"]),
-              _cV(_component_i_button, _uM({
-                class: "mode-button-spacing",
-                type: drawingMode.value == 'circle' ? 'success' : 'default',
-                size: "small",
-                customStyle: "border:1rpx solid #ebedf0",
-                onClick: () => {setDrawingMode('circle')}
-              }), _uM({
-                default: withSlotCtx((): any[] => [" 圆形 "]),
-                _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["type", "onClick"])
-            ])
-          ])
-        : _cC("v-if", true),
-      _cE("view", _uM({ class: "tool-tag-item" }), [
-        _cV(_component_i_button, _uM({
-          onClick: startDrawing,
-          disabled: isDrawing.value || selectedFence.value != null,
-          size: "small"
-        }), _uM({
-          default: withSlotCtx((): any[] => [" 开始绘制 "]),
-          _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["disabled"]),
-        _cV(_component_i_button, _uM({
-          onClick: finishDrawing,
-          disabled: !isDrawing.value || !canFinishDrawing.value,
-          size: "small"
-        }), _uM({
-          default: withSlotCtx((): any[] => [" 完成绘制 "]),
-          _: 1 /* STABLE */
-        }), 8 /* PROPS */, ["disabled"]),
-        _cV(_component_i_button, _uM({
-          onClick: clearDrawing,
-          size: "small"
-        }), _uM({
-          default: withSlotCtx((): any[] => [" 重置绘制 "]),
-          _: 1 /* STABLE */
-        })),
-        _cV(_component_i_button, _uM({
-          onClick: showFenceList,
-          size: "small"
-        }), _uM({
-          default: withSlotCtx((): any[] => [" 围栏列表 "]),
-          _: 1 /* STABLE */
-        }))
-      ]),
-      _cE("view", _uM({ class: "status-info" }), [
-        _cE("text", _uM({ class: "status-text" }), "围栏类型: " + _tD(drawingMode.value === 'polygon' ? '多边形' : '圆形'), 1 /* TEXT */),
-        drawingMode.value === 'polygon'
-          ? _cE("text", _uM({
+      _cV(_component_i_popup, _uM({
+        ref_key: "showFenceModal",
+        ref: showFenceModal,
+        mode: "bottom",
+        round: "10",
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          isTrue(selectedFence.value)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "fence-operations"
+              }), [
+                _cE("view", _uM({ class: "fence-header" }), [
+                  _cE("text", _uM({ class: "fence-name" }), _tD(getSelectedFenceName()), 1 /* TEXT */),
+                  _cV(_component_i_icon, _uM({
+                    name: "close",
+                    onClick: () => {selectedFence.value = null; showFenceModal.value?.$callMethod('close')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ]),
+                _cE("view", _uM({ class: "fence-actions" }), [
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    onClick: editSelectedFence
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["编辑"]),
+                    _: 1 /* STABLE */
+                  })),
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    type: "error",
+                    onClick: deleteSelectedFence
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["删除"]),
+                    _: 1 /* STABLE */
+                  })),
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    type: "primary",
+                    onClick: showSelectedFenceDevices
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["绑定设备"]),
+                    _: 1 /* STABLE */
+                  }))
+                ])
+              ])
+            : _cC("v-if", true)
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cE("view", _uM({ class: "tools-panel" }), [
+        isTrue(!isDrawing.value && !selectedFence.value)
+          ? _cE("view", _uM({
               key: 0,
-              class: "status-text"
-            }), "顶点数量: " + _tD(points.value.length), 1 /* TEXT */)
-          : _cC("v-if", true),
-        drawingMode.value === 'circle'
-          ? _cE("text", _uM({
-              key: 1,
-              class: "status-text"
-            }), "半径: " + _tD(circleRadius.value.toFixed(2)) + "米", 1 /* TEXT */)
-          : _cC("v-if", true)
-      ])
-    ]),
-    _cV(_component_i_popup, _uM({
-      ref_key: "fencesPopup",
-      ref: fencesPopup,
-      mode: "bottom",
-      round: "10",
-      height: "800rpx",
-      disabledScroll: true,
-      contentMargin: "0",
-      showClose: true
-    }), _uM({
-      default: withSlotCtx((): any[] => [
-        _cE("view", _uM({ class: "fence-list" }), [
-          _cE("view", _uM({ class: "list-header" }), [
-            _cE("text", _uM({ class: "title" }), "围栏列表")
-          ]),
-          _cE("scroll-view", _uM({
-            class: "list-content",
-            "scroll-y": "true",
-            "show-scrollbar": false
-          }), [
-            _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, (fence, __key, __index, _cached): any => {
-              return _cE("view", _uM({
-                key: fence.id,
-                class: "fence-item",
-                onClick: () => {selectFence(fence)}
-              }), [
-                _cE("view", _uM({ class: "fence-info" }), [
-                  _cE("text", _uM({ class: "name" }), _tD(fence.name), 1 /* TEXT */),
-                  _cE("text", _uM({ class: "type" }), _tD(getFenceType(fence) === 'circle' ? '圆形' : '多边形'), 1 /* TEXT */),
-                  _cE("text", _uM({ class: "devices" }), "绑定设备: " + _tD(fence.deviceCount || 0) + "台", 1 /* TEXT */)
-                ]),
-                _cV(_component_i_icon, _uM({
-                  name: "/static/arrow-right.png",
-                  fontSize: "15"
-                }))
-              ], 8 /* PROPS */, ["onClick"])
-            }), 128 /* KEYED_FRAGMENT */),
-            fenceList.value.length == 0
-              ? _cE("view", _uM({
-                  key: 0,
-                  class: "empty"
-                }), [
-                  _cE("text", _uM({ class: "empty-text" }), "暂无围栏数据")
-                ])
-              : _cC("v-if", true)
-          ])
-        ])
-      ]),
-      _: 1 /* STABLE */
-    }), 512 /* NEED_PATCH */),
-    _cV(_component_i_popup, _uM({
-      ref_key: "editDialogPopup",
-      ref: editDialogPopup,
-      mode: "bottom",
-      round: "10",
-      contentDraggable: false,
-      showClose: true
-    }), _uM({
-      default: withSlotCtx((): any[] => [
-        _cE("view", _uM({ class: "edit-dialog" }), [
-          _cE("view", _uM({ class: "dialog-header" }), [
-            _cE("text", _uM({ class: "dialog-title" }), _tD(editingFence.value ? '编辑围栏' : '新增围栏'), 1 /* TEXT */)
-          ]),
-          _cE("view", _uM({ class: "dialog-content" }), [
-            _cV(_component_i_input, _uM({
-              modelValue: fenceForm.name,
-              "onUpdate:modelValue": $event => {(fenceForm.name) = $event},
-              placeholder: "请输入围栏名称",
-              border: "surround"
-            }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
-            _cE("view", _uM({ class: "radio-group" }), [
-              _cE("text", _uM({ class: "label" }), "告警类型:"),
-              _cE("view", _uM({ class: "radio-options" }), [
-                _cV(_component_i_radio, _uM({
-                  modelValue: fenceForm.alarmType,
-                  "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
-                  name: "0",
-                  iconPlacement: "left"
+              class: "drawing-mode-selector"
+            }), [
+              _cE("text", _uM({ class: "mode-title" }), "选择围栏类型:"),
+              _cE("view", _uM({ class: "mode-buttons" }), [
+                _cV(_component_i_button, _uM({
+                  type: drawingMode.value == 'polygon' ? 'success' : 'default',
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: () => {setDrawingMode('polygon')}
                 }), _uM({
-                  default: withSlotCtx((): any[] => ["不告警"]),
+                  default: withSlotCtx((): any[] => [" 多边形 "]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
-                _cV(_component_i_radio, _uM({
-                  modelValue: fenceForm.alarmType,
-                  "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
-                  name: "1",
-                  iconPlacement: "left"
+                }), 8 /* PROPS */, ["type", "onClick"]),
+                _cV(_component_i_button, _uM({
+                  class: "mode-button-spacing",
+                  type: drawingMode.value == 'circle' ? 'success' : 'default',
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: () => {setDrawingMode('circle')}
                 }), _uM({
-                  default: withSlotCtx((): any[] => ["出入告警"]),
+                  default: withSlotCtx((): any[] => [" 圆形 "]),
                   _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
-                _cV(_component_i_radio, _uM({
-                  modelValue: fenceForm.alarmType,
-                  "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
-                  name: "2",
-                  iconPlacement: "left"
-                }), _uM({
-                  default: withSlotCtx((): any[] => ["出告警"]),
-                  _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
-                _cV(_component_i_radio, _uM({
-                  modelValue: fenceForm.alarmType,
-                  "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
-                  name: "3",
-                  iconPlacement: "left"
-                }), _uM({
-                  default: withSlotCtx((): any[] => ["入告警"]),
-                  _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                }), 8 /* PROPS */, ["type", "onClick"])
               ])
             ])
-          ]),
-          _cE("view", _uM({ class: "dialog-actions" }), [
-            _cV(_component_i_button, _uM({ onClick: closeEditDialog }), _uM({
-              default: withSlotCtx((): any[] => ["取消"]),
-              _: 1 /* STABLE */
-            })),
-            _cV(_component_i_button, _uM({
-              type: "primary",
-              onClick: saveFence
-            }), _uM({
-              default: withSlotCtx((): any[] => ["保存"]),
-              _: 1 /* STABLE */
-            }))
+          : _cC("v-if", true),
+        _cE("view", _uM({ class: "tool-tag-item" }), [
+          _cV(_component_i_button, _uM({
+            onClick: startDrawing,
+            disabled: isDrawing.value || selectedFence.value != null,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 开始绘制 "]),
+            _: 1 /* STABLE */
+          }), 8 /* PROPS */, ["disabled"]),
+          _cV(_component_i_button, _uM({
+            onClick: finishDrawing,
+            disabled: !isDrawing.value || !canFinishDrawing.value,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 完成绘制 "]),
+            _: 1 /* STABLE */
+          }), 8 /* PROPS */, ["disabled"]),
+          _cV(_component_i_button, _uM({
+            onClick: clearDrawing,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 重置绘制 "]),
+            _: 1 /* STABLE */
+          })),
+          _cV(_component_i_button, _uM({
+            onClick: showFenceList,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 围栏列表 "]),
+            _: 1 /* STABLE */
+          }))
+        ]),
+        _cE("view", _uM({ class: "status-info" }), [
+          _cE("text", _uM({ class: "status-text" }), "围栏类型: " + _tD(drawingMode.value === 'polygon' ? '多边形' : '圆形'), 1 /* TEXT */),
+          drawingMode.value === 'polygon'
+            ? _cE("text", _uM({
+                key: 0,
+                class: "status-text"
+              }), "顶点数量: " + _tD(points.value.length), 1 /* TEXT */)
+            : _cC("v-if", true),
+          drawingMode.value === 'circle'
+            ? _cE("text", _uM({
+                key: 1,
+                class: "status-text"
+              }), "半径: " + _tD(circleRadius.value.toFixed(2)) + "米", 1 /* TEXT */)
+            : _cC("v-if", true)
+        ])
+      ]),
+      _cV(_component_i_popup, _uM({
+        ref_key: "fencesPopup",
+        ref: fencesPopup,
+        mode: "bottom",
+        round: "10",
+        height: "800rpx",
+        disabledScroll: true,
+        contentMargin: "0",
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "fence-list" }), [
+            _cE("view", _uM({ class: "list-header" }), [
+              _cE("text", _uM({ class: "title" }), "围栏列表")
+            ]),
+            _cE("scroll-view", _uM({
+              class: "list-content",
+              "scroll-y": "true",
+              "show-scrollbar": false
+            }), [
+              _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, (fence, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: fence.id,
+                  class: "fence-item",
+                  onClick: () => {selectFence(fence)}
+                }), [
+                  _cE("view", _uM({ class: "fence-info" }), [
+                    _cE("text", _uM({ class: "name" }), _tD(fence.name), 1 /* TEXT */),
+                    _cE("text", _uM({ class: "type" }), _tD(getFenceType(fence) === 'circle' ? '圆形' : '多边形'), 1 /* TEXT */),
+                    _cE("text", _uM({ class: "devices" }), "绑定设备: " + _tD(fence.deviceCount || 0) + "台", 1 /* TEXT */)
+                  ]),
+                  _cV(_component_i_icon, _uM({
+                    name: "/static/arrow-right.png",
+                    fontSize: "15"
+                  }))
+                ], 8 /* PROPS */, ["onClick"])
+              }), 128 /* KEYED_FRAGMENT */),
+              fenceList.value.length == 0
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "empty"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "暂无围栏数据")
+                  ])
+                : _cC("v-if", true)
+            ])
           ])
-        ])
-      ]),
-      _: 1 /* STABLE */
-    }), 512 /* NEED_PATCH */),
-    _cV(_component_i_popup, _uM({
-      ref_key: "deviceDialogPopup",
-      ref: deviceDialogPopup,
-      mode: "bottom",
-      round: "10",
-      closeOnMask: true,
-      showClose: true
-    }), _uM({
-      default: withSlotCtx((): any[] => [
-        _cE("view", _uM({ class: "device-dialog" }), [
-          _cE("view", _uM({ class: "dialog-header" }), [
-            _cE("text", _uM({ class: "dialog-title" }), "设备绑定 - " + _tD(currentFenceName.value), 1 /* TEXT */)
-          ]),
-          _cE("view", _uM({ class: "dialog-tabs" }), [
-            _cE("text", _uM({
-              class: _nC(['tab', activeTab.value === 'bind' ? 'active' : '']),
-              onClick: () => {switchTab('bind')}
-            }), "已绑定设备", 10 /* CLASS, PROPS */, ["onClick"]),
-            _cE("text", _uM({
-              class: _nC(['tab', activeTab.value === 'unbind' ? 'active' : '']),
-              onClick: () => {switchTab('unbind')}
-            }), "未绑定设备", 10 /* CLASS, PROPS */, ["onClick"])
-          ]),
-          _cE("scroll-view", _uM({
-            class: "device-list",
-            "scroll-y": "true",
-            "show-scrollbar": false,
-            "scroll-top": scrollTop.value,
-            onScrolltolower: handleLoadMore,
-            "lower-threshold": 150
-          }), [
-            _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, (device, __key, __index, _cached): any => {
-              return _cE("view", _uM({
-                key: getDeviceImei(device),
-                class: "device-item"
-              }), [
-                _cE("view", _uM({ class: "device-info" }), [
-                  _cE("text", _uM({ class: "name" }), _tD(getDeviceDisplayName(device)), 1 /* TEXT */),
-                  isTrue(getDeviceImei(device))
-                    ? _cE("text", _uM({
-                        key: 0,
-                        class: "status"
-                      }), _tD(isDeviceOnline(device) ? '在线' : '离线'), 1 /* TEXT */)
-                    : _cC("v-if", true)
-                ]),
-                _cV(_component_i_switch, _uM({
-                  "model-value": isDeviceBound(getDeviceImei(device)),
-                  onChange: ($event: any) => {handleDeviceBindingChange(getDeviceImei(device), $event as boolean)},
-                  disabled: loading.value || loadingMore.value,
-                  size: "20"
-                }), null, 8 /* PROPS */, ["model-value", "onChange", "disabled"])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cV(_component_i_popup, _uM({
+        ref_key: "editDialogPopup",
+        ref: editDialogPopup,
+        mode: "bottom",
+        round: "10",
+        contentDraggable: false,
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "edit-dialog" }), [
+            _cE("view", _uM({ class: "dialog-header" }), [
+              _cE("text", _uM({ class: "dialog-title" }), _tD(editingFence.value ? '编辑围栏' : '新增围栏'), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "dialog-content" }), [
+              _cV(_component_i_input, _uM({
+                modelValue: fenceForm.name,
+                "onUpdate:modelValue": $event => {(fenceForm.name) = $event},
+                placeholder: "请输入围栏名称",
+                border: "surround"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+              _cE("view", _uM({ class: "radio-group" }), [
+                _cE("text", _uM({ class: "label" }), "告警类型:"),
+                _cE("view", _uM({ class: "radio-options" }), [
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "0",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["不告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "1",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["出入告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "2",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["出告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "3",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["入告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ])
               ])
-            }), 128 /* KEYED_FRAGMENT */),
-            isTrue(deviceList.value.length == 0 && !loading.value)
-              ? _cE("view", _uM({
-                  key: 0,
-                  class: "empty"
+            ]),
+            _cE("view", _uM({ class: "dialog-actions" }), [
+              _cV(_component_i_button, _uM({ onClick: closeEditDialog }), _uM({
+                default: withSlotCtx((): any[] => ["取消"]),
+                _: 1 /* STABLE */
+              })),
+              _cV(_component_i_button, _uM({
+                type: "primary",
+                onClick: saveFence
+              }), _uM({
+                default: withSlotCtx((): any[] => ["保存"]),
+                _: 1 /* STABLE */
+              }))
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cV(_component_i_popup, _uM({
+        ref_key: "deviceDialogPopup",
+        ref: deviceDialogPopup,
+        mode: "bottom",
+        round: "10",
+        closeOnMask: true,
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "device-dialog" }), [
+            _cE("view", _uM({ class: "dialog-header" }), [
+              _cE("text", _uM({ class: "dialog-title" }), "设备绑定 - " + _tD(currentFenceName.value), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "dialog-tabs" }), [
+              _cE("text", _uM({
+                class: _nC(['tab', activeTab.value === 'bind' ? 'active' : '']),
+                onClick: () => {switchTab('bind')}
+              }), "已绑定设备", 10 /* CLASS, PROPS */, ["onClick"]),
+              _cE("text", _uM({
+                class: _nC(['tab', activeTab.value === 'unbind' ? 'active' : '']),
+                onClick: () => {switchTab('unbind')}
+              }), "未绑定设备", 10 /* CLASS, PROPS */, ["onClick"])
+            ]),
+            _cE("scroll-view", _uM({
+              class: "device-list",
+              "scroll-y": "true",
+              "show-scrollbar": false,
+              "scroll-top": scrollTop.value,
+              onScrolltolower: handleLoadMore,
+              "lower-threshold": 150
+            }), [
+              _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, (device, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: getDeviceImei(device),
+                  class: "device-item"
                 }), [
-                  _cE("text", _uM({ class: "empty-text" }), _tD(activeTab.value === 'bind' ? '暂无绑定设备' : '暂无可用设备'), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "device-info" }), [
+                    _cE("text", _uM({ class: "name" }), _tD(getDeviceDisplayName(device)), 1 /* TEXT */),
+                    isTrue(getDeviceImei(device))
+                      ? _cE("text", _uM({
+                          key: 0,
+                          class: "status"
+                        }), _tD(isDeviceOnline(device) ? '在线' : '离线'), 1 /* TEXT */)
+                      : _cC("v-if", true)
+                  ]),
+                  _cV(_component_i_switch, _uM({
+                    "model-value": isDeviceBound(getDeviceImei(device)),
+                    onChange: ($event: any) => {handleDeviceBindingChange(getDeviceImei(device), $event as boolean)},
+                    disabled: loading.value || loadingMore.value,
+                    size: "20"
+                  }), null, 8 /* PROPS */, ["model-value", "onChange", "disabled"])
                 ])
-              : _cC("v-if", true),
-            isTrue(loadingMore.value)
-              ? _cE("view", _uM({
-                  key: 1,
-                  class: "loading-tip"
-                }), [
-                  _cE("text", _uM({ class: "empty-text" }), "正在加载更多...")
-                ])
-              : _cC("v-if", true),
-            isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)
-              ? _cE("view", _uM({
-                  key: 2,
-                  class: "empty-text-box"
-                }), [
-                  _cE("text", _uM({ class: "empty-text" }), "暂无更多数据")
-                ])
-              : _cC("v-if", true)
-          ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top"])
-        ])
-      ]),
-      _: 1 /* STABLE */
-    }), 512 /* NEED_PATCH */)
-  ])
+              }), 128 /* KEYED_FRAGMENT */),
+              isTrue(deviceList.value.length == 0 && !loading.value)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "empty"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), _tD(activeTab.value === 'bind' ? '暂无绑定设备' : '暂无可用设备'), 1 /* TEXT */)
+                  ])
+                : _cC("v-if", true),
+              isTrue(loadingMore.value)
+                ? _cE("view", _uM({
+                    key: 1,
+                    class: "loading-tip"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "正在加载更多...")
+                  ])
+                : _cC("v-if", true),
+              isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)
+                ? _cE("view", _uM({
+                    key: 2,
+                    class: "empty-text-box"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "暂无更多数据")
+                  ])
+                : _cC("v-if", true)
+            ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */)
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
 }
 }
 

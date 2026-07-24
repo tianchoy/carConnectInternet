@@ -13,7 +13,6 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.showToast as uni_showToast
 open class GenPagesUserCenterCarListCarList : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -39,13 +38,13 @@ open class GenPagesUserCenterCarListCarList : BasePage {
             }
             val loadCarListData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:58")
+                        console.log(currPage.value, totalPage.value, " at pages/userCenter/carList/carList.uvue:60")
                         if (loading.value || !hasMore.value) {
                             return@w1
                         }
                         loading.value = true
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 63, 10), "page" to currPage.value, "pageSize" to pageSize.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/userCenter/carList/carList.uvue", 65, 10), "page" to currPage.value, "pageSize" to pageSize.value)
                             val res = await(getUserDeviceList(data))
                             val code = res.code
                             val list = res.data.list
@@ -62,7 +61,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                                     currPage.value++
                                 }
                             } else {
-                                uni_showToast(ShowToastOptions(title = if (res.msg != "") {
+                                showAppToast(ShowToastOptions(title = if (res.msg != "") {
                                     res.msg
                                 } else {
                                     "加载失败"
@@ -71,8 +70,8 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:98")
-                            uni_showToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
+                            console.error("加载车辆列表失败:", error, " at pages/userCenter/carList/carList.uvue:100")
+                            showAppToast(ShowToastOptions(title = "加载失败，请重试", icon = "none"))
                         }
                          finally {
                             loading.value = false
@@ -93,6 +92,7 @@ open class GenPagesUserCenterCarListCarList : BasePage {
             }
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
+                val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "车辆管理", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to true, "isIcon" to true, "onCapsuleClick" to addCar, "isShowStyle" to true)),
                     _cE("view", _uM("class" to "container"), _uA(
@@ -128,7 +128,8 @@ open class GenPagesUserCenterCarListCarList : BasePage {
                                 _cC("v-if", true)
                             }
                         ))
-                    ))
+                    )),
+                    _cV(_component_app_toast)
                 ), 64)
             }
         }

@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_EBNPSe";
+    const id = "app-ios_XO-X41";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -100,7 +100,7 @@
     });
   }
   initRuntimeSocketService();
-  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
+  const _sfc_main$N = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
       type: String,
       default: "home-3-fill"
@@ -419,7 +419,7 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$K = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
+  const _style_0$L = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -427,7 +427,7 @@
     }
     return target;
   };
-  function _sfc_render$K(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$M(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -458,11 +458,11 @@
       /* CLASS, STYLE */
     );
   }
-  const __easycom_2$6 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$K], ["styles", [_style_0$K]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-icon/i-icon.uvue"]]);
+  const __easycom_2$6 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["render", _sfc_render$M], ["styles", [_style_0$L]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-icon/i-icon.uvue"]]);
   function resolveEasycom(component, easycom) {
     return typeof component === "string" ? easycom : component;
   }
-  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
+  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
     title: { type: String, default: "" },
     activeColor: { type: String, default: "#19be6b" },
@@ -494,8 +494,8 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$J = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
-  function _sfc_render$J(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$K = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
+  function _sfc_render$L(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "i-card",
       onClick: $setup.emitClick
@@ -542,7 +542,7 @@
       ])
     ]);
   }
-  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$J], ["styles", [_style_0$J]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue"]]);
+  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["render", _sfc_render$L], ["styles", [_style_0$K]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue"]]);
   let PickerItem$1 = class PickerItem2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -566,7 +566,7 @@
       delete this.__props__;
     }
   };
-  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
+  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
     modelValue: {
       type: [String, Number, Array],
       default: ""
@@ -1022,8 +1022,8 @@
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
-  const _style_0$I = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
-  function _sfc_render$I(_ctx, _cache, $props, $setup, $data, $options) {
+  const _style_0$J = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
+  function _sfc_render$K(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "i-picker" }, [
       $props.showInput ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
@@ -1326,7 +1326,363 @@
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["styles", [_style_0$I]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-picker/i-picker.uvue"]]);
+  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$K], ["styles", [_style_0$J]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-picker/i-picker.uvue"]]);
+  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
+    zIndex: { type: [String, Number], default: 10090 },
+    loading: { type: Boolean, default: false },
+    title: { type: String, default: "" },
+    icon: { type: String, default: "" },
+    type: { type: String, default: "default" },
+    mask: { type: Boolean, default: false },
+    position: { type: String, default: "center" },
+    duration: { type: [String, Number], default: 2e3 },
+    fill: { type: Boolean, default: false },
+    customStyle: { type: [String, Object], default: "" }
+  }, setup(__props, _a) {
+    var __expose = _a.expose;
+    const props = __props;
+    const visible = vue.ref(false);
+    const timer = vue.ref(0);
+    const currentZIndex = vue.ref(props.zIndex);
+    const currentLoading = vue.ref(props.loading);
+    const currentTitle = vue.ref(props.title);
+    const currentIcon = vue.ref(props.icon);
+    const currentType = vue.ref(props.type);
+    const currentMask = vue.ref(props.mask);
+    const currentPosition = vue.ref(props.position);
+    const currentDuration = vue.ref(props.duration);
+    const currentFill = vue.ref(props.fill);
+    const currentCustomStyle = vue.ref(props.customStyle);
+    const loadingAngle = vue.ref(0);
+    let loadingTimer = 0;
+    const toastClass = vue.computed(() => {
+      return "i-toast i-toast--" + normalizePosition(currentPosition.value);
+    });
+    const toastStyle = vue.computed(() => {
+      let style = "z-index:" + String(currentZIndex.value) + ";";
+      style += "background-color:" + resolveBgColor() + ";";
+      if (typeof currentCustomStyle.value == "string")
+        style += currentCustomStyle.value;
+      return style;
+    });
+    const iconClass = vue.computed(() => {
+      if (currentFill.value)
+        return "i-toast__icon i-toast__icon--fill";
+      return "i-toast__icon";
+    });
+    const displayIcon = vue.computed(() => {
+      if (currentIcon.value.length > 0 && !isImagePath(currentIcon.value)) {
+        return currentIcon.value;
+      }
+      if (currentType.value == "success")
+        return "✓";
+      if (currentType.value == "error")
+        return "×";
+      if (currentType.value == "warning")
+        return "!";
+      if (currentType.value == "primary")
+        return "i";
+      return "";
+    });
+    const isImageIcon = vue.computed(() => {
+      return currentIcon.value.length > 0 && isImagePath(currentIcon.value);
+    });
+    const loadingStyle = vue.computed(() => {
+      return "transform:rotate(" + String(loadingAngle.value) + "deg);";
+    });
+    vue.onUnmounted(() => {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+    });
+    function open(options = null) {
+      applyOptions(options, "");
+      showToast();
+    }
+    function close() {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+      visible.value = false;
+    }
+    function primary(options = null) {
+      applyOptions(options, "primary");
+      showToast();
+    }
+    function success(options = null) {
+      applyOptions(options, "success");
+      showToast();
+    }
+    function error(options = null) {
+      applyOptions(options, "error");
+      showToast();
+    }
+    function warning(options = null) {
+      applyOptions(options, "warning");
+      showToast();
+    }
+    function showLoading(options = null) {
+      applyOptions(options, "default");
+      currentLoading.value = true;
+      if (currentTitle.value.length == 0)
+        currentTitle.value = "加载中";
+      showToast();
+    }
+    function showToast() {
+      clearTimeout(timer.value);
+      visible.value = true;
+      if (currentLoading.value) {
+        startLoadingAnimation();
+      } else {
+        stopLoadingAnimation();
+      }
+      const duration = Number(currentDuration.value);
+      if (duration > 0) {
+        timer.value = setTimeout(() => {
+          close();
+        }, duration);
+      }
+    }
+    function applyOptions(options = null, forcedType = null) {
+      currentZIndex.value = props.zIndex;
+      currentLoading.value = props.loading;
+      currentTitle.value = props.title;
+      currentIcon.value = props.icon;
+      currentType.value = forcedType.length > 0 ? forcedType : props.type;
+      currentMask.value = props.mask;
+      currentPosition.value = props.position;
+      currentDuration.value = props.duration;
+      currentFill.value = props.fill;
+      currentCustomStyle.value = props.customStyle;
+      if (options == null)
+        return null;
+      if (typeof options == "string") {
+        currentTitle.value = options;
+        return null;
+      }
+      if (typeof options == "object") {
+        setValue(options, "zIndex");
+        setValue(options, "loading");
+        setValue(options, "title");
+        setValue(options, "icon");
+        setValue(options, "type");
+        setValue(options, "mask");
+        setValue(options, "position");
+        setValue(options, "duration");
+        setValue(options, "fill");
+        setValue(options, "customStyle");
+      }
+    }
+    function setValue(options = null, keyName = null) {
+      const value = options[keyName];
+      if (value == null)
+        return null;
+      if (keyName == "zIndex")
+        currentZIndex.value = value;
+      if (keyName == "loading")
+        currentLoading.value = value == true;
+      if (keyName == "title")
+        currentTitle.value = String(value);
+      if (keyName == "icon")
+        currentIcon.value = String(value);
+      if (keyName == "type")
+        currentType.value = String(value);
+      if (keyName == "mask")
+        currentMask.value = value == true;
+      if (keyName == "position")
+        currentPosition.value = String(value);
+      if (keyName == "duration")
+        currentDuration.value = value;
+      if (keyName == "fill")
+        currentFill.value = value == true;
+      if (keyName == "customStyle")
+        currentCustomStyle.value = value;
+    }
+    function startLoadingAnimation() {
+      if (loadingTimer > 0)
+        return null;
+      loadingTimer = setInterval(() => {
+        let angle = (loadingAngle.value + 24) % 360;
+        if (angle < 0)
+          angle = angle + 360;
+        loadingAngle.value = angle;
+      }, 50);
+    }
+    function stopLoadingAnimation() {
+      if (loadingTimer > 0) {
+        clearInterval(loadingTimer);
+        loadingTimer = 0;
+      }
+      loadingAngle.value = 0;
+    }
+    function normalizePosition(value = null) {
+      if (value == "top" || value == "bottom")
+        return value;
+      return "center";
+    }
+    function resolveBgColor() {
+      if (currentType.value == "primary")
+        return "#2979ff";
+      if (currentType.value == "success")
+        return "#19be6b";
+      if (currentType.value == "warning")
+        return "#ff9900";
+      if (currentType.value == "error")
+        return "#fa3534";
+      return "rgba(0, 0, 0, 0.78)";
+    }
+    function isImagePath(value = null) {
+      const text = String(value);
+      return text.indexOf("/") >= 0 || text.indexOf("http") == 0;
+    }
+    __expose({
+      open,
+      close,
+      primary,
+      success,
+      error,
+      warning,
+      showLoading
+    });
+    const __returned__ = { props, visible, timer, currentZIndex, currentLoading, currentTitle, currentIcon, currentType, currentMask, currentPosition, currentDuration, currentFill, currentCustomStyle, loadingAngle, get loadingTimer() {
+      return loadingTimer;
+    }, set loadingTimer(v) {
+      loadingTimer = v;
+    }, toastClass, toastStyle, iconClass, displayIcon, isImageIcon, loadingStyle, open, close, primary, success, error, warning, showLoading, showToast, applyOptions, setValue, startLoadingAnimation, stopLoadingAnimation, normalizePosition, resolveBgColor, isImagePath };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  } }));
+  const _style_0$I = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "left": 50, "right": 50, "minWidth": 96, "minHeight": 44, "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  function _sfc_render$J(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        $setup.visible && $setup.currentMask ? (vue.openBlock(), vue.createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: "i-toast__mask",
+            style: vue.normalizeStyle("z-index:" + String(Number($setup.currentZIndex) - 1))
+          },
+          null,
+          4
+          /* STYLE */
+        )) : vue.createCommentVNode("v-if", true),
+        $setup.visible ? (vue.openBlock(), vue.createElementBlock(
+          "view",
+          {
+            key: 1,
+            class: vue.normalizeClass($setup.toastClass),
+            style: vue.normalizeStyle($setup.toastStyle)
+          },
+          [
+            $setup.currentLoading ? (vue.openBlock(), vue.createElementBlock(
+              "view",
+              {
+                key: 0,
+                class: "i-toast__loading",
+                style: vue.normalizeStyle($setup.loadingStyle)
+              },
+              null,
+              4
+              /* STYLE */
+            )) : $setup.isImageIcon ? (vue.openBlock(), vue.createElementBlock("image", {
+              key: 1,
+              class: "i-toast__image",
+              src: $setup.currentIcon,
+              mode: "aspectFit"
+            }, null, 8, ["src"])) : $setup.displayIcon.length > 0 ? (vue.openBlock(), vue.createElementBlock(
+              "view",
+              {
+                key: 2,
+                class: vue.normalizeClass($setup.iconClass)
+              },
+              [
+                vue.createElementVNode(
+                  "text",
+                  { class: "i-toast__icon-text" },
+                  vue.toDisplayString($setup.displayIcon),
+                  1
+                  /* TEXT */
+                )
+              ],
+              2
+              /* CLASS */
+            )) : vue.createCommentVNode("v-if", true),
+            vue.createElementVNode(
+              "text",
+              { class: "i-toast__text" },
+              vue.toDisplayString($setup.currentTitle),
+              1
+              /* TEXT */
+            )
+          ],
+          6
+          /* CLASS, STYLE */
+        )) : vue.createCommentVNode("v-if", true)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
+  }
+  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$J], ["styles", [_style_0$I]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-toast/i-toast.uvue"]]);
+  const iosToastHandlers = [];
+  function registerIosToastHandler(handler) {
+    const index = iosToastHandlers.indexOf(handler);
+    if (index == -1)
+      iosToastHandlers.push(handler);
+  }
+  function unregisterIosToastHandler(handler) {
+    const index = iosToastHandlers.indexOf(handler);
+    if (index >= 0)
+      iosToastHandlers.splice(index, 1);
+  }
+  function showAppToast(options) {
+    const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null;
+    if (handler != null)
+      handler(options);
+  }
+  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const toastRef = vue.ref(null);
+    const handleToast = (options) => {
+      var _a2, _b, _c;
+      const toast = toastRef.value;
+      if (toast == null)
+        return null;
+      const toastOptions = new UTSJSONObject({
+        title: options.title,
+        duration: (_a2 = options.duration) !== null && _a2 !== void 0 ? _a2 : 2e3,
+        position: (_b = options.position) !== null && _b !== void 0 ? _b : "center",
+        mask: (_c = options.mask) !== null && _c !== void 0 ? _c : false
+      });
+      if (options.icon == "success") {
+        toast.success(toastOptions);
+      } else if (options.icon == "error") {
+        toast.error(toastOptions);
+      } else {
+        toast.open(toastOptions);
+      }
+    };
+    registerIosToastHandler(handleToast);
+    vue.onUnmounted(() => {
+      unregisterIosToastHandler(handleToast);
+    });
+    const __returned__ = { toastRef, handleToast };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  } }));
+  function _sfc_render$I(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_i_toast = resolveEasycom(vue.resolveDynamicComponent("i-toast"), __easycom_0$6);
+    return vue.openBlock(), vue.createBlock(
+      _component_i_toast,
+      { ref: "toastRef" },
+      null,
+      512
+      /* NEED_PATCH */
+    );
+  }
+  const __easycom_3$3 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["__file", "/Users/xyhc/Documents/carConnectInternet/components/app-toast/app-toast.uvue"]]);
   function __awaiter(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -1512,22 +1868,22 @@
   }
   const BASE_URL = "https://car.zdiot.cn:18443/api";
   function handleTokenExpired() {
-    uni.__log__("log", "at api/http.uts:38", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:39", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
-    uni.showToast({
+    showAppToast({
       title: "登录已过期，请重新登录",
       icon: "none",
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:52", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:53", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:56", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:57", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:59", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:60", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -1552,38 +1908,38 @@
     if (config.showLoading != false) {
       uni.hideLoading();
     }
-    uni.__log__("log", "at api/http.uts:111", "请求错误详情:", error);
+    uni.__log__("log", "at api/http.uts:112", "请求错误详情:", error);
     if (error.statusCode != 0) {
       switch (error.statusCode) {
         case 401:
           handleTokenExpired();
           break;
         case 403:
-          uni.showToast({
+          showAppToast({
             title: "没有权限访问",
             icon: "none"
           });
           break;
         case 404:
-          uni.showToast({
+          showAppToast({
             title: "请求资源不存在",
             icon: "none"
           });
           break;
         case 500:
-          uni.showToast({
+          showAppToast({
             title: "服务器错误",
             icon: "none"
           });
           break;
         default:
-          uni.showToast({
+          showAppToast({
             title: error.message != null ? error.message : "请求错误: ".concat(error.statusCode),
             icon: "none"
           });
       }
     } else {
-      uni.showToast({
+      showAppToast({
         title: "网络错误，请检查网络连接",
         icon: "none"
       });
@@ -2274,7 +2630,7 @@
       return new SendCmdResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString("data", "") });
     });
   };
-  let Coordinate$1 = class Coordinate2 extends UTS.UTSType {
+  class Coordinate extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -2287,14 +2643,14 @@
         name: "Coordinate"
       };
     }
-    constructor(options, metadata = Coordinate2.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.lat = this.__props__.lat;
       this.lng = this.__props__.lng;
       delete this.__props__;
     }
-  };
+  }
   class CoordTransform {
     /**
      * WGS84转腾讯地图坐标系（GCJ02）
@@ -2304,7 +2660,7 @@
      */
     static wgs84ToTencent(wgLat, wgLon) {
       if (!this.isInChina(wgLon, wgLat)) {
-        return new Coordinate$1({ lat: wgLat, lng: wgLon });
+        return new Coordinate({ lat: wgLat, lng: wgLon });
       }
       let dLat = this.transformLat(wgLon - 105, wgLat - 35);
       let dLng = this.transformLng(wgLon - 105, wgLat - 35);
@@ -2316,7 +2672,7 @@
       dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
       const mgLat = wgLat + dLat;
       const mgLng = wgLon + dLng;
-      return new Coordinate$1({
+      return new Coordinate({
         lat: parseFloat(mgLat.toFixed(6)),
         lng: parseFloat(mgLng.toFixed(6))
       });
@@ -2329,7 +2685,7 @@
      */
     static tencentToWgs84(tcLat, tcLon) {
       if (!this.isInChina(tcLon, tcLat)) {
-        return new Coordinate$1({ lat: tcLat, lng: tcLon });
+        return new Coordinate({ lat: tcLat, lng: tcLon });
       }
       let wgsLat = tcLat;
       let wgsLng = tcLon;
@@ -2343,7 +2699,7 @@
           break;
         }
       }
-      return new Coordinate$1({
+      return new Coordinate({
         lat: parseFloat(wgsLat.toFixed(6)),
         lng: parseFloat(wgsLng.toFixed(6))
       });
@@ -2372,7 +2728,7 @@
           uni.__log__("warn", "at utils/coordTransform.uts:108", "设备经纬度无效", device);
           return device;
         }
-        let converted = new Coordinate$1({ lat, lng });
+        let converted = new Coordinate({ lat, lng });
         if (targetSystem === "tencent") {
           converted = this.wgs84ToTencent(lat, lng);
         } else {
@@ -2400,7 +2756,7 @@
         return this.tencentToWgs84(lat, lng);
       } else {
         uni.__log__("warn", "at utils/coordTransform.uts:143", "不支持的坐标系转换", fromSystem, "->", toSystem);
-        return new Coordinate$1({ lat, lng });
+        return new Coordinate({ lat, lng });
       }
     }
     /**
@@ -2749,9 +3105,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:316", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:350", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:318", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:352", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -2795,23 +3151,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:376", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:410", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:385", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:419", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:387", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:421", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:396", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:430", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -2822,7 +3178,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:409", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:443", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -2830,7 +3186,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:419", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:453", "清除保存设备索引失败:", error);
         }
       };
       const setCurrentCarFromSavedDevice = (savedDevice = null) => {
@@ -2849,7 +3205,7 @@
       };
       const handlePicker = () => {
         if (deviceList.value.length == 0) {
-          uni.showToast({
+          showAppToast({
             title: "暂无车辆数据",
             icon: "none"
           });
@@ -2919,7 +3275,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:522", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:556", "加载设备详情失败", error);
           }
         });
       };
@@ -2952,7 +3308,7 @@
           try {
             const res = yield getTrackPos(data);
             if (res.code == 401) {
-              uni.showToast({
+              showAppToast({
                 title: "登录过期，请重新登录",
                 icon: "none",
                 duration: 2e3
@@ -2969,7 +3325,7 @@
             }
             uni.hideLoading();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:578", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:612", "加载轨迹失败", error);
           }
         });
       };
@@ -2988,8 +3344,8 @@
               const lat = position.getNumber("latitude", 0);
               const lng = position.getNumber("longitude", 0);
               if (isNaN(lat) || isNaN(lng)) {
-                uni.__log__("error", "at pages/index/index.uvue:599", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
-                uni.showToast({
+                uni.__log__("error", "at pages/index/index.uvue:633", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+                showAppToast({
                   title: "定位数据异常",
                   icon: "none"
                 });
@@ -3002,20 +3358,20 @@
               yield delay(100);
               const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
               markers.value = [nextMarker];
-              uni.__log__("log", "at pages/index/index.uvue:625", "标记点更新完成");
+              uni.__log__("log", "at pages/index/index.uvue:659", "标记点更新完成");
               return true;
             } else {
-              uni.__log__("warn", "at pages/index/index.uvue:628", "获取设备位置失败");
+              uni.__log__("warn", "at pages/index/index.uvue:662", "获取设备位置失败");
               isMapReady.value = false;
-              uni.showToast({
+              showAppToast({
                 title: "获取位置失败",
                 icon: "none"
               });
               return false;
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:637", "加载设备位置失败", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/index/index.uvue:671", "加载设备位置失败", error);
+            showAppToast({
               title: "定位失败，请重试",
               icon: "none"
             });
@@ -3025,7 +3381,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:648", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:682", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -3041,13 +3397,13 @@
               withPos: false,
               withTrip: true
             }));
-            uni.showToast({
+            showAppToast({
               title: "切换成功",
               icon: "success"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:669", "切换车辆失败", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/index/index.uvue:703", "切换车辆失败", error);
+            showAppToast({
               title: "切换失败，请重试",
               icon: "none"
             });
@@ -3061,28 +3417,28 @@
         const indexs = e.getArray("indexs");
         let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
         if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:691", "无法解析选中的索引，使用当前设备");
+          uni.__log__("warn", "at pages/index/index.uvue:725", "无法解析选中的索引，使用当前设备");
           const currentIndex = deviceList.value.findIndex((device) => {
             return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
           });
           if (currentIndex != -1) {
             selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:697", "使用当前设备索引:", selectedIndex);
+            uni.__log__("log", "at pages/index/index.uvue:731", "使用当前设备索引:", selectedIndex);
           } else {
             selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:700", "使用默认索引: 0");
+            uni.__log__("log", "at pages/index/index.uvue:734", "使用默认索引: 0");
           }
         }
         const selectedDevice = deviceList.value[selectedIndex];
         if (!selectedDevice) {
-          uni.showToast({
+          showAppToast({
             title: "选择设备失败",
             icon: "none"
           });
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:715", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:749", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -3163,7 +3519,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:818", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:852", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -3198,14 +3554,14 @@
                 }));
               }
             } else {
-              uni.showToast({
+              showAppToast({
                 title: "暂无车辆数据",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:864", "加载车辆列表失败", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/index/index.uvue:898", "加载车辆列表失败", error);
+            showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
             });
@@ -3218,7 +3574,7 @@
       const refreshLocation = () => {
         return __awaiter(this, void 0, void 0, function* () {
           if (!currentCarDeviceId.value) {
-            uni.showToast({
+            showAppToast({
               title: "请先选择车辆",
               icon: "none"
             });
@@ -3231,8 +3587,8 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:893", "刷新位置失败", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/index/index.uvue:927", "刷新位置失败", error);
+            showAppToast({
               title: "刷新失败",
               icon: "none"
             });
@@ -3247,7 +3603,7 @@
       }
       function isLogin() {
         if (!checkToken()) {
-          uni.showToast({
+          showAppToast({
             title: "请先登录",
             icon: "none"
           });
@@ -3259,11 +3615,15 @@
         if (!isLogin())
           return null;
         uni.navigateTo({
-          url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude
+          url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
+          fail: (err) => {
+            if (err.errMsg.indexOf("locked") < 0)
+              uni.__log__("error", "at pages/index/index.uvue:959", "跳转轨迹详情失败:", err);
+          }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:929", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:966", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -3274,7 +3634,7 @@
         if (!isLogin())
           return null;
         if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-          uni.showToast({
+          showAppToast({
             title: "请先选择车辆",
             icon: "none"
           });
@@ -3288,7 +3648,11 @@
         if (!isLogin())
           return null;
         uni.navigateTo({
-          url: "/pages/addCar/addCar"
+          url: "/pages/addCar/addCar",
+          fail: (err) => {
+            if (err.errMsg.indexOf("locked") < 0)
+              uni.__log__("error", "at pages/index/index.uvue:994", "跳转添加设备失败:", err);
+          }
         });
       };
       const toMsgCenter = () => {
@@ -3307,17 +3671,17 @@
           name: currentCarName.value,
           scale: 18,
           success: () => {
-            uni.showToast({
+            showAppToast({
               title: "成功调起地图",
               icon: "none"
             });
           },
           fail: (err) => {
-            uni.showToast({
+            showAppToast({
               title: "调起地图失败",
               icon: "none"
             });
-            uni.__log__("error", "at pages/index/index.uvue:986", "调起地图失败:", err);
+            uni.__log__("error", "at pages/index/index.uvue:1026", "调起地图失败:", err);
           }
         });
       };
@@ -3329,7 +3693,7 @@
         });
       };
       const contactCustomerService = () => {
-        uni.showToast({
+        showAppToast({
           title: "请在微信小程序中联系客服",
           icon: "none"
         });
@@ -3341,12 +3705,14 @@
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
-        uni.__log__("log", "at pages/index/index.uvue:1028", iccid);
         needRefresh.value = true;
+        uni.__log__("log", "at pages/index/index.uvue:1089", "iccid", iccid);
         needRefresh.value = false;
-        uni.showToast({
+        showAppToast({
           title: "请在微信小程序中完成充值",
-          icon: "none"
+          icon: "none",
+          duration: 2e3,
+          mask: true
         });
       };
       const gotoLogin = () => {
@@ -3358,14 +3724,14 @@
         return __awaiter(this, void 0, void 0, function* () {
           const result = yield delDevice(currentCarImei.value);
           if (result.code == 0) {
-            uni.showToast({
+            showAppToast({
               title: "解绑成功",
               icon: "success"
             });
             clearSavedSelectedDevice();
             clearSavedSelectedDeviceIndex();
           } else {
-            uni.showToast({
+            showAppToast({
               title: "解绑失败",
               icon: "error"
             });
@@ -3404,7 +3770,7 @@
                     url: "/pages/login/login"
                   });
                 } else {
-                  uni.showToast({
+                  showAppToast({
                     title: "退出账户失败"
                   });
                 }
@@ -3449,336 +3815,372 @@
   const _imports_6 = "/static/pay.png";
   const _imports_7 = "/static/online.png";
   const _imports_8 = "/static/del.png";
-  const _style_0$H = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "marginLeft": "30rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-container": { ".container .page-bg .content .map-box ": { "height": "300rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "100%", "height": "100%", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "zIndex": 2, "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)" }, ".container .page-bg .content .mile-record .green": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderLeftColor": "#4cd964", "borderBottomColor": "#b3b5b01c", "borderBottomWidth": 5, "transform": "rotate(135deg)" }, ".container .page-bg .content .mile-record .orange": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderLeftColor": "#ff9500", "borderBottomColor": "#b3b5b01c", "borderBottomWidth": 5, "transform": "rotate(135deg)" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10, "textAlign": "center" } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "marginLeft": "8rpx", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "fontSize": "28rpx", "fontWeight": 500, "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx", "fontWeight": "normal" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const _style_0$H = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "marginLeft": "30rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-container": { ".container .page-bg .content .map-box ": { "height": "300rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
   function _sfc_render$H(_ctx, _cache, $props, $setup, $data, $options) {
     var _a;
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
     const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
     const _component_map = vue.resolveComponent("map");
     const _component_i_picker = resolveEasycom(vue.resolveDynamicComponent("i-picker"), __easycom_2$5);
-    return vue.openBlock(), vue.createElementBlock("scroll-view", {
-      class: "container",
-      "scroll-y": "true",
-      "show-scrollbar": false
-    }, [
-      vue.createElementVNode("view", { class: "page-bg" }, [
-        vue.createElementVNode(
-          "view",
-          {
-            class: "top",
-            style: vue.normalizeStyle({ paddingTop: $setup.statusBarHeight + 50 + "px" })
-          },
-          [
-            vue.createElementVNode("view", { class: "device-car" }, [
-              vue.createElementVNode("view", { class: "current-car" }, [
-                $setup.checkToken() ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
-                  $setup.currentCarName ? (vue.openBlock(), vue.createElementBlock(
-                    "text",
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("scroll-view", {
+          class: "container",
+          "scroll-y": "true",
+          "show-scrollbar": false
+        }, [
+          vue.createElementVNode("view", { class: "page-bg" }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: "top",
+                style: vue.normalizeStyle({ paddingTop: $setup.statusBarHeight + 10 + "px" })
+              },
+              [
+                vue.createElementVNode("view", { class: "device-car" }, [
+                  vue.createElementVNode("view", { class: "current-car" }, [
+                    $setup.checkToken() ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+                      $setup.currentCarName ? (vue.openBlock(), vue.createElementBlock(
+                        "text",
+                        {
+                          key: 0,
+                          class: "car-id",
+                          onClick: $setup.handlePicker
+                        },
+                        vue.toDisplayString((_a = $setup.currentCarName) != null ? _a : "加载中…"),
+                        1
+                        /* TEXT */
+                      )) : (vue.openBlock(), vue.createElementBlock("text", {
+                        key: 1,
+                        class: "car-id"
+                      }, "暂无设备"))
+                    ])) : (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 1,
+                      class: "login",
+                      onClick: $setup.gotoLogin
+                    }, "点击登录!")),
+                    vue.createVNode(_component_i_icon, {
+                      name: "/static/right-bottom.png",
+                      fontSize: "7"
+                    })
+                  ]),
+                  vue.createElementVNode("view", { class: "nav-tools" }, [
+                    vue.createCommentVNode("v-if", true),
+                    vue.createVNode(_component_i_icon, {
+                      name: "/static/reload.png",
+                      fontSize: "18",
+                      onClick: $setup.handleReload
+                    }),
+                    vue.createVNode(_component_i_icon, {
+                      class: "nav-tool-spacing",
+                      name: "/static/maps.png",
+                      fontSize: "20",
+                      onClick: $setup.toDeviceList
+                    }),
+                    vue.createVNode(_component_i_icon, {
+                      class: "nav-tool-spacing",
+                      name: "/static/addNew.png",
+                      fontSize: "18",
+                      onClick: $setup.toAdd
+                    })
+                  ])
+                ]),
+                $setup.safeDeviceDetail.deviceStatus.batteryPercent && $setup.safeDeviceDetail.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 0,
+                  class: "device-info"
+                }, [
+                  $setup.safeDeviceDetail.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createBlock(_component_i_line_progress, {
+                    key: 0,
+                    percent: $setup.safeDeviceDetail.deviceStatus.batteryPercent
+                  }, null, 8, ["percent"])) : vue.createCommentVNode("v-if", true),
+                  $setup.safeDeviceDetail.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createElementBlock(
+                    "view",
                     {
-                      key: 0,
-                      class: "car-id",
-                      onClick: $setup.handlePicker
+                      key: 1,
+                      class: "info"
                     },
-                    vue.toDisplayString((_a = $setup.currentCarName) != null ? _a : "加载中…"),
+                    "电量: " + vue.toDisplayString($setup.safeDeviceDetail.deviceStatus.batteryPercent) + "%",
                     1
                     /* TEXT */
-                  )) : (vue.openBlock(), vue.createElementBlock("text", {
-                    key: 1,
-                    class: "car-id"
-                  }, "暂无设备"))
-                ])) : (vue.openBlock(), vue.createElementBlock("text", {
-                  key: 1,
-                  class: "login",
-                  onClick: $setup.gotoLogin
-                }, "点击登录!")),
-                vue.createVNode(_component_i_icon, {
-                  name: "/static/right-bottom.png",
-                  fontSize: "7"
-                })
-              ]),
-              vue.createElementVNode("view", { class: "nav-tools" }, [
-                vue.createCommentVNode("v-if", true),
-                vue.createVNode(_component_i_icon, {
-                  name: "/static/reload.png",
-                  fontSize: "18",
-                  onClick: $setup.handleReload
-                }),
-                vue.createVNode(_component_i_icon, {
-                  class: "nav-tool-spacing",
-                  name: "/static/maps.png",
-                  fontSize: "20",
-                  onClick: $setup.toDeviceList
-                }),
-                vue.createVNode(_component_i_icon, {
-                  class: "nav-tool-spacing",
-                  name: "/static/addNew.png",
-                  fontSize: "18",
-                  onClick: $setup.toAdd
-                })
-              ])
-            ]),
-            $setup.safeDeviceDetail.deviceStatus.batteryPercent && $setup.safeDeviceDetail.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
-              class: "device-info"
-            }, [
-              $setup.safeDeviceDetail.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createBlock(_component_i_line_progress, {
-                key: 0,
-                percent: $setup.safeDeviceDetail.deviceStatus.batteryPercent
-              }, null, 8, ["percent"])) : vue.createCommentVNode("v-if", true),
-              $setup.safeDeviceDetail.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createElementBlock(
-                "view",
-                {
-                  key: 1,
-                  class: "info"
-                },
-                "电量: " + vue.toDisplayString($setup.safeDeviceDetail.deviceStatus.batteryPercent) + "%",
-                1
-                /* TEXT */
-              )) : vue.createCommentVNode("v-if", true),
-              $setup.safeDeviceDetail.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock(
-                "view",
-                {
-                  key: 2,
-                  class: "info"
-                },
-                "电压: " + vue.toDisplayString($setup.safeDeviceDetail.deviceStatus.voltage) + "V",
-                1
-                /* TEXT */
-              )) : vue.createCommentVNode("v-if", true)
-            ])) : vue.createCommentVNode("v-if", true),
-            vue.createElementVNode("view", { class: "banner" }, [
-              vue.createElementVNode("image", {
-                src: _imports_1$2,
-                mode: "aspectFit",
-                class: "banner-image"
-              })
-            ]),
-            vue.createElementVNode("view", { class: "car-state" }, [
-              vue.createElementVNode("view", { class: "state-item" }, [
-                vue.createElementVNode("text", { class: "state-label" }, "设备状态"),
-                vue.createElementVNode(
-                  "text",
-                  {
-                    class: vue.normalizeClass(["state-value", { "online": $setup.safeDeviceDetail.connectionStatus == "online" }])
-                  },
-                  vue.toDisplayString($setup.safeDeviceDetail.connectionStatus == "online" ? "在线" : "离线"),
-                  3
-                  /* TEXT, CLASS */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "state-item" }, [
-                vue.createElementVNode("text", { class: "state-label" }, "最后定位"),
-                vue.createElementVNode(
-                  "text",
-                  { class: "state-value" },
-                  vue.toDisplayString($setup.devicePositionUpdateTime),
-                  1
-                  /* TEXT */
-                )
-              ])
-            ])
-          ],
-          4
-          /* STYLE */
-        ),
-        vue.createElementVNode("view", { class: "content" }, [
-          vue.createElementVNode("view", { class: "map-box" }, [
-            vue.createElementVNode("view", { class: "map-header" }, [
-              vue.createElementVNode("text", { class: "map-title" }, "车辆定位"),
-              vue.createElementVNode("text", {
-                class: "map-refresh",
-                onClick: $setup.refreshLocation
-              }, "刷新位置")
-            ]),
-            vue.createElementVNode("view", { class: "map-container" }, [
-              $setup.isMapReady ? (vue.openBlock(), vue.createBlock(_component_map, {
-                key: 0,
-                id: "myMap",
-                latitude: $setup.center.latitude,
-                longitude: $setup.center.longitude,
-                scale: $setup.mapScale,
-                style: { "width": "100%", "height": "100%" },
-                "show-location": true,
-                "enable-traffic": true,
-                "enable-overlooking": true,
-                "enable-building": true,
-                "enable-3D": false,
-                markers: $setup.markers
-              }, null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("v-if", true)
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "mile-record" }, [
-            vue.createElementVNode("view", { class: "record-header" }, [
-              vue.createElementVNode("text", { class: "record-title" }, "轨迹记录"),
-              vue.createElementVNode("text", {
-                class: "record-desc",
-                onClick: $setup.toRecordDetail
-              }, "更多轨迹")
-            ]),
-            vue.createElementVNode("view", { class: "ring-container" }, [
-              vue.createElementVNode("view", { class: "ring-item" }, [
-                vue.createElementVNode("view", { class: "ring-bg green" }),
-                vue.createElementVNode("view", { class: "ring-text" }, [
-                  vue.createElementVNode("text", { class: "unit" }, "条"),
-                  vue.createElementVNode(
-                    "text",
-                    { class: "num" },
-                    vue.toDisplayString($setup.totalTrips),
+                  )) : vue.createCommentVNode("v-if", true),
+                  $setup.safeDeviceDetail.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock(
+                    "view",
+                    {
+                      key: 2,
+                      class: "info"
+                    },
+                    "电压: " + vue.toDisplayString($setup.safeDeviceDetail.deviceStatus.voltage) + "V",
                     1
                     /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "label" }, "今日轨迹")
+                  )) : vue.createCommentVNode("v-if", true)
+                ])) : vue.createCommentVNode("v-if", true),
+                vue.createElementVNode("view", { class: "banner" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_1$2,
+                    mode: "aspectFit",
+                    class: "banner-image"
+                  })
+                ]),
+                vue.createElementVNode("view", { class: "car-state" }, [
+                  vue.createElementVNode("view", { class: "state-item" }, [
+                    vue.createElementVNode("text", { class: "state-label" }, "设备状态"),
+                    vue.createElementVNode(
+                      "text",
+                      {
+                        class: vue.normalizeClass(["state-value", { "online": $setup.safeDeviceDetail.connectionStatus == "online" }])
+                      },
+                      vue.toDisplayString($setup.safeDeviceDetail.connectionStatus == "online" ? "在线" : "离线"),
+                      3
+                      /* TEXT, CLASS */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "state-item" }, [
+                    vue.createElementVNode("text", { class: "state-label" }, "最后定位"),
+                    vue.createElementVNode(
+                      "text",
+                      { class: "state-value" },
+                      vue.toDisplayString($setup.devicePositionUpdateTime),
+                      1
+                      /* TEXT */
+                    )
+                  ])
+                ])
+              ],
+              4
+              /* STYLE */
+            ),
+            vue.createElementVNode("view", { class: "content" }, [
+              vue.createElementVNode("view", { class: "map-box" }, [
+                vue.createElementVNode("view", { class: "map-header" }, [
+                  vue.createElementVNode("text", { class: "map-title" }, "车辆定位"),
+                  vue.createElementVNode("text", {
+                    class: "map-refresh",
+                    onClick: $setup.refreshLocation
+                  }, "刷新位置")
+                ]),
+                vue.createElementVNode("view", { class: "map-container" }, [
+                  $setup.isMapReady ? (vue.openBlock(), vue.createBlock(_component_map, {
+                    key: 0,
+                    id: "myMap",
+                    latitude: $setup.center.latitude,
+                    longitude: $setup.center.longitude,
+                    scale: $setup.mapScale,
+                    style: { "width": "100%", "height": "100%" },
+                    "show-location": true,
+                    "enable-traffic": true,
+                    "enable-overlooking": true,
+                    "enable-building": true,
+                    "enable-3D": false,
+                    markers: $setup.markers
+                  }, null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("v-if", true)
                 ])
               ]),
-              vue.createElementVNode("view", { class: "ring-item" }, [
-                vue.createElementVNode("view", { class: "ring-bg orange" }),
-                vue.createElementVNode("view", { class: "ring-text" }, [
-                  vue.createElementVNode("text", { class: "unit" }, "km"),
-                  vue.createElementVNode(
-                    "text",
-                    { class: "num" },
-                    vue.toDisplayString(($setup.totalMileage / 1e3).toFixed(2)),
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "label" }, "今日里程")
+              vue.createElementVNode("view", { class: "mile-record" }, [
+                vue.createElementVNode("view", { class: "record-header" }, [
+                  vue.createElementVNode("text", { class: "record-title" }, "轨迹记录"),
+                  vue.createElementVNode("text", {
+                    class: "record-desc",
+                    onClick: $setup.toRecordDetail
+                  }, "更多轨迹")
+                ]),
+                vue.createElementVNode("view", { class: "ring-container" }, [
+                  vue.createElementVNode("view", { class: "ring-item" }, [
+                    vue.createElementVNode("view", { class: "ring-bg green" }, [
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--top-left" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--track" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--top-right" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--bottom-right" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--bottom-left" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ])
+                    ]),
+                    vue.createElementVNode("view", { class: "ring-text" }, [
+                      vue.createElementVNode("text", { class: "unit" }, "条"),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "num" },
+                        vue.toDisplayString($setup.totalTrips),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode("text", { class: "label" }, "今日轨迹")
+                    ])
+                  ]),
+                  vue.createElementVNode("view", { class: "ring-item" }, [
+                    vue.createElementVNode("view", { class: "ring-bg orange" }, [
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--top-left" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--track" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--top-right" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--bottom-right" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ]),
+                      vue.createElementVNode("view", { class: "ring-quarter ring-quarter--bottom-left" }, [
+                        vue.createElementVNode("view", { class: "ring-stroke ring-stroke--active" })
+                      ])
+                    ]),
+                    vue.createElementVNode("view", { class: "ring-text" }, [
+                      vue.createElementVNode("text", { class: "unit" }, "km"),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "num" },
+                        vue.toDisplayString(($setup.totalMileage / 1e3).toFixed(2)),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode("text", { class: "label" }, "今日里程")
+                    ])
+                  ])
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "device-list" }, [
+                vue.createElementVNode("view", {
+                  class: "device-item",
+                  onClick: $setup.toDeviceDetail
+                }, [
+                  vue.createElementVNode("view", { class: "item-label" }, [
+                    vue.createElementVNode("view", { class: "icon icon-device" }, [
+                      vue.createElementVNode("image", {
+                        src: _imports_2$2,
+                        mode: "aspectFill",
+                        class: "icon-image"
+                      })
+                    ]),
+                    vue.createElementVNode("view", { class: "item-info" }, [
+                      vue.createElementVNode("text", { class: "item-title" }, "设备详情"),
+                      vue.createElementVNode("text", { class: "item-desc" }, "查看设备更多详情")
+                    ])
+                  ]),
+                  vue.createVNode(_component_i_icon, {
+                    name: "/static/arrow-right.png",
+                    fontSize: "15"
+                  })
+                ]),
+                vue.createElementVNode("view", {
+                  class: "device-item",
+                  onClick: $setup.toFindCar
+                }, [
+                  vue.createElementVNode("view", { class: "item-label" }, [
+                    vue.createElementVNode("view", { class: "icon icon-car" }, [
+                      vue.createElementVNode("image", {
+                        src: _imports_3$1,
+                        mode: "aspectFill",
+                        class: "icon-image"
+                      })
+                    ]),
+                    vue.createElementVNode("view", { class: "item-info" }, [
+                      vue.createElementVNode("text", { class: "item-title" }, "一键寻车"),
+                      vue.createElementVNode("text", { class: "item-desc" }, "点击立即寻找车辆位置")
+                    ])
+                  ]),
+                  vue.createVNode(_component_i_icon, {
+                    name: "/static/arrow-right.png",
+                    fontSize: "15"
+                  })
+                ]),
+                vue.createElementVNode("view", {
+                  class: "device-item",
+                  onClick: $setup.toFence
+                }, [
+                  vue.createElementVNode("view", { class: "item-label" }, [
+                    vue.createElementVNode("view", { class: "icon icon-fence" }, [
+                      vue.createElementVNode("image", {
+                        src: _imports_4,
+                        mode: "aspectFill",
+                        class: "icon-image"
+                      })
+                    ]),
+                    vue.createElementVNode("view", { class: "item-info" }, [
+                      vue.createElementVNode("text", { class: "item-title" }, "电子围栏"),
+                      vue.createElementVNode("text", { class: "item-desc" }, "点击去设置或者查看电子围栏")
+                    ])
+                  ]),
+                  vue.createVNode(_component_i_icon, {
+                    name: "/static/arrow-right.png",
+                    fontSize: "15"
+                  })
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "service" }, [
+                vue.createElementVNode("text", { class: "service-header" }, "服务中心"),
+                vue.createElementVNode("view", { class: "service-content" }, [
+                  vue.createElementVNode("view", {
+                    class: "service-item",
+                    onClick: $setup.toMsgCenter
+                  }, [
+                    vue.createElementVNode("image", {
+                      src: _imports_5,
+                      mode: "aspectFill",
+                      class: "icon-image"
+                    }),
+                    vue.createElementVNode("text", { class: "item-title" }, "警报消息")
+                  ]),
+                  vue.createElementVNode("view", {
+                    class: "service-item",
+                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.toPay($setup.currentCarIccId, $setup.currentCarSimMerchant))
+                  }, [
+                    vue.createElementVNode("image", {
+                      src: _imports_6,
+                      mode: "aspectFill",
+                      class: "icon-image"
+                    }),
+                    vue.createElementVNode("text", { class: "item-title" }, "一键续费")
+                  ]),
+                  vue.createElementVNode("view", {
+                    class: "service-item",
+                    onClick: $setup.contactCustomerService
+                  }, [
+                    vue.createElementVNode("image", {
+                      src: _imports_7,
+                      mode: "aspectFill",
+                      class: "icon-image"
+                    }),
+                    vue.createElementVNode("text", { class: "item-title" }, "在线客服")
+                  ]),
+                  vue.createElementVNode("view", {
+                    class: "service-item",
+                    onClick: $setup.unbindDevice
+                  }, [
+                    vue.createElementVNode("image", {
+                      src: _imports_8,
+                      mode: "aspectFill",
+                      class: "icon-image"
+                    }),
+                    vue.createElementVNode("text", {
+                      class: "item-title",
+                      style: { "color": "#d81e06" }
+                    }, "删除设备")
+                  ])
                 ])
               ])
             ])
           ]),
-          vue.createElementVNode("view", { class: "device-list" }, [
-            vue.createElementVNode("view", {
-              class: "device-item",
-              onClick: $setup.toDeviceDetail
-            }, [
-              vue.createElementVNode("view", { class: "item-label" }, [
-                vue.createElementVNode("view", { class: "icon icon-device" }, [
-                  vue.createElementVNode("image", {
-                    src: _imports_2$2,
-                    mode: "aspectFill",
-                    class: "icon-image"
-                  })
-                ]),
-                vue.createElementVNode("view", { class: "item-info" }, [
-                  vue.createElementVNode("text", { class: "item-title" }, "设备详情"),
-                  vue.createElementVNode("text", { class: "item-desc" }, "查看设备更多详情")
-                ])
-              ]),
-              vue.createVNode(_component_i_icon, {
-                name: "/static/arrow-right.png",
-                fontSize: "15"
-              })
-            ]),
-            vue.createElementVNode("view", {
-              class: "device-item",
-              onClick: $setup.toFindCar
-            }, [
-              vue.createElementVNode("view", { class: "item-label" }, [
-                vue.createElementVNode("view", { class: "icon icon-car" }, [
-                  vue.createElementVNode("image", {
-                    src: _imports_3$1,
-                    mode: "aspectFill",
-                    class: "icon-image"
-                  })
-                ]),
-                vue.createElementVNode("view", { class: "item-info" }, [
-                  vue.createElementVNode("text", { class: "item-title" }, "一键寻车"),
-                  vue.createElementVNode("text", { class: "item-desc" }, "点击立即寻找车辆位置")
-                ])
-              ]),
-              vue.createVNode(_component_i_icon, {
-                name: "/static/arrow-right.png",
-                fontSize: "15"
-              })
-            ]),
-            vue.createElementVNode("view", {
-              class: "device-item",
-              onClick: $setup.toFence
-            }, [
-              vue.createElementVNode("view", { class: "item-label" }, [
-                vue.createElementVNode("view", { class: "icon icon-fence" }, [
-                  vue.createElementVNode("image", {
-                    src: _imports_4,
-                    mode: "aspectFill",
-                    class: "icon-image"
-                  })
-                ]),
-                vue.createElementVNode("view", { class: "item-info" }, [
-                  vue.createElementVNode("text", { class: "item-title" }, "电子围栏"),
-                  vue.createElementVNode("text", { class: "item-desc" }, "点击去设置或者查看电子围栏")
-                ])
-              ]),
-              vue.createVNode(_component_i_icon, {
-                name: "/static/arrow-right.png",
-                fontSize: "15"
-              })
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "service" }, [
-            vue.createElementVNode("view", { class: "service-header" }, "服务中心"),
-            vue.createElementVNode("view", { class: "service-content" }, [
-              vue.createElementVNode("view", {
-                class: "service-item",
-                onClick: $setup.toMsgCenter
-              }, [
-                vue.createElementVNode("image", {
-                  src: _imports_5,
-                  mode: "aspectFill",
-                  class: "icon-image"
-                }),
-                vue.createElementVNode("text", { class: "item-title" }, "警报消息")
-              ]),
-              vue.createElementVNode("view", {
-                class: "service-item",
-                onClick: _cache[0] || (_cache[0] = ($event) => $setup.toPay($setup.currentCarIccId, $setup.currentCarSimMerchant))
-              }, [
-                vue.createElementVNode("image", {
-                  src: _imports_6,
-                  mode: "aspectFill",
-                  class: "icon-image"
-                }),
-                vue.createElementVNode("text", { class: "item-title" }, "一键续费")
-              ]),
-              vue.createElementVNode("view", {
-                class: "service-item",
-                onClick: $setup.contactCustomerService
-              }, [
-                vue.createElementVNode("image", {
-                  src: _imports_7,
-                  mode: "aspectFill",
-                  class: "icon-image"
-                }),
-                vue.createElementVNode("text", { class: "item-title" }, "在线客服")
-              ]),
-              vue.createElementVNode("view", {
-                class: "service-item",
-                onClick: $setup.unbindDevice
-              }, [
-                vue.createElementVNode("image", {
-                  src: _imports_8,
-                  mode: "aspectFill",
-                  class: "icon-image"
-                }),
-                vue.createElementVNode("text", {
-                  class: "item-title",
-                  style: { "color": "#d81e06" }
-                }, "删除设备")
-              ])
-            ])
-          ])
-        ])
-      ]),
-      $setup.showPicker ? (vue.openBlock(), vue.createBlock(_component_i_picker, {
-        key: $setup.pickerKey,
-        show: $setup.showPicker,
-        columns: $setup.pickerColumns,
-        defaultIndex: $setup.pickerDefaultIndex,
-        visibleItemCount: 5,
-        onConfirm: $setup.handleConfirm,
-        onCancel: $setup.closePicker,
-        onClose: $setup.closePicker
-      }, null, 8, ["show", "columns", "defaultIndex"])) : vue.createCommentVNode("v-if", true)
-    ]);
+          $setup.showPicker ? (vue.openBlock(), vue.createBlock(_component_i_picker, {
+            key: $setup.pickerKey,
+            show: $setup.showPicker,
+            columns: $setup.pickerColumns,
+            defaultIndex: $setup.pickerDefaultIndex,
+            visibleItemCount: 5,
+            onConfirm: $setup.handleConfirm,
+            onCancel: $setup.closePicker,
+            onClose: $setup.closePicker
+          }, null, 8, ["show", "columns", "defaultIndex"])) : vue.createCommentVNode("v-if", true)
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$H], ["styles", [_style_0$H]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/index/index.uvue"]]);
   const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
@@ -3833,7 +4235,7 @@
     }
   });
   const _imports_0$3 = "/static/back.png";
-  const _style_0$G = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule": { "": { "textAlign": "center" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
+  const _style_0$G = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
   function _sfc_render$G(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
     return vue.openBlock(), vue.createElementBlock(
@@ -3877,7 +4279,7 @@
               })) : vue.createCommentVNode("v-if", true)
             ]),
             vue.createElementVNode(
-              "view",
+              "text",
               {
                 class: "title",
                 style: vue.normalizeStyle({ color: $props.textColor, "line-height": $setup.navBarHeight + "px" })
@@ -4373,7 +4775,7 @@
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:99", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:100", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -4416,7 +4818,7 @@
               newMessageCount.value = count;
             }
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:139", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:140", "检查新消息失败:", error);
           }
         });
       }
@@ -4424,10 +4826,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:149", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:150", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:153", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:154", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -4478,7 +4880,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:200", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:201", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4486,12 +4888,12 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:208", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:209", "加载新消息");
           yield loadMsgList(true);
           hasNewMessages.value = false;
           newMessageCount.value = 0;
           lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
-          uni.__log__("log", "at pages/message/message.uvue:213", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:214", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -4508,47 +4910,47 @@
       };
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:237", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:238", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:247", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:248", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:249", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:250", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:257", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:258", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:259", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:260", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:266", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:267", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:268", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:269", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:277", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:278", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:279", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:280", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:287", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:288", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -4558,7 +4960,7 @@
       };
       const loadMore = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:298", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
+          uni.__log__("log", "at pages/message/message.uvue:299", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
           if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
             if (currPage.value >= totalPage.value) {
               loadStatus.value = "nomore";
@@ -4570,7 +4972,7 @@
         });
       };
       const onScrollToLower = () => {
-        uni.__log__("log", "at pages/message/message.uvue:312", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
+        uni.__log__("log", "at pages/message/message.uvue:313", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
         if (loadStatus.value == "loadmore" && !isLoading.value) {
           loadMore();
         }
@@ -4593,7 +4995,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:336", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:337", "更新状态失败:", error);
             }
           }
         });
@@ -4663,6 +5065,7 @@
   function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -4762,7 +5165,8 @@
             content: $setup.modalContent.getString("content", ""),
             onConfirm: $setup.ReadIt
           }, null, 8, ["show", "title", "content"])
-        ])
+        ]),
+        vue.createVNode(_component_app_toast)
       ],
       64
       /* STABLE_FRAGMENT */
@@ -5115,7 +5519,7 @@
         }
       });
       const contactCustomerService = () => {
-        uni.showToast({
+        showAppToast({
           title: "请在微信小程序中联系人工客服",
           icon: "none"
         });
@@ -5148,7 +5552,7 @@
             url: "/pages/userCenter/carList/carList"
           });
         } else {
-          uni.showToast({
+          showAppToast({
             title: "请先登录",
             icon: "none"
           });
@@ -5160,7 +5564,7 @@
             url: "/pages/userCenter/payDeviceList/payDeviceList"
           });
         } else {
-          uni.showToast({
+          showAppToast({
             title: "请先登录",
             icon: "none"
           });
@@ -5172,7 +5576,7 @@
             url: "/pages/webview/webview?url=" + encodeURIComponent("https://shop.zdiot.cn/")
           });
         } else {
-          uni.showToast({
+          showAppToast({
             title: "请先登录",
             icon: "none"
           });
@@ -5190,105 +5594,115 @@
     const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$4);
     const _component_movable_view = vue.resolveComponent("movable-view");
     const _component_movable_area = vue.resolveComponent("movable-area");
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "个人中心",
-        "show-back": false,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", {
-        class: "user-info-box",
-        onClick: $setup.userInfoDetail
-      }, [
-        vue.createElementVNode("view", { class: "userinfo" }, [
-          vue.createElementVNode("view", null, [
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "个人中心",
+            "show-back": false,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", {
+            class: "user-info-box",
+            onClick: $setup.userInfoDetail
+          }, [
+            vue.createElementVNode("view", { class: "userinfo" }, [
+              vue.createElementVNode("view", null, [
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/avatar.png",
+                  fontSize: "40"
+                })
+              ]),
+              vue.createElementVNode("view", { class: "user-info" }, [
+                $setup.Login ? (vue.openBlock(), vue.createElementBlock(
+                  "text",
+                  { key: 0 },
+                  vue.toDisplayString($setup.userInfo.mobile),
+                  1
+                  /* TEXT */
+                )) : (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "点击登录"))
+              ])
+            ]),
             vue.createVNode(_component_i_icon, {
-              name: "/static/avatar.png",
-              fontSize: "40"
+              name: "/static/arrow-right.png",
+              fontSize: "15"
             })
           ]),
-          vue.createElementVNode("view", { class: "user-info" }, [
-            $setup.Login ? (vue.openBlock(), vue.createElementBlock(
-              "text",
-              { key: 0 },
-              vue.toDisplayString($setup.userInfo.mobile),
-              1
-              /* TEXT */
-            )) : (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "点击登录"))
-          ])
-        ]),
-        vue.createVNode(_component_i_icon, {
-          name: "/static/arrow-right.png",
-          fontSize: "15"
-        })
-      ]),
-      $setup.Login ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
-        vue.createElementVNode("view", {
-          class: "list",
-          onClick: $setup.carList
-        }, [
-          vue.createElementVNode("view", { class: "left" }, [
-            vue.createElementVNode("text", null, "我的车辆"),
-            vue.createElementVNode("text", { class: "badge" }, [
-              vue.createVNode(_component_i_badge, {
-                type: "danger",
-                maxCount: "99",
-                count: $setup.carsnumber
-              }, null, 8, ["count"])
-            ])
-          ]),
-          vue.createVNode(_component_i_icon, {
-            name: "/static/arrow-right.png",
-            fontSize: "15"
-          })
-        ]),
-        vue.createElementVNode("view", {
-          class: "list",
-          onClick: $setup.platformRenewal
-        }, "平台续费")
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.version ? (vue.openBlock(), vue.createElementBlock(
-        "view",
-        {
-          key: 1,
-          class: "version"
-        },
-        "当前版本：" + vue.toDisplayString($setup.version),
-        1
-        /* TEXT */
-      )) : vue.createCommentVNode("v-if", true),
-      vue.createVNode(_component_movable_area, { class: "movable-area" }, {
-        default: vue.withCtx(() => [
-          vue.createVNode(_component_movable_view, {
-            class: "movable-view",
-            direction: "all",
-            x: $setup.moveX,
-            y: $setup.moveY,
-            onChange: $setup.onMoveChange
-          }, {
+          $setup.Login ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+            vue.createElementVNode("view", {
+              class: "list",
+              onClick: $setup.carList
+            }, [
+              vue.createElementVNode("view", { class: "left" }, [
+                vue.createElementVNode("text", null, "我的车辆"),
+                vue.createElementVNode("text", { class: "badge" }, [
+                  vue.createVNode(_component_i_badge, {
+                    type: "danger",
+                    maxCount: "99",
+                    count: $setup.carsnumber
+                  }, null, 8, ["count"])
+                ])
+              ]),
+              vue.createVNode(_component_i_icon, {
+                name: "/static/arrow-right.png",
+                fontSize: "15"
+              })
+            ]),
+            vue.createElementVNode("view", {
+              class: "list",
+              onClick: $setup.platformRenewal
+            }, "平台续费")
+          ])) : vue.createCommentVNode("v-if", true),
+          $setup.version ? (vue.openBlock(), vue.createElementBlock(
+            "view",
+            {
+              key: 1,
+              class: "version"
+            },
+            "当前版本：" + vue.toDisplayString($setup.version),
+            1
+            /* TEXT */
+          )) : vue.createCommentVNode("v-if", true),
+          vue.createVNode(_component_movable_area, { class: "movable-area" }, {
             default: vue.withCtx(() => [
-              vue.createElementVNode("view", {
-                class: "contact-button-movable",
-                onClick: $setup.contactCustomerService
-              }, [
-                vue.createVNode(_component_i_icon, {
-                  name: "/static/server-man.png",
-                  fontSize: "20"
-                }),
-                vue.createElementVNode("text", { class: "contact-text" }, "人工客服"),
-                vue.createElementVNode("text", { class: "contact-text" }, "08:00-24:00")
-              ])
+              vue.createVNode(_component_movable_view, {
+                class: "movable-view",
+                direction: "all",
+                x: $setup.moveX,
+                y: $setup.moveY,
+                onChange: $setup.onMoveChange
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode("view", {
+                    class: "contact-button-movable",
+                    onClick: $setup.contactCustomerService
+                  }, [
+                    vue.createVNode(_component_i_icon, {
+                      name: "/static/server-man.png",
+                      fontSize: "20"
+                    }),
+                    vue.createElementVNode("text", { class: "contact-text" }, "人工客服"),
+                    vue.createElementVNode("text", { class: "contact-text" }, "08:00-24:00")
+                  ])
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["x", "y"])
             ]),
             _: 1
             /* STABLE */
-          }, 8, ["x", "y"])
+          })
         ]),
-        _: 1
-        /* STABLE */
-      })
-    ]);
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["styles", [_style_0$C]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/userCenter.uvue"]]);
   const _sfc_main$C = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
@@ -6104,7 +6518,7 @@
       /* CLASS */
     );
   }
-  const __easycom_3$3 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["styles", [_style_0$z]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-checkbox/i-checkbox.uvue"]]);
+  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["styles", [_style_0$z]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-checkbox/i-checkbox.uvue"]]);
   const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
     hairline: {
       type: Boolean,
@@ -6955,7 +7369,7 @@
       /* CLASS */
     );
   }
-  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["styles", [_style_0$x]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form/i-form.uvue"]]);
+  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["styles", [_style_0$x]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-form/i-form.uvue"]]);
   class FormData extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -7032,7 +7446,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:127", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:129", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -7069,22 +7483,22 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:170", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:172", "设备型号:", deviceModel.value);
       };
       const validateForm = () => {
         if (form.value.username.length == 0) {
-          uni.showToast({ title: "请输入账号", icon: "none" });
+          showAppToast({ title: "请输入账号", icon: "none" });
           return false;
         }
         if (form.value.password.length == 0) {
-          uni.showToast({ title: "请输入密码", icon: "none" });
+          showAppToast({ title: "请输入密码", icon: "none" });
           return false;
         }
         return true;
       };
       const loginBt = () => {
         if (!docState.value) {
-          uni.showToast({
+          showAppToast({
             title: "请先阅读并同意用户协议",
             icon: "error"
           });
@@ -7098,32 +7512,32 @@
       const submit = () => {
         return __awaiter(this, void 0, void 0, function* () {
           if (!docState.value) {
-            uni.showToast({
+            showAppToast({
               title: "请先阅读并同意用户协议",
               icon: "error"
             });
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:298", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:300", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:300", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:302", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:309", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:311", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:319", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:321", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:321", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:323", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
@@ -7131,7 +7545,7 @@
             if (token != "") {
               saveAccountPassword();
               uni.setStorageSync("token", token);
-              uni.showToast({
+              showAppToast({
                 title: "登录成功",
                 icon: "success"
               });
@@ -7141,22 +7555,22 @@
                 });
               }, 500);
             } else {
-              uni.showToast({
+              showAppToast({
                 title: "登录失败，请重试",
                 icon: "error"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:350", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:352", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
-              uni.showToast({
+              showAppToast({
                 icon: "error",
                 title: "登录失败，请检查账号、密码或网络"
               });
             } else {
-              uni.showToast({
+              showAppToast({
                 icon: "error",
                 title: "登录失败，请检查网络后重试"
               });
@@ -7186,7 +7600,7 @@
       vue.onMounted(() => {
         getSystemInfo();
         loadSavedAccount();
-        uni.__log__("log", "at pages/login/login.uvue:446", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:448", "pswLogin 初始值:", pswLogin.value);
       });
       const __returned__ = { docState, pswLogin, rememberPassword, formValid, loading, form, deviceModel, pswrules, updateFormValid, loadSavedAccount, isPswLogin, toggleRememberPassword, saveAccountPassword, filterNonLatin, isDocState, getSystemInfo, validateForm, loginBt, handleGetPhoneNumber, submit, userAgreement, privacyPolicy, gotoIndex, gotoAgreement, gotoPrivacy };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -7194,157 +7608,167 @@
     }
   });
   const _imports_0$2 = "/static/car_location.png";
-  const _style_0$w = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "100rpx", "paddingBottom": "20rpx", "paddingLeft": "100rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": 10, "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const _style_0$w = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "100rpx", "paddingBottom": "20rpx", "paddingLeft": "100rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": 10 } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": 10 } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
   function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$3);
-    const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$3);
+    const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$2);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
-    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$2);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "登陆",
-        "show-back": false,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "banner" }, [
-        vue.createElementVNode("image", {
-          src: _imports_0$2,
-          class: "banner-image",
-          mode: "aspectFill"
-        }),
-        vue.createElementVNode("text", { class: "title" }, "车联网")
-      ]),
-      vue.createElementVNode("view", { class: "content" }, [
-        $setup.pswLogin ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
-          vue.createVNode(_component_i_form, {
-            modelValue: $setup.form,
-            rules: $setup.pswrules,
-            labelDirection: "horizontal",
-            watchValidStatus: "",
-            "onUpdate:modelValid": $setup.updateFormValid
-          }, {
-            default: vue.withCtx(() => [
-              vue.createVNode(_component_i_form_item, {
-                name: "username",
-                label: "",
-                required: "",
+    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "登陆",
+            "show-back": false,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "banner" }, [
+            vue.createElementVNode("image", {
+              src: _imports_0$2,
+              class: "banner-image",
+              mode: "aspectFill"
+            }),
+            vue.createElementVNode("text", { class: "title" }, "车联网")
+          ]),
+          vue.createElementVNode("view", { class: "content" }, [
+            $setup.pswLogin ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+              vue.createVNode(_component_i_form, {
+                modelValue: $setup.form,
+                rules: $setup.pswrules,
                 labelDirection: "horizontal",
-                labelWidth: "0"
+                watchValidStatus: "",
+                "onUpdate:modelValid": $setup.updateFormValid
               }, {
                 default: vue.withCtx(() => [
-                  vue.createVNode(_component_i_input, {
-                    modelValue: $setup.form.username,
-                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.username = $event),
-                    placeholder: "请输入账号",
-                    clearable: "",
-                    prefixIcon: "account-fill"
-                  }, null, 8, ["modelValue"])
+                  vue.createVNode(_component_i_form_item, {
+                    name: "username",
+                    label: "",
+                    required: "",
+                    labelDirection: "horizontal",
+                    labelWidth: "0"
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_i_input, {
+                        modelValue: $setup.form.username,
+                        "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.username = $event),
+                        placeholder: "请输入账号",
+                        clearable: "",
+                        prefixIcon: "account-fill"
+                      }, null, 8, ["modelValue"])
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }),
+                  vue.createVNode(_component_i_form_item, {
+                    name: "password",
+                    label: "",
+                    required: "",
+                    labelDirection: "horizontal",
+                    labelWidth: "0"
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_i_input, {
+                        modelValue: $setup.form.password,
+                        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.password = $event),
+                        onInput: $setup.filterNonLatin,
+                        placeholder: "请输入密码",
+                        password: true
+                      }, null, 8, ["modelValue"])
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }),
+                  vue.createElementVNode("view", { class: "remember-password" }, [
+                    vue.createVNode(_component_i_checkbox, {
+                      checked: $setup.rememberPassword,
+                      onChange: $setup.toggleRememberPassword,
+                      label: "记住密码"
+                    }, null, 8, ["checked"])
+                  ]),
+                  vue.createVNode(_component_i_button, {
+                    type: "primary",
+                    onClick: $setup.submit,
+                    loading: $setup.loading
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createTextVNode("提交")
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["loading"])
                 ]),
                 _: 1
                 /* STABLE */
-              }),
-              vue.createVNode(_component_i_form_item, {
-                name: "password",
-                label: "",
-                required: "",
-                labelDirection: "horizontal",
-                labelWidth: "0"
-              }, {
-                default: vue.withCtx(() => [
-                  vue.createVNode(_component_i_input, {
-                    modelValue: $setup.form.password,
-                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.password = $event),
-                    onInput: $setup.filterNonLatin,
-                    placeholder: "请输入密码",
-                    password: true
-                  }, null, 8, ["modelValue"])
-                ]),
-                _: 1
-                /* STABLE */
-              }),
-              vue.createElementVNode("view", { class: "remember-password" }, [
-                vue.createVNode(_component_i_checkbox, {
-                  checked: $setup.rememberPassword,
-                  onChange: $setup.toggleRememberPassword,
-                  label: "记住密码"
-                }, null, 8, ["checked"])
-              ]),
-              vue.createVNode(_component_i_button, {
+              }, 8, ["modelValue"])
+            ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 1 }, [
+              !$setup.docState ? (vue.openBlock(), vue.createElementBlock("button", {
+                key: 0,
                 type: "primary",
-                onClick: $setup.submit,
-                loading: $setup.loading
-              }, {
-                default: vue.withCtx(() => [
-                  vue.createTextVNode("提交")
-                ]),
-                _: 1
-                /* STABLE */
-              }, 8, ["loading"])
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["modelValue"])
-        ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 1 }, [
-          !$setup.docState ? (vue.openBlock(), vue.createElementBlock("button", {
-            key: 0,
-            type: "primary",
-            plain: "true",
-            onClick: $setup.loginBt
-          }, " 个人用户登录 ")) : vue.createCommentVNode("v-if", true),
-          $setup.docState ? (vue.openBlock(), vue.createElementBlock(
-            "button",
-            {
-              key: 1,
-              "open-type": "getPhoneNumber",
-              type: "primary",
-              plain: "true",
-              onGetphonenumber: $setup.handleGetPhoneNumber
-            },
-            " 个人用户登录 ",
-            32
-            /* NEED_HYDRATION */
-          )) : vue.createCommentVNode("v-if", true)
-        ])),
-        vue.createElementVNode("view", { class: "documents" }, [
-          vue.createVNode(_component_i_checkbox, {
-            checked: $setup.docState,
-            onChange: $setup.isDocState
-          }, null, 8, ["checked"]),
-          vue.createElementVNode("view", { class: "doc-info-box" }, [
-            vue.createTextVNode(" 已阅读并同意"),
-            vue.createElementVNode("text", {
-              class: "doc-link",
-              onClick: $setup.gotoAgreement
-            }, "《用户协议》"),
-            vue.createTextVNode("和"),
-            vue.createElementVNode("text", {
-              class: "doc-link",
-              onClick: $setup.gotoPrivacy
-            }, "《隐私政策》")
+                plain: "true",
+                onClick: $setup.loginBt
+              }, " 个人用户登录 ")) : vue.createCommentVNode("v-if", true),
+              $setup.docState ? (vue.openBlock(), vue.createElementBlock(
+                "button",
+                {
+                  key: 1,
+                  "open-type": "getPhoneNumber",
+                  type: "primary",
+                  plain: "true",
+                  onGetphonenumber: $setup.handleGetPhoneNumber
+                },
+                " 个人用户登录 ",
+                32
+                /* NEED_HYDRATION */
+              )) : vue.createCommentVNode("v-if", true)
+            ])),
+            vue.createElementVNode("view", { class: "documents" }, [
+              vue.createVNode(_component_i_checkbox, {
+                checked: $setup.docState,
+                onChange: $setup.isDocState
+              }, null, 8, ["checked"]),
+              vue.createElementVNode("view", { class: "doc-info-box" }, [
+                vue.createElementVNode("text", { class: "doc-text" }, "已阅读并同意"),
+                vue.createElementVNode("text", {
+                  class: "doc-link",
+                  onClick: $setup.gotoAgreement
+                }, "《用户协议》"),
+                vue.createElementVNode("text", { class: "doc-text" }, "和"),
+                vue.createElementVNode("text", {
+                  class: "doc-link",
+                  onClick: $setup.gotoPrivacy
+                }, "《隐私政策》")
+              ])
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "other-way" }, [
+            vue.createElementVNode("view", {
+              class: "noLogin",
+              onClick: $setup.gotoIndex
+            }, "暂不登录"),
+            vue.createElementVNode(
+              "view",
+              {
+                class: "BLogin",
+                onClick: $setup.isPswLogin
+              },
+              vue.toDisplayString($setup.pswLogin ? "个人用户登录" : "企业用户登录"),
+              1
+              /* TEXT */
+            )
           ])
-        ])
-      ]),
-      vue.createElementVNode("view", { class: "other-way" }, [
-        vue.createElementVNode("view", {
-          class: "noLogin",
-          onClick: $setup.gotoIndex
-        }, "暂不登录"),
-        vue.createElementVNode(
-          "view",
-          {
-            class: "BLogin",
-            onClick: $setup.isPswLogin
-          },
-          vue.toDisplayString($setup.pswLogin ? "个人用户登录" : "企业用户登录"),
-          1
-          /* TEXT */
-        )
-      ])
-    ]);
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["styles", [_style_0$w]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/login/login.uvue"]]);
   class PickerItem extends UTS.UTSType {
@@ -7474,13 +7898,13 @@
       }, [
         vue.createElementVNode("view", { class: "times" }, [
           vue.createElementVNode(
-            "view",
+            "text",
             null,
             vue.toDisplayString($props.currentTime),
             1
             /* TEXT */
           ),
-          !$props.showPickerTime ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, "刷新一次位置")) : vue.createCommentVNode("v-if", true)
+          !$props.showPickerTime ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "刷新一次位置")) : vue.createCommentVNode("v-if", true)
         ])
       ])) : (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
@@ -7493,7 +7917,7 @@
           onClick: _cache[1] || (_cache[1] = ($event) => $props.showPicker ? $setup.handleCar : null)
         }, [
           vue.createElementVNode(
-            "view",
+            "text",
             { class: "plateNo" },
             vue.toDisplayString($props.currentCar),
             1
@@ -7507,7 +7931,7 @@
           },
           [
             vue.createElementVNode(
-              "view",
+              "text",
               { class: "state" },
               vue.toDisplayString($props.carStatus == "online" ? "在线" : "离线"),
               1
@@ -7847,18 +8271,26 @@
       uni.request({
         url: "https://api.tianditu.gov.cn/geocoder?postStr=".concat(encodeURIComponent(postStr), "&type=geocode&tk=").concat(tk),
         method: "GET",
+        header: new UTSJSONObject({
+          "User-Agent": "Mozilla/5.0"
+        }),
         success: (res) => {
-          if (res.statusCode == 200 && res.data != null) {
-            const response = res.data;
-            const result = response.getJSON("result");
-            if (result == null) {
-              reject(new Error("获取地址信息失败"));
-              return null;
-            }
-            resolve({ result: new AddressResult({ formatted_address: result.getString("formatted_address", "") }) });
-          } else {
-            reject(new Error("获取地址信息失败"));
+          if (res.statusCode != 200 || res.data == null) {
+            reject(new Error("获取地址信息失败，状态码：".concat(res.statusCode)));
+            return null;
           }
+          const response = res.data;
+          const result = response.getJSON("result");
+          if (result == null) {
+            reject(new Error("获取地址信息失败：".concat(response.getString("msg", "响应缺少结果"))));
+            return null;
+          }
+          const formattedAddress = result.getString("formatted_address", "");
+          if (formattedAddress == "") {
+            reject(new Error("获取地址信息失败：响应缺少地址"));
+            return null;
+          }
+          resolve({ result: new AddressResult({ formatted_address: formattedAddress }) });
         },
         fail: (err) => {
           reject(err);
@@ -7965,14 +8397,8 @@
         address: ""
       }));
       const currentCarInfo = vue.ref(new UTSJSONObject({}));
-      const signalRssi = vue.computed(() => {
-        const attribute = currentCarInfo.value["attribute"];
-        return attribute != null ? attribute["rssi"] : null;
-      });
-      const signalSat = vue.computed(() => {
-        const attribute = currentCarInfo.value["attribute"];
-        return attribute != null ? attribute["sat"] : null;
-      });
+      const signalRssi = vue.ref(null);
+      const signalSat = vue.ref(null);
       const carVoltage = vue.computed(() => {
         return currentCarInfo.value["voltage"];
       });
@@ -8028,7 +8454,7 @@
         } else if (signalValue >= 15) {
           return new SignalDetail({
             experience: "一般",
-            quality: "中等",
+            quality: "一般",
             color: "#faad14",
             level: 3
           });
@@ -8069,7 +8495,7 @@
       const createMarker = (id, lat, lng, type, title = null) => {
         const connectionStatus = datainfo.value["connectionStatus"];
         const carType = currentCarInfo.value["carType"];
-        const marker = new UTSJSONObject({
+        const marker = {
           id,
           latitude: lat,
           longitude: lng,
@@ -8084,7 +8510,7 @@
             padding: 5,
             display: "ALWAYS"
           })
-        });
+        };
         return marker;
       };
       const delay = (ms) => {
@@ -8096,6 +8522,8 @@
       };
       const loadData = (data, retryCount) => {
         return __awaiter(this, void 0, void 0, function* () {
+          signalRssi.value = null;
+          signalSat.value = null;
           let retry = retryCount;
           const tryLoad = (attempt) => {
             return __awaiter(this, void 0, void 0, function* () {
@@ -8105,7 +8533,6 @@
                 if (!res || !res.data || res.data.length == 0) {
                   throw new Error("返回数据为空");
                 }
-                uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:343", "接口请求成功", attempt);
                 let foundDevice = false;
                 try {
                   for (var _b = __values(res.data), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -8114,11 +8541,14 @@
                     if (itemImei != null && itemImei == imei.value) {
                       foundDevice = true;
                       datainfo.value = item;
+                      const attribute = item["attribute"];
+                      signalRssi.value = attribute != null ? attribute["rssi"] : null;
+                      signalSat.value = attribute != null ? attribute["sat"] : null;
                       const latitude = item.getNumber("latitude", 0);
                       const longitude = item.getNumber("longitude", 0);
                       if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:359", "位置信息缺失", item);
-                        uni.showToast({
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:357", "位置信息缺失", item);
+                        showAppToast({
                           title: "位置信息缺失",
                           icon: "none"
                         });
@@ -8127,7 +8557,7 @@
                       const lat = parseFloat(latitude.toString());
                       const lng = parseFloat(longitude.toString());
                       if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:372", "经纬度格式错误", latitude, longitude);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:370", "经纬度格式错误", latitude, longitude);
                         return false;
                       }
                       let convertedLat = lat;
@@ -8136,22 +8566,16 @@
                         const coord = CoordTransform.wgs84ToTencent(lat, lng);
                         convertedLat = coord.lat;
                         convertedLng = coord.lng;
-                        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:383", "坐标转换结果:", coord);
                       } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:385", "坐标转换失败:", transformError);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:382", "坐标转换失败:", transformError);
                       }
                       center.latitude = convertedLat;
                       center.longitude = convertedLng;
-                      uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:391", "地图中心点更新:", new UTSJSONObject({
-                        latitude: center.latitude,
-                        longitude: center.longitude
-                      }));
                       yield delay(50);
                       const deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value["deviceName"]);
                       markers.value = [];
                       yield delay(50);
                       markers.value = [deviceMarker];
-                      uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:413", "标记点更新完成");
                       const connectionStatus = item["connectionStatus"];
                       if (connectionStatus != "online" && refreshTimer.value !== null) {
                         const timer = refreshTimer.value;
@@ -8160,17 +8584,15 @@
                         }
                         refreshTimer.value = null;
                         isRefreshing.value = false;
-                        uni.showToast({
+                        showAppToast({
                           title: "设备已离线，停止自动刷新",
                           icon: "none"
                         });
                       }
-                      const attribute = item["attribute"];
-                      const rssi = attribute != null ? attribute["rssi"] : null;
-                      if (rssi != null) {
-                        const signalExp = getSignalDetail(rssi).experience;
+                      if (signalRssi.value != null) {
+                        const signalExp = getSignalDetail(signalRssi.value).experience;
                         if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:436", "设备 ".concat(imei.value, " 信号较弱: ").concat(rssi, "dBm"));
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:424", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
                         }
                       }
                     }
@@ -8191,14 +8613,14 @@
                 }
                 return true;
               } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:450", "第".concat(attempt, "次加载设备数据失败:"), error);
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:438", "第".concat(attempt, "次加载设备数据失败:"), error);
                 if (attempt < retry) {
                   const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:456", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:444", "等待".concat(delayMs / 1e3, "秒后重试..."));
                   yield delay(delayMs);
                   return false;
                 } else {
-                  uni.showToast({
+                  showAppToast({
                     title: "数据加载失败，请稍后重试",
                     icon: "none",
                     duration: 2e3
@@ -8210,7 +8632,7 @@
                     }
                     refreshTimer.value = null;
                     isRefreshing.value = false;
-                    uni.showToast({
+                    showAppToast({
                       title: "数据加载失败，停止自动刷新",
                       icon: "none"
                     });
@@ -8235,19 +8657,19 @@
               deviceids: imei.value
             }), 3);
             if (success) {
-              uni.showToast({
+              showAppToast({
                 title: "刷新成功",
                 icon: "success"
               });
             } else {
-              uni.showToast({
+              showAppToast({
                 title: "刷新失败",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:518", "手动刷新失败:", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:506", "手动刷新失败:", error);
+            showAppToast({
               title: "刷新失败",
               icon: "none"
             });
@@ -8348,7 +8770,7 @@
             predictCmdId = 1;
             type = 1;
           } else {
-            uni.showToast({
+            showAppToast({
               title: "操作类型错误",
               icon: "none"
             });
@@ -8368,21 +8790,21 @@
             }));
             uni.hideLoading();
             if (res.code == 0) {
-              uni.showToast({
+              showAppToast({
                 title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
                 icon: "success"
               });
               psw.value = "";
             } else {
-              uni.showToast({
+              showAppToast({
                 title: res.msg.length > 0 ? res.msg : "操作失败",
                 icon: "none"
               });
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:696", "操作失败:", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:684", "操作失败:", error);
+            showAppToast({
               title: "操作失败，请重试",
               icon: "none"
             });
@@ -8392,7 +8814,7 @@
       const confirm = () => {
         return __awaiter(this, void 0, void 0, function* () {
           if (userType.value == "1" && psw.value == "") {
-            uni.showToast({
+            showAppToast({
               title: "请输入密码",
               icon: "none"
             });
@@ -8409,8 +8831,12 @@
       };
       const refreshAdress = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          const addr = yield getAddress(center.latitude, center.longitude);
-          address.value = addr.result.formatted_address;
+          try {
+            const addr = yield getAddress(center.latitude, center.longitude);
+            address.value = addr.result.formatted_address;
+          } catch (error) {
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:720", "获取地址信息失败:", error);
+          }
         });
       };
       function navTo() {
@@ -8421,27 +8847,26 @@
           uni.openLocation({
             latitude: center.latitude,
             longitude: center.longitude,
-            name: address.value,
+            name: address.value || "当前位置",
             scale: 18,
             success: () => {
-              uni.showToast({
+              showAppToast({
                 title: "成功调起地图",
                 icon: "none"
               });
             },
             fail: (err) => {
-              uni.showToast({
+              showAppToast({
                 title: "调起地图失败",
                 icon: "none"
               });
-              uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:754", "调起地图失败:", err);
+              uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:745", "调起地图失败:", err);
             }
           });
         });
       }
       const handleGridClick = (event = null) => {
         const name = event;
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:762", name);
         const itemTo = name.text;
         if (itemTo == "轨迹回放") {
           stopAutoRefresh();
@@ -8507,10 +8932,9 @@
         return __awaiter(this, void 0, void 0, function* () {
           if (deviceId.value !== null) {
             const res = yield getDeviceDetail(deviceId.value);
-            uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:836", "设备详情：", res.data);
             currentCarInfo.value = res.data;
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:839", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:828", "设备id获取失败");
           }
         });
       };
@@ -8520,13 +8944,6 @@
         deviceId.value = option.deviceId;
         const storedUserType = uni.getStorageSync("userType");
         userType.value = storedUserType !== null && storedUserType !== void 0 ? storedUserType : "";
-        vue.watch(center, (newVal, oldVal) => {
-          uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:852", "center 变化:", new UTSJSONObject({
-            old: oldVal,
-            new: newVal,
-            time: (/* @__PURE__ */ new Date()).toISOString()
-          }));
-        }, { deep: true });
         loadDeviceDetail().then(() => {
           const data = new UTSJSONObject({
             deptId: deptId.value,
@@ -8542,17 +8959,17 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:882", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:862", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:891", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:871", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:896", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:876", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
       const __returned__ = { deptId, imei, deviceId, center, mapScale, datainfo, address, currentTime, onCurrentTimeChange, times, refreshTimer, isRefreshing, popupRef, psw, currentOperation, modalTitle, userType, filterNonLatin, markers, showDevicePopup, currentDeviceInfo, currentCarInfo, signalRssi, signalSat, carVoltage, batteryPercent, getBatteryColor, getSignalDetail, getMobileSignalBarClass, createMarker, delay, loadData, manualRefresh, setupAutoRefresh, stopAutoRefresh, baseList, executeOperation, confirm, carDetail, refreshAdress, navTo, handleGridClick, loadDeviceDetail };
@@ -8563,7 +8980,7 @@
   const _imports_0$1 = "/static/sate.png";
   const _imports_1$1 = "/static/v.png";
   const _imports_2$1 = "/static/pow.png";
-  const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "Imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "fontSize": "28rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .Imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "pos-time": { ".container .tools-panel .Imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "addree-box": { ".container .tools-panel .Imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .Imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-text": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "mobile-signal": { ".container .tools-panel .Imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "10rpx" } }, "signal-bar-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-active": { "!background": "var(--signal-color, #52c41a)" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .bar-off": { "backgroundImage": "none", "backgroundColor": "#e8e8e8" } }, "signal-info-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "Imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "fontSize": "28rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .Imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "pos-time": { ".container .tools-panel .Imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "addree-box": { ".container .tools-panel .Imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .Imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-text": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .Imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
   function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
@@ -8572,290 +8989,296 @@
     const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "详情",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "map-container" }, [
-        vue.createVNode(_component_map, {
-          id: "myMap",
-          latitude: $setup.center.latitude,
-          longitude: $setup.center.longitude,
-          markers: $setup.markers,
-          scale: $setup.mapScale,
-          style: { "width": "100%", "height": "100%" },
-          "show-location": false,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_sub_navBar, {
-              currentTime: $setup.currentTime,
-              showTime: true,
-              showPickerTime: false,
-              "onUpdate:currentTime": $setup.onCurrentTimeChange,
-              currentCar: $setup.currentCarInfo.plateNo,
-              times: $setup.times,
-              carStatus: $setup.datainfo.connectionStatus,
-              showPicker: false,
-              showCar: true
-            }, null, 8, ["currentTime", "currentCar", "times", "carStatus"])
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "详情",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "map-container" }, [
+            vue.createVNode(_component_map, {
+              id: "myMap",
+              latitude: $setup.center.latitude,
+              longitude: $setup.center.longitude,
+              markers: $setup.markers,
+              scale: $setup.mapScale,
+              style: { "width": "100%", "height": "100%" },
+              "show-location": false,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_sub_navBar, {
+                  currentTime: $setup.currentTime,
+                  showTime: true,
+                  showPickerTime: false,
+                  "onUpdate:currentTime": $setup.onCurrentTimeChange,
+                  currentCar: $setup.currentCarInfo.plateNo,
+                  times: $setup.times,
+                  carStatus: $setup.datainfo.connectionStatus,
+                  showPicker: false,
+                  showCar: true
+                }, null, 8, ["currentTime", "currentCar", "times", "carStatus"])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["latitude", "longitude", "markers", "scale"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["latitude", "longitude", "markers", "scale"])
-      ]),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        vue.createElementVNode("view", { class: "Imei-box" }, [
-          vue.createElementVNode("view", {
-            class: "imei-info",
-            onClick: $setup.carDetail
-          }, [
-            vue.createElementVNode("view", { class: "imeis" }, [
-              vue.createElementVNode(
-                "text",
-                null,
-                "ID: " + vue.toDisplayString($setup.imei),
-                1
-                /* TEXT */
-              ),
-              vue.createElementVNode("text", { class: "pos-time" })
-            ]),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/arrow-right.png",
-              fontSize: "16"
-            })
-          ]),
-          vue.createElementVNode("view", { class: "pos-date" }, [
-            vue.createElementVNode(
-              "view",
-              { class: "addree-box" },
-              "定位时间: " + vue.toDisplayString($setup.datainfo.positionUpdateTime),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "view",
-              { class: "addree-box" },
-              "通信时间: " + vue.toDisplayString($setup.datainfo.signalUpdateTime),
-              1
-              /* TEXT */
-            )
-          ]),
-          vue.createElementVNode("view", { class: "pos-adress" }, [
-            vue.createElementVNode("view", { class: "addree-box" }, [
-              vue.createElementVNode("text", { style: { "margin-right": "10rpx" } }, "当前地址:"),
-              $setup.address ? (vue.openBlock(), vue.createElementBlock(
-                "text",
-                {
-                  key: 0,
-                  class: "address-text"
-                },
-                vue.toDisplayString($setup.address),
-                1
-                /* TEXT */
-              )) : (vue.openBlock(), vue.createElementBlock(
-                "text",
-                { key: 1 },
-                vue.toDisplayString($setup.center.latitude) + " , " + vue.toDisplayString($setup.center.longitude),
-                1
-                /* TEXT */
-              )),
-              !$setup.address ? (vue.openBlock(), vue.createElementBlock("text", {
-                key: 2,
-                style: { "color": "#007AFF", "margin-left": "20rpx", "font-weight": "bold" },
-                onClick: $setup.refreshAdress
-              }, "中文地址")) : vue.createCommentVNode("v-if", true)
-            ])
-          ]),
-          $setup.signalRssi || $setup.signalSat ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "signal-container"
-          }, [
-            $setup.signalRssi ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
-              class: "signal-item"
-            }, [
-              vue.createElementVNode("view", { class: "mobile-signal" }, [
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            vue.createElementVNode("view", { class: "Imei-box" }, [
+              vue.createElementVNode("view", {
+                class: "imei-info",
+                onClick: $setup.carDetail
+              }, [
+                vue.createElementVNode("view", { class: "imeis" }, [
+                  vue.createElementVNode(
+                    "text",
+                    null,
+                    "ID: " + vue.toDisplayString($setup.imei),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode("text", { class: "pos-time" })
+                ]),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/arrow-right.png",
+                  fontSize: "16"
+                })
+              ]),
+              vue.createElementVNode("view", { class: "pos-date" }, [
                 vue.createElementVNode(
+                  "text",
+                  { class: "addree-box" },
+                  "定位时间: " + vue.toDisplayString($setup.datainfo.positionUpdateTime),
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode(
+                  "text",
+                  { class: "addree-box" },
+                  "通信时间: " + vue.toDisplayString($setup.datainfo.signalUpdateTime),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode("view", { class: "pos-adress" }, [
+                vue.createElementVNode("view", { class: "addree-box" }, [
+                  vue.createElementVNode("text", { style: { "margin-right": "10rpx", "font-size": "22rpx" } }, "当前位置:"),
+                  $setup.address ? (vue.openBlock(), vue.createElementBlock(
+                    "text",
+                    {
+                      key: 0,
+                      class: "address-text"
+                    },
+                    vue.toDisplayString($setup.address),
+                    1
+                    /* TEXT */
+                  )) : (vue.openBlock(), vue.createElementBlock(
+                    "text",
+                    {
+                      key: 1,
+                      class: "address-text"
+                    },
+                    vue.toDisplayString($setup.center.latitude) + " , " + vue.toDisplayString($setup.center.longitude),
+                    1
+                    /* TEXT */
+                  )),
+                  !$setup.address ? (vue.openBlock(), vue.createElementBlock("text", {
+                    key: 2,
+                    style: { "color": "#007AFF", "margin-left": "20rpx", "font-weight": "bold", "font-size": "22rpx" },
+                    onClick: $setup.refreshAdress
+                  }, "中文地址")) : vue.createCommentVNode("v-if", true)
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "signal-container" }, [
+                $setup.signalRssi != null ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 0,
+                  class: "signal-item"
+                }, [
+                  vue.createElementVNode("view", { class: "mobile-signal" }, [
+                    vue.createElementVNode("view", { class: "signal-bars-horizontal" }, [
+                      vue.createElementVNode(
+                        "view",
+                        {
+                          class: "signal-bar-h signal-bar-h-1",
+                          style: vue.normalizeStyle({ backgroundColor: $setup.getMobileSignalBarClass(0, $setup.signalRssi) == "bar-active" ? $setup.getSignalDetail($setup.signalRssi).color : "#e8e8e8" })
+                        },
+                        null,
+                        4
+                        /* STYLE */
+                      ),
+                      vue.createElementVNode(
+                        "view",
+                        {
+                          class: "signal-bar-h signal-bar-h-2",
+                          style: vue.normalizeStyle({ backgroundColor: $setup.getMobileSignalBarClass(1, $setup.signalRssi) == "bar-active" ? $setup.getSignalDetail($setup.signalRssi).color : "#e8e8e8" })
+                        },
+                        null,
+                        4
+                        /* STYLE */
+                      ),
+                      vue.createElementVNode(
+                        "view",
+                        {
+                          class: "signal-bar-h signal-bar-h-3",
+                          style: vue.normalizeStyle({ backgroundColor: $setup.getMobileSignalBarClass(2, $setup.signalRssi) == "bar-active" ? $setup.getSignalDetail($setup.signalRssi).color : "#e8e8e8" })
+                        },
+                        null,
+                        4
+                        /* STYLE */
+                      ),
+                      vue.createElementVNode(
+                        "view",
+                        {
+                          class: "signal-bar-h signal-bar-h-4",
+                          style: vue.normalizeStyle({ backgroundColor: $setup.getMobileSignalBarClass(3, $setup.signalRssi) == "bar-active" ? $setup.getSignalDetail($setup.signalRssi).color : "#e8e8e8" })
+                        },
+                        null,
+                        4
+                        /* STYLE */
+                      ),
+                      vue.createElementVNode(
+                        "view",
+                        {
+                          class: "signal-bar-h signal-bar-h-5",
+                          style: vue.normalizeStyle({ backgroundColor: $setup.getMobileSignalBarClass(4, $setup.signalRssi) == "bar-active" ? $setup.getSignalDetail($setup.signalRssi).color : "#e8e8e8" })
+                        },
+                        null,
+                        4
+                        /* STYLE */
+                      )
+                    ]),
+                    vue.createElementVNode("view", { class: "signal-info-h" }, [
+                      vue.createElementVNode(
+                        "text",
+                        {
+                          class: "experience",
+                          style: vue.normalizeStyle({ color: $setup.getSignalDetail($setup.signalRssi).color })
+                        },
+                        vue.toDisplayString($setup.getSignalDetail($setup.signalRssi).experience),
+                        5
+                        /* TEXT, STYLE */
+                      ),
+                      vue.createElementVNode(
+                        "text",
+                        {
+                          class: "signal-value",
+                          style: vue.normalizeStyle({ color: $setup.getSignalDetail($setup.signalRssi).color })
+                        },
+                        "CSQ " + vue.toDisplayString($setup.signalRssi),
+                        5
+                        /* TEXT, STYLE */
+                      )
+                    ])
+                  ])
+                ])) : vue.createCommentVNode("v-if", true),
+                $setup.signalSat != null ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 1,
+                  class: "satellite-item-h"
+                }, [
+                  vue.createElementVNode("image", {
+                    class: "satellite-icon",
+                    src: _imports_0$1
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "satellite-text" },
+                    vue.toDisplayString($setup.signalSat),
+                    1
+                    /* TEXT */
+                  )
+                ])) : vue.createCommentVNode("v-if", true),
+                $setup.carVoltage ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 2,
+                  class: "power"
+                }, [
+                  vue.createElementVNode("image", {
+                    class: "power-icon",
+                    src: _imports_1$1
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    null,
+                    vue.toDisplayString($setup.carVoltage) + "V",
+                    1
+                    /* TEXT */
+                  )
+                ])) : vue.createCommentVNode("v-if", true),
+                $setup.batteryPercent ? (vue.openBlock(), vue.createElementBlock(
                   "view",
                   {
-                    class: "signal-bars-horizontal",
-                    style: vue.normalizeStyle({ "--signal-color": $setup.getSignalDetail($setup.signalRssi).color })
+                    key: 3,
+                    class: "battery",
+                    style: vue.normalizeStyle({ color: $setup.getBatteryColor($setup.batteryPercent) })
                   },
                   [
+                    vue.createElementVNode("image", {
+                      class: "battery-icon",
+                      src: _imports_2$1,
+                      alt: ""
+                    }),
                     vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["signal-bar-h signal-bar-h-1", $setup.getMobileSignalBarClass(0, $setup.signalRssi)])
-                      },
+                      "text",
                       null,
-                      2
-                      /* CLASS */
-                    ),
-                    vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["signal-bar-h signal-bar-h-2", $setup.getMobileSignalBarClass(1, $setup.signalRssi)])
-                      },
-                      null,
-                      2
-                      /* CLASS */
-                    ),
-                    vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["signal-bar-h signal-bar-h-3", $setup.getMobileSignalBarClass(2, $setup.signalRssi)])
-                      },
-                      null,
-                      2
-                      /* CLASS */
-                    ),
-                    vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["signal-bar-h signal-bar-h-4", $setup.getMobileSignalBarClass(3, $setup.signalRssi)])
-                      },
-                      null,
-                      2
-                      /* CLASS */
-                    ),
-                    vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["signal-bar-h signal-bar-h-5", $setup.getMobileSignalBarClass(4, $setup.signalRssi)])
-                      },
-                      null,
-                      2
-                      /* CLASS */
+                      vue.toDisplayString($setup.batteryPercent) + "%",
+                      1
+                      /* TEXT */
                     )
                   ],
                   4
                   /* STYLE */
-                ),
-                vue.createElementVNode("view", { class: "signal-info-h" }, [
-                  vue.createElementVNode(
-                    "text",
-                    {
-                      class: "experience",
-                      style: vue.normalizeStyle({ color: $setup.getSignalDetail($setup.signalRssi).color })
-                    },
-                    vue.toDisplayString($setup.getSignalDetail($setup.signalRssi).experience),
-                    5
-                    /* TEXT, STYLE */
-                  ),
-                  vue.createElementVNode(
-                    "text",
-                    {
-                      class: "signal-value",
-                      style: vue.normalizeStyle({ color: $setup.getSignalDetail($setup.signalRssi).color })
-                    },
-                    "CSQ " + vue.toDisplayString($setup.signalRssi),
-                    5
-                    /* TEXT, STYLE */
-                  )
-                ])
+                )) : vue.createCommentVNode("v-if", true)
               ])
-            ])) : vue.createCommentVNode("v-if", true),
-            $setup.signalSat ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 1,
-              class: "satellite-item-h"
-            }, [
-              vue.createElementVNode("image", {
-                class: "satellite-icon",
-                src: _imports_0$1
-              }),
-              vue.createElementVNode(
-                "text",
-                { class: "satellite-text" },
-                vue.toDisplayString($setup.signalSat),
-                1
-                /* TEXT */
-              )
-            ])) : vue.createCommentVNode("v-if", true),
-            $setup.carVoltage ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 2,
-              class: "power"
-            }, [
-              vue.createElementVNode("image", {
-                class: "power-icon",
-                src: _imports_1$1
-              }),
-              vue.createElementVNode(
-                "text",
-                null,
-                vue.toDisplayString($setup.carVoltage) + "V",
-                1
-                /* TEXT */
-              )
-            ])) : vue.createCommentVNode("v-if", true),
-            $setup.batteryPercent ? (vue.openBlock(), vue.createElementBlock(
-              "view",
-              {
-                key: 3,
-                class: "battery",
-                style: vue.normalizeStyle({ color: $setup.getBatteryColor($setup.batteryPercent) })
-              },
-              [
-                vue.createElementVNode("image", {
-                  class: "battery-icon",
-                  src: _imports_2$1,
-                  alt: ""
-                }),
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  vue.toDisplayString($setup.batteryPercent) + "%",
-                  1
-                  /* TEXT */
-                )
-              ],
-              4
-              /* STYLE */
-            )) : vue.createCommentVNode("v-if", true)
-          ])) : vue.createCommentVNode("v-if", true)
-        ]),
-        vue.createVNode(_component_i_grid, {
-          items: $setup.baseList,
-          col: 5,
-          itemHeight: "88",
-          round: "8",
-          imageSize: 30,
-          iconColor: "#3c9cff",
-          textColor: "#606266",
-          showBorder: true,
-          onClick: _cache[0] || (_cache[0] = ($event) => $setup.handleGridClick($event))
-        }, null, 8, ["items"])
-      ]),
-      vue.createElementVNode("view", null, [
-        vue.createVNode(_component_i_modal, {
-          show: $setup.popupRef,
-          title: $setup.modalTitle,
-          onConfirm: $setup.confirm
-        }, {
-          default: vue.withCtx(() => [
-            vue.createElementVNode("view", null, [
-              vue.createVNode(_component_i_input, {
-                modelValue: $setup.psw,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.psw = $event),
-                onInput: $setup.filterNonLatin,
-                placeholder: "请输入密码",
-                clearable: "",
-                password: true
-              }, null, 8, ["modelValue"])
-            ])
+            ]),
+            vue.createVNode(_component_i_grid, {
+              items: $setup.baseList,
+              col: 5,
+              itemHeight: "88",
+              round: "8",
+              imageSize: 30,
+              iconColor: "#3c9cff",
+              textColor: "#606266",
+              showBorder: true,
+              onClick: _cache[0] || (_cache[0] = ($event) => $setup.handleGridClick($event))
+            }, null, 8, ["items"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["show", "title"])
-      ])
-    ]);
+          vue.createElementVNode("view", null, [
+            vue.createVNode(_component_i_modal, {
+              show: $setup.popupRef,
+              title: $setup.modalTitle,
+              onConfirm: $setup.confirm
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", null, [
+                  vue.createVNode(_component_i_input, {
+                    modelValue: $setup.psw,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.psw = $event),
+                    onInput: $setup.filterNonLatin,
+                    placeholder: "请输入密码",
+                    clearable: "",
+                    password: true
+                  }, null, 8, ["modelValue"])
+                ])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["show", "title"])
+          ])
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["styles", [_style_0$t]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/carInfoDetail/carInfoDetail.uvue"]]);
   const _sfc_main$t = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
@@ -9395,20 +9818,22 @@
                 {
                   key: 2,
                   class: vue.normalizeClass($setup.closeClass),
-                  style: vue.normalizeStyle($setup.closeStyle),
                   onClick: $setup.close
                 },
                 [
                   vue.createElementVNode(
                     "text",
-                    { class: "i-popup__close-text" },
+                    {
+                      class: "i-popup__close-text",
+                      style: vue.normalizeStyle($setup.closeStyle)
+                    },
                     vue.toDisplayString($setup.closeIconText),
-                    1
-                    /* TEXT */
+                    5
+                    /* TEXT, STYLE */
                   )
                 ],
-                6
-                /* CLASS, STYLE */
+                2
+                /* CLASS */
               )) : vue.createCommentVNode("v-if", true),
               $props.disabledScroll ? (vue.openBlock(), vue.createElementBlock(
                 "view",
@@ -9491,20 +9916,22 @@
                 {
                   key: 5,
                   class: vue.normalizeClass($setup.closeClass),
-                  style: vue.normalizeStyle($setup.closeStyle),
                   onClick: $setup.close
                 },
                 [
                   vue.createElementVNode(
                     "text",
-                    { class: "i-popup__close-text" },
+                    {
+                      class: "i-popup__close-text",
+                      style: vue.normalizeStyle($setup.closeStyle)
+                    },
                     vue.toDisplayString($setup.closeIconText),
-                    1
-                    /* TEXT */
+                    5
+                    /* TEXT, STYLE */
                   )
                 ],
-                6
-                /* CLASS, STYLE */
+                2
+                /* CLASS */
               )) : vue.createCommentVNode("v-if", true)
             ],
             6
@@ -9516,97 +9943,69 @@
       )) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["styles", [_style_0$s]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-popup/i-popup.uvue"]]);
-  let CarIconItem$1 = class CarIconItem2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            text: { type: String, optional: false },
-            image: { type: String, optional: false }
-          };
-        },
-        name: "CarIconItem"
-      };
-    }
-    constructor(options, metadata = CarIconItem2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.text = this.__props__.text;
-      this.image = this.__props__.image;
-      delete this.__props__;
-    }
-  };
+  const __easycom_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["styles", [_style_0$s]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-popup/i-popup.uvue"]]);
   const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
     __name: "car-icons",
     props: {
+      show: { type: Boolean, required: true, default: false },
       title: { type: String, required: true, default: "请选择图标" },
       col: { type: Number, required: true, default: 4 },
       iconSize: { type: Number, required: true, default: 40 },
       safeAreaInsetBottom: { type: Boolean, required: true, default: true }
     },
-    emits: ["select"],
+    emits: ["select", "update:show"],
     setup(__props, _a) {
       var __expose = _a.expose, __emit = _a.emit;
+      __expose();
       const props = __props;
       const emit = __emit;
-      const visible = vue.ref(false);
       const iconList = [
-        new CarIconItem$1({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
-        new CarIconItem$1({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
-        new CarIconItem$1({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
-        new CarIconItem$1({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
-        new CarIconItem$1({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
-        new CarIconItem$1({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
-        new CarIconItem$1({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
-        new CarIconItem$1({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
-        new CarIconItem$1({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
-        new CarIconItem$1({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
-        new CarIconItem$1({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
-        new CarIconItem$1({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
-        new CarIconItem$1({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
-        new CarIconItem$1({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
-        new CarIconItem$1({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
-        new CarIconItem$1({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
-        new CarIconItem$1({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
-        new CarIconItem$1({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
-        new CarIconItem$1({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
-        new CarIconItem$1({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
+        new UTSJSONObject({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
+        new UTSJSONObject({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
+        new UTSJSONObject({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
+        new UTSJSONObject({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
+        new UTSJSONObject({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
+        new UTSJSONObject({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
+        new UTSJSONObject({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
+        new UTSJSONObject({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
+        new UTSJSONObject({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
+        new UTSJSONObject({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
+        new UTSJSONObject({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
+        new UTSJSONObject({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
+        new UTSJSONObject({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
+        new UTSJSONObject({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
+        new UTSJSONObject({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
+        new UTSJSONObject({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
+        new UTSJSONObject({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
+        new UTSJSONObject({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
+        new UTSJSONObject({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
+        new UTSJSONObject({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
       ];
       const itemWidth = vue.computed(() => {
         const cols = props.col > 0 ? props.col : 4;
         return 100 / cols + "%";
       });
       const close = () => {
-        visible.value = false;
+        emit("update:show", false);
       };
       const handleSelect = (item = null) => {
         const selected = item;
-        uni.__log__("log", "at components/car-icons/car-icons.uvue:97", "选择的图标:", selected);
+        uni.__log__("log", "at components/car-icons/car-icons.uvue:93", "选择的图标:", selected);
         emit("select", selected);
         close();
       };
       const handlePopupClick = () => {
-        uni.__log__("log", "at components/car-icons/car-icons.uvue:104", "Popup clicked");
-      };
-      const open = () => {
-        visible.value = true;
+        uni.__log__("log", "at components/car-icons/car-icons.uvue:100", "Popup clicked");
       };
       const getIconByName = (name) => {
-        return UTS.arrayFind(iconList, (item) => {
-          return item.name === name;
-        });
+        for (let index = 0; index < iconList.length; index++) {
+          const item = iconList[index];
+          if (item.getString("name", "") == name)
+            return item;
+        }
+        return null;
       };
-      __expose({
-        open,
-        close,
-        iconList,
-        getIconByName
-      });
-      const __returned__ = { props, emit, visible, iconList, itemWidth, close, handleSelect, handlePopupClick, open, getIconByName };
+      const __returned__ = { props, emit, iconList, itemWidth, close, handleSelect, handlePopupClick, getIconByName };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -9614,9 +10013,9 @@
   const _style_0$r = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
   function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
-    const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
+    const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
     return vue.openBlock(), vue.createBlock(_component_i_popup, {
-      show: $setup.visible,
+      show: $setup.props.show,
       title: $props.title,
       mode: "bottom",
       safeBottom: $props.safeAreaInsetBottom,
@@ -9695,29 +10094,6 @@
       delete this.__props__;
     }
   }
-  class CarIconItem extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            text: { type: String, optional: false },
-            image: { type: String, optional: false }
-          };
-        },
-        name: "CarIconItem"
-      };
-    }
-    constructor(options, metadata = CarIconItem.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.text = this.__props__.text;
-      this.image = this.__props__.image;
-      delete this.__props__;
-    }
-  }
   class AddDeviceResponse extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -9741,53 +10117,12 @@
       delete this.__props__;
     }
   }
-  let FormInstance$1 = class FormInstance2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            validate: { type: "Unknown", optional: false }
-          };
-        },
-        name: "FormInstance"
-      };
-    }
-    constructor(options, metadata = FormInstance2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.validate = this.__props__.validate;
-      delete this.__props__;
-    }
-  };
-  class DeviceTypeSelectorInstance extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            open: { type: "Unknown", optional: false },
-            close: { type: "Unknown", optional: false }
-          };
-        },
-        name: "DeviceTypeSelectorInstance"
-      };
-    }
-    constructor(options, metadata = DeviceTypeSelectorInstance.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.open = this.__props__.open;
-      this.close = this.__props__.close;
-      delete this.__props__;
-    }
-  }
   const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
     __name: "addCar",
     setup(__props, _a) {
       var __expose = _a.expose;
       __expose();
-      const formRef = vue.ref(null);
-      const deviceTypeSelect = vue.ref(null);
+      const carIconSelectorVisible = vue.ref(false);
       const loading = vue.ref(false);
       const formValid = vue.ref(false);
       const carInfo = vue.ref(new CarFormData({
@@ -9799,31 +10134,10 @@
         carType: ""
       }));
       const actions = vue.ref([]);
-      const rules = new UTSJSONObject(
-        {
-          imei: [
-            new UTSJSONObject({
-              required: true,
-              message: "请输入设备ID",
-              trigger: ["blur", "change"]
-            }),
-            new UTSJSONObject({
-              min: 8,
-              max: 18,
-              message: "ID长度应在8-18位之间",
-              trigger: ["blur", "change"]
-            })
-          ],
-          deviceType: [
-            new UTSJSONObject({
-              required: true,
-              message: "请选择设备图标",
-              trigger: ["blur", "change"]
-            })
-          ]
-        }
-        // ===== 处理表单验证状态更新 =====
-      );
+      const rules = [
+        new UTSJSONObject({ name: "imei", required: true, message: "请输入设备ID" }),
+        new UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
+      ];
       const handleModelValid = (value = null) => {
         formValid.value = !!value;
       };
@@ -9833,52 +10147,59 @@
         });
       };
       const handleScanResult = (data) => {
-        uni.__log__("log", "at pages/addCar/addCar.uvue:144", "接收到扫码结果:", data.result);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:113", "接收到扫码结果:", data.result);
         if (data.result.length == 15) {
           carInfo.value.imei = "0" + data.result.slice(4, 15);
         } else if (data.result.length == 11) {
           carInfo.value.imei = "0" + data.result;
         } else {
-          uni.showToast({
+          showAppToast({
             title: "请输入正确的设备ID",
             icon: "none"
           });
         }
       };
+      const updateCarIconSelectorVisible = (visible) => {
+        carIconSelectorVisible.value = visible;
+      };
       const selectIcon = (item) => {
-        var _a2;
-        uni.__log__("log", "at pages/addCar/addCar.uvue:160", item.name);
-        carInfo.value.deviceType = item.name;
-        carInfo.value.deviceTypeValue = item.text;
-        (_a2 = deviceTypeSelect.value) === null || _a2 === void 0 ? null : _a2.close();
+        const name = item.getString("name", "");
+        const text = item.getString("text", "");
+        uni.__log__("log", "at pages/addCar/addCar.uvue:135", name);
+        carInfo.value.deviceType = name;
+        carInfo.value.deviceTypeValue = text;
+        carIconSelectorVisible.value = false;
       };
       const deviceTypeSelectFun = () => {
-        var _a2;
-        (_a2 = deviceTypeSelect.value) === null || _a2 === void 0 ? null : _a2.open();
+        carIconSelectorVisible.value = true;
       };
       const refreshDeviceList = () => {
         uni.$emit("refreshDeviceList");
       };
       const validateForm = () => {
-        return new Promise((resolve, reject) => {
-          const form = formRef.value;
-          if (form == null) {
-            reject(new Error("表单实例不存在"));
-            return null;
-          }
-          if (form.validate()) {
-            resolve(true);
-          } else {
-            reject(new Error("表单验证失败"));
-          }
-        });
+        if (carInfo.value.imei.length == 0) {
+          showAppToast({
+            title: "请输入设备ID",
+            icon: "none"
+          });
+          return false;
+        }
+        if (carInfo.value.deviceType.length == 0) {
+          showAppToast({
+            title: "请选择设备图标",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
       };
       const submit = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/addCar/addCar.uvue:195", "=== 开始提交设备 ===");
+          uni.__log__("log", "at pages/addCar/addCar.uvue:172", "=== 开始提交设备 ===");
           try {
-            yield validateForm();
-            uni.__log__("log", "at pages/addCar/addCar.uvue:200", "✅ 表单验证通过");
+            if (!validateForm())
+              return Promise.resolve(null);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:177", "✅ 表单验证通过");
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "添加中...",
@@ -9890,13 +10211,13 @@
               carType: carInfo.value.deviceType
               // plateNo: carInfo.value.plateNo
             });
-            uni.__log__("log", "at pages/addCar/addCar.uvue:215", "📤 提交数据:", submitData);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:192", "📤 提交数据:", submitData);
             const res = yield addDevice(submitData);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:218", "✅ 添加设备返回:", res);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:195", "✅ 添加设备返回:", res);
             uni.hideLoading();
             loading.value = false;
             if (res.code == 0) {
-              uni.showToast({
+              showAppToast({
                 title: "添加成功",
                 icon: "success"
               });
@@ -9906,17 +10227,17 @@
                 uni.navigateBack();
               }, 1500);
             } else {
-              uni.showToast({
+              showAppToast({
                 title: res.msg || "添加失败",
                 icon: "none",
                 duration: 2e3
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:245", "❌ 添加设备失败:", error);
+            uni.__log__("error", "at pages/addCar/addCar.uvue:222", "❌ 添加设备失败:", error);
             uni.hideLoading();
             loading.value = false;
-            uni.showToast({
+            showAppToast({
               title: "添加设备失败",
               icon: "none"
             });
@@ -9925,7 +10246,6 @@
       };
       vue.onLoad(() => {
         uni.$on("scanCodeResult", handleScanResult);
-        uni.__log__("log", "at pages/addCar/addCar.uvue:260", "formRef 初始值:", formRef.value);
       });
       vue.onShow(() => {
         const rawResult = uni.getStorageSync("scanCodeResult");
@@ -9938,7 +10258,7 @@
       vue.onUnload(() => {
         uni.$off("scanCodeResult", handleScanResult);
       });
-      const __returned__ = { formRef, deviceTypeSelect, loading, formValid, carInfo, actions, rules, handleModelValid, scanCode, handleScanResult, selectIcon, deviceTypeSelectFun, refreshDeviceList, validateForm, submit, get carIcons() {
+      const __returned__ = { carIconSelectorVisible, loading, formValid, carInfo, actions, rules, handleModelValid, scanCode, handleScanResult, updateCarIconSelectorVisible, selectIcon, deviceTypeSelectFun, refreshDeviceList, validateForm, submit, get carIcons() {
         return carIcons;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -9951,122 +10271,126 @@
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$3);
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
-    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$2);
+    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "添加设备",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "content" }, [
-        vue.createVNode(_component_i_form, {
-          labelPosition: "left",
-          modelValue: $setup.carInfo,
-          rules: $setup.rules,
-          ref: "formRef",
-          labelDirection: "horizontal",
-          watchValidStatus: "",
-          "onUpdate:modelValid": $setup.handleModelValid
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_i_form_item, {
-              label: "设备名称",
-              name: "deviceName",
-              labelDirection: "horizontal"
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "添加设备",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "content" }, [
+            vue.createVNode(_component_i_form, {
+              labelPosition: "left",
+              modelValue: $setup.carInfo,
+              rules: $setup.rules,
+              labelDirection: "horizontal",
+              watchValidStatus: "",
+              "onUpdate:modelValid": $setup.handleModelValid
             }, {
               default: vue.withCtx(() => [
-                vue.createVNode(_component_i_input, {
-                  border: "none",
-                  modelValue: $setup.carInfo.deviceName,
-                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.carInfo.deviceName = $event),
-                  placeholder: "请输入设备名称"
-                }, null, 8, ["modelValue"])
-              ]),
-              _: 1
-              /* STABLE */
-            }),
-            vue.createVNode(_component_i_form_item, {
-              label: "*设备ID",
-              name: "imei",
-              labelDirection: "horizontal"
-            }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_i_input, {
-                  border: "none",
-                  modelValue: $setup.carInfo.imei,
-                  "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.carInfo.imei = $event),
-                  placeholder: "请输入设备ID(必填)"
+                vue.createVNode(_component_i_form_item, {
+                  label: "设备名称",
+                  name: "deviceName",
+                  labelDirection: "horizontal"
                 }, {
-                  suffix: vue.withCtx(() => [
-                    vue.createVNode(_component_i_icon, {
-                      name: "/static/sancode.png",
-                      fontSize: "20",
-                      onClick: $setup.scanCode
-                    })
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      border: "none",
+                      modelValue: $setup.carInfo.deviceName,
+                      "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.carInfo.deviceName = $event),
+                      placeholder: "请输入设备名称"
+                    }, null, 8, ["modelValue"])
                   ]),
                   _: 1
                   /* STABLE */
-                }, 8, ["modelValue"])
+                }),
+                vue.createVNode(_component_i_form_item, {
+                  label: "*设备ID",
+                  name: "imei",
+                  labelDirection: "horizontal"
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      border: "none",
+                      modelValue: $setup.carInfo.imei,
+                      "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.carInfo.imei = $event),
+                      placeholder: "请输入设备ID(必填)"
+                    }, {
+                      suffix: vue.withCtx(() => [
+                        vue.createVNode(_component_i_icon, {
+                          name: "/static/sancode.png",
+                          fontSize: "20",
+                          onClick: $setup.scanCode
+                        })
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }, 8, ["modelValue"])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                vue.createVNode(_component_i_form_item, {
+                  label: "车标",
+                  name: "deviceType",
+                  labelDirection: "horizontal"
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createElementVNode("view", {
+                      class: "car-type-selector",
+                      onClick: $setup.deviceTypeSelectFun
+                    }, [
+                      vue.createElementVNode(
+                        "text",
+                        {
+                          class: vue.normalizeClass(["clickable", { "placeholder": !$setup.carInfo.deviceTypeValue }])
+                        },
+                        vue.toDisplayString($setup.carInfo.deviceTypeValue || "请选择设备图标(必选)"),
+                        3
+                        /* TEXT, CLASS */
+                      )
+                    ])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                vue.createVNode($setup["carIcons"], {
+                  show: $setup.carIconSelectorVisible,
+                  "onUpdate:show": $setup.updateCarIconSelectorVisible,
+                  onSelect: $setup.selectIcon
+                }, null, 8, ["show"])
               ]),
               _: 1
               /* STABLE */
-            }),
-            vue.createVNode(_component_i_form_item, {
-              label: "车标",
-              name: "deviceType",
-              labelDirection: "horizontal"
+            }, 8, ["modelValue"])
+          ]),
+          vue.createElementVNode("view", { class: "btn" }, [
+            vue.createVNode(_component_i_button, {
+              type: "primary",
+              onClick: $setup.submit,
+              loading: $setup.loading
             }, {
               default: vue.withCtx(() => [
-                vue.createElementVNode("view", {
-                  class: "car-type-selector",
-                  onClick: $setup.deviceTypeSelectFun
-                }, [
-                  vue.createElementVNode(
-                    "text",
-                    {
-                      class: vue.normalizeClass(["clickable", { "placeholder": !$setup.carInfo.deviceTypeValue }])
-                    },
-                    vue.toDisplayString($setup.carInfo.deviceTypeValue || "请选择设备图标(必选)"),
-                    3
-                    /* TEXT, CLASS */
-                  )
-                ])
+                vue.createTextVNode("提交")
               ]),
               _: 1
               /* STABLE */
-            }),
-            vue.createVNode(
-              $setup["carIcons"],
-              {
-                ref: "deviceTypeSelect",
-                onSelect: $setup.selectIcon
-              },
-              null,
-              512
-              /* NEED_PATCH */
-            )
-          ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["modelValue"])
-      ]),
-      vue.createElementVNode("view", { class: "btn" }, [
-        vue.createVNode(_component_i_button, {
-          type: "primary",
-          onClick: $setup.submit,
-          loading: $setup.loading
-        }, {
-          default: vue.withCtx(() => [
-            vue.createTextVNode("提交")
-          ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["loading"])
-      ])
-    ]);
+            }, 8, ["loading"])
+          ])
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["styles", [_style_0$q]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/addCar/addCar.uvue"]]);
   const _sfc_main$q = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-slider" }, { __name: "i-slider", props: {
@@ -10515,7 +10839,7 @@
       /* CLASS */
     );
   }
-  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["styles", [_style_0$p]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-slider/i-slider.uvue"]]);
+  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["styles", [_style_0$p]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-slider/i-slider.uvue"]]);
   function isString$1(str) {
     return typeof str == "string";
   }
@@ -15140,36 +15464,7 @@
       delete this.__props__;
     }
   }
-  class PolylineData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            points: { type: "Unknown", optional: false },
-            color: { type: String, optional: false },
-            width: { type: Number, optional: false },
-            arrowLine: { type: Boolean, optional: false },
-            borderColor: { type: String, optional: false },
-            borderWidth: { type: Number, optional: false }
-          };
-        },
-        name: "PolylineData"
-      };
-    }
-    constructor(options, metadata = PolylineData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.points = this.__props__.points;
-      this.color = this.__props__.color;
-      this.width = this.__props__.width;
-      this.arrowLine = this.__props__.arrowLine;
-      this.borderColor = this.__props__.borderColor;
-      this.borderWidth = this.__props__.borderWidth;
-      delete this.__props__;
-    }
-  }
-  let CoordinatePoint$1 = class CoordinatePoint2 extends UTS.UTSType {
+  class MapPolylinePoint extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -15179,51 +15474,45 @@
             longitude: { type: Number, optional: false }
           };
         },
-        name: "CoordinatePoint"
+        name: "MapPolylinePoint"
       };
     }
-    constructor(options, metadata = CoordinatePoint2.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = MapPolylinePoint.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.latitude = this.__props__.latitude;
       this.longitude = this.__props__.longitude;
       delete this.__props__;
     }
-  };
-  class CarMarker extends UTS.UTSType {
+  }
+  class MpPolylineData extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
         get fields() {
           return {
-            id: { type: Number, optional: false },
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false },
-            iconPath: { type: String, optional: false },
+            points: { type: "Unknown", optional: false },
+            color: { type: String, optional: false },
             width: { type: Number, optional: false },
-            height: { type: Number, optional: false },
-            rotate: { type: Number, optional: false },
-            anchor: { type: "Unknown", optional: false },
-            callout: { type: "Unknown", optional: false },
-            animation: { type: "Unknown", optional: false }
+            dottedLine: { type: Boolean, optional: false },
+            arrowLine: { type: Boolean, optional: false },
+            borderColor: { type: String, optional: false },
+            borderWidth: { type: Number, optional: false }
           };
         },
-        name: "CarMarker"
+        name: "MpPolylineData"
       };
     }
-    constructor(options, metadata = CarMarker.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.id = this.__props__.id;
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      this.iconPath = this.__props__.iconPath;
+      this.points = this.__props__.points;
+      this.color = this.__props__.color;
       this.width = this.__props__.width;
-      this.height = this.__props__.height;
-      this.rotate = this.__props__.rotate;
-      this.anchor = this.__props__.anchor;
-      this.callout = this.__props__.callout;
-      this.animation = this.__props__.animation;
+      this.dottedLine = this.__props__.dottedLine;
+      this.arrowLine = this.__props__.arrowLine;
+      this.borderColor = this.__props__.borderColor;
+      this.borderWidth = this.__props__.borderWidth;
       delete this.__props__;
     }
   }
@@ -15247,14 +15536,16 @@
       const trackPoints = vue.ref([]);
       const polyline = vue.ref([]);
       const isPlaying = vue.ref(false);
+      const isTrackPlayable = vue.ref(false);
       const playbackSpeed = vue.ref(5);
       const totalDistance = vue.ref(0);
       const currentSpeed = vue.ref(0);
       const currentTime = vue.ref("");
       const currentIndex = vue.ref(0);
       const carMarker = vue.ref(null);
-      let playbackTimer = 0;
+      let playbackTimer = null;
       let lastTimestamp = 0;
+      let replaySessionId = 0;
       const startTime = vue.ref("");
       const endTime = vue.ref("");
       const lat = vue.ref("");
@@ -15277,10 +15568,20 @@
         }
         return date.getTime();
       }
-      function formatDateForDisplay(dateStr) {
+      function normalizeDateTime(dateStr) {
         if (!dateStr)
           return "";
-        return dateStr.replace(/\//g, "-");
+        let normalized = dateStr.replace(/-/g, "/");
+        const parts = normalized.split(" ");
+        if (parts.length < 2)
+          return normalized;
+        const timeParts = parts[1].split(":");
+        if (timeParts.length == 2)
+          normalized += ":00";
+        return normalized;
+      }
+      function formatDateForDisplay(dateStr) {
+        return normalizeDateTime(dateStr).replace(/\//g, "-");
       }
       function calculateBearing(lat1, lng1, lat2, lng2) {
         const degToRad = (d) => {
@@ -15369,99 +15670,103 @@
       }
       function initCarMarker() {
         var _a2, _b;
-        if (trackPoints.value.length > 0) {
-          const firstPoint = trackPoints.value[0];
-          const marker = new CarMarker({
-            id: 999,
-            latitude: firstPoint.latitude,
-            longitude: firstPoint.longitude,
-            iconPath: getDeviceIcon((_a2 = carStatus.value) !== null && _a2 !== void 0 ? _a2 : "", (_b = carType.value) !== null && _b !== void 0 ? _b : ""),
-            width: 25,
-            height: 25,
-            rotate: firstPoint.rotation,
-            anchor: new UTSJSONObject({}),
-            callout: new UTSJSONObject({}),
-            animation: new UTSJSONObject({})
+        if (trackPoints.value.length == 0)
+          return null;
+        const firstPoint = trackPoints.value[0];
+        const marker = {
+          id: 999,
+          latitude: firstPoint.latitude,
+          longitude: firstPoint.longitude,
+          iconPath: getDeviceIcon((_a2 = carStatus.value) !== null && _a2 !== void 0 ? _a2 : "", (_b = carType.value) !== null && _b !== void 0 ? _b : ""),
+          width: 25,
+          height: 25,
+          rotate: firstPoint.rotation,
+          anchor: { x: 0.5, y: 0.5 }
+        };
+        carMarker.value = marker;
+        const startMarker = {
+          id: 1e3,
+          latitude: firstPoint.latitude,
+          longitude: firstPoint.longitude,
+          iconPath: "/static/start.png",
+          width: 24,
+          height: 24,
+          anchor: { x: 0.5, y: 0.5 },
+          callout: new UTSJSONObject({ content: "起点", borderRadius: 5, padding: 5, display: "BYCLICK" })
+        };
+        const lastPoint = trackPoints.value[trackPoints.value.length - 1];
+        const endMarker = {
+          id: 1001,
+          latitude: lastPoint.latitude,
+          longitude: lastPoint.longitude,
+          iconPath: "/static/end.png",
+          width: 24,
+          height: 24,
+          anchor: { x: 0.5, y: 0.5 },
+          callout: new UTSJSONObject({ content: "终点", borderRadius: 5, padding: 5, display: "BYCLICK" })
+        };
+        markers.value = [marker, startMarker, endMarker];
+      }
+      function toMpPoints(points) {
+        return points.map((point) => {
+          return new MapPolylinePoint({
+            latitude: point.latitude,
+            longitude: point.longitude
           });
-          carMarker.value = marker;
-          const startMarker = new UTSJSONObject({
-            id: 1e3,
-            latitude: trackPoints.value[0].latitude,
-            longitude: trackPoints.value[0].longitude,
-            iconPath: "/static/start.png",
-            width: 24,
-            height: 24,
-            // anchor: { x: 0.5, y: 0.5 },
-            callout: new UTSJSONObject({
-              content: "起点",
-              borderRadius: 5,
-              padding: 5,
-              display: "BYCLICK"
-            })
-          });
-          const endMarker = new UTSJSONObject({
-            id: 1001,
-            latitude: trackPoints.value[trackPoints.value.length - 1].latitude,
-            longitude: trackPoints.value[trackPoints.value.length - 1].longitude,
-            iconPath: "/static/end.png",
-            width: 24,
-            height: 24,
-            // anchor: { x: 0.5, y: 0.5 },
-            callout: new UTSJSONObject({
-              content: "终点",
-              borderRadius: 5,
-              padding: 5,
-              display: "BYCLICK"
-            })
-          });
-          markers.value = [marker, startMarker, endMarker];
-        }
+        });
       }
       function updatePolyline() {
-        if (!trackPoints.value || trackPoints.value.length < 2) {
+        if (trackPoints.value.length < 2) {
           polyline.value = [];
           return null;
         }
-        const newPolyline = [];
+        const lines = [];
+        const unplayedPoints = trackPoints.value.slice(currentIndex.value);
+        if (unplayedPoints.length >= 2) {
+          lines.push(new MpPolylineData({
+            points: toMpPoints(unplayedPoints),
+            color: "#999999",
+            width: 3,
+            dottedLine: true,
+            arrowLine: false,
+            borderColor: "#FFFFFF",
+            borderWidth: 1
+          }));
+        }
         if (currentIndex.value > 0) {
-          const playedPoints = trackPoints.value.slice(0, currentIndex.value + 1);
-          if (playedPoints.length >= 2) {
-            newPolyline.push(new PolylineData({
-              points: playedPoints.map((point) => {
-                return new CoordinatePoint$1({ latitude: point.latitude, longitude: point.longitude });
-              }),
-              color: "#1890FF",
-              width: 6,
-              arrowLine: true,
-              borderColor: "#FFF",
-              borderWidth: 1
-            }));
-          }
+          lines.push(new MpPolylineData({
+            points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
+            color: "#1890FF",
+            width: 6,
+            dottedLine: false,
+            arrowLine: true,
+            borderColor: "#FFFFFF",
+            borderWidth: 1
+          }));
         }
-        if (currentIndex.value < trackPoints.value.length - 1) {
-          const unplayedPoints = trackPoints.value.slice(currentIndex.value);
-          if (unplayedPoints.length >= 2) {
-            newPolyline.push(new PolylineData({
-              arrowLine: null,
-              points: unplayedPoints.map((point) => {
-                return new CoordinatePoint$1({ latitude: point.latitude, longitude: point.longitude });
-              }),
-              color: "#999",
-              width: 3,
-              borderColor: "#FFF",
-              borderWidth: 1
-            }));
-          }
-        }
-        polyline.value = newPolyline;
+        polyline.value = lines;
+      }
+      function initPolyline() {
+        updatePolyline();
       }
       function updateCarPosition() {
         const marker = carMarker.value;
         if (marker != null && trackPoints.value.length > 0 && currentIndex.value < trackPoints.value.length) {
           const point = trackPoints.value[currentIndex.value];
-          marker.latitude = point.latitude;
-          marker.longitude = point.longitude;
-          marker.rotate = point.rotation;
+          const updatedMarker = {
+            id: marker.id,
+            latitude: point.latitude,
+            longitude: point.longitude,
+            iconPath: marker.iconPath,
+            width: marker.width,
+            height: marker.height,
+            rotate: point.rotation,
+            anchor: marker.anchor,
+            callout: marker.callout,
+            label: marker.label
+          };
+          carMarker.value = updatedMarker;
+          markers.value = [updatedMarker, ...markers.value.slice(1)];
           if (currentIndex.value % 5 == 0 || currentIndex.value == 0 || currentIndex.value == trackPoints.value.length - 1) {
             center.latitude = point.latitude;
             center.longitude = point.longitude;
@@ -15475,15 +15780,24 @@
       }
       function showCurrentPosition() {
         var _a2, _b, _c, _d;
-        uni.showToast({
-          title: "这段时间没有数据",
-          icon: "none",
-          duration: 2e3
-        });
+        isTrackPlayable.value = false;
         const originalLatText = (_a2 = lat.value) !== null && _a2 !== void 0 ? _a2 : "";
         const originalLngText = (_b = lng.value) !== null && _b !== void 0 ? _b : "";
         const originalLat = parseFloat(originalLatText);
         const originalLng = parseFloat(originalLngText);
+        if (isNaN(originalLat) || isNaN(originalLng) || originalLat == 0 || originalLng == 0) {
+          showAppToast({
+            title: "这段时间没有数据",
+            icon: "none",
+            duration: 2e3
+          });
+          return null;
+        }
+        showAppToast({
+          title: "这段时间没有数据",
+          icon: "none",
+          duration: 2e3
+        });
         const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng);
         center.latitude = convertedCoord.lat;
         center.longitude = convertedCoord.lng;
@@ -15498,7 +15812,7 @@
           }
           // 初始化小车标记
         );
-        const marker = new CarMarker({
+        const marker = {
           id: 999,
           latitude: currentPoint.latitude,
           longitude: currentPoint.longitude,
@@ -15506,12 +15820,38 @@
           width: 25,
           height: 25,
           rotate: 0,
-          anchor: new UTSJSONObject({}),
-          callout: new UTSJSONObject({}),
-          animation: new UTSJSONObject({})
-        });
+          anchor: { x: 0.5, y: 0.5 }
+        };
         carMarker.value = marker;
         markers.value = [marker];
+      }
+      function clearTrackDisplay() {
+        trackPoints.value = [];
+        isTrackPlayable.value = false;
+        currentIndex.value = 0;
+        currentSpeed.value = 0;
+        currentTime.value = "";
+        totalDistance.value = 0;
+        carMarker.value = null;
+        markers.value = [];
+        polyline.value = [];
+      }
+      function pausePlayback() {
+        isPlaying.value = false;
+        const timer = playbackTimer;
+        if (timer != null) {
+          clearTimeout(timer);
+          playbackTimer = null;
+        }
+      }
+      function renderPlaybackIndex() {
+        if (trackPoints.value.length == 0)
+          return null;
+        updateCarPosition();
+        updatePolyline();
+        const point = trackPoints.value[currentIndex.value];
+        currentSpeed.value = point.speed;
+        currentTime.value = point.deviceTime;
       }
       function processTrackData(positions) {
         const processedPoints = [];
@@ -15520,36 +15860,44 @@
           const deviceTimeStr = point.getString("deviceTime", "");
           const originalLat = point.getNumber("latitude", 0);
           const originalLng = point.getNumber("longitude", 0);
+          if (originalLat == 0 || originalLng == 0 || !isFinite(originalLat) || !isFinite(originalLng) || deviceTimeStr == "" || safeParseDate(deviceTimeStr) == 0) {
+            continue;
+          }
           const convertedCoord = CoordTransform.wgs84ToTencent(originalLat, originalLng);
-          const processedPoint = new TrackPoint({
+          if (!isFinite(convertedCoord.lat) || !isFinite(convertedCoord.lng)) {
+            continue;
+          }
+          processedPoints.push(new TrackPoint({
             latitude: convertedCoord.lat,
             longitude: convertedCoord.lng,
             rotation: 0,
             deviceTime: formatDateForDisplay(deviceTimeStr),
             speed: point.getNumber("speed", 0)
-          });
-          if (i > 0) {
-            const prevPoint = processedPoints[i - 1];
-            processedPoint.rotation = calculateBearing(prevPoint.latitude, prevPoint.longitude, processedPoint.latitude, processedPoint.longitude);
-          } else {
-            processedPoint.rotation = 0;
-          }
-          processedPoints.push(processedPoint);
+          }));
+        }
+        for (let i = 1; i < processedPoints.length; i++) {
+          const previousPoint = processedPoints[i - 1];
+          const currentPoint = processedPoints[i];
+          currentPoint.rotation = calculateBearing(previousPoint.latitude, previousPoint.longitude, currentPoint.latitude, currentPoint.longitude);
         }
         if (processedPoints.length > 1) {
           processedPoints[processedPoints.length - 1].rotation = processedPoints[processedPoints.length - 2].rotation;
         }
         trackPoints.value = processedPoints;
+        isTrackPlayable.value = processedPoints.length > 1;
+        currentIndex.value = 0;
         calculateTrackDistance();
         initCarMarker();
-        updatePolyline();
+        initPolyline();
         adjustMapToFitTrack();
-        if (trackPoints.value.length > 0) {
-          currentTime.value = trackPoints.value[0].deviceTime;
-        }
+        renderPlaybackIndex();
       }
       const loadTrackPos = () => {
         return __awaiter(this, void 0, void 0, function* () {
+          var _a2, _b, _c;
+          pausePlayback();
+          const requestId = ++replaySessionId;
+          clearTrackDisplay();
           uni.showLoading(new UTSJSONObject({ title: "加载中..." }));
           const data = new UTSJSONObject({
             imei: imei.value,
@@ -15560,56 +15908,55 @@
             withPos: true,
             withTrip: false
           });
-          const res = yield getTrackPos(data);
-          const trackData = res.data;
-          const positions = trackData === null || trackData === void 0 ? null : trackData.getArray("positions");
-          if (positions != null && positions.length > 0) {
-            processTrackData(positions);
-            uni.hideLoading();
-          } else {
-            showCurrentPosition();
-            uni.hideLoading();
+          try {
+            const res = yield getTrackPos(data);
+            if (requestId != replaySessionId)
+              return Promise.resolve(null);
+            const positions = (_a2 = res.data) === null || _a2 === void 0 ? null : _a2.getArray("positions");
+            if (positions != null && positions.length > 0) {
+              processTrackData(positions);
+              if (trackPoints.value.length == 0) {
+                showCurrentPosition();
+              }
+            } else {
+              showCurrentPosition();
+            }
+          } catch (error) {
+            if (requestId != replaySessionId)
+              return Promise.resolve(null);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:631", "加载轨迹失败:", error);
+            showAppToast({ title: "轨迹加载失败", icon: "none" });
+            if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
+              showCurrentPosition();
+            }
+          } finally {
+            if (requestId == replaySessionId) {
+              uni.hideLoading();
+            }
           }
         });
       };
-      function pausePlayback() {
-        isPlaying.value = false;
-        const timer = playbackTimer;
-        if (timer != null) {
-          clearTimeout(timer);
-          playbackTimer = null;
-        }
-      }
       function resetPlayback() {
         pausePlayback();
         currentIndex.value = 0;
-        currentSpeed.value = 0;
-        if (trackPoints.value.length > 0) {
-          currentTime.value = trackPoints.value[0].deviceTime;
-        }
-        updateCarPosition();
-        updatePolyline();
+        renderPlaybackIndex();
       }
       function playNextPoint() {
         if (currentIndex.value >= trackPoints.value.length - 1) {
           pausePlayback();
-          updatePolyline();
-          uni.showToast({
+          showAppToast({
             title: "轨迹回放完成",
             icon: "none",
             duration: 1500
           });
-          return null;
+          return false;
         }
         currentIndex.value++;
-        updateCarPosition();
-        updatePolyline();
-        const point = trackPoints.value[currentIndex.value];
-        currentSpeed.value = point.speed;
-        currentTime.value = point.deviceTime;
+        renderPlaybackIndex();
+        return true;
       }
-      function playbackStep() {
-        if (!isPlaying.value)
+      function playbackStep(sessionId) {
+        if (!isPlaying.value || sessionId != replaySessionId)
           return null;
         const now = Date.now();
         const elapsed = now - lastTimestamp;
@@ -15618,23 +15965,26 @@
           playNextPoint();
           lastTimestamp = now - elapsed % interval;
         }
-        if (isPlaying.value) {
+        if (isPlaying.value && sessionId == replaySessionId) {
           playbackTimer = setTimeout(() => {
-            playbackStep();
+            playbackStep(sessionId);
           }, 16);
         }
       }
       function startPlayback() {
-        if (trackPoints.value.length == 0) {
-          uni.showToast({ title: "没有轨迹数据", icon: "none" });
+        if (!isTrackPlayable.value) {
+          showAppToast({ title: "没有轨迹数据", icon: "none" });
           return null;
         }
         if (currentIndex.value >= trackPoints.value.length - 1) {
           resetPlayback();
         }
         isPlaying.value = true;
+        const sessionId = ++replaySessionId;
+        if (!playNextPoint())
+          return null;
         lastTimestamp = Date.now();
-        playbackStep();
+        playbackStep(sessionId);
       }
       function togglePlayback() {
         if (isPlaying.value) {
@@ -15644,10 +15994,7 @@
         }
       }
       function onConfirm(value) {
-        let formattedValue = value;
-        if (formattedValue.includes("-")) {
-          formattedValue = formattedValue.replace(/-/g, "/");
-        }
+        const formattedValue = normalizeDateTime(value);
         if (currentPickerType.value == "start") {
           startTime.value = formattedValue;
         } else {
@@ -15680,20 +16027,25 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:658", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:750", sTime.value, eTime.value);
         if (sTime.value != "" && eTime.value != "") {
-          startTime.value = sTime.value;
-          endTime.value = eTime.value;
+          startTime.value = normalizeDateTime(sTime.value);
+          endTime.value = normalizeDateTime(eTime.value);
           loadTrackPos();
         } else {
           initDateTime();
           loadTrackPos();
         }
       });
+      vue.onHide(() => {
+        pausePlayback();
+        ++replaySessionId;
+      });
       vue.onUnload(() => {
         pausePlayback();
+        ++replaySessionId;
       });
-      const __returned__ = { center, mapScale, imei, carStatus, plateNo, carType, showDateTimePicker, currentPickerType, pickerTitle, trackPoints, polyline, isPlaying, playbackSpeed, totalDistance, currentSpeed, currentTime, currentIndex, carMarker, get playbackTimer() {
+      const __returned__ = { center, mapScale, imei, carStatus, plateNo, carType, showDateTimePicker, currentPickerType, pickerTitle, trackPoints, polyline, isPlaying, isTrackPlayable, playbackSpeed, totalDistance, currentSpeed, currentTime, currentIndex, carMarker, get playbackTimer() {
         return playbackTimer;
       }, set playbackTimer(v = null) {
         playbackTimer = v;
@@ -15701,58 +16053,53 @@
         return lastTimestamp;
       }, set lastTimestamp(v) {
         lastTimestamp = v;
-      }, startTime, endTime, lat, lng, sTime, eTime, markers, safeParseDate, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, updatePolyline, updateCarPosition, showPicker, showCurrentPosition, processTrackData, loadTrackPos, pausePlayback, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, onConfirm, onCancel, setPlaybackSpeed };
+      }, get replaySessionId() {
+        return replaySessionId;
+      }, set replaySessionId(v) {
+        replaySessionId = v;
+      }, startTime, endTime, lat, lng, sTime, eTime, markers, safeParseDate, normalizeDateTime, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, toMpPoints, updatePolyline, initPolyline, updateCarPosition, showPicker, showCurrentPosition, clearTrackDisplay, pausePlayback, renderPlaybackIndex, processTrackData, loadTrackPos, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, onConfirm, onCancel, setPlaybackSpeed };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$k = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "backgroundColor": "#f5f5f5", "paddingTop": 0, "paddingRight": "10rpx", "paddingBottom": 0, "paddingLeft": "10rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "25rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
+  const _style_0$k = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "30rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "backgroundColor": "#f5f5f5", "paddingTop": 0, "paddingRight": "10rpx", "paddingBottom": 0, "paddingLeft": "10rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "24rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
   function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-    const _component_marker = vue.resolveComponent("marker");
-    const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
     const _component_map = vue.resolveComponent("map");
+    const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
-    const _component_i_slider = resolveEasycom(vue.resolveDynamicComponent("i-slider"), __easycom_3$1);
+    const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
+    const _component_i_slider = resolveEasycom(vue.resolveDynamicComponent("i-slider"), __easycom_4);
     const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), __easycom_2$1);
     const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "轨迹回放",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "map-container" }, [
-        vue.createVNode(_component_map, {
-          id: "myMap",
-          latitude: $setup.center.latitude,
-          longitude: $setup.center.longitude,
-          markers: $setup.markers,
-          polyline: $setup.polyline,
-          scale: $setup.mapScale,
-          style: { "width": "100%", "height": "100%" },
-          "show-location": true,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }, {
-          default: vue.withCtx(() => [
-            $setup.carMarker ? (vue.openBlock(), vue.createBlock(_component_marker, {
-              key: 0,
-              id: $setup.carMarker.id,
-              latitude: $setup.carMarker.latitude,
-              longitude: $setup.carMarker.longitude,
-              iconPath: $setup.carMarker.iconPath,
-              width: $setup.carMarker.width,
-              height: $setup.carMarker.height,
-              rotate: $setup.carMarker.rotate,
-              anchor: $setup.carMarker.anchor,
-              callout: $setup.carMarker.callout,
-              animation: $setup.carMarker.animation
-            }, null, 8, ["id", "latitude", "longitude", "iconPath", "width", "height", "rotate", "anchor", "callout", "animation"])) : vue.createCommentVNode("v-if", true),
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "轨迹回放",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "map-container" }, [
+            vue.createVNode(_component_map, {
+              id: "myMap",
+              latitude: $setup.center.latitude,
+              longitude: $setup.center.longitude,
+              markers: $setup.markers,
+              polyline: $setup.polyline,
+              scale: $setup.mapScale,
+              style: { "width": "100%", "height": "100%" },
+              "show-location": true,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }, null, 8, ["latitude", "longitude", "markers", "polyline", "scale"]),
             vue.createVNode(_component_sub_navBar, {
               showTime: false,
               currentCar: $setup.plateNo,
@@ -15760,121 +16107,119 @@
               carStatus: $setup.carStatus
             }, null, 8, ["currentCar", "carStatus"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["latitude", "longitude", "markers", "polyline", "scale"])
-      ]),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        vue.createElementVNode("view", { class: "Datetime-box" }, [
-          vue.createElementVNode("view", { class: "date-box" }, [
-            vue.createVNode(_component_i_icon, {
-              name: "/static/rili.png",
-              fontSize: "15"
-            }),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
-              },
-              vue.toDisplayString($setup.startTime),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode("text", null, "至"),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("end"))
-              },
-              vue.toDisplayString($setup.endTime),
-              1
-              /* TEXT */
-            )
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            vue.createElementVNode("view", { class: "Datetime-box" }, [
+              vue.createElementVNode("view", { class: "date-box" }, [
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/rili.png",
+                  fontSize: "15"
+                }),
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: "Date",
+                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
+                  },
+                  vue.toDisplayString($setup.startTime),
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode("text", null, "至"),
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: "Date",
+                    onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("end"))
+                  },
+                  vue.toDisplayString($setup.endTime),
+                  1
+                  /* TEXT */
+                )
+              ])
+            ]),
+            vue.createElementVNode("view", { class: "tool-tag-item" }, [
+              vue.createVNode(_component_i_button, {
+                type: "primary",
+                onClick: $setup.togglePlayback,
+                size: "small",
+                text: $setup.isPlaying ? "暂停" : "播放"
+              }, null, 8, ["text"]),
+              vue.createElementVNode("view", { class: "slider" }, [
+                vue.createVNode(_component_i_slider, {
+                  modelValue: $setup.playbackSpeed,
+                  "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.playbackSpeed = $event),
+                  min: 1,
+                  max: 50,
+                  step: 5,
+                  onChange: $setup.setPlaybackSpeed
+                }, null, 8, ["modelValue"])
+              ]),
+              vue.createElementVNode(
+                "text",
+                { class: "speed-label" },
+                vue.toDisplayString($setup.playbackSpeed) + "x",
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "play-back-info" }, [
+              vue.createElementVNode("view", { class: "item-info" }, [
+                vue.createElementVNode(
+                  "text",
+                  { class: "info-label" },
+                  vue.toDisplayString($setup.currentTime),
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode("text", { class: "info-label" }, "时间")
+              ]),
+              vue.createElementVNode("view", { class: "item-info" }, [
+                vue.createElementVNode(
+                  "text",
+                  { class: "info-label" },
+                  vue.toDisplayString($setup.currentSpeed) + "Km/h",
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode("text", { class: "info-label" }, "速度")
+              ]),
+              vue.createElementVNode("view", { class: "item-info" }, [
+                vue.createElementVNode(
+                  "text",
+                  { class: "info-label" },
+                  vue.toDisplayString(($setup.totalDistance / 1e3).toFixed(1)) + "Km",
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode("text", { class: "info-label" }, "里程")
+              ])
+            ]),
+            vue.createVNode(_component_l_popup, {
+              modelValue: $setup.showDateTimePicker,
+              "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.showDateTimePicker = $event),
+              position: "bottom",
+              closeable: false
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_l_date_time_picker, {
+                  "confirm-btn": "确认",
+                  "cancel-btn": "取消",
+                  title: $setup.pickerTitle,
+                  mode: 1 | 2 | 4 | 8 | 16 | 32,
+                  onConfirm: $setup.onConfirm,
+                  onCancel: $setup.onCancel
+                }, null, 8, ["title"])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["modelValue"])
           ])
         ]),
-        vue.createElementVNode("view", { class: "tool-tag-item" }, [
-          vue.createElementVNode(
-            "view",
-            {
-              class: "play-btn",
-              onClick: $setup.togglePlayback
-            },
-            vue.toDisplayString($setup.isPlaying ? "暂停" : "播放"),
-            1
-            /* TEXT */
-          ),
-          vue.createElementVNode("view", { class: "slider" }, [
-            vue.createVNode(_component_i_slider, {
-              modelValue: $setup.playbackSpeed,
-              "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.playbackSpeed = $event),
-              min: 1,
-              max: 10,
-              onChange: $setup.setPlaybackSpeed
-            }, null, 8, ["modelValue"])
-          ]),
-          vue.createElementVNode(
-            "text",
-            { class: "speed-label" },
-            vue.toDisplayString($setup.playbackSpeed) + "x",
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "play-back-info" }, [
-          vue.createElementVNode("view", { class: "item-info" }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString($setup.currentTime),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode("text", { class: "info-label" }, "时间")
-          ]),
-          vue.createElementVNode("view", { class: "item-info" }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString($setup.currentSpeed) + "Km/h",
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode("text", { class: "info-label" }, "速度")
-          ]),
-          vue.createElementVNode("view", { class: "item-info" }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(($setup.totalDistance / 1e3).toFixed(1)) + "Km",
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode("text", { class: "info-label" }, "里程")
-          ])
-        ]),
-        vue.createVNode(_component_l_popup, {
-          modelValue: $setup.showDateTimePicker,
-          "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.showDateTimePicker = $event),
-          position: "bottom",
-          closeable: false
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_l_date_time_picker, {
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: $setup.pickerTitle,
-              mode: 1 | 2 | 4 | 8 | 16 | 32,
-              onConfirm: $setup.onConfirm,
-              onCancel: $setup.onCancel
-            }, null, 8, ["title"])
-          ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["modelValue"])
-      ])
-    ]);
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesPlayBackPlayBack = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["styles", [_style_0$k]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/playBack/playBack.uvue"]]);
   const _sfc_main$j = /* @__PURE__ */ vue.defineComponent({
@@ -16283,6 +16628,19 @@
       function handleCurrentTimeUpdate(value) {
         currentTime.value = value;
       }
+      function createVehicleMarker(iconPath) {
+        return {
+          id: 1,
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
+          iconPath,
+          width: 25,
+          height: 25,
+          rotate: currentRotation.value,
+          anchor: { x: 0.5, y: 0.5 },
+          alpha: 1
+        };
+      }
       function loadInitialPosition() {
         return __awaiter(this, void 0, void 0, function* () {
           try {
@@ -16290,10 +16648,10 @@
               deptId: deptId.value,
               deviceids: imei.value
             });
-            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:124", "data", data);
+            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:138", "data", data);
             const res = yield getDevicePos(data);
-            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:128", "res", res);
-            if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
+            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:142", "res", res);
+            if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
               let foundDevice = false;
               res.data.forEach((item) => {
                 const itemImei = item.getString("imei", "");
@@ -16302,7 +16660,7 @@
                   const latitude = item.getNumber("latitude", 0);
                   const longitude = item.getNumber("longitude", 0);
                   if (latitude == 0 || longitude == 0) {
-                    uni.showToast({
+                    showAppToast({
                       title: "位置信息缺失",
                       icon: "none"
                     });
@@ -16332,37 +16690,26 @@
                   if (!markerInitialized.value) {
                     const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
                     lastIconPath = iconPath;
-                    markers.value = [new UTSJSONObject({
-                      id: 1,
-                      latitude: currentPosition.latitude,
-                      longitude: currentPosition.longitude,
-                      iconPath,
-                      width: 25,
-                      height: 25,
-                      rotate: currentRotation.value,
-                      anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
-                      alpha: 1,
-                      fixed: false
-                    })];
+                    markers.value = [createVehicleMarker(iconPath)];
                     markerInitialized.value = true;
                   }
                 }
               });
               if (!foundDevice) {
-                uni.showToast({
+                showAppToast({
                   title: "未找到车辆设备",
                   icon: "none"
                 });
               }
             } else {
-              uni.showToast({
+              showAppToast({
                 title: "获取位置失败",
                 icon: "none"
               });
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:211", "获取初始位置失败:", err);
-            uni.showToast({
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:214", "获取初始位置失败:", err);
+            showAppToast({
               title: "网络请求失败",
               icon: "none"
             });
@@ -16375,21 +16722,10 @@
         }
         const iconPath = getDeviceIcon(connectionStatus.value, carType.value);
         lastIconPath = iconPath;
-        const marker = new UTSJSONObject({
-          id: 1,
-          latitude: currentPosition.latitude,
-          longitude: currentPosition.longitude,
-          iconPath,
-          width: 25,
-          height: 25,
-          rotate: currentRotation.value,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
-          alpha: 1,
-          fixed: false
-        });
+        const marker = createVehicleMarker(iconPath);
         markers.value = [marker];
         markerInitialized.value = true;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:243", "初始化标记点完成");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:235", "初始化标记点完成");
       }
       function calculateMapRotation(direction) {
         let rotation = direction;
@@ -16408,7 +16744,7 @@
       }
       vue.onLoad((option) => {
         var _a2, _b, _c, _d, _e;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:264", "option", option);
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:256", "option", option);
         connectionStatus.value = (_a2 = option.connectionStatus) !== null && _a2 !== void 0 ? _a2 : "";
         imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
         currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -16450,24 +16786,13 @@
         return diff;
       }
       const updateMarkerSmooth = () => {
-        if (markers.value.length === 0) {
+        if (markers.value.length == 0) {
           initMarker();
           return null;
         }
         const newIconPath = getDeviceIcon(connectionStatus.value, carType.value);
-        const needUpdateIcon = newIconPath !== lastIconPath;
-        const updatedMarker = new UTSJSONObject({
-          id: 1,
-          latitude: currentPosition.latitude,
-          longitude: currentPosition.longitude,
-          iconPath: needUpdateIcon ? newIconPath : lastIconPath,
-          width: 25,
-          height: 25,
-          rotate: currentRotation.value,
-          anchor: new UTSJSONObject({ x: 0.5, y: 0.5 }),
-          alpha: 1,
-          fixed: false
-        });
+        const needUpdateIcon = newIconPath != lastIconPath;
+        const updatedMarker = createVehicleMarker(needUpdateIcon ? newIconPath : lastIconPath);
         markers.value = [updatedMarker];
         if (needUpdateIcon) {
           lastIconPath = newIconPath;
@@ -16555,8 +16880,8 @@
               deviceids: imei.value
             });
             const res = yield getDevicePos(data);
-            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:471", "222222");
-            if ((res === null || res === void 0 ? null : res.code) === 0 && res.data && res.data.length > 0) {
+            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:452", "222222");
+            if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
               const deviceData = UTS.arrayFind(res.data, (item) => {
                 return item.getString("imei", "") == imei.value;
               });
@@ -16568,10 +16893,7 @@
                 const status = deviceData.getString("connectionStatus", "unknown");
                 const direction = deviceData.getNumber("direction", lastDirection.value);
                 const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
-                let newDirection = direction;
-                if (direction === lastDirection.value) {
-                  newDirection = lastDirection.value;
-                }
+                const newDirection = direction;
                 const animationData = new AnimationQueueItem({
                   position: new CoordinatePoint({
                     latitude: convertedCoord.lat,
@@ -16587,7 +16909,7 @@
               }
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:503", "获取跟踪位置失败:", err);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:481", "获取跟踪位置失败:", err);
           }
         });
       };
@@ -16604,7 +16926,7 @@
           animationTimer.value = null;
         }
         isAnimating.value = false;
-        uni.showToast({
+        showAppToast({
           title: "停止跟踪",
           icon: "success",
           duration: 1500
@@ -16616,7 +16938,7 @@
         }
         animationQueue.value = [];
         isProcessingQueue.value = false;
-        const interval = 1e4;
+        const interval = 3e3;
         isTracking.value = true;
         if (trackingInterval.value != null) {
           clearInterval(trackingInterval.value);
@@ -16625,7 +16947,7 @@
         trackingInterval.value = setInterval(() => {
           loadTrackData();
         }, interval);
-        uni.showToast({
+        showAppToast({
           title: "开始跟踪",
           icon: "success",
           duration: 1500
@@ -16639,7 +16961,7 @@
         }
       };
       vue.onHide(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:578", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:556", "页面隐藏时停止自动刷新");
         isTracking.value = false;
         if (trackingInterval.value != null) {
           clearInterval(trackingInterval.value);
@@ -16654,7 +16976,7 @@
         isAnimating.value = false;
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:599", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:577", "页面卸载时停止自动刷新");
         isTracking.value = false;
         if (trackingInterval.value != null) {
           clearInterval(trackingInterval.value);
@@ -16676,89 +16998,97 @@
         return lastMarkerUpdateTime;
       }, set lastMarkerUpdateTime(v) {
         lastMarkerUpdateTime = v;
-      }, MARKER_UPDATE_INTERVAL, isTracking, trackingInterval, lastDirection, currentSpeed, currentAddress, currentTime, currentCar, times, handleCurrentTimeUpdate, loadInitialPosition, initMarker, calculateMapRotation, normalizeRotation, calculateDistance, calculateRealisticAnimationDuration, calculateShortestRotation, updateMarkerSmooth, startPositionAnimation, processAnimationQueue, addToAnimationQueue, loadTrackData, stopTracking, startTracking, toggleTracking };
+      }, MARKER_UPDATE_INTERVAL, isTracking, trackingInterval, lastDirection, currentSpeed, currentAddress, currentTime, currentCar, times, handleCurrentTimeUpdate, createVehicleMarker, loadInitialPosition, initMarker, calculateMapRotation, normalizeRotation, calculateDistance, calculateRealisticAnimationDuration, calculateShortestRotation, updateMarkerSmooth, startPositionAnimation, processAnimationQueue, addToAnimationQueue, loadTrackData, stopTracking, startTracking, toggleTracking };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$i = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "btn": { ".container .tools-panel ": { "marginBottom": "20rpx" } }, "pos-info-box": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0 } }, "speed": { ".container .tools-panel .pos-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "8rpx", "paddingRight": 0, "paddingBottom": "8rpx", "paddingLeft": 0, "fontSize": "28rpx" } }, "address": { ".container .tools-panel .pos-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "8rpx", "paddingRight": 0, "paddingBottom": "8rpx", "paddingLeft": 0, "fontSize": "28rpx" } } };
+  const _style_0$i = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "btn": { ".container .tools-panel ": { "marginBottom": "20rpx" } }, "pos-info-box": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0 } }, "speed": { ".container .tools-panel .pos-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "8rpx", "paddingRight": 0, "paddingBottom": "8rpx", "paddingLeft": 0 } }, "address": { ".container .tools-panel .pos-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "8rpx", "paddingRight": 0, "paddingBottom": "8rpx", "paddingLeft": 0 } }, "tracking-info-text": { ".container ": { "fontSize": "28rpx" } } };
   function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
     const _component_map = vue.resolveComponent("map");
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "车辆跟踪",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "map-container" }, [
-        vue.createVNode(_component_map, {
-          id: "myMap",
-          latitude: $setup.center.latitude,
-          longitude: $setup.center.longitude,
-          markers: $setup.markers,
-          scale: $setup.mapScale,
-          style: { "width": "100%", "height": "100%" },
-          "show-location": false,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_sub_navBar, {
-              currentTime: $setup.currentTime,
-              currentCar: $setup.currentCar,
-              times: $setup.times,
-              showCar: true,
-              "onUpdate:currentTime": $setup.handleCurrentTimeUpdate,
-              carStatus: $setup.connectionStatus
-            }, null, 8, ["currentTime", "currentCar", "times", "carStatus"])
+    const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "车辆跟踪",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "map-container" }, [
+            vue.createVNode(_component_map, {
+              id: "myMap",
+              latitude: $setup.center.latitude,
+              longitude: $setup.center.longitude,
+              markers: $setup.markers,
+              scale: $setup.mapScale,
+              style: { "width": "100%", "height": "100%" },
+              "show-location": false,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_sub_navBar, {
+                  currentTime: $setup.currentTime,
+                  currentCar: $setup.currentCar,
+                  times: $setup.times,
+                  showCar: true,
+                  "onUpdate:currentTime": $setup.handleCurrentTimeUpdate,
+                  carStatus: $setup.connectionStatus
+                }, null, 8, ["currentTime", "currentCar", "times", "carStatus"])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["latitude", "longitude", "markers", "scale"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["latitude", "longitude", "markers", "scale"])
-      ]),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        vue.createElementVNode("view", { class: "btn" }, [
-          vue.createElementVNode(
-            "button",
-            {
-              onClick: $setup.toggleTracking,
-              style: vue.normalizeStyle({ backgroundColor: $setup.isTracking ? "#e64340" : "#1296db" })
-            },
-            vue.toDisplayString($setup.isTracking ? "停止跟踪" : "开始跟踪"),
-            5
-            /* TEXT, STYLE */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "pos-info-box" }, [
-          vue.createElementVNode("view", { class: "speed" }, [
-            vue.createElementVNode("text", null, "时速："),
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString($setup.currentSpeed) + "Km/h",
-              1
-              /* TEXT */
-            )
-          ]),
-          vue.createElementVNode("view", { class: "address" }, [
-            vue.createElementVNode("text", null, "定位时间："),
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString($setup.currentAddress),
-              1
-              /* TEXT */
-            )
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            vue.createElementVNode("view", { class: "btn" }, [
+              vue.createVNode(_component_i_button, {
+                type: $setup.isTracking ? "danger" : "primary",
+                size: "small",
+                onClick: $setup.toggleTracking,
+                style: vue.normalizeStyle({ backgroundColor: $setup.isTracking ? "#e64340" : "#1296db" }),
+                text: $setup.isTracking ? "停止跟踪" : "开始跟踪"
+              }, null, 8, ["type", "style", "text"])
+            ]),
+            vue.createElementVNode("view", { class: "pos-info-box" }, [
+              vue.createElementVNode("view", { class: "speed" }, [
+                vue.createElementVNode("text", { class: "tracking-info-text" }, "时速："),
+                vue.createElementVNode(
+                  "text",
+                  { class: "tracking-info-text" },
+                  vue.toDisplayString($setup.currentSpeed) + "Km/h",
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode("view", { class: "address" }, [
+                vue.createElementVNode("text", { class: "tracking-info-text" }, "定位时间："),
+                vue.createElementVNode(
+                  "text",
+                  { class: "tracking-info-text" },
+                  vue.toDisplayString($setup.currentAddress),
+                  1
+                  /* TEXT */
+                )
+              ])
+            ])
           ])
-        ])
-      ])
-    ]);
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesVehicleTrackingVehicleTracking = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["styles", [_style_0$i]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/vehicleTracking/vehicleTracking.uvue"]]);
   const _sfc_main$h = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-empty" }, { __name: "i-empty", props: {
@@ -17165,14 +17495,14 @@
     const closeStyle = vue.computed(() => {
       return "color:" + computedTextColor.value + ";";
     });
-    function handleClick() {
+    function handleClick(event = null) {
       if (closeClicking.value) {
         closeClicking.value = false;
         return null;
       }
       if (props.disabled)
         return null;
-      emit("click", contentText.value);
+      emit("click", event);
     }
     function handleClose() {
       if (props.disabled)
@@ -17409,14 +17739,14 @@
               withTrip: true
             });
             const res = yield getTrackPos(data);
-            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:197", "获取里程数据成功:", res);
+            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:201", "获取里程数据成功:", res);
             const trackData = res.data;
             if (trackData != null) {
               processTripData(trackData);
             }
           } catch (e) {
-            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:203", "获取里程数据失败:", e);
-            uni.showToast({
+            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:207", "获取里程数据失败:", e);
+            showAppToast({
               title: "数据加载失败",
               icon: "none"
             });
@@ -17485,7 +17815,7 @@
       return __returned__;
     }
   });
-  const _style_0$f = { "container": { "": { "height": "100%", "backgroundColor": "#f5f7fa", "paddingBottom": "20rpx" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "color": "#333333" } }, "summary-panel": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "backgroundColor": "#ffffff", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx", "boxShadow": "0 2rpx 10rpx rgba(0, 0, 0, 0.05)" } }, "summary-item": { ".container .summary-panel ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "label": { ".container .summary-panel .summary-item ": { "fontSize": "24rpx", "color": "#999999", "marginBottom": "10rpx" } }, "value": { ".container .summary-panel .summary-item ": { "fontSize": "28rpx", "color": "#333333", "fontWeight": "bold" } }, "content": { ".container ": { "marginTop": 0, "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "trip-list": { ".container .content ": { "width": "100%" } }, "trip-group": { ".container .content .trip-list ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "group-header": { ".container .content .trip-list .trip-group ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "group-header-title": { ".container .content .trip-list .trip-group .group-header ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "group-date": { ".container .content .trip-list .trip-group .group-header ": { "fontSize": "30rpx", "color": "#333333", "marginRight": "30rpx" } }, "group-separator": { ".container .content .trip-list .trip-group ": { "height": "1rpx", "backgroundColor": "#eeeeee", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } }, "trip-item": { ".container .content .trip-list .trip-group ": { "display": "flex", "paddingTop": "25rpx", "paddingRight": 0, "paddingBottom": "25rpx", "paddingLeft": 0, "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "trip-index": { ".container .content .trip-list .trip-group .trip-item ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "5rpx" } }, "icon": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "width": "40rpx", "height": "40rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "display": "flex", "justifyContent": "center", "alignItems": "center", "fontSize": "24rpx", "marginRight": "20rpx" } }, "trip-distance-time": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "trip-content": { ".container .content .trip-list .trip-group .trip-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "icons": { ".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ": { "width": "50rpx", "height": "50rpx" } } };
+  const _style_0$f = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa", "paddingBottom": "20rpx" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "color": "#333333" } }, "summary-panel": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "backgroundColor": "#ffffff", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx", "boxShadow": "0 2rpx 10rpx rgba(0, 0, 0, 0.05)" } }, "summary-item": { ".container .summary-panel ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "label": { ".container .summary-panel .summary-item ": { "fontSize": "24rpx", "color": "#999999", "marginBottom": "10rpx" } }, "value": { ".container .summary-panel .summary-item ": { "fontSize": "28rpx", "color": "#333333", "fontWeight": "bold" } }, "content": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "20%", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "trip-list": { ".container .content ": { "width": "100%", "paddingBottom": "20rpx" } }, "trip-group": { ".container .content .trip-list ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "group-header": { ".container .content .trip-list .trip-group ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "group-header-title": { ".container .content .trip-list .trip-group .group-header ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "group-date": { ".container .content .trip-list .trip-group .group-header ": { "fontSize": "30rpx", "color": "#333333", "marginRight": "30rpx" } }, "group-separator": { ".container .content .trip-list .trip-group ": { "height": "1rpx", "backgroundColor": "#eeeeee", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } }, "trip-item": { ".container .content .trip-list .trip-group ": { "display": "flex", "paddingTop": "25rpx", "paddingRight": 0, "paddingBottom": "25rpx", "paddingLeft": 0, "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "trip-index": { ".container .content .trip-list .trip-group .trip-item ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "paddingTop": "5rpx" } }, "icon": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "width": "40rpx", "height": "40rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "display": "flex", "justifyContent": "center", "alignItems": "center", "fontSize": "24rpx", "marginRight": "20rpx" } }, "trip-distance-time": { ".container .content .trip-list .trip-group .trip-item .trip-index ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "trip-content": { ".container .content .trip-list .trip-group .trip-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "icons": { ".container .content .trip-list .trip-group .trip-item .trip-content .trip-locations ": { "width": "50rpx", "height": "50rpx" } } };
   function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
@@ -17493,205 +17823,219 @@
     const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
     const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
     const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "里程记录",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        vue.createElementVNode("view", { class: "Datetime-box" }, [
-          vue.createElementVNode("view", { class: "date-box" }, [
-            vue.createVNode(_component_i_icon, {
-              name: "/static/rili.png",
-              fontSize: "15"
-            }),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
-              },
-              vue.toDisplayString($setup.formatDisplayTime($setup.startTime)),
-              1
-              /* TEXT */
-            ),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/xiangxia.png",
-              fontSize: "15",
-              onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("start"))
-            }),
-            vue.createElementVNode("text", { style: { "padding": "0 10rpx" } }, "至"),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[2] || (_cache[2] = ($event) => $setup.showPicker("end"))
-              },
-              vue.toDisplayString($setup.formatDisplayTime($setup.endTime)),
-              1
-              /* TEXT */
-            ),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/xiangxia.png",
-              fontSize: "15",
-              onClick: _cache[3] || (_cache[3] = ($event) => $setup.showPicker("end"))
-            })
-          ])
-        ]),
-        vue.createVNode(_component_l_popup, {
-          modelValue: $setup.showDateTimePicker,
-          "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
-          position: "bottom",
-          closeable: false
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_l_date_time_picker, {
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: $setup.pickerTitle,
-              mode: 1 | 2 | 4 | 8 | 16 | 32,
-              onConfirm: $setup.onConfirm,
-              onCancel: $setup.onCancel
-            }, null, 8, ["title"])
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createVNode(_component_custom_navBar, {
+          title: "里程记录",
+          "show-back": true,
+          backgroundColor: "#fff",
+          textColor: "#333",
+          showCapsule: false
+        }),
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            vue.createElementVNode("view", { class: "Datetime-box" }, [
+              vue.createElementVNode("view", { class: "date-box" }, [
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/rili.png",
+                  fontSize: "15"
+                }),
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: "Date",
+                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
+                  },
+                  vue.toDisplayString($setup.formatDisplayTime($setup.startTime)),
+                  1
+                  /* TEXT */
+                ),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/xiangxia.png",
+                  fontSize: "15",
+                  onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("start"))
+                }),
+                vue.createElementVNode("text", { style: { "padding": "0 10rpx" } }, "至"),
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: "Date",
+                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.showPicker("end"))
+                  },
+                  vue.toDisplayString($setup.formatDisplayTime($setup.endTime)),
+                  1
+                  /* TEXT */
+                ),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/xiangxia.png",
+                  fontSize: "15",
+                  onClick: _cache[3] || (_cache[3] = ($event) => $setup.showPicker("end"))
+                })
+              ])
+            ]),
+            vue.createVNode(_component_l_popup, {
+              modelValue: $setup.showDateTimePicker,
+              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
+              position: "bottom",
+              closeable: false
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_l_date_time_picker, {
+                  "confirm-btn": "确认",
+                  "cancel-btn": "取消",
+                  title: $setup.pickerTitle,
+                  mode: 1 | 2 | 4 | 8 | 16 | 32,
+                  onConfirm: $setup.onConfirm,
+                  onCancel: $setup.onCancel
+                }, null, 8, ["title"])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["modelValue"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["modelValue"])
-      ]),
-      vue.createElementVNode("view", { class: "summary-panel" }, [
-        vue.createElementVNode("view", { class: "summary-item" }, [
-          vue.createElementVNode("text", { class: "label" }, "总里程"),
-          vue.createElementVNode(
-            "text",
-            { class: "value" },
-            vue.toDisplayString(($setup.totalMileage / 1e3).toFixed(2)) + " Km",
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "summary-item" }, [
-          vue.createElementVNode("text", { class: "label" }, "行程次数"),
-          vue.createElementVNode(
-            "text",
-            { class: "value" },
-            vue.toDisplayString($setup.totalTrips) + " 次",
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "summary-item" }, [
-          vue.createElementVNode("text", { class: "label" }, "平均速度"),
-          vue.createElementVNode(
-            "text",
-            { class: "value" },
-            vue.toDisplayString($setup.averageSpeed.toFixed(1)) + " km/h",
-            1
-            /* TEXT */
-          )
-        ])
-      ]),
-      vue.createElementVNode("scroll-view", {
-        class: "content",
-        "scroll-y": ""
-      }, [
-        $setup.groupedTrips.length == 0 ? (vue.openBlock(), vue.createBlock(_component_i_empty, {
-          key: 0,
-          text: "当前时间点暂无行程数据",
-          showButton: false,
-          description: ""
-        })) : (vue.openBlock(), vue.createElementBlock("view", {
-          key: 1,
-          class: "trip-list"
-        }, [
-          (vue.openBlock(true), vue.createElementBlock(
-            vue.Fragment,
-            null,
-            vue.renderList($setup.groupedTrips, (group, groupIndex) => {
-              return vue.openBlock(), vue.createElementBlock("view", {
-                key: groupIndex,
-                class: "trip-group"
-              }, [
-                vue.createElementVNode("view", { class: "group-header" }, [
-                  vue.createElementVNode("view", { class: "group-header-title" }, [
-                    vue.createElementVNode(
-                      "text",
-                      { class: "group-date" },
-                      vue.toDisplayString(group.date),
-                      1
-                      /* TEXT */
-                    ),
-                    vue.createVNode(_component_i_tag, {
-                      text: group.trips.length + "段",
-                      type: "success",
-                      size: "small"
-                    }, null, 8, ["text"])
-                  ]),
-                  vue.createElementVNode(
-                    "text",
-                    null,
-                    "里程 " + vue.toDisplayString((group.totalDistance / 1e3).toFixed(2)) + " km",
-                    1
-                    /* TEXT */
-                  )
-                ]),
-                vue.createElementVNode("view", { class: "group-separator" }),
-                (vue.openBlock(true), vue.createElementBlock(
-                  vue.Fragment,
-                  null,
-                  vue.renderList(group.trips, (item, index) => {
-                    return vue.openBlock(), vue.createElementBlock("view", {
-                      key: index,
-                      class: "trip-item",
-                      onClick: ($event) => $setup.gotoTripDetail($setup.getTripStartTime(item), $setup.getTripEndTime(item))
-                    }, [
-                      vue.createElementVNode("view", { class: "trip-index" }, [
+          vue.createElementVNode("view", { class: "summary-panel" }, [
+            vue.createElementVNode("view", { class: "summary-item" }, [
+              vue.createElementVNode("text", { class: "label" }, "总里程"),
+              vue.createElementVNode(
+                "text",
+                { class: "value" },
+                vue.toDisplayString(($setup.totalMileage / 1e3).toFixed(2)) + " Km",
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "summary-item" }, [
+              vue.createElementVNode("text", { class: "label" }, "行程次数"),
+              vue.createElementVNode(
+                "text",
+                { class: "value" },
+                vue.toDisplayString($setup.totalTrips) + " 次",
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "summary-item" }, [
+              vue.createElementVNode("text", { class: "label" }, "平均速度"),
+              vue.createElementVNode(
+                "text",
+                { class: "value" },
+                vue.toDisplayString($setup.averageSpeed.toFixed(1)) + " km/h",
+                1
+                /* TEXT */
+              )
+            ])
+          ]),
+          vue.createElementVNode("scroll-view", {
+            class: "content",
+            "scroll-y": "true",
+            "show-scrollbar": false,
+            "enable-flex": ""
+          }, [
+            $setup.groupedTrips.length == 0 ? (vue.openBlock(), vue.createBlock(_component_i_empty, {
+              key: 0,
+              text: "当前时间点暂无行程数据",
+              showButton: false,
+              description: ""
+            })) : (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "trip-list"
+            }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.groupedTrips, (group, groupIndex) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: groupIndex,
+                    class: "trip-group"
+                  }, [
+                    vue.createElementVNode("view", { class: "group-header" }, [
+                      vue.createElementVNode("view", { class: "group-header-title" }, [
                         vue.createElementVNode(
                           "text",
-                          { class: "icon" },
-                          vue.toDisplayString(index + 1),
+                          { class: "group-date" },
+                          vue.toDisplayString(group.date),
                           1
                           /* TEXT */
                         ),
-                        vue.createElementVNode("view", { class: "trip-distance-time" }, [
-                          vue.createElementVNode(
-                            "text",
-                            null,
-                            vue.toDisplayString($setup.getTripHourRange(item)),
-                            1
-                            /* TEXT */
-                          ),
-                          vue.createElementVNode(
-                            "text",
-                            null,
-                            vue.toDisplayString($setup.getTripDistanceText(item)) + " km",
-                            1
-                            /* TEXT */
-                          ),
-                          vue.createElementVNode(
-                            "text",
-                            null,
-                            vue.toDisplayString($setup.formatDuration($setup.getTripDuration(item))),
-                            1
-                            /* TEXT */
-                          )
-                        ])
-                      ])
-                    ], 8, ["onClick"]);
-                  }),
-                  128
-                  /* KEYED_FRAGMENT */
-                ))
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ]))
-      ])
-    ]);
+                        vue.createVNode(_component_i_tag, {
+                          text: group.trips.length + "段",
+                          type: "success",
+                          size: "small"
+                        }, null, 8, ["text"])
+                      ]),
+                      vue.createElementVNode(
+                        "text",
+                        null,
+                        "里程 " + vue.toDisplayString((group.totalDistance / 1e3).toFixed(2)) + " km",
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode("view", { class: "group-separator" }),
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList(group.trips, (item, index) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: index,
+                          class: "trip-item",
+                          onClick: ($event) => $setup.gotoTripDetail($setup.getTripStartTime(item), $setup.getTripEndTime(item))
+                        }, [
+                          vue.createElementVNode("view", { class: "trip-index" }, [
+                            vue.createElementVNode("view", { class: "icon" }, [
+                              vue.createElementVNode(
+                                "text",
+                                { style: { "color": "#ffffff", "font-size": "24rpx" } },
+                                vue.toDisplayString(index + 1),
+                                1
+                                /* TEXT */
+                              )
+                            ]),
+                            vue.createElementVNode("view", { class: "trip-distance-time" }, [
+                              vue.createElementVNode(
+                                "text",
+                                null,
+                                vue.toDisplayString($setup.getTripHourRange(item)),
+                                1
+                                /* TEXT */
+                              ),
+                              vue.createElementVNode(
+                                "text",
+                                null,
+                                vue.toDisplayString($setup.getTripDistanceText(item)) + " km",
+                                1
+                                /* TEXT */
+                              ),
+                              vue.createElementVNode(
+                                "text",
+                                null,
+                                vue.toDisplayString($setup.formatDuration($setup.getTripDuration(item))),
+                                1
+                                /* TEXT */
+                              )
+                            ])
+                          ])
+                        ], 8, ["onClick"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ]))
+          ])
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesMileageRecordMileageRecord = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["styles", [_style_0$f]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/mileageRecord/mileageRecord.uvue"]]);
   const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
@@ -17797,21 +18141,21 @@
       };
       const showAddress = (latitude, longitude) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:170", latitude, longitude);
+          uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:172", latitude, longitude);
           uni.openLocation({
             latitude,
             longitude,
             name: "当前位置",
             scale: 18,
             success: () => {
-              uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:177", "成功调起地图");
+              uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:179", "成功调起地图");
             },
             fail: (err) => {
-              uni.showToast({
+              showAppToast({
                 title: "调起地图失败",
                 icon: "none"
               });
-              uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:184", "调起地图失败:", err);
+              uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:186", "调起地图失败:", err);
             }
           });
         });
@@ -17825,167 +18169,177 @@
   const _imports_1 = "/static/endTime.png";
   const _imports_2 = "/static/stopTime.png";
   const _imports_3 = "/static/user_location.png";
-  const _style_0$e = { "container": { "": { "height": "100%", "backgroundColor": "#f5f7fa" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "width": "100%", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx" } }, "mileage_title": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": "20rpx", "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "alignItems": "flex-start", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "content-box": { ".container ": { "height": "80%" } }, "item": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "icons": { ".container .content .item ": { "width": "40rpx", "height": "40rpx", "marginRight": "15rpx" } } };
+  const _style_0$e = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "tools-panel": { ".container ": { "backgroundColor": "#ffffff", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#69c2f1", "borderRightColor": "#69c2f1", "borderBottomColor": "#69c2f1", "borderLeftColor": "#69c2f1", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "width": "100%", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "25rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx" } }, "mileage_title": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": "20rpx", "marginLeft": "40rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "alignItems": "flex-start", "backgroundColor": "#ffffff", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "content-box": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minHeight": 0, "marginBottom": "30rpx" } }, "item": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "15rpx", "paddingRight": 0, "paddingBottom": "15rpx", "paddingLeft": 0 } }, "icons": { ".container .content .item ": { "width": "40rpx", "height": "40rpx", "marginRight": "15rpx" } } };
   function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
     const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), __easycom_2$1);
     const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
     const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "停车记录",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        vue.createElementVNode("view", { class: "Datetime-box" }, [
-          vue.createElementVNode("view", { class: "date-box" }, [
-            vue.createVNode(_component_i_icon, {
-              name: "/static/rili.png",
-              fontSize: "15"
-            }),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
-              },
-              vue.toDisplayString($setup.startTime),
-              1
-              /* TEXT */
-            ),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/xiangxia.png",
-              fontSize: "15",
-              onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("start"))
-            }),
-            vue.createElementVNode("text", { style: { "padding": "0 10rpx" } }, "至"),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "Date",
-                onClick: _cache[2] || (_cache[2] = ($event) => $setup.showPicker("end"))
-              },
-              vue.toDisplayString($setup.endTime),
-              1
-              /* TEXT */
-            ),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/xiangxia.png",
-              fontSize: "15",
-              onClick: _cache[3] || (_cache[3] = ($event) => $setup.showPicker("end"))
-            })
-          ])
-        ]),
-        vue.createVNode(_component_l_popup, {
-          modelValue: $setup.showDateTimePicker,
-          "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
-          position: "bottom",
-          closeable: false
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_l_date_time_picker, {
-              "confirm-btn": "确认",
-              "cancel-btn": "取消",
-              title: $setup.pickerTitle,
-              mode: 1 | 2 | 4 | 8 | 16 | 32,
-              onConfirm: $setup.onConfirm,
-              onCancel: $setup.onCancel
-            }, null, 8, ["title"])
-          ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["modelValue"])
-      ]),
-      vue.createElementVNode("scroll-view", {
-        class: "content-box",
-        "scroll-y": ""
-      }, [
-        $setup.sortedCarStopDetail.length == 0 ? (vue.openBlock(), vue.createBlock(_component_i_empty, {
-          key: 0,
-          text: "当前时间暂无停车数据",
-          showButton: false,
-          description: ""
-        })) : (vue.openBlock(true), vue.createElementBlock(
-          vue.Fragment,
-          { key: 1 },
-          vue.renderList($setup.sortedCarStopDetail, (item, index) => {
-            return vue.openBlock(), vue.createElementBlock("view", {
-              class: "content",
-              key: index
-            }, [
-              vue.createElementVNode("view", { class: "item" }, [
-                vue.createElementVNode("image", {
-                  class: "icons",
-                  mode: "aspectFit",
-                  src: _imports_0
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "停车记录",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            vue.createElementVNode("view", { class: "Datetime-box" }, [
+              vue.createElementVNode("view", { class: "date-box" }, [
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/rili.png",
+                  fontSize: "15"
                 }),
                 vue.createElementVNode(
-                  "text",
-                  null,
-                  vue.toDisplayString(item.startTime),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item" }, [
-                vue.createElementVNode("image", {
-                  class: "icons",
-                  mode: "aspectFit",
-                  src: _imports_1
-                }),
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  vue.toDisplayString(item.endTime),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item" }, [
-                vue.createElementVNode("image", {
-                  class: "icons",
-                  mode: "aspectFit",
-                  src: _imports_2
-                }),
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  "停留 " + vue.toDisplayString($setup.calculateDuration(item.getNumber("duration", 0))),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item" }, [
-                vue.createElementVNode("image", {
-                  class: "icons",
-                  mode: "aspectFit",
-                  src: _imports_3
-                }),
-                item.address ? (vue.openBlock(), vue.createElementBlock(
                   "text",
                   {
-                    key: 0,
-                    class: "address"
+                    class: "Date",
+                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
                   },
-                  vue.toDisplayString(item.address || "加载中..."),
+                  vue.toDisplayString($setup.startTime),
                   1
                   /* TEXT */
-                )) : (vue.openBlock(), vue.createElementBlock("text", {
-                  key: 1,
-                  onClick: ($event) => $setup.showAddress(item.getNumber("latitude", 0), item.getNumber("longitude", 0))
-                }, "点击查看停车位置", 8, ["onClick"]))
+                ),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/xiangxia.png",
+                  fontSize: "15",
+                  onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("start"))
+                }),
+                vue.createElementVNode("text", { style: { "padding": "0 10rpx" } }, "至"),
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: "Date",
+                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.showPicker("end"))
+                  },
+                  vue.toDisplayString($setup.endTime),
+                  1
+                  /* TEXT */
+                ),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/xiangxia.png",
+                  fontSize: "15",
+                  onClick: _cache[3] || (_cache[3] = ($event) => $setup.showPicker("end"))
+                })
               ])
-            ]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        ))
-      ])
-    ]);
+            ]),
+            vue.createVNode(_component_l_popup, {
+              modelValue: $setup.showDateTimePicker,
+              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.showDateTimePicker = $event),
+              position: "bottom",
+              closeable: false
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_l_date_time_picker, {
+                  "confirm-btn": "确认",
+                  "cancel-btn": "取消",
+                  title: $setup.pickerTitle,
+                  mode: 1 | 2 | 4 | 8 | 16 | 32,
+                  onConfirm: $setup.onConfirm,
+                  onCancel: $setup.onCancel
+                }, null, 8, ["title"])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["modelValue"])
+          ]),
+          vue.createElementVNode("scroll-view", {
+            class: "content-box",
+            "scroll-y": "true"
+          }, [
+            $setup.sortedCarStopDetail.length == 0 ? (vue.openBlock(), vue.createBlock(_component_i_empty, {
+              key: 0,
+              text: "当前时间暂无停车数据",
+              showButton: false,
+              description: ""
+            })) : (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              { key: 1 },
+              vue.renderList($setup.sortedCarStopDetail, (item, index) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  class: "content",
+                  key: index
+                }, [
+                  vue.createElementVNode("view", { class: "item" }, [
+                    vue.createElementVNode("image", {
+                      class: "icons",
+                      mode: "aspectFit",
+                      src: _imports_0
+                    }),
+                    vue.createElementVNode(
+                      "text",
+                      null,
+                      vue.toDisplayString(item.startTime),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "item" }, [
+                    vue.createElementVNode("image", {
+                      class: "icons",
+                      mode: "aspectFit",
+                      src: _imports_1
+                    }),
+                    vue.createElementVNode(
+                      "text",
+                      null,
+                      vue.toDisplayString(item.endTime),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "item" }, [
+                    vue.createElementVNode("image", {
+                      class: "icons",
+                      mode: "aspectFit",
+                      src: _imports_2
+                    }),
+                    vue.createElementVNode(
+                      "text",
+                      null,
+                      "停留 " + vue.toDisplayString($setup.calculateDuration(item.getNumber("duration", 0))),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "item" }, [
+                    vue.createElementVNode("image", {
+                      class: "icons",
+                      mode: "aspectFit",
+                      src: _imports_3
+                    }),
+                    item.address ? (vue.openBlock(), vue.createElementBlock(
+                      "text",
+                      {
+                        key: 0,
+                        class: "address"
+                      },
+                      vue.toDisplayString(item.address || "加载中..."),
+                      1
+                      /* TEXT */
+                    )) : (vue.openBlock(), vue.createElementBlock("text", {
+                      key: 1,
+                      onClick: ($event) => $setup.showAddress(item.getNumber("latitude", 0), item.getNumber("longitude", 0))
+                    }, "点击查看停车位置", 8, ["onClick"]))
+                  ])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ])
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesStopRecordStopRecord = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["styles", [_style_0$e]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/stopRecord/stopRecord.uvue"]]);
   let UserInfo$1 = class UserInfo2 extends UTS.UTSType {
@@ -18038,9 +18392,9 @@
               type: type != null ? type : 0,
               createTime: createTime != null ? createTime : ""
             };
-            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:80", "用户信息:", userInfo.value);
+            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:82", "用户信息:", userInfo.value);
           } catch (e) {
-            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:82", "解析用户信息失败:", e);
+            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:84", "解析用户信息失败:", e);
           }
         }
       });
@@ -18058,7 +18412,7 @@
               url: "/pages/login/login"
             });
           } else {
-            uni.showToast({
+            showAppToast({
               title: "退出账户失败"
             });
           }
@@ -18073,91 +18427,101 @@
   function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "个人信息",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "content" }, [
-        vue.createElementVNode("view", { class: "title" }, " 基本信息 "),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("view", { class: "item" }, [
-            vue.createElementVNode("text", null, "账号"),
-            vue.createElementVNode("view", { class: "right" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "info" },
-                vue.toDisplayString($setup.userInfo.id),
-                1
-                /* TEXT */
-              )
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "item" }, [
-            vue.createElementVNode("text", null, "手机号"),
-            vue.createElementVNode("view", { class: "right" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "info" },
-                vue.toDisplayString($setup.userInfo.mobile),
-                1
-                /* TEXT */
-              )
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "item" }, [
-            vue.createElementVNode("text", null, "类型"),
-            vue.createElementVNode("view", { class: "right" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "info" },
-                vue.toDisplayString($setup.userInfo.type == 1 ? "公司用户" : "个人用户"),
-                1
-                /* TEXT */
-              )
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "item" }, [
-            vue.createElementVNode("text", null, "创建时间"),
-            vue.createElementVNode("view", { class: "right" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "info" },
-                vue.toDisplayString($setup.userInfo.createTime),
-                1
-                /* TEXT */
-              )
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "个人信息",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "content" }, [
+            vue.createElementVNode("view", { class: "title" }, " 基本信息 "),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("view", { class: "item" }, [
+                vue.createElementVNode("text", null, "账号"),
+                vue.createElementVNode("view", { class: "right" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "info" },
+                    vue.toDisplayString($setup.userInfo.id),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "item" }, [
+                vue.createElementVNode("text", null, "手机号"),
+                vue.createElementVNode("view", { class: "right" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "info" },
+                    vue.toDisplayString($setup.userInfo.mobile),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "item" }, [
+                vue.createElementVNode("text", null, "类型"),
+                vue.createElementVNode("view", { class: "right" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "info" },
+                    vue.toDisplayString($setup.userInfo.type == 1 ? "公司用户" : "个人用户"),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "item" }, [
+                vue.createElementVNode("text", null, "创建时间"),
+                vue.createElementVNode("view", { class: "right" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "info" },
+                    vue.toDisplayString($setup.userInfo.createTime),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ])
+            ]),
+            $setup.userInfo.type == 1 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "title"
+            }, " 安全信息 ")) : vue.createCommentVNode("v-if", true),
+            $setup.userInfo.type == 1 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "list",
+              onClick: $setup.editPassword
+            }, [
+              vue.createElementVNode("view", { class: "item" }, [
+                vue.createElementVNode("text", null, "修改密码"),
+                vue.createVNode(_component_i_icon, {
+                  name: "/static/arrow-right.png",
+                  fontSize: "15"
+                })
+              ])
+            ])) : vue.createCommentVNode("v-if", true),
+            vue.createElementVNode("view", { class: "footer" }, [
+              vue.createElementVNode("view", {
+                class: "logout",
+                onClick: $setup.logoutBtn
+              }, "退出登录")
             ])
           ])
         ]),
-        $setup.userInfo.type == 1 ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "title"
-        }, " 安全信息 ")) : vue.createCommentVNode("v-if", true),
-        $setup.userInfo.type == 1 ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 1,
-          class: "list",
-          onClick: $setup.editPassword
-        }, [
-          vue.createElementVNode("view", { class: "item" }, [
-            vue.createElementVNode("text", null, "修改密码"),
-            vue.createVNode(_component_i_icon, {
-              name: "/static/arrow-right.png",
-              fontSize: "15"
-            })
-          ])
-        ])) : vue.createCommentVNode("v-if", true),
-        vue.createElementVNode("view", { class: "footer" }, [
-          vue.createElementVNode("view", {
-            class: "logout",
-            onClick: $setup.logoutBtn
-          }, "退出登录")
-        ])
-      ])
-    ]);
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesUserCenterUserInfoUserInfo = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["styles", [_style_0$d]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/userInfo/userInfo.uvue"]]);
   class UserInfo extends UTS.UTSType {
@@ -18222,25 +18586,11 @@
           callback(null);
         }
       };
-      const rules = new UTSJSONObject({
-        password: [
-          new UTSJSONObject({ required: true, message: "请输入原密码", trigger: "blur" }),
-          new UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" })
-        ],
-        newPassword: [
-          new UTSJSONObject({ required: true, message: "请输入新密码", trigger: "blur" }),
-          new UTSJSONObject({ min: 6, max: 20, message: "密码长度在6到20个字符", trigger: "blur" }),
-          new UTSJSONObject({
-            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,20}$/,
-            message: "密码需包含大小写字母和数字",
-            trigger: "blur"
-          })
-        ],
-        confirmPassword: [
-          new UTSJSONObject({ required: true, message: "请确认新密码", trigger: "blur" }),
-          new UTSJSONObject({ validator: validateConfirmPassword, trigger: "blur" })
-        ]
-      });
+      const rules = [
+        new UTSJSONObject({ name: "password", required: true, message: "请输入原密码" }),
+        new UTSJSONObject({ name: "newPassword", required: true, message: "请输入新密码" }),
+        new UTSJSONObject({ name: "confirmPassword", required: true, message: "请确认新密码" })
+      ];
       const handleSubmit = () => {
         return __awaiter(this, void 0, void 0, function* () {
           try {
@@ -18256,7 +18606,7 @@
             const res = yield changePassWord(submitData);
             if (res.msg == "success") {
               uni.hideLoading();
-              uni.showToast({
+              showAppToast({
                 title: "密码修改成功",
                 icon: "success",
                 duration: 2e3
@@ -18266,7 +18616,7 @@
               }, 1500);
             } else {
               uni.hideLoading();
-              uni.showToast({
+              showAppToast({
                 title: "密码修改失败",
                 icon: "error",
                 duration: 2e3
@@ -18274,7 +18624,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.showToast({
+            showAppToast({
               title: "表单验证失败",
               icon: "none",
               duration: 2e3
@@ -18286,16 +18636,16 @@
         if (options.userInfo != null) {
           try {
             const parsedInfo = UTS.JSON.parse(decodeURIComponent(options.userInfo));
-            uni.__log__("log", "at pages/userCenter/editPassword/editPassword.uvue:132", parsedInfo);
+            uni.__log__("log", "at pages/userCenter/editPassword/editPassword.uvue:120", parsedInfo);
             const userId = parsedInfo.getString("userId");
             const mobile = parsedInfo.getString("mobile");
             userInfo.value = {
               id: userId != null ? userId : "",
               mobile: mobile != null ? mobile : ""
             };
-            uni.__log__("log", "at pages/userCenter/editPassword/editPassword.uvue:139", "用户信息:", userInfo.value);
+            uni.__log__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", "用户信息:", userInfo.value);
           } catch (e) {
-            uni.__log__("error", "at pages/userCenter/editPassword/editPassword.uvue:141", "解析用户信息失败:", e);
+            uni.__log__("error", "at pages/userCenter/editPassword/editPassword.uvue:129", "解析用户信息失败:", e);
           }
         }
       });
@@ -18309,98 +18659,108 @@
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$3);
-    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$2);
+    const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "修改密码",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "content" }, [
-        vue.createVNode(_component_i_form, {
-          modelValue: $setup.formData,
-          rules: $setup.rules,
-          ref: "formRef"
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_i_form_item, {
-              label: "原密码",
-              labelDirection: "horizontal",
-              labelWidth: "80",
-              name: "password",
-              borderBottom: ""
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "修改密码",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "content" }, [
+            vue.createVNode(_component_i_form, {
+              modelValue: $setup.formData,
+              rules: $setup.rules,
+              ref: "formRef"
             }, {
               default: vue.withCtx(() => [
-                vue.createVNode(_component_i_input, {
-                  modelValue: $setup.formData.password,
-                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formData.password = $event),
-                  placeholder: "请输入原密码",
-                  border: "none",
-                  type: "password",
-                  password: "",
-                  customStyle: "padding:20rpx"
-                }, null, 8, ["modelValue"])
+                vue.createVNode(_component_i_form_item, {
+                  label: "原密码",
+                  labelDirection: "horizontal",
+                  labelWidth: "80",
+                  name: "password",
+                  borderBottom: ""
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      modelValue: $setup.formData.password,
+                      "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formData.password = $event),
+                      placeholder: "请输入原密码",
+                      border: "none",
+                      type: "password",
+                      password: "",
+                      customStyle: "padding:20rpx"
+                    }, null, 8, ["modelValue"])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                vue.createVNode(_component_i_form_item, {
+                  label: "新密码",
+                  labelDirection: "horizontal",
+                  labelWidth: "80",
+                  name: "newPassword",
+                  borderBottom: ""
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      modelValue: $setup.formData.newPassword,
+                      "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formData.newPassword = $event),
+                      placeholder: "请输入新密码",
+                      border: "none",
+                      type: "password",
+                      password: "",
+                      customStyle: "padding:20rpx"
+                    }, null, 8, ["modelValue"])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                vue.createVNode(_component_i_form_item, {
+                  label: "确认密码",
+                  labelDirection: "horizontal",
+                  labelWidth: "80",
+                  name: "confirmPassword"
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_i_input, {
+                      modelValue: $setup.formData.confirmPassword,
+                      "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.formData.confirmPassword = $event),
+                      placeholder: "请再次输入新密码",
+                      border: "none",
+                      type: "password",
+                      password: "",
+                      customStyle: "padding:20rpx"
+                    }, null, 8, ["modelValue"])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                })
               ]),
               _: 1
               /* STABLE */
-            }),
-            vue.createVNode(_component_i_form_item, {
-              label: "新密码",
-              labelDirection: "horizontal",
-              labelWidth: "80",
-              name: "newPassword",
-              borderBottom: ""
-            }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_i_input, {
-                  modelValue: $setup.formData.newPassword,
-                  "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formData.newPassword = $event),
-                  placeholder: "请输入新密码",
-                  border: "none",
-                  type: "password",
-                  password: "",
-                  customStyle: "padding:20rpx"
-                }, null, 8, ["modelValue"])
-              ]),
-              _: 1
-              /* STABLE */
-            }),
-            vue.createVNode(_component_i_form_item, {
-              label: "确认密码",
-              labelDirection: "horizontal",
-              labelWidth: "80",
-              name: "confirmPassword"
-            }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(_component_i_input, {
-                  modelValue: $setup.formData.confirmPassword,
-                  "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.formData.confirmPassword = $event),
-                  placeholder: "请再次输入新密码",
-                  border: "none",
-                  type: "password",
-                  password: "",
-                  customStyle: "padding:20rpx"
-                }, null, 8, ["modelValue"])
-              ]),
-              _: 1
-              /* STABLE */
-            })
+            }, 8, ["modelValue"])
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["modelValue"])
-      ]),
-      vue.createElementVNode("view", { class: "btn" }, [
-        vue.createVNode(_component_i_button, {
-          type: "primary",
-          text: "提交修改",
-          onClick: $setup.handleSubmit
-        })
-      ])
-    ]);
+          vue.createElementVNode("view", { class: "btn" }, [
+            vue.createVNode(_component_i_button, {
+              type: "primary",
+              text: "提交修改",
+              onClick: $setup.handleSubmit
+            })
+          ])
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesUserCenterEditPasswordEditPassword = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["styles", [_style_0$c]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/editPassword/editPassword.uvue"]]);
   const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
@@ -18427,7 +18787,7 @@
       };
       const loadCarListData = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/userCenter/carList/carList.uvue:58", currPage.value, totalPage.value);
+          uni.__log__("log", "at pages/userCenter/carList/carList.uvue:60", currPage.value, totalPage.value);
           if (loading.value || !hasMore.value)
             return Promise.resolve(null);
           loading.value = true;
@@ -18452,14 +18812,14 @@
                 currPage.value++;
               }
             } else {
-              uni.showToast({
+              showAppToast({
                 title: res.msg || "加载失败",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/userCenter/carList/carList.uvue:98", "加载车辆列表失败:", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/userCenter/carList/carList.uvue:100", "加载车辆列表失败:", error);
+            showAppToast({
               title: "加载失败，请重试",
               icon: "none"
             });
@@ -18488,6 +18848,7 @@
   const _style_0$b = { "container": { "": { "width": "100%", "backgroundColor": "#f5f5f5", "marginTop": "170rpx" } }, "content": { ".container ": { "marginTop": "30rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "list": { ".container .content ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "paddingTop": "30rpx", "paddingRight": "40rpx", "paddingBottom": "30rpx", "paddingLeft": "40rpx", "marginBottom": "30rpx", "fontSize": "25rpx" } }, "title": { ".container .content .list ": { "fontWeight": "bold", "fontSize": "32rpx" } }, "device-info": { ".container .content .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx" } }, "tel": { ".container .content .list .device-info ": { "color": "#999999", "fontSize": "22rpx" } }, "loading": { ".container .content ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "24rpx" } }, "no-more": { ".container .content ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "24rpx" } } };
   function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -18554,7 +18915,8 @@
               vue.createElementVNode("text", null, "没有更多数据了")
             ])) : vue.createCommentVNode("v-if", true)
           ])
-        ])
+        ]),
+        vue.createVNode(_component_app_toast)
       ],
       64
       /* STABLE_FRAGMENT */
@@ -18599,80 +18961,90 @@
   const _style_0$a = { "container": { "": { "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { "": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "backgroundColor": "#ffffff", "paddingTop": "40rpx", "paddingRight": "40rpx", "paddingBottom": "40rpx", "paddingLeft": "40rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "list": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { "": { "width": "30%", "color": "#999999" } }, "info": { "": { "color": "#333333", "textAlign": "right", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
   function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "车辆详情",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false,
-        isIcon: true,
-        onCapsuleClick: $setup.toggleEdit,
-        Icon: "/static/edit-pen.png"
-      }),
-      vue.createElementVNode("view", { class: "content" }, [
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "设备ID"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.carInfo.getString("deviceId", "")),
-            1
-            /* TEXT */
-          )
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "车辆详情",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false,
+            isIcon: true,
+            onCapsuleClick: $setup.toggleEdit,
+            Icon: "/static/edit-pen.png"
+          }),
+          vue.createElementVNode("view", { class: "content" }, [
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "设备ID"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.carInfo.getString("deviceId", "")),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "设备名称"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.carInfo.getString("deviceName", "")),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "车标"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.carTitle),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "车牌号"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.formattedPlateNo),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "车架号"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.carInfo.getString("carVin", "")),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "list" }, [
+              vue.createElementVNode("text", { class: "title" }, "发动机号"),
+              vue.createElementVNode(
+                "text",
+                { class: "info" },
+                vue.toDisplayString($setup.carInfo.getString("engineNum", "")),
+                1
+                /* TEXT */
+              )
+            ])
+          ])
         ]),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "设备名称"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.carInfo.getString("deviceName", "")),
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "车标"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.carTitle),
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "车牌号"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.formattedPlateNo),
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "车架号"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.carInfo.getString("carVin", "")),
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "list" }, [
-          vue.createElementVNode("text", { class: "title" }, "发动机号"),
-          vue.createElementVNode(
-            "text",
-            { class: "info" },
-            vue.toDisplayString($setup.carInfo.getString("engineNum", "")),
-            1
-            /* TEXT */
-          )
-        ])
-      ])
-    ]);
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesUserCenterCarDetailCarDetail = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["styles", [_style_0$a]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/userCenter/carDetail/carDetail.uvue"]]);
   const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-radio" }, { __name: "i-radio", props: {
@@ -18802,8 +19174,10 @@
       return "width:" + formatSize(props.size) + ";height:" + formatSize(props.size) + ";border-radius:" + (circle ? formatSize(props.size) : "4px") + ";border-color:" + (checked.value ? props.activeColor : props.inactiveColor) + ";background-color:" + (checked.value && props.shape == "check" ? props.activeColor : "transparent") + ";";
     });
     const dotStyle = vue.computed(() => {
-      const fontSize = props.shape == "check" ? formatSize(parseFloat(props.iconSize.toString()) + 2) : formatSize(props.iconSize);
-      return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + fontSize + ";";
+      return "background-color:" + props.activeColor + ";";
+    });
+    const checkStyle = vue.computed(() => {
+      return "background-color:" + props.activeColor + ";color:" + props.iconColor + ";font-size:" + formatSize(parseFloat(props.iconSize.toString()) + 2) + ";";
     });
     const labelStyle = vue.computed(() => {
       let color = props.labelColor;
@@ -18824,7 +19198,7 @@
         return null;
       select();
     }
-    const __returned__ = { props, emit, formatSize, checked, wrapClass, labelClass, boxStyle, dotStyle, labelStyle, select, selectByLabel };
+    const __returned__ = { props, emit, formatSize, checked, wrapClass, labelClass, boxStyle, dotStyle, checkStyle, labelStyle, select, selectByLabel };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
     return __returned__;
   } }));
@@ -18862,7 +19236,7 @@
                 {
                   key: 1,
                   class: "i-radio__check",
-                  style: vue.normalizeStyle($setup.dotStyle)
+                  style: vue.normalizeStyle($setup.checkStyle)
                 },
                 "✓",
                 4
@@ -19106,27 +19480,6 @@
     ]);
   }
   const __easycom_7 = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["styles", [_style_0$8]], ["__file", "/Users/xyhc/Documents/carConnectInternet/uni_modules/i-ui-x/components/i-switch/i-switch.uvue"]]);
-  class Coordinate extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        },
-        name: "Coordinate"
-      };
-    }
-    constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  }
   class PaginationState extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -19196,27 +19549,6 @@
       delete this.__props__;
     }
   }
-  class PopupInstance extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            open: { type: "Unknown", optional: false },
-            close: { type: "Unknown", optional: false }
-          };
-        },
-        name: "PopupInstance"
-      };
-    }
-    constructor(options, metadata = PopupInstance.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.open = this.__props__.open;
-      this.close = this.__props__.close;
-      delete this.__props__;
-    }
-  }
   class ModalResult extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -19278,46 +19610,6 @@
       delete this.__props__;
     }
   }
-  class MapTapEventDetail extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        },
-        name: "MapTapEventDetail"
-      };
-    }
-    constructor(options, metadata = MapTapEventDetail.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  }
-  class MapTapEvent extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            detail: { type: MapTapEventDetail, optional: false }
-          };
-        },
-        name: "MapTapEvent"
-      };
-    }
-    constructor(options, metadata = MapTapEvent.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.detail = this.__props__.detail;
-      delete this.__props__;
-    }
-  }
   class SwitchChangeEvent extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -19334,41 +19626,6 @@
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.value = this.__props__.value;
-      delete this.__props__;
-    }
-  }
-  class CircleOverlay extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            id: { type: Number, optional: false },
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false },
-            radius: { type: Number, optional: false },
-            strokeWidth: { type: Number, optional: false },
-            strokeColor: { type: String, optional: false },
-            fillColor: { type: String, optional: false },
-            zIndex: { type: Number, optional: false },
-            centerMarker: { type: Boolean, optional: false }
-          };
-        },
-        name: "CircleOverlay"
-      };
-    }
-    constructor(options, metadata = CircleOverlay.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.id = this.__props__.id;
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      this.radius = this.__props__.radius;
-      this.strokeWidth = this.__props__.strokeWidth;
-      this.strokeColor = this.__props__.strokeColor;
-      this.fillColor = this.__props__.fillColor;
-      this.zIndex = this.__props__.zIndex;
-      this.centerMarker = this.__props__.centerMarker;
       delete this.__props__;
     }
   }
@@ -19489,34 +19746,28 @@
                 const convertedCoord = CoordTransform.wgs84ToTencent(deviceData.getNumber("latitude", 0), deviceData.getNumber("longitude", 0));
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
-                const position = new UTSJSONObject(
-                  {
-                    latitude: convertedCoord.lat,
-                    longitude: convertedCoord.lng
-                  }
-                  // 记录初始方向
-                );
+                const position = {
+                  latitude: convertedCoord.lat,
+                  longitude: convertedCoord.lng
+                };
                 lastDirection.value = deviceData.getNumber("direction", 0);
-                carMarker.value = new UTSJSONObject(
-                  {
-                    id: 0,
-                    latitude: position.latitude,
-                    longitude: position.longitude,
-                    iconPath: getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()),
-                    width: 25,
-                    height: 25,
-                    rotate: lastDirection.value >= 360 ? lastDirection.value - 360 : lastDirection.value < 0 ? lastDirection.value + 360 : lastDirection.value,
-                    callout: new UTSJSONObject({
-                      content: deviceName.value || "爱车位置",
-                      color: connectionStatus.value == "online" ? "#fff" : "#666",
-                      bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
-                      padding: 5,
-                      borderRadius: 4,
-                      display: "ALWAYS"
-                    })
-                  }
-                  // 更新标记点数组，保留车辆标记点
-                );
+                carMarker.value = {
+                  id: 0,
+                  latitude: position.latitude,
+                  longitude: position.longitude,
+                  iconPath: getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()),
+                  width: 25,
+                  height: 25,
+                  rotate: lastDirection.value >= 360 ? lastDirection.value - 360 : lastDirection.value < 0 ? lastDirection.value + 360 : lastDirection.value,
+                  callout: new UTSJSONObject({
+                    content: deviceName.value || "爱车位置",
+                    color: connectionStatus.value == "online" ? "#fff" : "#666",
+                    bgColor: connectionStatus.value == "online" ? "#07C160" : "#ccc",
+                    padding: 5,
+                    borderRadius: 4,
+                    display: "ALWAYS"
+                  })
+                };
                 const marker = carMarker.value;
                 if (marker != null) {
                   markers.value = [marker];
@@ -19527,8 +19778,8 @@
               }
             });
           } catch (err) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:384", "获取初始位置失败:", err);
-            uni.showToast({
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:356", "获取初始位置失败:", err);
+            showAppToast({
               title: "获取车辆位置失败",
               icon: "none"
             });
@@ -19566,10 +19817,10 @@
         return coordPoints.map((point) => {
           const values = point.trim().split(" ");
           const convertedCoord = CoordTransform.wgs84ToTencent(parseFloat(values[0]), parseFloat(values[1]));
-          return new Coordinate({
+          return {
             latitude: convertedCoord.lat,
             longitude: convertedCoord.lng
-          });
+          };
         });
       }
       function parseCircle(circleStr) {
@@ -19585,7 +19836,7 @@
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
           if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:444", "无效的圆形围栏数据:", circleStr);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:416", "无效的圆形围栏数据:", circleStr);
             return null;
           }
           const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -19595,7 +19846,7 @@
             radius
           };
         } catch (error) {
-          uni.__log__("error", "at pages/geofencing/geofencing.uvue:454", "解析圆形围栏失败:", error, "数据:", circleStr);
+          uni.__log__("error", "at pages/geofencing/geofencing.uvue:426", "解析圆形围栏失败:", error, "数据:", circleStr);
           return null;
         }
       }
@@ -19607,7 +19858,7 @@
         if (isDrawing.value) {
           if (drawingMode.value === "polygon") {
             points.value.forEach((point, index) => {
-              newMarkers.push(new UTSJSONObject({
+              newMarkers.push({
                 id: 1e3 + index,
                 latitude: point.latitude,
                 longitude: point.longitude,
@@ -19615,11 +19866,11 @@
                 width: 32,
                 height: 32,
                 callout: new UTSJSONObject({ content: "顶点".concat(index + 1), display: "ALWAYS" }),
-                anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-              }));
+                anchor: { x: 0.5, y: 0.5 }
+              });
             });
           } else if (drawingMode.value === "circle" && circleCenter.value) {
-            newMarkers.push(new UTSJSONObject({
+            newMarkers.push({
               id: 1e3,
               latitude: circleCenter.value.latitude,
               longitude: circleCenter.value.longitude,
@@ -19627,8 +19878,8 @@
               width: 32,
               height: 32,
               callout: new UTSJSONObject({ content: "圆心", display: "ALWAYS" }),
-              anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-            }));
+              anchor: { x: 0.5, y: 0.5 }
+            });
           }
         } else {
           const selected = selectedFence.value;
@@ -19641,7 +19892,7 @@
           if (fenceType === "circle") {
             const circleData = parseCircle(area);
             if (circleData != null) {
-              newMarkers.push(new UTSJSONObject({
+              newMarkers.push({
                 id: 2e3,
                 latitude: circleData.latitude,
                 longitude: circleData.longitude,
@@ -19649,13 +19900,13 @@
                 width: 32,
                 height: 32,
                 callout: new UTSJSONObject({ content: "圆心", display: "ALWAYS" }),
-                anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-              }));
+                anchor: { x: 0.5, y: 0.5 }
+              });
             }
           } else {
             const fencePoints = parsePolygon(area);
             fencePoints.forEach((point, index) => {
-              newMarkers.push(new UTSJSONObject({
+              newMarkers.push({
                 id: 2e3 + index,
                 latitude: point.latitude,
                 longitude: point.longitude,
@@ -19663,8 +19914,8 @@
                 width: 32,
                 height: 32,
                 callout: new UTSJSONObject({ content: "顶点".concat(index + 1), display: "ALWAYS" }),
-                anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-              }));
+                anchor: { x: 0.5, y: 0.5 }
+              });
             });
           }
         }
@@ -19686,29 +19937,25 @@
             const circleData = parseCircle(fence.getString("area", ""));
             if (circleData != null) {
               const displayRadius = circleData.radius > 1e5 ? 1e5 : circleData.radius;
-              fenceCircles.push(new CircleOverlay({
-                id: fence.getNumber("id", 0),
+              fenceCircles.push({
                 latitude: circleData.latitude,
                 longitude: circleData.longitude,
                 radius: displayRadius,
                 strokeWidth: 2,
-                strokeColor: "#FF0000",
-                fillColor: "rgba(255,0,0,0.2)",
-                zIndex: 1,
-                centerMarker: true
-              }));
+                color: "#FF0000",
+                fillColor: "rgba(255,0,0,0.2)"
+              });
             }
           } else {
             const fencePoints = parsePolygon(fence.getString("area", ""));
             if (fencePoints.length >= 3) {
-              fencePolygons.push(new UTSJSONObject({
-                id: fence.getNumber("id", 0),
+              fencePolygons.push({
                 points: fencePoints,
                 strokeWidth: 2,
                 strokeColor: "#FF0000",
-                fillColor: colorIndex++ === 0 ? "rgba(255,0,0,0.2)" : "rgba(".concat(Math.floor(Math.random() * 200), ",").concat(Math.floor(Math.random() * 200), ",").concat(Math.floor(Math.random() * 200), ",0.2)"),
+                fillColor: colorIndex++ == 0 ? "rgba(255,0,0,0.2)" : "rgba(".concat(Math.floor(Math.random() * 200), ",").concat(Math.floor(Math.random() * 200), ",").concat(Math.floor(Math.random() * 200), ",0.2)"),
                 zIndex: 1
-              }));
+              });
             }
           }
         });
@@ -19725,28 +19972,25 @@
         updateMarkers();
         if (isDrawing.value) {
           if (drawingMode.value === "polygon") {
-            polygons.value = points.value.length >= 3 ? [new UTSJSONObject({
+            polygons.value = points.value.length >= 3 ? [{
               points: points.value,
               strokeWidth: 2,
               strokeColor: "#FF0000",
               fillColor: "rgba(255,0,0,0.2)",
               zIndex: 1
-            })] : [];
+            }] : [];
             circles.value = [];
           } else if (drawingMode.value === "circle") {
             const drawingCenter = circleCenter.value;
             if (drawingCenter != null && circleRadius.value > 0) {
-              const drawingCircle = new CircleOverlay({
-                id: 0,
+              const drawingCircle = {
                 latitude: drawingCenter.latitude,
                 longitude: drawingCenter.longitude,
                 radius: circleRadius.value,
                 strokeWidth: 2,
-                strokeColor: "#FF0000",
-                fillColor: "rgba(255,0,0,0.2)",
-                zIndex: 1,
-                centerMarker: false
-              });
+                color: "#FF0000",
+                fillColor: "rgba(255,0,0,0.2)"
+              };
               circles.value = [drawingCircle];
             } else {
               circles.value = [];
@@ -19761,16 +20005,16 @@
         return __awaiter(this, void 0, void 0, function* () {
           try {
             const res = yield getGeofenceList();
-            if (res.code === 0) {
+            if (res.code == 0) {
               fenceList.value = res.data;
             } else {
-              uni.showToast({ title: "获取围栏列表失败", icon: "none" });
+              showAppToast({ title: "获取围栏列表失败", icon: "none" });
               fenceList.value = [];
             }
             renderFencesOnMap();
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:656", "加载围栏列表失败:", error);
-            uni.showToast({ title: "获取围栏列表失败", icon: "none" });
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:621", "加载围栏列表失败:", error);
+            showAppToast({ title: "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
             renderFencesOnMap();
           }
@@ -19832,7 +20076,7 @@
           }
         } else {
           const fencePoints = parsePolygon(area);
-          if (fencePoints.length === 0)
+          if (fencePoints.length == 0)
             return null;
           let totalLat = 0;
           let totalLng = 0;
@@ -19858,13 +20102,13 @@
       };
       const showFenceList = () => {
         var _a2;
-        (_a2 = fencesPopup.value) === null || _a2 === void 0 ? null : _a2.open();
+        (_a2 = fencesPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("open");
       };
       const selectFence = (fence) => {
         var _a2, _b;
         selectedFence.value = fence;
-        (_a2 = fencesPopup.value) === null || _a2 === void 0 ? null : _a2.close();
-        (_b = showFenceModal.value) === null || _b === void 0 ? null : _b.open();
+        (_a2 = fencesPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
+        (_b = showFenceModal.value) === null || _b === void 0 ? null : _b.$callMethod("open");
         const fenceType = getFenceType(fence);
         const area = fence.getString("area", "");
         if (fenceType === "circle") {
@@ -19887,7 +20131,8 @@
         var _a2;
         editingFence.value = fence;
         fenceForm.name = fence.getString("name", "");
-        const alarmType = fence.getString("alarmType", "");
+        const alarmTypeText = fence.getString("alarmType", "");
+        const alarmType = alarmTypeText.length > 0 ? alarmTypeText : fence.getNumber("alarmType", 1).toString();
         fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : "1";
         const fenceType = getFenceType(fence);
         drawingMode.value = fenceType;
@@ -19911,15 +20156,15 @@
           }
         }
         updateMapDisplay();
-        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.open();
+        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("open");
       };
       function deleteFenceById(id) {
         var _a2;
         return __awaiter(this, void 0, void 0, function* () {
           try {
             const result = yield deleteGeofence(id);
-            if (result.code === 0) {
-              uni.showToast({ title: "删除成功" });
+            if (result.code == 0) {
+              showAppToast({ title: "删除成功" });
               selectedFence.value = null;
               points.value = [];
               circleCenter.value = null;
@@ -19928,14 +20173,14 @@
               polygons.value = [];
               circles.value = [];
               updateMarkers();
-              (_a2 = showFenceModal.value) === null || _a2 === void 0 ? null : _a2.close();
+              (_a2 = showFenceModal.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
               yield loadGeofenceList();
             } else {
-              uni.showToast({ title: "删除失败", icon: "none" });
+              showAppToast({ title: "删除失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:861", "删除围栏失败:", error);
-            uni.showToast({ title: "删除失败", icon: "none" });
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:829", "删除围栏失败:", error);
+            showAppToast({ title: "删除失败", icon: "none" });
           }
         });
       }
@@ -19954,7 +20199,7 @@
         return __awaiter(this, void 0, void 0, function* () {
           var _a2, _b;
           if (!fenceForm.name) {
-            uni.showToast({ title: "请输入围栏名称", icon: "none" });
+            showAppToast({ title: "请输入围栏名称", icon: "none" });
             return Promise.resolve(null);
           }
           let area = "";
@@ -19968,10 +20213,10 @@
             }
           } else {
             if (drawingMode.value === "polygon" && points.value.length < 3) {
-              uni.showToast({ title: "请绘制有效的围栏区域（至少3个顶点）", icon: "none" });
+              showAppToast({ title: "请绘制有效的围栏区域（至少3个顶点）", icon: "none" });
               return Promise.resolve(null);
             } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
-              uni.showToast({ title: "请绘制有效的圆形围栏", icon: "none" });
+              showAppToast({ title: "请绘制有效的圆形围栏", icon: "none" });
               return Promise.resolve(null);
             }
             if (drawingMode.value === "polygon") {
@@ -19981,11 +20226,11 @@
             }
           }
           if (!area) {
-            uni.showToast({ title: "围栏数据无效，请重新绘制", icon: "none" });
+            showAppToast({ title: "围栏数据无效，请重新绘制", icon: "none" });
             return Promise.resolve(null);
           }
           if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
-            uni.showToast({ title: "请选择有效的告警类型", icon: "none" });
+            showAppToast({ title: "请选择有效的告警类型", icon: "none" });
             return Promise.resolve(null);
           }
           const fenceData = new UTSJSONObject({
@@ -20004,9 +20249,9 @@
               result = yield addGeofence(fenceData);
             }
             uni.hideLoading();
-            if (result.code === 0) {
-              uni.showToast({ title: editingFence.value ? "更新成功" : "保存成功" });
-              (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.close();
+            if (result.code == 0) {
+              showAppToast({ title: editingFence.value ? "更新成功" : "保存成功" });
+              (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
               const tempFence = editingFence.value;
               editingFence.value = null;
               isDrawing.value = false;
@@ -20016,26 +20261,31 @@
               yield loadGeofenceList();
               if (tempFence) {
                 selectedFence.value = null;
-                (_b = showFenceModal.value) === null || _b === void 0 ? null : _b.close();
+                (_b = showFenceModal.value) === null || _b === void 0 ? null : _b.$callMethod("close");
               }
             } else {
-              uni.showToast({ title: result.msg || "保存失败", icon: "none" });
+              showAppToast({ title: result.msg || "保存失败", icon: "none" });
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:972", "保存围栏失败:", error);
-            uni.showToast({ title: "保存失败，请重试", icon: "none" });
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:940", "保存围栏失败:", error);
+            showAppToast({ title: "保存失败，请重试", icon: "none" });
           }
         });
       };
+      function resetPagination(page) {
+        page.pageNum = 1;
+        page.pageSize = 10;
+        page.hasMore = true;
+        page.loadingMore = false;
+      }
       function initPagination(tabType) {
-        pagination[tabType] = new UTSJSONObject({
-          pageNum: 1,
-          pageSize: 10,
-          hasMore: true,
-          loadingMore: false
-        });
-        if (activeTab.value === tabType) {
+        if (tabType == "bind") {
+          resetPagination(pagination.bind);
+        } else {
+          resetPagination(pagination.unbind);
+        }
+        if (activeTab.value == tabType) {
           deviceList.value = [];
         }
       }
@@ -20051,9 +20301,9 @@
               pageSize: page.pageSize,
               geoId: fenceId
             }));
-            if (res.code === 0) {
+            if (res.code == 0) {
               const dataList = res.data.list || [];
-              if (page.pageNum === 1) {
+              if (page.pageNum == 1) {
                 boundDevices.value = dataList;
                 deviceList.value = dataList;
               } else {
@@ -20083,9 +20333,9 @@
               pageNum: page.pageNum,
               pageSize: page.pageSize
             }));
-            if (res.code === 0) {
+            if (res.code == 0) {
               const dataList = res.data.list || [];
-              if (page.pageNum === 1) {
+              if (page.pageNum == 1) {
                 deviceList.value = dataList;
               } else {
                 deviceList.value = [...deviceList.value, ...dataList];
@@ -20109,21 +20359,16 @@
           currentFenceId.value = fenceId;
           const selected = selectedFence.value;
           currentFenceName.value = selected != null ? selected.getString("name", "") : "";
-          (_a2 = deviceDialogPopup.value) === null || _a2 === void 0 ? null : _a2.open();
+          (_a2 = deviceDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("open");
           activeTab.value = "bind";
           scrollTop.value = 0;
           initPagination("bind");
           yield loadBoundDevices(fenceId);
         });
       };
-      const closeDeviceDialog = () => {
-        var _a2;
-        (_a2 = deviceDialogPopup.value) === null || _a2 === void 0 ? null : _a2.close();
-        scrollTop.value = 0;
-      };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1073", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1041", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -20131,7 +20376,7 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1085", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1053", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
             yield loadUnboundDevices();
@@ -20149,22 +20394,22 @@
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1105", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1073", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1112", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1080", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
             } else {
               result = yield unbindDevices(params);
             }
-            if (result.code === 0) {
-              uni.showToast({ title: bound ? "绑定成功" : "解绑成功" });
+            if (result.code == 0) {
+              showAppToast({ title: bound ? "绑定成功" : "解绑成功" });
               initPagination(activeTab.value);
               scrollTop.value = 0;
               if (activeTab.value === "bind") {
@@ -20173,11 +20418,11 @@
                 yield loadUnboundDevices();
               }
             } else {
-              uni.showToast({ title: result.msg || "操作失败", icon: "none" });
+              showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1135", "设备绑定操作失败:", error);
-            uni.showToast({ title: "操作失败", icon: "none" });
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1103", "设备绑定操作失败:", error);
+            showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
           }
@@ -20218,13 +20463,9 @@
         const deviceName2 = device.getString("deviceName", "");
         return deviceName2 ? deviceName2 : device.getString("plateNo", "");
       }
-      function closeFenceList() {
-        var _a2;
-        (_a2 = fencesPopup.value) === null || _a2 === void 0 ? null : _a2.close();
-      }
       function closeEditDialog() {
         var _a2;
-        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.close();
+        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
       }
       function getSelectedFenceName() {
         const fence = selectedFence.value;
@@ -20238,14 +20479,14 @@
       }
       function deleteSelectedFence() {
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1209", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1173", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1213", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1177", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
-            uni.showToast({
+            showAppToast({
               title: "围栏ID无效",
               icon: "none"
             });
@@ -20267,23 +20508,28 @@
         return R * c;
       }
       function addNewPoint(lat, lng) {
-        const point = new Coordinate({ latitude: lat, longitude: lng });
+        const point = { latitude: lat, longitude: lng };
         points.value.push(point);
         updateMapDisplay();
       }
       const handleMapTap = (e) => {
+        const detail = e.detail;
+        if (!isDrawing.value || detail == null || detail.latitude == null || detail.longitude == null)
+          return null;
+        const latitude = detail.latitude;
+        const longitude = detail.longitude;
         if (isDrawing.value) {
           if (drawingMode.value === "polygon") {
-            addNewPoint(e.detail.latitude, e.detail.longitude);
+            addNewPoint(latitude, longitude);
           } else if (drawingMode.value === "circle") {
             if (!circleCenter.value) {
               circleCenter.value = {
-                latitude: e.detail.latitude,
-                longitude: e.detail.longitude
+                latitude,
+                longitude
               };
               updateMapDisplay();
             } else {
-              const radius = calculateDistance(circleCenter.value.latitude, circleCenter.value.longitude, e.detail.latitude, e.detail.longitude);
+              const radius = calculateDistance(circleCenter.value.latitude, circleCenter.value.longitude, latitude, longitude);
               circleRadius.value = radius < 10 ? 10 : radius;
               updateMapDisplay();
             }
@@ -20293,25 +20539,25 @@
       const finishDrawing = () => {
         var _a2;
         if (drawingMode.value === "polygon" && points.value.length < 3) {
-          uni.showToast({ title: "至少需要3个顶点", icon: "none" });
+          showAppToast({ title: "至少需要3个顶点", icon: "none" });
           return null;
         } else if (drawingMode.value === "circle" && (!circleCenter.value || circleRadius.value <= 0)) {
-          uni.showToast({ title: "请设置有效的圆形围栏", icon: "none" });
+          showAppToast({ title: "请设置有效的圆形围栏", icon: "none" });
           return null;
         }
         isDrawing.value = false;
         fenceForm.name = "".concat(drawingMode.value === "circle" ? "圆形" : "多边形", "围栏").concat(fenceList.value.length + 1);
-        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.open();
+        (_a2 = editDialogPopup.value) === null || _a2 === void 0 ? null : _a2.$callMethod("open");
       };
       const updateFencePolygon = () => {
         if (drawingMode.value === "polygon") {
-          polygons.value = points.value.length >= 3 ? [new UTSJSONObject({
+          polygons.value = points.value.length >= 3 ? [{
             points: points.value,
             strokeWidth: 2,
             strokeColor: "#FF0000",
             fillColor: "rgba(255,0,0,0.2)",
             zIndex: 1
-          })] : [];
+          }] : [];
         } else {
           polygons.value = [];
         }
@@ -20323,9 +20569,8 @@
             longitude: circleCenter.value.longitude,
             radius: circleRadius.value,
             strokeWidth: 2,
-            strokeColor: "#FF0000",
-            fillColor: "rgba(255,0,0,0.2)",
-            zIndex: 1
+            color: "#FF0000",
+            fillColor: "rgba(255,0,0,0.2)"
           }];
         } else {
           circles.value = [];
@@ -20356,544 +20601,573 @@
         return loadMoreTimer;
       }, set loadMoreTimer(v = null) {
         loadMoreTimer = v;
-      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, closeDeviceDialog, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, closeFenceList, closeEditDialog, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing };
+      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, resetPagination, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, closeEditDialog, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$7 = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "fence-operations": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "width": "500rpx", "height": "200rpx" } }, "fence-header": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "40rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "fence-name": { ".container .fence-operations .fence-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "fence-actions": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "drawing-mode-selector": { ".container .tools-panel ": { "marginBottom": "20rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "mode-title": { ".container .tools-panel .drawing-mode-selector ": { "fontSize": "28rpx", "marginBottom": "15rpx", "color": "#333333", "fontWeight": 500 } }, "mode-buttons": { ".container .tools-panel .drawing-mode-selector ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "mode-button-spacing": { ".container .tools-panel .drawing-mode-selector .mode-buttons ": { "marginLeft": "20rpx" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "20rpx" } }, "status-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "fontSize": "28rpx", "color": "#333333", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "fence-list": { ".container ": { "height": "70%", "backgroundColor": "#ffffff" } }, "list-header": { ".container .fence-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { ".container .fence-list .list-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "list-content": { ".container .fence-list ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "fence-item": { ".container .fence-list .list-content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "fence-info": { ".container .fence-list .list-content .fence-item ": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "name": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "30rpx", "fontWeight": 500, "marginBottom": "8rpx" }, ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "30rpx", "marginBottom": "8rpx" } }, "type": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#2979ff", "marginBottom": "8rpx" } }, "devices": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#999999" } }, "empty": { ".container .fence-list .list-content ": { "textAlign": "center", "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0, "color": "#999999" }, ".container .device-dialog .device-list ": { "textAlign": "center", "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0, "color": "#999999" } }, "edit-dialog": { ".container ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "overflow": "hidden" } }, "dialog-header": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "textAlign": "center", "fontSize": "32rpx", "fontWeight": "bold", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" }, ".container .device-dialog ": { "display": "flex", "justifyContent": "space-between", "flexDirection": "row", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee", "fontSize": "32rpx", "fontWeight": "bold" } }, "dialog-content": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "radio-group": { ".container .edit-dialog .dialog-content ": { "marginTop": "30rpx" } }, "label": { ".container .edit-dialog .dialog-content .radio-group ": { "marginBottom": "30rpx", "fontSize": "28rpx", "fontWeight": 500 } }, "radio-options": { ".container .edit-dialog .dialog-content .radio-group ": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "dialog-actions": { ".container .edit-dialog ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" }, ".container .device-dialog ": { "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "device-dialog": { ".container ": { "height": "800rpx", "backgroundColor": "#ffffff" } }, "dialog-tabs": { ".container .device-dialog ": { "display": "flex", "flexDirection": "row", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "tab": { ".container .device-dialog .dialog-tabs ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "fontSize": "28rpx" }, ".container .device-dialog .dialog-tabs .active": { "color": "#2979ff", "borderBottomWidth": "4rpx", "borderBottomStyle": "solid", "borderBottomColor": "#2979ff" } }, "device-list": { ".container .device-dialog ": { "height": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "75rpx", "paddingLeft": "20rpx", "boxSizing": "border-box" } }, "device-item": { ".container .device-dialog .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "device-info": { ".container .device-dialog .device-list .device-item ": { "display": "flex", "flexDirection": "column" } }, "status": { ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "24rpx", "color": "#999999" } }, "loading-tip": { ".container .device-dialog .device-list ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "no-more": { ".container .device-dialog .device-list ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "26rpx" } }, "i-popup__content": { ".container ": { "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "i-grid-item": { ".container ": { "!alignItems": "flex-start", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } } };
+  const _style_0$7 = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "fence-operations": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "fence-header": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "40rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "fence-name": { ".container .fence-operations .fence-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "fence-actions": { ".container .fence-operations ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "column", "boxShadow": "0 -2px 10px rgba(0, 0, 0, 0.1)" } }, "drawing-mode-selector": { ".container .tools-panel ": { "marginBottom": "20rpx", "paddingBottom": "20rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "mode-title": { ".container .tools-panel .drawing-mode-selector ": { "fontSize": "28rpx", "marginBottom": "15rpx", "color": "#333333", "fontWeight": 500 } }, "mode-buttons": { ".container .tools-panel .drawing-mode-selector ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "mode-button-spacing": { ".container .tools-panel .drawing-mode-selector .mode-buttons ": { "marginLeft": "20rpx" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "20rpx" } }, "status-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "fence-list": { ".container ": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff" } }, "list-header": { ".container .fence-list ": { "flexShrink": 0, "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "title": { ".container .fence-list .list-header ": { "fontSize": "32rpx", "fontWeight": "bold" } }, "list-content": { ".container .fence-list ": { "height": "640rpx", "boxSizing": "border-box", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "fence-item": { ".container .fence-list .list-content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "fence-info": { ".container .fence-list .list-content .fence-item ": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "name": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "30rpx", "fontWeight": 500, "marginBottom": "8rpx" }, ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "30rpx", "marginBottom": "8rpx" } }, "type": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#2979ff", "marginBottom": "8rpx" } }, "devices": { ".container .fence-list .list-content .fence-item .fence-info ": { "fontSize": "24rpx", "color": "#999999" } }, "empty": { ".container .fence-list .list-content ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 }, ".container .device-dialog .device-list ": { "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 } }, "edit-dialog": { ".container ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "overflow": "hidden" } }, "dialog-header": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" }, ".container .device-dialog ": { "display": "flex", "justifyContent": "space-between", "flexDirection": "row", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "dialog-title": { ".container .edit-dialog ": { "textAlign": "center", "fontSize": "32rpx", "fontWeight": "bold" } }, "dialog-content": { ".container .edit-dialog ": { "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "radio-group": { ".container .edit-dialog .dialog-content ": { "marginTop": "30rpx" } }, "label": { ".container .edit-dialog .dialog-content .radio-group ": { "marginBottom": "30rpx", "fontSize": "28rpx", "fontWeight": 500 } }, "radio-options": { ".container .edit-dialog .dialog-content .radio-group ": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "dialog-actions": { ".container .edit-dialog ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" }, ".container .device-dialog ": { "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderTopWidth": "1rpx", "borderTopStyle": "solid", "borderTopColor": "#eeeeee" } }, "device-dialog": { ".container ": { "height": "800rpx", "backgroundColor": "#ffffff" } }, "dialog-tabs": { ".container .device-dialog ": { "display": "flex", "flexDirection": "row", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#eeeeee" } }, "tab": { ".container .device-dialog .dialog-tabs ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "fontSize": "28rpx" }, ".container .device-dialog .dialog-tabs .active": { "color": "#2979ff", "borderBottomWidth": "4rpx", "borderBottomStyle": "solid", "borderBottomColor": "#2979ff" } }, "device-list": { ".container .device-dialog ": { "height": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "75rpx", "paddingLeft": "20rpx", "boxSizing": "border-box" } }, "device-item": { ".container .device-dialog .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f5f5f5" } }, "device-info": { ".container .device-dialog .device-list .device-item ": { "display": "flex", "flexDirection": "column" } }, "status": { ".container .device-dialog .device-list .device-item .device-info ": { "fontSize": "24rpx", "color": "#999999" } }, "loading-tip": { ".container .device-dialog .device-list ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "no-more": { ".container .device-dialog .device-list ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "26rpx" } }, "drag-hint-text": { ".container ": { "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "textAlign": "center" } }, "status-text": { ".container ": { "fontSize": "28rpx", "color": "#333333" } }, "empty-text-box": { ".container ": { "marginTop": "30rpx" } }, "empty-text": { ".container ": { "textAlign": "center", "fontSize": "22rpx", "color": "#999999" } }, "i-popup__content": { ".container ": { "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "i-grid-item": { ".container ": { "!alignItems": "flex-start", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "10rpx", "marginLeft": 0 } } };
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
     const _component_map = vue.resolveComponent("map");
     const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$6);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
-    const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
+    const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_radio = resolveEasycom(vue.resolveDynamicComponent("i-radio"), __easycom_6);
     const _component_i_switch = resolveEasycom(vue.resolveDynamicComponent("i-switch"), __easycom_7);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "地理围栏",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "map-container" }, [
-        vue.createVNode(_component_map, {
-          id: "myMap",
-          latitude: $setup.center.latitude,
-          longitude: $setup.center.longitude,
-          scale: $setup.mapScale,
-          style: { "width": "100%", "height": "100%" },
-          "show-location": false,
-          polygons: $setup.polygons,
-          markers: $setup.markers,
-          circles: $setup.circles,
-          onClick: $setup.handleMapTap,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }, {
-          default: vue.withCtx(() => [
-            vue.createVNode(_component_sub_navBar, {
-              showTime: false,
-              currentCar: $setup.currentCar,
-              showCar: true,
-              carStatus: $setup.connectionStatus
-            }, null, 8, ["currentCar", "carStatus"])
-          ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"]),
-        $setup.isDrawing ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "drag-hint"
-        }, [
-          $setup.drawingMode === "polygon" ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "点击地图添加围栏点,至少需要3个点")) : vue.createCommentVNode("v-if", true),
-          $setup.drawingMode === "circle" ? (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "点击地图确定圆心，再点一下地图确定半径")) : vue.createCommentVNode("v-if", true)
-        ])) : vue.createCommentVNode("v-if", true)
-      ]),
-      vue.createVNode(
-        _component_i_popup,
-        {
-          ref: "showFenceModal",
-          mode: "center",
-          round: "10"
-        },
-        {
-          default: vue.withCtx(() => [
-            $setup.selectedFence ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
-              class: "fence-operations"
-            }, [
-              vue.createElementVNode("view", { class: "fence-header" }, [
-                vue.createElementVNode(
-                  "text",
-                  { class: "fence-name" },
-                  vue.toDisplayString($setup.getSelectedFenceName()),
-                  1
-                  /* TEXT */
-                ),
-                vue.createVNode(_component_i_icon, {
-                  name: "close",
-                  onClick: _cache[0] || (_cache[0] = ($event) => {
-                    var _a;
-                    $setup.selectedFence = null;
-                    (_a = $setup.showFenceModal) == null ? void 0 : _a.close();
-                  })
-                })
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "地理围栏",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "map-container" }, [
+            vue.createVNode(_component_map, {
+              id: "myMap",
+              latitude: $setup.center.latitude,
+              longitude: $setup.center.longitude,
+              scale: $setup.mapScale,
+              style: { "width": "100%", "height": "100%" },
+              "show-location": false,
+              polygons: $setup.polygons,
+              markers: $setup.markers,
+              circles: $setup.circles,
+              onTap: $setup.handleMapTap,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(_component_sub_navBar, {
+                  showTime: false,
+                  currentCar: $setup.currentCar,
+                  showCar: true,
+                  carStatus: $setup.connectionStatus
+                }, null, 8, ["currentCar", "carStatus"])
               ]),
-              vue.createElementVNode("view", { class: "fence-actions" }, [
-                vue.createVNode(_component_i_button, {
-                  size: "small",
-                  onClick: $setup.editSelectedFence
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createTextVNode("编辑")
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }),
-                vue.createVNode(_component_i_button, {
-                  size: "small",
-                  type: "error",
-                  onClick: $setup.deleteSelectedFence
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createTextVNode("删除")
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }),
-                vue.createVNode(_component_i_button, {
-                  size: "small",
-                  type: "primary",
-                  onClick: $setup.showSelectedFenceDevices
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createTextVNode("绑定设备")
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ])
+              _: 1
+              /* STABLE */
+            }, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"]),
+            $setup.isDrawing ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "drag-hint"
+            }, [
+              $setup.drawingMode === "polygon" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 0,
+                class: "drag-hint-text"
+              }, "点击地图添加围栏点,至少需要3个点")) : vue.createCommentVNode("v-if", true),
+              $setup.drawingMode === "circle" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 1,
+                class: "drag-hint-text"
+              }, "点击地图确定圆心，再点一下地图确定半径")) : vue.createCommentVNode("v-if", true)
             ])) : vue.createCommentVNode("v-if", true)
           ]),
-          _: 1
-          /* STABLE */
-        },
-        512
-        /* NEED_PATCH */
-      ),
-      vue.createElementVNode("view", { class: "tools-panel" }, [
-        !$setup.isDrawing && !$setup.selectedFence ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "drawing-mode-selector"
-        }, [
-          vue.createElementVNode("view", { class: "mode-title" }, "选择围栏类型:"),
-          vue.createElementVNode("view", { class: "mode-buttons" }, [
-            vue.createVNode(_component_i_button, {
-              type: $setup.drawingMode == "polygon" ? "success" : "default",
-              size: "small",
-              customStyle: "border:1rpx solid #ebedf0",
-              onClick: _cache[1] || (_cache[1] = ($event) => $setup.setDrawingMode("polygon"))
-            }, {
+          vue.createVNode(
+            _component_i_popup,
+            {
+              ref: "showFenceModal",
+              mode: "bottom",
+              round: "10",
+              showClose: true
+            },
+            {
               default: vue.withCtx(() => [
-                vue.createTextVNode(" 多边形 ")
-              ]),
-              _: 1
-              /* STABLE */
-            }, 8, ["type"]),
-            vue.createVNode(_component_i_button, {
-              class: "mode-button-spacing",
-              type: $setup.drawingMode == "circle" ? "success" : "default",
-              size: "small",
-              customStyle: "border:1rpx solid #ebedf0",
-              onClick: _cache[2] || (_cache[2] = ($event) => $setup.setDrawingMode("circle"))
-            }, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode(" 圆形 ")
-              ]),
-              _: 1
-              /* STABLE */
-            }, 8, ["type"])
-          ])
-        ])) : vue.createCommentVNode("v-if", true),
-        vue.createElementVNode("view", { class: "tool-tag-item" }, [
-          vue.createVNode(_component_i_button, {
-            onClick: $setup.startDrawing,
-            disabled: $setup.isDrawing || $setup.selectedFence,
-            size: "small"
-          }, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode(" 开始绘制 ")
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["disabled"]),
-          vue.createVNode(_component_i_button, {
-            onClick: $setup.finishDrawing,
-            disabled: !$setup.isDrawing || !$setup.canFinishDrawing,
-            size: "small"
-          }, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode(" 完成绘制 ")
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["disabled"]),
-          vue.createVNode(_component_i_button, {
-            onClick: $setup.clearDrawing,
-            size: "small"
-          }, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode(" 重置绘制 ")
-            ]),
-            _: 1
-            /* STABLE */
-          }),
-          vue.createVNode(_component_i_button, {
-            onClick: $setup.showFenceList,
-            size: "small"
-          }, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode(" 围栏列表 ")
-            ]),
-            _: 1
-            /* STABLE */
-          })
-        ]),
-        vue.createElementVNode("view", { class: "status-info" }, [
-          vue.createElementVNode(
-            "text",
-            null,
-            "围栏类型: " + vue.toDisplayString($setup.drawingMode === "polygon" ? "多边形" : "圆形"),
-            1
-            /* TEXT */
-          ),
-          $setup.drawingMode === "polygon" ? (vue.openBlock(), vue.createElementBlock(
-            "text",
-            { key: 0 },
-            "顶点数量: " + vue.toDisplayString($setup.points.length),
-            1
-            /* TEXT */
-          )) : vue.createCommentVNode("v-if", true),
-          $setup.drawingMode === "circle" ? (vue.openBlock(), vue.createElementBlock(
-            "text",
-            { key: 1 },
-            "半径: " + vue.toDisplayString($setup.circleRadius.toFixed(2)) + "米",
-            1
-            /* TEXT */
-          )) : vue.createCommentVNode("v-if", true)
-        ])
-      ]),
-      vue.createVNode(
-        _component_i_popup,
-        {
-          ref: "fencesPopup",
-          mode: "bottom",
-          round: "10"
-        },
-        {
-          default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "fence-list" }, [
-              vue.createElementVNode("view", { class: "list-header" }, [
-                vue.createElementVNode("text", { class: "title" }, "围栏列表"),
-                vue.createVNode(_component_i_icon, {
-                  name: "/static/close.png",
-                  fontSize: "15",
-                  onClick: $setup.closeFenceList
-                })
-              ]),
-              vue.createElementVNode("scroll-view", {
-                class: "list-content",
-                "scroll-y": ""
-              }, [
-                (vue.openBlock(true), vue.createElementBlock(
-                  vue.Fragment,
-                  null,
-                  vue.renderList($setup.fenceList, (fence) => {
-                    return vue.openBlock(), vue.createElementBlock("view", {
-                      key: fence.id,
-                      class: "fence-item",
-                      onClick: ($event) => $setup.selectFence(fence)
-                    }, [
-                      vue.createElementVNode("view", { class: "fence-info" }, [
-                        vue.createElementVNode(
-                          "text",
-                          { class: "name" },
-                          vue.toDisplayString(fence.name),
-                          1
-                          /* TEXT */
-                        ),
-                        vue.createElementVNode(
-                          "text",
-                          { class: "type" },
-                          vue.toDisplayString($setup.getFenceType(fence) === "circle" ? "圆形" : "多边形"),
-                          1
-                          /* TEXT */
-                        ),
-                        vue.createElementVNode(
-                          "text",
-                          { class: "devices" },
-                          "绑定设备: " + vue.toDisplayString(fence.deviceCount || 0) + "台",
-                          1
-                          /* TEXT */
-                        )
-                      ]),
-                      vue.createVNode(_component_i_icon, {
-                        name: "/static/arrow-right.png",
-                        fontSize: "15"
-                      })
-                    ], 8, ["onClick"]);
-                  }),
-                  128
-                  /* KEYED_FRAGMENT */
-                )),
-                $setup.fenceList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                $setup.selectedFence ? (vue.openBlock(), vue.createElementBlock("view", {
                   key: 0,
-                  class: "empty"
-                }, " 暂无围栏数据 ")) : vue.createCommentVNode("v-if", true)
+                  class: "fence-operations"
+                }, [
+                  vue.createElementVNode("view", { class: "fence-header" }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "fence-name" },
+                      vue.toDisplayString($setup.getSelectedFenceName()),
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createVNode(_component_i_icon, {
+                      name: "close",
+                      onClick: _cache[0] || (_cache[0] = ($event) => {
+                        var _a;
+                        $setup.selectedFence = null;
+                        (_a = $setup.showFenceModal) == null ? void 0 : _a.$callMethod("close");
+                      })
+                    })
+                  ]),
+                  vue.createElementVNode("view", { class: "fence-actions" }, [
+                    vue.createVNode(_component_i_button, {
+                      size: "small",
+                      onClick: $setup.editSelectedFence
+                    }, {
+                      default: vue.withCtx(() => [
+                        vue.createTextVNode("编辑")
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    vue.createVNode(_component_i_button, {
+                      size: "small",
+                      type: "error",
+                      onClick: $setup.deleteSelectedFence
+                    }, {
+                      default: vue.withCtx(() => [
+                        vue.createTextVNode("删除")
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    vue.createVNode(_component_i_button, {
+                      size: "small",
+                      type: "primary",
+                      onClick: $setup.showSelectedFenceDevices
+                    }, {
+                      default: vue.withCtx(() => [
+                        vue.createTextVNode("绑定设备")
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ])
+                ])) : vue.createCommentVNode("v-if", true)
+              ]),
+              _: 1
+              /* STABLE */
+            },
+            512
+            /* NEED_PATCH */
+          ),
+          vue.createElementVNode("view", { class: "tools-panel" }, [
+            !$setup.isDrawing && !$setup.selectedFence ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "drawing-mode-selector"
+            }, [
+              vue.createElementVNode("text", { class: "mode-title" }, "选择围栏类型:"),
+              vue.createElementVNode("view", { class: "mode-buttons" }, [
+                vue.createVNode(_component_i_button, {
+                  type: $setup.drawingMode == "polygon" ? "success" : "default",
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: _cache[1] || (_cache[1] = ($event) => $setup.setDrawingMode("polygon"))
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createTextVNode(" 多边形 ")
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["type"]),
+                vue.createVNode(_component_i_button, {
+                  class: "mode-button-spacing",
+                  type: $setup.drawingMode == "circle" ? "success" : "default",
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: _cache[2] || (_cache[2] = ($event) => $setup.setDrawingMode("circle"))
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createTextVNode(" 圆形 ")
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["type"])
               ])
+            ])) : vue.createCommentVNode("v-if", true),
+            vue.createElementVNode("view", { class: "tool-tag-item" }, [
+              vue.createVNode(_component_i_button, {
+                onClick: $setup.startDrawing,
+                disabled: $setup.isDrawing || $setup.selectedFence != null,
+                size: "small"
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode(" 开始绘制 ")
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["disabled"]),
+              vue.createVNode(_component_i_button, {
+                onClick: $setup.finishDrawing,
+                disabled: !$setup.isDrawing || !$setup.canFinishDrawing,
+                size: "small"
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode(" 完成绘制 ")
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["disabled"]),
+              vue.createVNode(_component_i_button, {
+                onClick: $setup.clearDrawing,
+                size: "small"
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode(" 重置绘制 ")
+                ]),
+                _: 1
+                /* STABLE */
+              }),
+              vue.createVNode(_component_i_button, {
+                onClick: $setup.showFenceList,
+                size: "small"
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode(" 围栏列表 ")
+                ]),
+                _: 1
+                /* STABLE */
+              })
+            ]),
+            vue.createElementVNode("view", { class: "status-info" }, [
+              vue.createElementVNode(
+                "text",
+                { class: "status-text" },
+                "围栏类型: " + vue.toDisplayString($setup.drawingMode === "polygon" ? "多边形" : "圆形"),
+                1
+                /* TEXT */
+              ),
+              $setup.drawingMode === "polygon" ? (vue.openBlock(), vue.createElementBlock(
+                "text",
+                {
+                  key: 0,
+                  class: "status-text"
+                },
+                "顶点数量: " + vue.toDisplayString($setup.points.length),
+                1
+                /* TEXT */
+              )) : vue.createCommentVNode("v-if", true),
+              $setup.drawingMode === "circle" ? (vue.openBlock(), vue.createElementBlock(
+                "text",
+                {
+                  key: 1,
+                  class: "status-text"
+                },
+                "半径: " + vue.toDisplayString($setup.circleRadius.toFixed(2)) + "米",
+                1
+                /* TEXT */
+              )) : vue.createCommentVNode("v-if", true)
             ])
           ]),
-          _: 1
-          /* STABLE */
-        },
-        512
-        /* NEED_PATCH */
-      ),
-      vue.createVNode(
-        _component_i_popup,
-        {
-          ref: "editDialogPopup",
-          mode: "center",
-          round: "10"
-        },
-        {
-          default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "edit-dialog" }, [
-              vue.createElementVNode("view", { class: "dialog-header" }, [
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  vue.toDisplayString($setup.editingFence ? "编辑围栏" : "新增围栏"),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "dialog-content" }, [
-                vue.createVNode(_component_i_input, {
-                  modelValue: $setup.fenceForm.name,
-                  "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.fenceForm.name = $event),
-                  placeholder: "请输入围栏名称",
-                  border: "surround"
-                }, null, 8, ["modelValue"]),
-                vue.createElementVNode("view", { class: "radio-group" }, [
-                  vue.createElementVNode("text", { class: "label" }, "告警类型:"),
-                  vue.createElementVNode("view", { class: "radio-options" }, [
-                    vue.createVNode(_component_i_radio, {
-                      modelValue: $setup.fenceForm.alarmType,
-                      "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.fenceForm.alarmType = $event),
-                      name: "0",
-                      iconPlacement: "left"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createTextVNode("不告警")
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }, 8, ["modelValue"]),
-                    vue.createVNode(_component_i_radio, {
-                      modelValue: $setup.fenceForm.alarmType,
-                      "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.fenceForm.alarmType = $event),
-                      name: "1",
-                      iconPlacement: "left"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createTextVNode("出入告警")
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }, 8, ["modelValue"]),
-                    vue.createVNode(_component_i_radio, {
-                      modelValue: $setup.fenceForm.alarmType,
-                      "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => $setup.fenceForm.alarmType = $event),
-                      name: "2",
-                      iconPlacement: "left"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createTextVNode("出告警")
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }, 8, ["modelValue"]),
-                    vue.createVNode(_component_i_radio, {
-                      modelValue: $setup.fenceForm.alarmType,
-                      "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.fenceForm.alarmType = $event),
-                      name: "3",
-                      iconPlacement: "left"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createTextVNode("入告警")
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }, 8, ["modelValue"])
+          vue.createVNode(
+            _component_i_popup,
+            {
+              ref: "fencesPopup",
+              mode: "bottom",
+              round: "10",
+              height: "800rpx",
+              disabledScroll: true,
+              contentMargin: "0",
+              showClose: true
+            },
+            {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", { class: "fence-list" }, [
+                  vue.createElementVNode("view", { class: "list-header" }, [
+                    vue.createElementVNode("text", { class: "title" }, "围栏列表")
+                  ]),
+                  vue.createElementVNode("scroll-view", {
+                    class: "list-content",
+                    "scroll-y": "true",
+                    "show-scrollbar": false
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.fenceList, (fence) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: fence.id,
+                          class: "fence-item",
+                          onClick: ($event) => $setup.selectFence(fence)
+                        }, [
+                          vue.createElementVNode("view", { class: "fence-info" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "name" },
+                              vue.toDisplayString(fence.name),
+                              1
+                              /* TEXT */
+                            ),
+                            vue.createElementVNode(
+                              "text",
+                              { class: "type" },
+                              vue.toDisplayString($setup.getFenceType(fence) === "circle" ? "圆形" : "多边形"),
+                              1
+                              /* TEXT */
+                            ),
+                            vue.createElementVNode(
+                              "text",
+                              { class: "devices" },
+                              "绑定设备: " + vue.toDisplayString(fence.deviceCount || 0) + "台",
+                              1
+                              /* TEXT */
+                            )
+                          ]),
+                          vue.createVNode(_component_i_icon, {
+                            name: "/static/arrow-right.png",
+                            fontSize: "15"
+                          })
+                        ], 8, ["onClick"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    )),
+                    $setup.fenceList.length == 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 0,
+                      class: "empty"
+                    }, [
+                      vue.createElementVNode("text", { class: "empty-text" }, "暂无围栏数据")
+                    ])) : vue.createCommentVNode("v-if", true)
                   ])
                 ])
               ]),
-              vue.createElementVNode("view", { class: "dialog-actions" }, [
-                vue.createVNode(_component_i_button, { onClick: $setup.closeEditDialog }, {
-                  default: vue.withCtx(() => [
-                    vue.createTextVNode("取消")
+              _: 1
+              /* STABLE */
+            },
+            512
+            /* NEED_PATCH */
+          ),
+          vue.createVNode(
+            _component_i_popup,
+            {
+              ref: "editDialogPopup",
+              mode: "bottom",
+              round: "10",
+              contentDraggable: false,
+              showClose: true
+            },
+            {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", { class: "edit-dialog" }, [
+                  vue.createElementVNode("view", { class: "dialog-header" }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "dialog-title" },
+                      vue.toDisplayString($setup.editingFence ? "编辑围栏" : "新增围栏"),
+                      1
+                      /* TEXT */
+                    )
                   ]),
-                  _: 1
-                  /* STABLE */
-                }),
-                vue.createVNode(_component_i_button, {
-                  type: "primary",
-                  onClick: $setup.saveFence
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createTextVNode("保存")
+                  vue.createElementVNode("view", { class: "dialog-content" }, [
+                    vue.createVNode(_component_i_input, {
+                      modelValue: $setup.fenceForm.name,
+                      "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.fenceForm.name = $event),
+                      placeholder: "请输入围栏名称",
+                      border: "surround"
+                    }, null, 8, ["modelValue"]),
+                    vue.createElementVNode("view", { class: "radio-group" }, [
+                      vue.createElementVNode("text", { class: "label" }, "告警类型:"),
+                      vue.createElementVNode("view", { class: "radio-options" }, [
+                        vue.createVNode(_component_i_radio, {
+                          modelValue: $setup.fenceForm.alarmType,
+                          "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.fenceForm.alarmType = $event),
+                          name: "0",
+                          iconPlacement: "left"
+                        }, {
+                          default: vue.withCtx(() => [
+                            vue.createTextVNode("不告警")
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"]),
+                        vue.createVNode(_component_i_radio, {
+                          modelValue: $setup.fenceForm.alarmType,
+                          "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.fenceForm.alarmType = $event),
+                          name: "1",
+                          iconPlacement: "left"
+                        }, {
+                          default: vue.withCtx(() => [
+                            vue.createTextVNode("出入告警")
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"]),
+                        vue.createVNode(_component_i_radio, {
+                          modelValue: $setup.fenceForm.alarmType,
+                          "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => $setup.fenceForm.alarmType = $event),
+                          name: "2",
+                          iconPlacement: "left"
+                        }, {
+                          default: vue.withCtx(() => [
+                            vue.createTextVNode("出告警")
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"]),
+                        vue.createVNode(_component_i_radio, {
+                          modelValue: $setup.fenceForm.alarmType,
+                          "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.fenceForm.alarmType = $event),
+                          name: "3",
+                          iconPlacement: "left"
+                        }, {
+                          default: vue.withCtx(() => [
+                            vue.createTextVNode("入告警")
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"])
+                      ])
+                    ])
                   ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ])
-            ])
-          ]),
-          _: 1
-          /* STABLE */
-        },
-        512
-        /* NEED_PATCH */
-      ),
-      vue.createVNode(
-        _component_i_popup,
-        {
-          ref: "deviceDialogPopup",
-          mode: "bottom",
-          round: "10",
-          "mask-click-able": false
-        },
-        {
-          default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "device-dialog" }, [
-              vue.createElementVNode("view", { class: "dialog-header" }, [
-                vue.createElementVNode(
-                  "text",
-                  null,
-                  "设备绑定 - " + vue.toDisplayString($setup.currentFenceName),
-                  1
-                  /* TEXT */
-                ),
-                vue.createVNode(_component_i_icon, {
-                  name: "close",
-                  onClick: $setup.closeDeviceDialog
-                })
-              ]),
-              vue.createElementVNode("view", { class: "dialog-tabs" }, [
-                vue.createElementVNode(
-                  "view",
-                  {
-                    class: vue.normalizeClass(["tab", $setup.activeTab === "bind" ? "active" : ""]),
-                    onClick: _cache[8] || (_cache[8] = ($event) => $setup.switchTab("bind"))
-                  },
-                  " 已绑定设备 ",
-                  2
-                  /* CLASS */
-                ),
-                vue.createElementVNode(
-                  "view",
-                  {
-                    class: vue.normalizeClass(["tab", $setup.activeTab === "unbind" ? "active" : ""]),
-                    onClick: _cache[9] || (_cache[9] = ($event) => $setup.switchTab("unbind"))
-                  },
-                  " 未绑定设备 ",
-                  2
-                  /* CLASS */
-                )
-              ]),
-              vue.createElementVNode("scroll-view", {
-                class: "device-list",
-                "scroll-y": "",
-                "scroll-top": $setup.scrollTop,
-                onScrolltolower: $setup.handleLoadMore,
-                "lower-threshold": 150
-              }, [
-                (vue.openBlock(true), vue.createElementBlock(
-                  vue.Fragment,
-                  null,
-                  vue.renderList($setup.deviceList, (device) => {
-                    return vue.openBlock(), vue.createElementBlock("view", {
-                      key: $setup.getDeviceImei(device),
-                      class: "device-item"
-                    }, [
-                      vue.createElementVNode("view", { class: "device-info" }, [
-                        vue.createElementVNode(
-                          "text",
-                          { class: "name" },
-                          vue.toDisplayString($setup.getDeviceDisplayName(device)),
-                          1
-                          /* TEXT */
-                        ),
-                        $setup.getDeviceImei(device) ? (vue.openBlock(), vue.createElementBlock(
-                          "text",
-                          {
-                            key: 0,
-                            class: "status"
-                          },
-                          vue.toDisplayString($setup.isDeviceOnline(device) ? "在线" : "离线"),
-                          1
-                          /* TEXT */
-                        )) : vue.createCommentVNode("v-if", true)
+                  vue.createElementVNode("view", { class: "dialog-actions" }, [
+                    vue.createVNode(_component_i_button, { onClick: $setup.closeEditDialog }, {
+                      default: vue.withCtx(() => [
+                        vue.createTextVNode("取消")
                       ]),
-                      vue.createVNode(_component_i_switch, {
-                        "model-value": $setup.isDeviceBound($setup.getDeviceImei(device)),
-                        onChange: ($event) => $setup.handleDeviceBindingChange($setup.getDeviceImei(device), $event),
-                        disabled: $setup.loading || $setup.loadingMore,
-                        size: "20"
-                      }, null, 8, ["model-value", "onChange", "disabled"])
-                    ]);
-                  }),
-                  128
-                  /* KEYED_FRAGMENT */
-                )),
-                $setup.deviceList.length === 0 && !$setup.loading ? (vue.openBlock(), vue.createElementBlock(
-                  "view",
-                  {
-                    key: 0,
-                    class: "empty"
-                  },
-                  vue.toDisplayString($setup.activeTab === "bind" ? "暂无绑定设备" : "暂无可用设备"),
-                  1
-                  /* TEXT */
-                )) : vue.createCommentVNode("v-if", true),
-                $setup.loadingMore ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 1,
-                  class: "loading-tip"
-                }, [
-                  vue.createElementVNode("text", null, "正在加载更多...")
-                ])) : vue.createCommentVNode("v-if", true),
-                $setup.deviceList.length > 0 && !$setup.hasMore && !$setup.loadingMore ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 2,
-                  class: "no-more"
-                }, " 暂无更多数据 ")) : vue.createCommentVNode("v-if", true)
-              ], 40, ["scroll-top"])
-            ])
-          ]),
-          _: 1
-          /* STABLE */
-        },
-        512
-        /* NEED_PATCH */
-      )
-    ]);
+                      _: 1
+                      /* STABLE */
+                    }),
+                    vue.createVNode(_component_i_button, {
+                      type: "primary",
+                      onClick: $setup.saveFence
+                    }, {
+                      default: vue.withCtx(() => [
+                        vue.createTextVNode("保存")
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ])
+                ])
+              ]),
+              _: 1
+              /* STABLE */
+            },
+            512
+            /* NEED_PATCH */
+          ),
+          vue.createVNode(
+            _component_i_popup,
+            {
+              ref: "deviceDialogPopup",
+              mode: "bottom",
+              round: "10",
+              closeOnMask: true,
+              showClose: true
+            },
+            {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", { class: "device-dialog" }, [
+                  vue.createElementVNode("view", { class: "dialog-header" }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "dialog-title" },
+                      "设备绑定 - " + vue.toDisplayString($setup.currentFenceName),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "dialog-tabs" }, [
+                    vue.createElementVNode(
+                      "text",
+                      {
+                        class: vue.normalizeClass(["tab", $setup.activeTab === "bind" ? "active" : ""]),
+                        onClick: _cache[8] || (_cache[8] = ($event) => $setup.switchTab("bind"))
+                      },
+                      "已绑定设备",
+                      2
+                      /* CLASS */
+                    ),
+                    vue.createElementVNode(
+                      "text",
+                      {
+                        class: vue.normalizeClass(["tab", $setup.activeTab === "unbind" ? "active" : ""]),
+                        onClick: _cache[9] || (_cache[9] = ($event) => $setup.switchTab("unbind"))
+                      },
+                      "未绑定设备",
+                      2
+                      /* CLASS */
+                    )
+                  ]),
+                  vue.createElementVNode("scroll-view", {
+                    class: "device-list",
+                    "scroll-y": "true",
+                    "show-scrollbar": false,
+                    "scroll-top": $setup.scrollTop,
+                    onScrolltolower: $setup.handleLoadMore,
+                    "lower-threshold": 150
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.deviceList, (device) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: $setup.getDeviceImei(device),
+                          class: "device-item"
+                        }, [
+                          vue.createElementVNode("view", { class: "device-info" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "name" },
+                              vue.toDisplayString($setup.getDeviceDisplayName(device)),
+                              1
+                              /* TEXT */
+                            ),
+                            $setup.getDeviceImei(device) ? (vue.openBlock(), vue.createElementBlock(
+                              "text",
+                              {
+                                key: 0,
+                                class: "status"
+                              },
+                              vue.toDisplayString($setup.isDeviceOnline(device) ? "在线" : "离线"),
+                              1
+                              /* TEXT */
+                            )) : vue.createCommentVNode("v-if", true)
+                          ]),
+                          vue.createVNode(_component_i_switch, {
+                            "model-value": $setup.isDeviceBound($setup.getDeviceImei(device)),
+                            onChange: ($event) => $setup.handleDeviceBindingChange($setup.getDeviceImei(device), $event),
+                            disabled: $setup.loading || $setup.loadingMore,
+                            size: "20"
+                          }, null, 8, ["model-value", "onChange", "disabled"])
+                        ]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    )),
+                    $setup.deviceList.length == 0 && !$setup.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 0,
+                      class: "empty"
+                    }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "empty-text" },
+                        vue.toDisplayString($setup.activeTab === "bind" ? "暂无绑定设备" : "暂无可用设备"),
+                        1
+                        /* TEXT */
+                      )
+                    ])) : vue.createCommentVNode("v-if", true),
+                    $setup.loadingMore ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 1,
+                      class: "loading-tip"
+                    }, [
+                      vue.createElementVNode("text", { class: "empty-text" }, "正在加载更多...")
+                    ])) : vue.createCommentVNode("v-if", true),
+                    $setup.deviceList.length > 0 && !$setup.hasMore && !$setup.loadingMore ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 2,
+                      class: "empty-text-box"
+                    }, [
+                      vue.createElementVNode("text", { class: "empty-text" }, "暂无更多数据")
+                    ])) : vue.createCommentVNode("v-if", true)
+                  ], 40, ["scroll-top"])
+                ])
+              ]),
+              _: 1
+              /* STABLE */
+            },
+            512
+            /* NEED_PATCH */
+          )
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesGeofencingGeofencing = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["styles", [_style_0$7]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/geofencing/geofencing.uvue"]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
@@ -20909,10 +21183,10 @@
         if (!scanFunctionIsUseable.value || scanResult.length == 0)
           return null;
         scanFunctionIsUseable.value = false;
-        uni.__log__("log", "at pages/scancode/scancode.uvue:17", "扫码结果:", scanResult);
+        uni.__log__("log", "at pages/scancode/scancode.uvue:19", "扫码结果:", scanResult);
         uni.setStorageSync("scanCodeResult", scanResult);
         uni.$emit("scanCodeResult", new UTSJSONObject({ result: scanResult }));
-        uni.showToast({
+        showAppToast({
           title: "扫码成功",
           icon: "success",
           duration: 1e3
@@ -20927,14 +21201,14 @@
         uni.scanCode(new UTSJSONObject({
           onlyFromCamera: true,
           success: (res) => {
-            uni.__log__("log", "at pages/scancode/scancode.uvue:35", "扫码成功res:", res);
+            uni.__log__("log", "at pages/scancode/scancode.uvue:37", "扫码成功res:", res);
             const result = res.result;
             if (result != null)
               handleScanResult(result);
           },
           fail: (err) => {
-            uni.__log__("log", "at pages/scancode/scancode.uvue:40", "扫码失败:", err);
-            uni.showToast({ title: "扫码失败", icon: "none" });
+            uni.__log__("log", "at pages/scancode/scancode.uvue:42", "扫码失败:", err);
+            showAppToast({ title: "扫码失败", icon: "none" });
             goBack();
           }
         }));
@@ -20949,7 +21223,17 @@
   });
   const _style_0$6 = { "container": { "": { "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#000000" } }, "scan-header": { "": { "height": "88rpx", "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundColor": "#ffffff" } }, "back-button": { "": { "width": "120rpx", "color": "#333333", "fontSize": "28rpx", "textAlign": "center" } }, "title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#333333", "fontSize": "36rpx", "fontWeight": "bold", "textAlign": "center", "marginRight": "120rpx" } }, "scancode-box": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "scan-button": { "": { "color": "#ffffff", "fontSize": "32rpx", "backgroundColor": "#007aff", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "paddingTop": "24rpx", "paddingRight": "60rpx", "paddingBottom": "24rpx", "paddingLeft": "60rpx" } }, "tip": { "": { "position": "fixed", "bottom": "100rpx", "left": 0, "right": 0, "textAlign": "center", "color": "#ffffff", "fontSize": "28rpx", "backgroundColor": "rgba(0,0,0,0.5)", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } } };
   function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view");
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view"),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesScancodeScancode = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["styles", [_style_0$6]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/scancode/scancode.uvue"]]);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
@@ -21001,14 +21285,14 @@
                 currPage.value++;
               }
             } else {
-              uni.showToast({
+              showAppToast({
                 title: res.msg || "加载失败",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:123", "加载车辆列表失败:", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/userCenter/payDeviceList/payDeviceList.uvue:125", "加载车辆列表失败:", error);
+            showAppToast({
               title: "加载失败，请重试",
               icon: "none"
             });
@@ -21031,10 +21315,10 @@
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
-        uni.__log__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:154", iccid);
+        uni.__log__("log", "at pages/userCenter/payDeviceList/payDeviceList.uvue:156", iccid);
         needRefresh.value = true;
         needRefresh.value = false;
-        uni.showToast({
+        showAppToast({
           title: "请在微信小程序中完成充值",
           icon: "none"
         });
@@ -21048,7 +21332,7 @@
         resetData();
         loadPayDeviceListData().finally(() => {
           uni.stopPullDownRefresh();
-          uni.showToast({
+          showAppToast({
             title: "刷新成功",
             icon: "success"
           });
@@ -21062,6 +21346,7 @@
   const _style_0$5 = { "container": { "": { "width": "100%", "backgroundColor": "#f5f5f5", "marginTop": "170rpx" } }, "content": { ".container ": { "marginTop": "30rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "list": { ".container .content ": { "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginBottom": "30rpx" } }, "device-info": { ".container .content .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "28rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0 } }, "label": { ".container .content .list .device-info ": { "color": "#666666" } }, "title": { ".container .content .list .device-info ": { "fontWeight": "bold", "fontSize": "32rpx", "color": "#000000" } }, "value": { ".container .content .list .device-info ": { "color": "#333333" } }, "pay-btn": { ".container .content .list .device-info ": { "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx", "fontSize": "25rpx", "color": "#ffffff", "backgroundColor": "#5ac725", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "loading": { ".container .content ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "24rpx" } }, "no-more": { ".container .content ": { "textAlign": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "24rpx" } }, "empty": { ".container .content ": { "textAlign": "center", "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "28rpx" } } };
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -21152,7 +21437,8 @@
               vue.createElementVNode("text", null, "暂无设备数据")
             ])) : vue.createCommentVNode("v-if", true)
           ])
-        ])
+        ]),
+        vue.createVNode(_component_app_toast)
       ],
       64
       /* STABLE_FRAGMENT */
@@ -21191,7 +21477,7 @@
         try {
           return UTS.JSON.parse(details);
         } catch (e) {
-          uni.__log__("error", "at pages/cmd/cmd.uvue:101", "解析参数配置失败:", e);
+          uni.__log__("error", "at pages/cmd/cmd.uvue:103", "解析参数配置失败:", e);
           return [];
         }
       });
@@ -21220,18 +21506,18 @@
           try {
             loading.value = true;
             const response = yield getCmdAction();
-            uni.__log__("log", "at pages/cmd/cmd.uvue:133", "加载指令类型响应:", response);
+            uni.__log__("log", "at pages/cmd/cmd.uvue:135", "加载指令类型响应:", response);
             if (response.code == 0) {
               commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
             } else {
-              uni.showToast({
+              showAppToast({
                 title: "加载指令类型失败",
                 icon: "none"
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:144", "加载指令类型出错:", error);
-            uni.showToast({
+            uni.__log__("error", "at pages/cmd/cmd.uvue:146", "加载指令类型出错:", error);
+            showAppToast({
               title: "网络错误",
               icon: "none"
             });
@@ -21264,11 +21550,11 @@
             if (response.code == 0) {
               commands.value = response.data;
             } else {
-              uni.showToast({ title: "加载指令列表失败", icon: "none" });
+              showAppToast({ title: "加载指令列表失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:179", "加载指令列表出错:", error);
-            uni.showToast({ title: "网络错误", icon: "none" });
+            uni.__log__("error", "at pages/cmd/cmd.uvue:181", "加载指令列表出错:", error);
+            showAppToast({ title: "网络错误", icon: "none" });
           } finally {
             loading.value = false;
           }
@@ -21302,7 +21588,7 @@
           }
           paramValues.value = values;
         } catch (e) {
-          uni.__log__("error", "at pages/cmd/cmd.uvue:214", "初始化参数值失败:", e);
+          uni.__log__("error", "at pages/cmd/cmd.uvue:216", "初始化参数值失败:", e);
           paramValues.value = [];
         }
       };
@@ -21328,7 +21614,7 @@
         return __awaiter(this, void 0, void 0, function* () {
           var _a2, _b;
           if (!isFormValid.value || selectedCommand.value == null) {
-            uni.showToast({ title: "请填写所有参数", icon: "none" });
+            showAppToast({ title: "请填写所有参数", icon: "none" });
             return Promise.resolve(null);
           }
           const command = selectedCommand.value;
@@ -21350,13 +21636,13 @@
               predictCmdId: command["predictCmdId"]
             }));
             if (response.code == 0) {
-              uni.showToast({ title: "指令发送成功", icon: "success" });
+              showAppToast({ title: "指令发送成功", icon: "success" });
             } else {
-              uni.showToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
+              showAppToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:271", "发送指令出错:", error);
-            uni.showToast({ title: "网络错误", icon: "none" });
+            uni.__log__("error", "at pages/cmd/cmd.uvue:273", "发送指令出错:", error);
+            showAppToast({ title: "网络错误", icon: "none" });
           } finally {
             loading.value = false;
           }
@@ -21372,207 +21658,217 @@
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
     const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$2);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "指令",
-        "show-back": true,
-        backgroundColor: "#fff",
-        textColor: "#333",
-        showCapsule: false
-      }),
-      vue.createElementVNode("view", { class: "device-info" }, [
-        vue.createElementVNode(
-          "text",
-          { class: "device-label" },
-          "设备ID: " + vue.toDisplayString($setup.imei),
-          1
-          /* TEXT */
-        )
-      ]),
-      vue.createElementVNode("view", { class: "section" }, [
-        vue.createElementVNode("text", { class: "section-title" }, "指令类型"),
-        vue.createElementVNode("view", { class: "type-container" }, [
-          vue.createElementVNode("view", { class: "type-list" }, [
-            (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.commandTypes, (type, index) => {
-                return vue.openBlock(), vue.createElementBlock("view", {
-                  key: type.cmdmId,
-                  class: vue.normalizeClass(["type-item", { active: $setup.selectedTypeId == type.cmdmId }]),
-                  onClick: ($event) => $setup.selectTypeByItem(type)
-                }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "type-name" },
-                    vue.toDisplayString(type.cmdName),
-                    1
-                    /* TEXT */
-                  )
-                ], 10, ["onClick"]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ])
-        ])
-      ]),
-      $setup.commands.length ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 0,
-        class: "section"
-      }, [
-        vue.createElementVNode("text", { class: "section-title" }, "指令列表"),
-        vue.createElementVNode("view", { class: "command-list" }, [
-          (vue.openBlock(true), vue.createElementBlock(
-            vue.Fragment,
-            null,
-            vue.renderList($setup.commands, (cmd, index) => {
-              return vue.openBlock(), vue.createElementBlock("view", {
-                key: cmd.predictCmdId,
-                class: vue.normalizeClass(["command-item", { active: $setup.selectedCommandId == cmd.predictCmdId }]),
-                onClick: ($event) => $setup.selectCommand(cmd)
-              }, [
-                vue.createElementVNode(
-                  "text",
-                  { class: "command-name" },
-                  vue.toDisplayString(cmd.cmdName),
-                  1
-                  /* TEXT */
-                ),
-                vue.createElementVNode(
-                  "text",
-                  { class: "command-descr" },
-                  vue.toDisplayString(cmd.remarks),
-                  1
-                  /* TEXT */
-                )
-              ], 10, ["onClick"]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.selectedCommandDetails ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "section"
-      }, [
-        vue.createElementVNode("view", { class: "param-form" }, [
-          (vue.openBlock(true), vue.createElementBlock(
-            vue.Fragment,
-            null,
-            vue.renderList($setup.paramConfigs, (param, index) => {
-              return vue.openBlock(), vue.createElementBlock("view", {
-                key: "param_" + index,
-                class: "param-item"
-              }, [
-                vue.createElementVNode(
-                  "text",
-                  { class: "section-title" },
-                  vue.toDisplayString(param.label),
-                  1
-                  /* TEXT */
-                ),
-                param.type == "input" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
-                  key: 0,
-                  class: "param-input",
-                  modelValue: $setup.paramValues[index],
-                  "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
-                  placeholder: "请输入" + param.label,
-                  "placeholder-class": "placeholder"
-                }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder"])) : vue.createCommentVNode("v-if", true),
-                param.type == "number" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
-                  key: 1,
-                  class: "param-input",
-                  type: "number",
-                  modelValue: $setup.paramValues[index],
-                  "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
-                  placeholder: "请输入" + param.label,
-                  "placeholder-class": "placeholder",
-                  maxlength: param.max
-                }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder", "maxlength"])) : vue.createCommentVNode("v-if", true),
-                param.type == "radio" ? (vue.openBlock(), vue.createElementBlock("view", {
-                  key: 2,
-                  class: "radio-group"
-                }, [
-                  (vue.openBlock(true), vue.createElementBlock(
-                    vue.Fragment,
-                    null,
-                    vue.renderList($setup.getRadioItems(param), (item) => {
-                      return vue.openBlock(), vue.createElementBlock("view", {
-                        key: "radio_" + item.value,
-                        class: "radio-item",
-                        onClick: ($event) => $setup.selectRadio(index, $setup.getRadioValue(item))
-                      }, [
-                        vue.createElementVNode("view", { class: "radio-icon" }, [
-                          vue.createElementVNode(
-                            "view",
-                            {
-                              class: vue.normalizeClass(["radio-inner", { checked: $setup.paramValues[index] == $setup.getRadioValue(item) }])
-                            },
-                            null,
-                            2
-                            /* CLASS */
-                          )
-                        ]),
-                        vue.createElementVNode(
-                          "text",
-                          { class: "radio-label" },
-                          vue.toDisplayString($setup.getRadioDescription(item)),
-                          1
-                          /* TEXT */
-                        )
-                      ], 8, ["onClick"]);
-                    }),
-                    128
-                    /* KEYED_FRAGMENT */
-                  ))
-                ])) : vue.createCommentVNode("v-if", true)
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          )),
-          vue.createVNode(_component_i_button, {
-            type: "primary",
-            text: "发送指令",
-            class: "submit-btn",
-            disabled: !$setup.isFormValid,
-            onClick: $setup.sendCommand
-          }, null, 8, ["disabled"])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.commandRecords ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 2,
-        class: "section"
-      }, [
-        vue.createElementVNode("text", { class: "section-title" }, "指令记录"),
-        vue.createElementVNode(
-          "view",
-          { class: "record-list" },
-          vue.toDisplayString($setup.commandRecordReason),
-          1
-          /* TEXT */
-        )
-      ])) : vue.createCommentVNode("v-if", true),
-      !$setup.selectedTypeId ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 3,
-        class: "empty-state"
-      }, [
-        vue.createElementVNode("text", { class: "empty-text" }, "请先选择指令类型")
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.loading ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 4,
-        class: "loading"
-      }, [
-        vue.createElementVNode("text", { class: "loading-text" }, "加载中...")
-      ])) : $setup.commands.length == 0 && $setup.selectedTypeId != null ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 5,
-        class: "empty-state"
-      }, [
-        vue.createElementVNode("text", { class: "empty-text" }, "暂无指令")
-      ])) : vue.createCommentVNode("v-if", true)
-    ]);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "指令",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false
+          }),
+          vue.createElementVNode("view", { class: "device-info" }, [
+            vue.createElementVNode(
+              "text",
+              { class: "device-label" },
+              "设备ID: " + vue.toDisplayString($setup.imei),
+              1
+              /* TEXT */
+            )
+          ]),
+          vue.createElementVNode("view", { class: "section" }, [
+            vue.createElementVNode("text", { class: "section-title" }, "指令类型"),
+            vue.createElementVNode("view", { class: "type-container" }, [
+              vue.createElementVNode("view", { class: "type-list" }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.commandTypes, (type, index) => {
+                    return vue.openBlock(), vue.createElementBlock("view", {
+                      key: type.cmdmId,
+                      class: vue.normalizeClass(["type-item", { active: $setup.selectedTypeId == type.cmdmId }]),
+                      onClick: ($event) => $setup.selectTypeByItem(type)
+                    }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "type-name" },
+                        vue.toDisplayString(type.cmdName),
+                        1
+                        /* TEXT */
+                      )
+                    ], 10, ["onClick"]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])
+            ])
+          ]),
+          $setup.commands.length ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "section"
+          }, [
+            vue.createElementVNode("text", { class: "section-title" }, "指令列表"),
+            vue.createElementVNode("view", { class: "command-list" }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.commands, (cmd, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: cmd.predictCmdId,
+                    class: vue.normalizeClass(["command-item", { active: $setup.selectedCommandId == cmd.predictCmdId }]),
+                    onClick: ($event) => $setup.selectCommand(cmd)
+                  }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "command-name" },
+                      vue.toDisplayString(cmd.cmdName),
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode(
+                      "text",
+                      { class: "command-descr" },
+                      vue.toDisplayString(cmd.remarks),
+                      1
+                      /* TEXT */
+                    )
+                  ], 10, ["onClick"]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])
+          ])) : vue.createCommentVNode("v-if", true),
+          $setup.selectedCommandDetails ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "section"
+          }, [
+            vue.createElementVNode("view", { class: "param-form" }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.paramConfigs, (param, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: "param_" + index,
+                    class: "param-item"
+                  }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "section-title" },
+                      vue.toDisplayString(param.label),
+                      1
+                      /* TEXT */
+                    ),
+                    param.type == "input" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
+                      key: 0,
+                      class: "param-input",
+                      modelValue: $setup.paramValues[index],
+                      "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
+                      placeholder: "请输入" + param.label,
+                      "placeholder-class": "placeholder"
+                    }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder"])) : vue.createCommentVNode("v-if", true),
+                    param.type == "number" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
+                      key: 1,
+                      class: "param-input",
+                      type: "number",
+                      modelValue: $setup.paramValues[index],
+                      "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
+                      placeholder: "请输入" + param.label,
+                      "placeholder-class": "placeholder",
+                      maxlength: param.max
+                    }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder", "maxlength"])) : vue.createCommentVNode("v-if", true),
+                    param.type == "radio" ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 2,
+                      class: "radio-group"
+                    }, [
+                      (vue.openBlock(true), vue.createElementBlock(
+                        vue.Fragment,
+                        null,
+                        vue.renderList($setup.getRadioItems(param), (item) => {
+                          return vue.openBlock(), vue.createElementBlock("view", {
+                            key: "radio_" + item.value,
+                            class: "radio-item",
+                            onClick: ($event) => $setup.selectRadio(index, $setup.getRadioValue(item))
+                          }, [
+                            vue.createElementVNode("view", { class: "radio-icon" }, [
+                              vue.createElementVNode(
+                                "view",
+                                {
+                                  class: vue.normalizeClass(["radio-inner", { checked: $setup.paramValues[index] == $setup.getRadioValue(item) }])
+                                },
+                                null,
+                                2
+                                /* CLASS */
+                              )
+                            ]),
+                            vue.createElementVNode(
+                              "text",
+                              { class: "radio-label" },
+                              vue.toDisplayString($setup.getRadioDescription(item)),
+                              1
+                              /* TEXT */
+                            )
+                          ], 8, ["onClick"]);
+                        }),
+                        128
+                        /* KEYED_FRAGMENT */
+                      ))
+                    ])) : vue.createCommentVNode("v-if", true)
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              )),
+              vue.createVNode(_component_i_button, {
+                type: "primary",
+                text: "发送指令",
+                class: "submit-btn",
+                disabled: !$setup.isFormValid,
+                onClick: $setup.sendCommand
+              }, null, 8, ["disabled"])
+            ])
+          ])) : vue.createCommentVNode("v-if", true),
+          $setup.commandRecords ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 2,
+            class: "section"
+          }, [
+            vue.createElementVNode("text", { class: "section-title" }, "指令记录"),
+            vue.createElementVNode(
+              "view",
+              { class: "record-list" },
+              vue.toDisplayString($setup.commandRecordReason),
+              1
+              /* TEXT */
+            )
+          ])) : vue.createCommentVNode("v-if", true),
+          !$setup.selectedTypeId ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 3,
+            class: "empty-state"
+          }, [
+            vue.createElementVNode("text", { class: "empty-text" }, "请先选择指令类型")
+          ])) : vue.createCommentVNode("v-if", true),
+          $setup.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 4,
+            class: "loading"
+          }, [
+            vue.createElementVNode("text", { class: "loading-text" }, "加载中...")
+          ])) : $setup.commands.length == 0 && $setup.selectedTypeId != null ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 5,
+            class: "empty-state"
+          }, [
+            vue.createElementVNode("text", { class: "empty-text" }, "暂无指令")
+          ])) : vue.createCommentVNode("v-if", true)
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesCmdCmd = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["styles", [_style_0$4]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/cmd/cmd.uvue"]]);
   const emptyImage = "/static/empty.png";
@@ -21599,7 +21895,7 @@
       }
       vue.onLoad((options) => {
         var _a2, _b, _c, _d;
-        uni.__log__("log", "at pages/webview/webview.uvue:42", "接收到的参数:", options);
+        uni.__log__("log", "at pages/webview/webview.uvue:44", "接收到的参数:", options);
         const optionData = options;
         const url = (_a2 = optionData.getString("url", "")) !== null && _a2 !== void 0 ? _a2 : "";
         const pageTitle = (_b = optionData.getString("title", "")) !== null && _b !== void 0 ? _b : "";
@@ -21620,26 +21916,26 @@
             });
           }
         } else {
-          uni.showToast({
+          showAppToast({
             title: "链接地址无效",
             icon: "none"
           });
         }
       });
       const handleLoad = (e = null) => {
-        uni.__log__("log", "at pages/webview/webview.uvue:79", "网页加载成功", e);
+        uni.__log__("log", "at pages/webview/webview.uvue:81", "网页加载成功", e);
         uni.hideLoading();
       };
       const handleError = (e = null) => {
-        uni.__log__("error", "at pages/webview/webview.uvue:85", "网页加载失败", e);
-        uni.showToast({
+        uni.__log__("error", "at pages/webview/webview.uvue:87", "网页加载失败", e);
+        showAppToast({
           title: "页面加载失败",
           icon: "none"
         });
       };
       const handleMessage = (e) => {
         const detail = e.getJSON("detail");
-        uni.__log__("log", "at pages/webview/webview.uvue:95", "接收网页消息:", detail);
+        uni.__log__("log", "at pages/webview/webview.uvue:97", "接收网页消息:", detail);
       };
       const goBack = () => {
         uni.navigateBack(new UTSJSONObject({
@@ -21655,31 +21951,76 @@
   function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_web_view = vue.resolveComponent("web-view");
     const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "webview-container" }, [
-      $setup.webviewUrl ? (vue.openBlock(), vue.createBlock(_component_web_view, {
-        key: 0,
-        src: $setup.webviewUrl,
-        onMessage: $setup.handleMessage,
-        onLoad: $setup.handleLoad,
-        onError: $setup.handleError
-      }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "error-page"
-      }, [
-        vue.createVNode(_component_i_empty, {
-          text: "页面加载失败",
-          showButton: false,
-          description: "",
-          image: $setup.emptyImage
-        }),
-        vue.createElementVNode("button", {
-          class: "back-btn",
-          onClick: $setup.goBack
-        }, "返回上一页")
-      ]))
-    ]);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "webview-container" }, [
+          $setup.webviewUrl ? (vue.openBlock(), vue.createBlock(_component_web_view, {
+            key: 0,
+            src: $setup.webviewUrl,
+            onMessage: $setup.handleMessage,
+            onLoad: $setup.handleLoad,
+            onError: $setup.handleError
+          }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "error-page"
+          }, [
+            vue.createVNode(_component_i_empty, {
+              text: "页面加载失败",
+              showButton: false,
+              description: "",
+              image: $setup.emptyImage
+            }),
+            vue.createElementVNode("button", {
+              class: "back-btn",
+              onClick: $setup.goBack
+            }, "返回上一页")
+          ]))
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesWebviewWebview = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["styles", [_style_0$3]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/webview/webview.uvue"]]);
+  class DeviceItem extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            plateNo: { type: String, optional: false },
+            imei: { type: String, optional: false },
+            status: { type: Number, optional: false },
+            companyId: { type: String, optional: false },
+            deviceName: { type: String, optional: false },
+            deviceId: { type: String, optional: false },
+            iccid: { type: String, optional: false },
+            simMerchant: { type: String, optional: false },
+            connectionStatus: { type: String, optional: false }
+          };
+        },
+        name: "DeviceItem"
+      };
+    }
+    constructor(options, metadata = DeviceItem.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.plateNo = this.__props__.plateNo;
+      this.imei = this.__props__.imei;
+      this.status = this.__props__.status;
+      this.companyId = this.__props__.companyId;
+      this.deviceName = this.__props__.deviceName;
+      this.deviceId = this.__props__.deviceId;
+      this.iccid = this.__props__.iccid;
+      this.simMerchant = this.__props__.simMerchant;
+      this.connectionStatus = this.__props__.connectionStatus;
+      delete this.__props__;
+    }
+  }
   const _sfc_main$2 = /* @__PURE__ */ vue.defineComponent({
     __name: "indexListMode",
     props: {
@@ -21698,10 +22039,10 @@
         if (simMerchant.toLowerCase() == "zddx") {
           iccid = iccid.substring(0, iccid.length - 1);
         }
-        uni.__log__("log", "at components/indexListMode/indexListMode.uvue:59", iccid);
+        uni.__log__("log", "at components/indexListMode/indexListMode.uvue:52", iccid);
         needRefresh.value = true;
         needRefresh.value = false;
-        uni.showToast({
+        showAppToast({
           title: "请在微信小程序中完成充值",
           icon: "none"
         });
@@ -21749,7 +22090,7 @@
               vue.createElementVNode("view", { class: "title" }, [
                 vue.createElementVNode("view", { class: "car-number" }, [
                   vue.createTextVNode(
-                    vue.toDisplayString(item.deviceName) + " ",
+                    vue.toDisplayString(item.deviceName || item.imei) + " ",
                     1
                     /* TEXT */
                   ),
@@ -21762,11 +22103,6 @@
                   }, null, 8, ["text", "type"])
                 ]),
                 vue.createElementVNode("view", { class: "device-tools" }, [
-                  vue.createVNode(_component_i_tag, {
-                    text: "充值",
-                    type: "success",
-                    onClick: vue.withModifiers(($event) => $setup.pay(item.iccid, item.simMerchant), ["stop"])
-                  }, null, 8, ["onClick"]),
                   vue.createVNode(_component_i_tag, {
                     class: "device-tool-spacing",
                     text: "解绑",
@@ -21826,6 +22162,23 @@
         showMap.value = !showMap.value;
       };
       const originalDeviceList = vue.ref([]);
+      const deviceListItems = vue.computed(() => {
+        return originalDeviceList.value.map((item) => {
+          const imei = item.getString("imei", "");
+          const rawDeviceName = item.getString("deviceName", "");
+          return new DeviceItem({
+            plateNo: item.getString("plateNo", ""),
+            imei,
+            status: item.getNumber("status", 0),
+            companyId: item.getString("companyId", ""),
+            deviceName: rawDeviceName != "" ? rawDeviceName : imei,
+            deviceId: item.getString("deviceId", ""),
+            iccid: item.getString("iccid", ""),
+            simMerchant: item.getString("simMerchant", ""),
+            connectionStatus: item.getString("connectionStatus", "")
+          });
+        });
+      });
       const filteredDevices = vue.computed(() => {
         if (!Array.isArray(originalDeviceList.value))
           return [];
@@ -21871,7 +22224,7 @@
           const parsedId = idValue != null ? parseInt(idValue.toString()) : NaN;
           const markerId = isNaN(parsedId) ? index + 1 : parsedId;
           const deviceName = (_d = (_c = device["deviceName"]) !== null && _c !== void 0 ? _c : device["plateNo"]) !== null && _d !== void 0 ? _d : "设备";
-          nextMarkers.push(new UTSJSONObject({
+          nextMarkers.push({
             id: markerId,
             latitude: lat,
             longitude: lng,
@@ -21885,11 +22238,15 @@
               borderRadius: 8,
               bgColor: "#ffffff"
             }),
-            joinCluster: true,
-            anchor: new UTSJSONObject({ x: 0.5, y: 0.5 })
-          }));
+            anchor: { x: 0.5, y: 0.5 }
+          });
         }
         markers.value = nextMarkers;
+        if (nextMarkers.length > 0 && userLocation.value.latitude == 0 && userLocation.value.longitude == 0) {
+          const firstMarker = nextMarkers[0];
+          userLocation.value.latitude = firstMarker.latitude;
+          userLocation.value.longitude = firstMarker.longitude;
+        }
       };
       vue.watchEffect(() => {
         if (showMap.value) {
@@ -21903,14 +22260,24 @@
             if (from) {
               const params = new UTSJSONObject({ pageSize: 1e3 });
               const res = yield getUserDeviceList(params);
-              const list = res.data.list;
-              deviceList = list != null ? list : [];
+              const list = res.code == 0 && res.data != null ? res.data.list : null;
+              if (list == null || !Array.isArray(list)) {
+                uni.__log__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
+                originalDeviceList.value = [];
+                markers.value = [];
+                return Promise.resolve(null);
+              }
+              deviceList = list !== null && list !== void 0 ? list : [];
             }
+            if (!Array.isArray(deviceList))
+              deviceList = [];
             originalDeviceList.value = CoordTransform.batchConvertCoordinates(deviceList, "tencent");
             updateMarkers(originalDeviceList.value);
           } catch (err) {
-            uni.__log__("error", "at pages/deviceList/deviceList.uvue:126", "获取设备列表失败:", err);
-            uni.showToast({ title: "获取设备列表失败", icon: "none" });
+            uni.__log__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
+            originalDeviceList.value = [];
+            markers.value = [];
+            showAppToast({ title: "获取设备列表失败", icon: "none" });
           }
         });
       };
@@ -21918,13 +22285,13 @@
         return __awaiter(this, void 0, void 0, function* () {
           const res = yield delDevice(imei);
           if (res.code == 0) {
-            uni.showToast({
+            showAppToast({
               title: "解绑成功",
               icon: "success"
             });
             uni.setStorageSync("needRefreshHome", true);
           } else {
-            uni.showToast({
+            showAppToast({
               title: "解绑失败",
               icon: "error"
             });
@@ -21936,12 +22303,24 @@
         uni.getLocation(new UTSJSONObject({
           type: "wgs84",
           success: (res) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:153", "获取位置成功:", res);
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:187", "获取位置成功:", res);
             userLocation.value.latitude = res.latitude;
             userLocation.value.longitude = res.longitude;
           },
           fail: (err) => {
-            uni.__log__("log", "at pages/deviceList/deviceList.uvue:158", "获取位置失败:", err);
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:192", "获取位置失败:", err);
+          }
+        }));
+      };
+      const subMsg = () => {
+        uni.__log__("log", "at pages/deviceList/deviceList.uvue:199", "订阅消息");
+        uni.requestSubscribeMessage(new UTSJSONObject({
+          tmplIds: ["VRR0UEO9VJOLs0MHlU0OilqX6MVFDwH3_3gz3Oc0NIc"],
+          success: (res = null) => {
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:203", "订阅成功:", res);
+          },
+          fail: (err = null) => {
+            uni.__log__("log", "at pages/deviceList/deviceList.uvue:206", "订阅失败:", err);
           }
         }));
       };
@@ -21956,7 +22335,7 @@
           return device["deviceId"] == markerId;
         });
         if (selectedDevice == null) {
-          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:174", "未找到对应的设备信息", markerId);
+          uni.__log__("warn", "at pages/deviceList/deviceList.uvue:222", "未找到对应的设备信息", markerId);
           return null;
         }
         const imeiValue = (_a2 = selectedDevice["imei"]) !== null && _a2 !== void 0 ? _a2 : "";
@@ -21970,69 +22349,80 @@
         getLocation();
         loadUserDeviceList([], true);
       });
-      const __returned__ = { mapScale, showMap, markers, iconColor, userLocation, pickerStateTitle, showWhat, originalDeviceList, filteredDevices, totalCount, onlineCount, offlineCount, updateMarkers, loadUserDeviceList, unbindDevice, getLocation, changeState, handleTap };
+      const __returned__ = { mapScale, showMap, markers, iconColor, userLocation, pickerStateTitle, showWhat, originalDeviceList, deviceListItems, filteredDevices, totalCount, onlineCount, offlineCount, updateMarkers, loadUserDeviceList, unbindDevice, getLocation, subMsg, changeState, handleTap };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$1 = { "container": { "": { "position": "relative", "width": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100, "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "35rpx" } }, "btn-map-list": { ".container .tool-nav ": { "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "right-bar": { ".container ": { "position": "absolute", "top": "25rpx", "left": "20rpx", "zIndex": 100, "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "status-spacing": { ".container .right-bar ": { "marginLeft": "20rpx" } }, "allCar": { ".container .right-bar ": { "backgroundColor": "#1296db" } }, "onlineCar": { ".container .right-bar ": { "backgroundColor": "#0da117" } }, "offlineCar": { ".container .right-bar ": { "backgroundColor": "#d81e06" } } };
+  const _style_0$1 = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100, "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "35rpx" } }, "btn-map-list": { ".container .tool-nav ": { "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "#1296db", "color": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "right-bar": { ".container ": { "position": "absolute", "top": "25rpx", "left": "20rpx", "zIndex": 100, "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "status-spacing": { ".container .right-bar ": { "marginLeft": "20rpx" } }, "allCar": { ".container .right-bar ": { "backgroundColor": "#1296db" } }, "onlineCar": { ".container .right-bar ": { "backgroundColor": "#0da117" } }, "offlineCar": { ".container .right-bar ": { "backgroundColor": "#d81e06" } } };
   function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_map = vue.resolveComponent("map");
     const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
     const _component_indexListMode = resolveEasycom(vue.resolveDynamicComponent("indexListMode"), __easycom_2);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createVNode(_component_custom_navBar, {
-        title: "全部设备",
-        "show-back": true,
-        backgroundColor: "#f1f1f1",
-        textColor: "#333",
-        showCapsule: true,
-        isIcon: true,
-        onCapsuleClick: $setup.showWhat,
-        Icon: "/static/maps.png",
-        iconColor: $setup.iconColor
-      }, null, 8, ["iconColor"]),
-      $setup.showMap ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 0,
-        class: "map-container"
-      }, [
-        vue.createVNode(_component_map, {
-          id: "myMap",
-          scale: $setup.mapScale,
-          style: { "width": "100%", "height": "100%" },
-          onMarkertap: $setup.handleTap,
-          latitude: $setup.userLocation.latitude,
-          longitude: $setup.userLocation.longitude,
-          "enable-traffic": true
-        }, null, 8, ["scale", "latitude", "longitude"]),
-        $setup.showMap ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "right-bar"
-        }, [
-          vue.createVNode(_component_i_tag, {
-            type: "primary",
-            onClick: _cache[0] || (_cache[0] = ($event) => $setup.changeState("在线")),
-            text: "在线 ".concat($setup.onlineCount)
-          }, null, 8, ["text"]),
-          vue.createVNode(_component_i_tag, {
-            type: "success",
-            onClick: _cache[1] || (_cache[1] = ($event) => $setup.changeState("在线")),
-            text: "在线 ".concat($setup.onlineCount)
-          }, null, 8, ["text"]),
-          vue.createVNode(_component_i_tag, {
-            type: "danger",
-            onClick: _cache[2] || (_cache[2] = ($event) => $setup.changeState("离线")),
-            text: "离线 ".concat($setup.offlineCount)
-          }, null, 8, ["text"])
-        ])) : vue.createCommentVNode("v-if", true)
-      ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 1 }, [
-        vue.createVNode(_component_indexListMode, {
-          lists: $setup.originalDeviceList,
-          onUnbindDevice: $setup.unbindDevice
-        }, null, 8, ["lists"])
-      ]))
-    ]);
+    const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), __easycom_3$3);
+    return vue.openBlock(), vue.createElementBlock(
+      vue.Fragment,
+      null,
+      [
+        vue.createElementVNode("view", { class: "container" }, [
+          vue.createVNode(_component_custom_navBar, {
+            title: "全部设备",
+            "show-back": true,
+            backgroundColor: "#f1f1f1",
+            textColor: "#333",
+            showCapsule: true,
+            isIcon: true,
+            onCapsuleClick: $setup.showWhat,
+            Icon: "/static/maps.png",
+            iconColor: $setup.iconColor
+          }, null, 8, ["iconColor"]),
+          $setup.showMap ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "map-container"
+          }, [
+            vue.createVNode(_component_map, {
+              id: "myMap",
+              scale: $setup.mapScale,
+              style: { "width": "100%", "height": "100%" },
+              onMarkertap: $setup.handleTap,
+              latitude: $setup.userLocation.latitude,
+              longitude: $setup.userLocation.longitude,
+              markers: $setup.markers,
+              "enable-traffic": true
+            }, null, 8, ["scale", "latitude", "longitude", "markers"]),
+            $setup.showMap ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "right-bar"
+            }, [
+              vue.createVNode(_component_i_tag, {
+                type: "primary",
+                onClick: _cache[0] || (_cache[0] = ($event) => $setup.changeState("全部")),
+                text: "全部 ".concat($setup.totalCount)
+              }, null, 8, ["text"]),
+              vue.createVNode(_component_i_tag, {
+                type: "success",
+                onClick: _cache[1] || (_cache[1] = ($event) => $setup.changeState("在线")),
+                text: "在线 ".concat($setup.onlineCount)
+              }, null, 8, ["text"]),
+              vue.createVNode(_component_i_tag, {
+                type: "danger",
+                onClick: _cache[2] || (_cache[2] = ($event) => $setup.changeState("离线")),
+                text: "离线 ".concat($setup.offlineCount)
+              }, null, 8, ["text"])
+            ])) : vue.createCommentVNode("v-if", true)
+          ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 1 }, [
+            vue.createVNode(_component_indexListMode, {
+              lists: $setup.deviceListItems,
+              onUnbindDevice: $setup.unbindDevice
+            }, null, 8, ["lists"])
+          ]))
+        ]),
+        vue.createVNode(_component_app_toast)
+      ],
+      64
+      /* STABLE_FRAGMENT */
+    );
   }
   const PagesDeviceListDeviceList = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["styles", [_style_0$1]], ["__file", "/Users/xyhc/Documents/carConnectInternet/pages/deviceList/deviceList.uvue"]]);
   __definePage("pages/index/index", PagesIndexIndex);
@@ -22058,16 +22448,16 @@
   __definePage("pages/deviceList/deviceList", PagesDeviceListDeviceList);
   const _sfc_main = vue.defineComponent({
     onLaunch: function() {
-      uni.__log__("log", "at App.uvue:75", "App onLaunch");
+      uni.__log__("log", "at App.uvue:73", "App onLaunch");
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:80", "App Show");
+      uni.__log__("log", "at App.uvue:77", "App Show");
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:83", "App Hide");
+      uni.__log__("log", "at App.uvue:80", "App Hide");
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:104", "App Exit");
+      uni.__log__("log", "at App.uvue:101", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };

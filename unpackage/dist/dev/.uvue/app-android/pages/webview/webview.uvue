@@ -1,4 +1,6 @@
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue';
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../utils/toast.uts';
 import { ref } from 'vue';
 const __sfc__ = defineComponent({
     __name: 'webview',
@@ -26,13 +28,13 @@ const __sfc__ = defineComponent({
         }
         // 页面加载
         onLoad((options) => {
-            console.log('接收到的参数:', options, " at pages/webview/webview.uvue:42");
+            console.log('接收到的参数:', options, " at pages/webview/webview.uvue:44");
             const optionData = options as UTSJSONObject;
             const url: string = optionData.getString('url', '') ?? '';
             const pageTitle: string = optionData.getString('title', '') ?? '';
             if (url != '') {
                 // decodeURIComponent 在 UTS 中返回可空字符串，使用空字符串作为回退值。
-                let decodedUrl: string = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:49") ?? '';
+                let decodedUrl: string = UTSAndroid.consoleDebugError(decodeURIComponent(url), " at pages/webview/webview.uvue:51") ?? '';
                 // 添加协议前缀（如果没有的话）
                 if (!decodedUrl.startsWith('http://') && !decodedUrl.startsWith('https://')) {
                     decodedUrl = 'https://' + decodedUrl;
@@ -41,7 +43,7 @@ const __sfc__ = defineComponent({
                 // 设置导航栏标题
                 if (pageTitle != '') {
                     uni.setNavigationBarTitle({
-                        title: UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:61") ?? ''
+                        title: UTSAndroid.consoleDebugError(decodeURIComponent(pageTitle), " at pages/webview/webview.uvue:63") ?? ''
                     });
                 }
                 else {
@@ -52,29 +54,29 @@ const __sfc__ = defineComponent({
                 }
             }
             else {
-                uni.showToast({
+                showAppToast({
                     title: '链接地址无效',
                     icon: 'none'
-                });
+                } as ShowToastOptions);
             }
         });
         // webview 加载成功
         const handleLoad = (e: any): void => {
-            console.log('网页加载成功', e, " at pages/webview/webview.uvue:79");
+            console.log('网页加载成功', e, " at pages/webview/webview.uvue:81");
             uni.hideLoading();
         };
         // webview 加载错误
         const handleError = (e: any): void => {
-            console.error('网页加载失败', e, " at pages/webview/webview.uvue:85");
-            uni.showToast({
+            console.error('网页加载失败', e, " at pages/webview/webview.uvue:87");
+            showAppToast({
                 title: '页面加载失败',
                 icon: 'none'
-            });
+            } as ShowToastOptions);
         };
         // 接收网页传递的消息（如果网页调用了 postMessage）
         const handleMessage = (e: UTSJSONObject): void => {
             const detail = e.getJSON('detail');
-            console.log('接收网页消息:', detail, " at pages/webview/webview.uvue:95");
+            console.log('接收网页消息:', detail, " at pages/webview/webview.uvue:97");
         };
         // 返回上一页
         const goBack = () => {
@@ -85,31 +87,35 @@ const __sfc__ = defineComponent({
         return (): any | null => {
             const _component_web_view = resolveComponent("web-view");
             const _component_i_empty = resolveEasyComponent("i-empty", _easycom_i_empty);
-            return _cE("view", _uM({ class: "webview-container" }), [
-                isTrue(webviewUrl.value)
-                    ? _cV(_component_web_view, _uM({
-                        key: 0,
-                        src: webviewUrl.value,
-                        onMessage: handleMessage,
-                        onLoad: handleLoad,
-                        onError: handleError
-                    }), null, 8 /* PROPS */, ["src"])
-                    : _cE("view", _uM({
-                        key: 1,
-                        class: "error-page"
-                    }), [
-                        _cV(_component_i_empty, _uM({
-                            text: "页面加载失败",
-                            showButton: false,
-                            description: "",
-                            image: emptyImage
-                        })),
-                        _cE("button", _uM({
-                            class: "back-btn",
-                            onClick: goBack
-                        }), "返回上一页")
-                    ])
-            ]);
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
+            return _cE(Fragment, null, [
+                _cE("view", _uM({ class: "webview-container" }), [
+                    isTrue(webviewUrl.value)
+                        ? _cV(_component_web_view, _uM({
+                            key: 0,
+                            src: webviewUrl.value,
+                            onMessage: handleMessage,
+                            onLoad: handleLoad,
+                            onError: handleError
+                        }), null, 8 /* PROPS */, ["src"])
+                        : _cE("view", _uM({
+                            key: 1,
+                            class: "error-page"
+                        }), [
+                            _cV(_component_i_empty, _uM({
+                                text: "页面加载失败",
+                                showButton: false,
+                                description: "",
+                                image: emptyImage
+                            })),
+                            _cE("button", _uM({
+                                class: "back-btn",
+                                onClick: goBack
+                            }), "返回上一页")
+                        ])
+                ]),
+                _cV(_component_app_toast)
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });

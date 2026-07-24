@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const utils_toast = require("../../../utils/toast.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -7,15 +8,17 @@ if (!Array) {
   const _easycom_i_form_item_1 = common_vendor.resolveComponent("i-form-item");
   const _easycom_i_form_1 = common_vendor.resolveComponent("i-form");
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_form_1 + _easycom_i_button_1)();
+  const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_form_1 + _easycom_i_button_1 + _easycom_app_toast_1)();
 }
 const _easycom_custom_navBar = () => "../../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_input = () => "../../../uni_modules/i-ui-x/components/i-input/i-input.js";
 const _easycom_i_form_item = () => "../../../uni_modules/i-ui-x/components/i-form-item/i-form-item.js";
 const _easycom_i_form = () => "../../../uni_modules/i-ui-x/components/i-form/i-form.js";
 const _easycom_i_button = () => "../../../uni_modules/i-ui-x/components/i-button/i-button.js";
+const _easycom_app_toast = () => "../../../components/app-toast/app-toast.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_form + _easycom_i_button)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_form + _easycom_i_button + _easycom_app_toast)();
 }
 class UserInfo extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -90,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.changePassWord(submitData);
           if (res.msg == "success") {
             common_vendor.index.hideLoading();
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "密码修改成功",
               icon: "success",
               duration: 2e3
@@ -100,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, 1500);
           } else {
             common_vendor.index.hideLoading();
-            common_vendor.index.showToast({
+            utils_toast.showAppToast({
               title: "密码修改失败",
               icon: "error",
               duration: 2e3
@@ -108,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.showToast({
+          utils_toast.showAppToast({
             title: "表单验证失败",
             icon: "none",
             duration: 2e3
@@ -120,16 +123,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options.userInfo != null) {
         try {
           const parsedInfo = common_vendor.UTS.JSON.parse(decodeURIComponent(options.userInfo));
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:118", parsedInfo);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:120", parsedInfo);
           const userId = parsedInfo.getString("userId");
           const mobile = parsedInfo.getString("mobile");
           userInfo.value = {
             id: userId != null ? userId : "",
             mobile: mobile != null ? mobile : ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:125", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/editPassword/editPassword.uvue:127", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:127", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/editPassword/editPassword.uvue:129", "解析用户信息失败:", e);
         }
       }
     });
@@ -145,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return common_vendor.unref(formData).password = $event;
-        }, "1d"),
+        }, "ba"),
         c: common_vendor.p({
           placeholder: "请输入原密码",
           border: "none",
@@ -163,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.o(($event) => {
           return common_vendor.unref(formData).newPassword = $event;
-        }, "05"),
+        }, "70"),
         f: common_vendor.p({
           placeholder: "请输入新密码",
           border: "none",
@@ -181,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return common_vendor.unref(formData).confirmPassword = $event;
-        }, "5f"),
+        }, "f7"),
         i: common_vendor.p({
           placeholder: "请再次输入新密码",
           border: "none",
@@ -204,15 +207,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rules,
           class: "r"
         }),
-        m: common_vendor.o(handleSubmit, "19"),
+        m: common_vendor.o(handleSubmit, "9e"),
         n: common_vendor.p({
           type: "primary",
           text: "提交修改"
         }),
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`,
-        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };
