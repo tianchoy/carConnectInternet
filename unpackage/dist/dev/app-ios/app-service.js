@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_-AT23a";
+    const id = "app-ios_D0lmNO";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -4777,11 +4777,13 @@
       const newMessageCount = vue.ref(0);
       const lastUpdateTime = vue.ref((/* @__PURE__ */ new Date()).getTime());
       const Login = vue.ref(false);
+      const messageScrollViewportHeight = vue.ref(0);
+      const isNearMessageListBottom = vue.ref(false);
       let checkTimer = 0;
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:101", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:105", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -4824,7 +4826,7 @@
               newMessageCount.value = count;
             }
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:141", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:145", "检查新消息失败:", error);
           }
         });
       }
@@ -4832,10 +4834,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:151", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:155", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:155", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:159", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -4846,6 +4848,7 @@
             currPage.value = 1;
             msgList.value = [];
             loadStatus.value = "loadmore";
+            isNearMessageListBottom.value = false;
           }
           if (isLoading.value)
             return Promise.resolve(null);
@@ -4886,7 +4889,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:202", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:207", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4894,12 +4897,12 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:210", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:215", "加载新消息");
           yield loadMsgList(true);
           hasNewMessages.value = false;
           newMessageCount.value = 0;
           lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
-          uni.__log__("log", "at pages/message/message.uvue:215", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:220", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -4914,49 +4917,62 @@
       const gotoLogin = () => {
         uni.redirectTo({ url: "/pages/login/login" });
       };
+      const measureMessageScrollViewport = () => {
+        uni.createSelectorQuery().select("#message-scroll-container").boundingClientRect((rect = null) => {
+          var _a2;
+          if (rect == null)
+            return null;
+          const nodeInfo = rect;
+          const height = (_a2 = nodeInfo.height) !== null && _a2 !== void 0 ? _a2 : 0;
+          if (height > 0) {
+            messageScrollViewportHeight.value = height;
+          }
+        }).exec();
+      };
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:239", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:255", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
+          measureMessageScrollViewport();
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:249", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:266", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:251", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:268", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:259", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:276", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:261", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:278", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:268", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:285", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:270", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:287", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:279", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:296", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:281", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:298", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:289", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:306", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -4966,7 +4982,6 @@
       };
       const loadMore = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:300", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
           if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
             if (currPage.value >= totalPage.value) {
               loadStatus.value = "nomore";
@@ -4978,9 +4993,21 @@
         });
       };
       const onScrollToLower = () => {
-        uni.__log__("log", "at pages/message/message.uvue:314", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
         if (loadStatus.value == "loadmore" && !isLoading.value) {
           loadMore();
+        }
+      };
+      const onMessageScroll = (event) => {
+        const viewportHeight = messageScrollViewportHeight.value;
+        if (viewportHeight <= 0)
+          return null;
+        const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight;
+        const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100;
+        if (isNearBottom && !isNearMessageListBottom.value) {
+          isNearMessageListBottom.value = true;
+          loadMore();
+        } else if (!isNearBottom) {
+          isNearMessageListBottom.value = false;
         }
       };
       const handleItemClick = (item) => {
@@ -5001,7 +5028,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:338", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:368", "更新状态失败:", error);
             }
           }
         });
@@ -5039,7 +5066,7 @@
         if (!timeString)
           return "";
         try {
-          const date = new Date(timeString);
+          const date = new Date(timeString.replace(/-/g, "/"));
           const now = /* @__PURE__ */ new Date();
           const diff = now.getTime() - date.getTime();
           const minutes = Math.floor(diff / 6e4);
@@ -5058,16 +5085,16 @@
           return timeString;
         }
       };
-      const __returned__ = { modal, modalContent, refresherTriggered, msgList, currPage, pageSize, totalPage, loadStatus, isLoading, hasNewMessages, newMessageCount, lastUpdateTime, Login, get checkTimer() {
+      const __returned__ = { modal, modalContent, refresherTriggered, msgList, currPage, pageSize, totalPage, loadStatus, isLoading, hasNewMessages, newMessageCount, lastUpdateTime, Login, messageScrollViewportHeight, isNearMessageListBottom, get checkTimer() {
         return checkTimer;
       }, set checkTimer(v) {
         checkTimer = v;
-      }, isPageActive, stopNewMessageCheck, vibrateAlert, checkNewMessages, startNewMessageCheck, loadMsgList, loadNewMessages, gotoLogin, onRefresherRefresh, loadMore, onScrollToLower, handleItemClick, ReadIt, getMessageId, getMessageCreateTime, getMessageContent, isMessageUnread, getMessageTypeText, getMessageTitle, formatTime };
+      }, isPageActive, stopNewMessageCheck, vibrateAlert, checkNewMessages, startNewMessageCheck, loadMsgList, loadNewMessages, gotoLogin, measureMessageScrollViewport, onRefresherRefresh, loadMore, onScrollToLower, onMessageScroll, handleItemClick, ReadIt, getMessageId, getMessageCreateTime, getMessageContent, isMessageUnread, getMessageTypeText, getMessageTitle, formatTime };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$E = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5", "marginTop": "170rpx", "position": "relative" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "textAlign": "center" } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "textAlign": "center" } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
   function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
@@ -5089,11 +5116,13 @@
             "scroll-y": "true",
             "show-scrollbar": false,
             class: "scroll-container",
+            id: "message-scroll-container",
             "refresher-enabled": "",
             "refresher-triggered": $setup.refresherTriggered,
             "lower-threshold": 100,
             onRefresherrefresh: $setup.onRefresherRefresh,
-            onScrolltolower: $setup.onScrollToLower
+            onScrolltolower: $setup.onScrollToLower,
+            onScroll: $setup.onMessageScroll
           }, [
             vue.createElementVNode("view", { class: "list-box" }, [
               $setup.msgList.length == 0 && !$setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {

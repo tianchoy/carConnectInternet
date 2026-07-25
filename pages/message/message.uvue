@@ -6,11 +6,13 @@
 			scroll-y="true" 
 			:show-scrollbar="false"
 			class="scroll-container"
+			id="message-scroll-container"
 			refresher-enabled
 			:refresher-triggered="refresherTriggered"
 			:lower-threshold="100"
 			@refresherrefresh="onRefresherRefresh"
-			@scrolltolower="onScrollToLower">
+			@scrolltolower="onScrollToLower"
+			@scroll="onMessageScroll">
 
 			<view class="list-box">
 				<!-- 显示空状态 -->
@@ -80,6 +82,8 @@
 	const newMessageCount = ref(0)   // 新消息数量
 	const lastUpdateTime = ref(new Date().getTime()) // 最后更新时间
 	const Login = ref(false)
+	const messageScrollViewportHeight = ref(0)
+	const isNearMessageListBottom = ref(false)
 
 	// 定时器相关
 	let checkTimer: number = 0
@@ -165,6 +169,7 @@
 			currPage.value = 1
 			msgList.value = []
 			loadStatus.value = 'loadmore'
+			isNearMessageListBottom.value = false
 		}
 		if (isLoading.value) return
 		isLoading.value = true
@@ -233,11 +238,23 @@
 			uni.redirectTo({ url: '/pages/login/login' })
 		}
 
+	const measureMessageScrollViewport = () : void => {
+		uni.createSelectorQuery().select('#message-scroll-container').boundingClientRect((rect : any) => {
+			if (rect == null) return
+			const nodeInfo = rect as NodeInfo
+			const height = nodeInfo.height ?? 0
+			if (height > 0) {
+				messageScrollViewportHeight.value = height
+			}
+		}).exec()
+	}
+
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
 			console.log('页面显示 - 启动自动刷新')
 			isPageActive.value = true
+			measureMessageScrollViewport()
 			startNewMessageCheck()
 			// 立即检查一次新消息
 			checkNewMessages()
@@ -297,7 +314,6 @@
 
 	// 加载更多
 	const loadMore = async () => {
-		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value)
 		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
 			if (currPage.value >= totalPage.value) {
 				loadStatus.value = 'nomore'
@@ -311,10 +327,24 @@
 
 	// 滚动到底部加载更多
 	const onScrollToLower = () => {
-		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value)
 		if (loadStatus.value == 'loadmore' && !isLoading.value) {
 			loadMore()
 		}
+	}
+
+	const onMessageScroll = (event : UniScrollEvent) : void => {
+		// #ifdef APP-IOS
+		const viewportHeight = messageScrollViewportHeight.value
+		if (viewportHeight <= 0) return
+		const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight
+		const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100
+		if (isNearBottom && !isNearMessageListBottom.value) {
+			isNearMessageListBottom.value = true
+			loadMore()
+		} else if (!isNearBottom) {
+			isNearMessageListBottom.value = false
+		}
+		// #endif
 	}
 
 
@@ -377,7 +407,7 @@
 	const formatTime = (timeString: string) => {
 		if (!timeString) return ''
 		try {
-			const date = new Date(timeString)
+			const date = new Date(timeString.replace(/-/g, '/'))
 			const now = new Date()
 			const diff = now.getTime() - date.getTime()
 			const minutes = Math.floor(diff / 60000)
@@ -399,10 +429,10 @@
 <style lang="scss">
 	.container {
 		width: 100%;
-		height: 100%;
+		position: fixed;
+		top: 170rpx;
+		bottom: 0;
 		background-color: #f5f5f5;
-		margin-top: 170rpx;
-		position: relative;
 
 		.scroll-container {
 			height: 100%;

@@ -1,0 +1,61 @@
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
+import { showAppToast } from '../../utils/toast.uts';
+import { ref } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'scancode',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const scanFunctionIsUseable = ref(true);
+        const goBack = () => {
+            uni.navigateBack({ delta: 1 });
+        };
+        const handleScanResult = (scanResult: string) => {
+            if (!scanFunctionIsUseable.value || scanResult.length == 0)
+                return;
+            scanFunctionIsUseable.value = false;
+            console.log('扫码结果:', scanResult);
+            uni.setStorageSync('scanCodeResult', scanResult);
+            uni.$emit('scanCodeResult', { result: scanResult });
+            showAppToast({
+                title: '扫码成功',
+                icon: 'success',
+                duration: 1000
+            } as ShowToastOptions);
+            setTimeout(() => {
+                uni.navigateBack({ delta: 1 });
+            }, 1000);
+        };
+        const startScan = () => {
+            if (!scanFunctionIsUseable.value)
+                return;
+            uni.scanCode({
+                onlyFromCamera: true,
+                success: (res) => {
+                    console.log('扫码成功res:', res);
+                    const result = res.result;
+                    if (result != null)
+                        handleScanResult(result);
+                },
+                fail: (err) => {
+                    console.log('扫码失败:', err);
+                    showAppToast({ title: '扫码失败', icon: 'none' } as ShowToastOptions);
+                    goBack();
+                }
+            });
+        };
+        onLoad((_options) => {
+            startScan();
+        });
+        return (): any | null => {
+            const _component_app_toast = resolveEasyComponent("app-toast", _easycom_app_toast);
+            return _cE(Fragment, null, [
+                _cE("view"),
+                _cV(_component_app_toast)
+            ], 64 /* STABLE_FRAGMENT */);
+        };
+    }
+});
+export default __sfc__;
+const GenPagesScancodeScancodeStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#000000"]]))], ["scan-header", _pS(_uM([["height", "88rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["backgroundColor", "#ffffff"]]))], ["back-button", _pS(_uM([["width", "120rpx"], ["color", "#333333"], ["fontSize", "28rpx"], ["textAlign", "center"]]))], ["title", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["color", "#333333"], ["fontSize", "36rpx"], ["fontWeight", "bold"], ["textAlign", "center"], ["marginRight", "120rpx"]]))], ["scancode-box", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["scan-button", _pS(_uM([["color", "#ffffff"], ["fontSize", "32rpx"], ["backgroundColor", "#007aff"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["paddingTop", "24rpx"], ["paddingRight", "60rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "60rpx"]]))], ["tip", _pS(_uM([["position", "fixed"], ["bottom", "100rpx"], ["left", 0], ["right", 0], ["textAlign", "center"], ["color", "#ffffff"], ["fontSize", "28rpx"], ["backgroundColor", "rgba(0,0,0,0.5)"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]]))]])];

@@ -1,0 +1,390 @@
+import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
+import { computed, nextTick, ref, watch } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'i-form',
+name: 'i-form',
+  props: {
+  modelValue: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+  fields: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  rules: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  showActions: {
+    type: Boolean,
+    default: false,
+  },
+  submitText: {
+    type: String,
+    default: '提交',
+  },
+  resetText: {
+    type: String,
+    default: '重置',
+  },
+  labelDirection: {
+    type: String,
+    default: 'horizontal',
+  },
+  errorAlign: {
+    type: String,
+    default: 'left',
+  },
+  errorAutoPage: {
+    type: Boolean,
+    default: true,
+  },
+  scrollOffsetTop: {
+    type: [String, Number],
+    default: 12,
+  },
+  scrollDuration: {
+    type: [String, Number],
+    default: 300,
+  },
+  scrollIdPrefix: {
+    type: String,
+    default: 'i-form-item-',
+  },
+  watchValidStatus: {
+    type: Boolean,
+    default: false,
+  },
+  modelValid: {
+    type: Boolean,
+    default: false,
+  },
+},
+  emits: [
+  'submit',
+  'reset',
+  'validate',
+  'scroll-to-error',
+  'update:modelValid',
+  'update:valid',
+],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+/**
+ * Props 说明：依据 DCloud uni-app x form，提供表单容器、校验和提交能力。
+ * - modelValue: 表单数据对象，和 rules/fields 中的 name 对应。
+ * - fields: 字段配置数组，兼容旧版写法；支持 name、label、value、required、message。
+ * - rules: 校验规则数组；当 fields 为空时使用，支持 required、message、validator。
+ * - showActions: 是否显示内置提交/重置按钮。
+ * - submitText/resetText: 内置按钮文案。
+ * - labelDirection: 标签方向，horizontal 横向，vertical 纵向。
+ * - errorAlign: 错误信息对齐方式，left、center、right。
+ * - errorAutoPage: 校验失败后是否滚动到首个错误字段。
+ * - scrollOffsetTop: 滚动到错误字段时的顶部偏移。
+ * - scrollDuration: 滚动动画时长。
+ * - scrollIdPrefix: 字段滚动定位 id 前缀，需要和 i-form-item 保持一致。
+ * - watchValidStatus: 是否在字段变化时实时输出 modelValid。
+ * - modelValid: 当前校验状态，建议通过 v-model:valid 或 update:modelValid 读取。
+ */
+const props = __props
+
+/**
+ * Emits 说明：表单校验和提交状态。
+ * - submit: 提交表单时触发，参数包含 valid、values、errors。
+ * - reset: 重置组件状态时触发。
+ * - validate: 触发表单校验时触发。
+ * - scroll-to-error: 校验失败并准备滚动到错误项时触发，参数包含 field、targetId、selector。
+ * - update:modelValid/update:valid: 输出实时或手动校验结果。
+ */
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const valid = ref<boolean>(true)
+const message = ref<string>('')
+const errors = ref<Array<UTSJSONObject>>([])
+
+const formClass = computed(() => {
+  const classes = ['i-form']
+  if (props.labelDirection == 'vertical') classes.push('i-form--vertical')
+  return classes.join(' ')
+})
+
+const messageClass = computed(() => {
+  return valid.value
+    ? 'i-form__message i-form__message--success'
+    : 'i-form__message i-form__message--error'
+})
+
+const messageStyle = computed(() => {
+  return 'text-align:' + props.errorAlign + ';'
+})
+
+function valueText(value: any): string {
+  if (typeof value == 'string') return value
+  if (typeof value == 'number' || typeof value == 'boolean') return value.toString()
+  if (Array.isArray(value)) {
+    const list = value as Array<any>
+    return list.join(',')
+  }
+  if (value != null && typeof value == 'object') return '[object Object]'
+  return ''
+}
+
+function activeFields(): Array<UTSJSONObject> {
+  const fields = props.fields
+  if (fields != null && fields.length > 0) return fields as Array<UTSJSONObject>
+  const rules = props.rules
+  if (rules != null) return rules as Array<UTSJSONObject>
+  return [] as Array<UTSJSONObject>
+}
+
+function fieldValue(item: UTSJSONObject): any {
+  const configuredValue = item['value']
+  if (configuredValue != null) return configuredValue
+  const name = item.getString('name', '')
+  if (name.length == 0) return ''
+  const values = props.modelValue as UTSJSONObject | null
+  if (values != null) {
+    const modelValue = values[name]
+    if (modelValue != null) return modelValue as any
+  }
+  return ''
+}
+
+function fieldLabel(item: UTSJSONObject): string {
+  const label = item.getString('label', item.getString('name', ''))
+  return label.length > 0 ? label : '字段'
+}
+
+function fieldRequired(item: UTSJSONObject): boolean {
+  return item.getBoolean('required', false)
+}
+
+function fieldMessage(item: UTSJSONObject): string {
+  const customMessage = item.getString('message', '')
+  if (customMessage.length > 0) return customMessage
+  return fieldLabel(item) + '不能为空'
+}
+
+function checkField(item: UTSJSONObject, selectedKeys: Array<string>): string {
+  const name = item.getString('name', '')
+  if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0) return ''
+  const value = fieldValue(item)
+  if (fieldRequired(item) && valueText(value).length == 0) {
+    return fieldMessage(item)
+  }
+  return ''
+}
+
+function collectValues(): UTSJSONObject {
+  const values = {} as UTSJSONObject
+  const list = activeFields()
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i] as UTSJSONObject
+    const name = item.getString('name', '')
+    if (name.length > 0) values[name] = fieldValue(item)
+  }
+  return values
+}
+
+function numberValue(value: string | number): number {
+  if (typeof value == 'number') return value
+  return Number.from(parseFloat(value))
+}
+
+function normalizeIdName(name: string): string {
+  let result = ''
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charAt(i)
+    const isNumber = char >= '0' && char <= '9'
+    const isUpper = char >= 'A' && char <= 'Z'
+    const isLower = char >= 'a' && char <= 'z'
+    if (isNumber || isUpper || isLower || char == '-' || char == '_') {
+      result = result + char
+    } else {
+      result = result + '-'
+    }
+  }
+  return result
+}
+
+function scrollTargetId(name: string): string {
+  return props.scrollIdPrefix + normalizeIdName(name)
+}
+
+function scrollToFirstError(nextErrors: Array<UTSJSONObject>): void {
+  if (!props.errorAutoPage || nextErrors.length == 0) return
+  const field = nextErrors[0].getString('field', '')
+  if (field.length == 0) return
+  const targetId = scrollTargetId(field)
+  const selector = '#' + targetId
+  const offsetTop = numberValue(props.scrollOffsetTop)
+  const duration = numberValue(props.scrollDuration)
+  emit('scroll-to-error', {
+    field,
+    targetId,
+    selector,
+    offsetTop,
+    duration,
+  })
+  nextTick(() => {
+    uni.pageScrollTo({
+      selector,
+      offsetTop,
+      duration,
+    })
+  })
+}
+
+function validateFields(selectedKeys: Array<string>, silent: boolean): boolean {
+  const list = activeFields()
+  const nextErrors = [] as Array<UTSJSONObject>
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    const errorMessage = checkField(item, selectedKeys)
+    if (errorMessage.length > 0) {
+      nextErrors.push({
+        field: item.getString('name', ''),
+        message: errorMessage,
+      })
+    }
+  }
+  errors.value = nextErrors
+  valid.value = nextErrors.length == 0
+  if (!silent) {
+    if (valid.value) {
+      message.value = '校验通过'
+    } else {
+      const firstError = nextErrors[0]
+      message.value = firstError.getString('message', '')
+    }
+    emit('validate', {
+      valid: valid.value,
+      message: message.value,
+      errors: nextErrors,
+      values: collectValues(),
+    })
+    if (!valid.value) scrollToFirstError(nextErrors)
+  }
+  emit('update:modelValid', valid.value)
+  emit('update:valid', valid.value)
+  return valid.value
+}
+
+function validate(): boolean {
+  return validateFields([] as Array<string>, false)
+}
+
+function validFields(keys: Array<string>): boolean {
+  return validateFields(keys, false)
+}
+
+function checkAsyncVaildStatus(): boolean {
+  return validateFields([] as Array<string>, true)
+}
+
+function clearValid(): void {
+  valid.value = true
+  message.value = ''
+  errors.value = [] as Array<UTSJSONObject>
+  emit('update:modelValid', true)
+  emit('update:valid', true)
+}
+
+function submit(): void {
+  const isValid = validate()
+  const result = {
+    valid: isValid,
+    values: collectValues(),
+    errors: errors.value,
+    message: message.value,
+  }
+  emit('submit', result)
+}
+
+function reset(): void {
+  clearValid()
+  emit('reset', {
+    values: collectValues(),
+  })
+}
+
+watch(
+  () : any => [props.fields, props.rules, props.modelValue, props.watchValidStatus],
+  () : void => {
+    if (props.watchValidStatus) validateFields([] as Array<string>, true)
+  },
+  { deep: true }
+)
+
+__expose({
+  valid: validFields,
+  validate,
+  clearValid,
+  checkAsyncVaildStatus,
+  submit,
+  reset,
+})
+
+return (): any | null => {
+
+const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
+
+  return _cE("view", _uM({
+    class: _nC(formClass.value)
+  }), [
+    renderSlot(_ctx.$slots, "default"),
+    message.value.length > 0
+      ? _cE("text", _uM({
+          key: 0,
+          class: _nC(messageClass.value),
+          style: _nS(messageStyle.value)
+        }), _tD(message.value), 7 /* TEXT, CLASS, STYLE */)
+      : _cC("v-if", true),
+    isTrue(_ctx.showActions)
+      ? _cE("view", _uM({
+          key: 1,
+          class: "i-form__actions"
+        }), [
+          _cV(_component_i_button, _uM({
+            size: "small",
+            plain: "",
+            onClick: reset
+          }), _uM({
+            default: withSlotCtx((): any[] => [_tD(_ctx.resetText)]),
+            _: 1 /* STABLE */
+          })),
+          _cV(_component_i_button, _uM({
+            size: "small",
+            type: "primary",
+            onClick: submit
+          }), _uM({
+            default: withSlotCtx((): any[] => [_tD(_ctx.submitText)]),
+            _: 1 /* STABLE */
+          }))
+        ])
+      : _cC("v-if", true)
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type IFormComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesIUiXComponentsIFormIFormStyles = [_uM([["i-form", _pS(_uM([["paddingTop", 4], ["paddingRight", 0], ["paddingBottom", 4], ["paddingLeft", 0]]))], ["i-form__message", _pS(_uM([["marginTop", 10], ["fontSize", 13], ["lineHeight", "20px"]]))], ["i-form__message--success", _pS(_uM([["color", "#19be6b"]]))], ["i-form__message--error", _pS(_uM([["color", "#fa3534"]]))], ["i-form__actions", _pS(_uM([["marginTop", 12], ["flexDirection", "row"], ["justifyContent", "flex-end"]]))]])]

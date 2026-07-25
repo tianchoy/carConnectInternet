@@ -1,0 +1,1616 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue'
+import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
+import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
+import _easycom_i_popup from '@/uni_modules/i-ui-x/components/i-popup/i-popup.uvue'
+import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
+import _easycom_i_radio from '@/uni_modules/i-ui-x/components/i-radio/i-radio.uvue'
+import _easycom_i_switch from '@/uni_modules/i-ui-x/components/i-switch/i-switch.uvue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref, reactive, onMounted, computed, watch } from 'vue'
+	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
+	import CoordTransform from '../../utils/coordTransform.uts'
+	import { getDeviceIcon } from '../../utils/cars'
+
+	type Coordinate = LocationObject;
+	type PaginationState = {
+		pageNum : number;
+		pageSize : number;
+		hasMore : boolean;
+		loadingMore : boolean;
+	};
+	type Pagination = {
+		bind : PaginationState;
+		unbind : PaginationState;
+	};
+	type CircleData = {
+		latitude : number;
+		longitude : number;
+		radius : number;
+	};
+	type ModalResult = {
+		confirm : boolean;
+	};
+	type FenceForm = {
+		name : string;
+		alarmType : string;
+	};
+	type FenceResponse = {
+		code : number;
+		msg : string;
+	};
+	type SwitchChangeEvent = {
+		value : boolean;
+	};
+	// 地图状态
+	type CoordinateBounds = {
+		minLat : number;
+		maxLat : number;
+		minLng : number;
+		maxLng : number;
+	};
+
+	// 根据半径计算合适的缩放级别
+	
+const __sfc__ = defineComponent({
+  __name: 'geofencing',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const imei = ref<string | null>(null)
+	const connectionStatus = ref<string | null>(null)
+	const deptId = ref<string | null>(null)
+	const carType = ref<string | null>(null)
+	const deviceName = ref<string | null>(null)
+	const center = reactive({
+		latitude: 39.90469,
+		longitude: 116.40717
+	})
+	const mapScale = ref(12)
+	const isMapReady = ref(false)
+	const isInitialPositionSettled = ref(false)
+	const markers = ref<Array<Marker>>([]) // 标记点
+	const carMarker = ref<Marker | null>(null) // 车辆标记点
+	const circles = ref<Array<Circle>>([]) // 圆形围栏
+	const carInFence = ref(false) // 车辆是否在围栏内
+
+	// 电子围栏相关状态
+	const isDrawing = ref(false)
+	const drawingMode = ref('polygon') // 'polygon' 或 'circle'
+	const points = ref<Array<Coordinate>>([])
+	const polygons = ref<Array<Polygon>>([]) // 存储地理围栏多边形数据
+	const circleCenter = ref<Coordinate | null>(null);
+	const circleRadius = ref(0) // 圆形围栏半径（米）
+	const currentSpeed = ref(0)
+	const currentAddress = ref('获取中...')
+	const currentCar = ref<string | null>('京A12345')
+	const lastDirection = ref(0)
+	const showFenceModal = ref<ComponentPublicInstance | null>(null)
+
+	// 围栏管理状态
+	const fenceList = ref<Array<UTSJSONObject>>([])
+	const selectedFence = ref<UTSJSONObject | null>(null)
+	const fencesPopup = ref<ComponentPublicInstance | null>(null)
+	const editDialogPopup = ref<ComponentPublicInstance | null>(null)
+	const editingFence = ref<UTSJSONObject | null>(null)
+	const alarmTypeOptions = ['0', '1', '2', '3']
+	const fenceForm = reactive<FenceForm>({
+		name: '',
+		alarmType: '1'
+	})
+
+	// 设备绑定状态
+	const deviceDialogPopup = ref<ComponentPublicInstance | null>(null)
+	const activeTab = ref('bind')
+	const deviceList = ref<Array<UTSJSONObject>>([]) // 当前显示的设备列表
+	const boundDevices = ref<Array<UTSJSONObject>>([]) // 已绑定设备完整列表
+	const currentFenceName = ref('')
+	const currentFenceId = ref('')
+	const loading = ref(false)
+	const scrollTop = ref(0) // 滚动位置控制
+	let loadMoreTimer = null // 防抖定时器
+
+	// 分页控制变量（已绑定/未绑定设备）
+	const pagination = reactive<Pagination>({
+		bind: {
+			pageNum: 1, // 当前页码
+			pageSize: 10, // 每页条数
+			hasMore: true, // 是否还有更多数据
+			loadingMore: false // 加载更多中状态
+		},
+		unbind: {
+			pageNum: 1,
+			pageSize: 10,
+			hasMore: true,
+			loadingMore: false
+		}
+	})
+
+	// 计算是否可以完成绘制
+	const canFinishDrawing = computed(() => {
+		if (drawingMode.value === 'polygon') {
+			return points.value.length >= 3
+		} else if (drawingMode.value === 'circle') {
+			return circleCenter.value !== null && circleRadius.value > 0
+		}
+		return false
+	})
+
+	// 计算当前加载更多状态
+	const loadingMore = computed(() => {
+		return activeTab.value === 'bind' ? pagination.bind.loadingMore : pagination.unbind.loadingMore
+	})
+
+	// 计算是否还有更多数据
+	const hasMore = computed(() => {
+		return activeTab.value === 'bind' ? pagination.bind.hasMore : pagination.unbind.hasMore
+	})
+
+
+
+
+	const loadInitialPosition = async () => {
+		uni.showLoading({
+			title: '获取车辆位置中...'
+		})
+
+		try {
+			const data = { deptId: deptId.value, deviceids: imei.value }
+			const res = await getDevicePos(data)
+
+			res.data.forEach(item => {
+				if (item.getString('imei', '') == imei.value) {
+					const deviceData = item
+					const latitude = deviceData.getNumber('latitude', 0)
+					const longitude = deviceData.getNumber('longitude', 0)
+					if (!isFinite(latitude) || !isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || latitude == 0 || longitude == 0) {
+						return
+					}
+					// 转换坐标到腾讯地图坐标系
+					const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
+					center.latitude = convertedCoord.lat
+					center.longitude = convertedCoord.lng
+
+					const position : LocationObject = {
+						latitude: convertedCoord.lat,
+						longitude: convertedCoord.lng
+					}
+
+					// 记录初始方向
+					lastDirection.value = deviceData.getNumber('direction', 0)
+
+					// 创建车辆标记点
+					carMarker.value = {
+						id: 0,
+						latitude: position.latitude,
+						longitude: position.longitude,
+						iconPath: getDeviceIcon(connectionStatus.value.toString(), carType.value.toString()),
+						width: 25,
+						height: 25,
+						rotate: lastDirection.value >= 360 ? lastDirection.value - 360 : (lastDirection.value < 0 ? lastDirection.value + 360 : lastDirection.value), // 修正方向
+						callout: {
+							content: deviceName.value || '爱车位置',
+							color: connectionStatus.value == 'online' ? '#fff' : '#666',
+							bgColor: connectionStatus.value == 'online' ? '#07C160' : '#ccc',
+							padding: 5,
+							borderRadius: 4,
+							display: 'ALWAYS'
+						}
+					} as Marker
+
+					// 更新标记点数组，保留车辆标记点
+					const marker = carMarker.value
+					if (marker != null) {
+						markers.value = [marker]
+						isMapReady.value = true
+					}
+
+					// 更新车辆信息
+					currentSpeed.value = deviceData.speed ? parseFloat(deviceData.speed.toString()) : 0
+					currentAddress.value = deviceData.positionUpdateTime
+						? `最后定位: ${deviceData.positionUpdateTime}`
+						: '未知位置'
+					connectionStatus.value = deviceData.connectionStatus ? deviceData.connectionStatus.toString() : 'unknown'
+				}
+			})
+
+		} catch (err) {
+			console.error('获取初始位置失败:', err)
+			showAppToast({
+				title: '获取车辆位置失败',
+				icon: 'none'
+			})
+		} finally {
+			isInitialPositionSettled.value = true
+			uni.hideLoading()
+		}
+	}
+
+	// 计算地图上的旋转角度（修正方向）
+
+
+	function calculateMapRotation(direction : number) : number {
+		let rotation = direction
+		if (rotation >= 360) rotation -= 360
+		if (rotation < 0) rotation += 360
+
+		return rotation
+	}
+
+	function getFenceType(fence : UTSJSONObject) : string {
+		const type = fence.getString('type', '')
+		if (type && type !== 'null') {
+			return type
+		}
+		const area = fence.getString('area', '')
+		if (area.startsWith('CIRCLE')) {
+			return 'circle'
+		} else if (area.startsWith('POLYGON')) {
+			return 'polygon'
+		}
+		return 'polygon'
+	}
+
+	function isValidCoordinate(latitude : number, longitude : number) : boolean {
+		return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
+	}
+
+	function parsePolygon(polygonStr : string) : Array<Coordinate> {
+		if (!polygonStr) return []
+		const coordStr = polygonStr.replace(/POLYGON \(\(/, '').replace(/\)\)/, '')
+		const points : Array<Coordinate> = []
+		coordStr.split(',').forEach((point : string) => {
+			const values = point.trim().split(/\s+/)
+			if (values.length != 2) return
+			const latitude = parseFloat(values[0])
+			const longitude = parseFloat(values[1])
+			if (!isValidCoordinate(latitude, longitude)) return
+			const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
+			points.push({
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng
+			})
+		})
+		return points
+	}
+
+	function parseCircle(circleStr : string) : CircleData | null {
+		if (!circleStr || !circleStr.startsWith('CIRCLE')) return null
+		try {
+			const coordStr = circleStr.replace(/CIRCLE \(/, '').replace(/\)/, '')
+			const parts = coordStr.split(',')
+			if (parts.length != 2) return null
+			const centerValues = parts[0].trim().split(/\s+/)
+			if (centerValues.length != 2) return null
+			const lat = parseFloat(centerValues[0])
+			const lng = parseFloat(centerValues[1])
+			const radius = parseFloat(parts[1].trim())
+			if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
+				console.error('无效的圆形围栏数据:', circleStr)
+				return null
+			}
+			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
+			return {
+				latitude: convertedCoord.lat,
+				longitude: convertedCoord.lng,
+				radius: radius
+			}
+		} catch (error) {
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr)
+			return null
+		}
+	}
+
+	function updateMarkers() : void {
+		const newMarkers : Array<Marker> = []
+
+		// 首先添加车辆标记点
+		if (carMarker.value) {
+			newMarkers.push(carMarker.value)
+		}
+
+		// 添加围栏顶点标记
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				// 多边形顶点标记
+				points.value.forEach((point, index) => {
+					newMarkers.push({
+						id: 1000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					} as Marker)
+				})
+			} else if (drawingMode.value === 'circle' && circleCenter.value) {
+				// 圆形圆心标记
+				newMarkers.push({
+					id: 1000,
+					latitude: circleCenter.value.latitude,
+					longitude: circleCenter.value.longitude,
+					iconPath: '/static/marker.png',
+					width: 32,
+					height: 32,
+					callout: { content: '圆心', display: 'ALWAYS' },
+					anchor: { x: 0.5, y: 0.5 }
+				} as Marker)
+			}
+		} else {
+			const selected = selectedFence.value
+			if (selected == null) {
+				markers.value = newMarkers
+				return
+			}
+			// 选中围栏时显示标记
+			const fenceType = getFenceType(selected)
+			const area = selected.getString('area', '')
+			if (fenceType === 'circle') {
+				const circleData = parseCircle(area)
+				if (circleData != null) {
+					newMarkers.push({
+						id: 2000,
+						latitude: circleData.latitude,
+						longitude: circleData.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: '圆心', display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					} as Marker)
+				}
+			} else {
+				const fencePoints = parsePolygon(area)
+				fencePoints.forEach((point, index) => {
+					newMarkers.push({
+						id: 2000 + index,
+						latitude: point.latitude,
+						longitude: point.longitude,
+						iconPath: '/static/marker.png',
+						width: 32,
+						height: 32,
+						callout: { content: `顶点${index + 1}`, display: 'ALWAYS' },
+						anchor: { x: 0.5, y: 0.5 }
+					} as Marker)
+				})
+			}
+		}
+
+		markers.value = newMarkers
+	}
+
+	const renderFencesOnMap = () => {
+		// 当围栏列表为空时，强制清空地图上所有围栏和标记
+		if (!fenceList.value || fenceList.value.length == 0) {
+			polygons.value = []; // 清空多边形围栏
+			circles.value = [];  // 清空圆形围栏
+			updateMarkers();    // 清空围栏相关标记（如顶点、圆心）
+			return;
+		}
+
+		const fencePolygons : Array<Polygon> = []
+		const fenceCircles : Array<Circle> = []
+		let colorIndex = 0
+
+		// 为每个围栏创建多边形或圆形
+		fenceList.value.forEach((fence : UTSJSONObject) => {
+			const fenceType = getFenceType(fence)
+
+			if (fenceType === 'circle') {
+				// 处理圆形围栏
+				const circleData = parseCircle(fence.getString('area', ''))
+				if (circleData != null) {
+					// 处理过大半径，避免无法显示
+					const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
+
+					fenceCircles.push({
+						latitude: circleData.latitude,
+						longitude: circleData.longitude,
+						radius: displayRadius,
+						strokeWidth: 2,
+						color: '#FF0000',
+						fillColor: `rgba(255,0,0,0.2)`
+					} as Circle)
+				}
+			} else {
+				// 处理多边形围栏
+				const fencePoints = parsePolygon(fence.getString('area', ''))
+				if (fencePoints.length >= 3) {
+					fencePolygons.push({
+						points: fencePoints,
+						strokeWidth: 2,
+						strokeColor: '#FF0000',
+						fillColor: colorIndex++ == 0 ? 'rgba(255,0,0,0.2)' : `rgba(${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},${Math.floor(Math.random() * 200)},0.2)`,
+						zIndex: 1
+					} as Polygon)
+				}
+			}
+		})
+
+		polygons.value = fencePolygons
+		circles.value = fenceCircles
+
+		// 确保圆形围栏能显示在地图视野中
+		if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && !isMapReady.value) {
+			// 设备初始位置不可用时，自动定位到第一个圆形围栏
+			const firstCircle = fenceCircles[0]
+			center.latitude = firstCircle.latitude
+			center.longitude = firstCircle.longitude
+			// 根据半径设置合适的缩放级别
+			mapScale.value = firstCircle.radius > 50000 ? 8 : firstCircle.radius > 20000 ? 9 : firstCircle.radius > 10000 ? 10 : firstCircle.radius > 5000 ? 11 : firstCircle.radius > 2000 ? 12 : firstCircle.radius > 1000 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16
+			isMapReady.value = true
+		}
+	}
+
+	function updateMapDisplay() : void {
+		updateMarkers()
+
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				polygons.value = points.value.length >= 3 ? [{
+					points: points.value,
+					strokeWidth: 2,
+					strokeColor: '#FF0000',
+					fillColor: 'rgba(255,0,0,0.2)',
+					zIndex: 1
+				} as Polygon] : []
+				circles.value = []
+			} else if (drawingMode.value === 'circle') {
+				const drawingCenter = circleCenter.value
+				if (drawingCenter != null && circleRadius.value > 0) {
+					const drawingCircle : Circle = {
+						latitude: drawingCenter.latitude,
+						longitude: drawingCenter.longitude,
+						radius: circleRadius.value,
+						strokeWidth: 2,
+						color: '#FF0000',
+						fillColor: 'rgba(255,0,0,0.2)'
+					} as Circle
+					circles.value = [drawingCircle]
+				} else {
+					circles.value = []
+				}
+				polygons.value = []
+			}
+		} else {
+			renderFencesOnMap()
+		}
+	}
+
+	// 加载围栏列表
+	const loadGeofenceList = async () => {
+		try {
+			const res = await getGeofenceList()
+			if (res.code == 0) {
+				fenceList.value = res.data;
+			} else {
+				showAppToast({ title: '获取围栏列表失败', icon: 'none' })
+				fenceList.value = []; // 失败时也清空列表
+			}
+			// 无论数据是否为空，都重新渲染
+			renderFencesOnMap()
+		} catch (error) {
+			console.error('加载围栏列表失败:', error)
+			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
+			fenceList.value = []; // 异常时强制清空
+			renderFencesOnMap()
+		}
+	}
+
+	// 获取围栏类型（根据area字段判断）
+
+
+	// 将围栏数据渲染到地图上
+
+
+	// 解析POLYGON字符串为坐标数组
+
+
+	// 解析CIRCLE字符串为圆心和半径
+
+
+	// 生成POLYGON字符串
+	const generatePolygonString = (points : Array<Coordinate>) : string => {
+		const coords = points.map((point : Coordinate) : string => {
+			const originalCoord = CoordTransform.tencentToWgs84(point.latitude, point.longitude)
+			return `${originalCoord.lat} ${originalCoord.lng}`
+		}).join(', ')
+		return `POLYGON ((${coords}))`
+	}
+
+	// 生成CIRCLE字符串
+	const generateCircleString = (center : Coordinate, radius : number) : string => {
+		const originalCoord = CoordTransform.tencentToWgs84(center.latitude, center.longitude)
+		return `CIRCLE (${originalCoord.lat} ${originalCoord.lng}, ${radius})`
+	}
+
+	const calculateZoomLevelFromRadius = (radius : number) : number => {
+		if (radius > 50000) return 8   // 50公里以上
+		if (radius > 20000) return 9    // 20-50公里
+		if (radius > 10000) return 10    // 10-20公里
+		if (radius > 5000) return 11     // 5-10公里
+		if (radius > 2000) return 12     // 2-5公里
+		if (radius > 1000) return 13    // 1-2公里
+		if (radius > 500) return 14      // 500米-1公里
+		if (radius > 200) return 15      // 200-500米
+		return 16                       // 200米以下
+	}
+
+	// 计算坐标边界
+	const calculateBounds = (points : Array<Coordinate>) : CoordinateBounds => {
+		let minLat = points[0].latitude
+		let maxLat = points[0].latitude
+		let minLng = points[0].longitude
+		let maxLng = points[0].longitude
+
+		points.forEach((point : Coordinate) : void => {
+			minLat = Math.min(minLat, point.latitude)
+			maxLat = Math.max(maxLat, point.latitude)
+			minLng = Math.min(minLng, point.longitude)
+			maxLng = Math.max(maxLng, point.longitude)
+		})
+
+		return { minLat, maxLat, minLng, maxLng }
+	}
+
+	// 调整地图中心到围栏中心位置
+	const setMapCenterToFence = (fence : UTSJSONObject) : void => {
+		const fenceType = getFenceType(fence)
+		const area = fence.getString('area', '')
+
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(area)
+			if (circleData != null) {
+				center.latitude = circleData.latitude
+				center.longitude = circleData.longitude
+				// 处理过大半径，设置合理的缩放级别
+				const displayRadius = circleData.radius > 100000 ? 100000 : circleData.radius;
+				// 根据半径调整缩放级别
+				mapScale.value = calculateZoomLevelFromRadius(displayRadius)
+			}
+		} else {
+			const fencePoints = parsePolygon(area)
+			if (fencePoints.length == 0) return
+
+			// 计算中心点
+			let totalLat = 0
+			let totalLng = 0
+
+			fencePoints.forEach(point => {
+				totalLat += point.latitude
+				totalLng += point.longitude
+			})
+
+			center.latitude = totalLat / fencePoints.length
+			center.longitude = totalLng / fencePoints.length
+
+			// 根据围栏大小自动调整缩放级别
+			const bounds = calculateBounds(fencePoints)
+			const latDiff = bounds.maxLat - bounds.minLat
+			const lngDiff = bounds.maxLng - bounds.minLng
+			const maxDiff = Math.max(latDiff, lngDiff)
+
+			if (maxDiff > 0.1) mapScale.value = 11
+			else if (maxDiff > 0.05) mapScale.value = 12
+			else if (maxDiff > 0.02) mapScale.value = 13
+			else mapScale.value = 14
+		}
+	}
+
+	// 显示围栏列表
+	const showFenceList = () => {
+		fencesPopup.value?.$callMethod('open')
+	}
+
+	// 选择围栏
+	const selectFence = (fence : UTSJSONObject) : void => {
+		selectedFence.value = fence
+		fencesPopup.value?.$callMethod('close')
+		showFenceModal.value?.$callMethod('open')
+
+		// 根据围栏类型显示
+		const fenceType = getFenceType(fence)
+		const area = fence.getString('area', '')
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(area)
+			if (circleData != null) {
+				circleCenter.value = { latitude: circleData.latitude, longitude: circleData.longitude }
+				circleRadius.value = circleData.radius
+				points.value = []
+			}
+		} else {
+			const fencePoints = parsePolygon(area)
+			points.value = fencePoints
+			circleCenter.value = null
+			circleRadius.value = 0
+		}
+
+		setMapCenterToFence(fence)
+		updateMapDisplay()
+	}
+
+	// 编辑围栏 - 修复版本
+	const editFence = (fence : UTSJSONObject) : void => {
+		editingFence.value = fence
+		fenceForm.name = fence.getString('name', '')
+		const alarmTypeText = fence.getString('alarmType', '')
+		const alarmType = alarmTypeText.length > 0
+			? alarmTypeText
+			: fence.getNumber('alarmType', 1).toString()
+		fenceForm.alarmType = alarmTypeOptions.includes(alarmType) ? alarmType : '1'
+
+		// 设置当前绘制模式为围栏实际类型
+		const fenceType = getFenceType(fence)
+		drawingMode.value = fenceType
+		const area = fence.getString('area', '')
+
+		// 【关键修复】恢复围栏数据到绘制状态
+		if (fenceType === 'circle') {
+			const circleData = parseCircle(area)
+			if (circleData != null) {
+				circleCenter.value = {
+					latitude: circleData.latitude,
+					longitude: circleData.longitude
+				}
+				circleRadius.value = circleData.radius
+				points.value = [] // 清空多边形点
+			}
+		} else {
+			const fencePoints = parsePolygon(area)
+			if (fencePoints.length >= 3) {
+				points.value = fencePoints
+				circleCenter.value = null
+				circleRadius.value = 0
+			}
+		}
+
+		// 更新地图显示，让用户看到围栏
+		updateMapDisplay()
+
+		// 打开编辑对话框
+		editDialogPopup.value?.$callMethod('open')
+	}
+
+	async function deleteFenceById(id : string) : Promise<void> {
+		try {
+			const result = await deleteGeofence(id)
+			if (result.code == 0) {
+				showAppToast({ title: '删除成功' })
+				selectedFence.value = null
+				points.value = []
+				circleCenter.value = null
+				circleRadius.value = 0
+				isDrawing.value = false
+				polygons.value = []
+				circles.value = []
+				updateMarkers()
+				showFenceModal.value?.$callMethod('close')
+				await loadGeofenceList()
+			} else {
+				showAppToast({ title: '删除失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('删除围栏失败:', error)
+			showAppToast({ title: '删除失败', icon: 'none' })
+		}
+	}
+
+	// 删除围栏
+	const deleteFence = (id : string) : void => {
+		uni.showModal({
+			title: '确认删除',
+			content: '确定要删除这个围栏吗？',
+			success: (res : ShowModalSuccess) : void => {
+				if (res.confirm) {
+					void deleteFenceById(id.toString())
+				}
+			}
+		})
+	}
+
+	// 保存围栏 - 修复版本
+	const saveFence = async () => {
+		if (!fenceForm.name) {
+			showAppToast({ title: '请输入围栏名称', icon: 'none' })
+			return
+		}
+
+		let area = ''
+
+		// 判断是新增还是编辑
+		if (editingFence.value) {
+			// 【编辑模式】优先使用新绘制的数据，如果没有则使用原有数据
+			if (drawingMode.value === 'polygon' && points.value.length >= 3) {
+				area = generatePolygonString(points.value)
+			} else if (drawingMode.value === 'circle' && circleCenter.value && circleRadius.value > 0) {
+				area = generateCircleString(circleCenter.value, circleRadius.value)
+			} else {
+				// 没有重新绘制，使用原有数据
+				area = editingFence.value.getString('area', '')
+			}
+		} else {
+			// 【新增模式】必须绘制
+			if (drawingMode.value === 'polygon' && points.value.length < 3) {
+				showAppToast({ title: '请绘制有效的围栏区域（至少3个顶点）', icon: 'none' })
+				return
+			} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
+				showAppToast({ title: '请绘制有效的圆形围栏', icon: 'none' })
+				return
+			}
+
+			if (drawingMode.value === 'polygon') {
+				area = generatePolygonString(points.value)
+			} else if (drawingMode.value === 'circle' && circleCenter.value) {
+				area = generateCircleString(circleCenter.value, circleRadius.value)
+			}
+		}
+
+		if (!area) {
+			showAppToast({ title: '围栏数据无效，请重新绘制', icon: 'none' })
+			return
+		}
+
+		if (!alarmTypeOptions.includes(fenceForm.alarmType)) {
+			showAppToast({ title: '请选择有效的告警类型', icon: 'none' })
+			return
+		}
+
+		const fenceData = {
+			name: fenceForm.name,
+			area: area,
+			alarmType: parseInt(fenceForm.alarmType),
+			type: drawingMode.value
+		}
+
+		try {
+			let result : any
+			if (editingFence.value) {
+				// 更新围栏
+				uni.showLoading({ title: '更新中...' })
+				result = await updateGeofence({ id: editingFence.value.id, ...fenceData })
+			} else {
+				// 新增围栏
+				uni.showLoading({ title: '保存中...' })
+				result = await addGeofence(fenceData)
+			}
+
+			uni.hideLoading()
+
+			if (result.code == 0) {
+				showAppToast({ title: editingFence.value ? '更新成功' : '保存成功' })
+				editDialogPopup.value?.$callMethod('close')
+
+				// 重置状态
+				const tempFence = editingFence.value
+				editingFence.value = null
+				isDrawing.value = false
+				points.value = []
+				circleCenter.value = null
+				circleRadius.value = 0
+
+				// 重新加载围栏列表
+				await loadGeofenceList()
+
+				// 如果是在编辑模式下关闭，取消选中状态
+				if (tempFence) {
+					selectedFence.value = null
+					showFenceModal.value?.$callMethod('close')
+				}
+			} else {
+				showAppToast({ title: result.msg || '保存失败', icon: 'none' })
+			}
+		} catch (error) {
+			uni.hideLoading()
+			console.error('保存围栏失败:', error)
+			showAppToast({ title: '保存失败，请重试', icon: 'none' })
+		}
+	}
+
+	function resetPagination(page : PaginationState) : void {
+		page.pageNum = 1
+		page.pageSize = 10
+		page.hasMore = true
+		page.loadingMore = false
+	}
+
+	function initPagination(tabType : string) : void {
+		if (tabType == 'bind') {
+			resetPagination(pagination.bind)
+		} else {
+			resetPagination(pagination.unbind)
+		}
+		if (activeTab.value == tabType) {
+			deviceList.value = []
+		}
+	}
+
+	async function loadBoundDevices(fenceId : string) : Promise<void> {
+		const page = pagination.bind
+		if (!page.hasMore || page.loadingMore) return
+
+		page.loadingMore = true
+		try {
+			const res = await getBoundDevices({
+				pageNum: page.pageNum,
+				pageSize: page.pageSize,
+				geoId: fenceId
+			})
+
+			if (res.code == 0) {
+				const dataList = res.data.list || []
+				if (page.pageNum == 1) {
+					boundDevices.value = dataList
+					deviceList.value = dataList
+				} else {
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
+			}
+		} catch (error) {
+			page.hasMore = false
+		} finally {
+			page.loadingMore = false
+		}
+	}
+
+	async function loadUnboundDevices() : Promise<void> {
+		const page = pagination.unbind
+		if (!page.hasMore || page.loadingMore) return
+
+		page.loadingMore = true
+		try {
+			const res = await getUnboundDevices({
+				pageNum: page.pageNum,
+				pageSize: page.pageSize
+			})
+
+			if (res.code == 0) {
+				const dataList = res.data.list || []
+				if (page.pageNum == 1) {
+					deviceList.value = dataList
+				} else {
+					deviceList.value = [...deviceList.value, ...dataList]
+				}
+				page.hasMore = dataList.length === page.pageSize
+				if (page.hasMore) page.pageNum++
+			} else {
+				page.hasMore = false
+			}
+		} catch (error) {
+			page.hasMore = false
+		} finally {
+			page.loadingMore = false
+		}
+	}
+
+	// 显示绑定设备对话框
+	const showBindDevices = async (fenceId : string) : Promise<void> => {
+		currentFenceId.value = fenceId
+		const selected = selectedFence.value
+		currentFenceName.value = selected != null ? selected.getString('name', '') : ''
+		deviceDialogPopup.value?.$callMethod('open')
+		activeTab.value = 'bind'
+		scrollTop.value = 0
+		// 初始化分页状态并加载第一页
+		initPagination('bind')
+		await loadBoundDevices(fenceId)
+	}
+
+	// 切换标签页
+	const switchTab = async (tab : string) : Promise<void> => {
+
+		console.log('switchTab', tab,currentFenceId.value)
+		if (activeTab.value === tab) return
+
+		activeTab.value = tab
+		scrollTop.value = 0
+		deviceList.value = [] // 清空列表
+
+		// 重置分页
+		initPagination(tab)
+
+		// 加载对应数据
+		if (tab === 'bind') {
+			console.log('switchTab,bind:', currentFenceId.value)
+			await loadBoundDevices(currentFenceId.value)
+		} else {
+			await loadUnboundDevices()
+		}
+	}
+
+	// 处理滚动到底部加载更多
+	const handleLoadMore = () => {
+		if (loadingMore.value || !hasMore.value) return
+
+		if (activeTab.value === 'bind') {
+			loadBoundDevices(currentFenceId.value)
+		} else {
+			loadUnboundDevices()
+		}
+	}
+
+	// 切换设备绑定状态
+	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
+		console.log('toggleDeviceBinding', deviceImei, bound)
+		loading.value = true
+		try {
+			const params = {
+				geofenceId: currentFenceId.value,
+				imeis: [deviceImei]
+			}
+			console.log('toggleDeviceBindingparams', params)
+			let result : any
+			if (bound) {
+				result = await bindDevices(params)
+			} else {
+				result = await unbindDevices(params)
+			}
+
+			if (result.code == 0) {
+				showAppToast({ title: bound ? '绑定成功' : '解绑成功' })
+				// 刷新当前标签页数据，重置分页
+				initPagination(activeTab.value)
+				scrollTop.value = 0
+
+				if (activeTab.value === 'bind') {
+					await loadBoundDevices(currentFenceId.value)
+				} else {
+					await loadUnboundDevices()
+				}
+			} else {
+				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('设备绑定操作失败:', error)
+			showAppToast({ title: '操作失败', icon: 'none' })
+		} finally {
+			loading.value = false
+		}
+	}
+
+	// 检查设备是否已绑定
+	const isDeviceBound = (deviceImei : string) : boolean => {
+		return boundDevices.value.some((device : UTSJSONObject) : boolean => device.getString('imei', '') === deviceImei)
+	}
+
+	/* 电子围栏绘制功能 */
+	// 设置绘制模式
+	const setDrawingMode = (mode : string) : void => {
+		drawingMode.value = mode
+		// 切换模式时清空当前绘制
+		if (isDrawing.value) {
+			points.value = []
+			circleCenter.value = null
+			circleRadius.value = 0
+			updateMapDisplay()
+		}
+	}
+
+	// 开始绘制
+	const startDrawing = () => {
+		isDrawing.value = true
+		points.value = []
+		circleCenter.value = null
+		circleRadius.value = 0
+		selectedFence.value = null
+		updateMapDisplay()
+	}
+
+	function handleDeviceBindingChange(deviceImei : string, bound : boolean) : void {
+		void toggleDeviceBinding(deviceImei, bound)
+	}
+
+	function getDeviceImei(device : UTSJSONObject) : string {
+		return device.getString('imei', '')
+	}
+
+	function isDeviceOnline(device : UTSJSONObject) : boolean {
+		return device.getString('connectionStatus', '') === 'online'
+	}
+
+	function getDeviceDisplayName(device : UTSJSONObject) : string {
+		const deviceName = device.getString('deviceName', '')
+		return deviceName ? deviceName : device.getString('plateNo', '')
+	}
+
+	function closeEditDialog() : void {
+		editDialogPopup.value?.$callMethod('close')
+	}
+
+	function getSelectedFenceName() : string {
+		const fence = selectedFence.value
+		return fence != null ? fence.getString('name', '') : ''
+	}
+
+	function editSelectedFence() : void {
+		const fence = selectedFence.value
+		if (fence != null) {
+			editFence(fence)
+		}
+	}
+
+	function deleteSelectedFence(): void {
+		const fence = selectedFence.value;
+		console.log('删除电子围栏', fence);
+
+		if (fence != null) {
+			const fenceId = fence.getString('id', '');
+			console.log('删除电子围栏ID', fenceId);
+
+			if (fenceId !== '') {
+				deleteFence(fenceId);
+			} else {
+				showAppToast({
+					title: '围栏ID无效',
+					icon: 'none'
+				});
+			}
+		}
+	}
+
+	function showSelectedFenceDevices() : void {
+		const fence = selectedFence.value
+		if (fence != null) {
+			void showBindDevices(fence.getString('id', ''))
+		}
+	}
+
+	function calculateDistance(lat1 : number, lng1 : number, lat2 : number, lng2 : number) : number {
+		const R = 6371000
+		const dLat = (lat2 - lat1) * Math.PI / 180
+		const dLng = (lng2 - lng1) * Math.PI / 180
+		const a =
+			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+			Math.sin(dLng / 2) * Math.sin(dLng / 2)
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+		return R * c
+	}
+
+	function addNewPoint(lat : number, lng : number) : void {
+		const point : Coordinate = { latitude: lat, longitude: lng }
+		points.value.push(point)
+		updateMapDisplay()
+	}
+
+	// 处理地图点击事件
+	const handleMapTap = (e : UniMapTapEvent) : void => {
+		const detail = e.detail
+		if (!isDrawing.value || detail == null || detail.latitude == null || detail.longitude == null) return
+
+		const latitude = detail.latitude
+		const longitude = detail.longitude
+		if (isDrawing.value) {
+			if (drawingMode.value === 'polygon') {
+				addNewPoint(latitude, longitude)
+			} else if (drawingMode.value === 'circle') {
+				if (!circleCenter.value) {
+					// 第一次点击设置圆心
+					circleCenter.value = {
+						latitude: latitude,
+						longitude: longitude
+					}
+					// 添加圆心标记
+					updateMapDisplay()
+				} else {
+					// 第二次点击确定半径
+					const radius = calculateDistance(
+						circleCenter.value.latitude,
+						circleCenter.value.longitude,
+						latitude,
+						longitude
+					)
+					// 限制最小半径为10米
+					circleRadius.value = radius < 10 ? 10 : radius
+					updateMapDisplay()
+				}
+			}
+		}
+	}
+
+	// 完成绘制
+	const finishDrawing = () => {
+		if (drawingMode.value === 'polygon' && points.value.length < 3) {
+			showAppToast({ title: '至少需要3个顶点', icon: 'none' })
+			return
+		} else if (drawingMode.value === 'circle' && (!circleCenter.value || circleRadius.value <= 0)) {
+			showAppToast({ title: '请设置有效的圆形围栏', icon: 'none' })
+			return
+		}
+
+		isDrawing.value = false
+
+		// 弹出编辑对话框
+		fenceForm.name = `${drawingMode.value === 'circle' ? '圆形' : '多边形'}围栏${fenceList.value.length + 1}`
+		editDialogPopup.value?.$callMethod('open')
+	}
+
+	// 更新标记点数组，保留车辆标记点
+
+
+
+
+	// 更新围栏多边形显示
+	const updateFencePolygon = () => {
+		if (drawingMode.value === 'polygon') {
+			polygons.value = points.value.length >= 3 ? [{
+				points: points.value,
+				strokeWidth: 2,
+				strokeColor: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)',
+				zIndex: 1
+			} as Polygon] : []
+		} else {
+			polygons.value = []
+		}
+	}
+
+	// 更新圆形围栏显示
+	const updateFenceCircle = () => {
+		if (drawingMode.value === 'circle' && circleCenter.value && circleRadius.value > 0) {
+			circles.value = [{
+				latitude: circleCenter.value.latitude,
+				longitude: circleCenter.value.longitude,
+				radius: circleRadius.value,
+				strokeWidth: 2,
+				color: '#FF0000',
+				fillColor: 'rgba(255,0,0,0.2)'
+			} as Circle]
+		} else {
+			circles.value = []
+		}
+	}
+
+	// 重置绘制
+	const clearDrawing = () => {
+		isDrawing.value = false
+		points.value = []
+		circleCenter.value = null
+		circleRadius.value = 0
+		selectedFence.value = null
+
+		// 清空地图上的所有围栏和标记
+		polygons.value = [];
+		circles.value = [];
+		updateMarkers(); // 保留车辆标记，仅清空围栏相关标记
+
+		renderFencesOnMap(); // 重新渲染（空列表时触发清空逻辑）
+	}
+	onLoad((option) => {
+		connectionStatus.value = option.connectionStatus
+		imei.value = option.imei
+		currentCar.value = option.plateNo
+		deptId.value = option.deptId
+		carType.value = option.carType
+		deviceName.value = option.deviceName
+
+		loadInitialPosition()
+		loadGeofenceList() // 页面加载时获取围栏列表
+	})
+
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_map = resolveComponent("map")
+const _component_sub_navBar = resolveEasyComponent("sub-navBar",_easycom_sub_navBar)
+const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
+const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
+const _component_i_popup = resolveEasyComponent("i-popup",_easycom_i_popup)
+const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
+const _component_i_radio = resolveEasyComponent("i-radio",_easycom_i_radio)
+const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "地理围栏",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "map-container" }), [
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: center.latitude,
+              longitude: center.longitude,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": false,
+              polygons: polygons.value,
+              markers: markers.value,
+              circles: circles.value,
+              onTap: handleMapTap,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"])
+          : _cC("v-if", true),
+        _cV(_component_sub_navBar, _uM({
+          class: "sub-nav-overlay",
+          showTime: false,
+          currentCar: currentCar.value,
+          showCar: true,
+          carStatus: connectionStatus.value
+        }), null, 8 /* PROPS */, ["currentCar", "carStatus"]),
+        isTrue(isDrawing.value)
+          ? _cE("view", _uM({
+              key: 1,
+              class: "drag-hint"
+            }), [
+              drawingMode.value === 'polygon'
+                ? _cE("text", _uM({
+                    key: 0,
+                    class: "drag-hint-text"
+                  }), "点击地图添加围栏点,至少需要3个点")
+                : _cC("v-if", true),
+              drawingMode.value === 'circle'
+                ? _cE("text", _uM({
+                    key: 1,
+                    class: "drag-hint-text"
+                  }), "点击地图确定圆心，再点一下地图确定半径")
+                : _cC("v-if", true)
+            ])
+          : _cC("v-if", true)
+      ]),
+      _cV(_component_i_popup, _uM({
+        ref_key: "showFenceModal",
+        ref: showFenceModal,
+        mode: "bottom",
+        round: "10",
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          isTrue(selectedFence.value)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "fence-operations"
+              }), [
+                _cE("view", _uM({ class: "fence-header" }), [
+                  _cE("text", _uM({ class: "fence-name" }), _tD(getSelectedFenceName()), 1 /* TEXT */),
+                  _cV(_component_i_icon, _uM({
+                    name: "close",
+                    onClick: () => {selectedFence.value = null; showFenceModal.value?.$callMethod('close')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ]),
+                _cE("view", _uM({ class: "fence-actions" }), [
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    onClick: editSelectedFence
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["编辑"]),
+                    _: 1 /* STABLE */
+                  })),
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    type: "error",
+                    onClick: deleteSelectedFence
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["删除"]),
+                    _: 1 /* STABLE */
+                  })),
+                  _cV(_component_i_button, _uM({
+                    size: "small",
+                    type: "primary",
+                    onClick: showSelectedFenceDevices
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["绑定设备"]),
+                    _: 1 /* STABLE */
+                  }))
+                ])
+              ])
+            : _cC("v-if", true)
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cE("view", _uM({ class: "tools-panel" }), [
+        isTrue(!isDrawing.value && !selectedFence.value)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "drawing-mode-selector"
+            }), [
+              _cE("text", _uM({ class: "mode-title" }), "选择围栏类型:"),
+              _cE("view", _uM({ class: "mode-buttons" }), [
+                _cV(_component_i_button, _uM({
+                  type: drawingMode.value == 'polygon' ? 'success' : 'default',
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: () => {setDrawingMode('polygon')}
+                }), _uM({
+                  default: withSlotCtx((): any[] => [" 多边形 "]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["type", "onClick"]),
+                _cV(_component_i_button, _uM({
+                  class: "mode-button-spacing",
+                  type: drawingMode.value == 'circle' ? 'success' : 'default',
+                  size: "small",
+                  customStyle: "border:1rpx solid #ebedf0",
+                  onClick: () => {setDrawingMode('circle')}
+                }), _uM({
+                  default: withSlotCtx((): any[] => [" 圆形 "]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["type", "onClick"])
+              ])
+            ])
+          : _cC("v-if", true),
+        _cE("view", _uM({ class: "tool-tag-item" }), [
+          _cV(_component_i_button, _uM({
+            onClick: startDrawing,
+            disabled: isDrawing.value || selectedFence.value != null,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 开始绘制 "]),
+            _: 1 /* STABLE */
+          }), 8 /* PROPS */, ["disabled"]),
+          _cV(_component_i_button, _uM({
+            onClick: finishDrawing,
+            disabled: !isDrawing.value || !canFinishDrawing.value,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 完成绘制 "]),
+            _: 1 /* STABLE */
+          }), 8 /* PROPS */, ["disabled"]),
+          _cV(_component_i_button, _uM({
+            onClick: clearDrawing,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 重置绘制 "]),
+            _: 1 /* STABLE */
+          })),
+          _cV(_component_i_button, _uM({
+            onClick: showFenceList,
+            size: "small"
+          }), _uM({
+            default: withSlotCtx((): any[] => [" 围栏列表 "]),
+            _: 1 /* STABLE */
+          }))
+        ]),
+        _cE("view", _uM({ class: "status-info" }), [
+          _cE("text", _uM({ class: "status-text" }), "围栏类型: " + _tD(drawingMode.value === 'polygon' ? '多边形' : '圆形'), 1 /* TEXT */),
+          drawingMode.value === 'polygon'
+            ? _cE("text", _uM({
+                key: 0,
+                class: "status-text"
+              }), "顶点数量: " + _tD(points.value.length), 1 /* TEXT */)
+            : _cC("v-if", true),
+          drawingMode.value === 'circle'
+            ? _cE("text", _uM({
+                key: 1,
+                class: "status-text"
+              }), "半径: " + _tD(circleRadius.value.toFixed(2)) + "米", 1 /* TEXT */)
+            : _cC("v-if", true)
+        ])
+      ]),
+      _cV(_component_i_popup, _uM({
+        ref_key: "fencesPopup",
+        ref: fencesPopup,
+        mode: "bottom",
+        round: "10",
+        height: "800rpx",
+        disabledScroll: true,
+        contentMargin: "0",
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "fence-list" }), [
+            _cE("view", _uM({ class: "list-header" }), [
+              _cE("text", _uM({ class: "title" }), "围栏列表")
+            ]),
+            _cE("scroll-view", _uM({
+              class: "list-content",
+              "scroll-y": "true",
+              "show-scrollbar": false
+            }), [
+              _cE(Fragment, null, RenderHelpers.renderList(fenceList.value, (fence, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: fence.id,
+                  class: "fence-item",
+                  onClick: () => {selectFence(fence)}
+                }), [
+                  _cE("view", _uM({ class: "fence-info" }), [
+                    _cE("text", _uM({ class: "name" }), _tD(fence.name), 1 /* TEXT */),
+                    _cE("text", _uM({ class: "type" }), _tD(getFenceType(fence) === 'circle' ? '圆形' : '多边形'), 1 /* TEXT */),
+                    _cE("text", _uM({ class: "devices" }), "绑定设备: " + _tD(fence.deviceCount || 0) + "台", 1 /* TEXT */)
+                  ]),
+                  _cV(_component_i_icon, _uM({
+                    name: "/static/arrow-right.png",
+                    fontSize: "15"
+                  }))
+                ], 8 /* PROPS */, ["onClick"])
+              }), 128 /* KEYED_FRAGMENT */),
+              fenceList.value.length == 0
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "empty"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "暂无围栏数据")
+                  ])
+                : _cC("v-if", true)
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cV(_component_i_popup, _uM({
+        ref_key: "editDialogPopup",
+        ref: editDialogPopup,
+        mode: "bottom",
+        round: "10",
+        contentDraggable: false,
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "edit-dialog" }), [
+            _cE("view", _uM({ class: "dialog-header" }), [
+              _cE("text", _uM({ class: "dialog-title" }), _tD(editingFence.value ? '编辑围栏' : '新增围栏'), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "dialog-content" }), [
+              _cV(_component_i_input, _uM({
+                modelValue: fenceForm.name,
+                "onUpdate:modelValue": $event => {(fenceForm.name) = $event},
+                placeholder: "请输入围栏名称",
+                border: "surround"
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+              _cE("view", _uM({ class: "radio-group" }), [
+                _cE("text", _uM({ class: "label" }), "告警类型:"),
+                _cE("view", _uM({ class: "radio-options" }), [
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "0",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["不告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "1",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["出入告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "2",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["出告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_i_radio, _uM({
+                    modelValue: fenceForm.alarmType,
+                    "onUpdate:modelValue": $event => {(fenceForm.alarmType) = $event},
+                    name: "3",
+                    iconPlacement: "left"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["入告警"]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ])
+              ])
+            ]),
+            _cE("view", _uM({ class: "dialog-actions" }), [
+              _cV(_component_i_button, _uM({ onClick: closeEditDialog }), _uM({
+                default: withSlotCtx((): any[] => ["取消"]),
+                _: 1 /* STABLE */
+              })),
+              _cV(_component_i_button, _uM({
+                type: "primary",
+                onClick: saveFence
+              }), _uM({
+                default: withSlotCtx((): any[] => ["保存"]),
+                _: 1 /* STABLE */
+              }))
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */),
+      _cV(_component_i_popup, _uM({
+        ref_key: "deviceDialogPopup",
+        ref: deviceDialogPopup,
+        mode: "bottom",
+        round: "10",
+        closeOnMask: true,
+        showClose: true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "device-dialog" }), [
+            _cE("view", _uM({ class: "dialog-header" }), [
+              _cE("text", _uM({ class: "dialog-title" }), "设备绑定 - " + _tD(currentFenceName.value), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "dialog-tabs" }), [
+              _cE("text", _uM({
+                class: _nC(['tab', activeTab.value === 'bind' ? 'active' : '']),
+                onClick: () => {switchTab('bind')}
+              }), "已绑定设备", 10 /* CLASS, PROPS */, ["onClick"]),
+              _cE("text", _uM({
+                class: _nC(['tab', activeTab.value === 'unbind' ? 'active' : '']),
+                onClick: () => {switchTab('unbind')}
+              }), "未绑定设备", 10 /* CLASS, PROPS */, ["onClick"])
+            ]),
+            _cE("scroll-view", _uM({
+              class: "device-list",
+              "scroll-y": "true",
+              "show-scrollbar": false,
+              "scroll-top": scrollTop.value,
+              onScrolltolower: handleLoadMore,
+              "lower-threshold": 150
+            }), [
+              _cE(Fragment, null, RenderHelpers.renderList(deviceList.value, (device, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: getDeviceImei(device),
+                  class: "device-item"
+                }), [
+                  _cE("view", _uM({ class: "device-info" }), [
+                    _cE("text", _uM({ class: "name" }), _tD(getDeviceDisplayName(device)), 1 /* TEXT */),
+                    isTrue(getDeviceImei(device))
+                      ? _cE("text", _uM({
+                          key: 0,
+                          class: "status"
+                        }), _tD(isDeviceOnline(device) ? '在线' : '离线'), 1 /* TEXT */)
+                      : _cC("v-if", true)
+                  ]),
+                  _cV(_component_i_switch, _uM({
+                    "model-value": isDeviceBound(getDeviceImei(device)),
+                    onChange: ($event: any) => {handleDeviceBindingChange(getDeviceImei(device), $event as boolean)},
+                    disabled: loading.value || loadingMore.value,
+                    size: "20"
+                  }), null, 8 /* PROPS */, ["model-value", "onChange", "disabled"])
+                ])
+              }), 128 /* KEYED_FRAGMENT */),
+              isTrue(deviceList.value.length == 0 && !loading.value)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "empty"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), _tD(activeTab.value === 'bind' ? '暂无绑定设备' : '暂无可用设备'), 1 /* TEXT */)
+                  ])
+                : _cC("v-if", true),
+              isTrue(loadingMore.value)
+                ? _cE("view", _uM({
+                    key: 1,
+                    class: "loading-tip"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "正在加载更多...")
+                  ])
+                : _cC("v-if", true),
+              isTrue(deviceList.value.length > 0 && !hasMore.value && !loadingMore.value)
+                ? _cE("view", _uM({
+                    key: 2,
+                    class: "empty-text-box"
+                  }), [
+                    _cE("text", _uM({ class: "empty-text" }), "暂无更多数据")
+                  ])
+                : _cC("v-if", true)
+            ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }), 512 /* NEED_PATCH */)
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesGeofencingGeofencingStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["sub-nav-overlay", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", 0], ["left", 0], ["right", 0], ["zIndex", 100]])]])], ["drag-hint", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", "150rpx"], ["left", 0], ["right", 0], ["zIndex", 100], ["backgroundColor", "rgba(255,255,255,0.9)"], ["paddingTop", "16rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "16rpx"], ["boxShadow", "0 4rpx 10rpx rgba(0, 0, 0, 0.1)"]])]])], ["fence-operations", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"]])]])], ["fence-header", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "40rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["fence-name", _uM([[".container .fence-operations .fence-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["fence-actions", _uM([[".container .fence-operations ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "column"], ["boxShadow", "0 -2px 10px rgba(0, 0, 0, 0.1)"]])]])], ["drawing-mode-selector", _uM([[".container .tools-panel ", _uM([["marginBottom", "20rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["mode-title", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["fontSize", "28rpx"], ["marginBottom", "15rpx"], ["color", "#333333"], ["fontWeight", 500]])]])], ["mode-buttons", _uM([[".container .tools-panel .drawing-mode-selector ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["mode-button-spacing", _uM([[".container .tools-panel .drawing-mode-selector .mode-buttons ", _uM([["marginLeft", "20rpx"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["status-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["fence-list", _uM([[".container ", _uM([["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#ffffff"]])]])], ["list-header", _uM([[".container .fence-list ", _uM([["flexShrink", 0], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["title", _uM([[".container .fence-list .list-header ", _uM([["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["list-content", _uM([[".container .fence-list ", _uM([["height", "640rpx"], ["boxSizing", "border-box"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["fence-item", _uM([[".container .fence-list .list-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["fence-info", _uM([[".container .fence-list .list-content .fence-item ", _uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["name", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "30rpx"], ["fontWeight", 500], ["marginBottom", "8rpx"]])], [".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "30rpx"], ["marginBottom", "8rpx"]])]])], ["type", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#2979ff"], ["marginBottom", "8rpx"]])]])], ["devices", _uM([[".container .fence-list .list-content .fence-item .fence-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["empty", _uM([[".container .fence-list .list-content ", _uM([["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0]])], [".container .device-dialog .device-list ", _uM([["paddingTop", "100rpx"], ["paddingRight", 0], ["paddingBottom", "100rpx"], ["paddingLeft", 0]])]])], ["edit-dialog", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["overflow", "hidden"]])]])], ["dialog-header", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["display", "flex"], ["justifyContent", "space-between"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["dialog-title", _uM([[".container .edit-dialog ", _uM([["textAlign", "center"], ["fontSize", "32rpx"], ["fontWeight", "bold"]])]])], ["dialog-content", _uM([[".container .edit-dialog ", _uM([["paddingTop", "30rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "30rpx"]])]])], ["radio-group", _uM([[".container .edit-dialog .dialog-content ", _uM([["marginTop", "30rpx"]])]])], ["label", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["marginBottom", "30rpx"], ["fontSize", "28rpx"], ["fontWeight", 500]])]])], ["radio-options", _uM([[".container .edit-dialog .dialog-content .radio-group ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["alignItems", "center"]])]])], ["dialog-actions", _uM([[".container .edit-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])], [".container .device-dialog ", _uM([["paddingTop", "20rpx"], ["paddingRight", "30rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "30rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eeeeee"]])]])], ["device-dialog", _uM([[".container ", _uM([["height", "800rpx"], ["backgroundColor", "#ffffff"]])]])], ["dialog-tabs", _uM([[".container .device-dialog ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eeeeee"]])]])], ["tab", _uM([[".container .device-dialog .dialog-tabs ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["fontSize", "28rpx"]])], [".container .device-dialog .dialog-tabs .active", _uM([["color", "#2979ff"], ["borderBottomWidth", "4rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#2979ff"]])]])], ["device-list", _uM([[".container .device-dialog ", _uM([["height", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "75rpx"], ["paddingLeft", "20rpx"], ["boxSizing", "border-box"]])]])], ["device-item", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]])]])], ["device-info", _uM([[".container .device-dialog .device-list .device-item ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["status", _uM([[".container .device-dialog .device-list .device-item .device-info ", _uM([["fontSize", "24rpx"], ["color", "#999999"]])]])], ["loading-tip", _uM([[".container .device-dialog .device-list ", _uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["no-more", _uM([[".container .device-dialog .device-list ", _uM([["textAlign", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "26rpx"]])]])], ["drag-hint-text", _uM([[".container ", _uM([["fontSize", "28rpx"], ["color", "#00aa00"], ["fontWeight", "bold"], ["textAlign", "center"]])]])], ["status-text", _uM([[".container ", _uM([["fontSize", "28rpx"], ["color", "#333333"]])]])], ["empty-text-box", _uM([[".container ", _uM([["marginTop", "30rpx"]])]])], ["empty-text", _uM([[".container ", _uM([["textAlign", "center"], ["fontSize", "22rpx"], ["color", "#999999"]])]])], ["i-popup__content", _uM([[".container ", _uM([["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["i-grid-item", _uM([[".container ", _uM([["!alignItems", "flex-start"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0]])]])]])]

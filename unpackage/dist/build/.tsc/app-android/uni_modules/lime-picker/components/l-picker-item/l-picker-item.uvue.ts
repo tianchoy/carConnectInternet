@@ -1,0 +1,322 @@
+import { unitConvert } from '@/uni_modules/lime-shared/unitConvert'
+	import { clamp } from '@/uni_modules/lime-shared/clamp'
+	import { usePickerMask }  from './usePickerMask'
+	import type { PickerItemProps, ManageChildInList, OnPick, UpdateItems } from './type';
+	import type { PickerColumnItem, PickerValue } from '../l-picker/type';
+	
+
+	import { type PickerCanvasConfig, PickerCanvasRenderer } from './PickerRenderer.uts'
+
+	
+	
+const __sfc__ = defineComponent({
+  __name: 'l-picker-item',
+  __props: PickerItemProps,
+  props: {
+    options: { type: Array as PropType<PickerColumnItem[]>, required: true, default: [] as PickerColumnItem[] },
+    value: { type: [String, Number], required: false },
+    column: { type: Number, required: true, default: -1 },
+    name: { type: [String, Number], required: false }
+  },
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	/**
+	 * PickerItem 选择器子项组件
+	 * @description 用于构建多列选择器的单个列项，通常作为 Picker 组件的子组件使用
+	 * <br>插件类型：LPickerItemComponentPublicInstance 
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-picker
+	 * 
+	 * @property {PickerColumnItem[]} options 当前列的选项列表（必填）
+	 * @property {PickerValue} value 当前选中值
+	 * @property {number} column 列索引标识（从0开始计数）
+	 * @property {string | number} name 列名称标识符
+	 */
+	const themeMode = inject('limeConfigProviderTheme', computed(() => 'light'))
+	const instance = getCurrentInstance()!;
+	const props = __props
+	const picker = inject<LPickerComponentPublicInstance | null>('limePicker', null);
+	const pickerItemInstanceArray = inject<LPickerItemComponentPublicInstance[] | null>('limePickerItems', null);
+	const manageChildInList = inject<ManageChildInList | null>('limePickerManageChildInList', null);
+	manageChildInList?.(instance.proxy! as LPickerItemComponentPublicInstance, true)
+	const onPick = inject<OnPick | null>('limePickerOnPick', null);
+	const updateItems = inject<UpdateItems | null>('limePickerUpdateItems', null);
+	// web 如果初始是0 当数据加载后 无法指向0
+
+
+
+
+	const curIndex = ref(0)
+
+	const isInitialized = ref(false)
+	const curValue = ref<PickerValue | null>(props.value);
+	const innerIndex = computed(() : number[] => [curIndex.value])
+	const isDarkMode = computed(() : boolean => themeMode.value == 'dark')
+	const column = computed(() : number => props.column != -1 ? props.column : pickerItemInstanceArray?.indexOf(instance.proxy! as LPickerItemComponentPublicInstance) ?? props.column);
+	const { platformMaskStyles } = usePickerMask(
+		computed(():string|null => picker?.bgColor),
+		isDarkMode,
+		computed(():string[]|null => picker?.maskColors),
+		isInitialized,
+	);
+
+	const indicatorStyles = computed(() : string => {
+		let style = `height: ${picker?.itemHeight ?? '50px'};border-bottom-color: transparent;`
+		return style + (isInitialized.value ? `border-top-color: rgba(0,0,0,0.001);` : `border-top-color: transparent;`)
+	})
+	
+	const itemStyles = computed(() : Map<string, any> => {
+		const style = new Map<string, any>();
+
+
+
+
+
+
+
+
+
+
+
+
+
+			style.set('height', unitConvert(picker?.itemHeight ?? 50) * props.options.length + 'px')
+
+		return style
+	})
+	const itemActiveStyles = computed(() : Map<string, any> => {
+		const style = new Map<string, any>();
+		if (picker?.itemActiveColor != null) {
+			style.set('color', picker.itemActiveColor!)
+		}
+		if (picker?.itemActiveFontWeight != null) {
+			style.set('font-weight', picker.itemActiveFontWeight!)
+		}
+		return style
+	})
+
+
+	const getIndexByValue = (val : PickerValue | null) => {
+		let defaultIndex = 0;
+		if (val != null) {
+			defaultIndex = props.options.findIndex((item) => item.value == val);
+		}
+		return defaultIndex < 0 ? 0 : defaultIndex;
+	};
+
+	let lastCount = props.options.length
+	const setIndex = (index : number) => {
+		let lastIndex = curIndex.value
+		let _index = clamp(index, 0, props.options.length - 1)
+		if (props.options.length > _index) {
+
+			curIndex.value = _index;
+			curValue.value = props.options[_index].value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
+	const setValue = (value : PickerValue | null) => {
+		if (value == curValue.value) return
+		curValue.value = value
+		const index = getIndexByValue(value)
+		setIndex(index)
+	}
+	const setOptions = () => { }
+	const setUpdateItems = () => {
+		const index = clamp(curIndex.value, 0, props.options.length - 1)
+		const curItem = props.options.length > index ? props.options[index] : null;
+		if (curItem == null) return
+		updateItems?.(curItem, index, column.value);
+	}
+
+	const handlePick = (e : UniPickerViewChangeEvent) => {
+		if (props.options.length == 0) return
+		const index = clamp(e.detail.value[0], 0, props.options.length - 1);
+		const curItem = props.options[index];
+		if (index == curIndex.value) return
+		setIndex(index)
+		onPick?.(curItem, index, column.value);
+	}
+
+	const stopValue = watch(() : PickerValue | null => props.value, (v : PickerValue | null) => {
+		setValue(v);
+		setUpdateItems();
+	}, { immediate: true })
+
+
+	const itemRef = ref<UniElement | null>(null)
+	// 在组件中使用
+	let canvasRenderer : PickerCanvasRenderer | null = null
+
+	// 提取配置的计算属性
+	const canvasWidth = ref<number>(0)
+	const canvasHeight = ref<number>(0)
+	const canvasConfig = computed(() : PickerCanvasConfig => ({
+		itemHeight: unitConvert(picker?.itemHeight ?? 50),
+		itemFontSize: unitConvert(picker?.itemFontSize ?? 16),
+		itemActiveFontWeight: picker?.itemActiveFontWeight,
+		itemColor: picker?.itemColor,
+		itemActiveColor: picker?.itemActiveColor,
+		canvasWidth: canvasWidth.value,
+		canvasHeight: canvasHeight.value
+	} as PickerCanvasConfig));
+
+
+	const updateItemStyle = () => {
+		if (itemRef.value == null) return
+		if(canvasRenderer == null) {
+			canvasRenderer = new PickerCanvasRenderer(itemRef.value!);
+		}
+		canvasRenderer?.render(
+			props.options,
+			curIndex.value,
+			canvasConfig.value,
+			isDarkMode.value
+		);
+	}
+
+	const getBoundingClientRect = () => {
+		requestAnimationFrame(() => {
+			itemRef.value?.getBoundingClientRectAsync()?.then(res => {
+				canvasWidth.value = res.width
+				canvasHeight.value = res.height
+			})
+		})
+	}
+	const resizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
+		getBoundingClientRect()
+	})
+	
+	let timerId: null|number = null
+	let renderCount = 0
+	const stopOptionsWatch = watch([()=> props.options, canvasHeight, isDarkMode, curIndex], () => {
+		if(canvasHeight.value == 0) return
+		updateItemStyle()
+		if(renderCount > 2) return
+		if(timerId != null) {
+			clearTimeout(timerId!)
+		}
+		timerId = setTimeout(()=> {
+			updateItemStyle()
+			// 鸿蒙可能首次会画出不出
+			renderCount++
+		},50)
+	});
+
+	const stopItemRefWatch = watch(() : UniElement | null => itemRef.value, (el : UniElement | null) => {
+		if (el == null) return
+		resizeObserver.observe(el)
+
+
+
+	})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	onBeforeUnmount(() => {
+		manageChildInList?.(instance.proxy! as LPickerItemComponentPublicInstance, false)
+
+		stopOptionsWatch()
+		stopItemRefWatch()
+		resizeObserver.disconnect()
+		canvasRenderer = null
+
+	})
+	
+	__expose({
+		setIndex,
+		setValue,
+		// setOptions,
+		// setUpdateItems,
+		getIndexByValue
+	})
+
+return (): any | null => {
+
+const _component_picker_view_column = resolveComponent("picker-view-column")
+const _component_picker_view = resolveComponent("picker-view")
+
+  return _cV(_component_picker_view, _uM({
+    class: "l-picker-item__group",
+    style: _nS(_uM({opacity: _ctx.options.length > 0 ? 1 : 0})),
+    "mask-style": unref(platformMaskStyles).common,
+    "mask-top-style": unref(platformMaskStyles).top,
+    "mask-bottom-style": unref(platformMaskStyles).bottom,
+    "indicator-style": unref(indicatorStyles),
+    "mask-class": "l-picker-item__mask",
+    value: unref(innerIndex),
+    onChange: handlePick,
+    "indicator-class": "l-picker-item__indicator"
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(_component_picker_view_column, _uM({ class: "l-picker-item__wrapper" }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({
+            ref_key: "itemRef",
+            ref: itemRef,
+            style: _nS([unref(itemStyles)])
+          }), null, 4 /* STYLE */)
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }), 8 /* PROPS */, ["style", "mask-style", "mask-top-style", "mask-bottom-style", "indicator-style", "value"])
+}
+}
+
+})
+export default __sfc__
+export type LPickerItemComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesLimePickerComponentsLPickerItemLPickerItemStyles = [_uM([["l-picker-item__group", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["l-picker-item__group-item", _pS(_uM([["height", "var(--l-picker-item-height, 50px)"], ["lineHeight", "var(--l-picker-item-height, 50px)"], ["textAlign", "center"], ["transitionDuration", "100ms"], ["transitionProperty", "fontWeight,color"], ["transitionTimingFunction", "linear"], ["fontWeight", 400], ["color", "var(--l-picker-item-color, #000000E0)"], ["fontSize", "var(--l-picker-item-font-size, 16px)"], ["whiteSpace", "nowrap"]]))], ["l-picker-item__group-item--active", _pS(_uM([["color", "var(--l-picker-item-active-color, #000000E0)"], ["fontWeight", "var(--l-picker-item-active-font-weight, 700)"]]))], ["l-picker-item__wrapper", _pS(_uM([["width", "100%"]]))], ["@TRANSITION", _uM([["l-picker-item__group-item", _uM([["duration", "100ms"], ["property", "fontWeight,color"], ["timingFunction", "linear"]])]])]])]
+
+import { LPickerComponentPublicInstance  } from "@/uni_modules/lime-picker/components/l-picker/l-picker.uvue"

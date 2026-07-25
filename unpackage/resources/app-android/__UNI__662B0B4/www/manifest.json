@@ -1,0 +1,42 @@
+{
+  "id": "__UNI__662B0B4",
+  "name": "carConnectInternet",
+  "description": "",
+  "version": {
+    "name": "1.0.0",
+    "code": "100"
+  },
+  "uni-app-x": {
+    "compilerVersion": "5.21"
+  },
+  "app-android": {
+    "distribute": {
+      "permissions": [
+        "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+        "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+        "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+        "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+        "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+        "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+      ],
+      "modules": {
+        "uni-barcode-scanning": {},
+        "uni-event": {},
+        "uni-getSystemInfo": {},
+        "uni-vibrate": {},
+        "uni-storage": {},
+        "uni-prompt": {},
+        "uni-scanCode": {},
+        "uni-rpx2px": {},
+        "uni-exit": {},
+        "uni-openLocation": {},
+        "uni-showLoading": {},
+        "uni-location": {},
+        "uni-dialogPage": {},
+        "uni-network": {},
+        "uni-map-tencent": {},
+        "uni-web-view": {}
+      }
+    }
+  }
+}

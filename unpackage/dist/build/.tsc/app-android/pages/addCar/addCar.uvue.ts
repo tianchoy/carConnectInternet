@@ -1,0 +1,373 @@
+import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue'
+import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uvue'
+import _easycom_i_form_item from '@/uni_modules/i-ui-x/components/i-form-item/i-form-item.uvue'
+import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
+import _easycom_i_form from '@/uni_modules/i-ui-x/components/i-form/i-form.uvue'
+import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
+import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import { showAppToast } from '../../utils/toast.uts'
+	import { ref } from 'vue'
+	import { addDevice, getCarType } from '../../api/request'
+	import carIcons from '../../components/car-icons/car-icons.uvue'
+
+	type CarFormData = {
+		deviceName: string
+		imei: string
+		deviceType: string
+		deviceTypeValue: string
+		plateNo: string
+		carType: string
+	}
+
+	type ScanResultData = {
+		result: string
+	}
+
+	type CarIconItem = UTSJSONObject
+
+	type AddDeviceResponse = {
+		code: number
+		msg: string
+		data: CarFormData
+	}
+
+	
+const __sfc__ = defineComponent({
+  __name: 'addCar',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const carIconSelectorVisible = ref<boolean>(false)
+	const loading = ref<boolean>(false)
+	const formValid = ref<boolean>(false)
+
+	const carInfo = ref<CarFormData>({
+		deviceName: '',
+		imei: '',
+		deviceType: '',
+		deviceTypeValue: '',
+		plateNo: '',
+		carType: ''
+	})
+
+	const actions = ref<any[]>([])
+
+	// ===== 表单验证规则 =====
+	const rules = [
+		{ name: 'imei', required: true, message: '请输入设备ID' } as UTSJSONObject,
+		{ name: 'deviceType', required: true, message: '请选择设备图标' } as UTSJSONObject
+	] as Array<UTSJSONObject>
+
+	// ===== 处理表单验证状态更新 =====
+	const handleModelValid = (value: any) => {
+		// 使用双重否定或比较运算符来转换为布尔值，避免使用 Boolean()
+		formValid.value = !!value
+		// 或者使用
+		// formValid.value = value === true
+		// formValid.value = value ? true : false
+	}
+
+	// ===== 核心功能函数 =====
+
+	// 扫码功能
+	const scanCode = () => {
+		uni.navigateTo({
+			url: '/pages/scancode/scancode?source=addCar'
+		})
+	}
+
+	// 扫码结果事件处理
+	const handleScanResult = (data: ScanResultData) => {
+		console.log('接收到扫码结果:', data.result)
+		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
+		if (data.result.length == 15) {
+			carInfo.value.imei = '0' + data.result.slice(4, 15)
+		} else if (data.result.length == 11) {
+			carInfo.value.imei = '0' + data.result
+		} else {
+			showAppToast({
+				title: '请输入正确的设备ID',
+				icon: 'none'
+			})
+		}
+	}
+
+	const updateCarIconSelectorVisible = (visible: boolean) => {
+		carIconSelectorVisible.value = visible
+	}
+
+	// 选择车标
+	const selectIcon = (item: CarIconItem) => {
+		const name = item.getString('name', '')
+		const text = item.getString('text', '')
+		console.log(name)
+		carInfo.value.deviceType = name
+		carInfo.value.deviceTypeValue = text
+		carIconSelectorVisible.value = false
+	}
+
+	// 打开车标选择器
+	const deviceTypeSelectFun = () => {
+		carIconSelectorVisible.value = true
+	}
+
+	// 刷新首页设备列表的方法
+	const refreshDeviceList = () => {
+		uni.$emit('refreshDeviceList')
+	}
+
+	// ===== 表单验证 =====
+	const validateForm = (): boolean => {
+		if (carInfo.value.imei.length == 0) {
+			showAppToast({
+				title: '请输入设备ID',
+				icon: 'none'
+			})
+			return false
+		}
+		if (carInfo.value.deviceType.length == 0) {
+			showAppToast({
+				title: '请选择设备图标',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
+	}
+
+	// ===== 提交表单 =====
+	const submit = async () => {
+		console.log('=== 开始提交设备 ===')
+
+		try {
+			// 表单验证
+			if (!validateForm()) return
+			console.log('✅ 表单验证通过')
+
+			loading.value = true
+			uni.showLoading({
+				title: '添加中...',
+				mask: true
+			})
+
+			const submitData = {
+				deviceName: carInfo.value.deviceName,
+				imei: carInfo.value.imei,
+				carType: carInfo.value.deviceType,
+				plateNo: carInfo.value.plateNo
+			}
+
+			console.log('📤 提交数据:', submitData)
+
+			const res = await addDevice(submitData)
+			console.log('✅ 添加设备返回:', res)
+
+			uni.hideLoading()
+			loading.value = false
+
+			if (res.code == 0) {
+				showAppToast({
+					title: '添加成功',
+					icon: 'success'
+				})
+
+				uni.setStorageSync('needRefreshHome', true)
+
+				// 添加成功后触发首页刷新
+				refreshDeviceList()
+
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 1500)
+			} else {
+				showAppToast({
+					title: res.msg || '添加失败',
+					icon: 'none',
+					duration: 2000
+				})
+			}
+		} catch (error: any) {
+			console.error('❌ 添加设备失败:', error)
+			uni.hideLoading()
+			loading.value = false
+			showAppToast({
+				title: '添加设备失败',
+				icon: 'none'
+			})
+		}
+	}
+
+	// ===== 生命周期 =====
+	onLoad(() => {
+		// loadCarTypeData()
+		// 注册扫码结果事件监听
+		uni.$on('scanCodeResult', handleScanResult)
+	})
+
+	onShow(() => {
+		const rawResult = uni.getStorageSync('scanCodeResult')
+			const result = rawResult != null ? rawResult.toString() : ''
+		if (result.length > 0) {
+			uni.removeStorageSync('scanCodeResult')
+			handleScanResult({ result: result })
+		}
+	})
+
+	onUnload(() => {
+		// 移除事件监听，防止内存泄漏
+		uni.$off('scanCodeResult', handleScanResult)
+	})
+
+	// ===== 加载车辆类型（注释掉，如需使用请取消注释） =====
+	// const loadCarTypeData = async () => {
+	// 	try {
+	// 		const res = await getCarType()
+	// 		if (res.msg == 'success') {
+	// 			actions.value = res.data.map(item => ({
+	// 				name: item.typeName,
+	// 				value: item.id.toString()
+	// 			}))
+	// 		} else {
+	// 			showAppToast({
+	// 				title: '获取车辆品牌失败',
+	// 				icon: 'none'
+	// 			})
+	// 		}
+	// 	} catch (error) {
+	// 		showAppToast({
+	// 			title: '请求失败，请重试',
+	// 			icon: 'none'
+	// 		})
+	// 	}
+	// }
+
+return (): any | null => {
+
+const _component_custom_navBar = resolveEasyComponent("custom-navBar",_easycom_custom_navBar)
+const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
+const _component_i_form_item = resolveEasyComponent("i-form-item",_easycom_i_form_item)
+const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
+const _component_i_form = resolveEasyComponent("i-form",_easycom_i_form)
+const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
+const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+
+  return _cE(Fragment, null, [
+    _cE("view", _uM({ class: "container" }), [
+      _cV(_component_custom_navBar, _uM({
+        title: "添加设备",
+        "show-back": true,
+        backgroundColor: "#fff",
+        textColor: "#333",
+        showCapsule: false
+      })),
+      _cE("view", _uM({ class: "content" }), [
+        _cV(_component_i_form, _uM({
+          labelPosition: "left",
+          modelValue: carInfo.value,
+          rules: rules,
+          labelDirection: "horizontal",
+          watchValidStatus: "",
+          "onUpdate:modelValid": handleModelValid
+        }), _uM({
+          default: withSlotCtx((): any[] => [
+            _cV(_component_i_form_item, _uM({
+              label: "设备名称",
+              name: "deviceName",
+              labelDirection: "horizontal"
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cV(_component_i_input, _uM({
+                  border: "none",
+                  modelValue: carInfo.value.deviceName,
+                  "onUpdate:modelValue": $event => {(carInfo.value.deviceName) = $event},
+                  placeholder: "请输入设备名称"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _: 1 /* STABLE */
+            })),
+            _cV(_component_i_form_item, _uM({
+              label: "*设备ID",
+              name: "imei",
+              labelDirection: "horizontal"
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cV(_component_i_input, _uM({
+                  border: "none",
+                  modelValue: carInfo.value.imei,
+                  "onUpdate:modelValue": $event => {(carInfo.value.imei) = $event},
+                  placeholder: "请输入设备ID(必填)"
+                }), _uM({
+                  suffix: withSlotCtx((): any[] => [
+                    _cV(_component_i_icon, _uM({
+                      name: "/static/sancode.png",
+                      fontSize: "20",
+                      onClick: scanCode
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _: 1 /* STABLE */
+            })),
+            _cV(_component_i_form_item, _uM({
+              label: "车标",
+              name: "deviceType",
+              labelDirection: "horizontal"
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({
+                  class: "car-type-selector",
+                  onClick: deviceTypeSelectFun
+                }), [
+                  _cE("text", _uM({
+                    class: _nC(["clickable", _uM({ 'placeholder': !carInfo.value.deviceTypeValue })])
+                  }), _tD(carInfo.value.deviceTypeValue || '请选择设备图标(必选)'), 3 /* TEXT, CLASS */)
+                ])
+              ]),
+              _: 1 /* STABLE */
+            })),
+            _cV(_component_i_form_item, _uM({
+              label: "车牌名",
+              name: "plateNo",
+              labelDirection: "horizontal"
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cV(_component_i_input, _uM({
+                  border: "none",
+                  modelValue: carInfo.value.plateNo,
+                  "onUpdate:modelValue": $event => {(carInfo.value.plateNo) = $event},
+                  placeholder: "请输入车牌名"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _: 1 /* STABLE */
+            })),
+            _cV(unref(carIcons), _uM({
+              show: carIconSelectorVisible.value,
+              "onUpdate:show": updateCarIconSelectorVisible,
+              onSelect: selectIcon
+            }), null, 8 /* PROPS */, ["show"])
+          ]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["modelValue"])
+      ]),
+      _cE("view", _uM({ class: "btn" }), [
+        _cV(_component_i_button, _uM({
+          type: "primary",
+          onClick: submit,
+          loading: loading.value
+        }), _uM({
+          default: withSlotCtx((): any[] => ["提交"]),
+          _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["loading"])
+      ])
+    ]),
+    _cV(_component_app_toast)
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesAddCarAddCarStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["height", "100%"], ["backgroundColor", "#f5f5f5"]]))], ["content", _uM([[".container ", _uM([["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"], ["paddingTop", "20rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "40rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["clickable", _uM([[".container ", _uM([["marginTop", 10], ["color", "#999999"], ["fontSize", "28rpx"]])]])], ["btn", _uM([[".container ", _uM([["marginTop", "50rpx"], ["marginRight", "20rpx"], ["marginBottom", 0], ["marginLeft", "20rpx"]])]])], ["plate-input", _uM([[".container ", _uM([["width", "100%"]])]])], ["input-wrapper", _uM([[".container .plate-input ", _uM([["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"]])]])], ["car-input-container", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"]])]])], ["car-number-input", _uM([[".container ", _uM([["width", "60%"], ["textAlign", "right"]])]])], ["plate-close", _uM([[".container .car-number-container ", _uM([["height", 40], ["display", "flex"], ["textAlign", "right"], ["backgroundColor", "#FFFFFF"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["alignItems", "center"]])]])], ["car-input-item", _uM([[".container .car-input-container .car-input-box ", _uM([["position", "relative"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#E2E2E2"], ["borderRightColor", "#E2E2E2"], ["borderBottomColor", "#E2E2E2"], ["borderLeftColor", "#E2E2E2"], ["height", 40], ["lineHeight", "40px"], ["textAlign", "center"], ["fontSize", 17]])]])], ["new-item-img", _uM([[".container .car-input-container .car-input-box .car-input-item ", _uM([["position", "absolute"], ["top", -2], ["left", "50%"], ["marginLeft", -15], ["height", 13], ["width", 30], ["zIndex", 9]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", "5rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "10rpx"], ["borderTopLeftRadius", 0], ["borderTopRightRadius", 0], ["borderBottomRightRadius", 0], ["borderBottomLeftRadius", 0], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#99999924"]])]])]])]

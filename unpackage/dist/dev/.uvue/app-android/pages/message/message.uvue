@@ -4,18 +4,18 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import { ref, onActivated, onDeactivated } from 'vue';
 import { getUserMsgList, setMsgState } from '../../api/request.uts';
 type ModalInstance = {
-    __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 63, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 65, 7>;
     open: () => void;
     close: () => void;
 };
 type MessageData = {
-    __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 87, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 91, 7>;
     list: Array<UTSJSONObject>;
     total: number;
     totalPage: number;
 };
 type MessageResponse = {
-    __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 92, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 96, 7>;
     code: number;
     msg: string;
     data: MessageData;
@@ -41,12 +41,14 @@ const __sfc__ = defineComponent({
         const newMessageCount = ref(0); // 新消息数量
         const lastUpdateTime = ref(new Date().getTime()); // 最后更新时间
         const Login = ref(false);
+        const messageScrollViewportHeight = ref(0);
+        const isNearMessageListBottom = ref(false);
         // 定时器相关
         let checkTimer: number = 0;
         const isPageActive = ref(false);
         function stopNewMessageCheck(): void {
             if (checkTimer > 0) {
-                console.log('停止定时消息检查', " at pages/message/message.uvue:101");
+                console.log('停止定时消息检查', " at pages/message/message.uvue:105");
                 clearInterval(checkTimer);
                 checkTimer = 0;
             }
@@ -91,7 +93,7 @@ const __sfc__ = defineComponent({
                 }
             }
             catch (error: any) {
-                console.error('检查新消息失败:', error, " at pages/message/message.uvue:141");
+                console.error('检查新消息失败:', error, " at pages/message/message.uvue:145");
             }
         }
         // 启动新消息检查
@@ -99,11 +101,11 @@ const __sfc__ = defineComponent({
             if (checkTimer > 0) {
                 stopNewMessageCheck();
             }
-            console.log('启动定时消息检查', " at pages/message/message.uvue:151");
+            console.log('启动定时消息检查', " at pages/message/message.uvue:155");
             // 每10秒检查一次新消息
             checkTimer = setInterval(() => {
                 if (isPageActive.value) {
-                    console.log('定时检查新消息...', " at pages/message/message.uvue:155");
+                    console.log('定时检查新消息...', " at pages/message/message.uvue:159");
                     checkNewMessages();
                 }
             }, 10000);
@@ -114,6 +116,7 @@ const __sfc__ = defineComponent({
                 currPage.value = 1;
                 msgList.value = [];
                 loadStatus.value = 'loadmore';
+                isNearMessageListBottom.value = false;
             }
             if (isLoading.value)
                 return;
@@ -154,7 +157,7 @@ const __sfc__ = defineComponent({
             }
             catch (error: any) {
                 loadStatus.value = 'loadmore';
-                console.error('请求异常:', error, " at pages/message/message.uvue:202");
+                console.error('请求异常:', error, " at pages/message/message.uvue:207");
             }
             finally {
                 isLoading.value = false;
@@ -162,12 +165,12 @@ const __sfc__ = defineComponent({
         }
         // 加载新消息
         async function loadNewMessages(): Promise<void> {
-            console.log('加载新消息', " at pages/message/message.uvue:210");
+            console.log('加载新消息', " at pages/message/message.uvue:215");
             await loadMsgList(true);
             hasNewMessages.value = false;
             newMessageCount.value = 0;
             lastUpdateTime.value = new Date().getTime();
-            console.log('新消息加载完成', " at pages/message/message.uvue:215");
+            console.log('新消息加载完成', " at pages/message/message.uvue:220");
         }
         // 页面加载时初始化数据
         onLoad((_options) => {
@@ -185,11 +188,23 @@ const __sfc__ = defineComponent({
         const gotoLogin = () => {
             uni.redirectTo({ url: '/pages/login/login' });
         };
+        const measureMessageScrollViewport = (): void => {
+            uni.createSelectorQuery().select('#message-scroll-container').boundingClientRect((rect: any) => {
+                if (rect == null)
+                    return;
+                const nodeInfo = rect as NodeInfo;
+                const height = nodeInfo.height ?? 0;
+                if (height > 0) {
+                    messageScrollViewportHeight.value = height;
+                }
+            }).exec();
+        };
         // 页面显示时启动定时器
         onShow(() => {
             if (Login.value) {
-                console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:239");
+                console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:255");
                 isPageActive.value = true;
+                measureMessageScrollViewport();
                 startNewMessageCheck();
                 // 立即检查一次新消息
                 checkNewMessages();
@@ -197,26 +212,26 @@ const __sfc__ = defineComponent({
         });
         // 页面隐藏时停止定时器
         onHide(() => {
-            console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:249");
+            console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:266");
             if (Login.value) {
-                console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:251");
+                console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:268");
                 isPageActive.value = false;
                 stopNewMessageCheck();
             }
         });
         // 页面卸载时清理资源
         onUnload(() => {
-            console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:259");
+            console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:276");
             if (Login.value) {
-                console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:261");
+                console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:278");
                 isPageActive.value = false;
                 stopNewMessageCheck();
             }
         });
         onActivated(() => {
-            console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:268");
+            console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:285");
             if (Login.value) {
-                console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:270");
+                console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:287");
                 isPageActive.value = true;
                 startNewMessageCheck();
                 // 立即检查一次新消息
@@ -224,16 +239,16 @@ const __sfc__ = defineComponent({
             }
         });
         onDeactivated(() => {
-            console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:279");
+            console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:296");
             if (Login.value) {
-                console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:281");
+                console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:298");
                 isPageActive.value = false;
                 stopNewMessageCheck();
             }
         });
         // 下拉刷新处理
         const onRefresherRefresh = () => {
-            console.log('下拉刷新触发', " at pages/message/message.uvue:289");
+            console.log('下拉刷新触发', " at pages/message/message.uvue:306");
             refresherTriggered.value = true;
             loadMsgList(true).then(() => {
                 refresherTriggered.value = false;
@@ -243,7 +258,6 @@ const __sfc__ = defineComponent({
         };
         // 加载更多
         const loadMore = async (): Promise<void> => {
-            console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:300");
             if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
                 if (currPage.value >= totalPage.value) {
                     loadStatus.value = 'nomore';
@@ -255,10 +269,11 @@ const __sfc__ = defineComponent({
         };
         // 滚动到底部加载更多
         const onScrollToLower = () => {
-            console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:314");
             if (loadStatus.value == 'loadmore' && !isLoading.value) {
                 loadMore();
             }
+        };
+        const onMessageScroll = (event: UniScrollEvent): void => {
         };
         // 处理消息点击
         const handleItemClick = async (item: UTSJSONObject): Promise<void> => {
@@ -277,7 +292,7 @@ const __sfc__ = defineComponent({
                     }
                 }
                 catch (error: any) {
-                    console.error('更新状态失败:', error, " at pages/message/message.uvue:338");
+                    console.error('更新状态失败:', error, " at pages/message/message.uvue:368");
                 }
             }
         };
@@ -312,7 +327,7 @@ const __sfc__ = defineComponent({
             if (!(timeString != ""))
                 return '';
             try {
-                const date = new Date(timeString);
+                const date = new Date(timeString.replace(/-/g, '/'));
                 const now = new Date();
                 const diff = now.getTime() - date.getTime();
                 const minutes = Math.floor(diff / 60000);
@@ -350,11 +365,13 @@ const __sfc__ = defineComponent({
                         "scroll-y": "true",
                         "show-scrollbar": false,
                         class: "scroll-container",
+                        id: "message-scroll-container",
                         "refresher-enabled": "",
                         "refresher-triggered": refresherTriggered.value,
                         "lower-threshold": 100,
                         onRefresherrefresh: onRefresherRefresh,
-                        onScrolltolower: onScrollToLower
+                        onScrolltolower: onScrollToLower,
+                        onScroll: onMessageScroll
                     }), [
                         _cE("view", _uM({ class: "list-box" }), [
                             isTrue(msgList.value.length == 0 && !isLoading.value)
@@ -431,5 +448,5 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["height", "100%"], ["backgroundColor", "#f5f5f5"], ["marginTop", "170rpx"], ["position", "relative"]]))], ["scroll-container", _uM([[".container ", _uM([["height", "100%"], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-badge", _uM([[".container .list-box ", _uM([["marginLeft", "16rpx"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#f56c6c"], ["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["textAlign", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "28rpx"]])]])], ["new-message-tip", _uM([[".container .list-box ", _uM([["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#FFFFFF"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"], ["fontSize", "26rpx"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["textAlign", "center"]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])];
+const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["position", "fixed"], ["top", "170rpx"], ["bottom", 0], ["backgroundColor", "#f5f5f5"]]))], ["scroll-container", _uM([[".container ", _uM([["height", "100%"], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-badge", _uM([[".container .list-box ", _uM([["marginLeft", "16rpx"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#f56c6c"], ["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["textAlign", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "28rpx"]])]])], ["new-message-tip", _uM([[".container .list-box ", _uM([["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#FFFFFF"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"], ["fontSize", "26rpx"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["textAlign", "center"]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])];
 //# sourceMappingURL=message.uvue.map

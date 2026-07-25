@@ -1,0 +1,139 @@
+import _easycom_i_grid from '@/uni_modules/i-ui-x/components/i-grid/i-grid.uvue'
+import _easycom_i_popup from '@/uni_modules/i-ui-x/components/i-popup/i-popup.uvue'
+import { computed } from 'vue'
+
+interface Props {
+  show: boolean
+  title: string
+  col: number
+  iconSize: number
+  safeAreaInsetBottom: boolean
+}
+
+type CarIconItem = UTSJSONObject
+
+interface Emits {
+  (e: 'select', item: CarIconItem): void
+  (e: 'update:show', show: boolean): void
+}
+
+
+const __sfc__ = defineComponent({
+  __name: 'car-icons',
+  __props: Props,
+  props: {
+    show: { type: Boolean, required: true, default: false },
+    title: { type: String, required: true, default: '请选择图标' },
+    col: { type: Number, required: true, default: 4 },
+    iconSize: { type: Number, required: true, default: 40 },
+    safeAreaInsetBottom: { type: Boolean, required: true, default: true }
+  },
+  emits: ["select", "update:show"],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+// 图标列表
+const iconList: Array<CarIconItem> = [
+  { name: 'car', text: '轿车', image: '/static/cars/online/car.png' } as UTSJSONObject,
+  { name: 'suv', text: '越野车', image: '/static/cars/online/suv.png' } as UTSJSONObject,
+  { name: 'bus', text: '公交车', image: '/static/cars/online/bus.png' } as UTSJSONObject,
+  { name: 'huoche', text: '货车', image: '/static/cars/online/huoche.png' } as UTSJSONObject,
+  { name: 'train', text: '火车', image: '/static/cars/online/train.png' } as UTSJSONObject,
+  { name: 'diandong', text: '电动车', image: '/static/cars/online/diandong.png' } as UTSJSONObject,
+  { name: 'moto', text: '摩托车', image: '/static/cars/online/moto.png' } as UTSJSONObject,
+  { name: 'bike', text: '自行车', image: '/static/cars/online/bike.png' } as UTSJSONObject,
+  { name: 'sanlun', text: '三轮车', image: '/static/cars/online/sanlun.png' } as UTSJSONObject,
+  { name: 'tuola', text: '拖拉机', image: '/static/cars/online/tuola.png' } as UTSJSONObject,
+  { name: 'wajue', text: '挖掘机', image: '/static/cars/online/wajue.png' } as UTSJSONObject,
+  { name: 'tuiche', text: '手推车', image: '/static/cars/online/tuiche.png' } as UTSJSONObject,
+  { name: 'baby', text: '婴儿车', image: '/static/cars/online/baby.png' } as UTSJSONObject,
+  { name: 'muma', text: '木马', image: '/static/cars/online/muma.png' } as UTSJSONObject,
+  { name: 'tank', text: '坦克', image: '/static/cars/online/tank.png' } as UTSJSONObject,
+  { name: 'zhuangjia', text: '装甲车', image: '/static/cars/online/zhuangjia.png' } as UTSJSONObject,
+  { name: 'plan', text: '飞机', image: '/static/cars/online/plan.png' } as UTSJSONObject,
+  { name: 'hangmu', text: '航母', image: '/static/cars/online/hangmu.png' } as UTSJSONObject,
+  { name: 'junjian', text: '军舰', image: '/static/cars/online/junjian.png' } as UTSJSONObject,
+  { name: 'walk', text: '步行', image: '/static/cars/online/walk.png' } as UTSJSONObject,
+]
+
+// 每个宫格宽度（根据列数计算百分比）
+const itemWidth = computed(() => {
+  const cols = props.col > 0 ? props.col : 4
+  return (100 / cols) + '%'
+})
+
+// 选择图标处理函数
+const close = () => {
+  emit('update:show', false)
+}
+
+const handleSelect = (item: any) => {
+  const selected = item as UTSJSONObject
+  console.log('选择的图标:', selected)
+  emit('select', selected)
+  close()
+}
+
+// 弹窗点击处理
+const handlePopupClick = () => {
+  console.log('Popup clicked')
+}
+
+// 根据图标名称获取图标信息
+const getIconByName = (name: string): CarIconItem | null => {
+  for (let index = 0; index < iconList.length; index++) {
+    const item = iconList[index]
+    if (item.getString('name', '') == name) return item
+  }
+  return null
+}
+
+return (): any | null => {
+
+const _component_i_grid = resolveEasyComponent("i-grid",_easycom_i_grid)
+const _component_i_popup = resolveEasyComponent("i-popup",_easycom_i_popup)
+
+  return _cV(_component_i_popup, _uM({
+    show: props.show,
+    title: _ctx.title,
+    mode: "bottom",
+    safeBottom: _ctx.safeAreaInsetBottom,
+    showClose: "",
+    onClose: close,
+    onClick: handlePopupClick
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cE("scroll-view", _uM({
+        class: "icon-selector",
+        "scroll-y": ""
+      }), [
+        _cV(_component_i_grid, _uM({
+          items: iconList,
+          col: 4,
+          itemHeight: "88",
+          round: "8",
+          imageSize: 30,
+          iconColor: "#3c9cff",
+          textColor: "#606266",
+          showBorder: true,
+          onClick: ($event: any) => {handleSelect($event)}
+        }), null, 8 /* PROPS */, ["onClick"])
+      ])
+    ]),
+    _: 1 /* STABLE */
+  }), 8 /* PROPS */, ["show", "title", "safeBottom"])
+}
+}
+
+})
+export default __sfc__
+export type CarIconsComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenComponentsCarIconsCarIconsStyles = [_uM([["icon-selector", _pS(_uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["backgroundColor", "#ffffff"], ["width::-webkit-scrollbar", 4], ["backgroundColor::-webkit-scrollbar-thumb", "#dddddd"], ["borderTopLeftRadius::-webkit-scrollbar-thumb", 4], ["borderTopRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomRightRadius::-webkit-scrollbar-thumb", 4], ["borderBottomLeftRadius::-webkit-scrollbar-thumb", 4], ["backgroundColor::-webkit-scrollbar-track", "#f5f5f5"]]))], ["icon-grid", _uM([[".icon-selector ", _uM([["width", "100%"], ["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]])]])], ["grid-item", _uM([[".icon-selector .icon-grid ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "20rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "10rpx"], ["width", "25%"], ["height", "100%"], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])]])], ["@TRANSITION", _uM([["grid-item", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])]])]])]

@@ -1,0 +1,26 @@
+const iosToastHandlers: Array<(options: ShowToastOptions) => void> = []
+
+export function registerIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+
+
+
+
+}
+
+export function unregisterIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+
+
+
+
+}
+
+export function showAppToast(options: ShowToastOptions): void {
+
+
+
+
+
+
+	uni.showToast(options)
+
+}

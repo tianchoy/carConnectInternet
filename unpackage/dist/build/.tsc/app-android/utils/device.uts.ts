@@ -1,0 +1,11 @@
+export type DeviceItem = {
+	plateNo: string
+	imei: string
+	status: number
+	companyId: string
+	deviceName: string
+	deviceId: string
+	iccid: string
+	simMerchant: string
+	connectionStatus: string
+}

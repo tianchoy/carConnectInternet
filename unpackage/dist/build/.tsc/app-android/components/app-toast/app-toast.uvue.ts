@@ -1,0 +1,54 @@
+import { onUnmounted, ref } from 'vue'
+import { registerIosToastHandler, unregisterIosToastHandler } from '../../utils/toast.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'app-toast',
+name: 'app-toast',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return (): any | null => {
+
+  return null
+}
+}
+
+})
+export default __sfc__
+export type AppToastComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenComponentsAppToastAppToastStyles = []
