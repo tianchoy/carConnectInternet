@@ -25,7 +25,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val _ctx = __ins.proxy as GenPagesPlayBackPlayBack
             val _cache = __ins.renderCache
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
-            val mapScale = ref(15)
+            val mapScale = ref(12)
+            val isMapReady = ref(false)
             val imei = ref<String?>("")
             val carStatus = ref<String?>("")
             val plateNo = ref<String?>("")
@@ -146,6 +147,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 val bounds = nullableBounds
                 center["latitude"] = (bounds.minLat + bounds.maxLat) / 2
                 center["longitude"] = (bounds.minLng + bounds.maxLng) / 2
+                isMapReady.value = true
                 val latDiff = bounds.maxLat - bounds.minLat
                 val lngDiff = bounds.maxLng - bounds.minLng
                 val maxDiff = Math.max(latDiff, lngDiff)
@@ -300,6 +302,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 markers.value = _uA(
                     marker
                 )
+                isMapReady.value = true
             }
             val showCurrentPosition = ::gen_showCurrentPosition_fn
             fun gen_clearTrackDisplay_fn(): Unit {
@@ -386,7 +389,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 606, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 609, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -406,7 +409,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:631")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:634")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -516,7 +519,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:750")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:753")
                 if (sTime.value != "" && eTime.value != "") {
                     startTime.value = normalizeDateTime(sTime.value)
                     endTime.value = normalizeDateTime(eTime.value)
@@ -551,14 +554,19 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "轨迹回放", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
-                                "latitude",
-                                "longitude",
-                                "markers",
-                                "polyline",
-                                "scale",
-                                "style"
-                            )),
+                            if (isTrue(isMapReady.value)) {
+                                _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                                    "latitude",
+                                    "longitude",
+                                    "markers",
+                                    "polyline",
+                                    "scale",
+                                    "style"
+                                ))
+                            } else {
+                                _cC("v-if", true)
+                            }
+                            ,
                             _cV(_component_sub_navBar, _uM("class" to "sub-nav-overlay", "showTime" to false, "currentCar" to plateNo.value, "showCar" to true, "carStatus" to carStatus.value), null, 8, _uA(
                                 "currentCar",
                                 "carStatus"

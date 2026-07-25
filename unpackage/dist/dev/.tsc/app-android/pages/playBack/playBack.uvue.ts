@@ -62,7 +62,8 @@ const center = reactive({
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(15)
+	const mapScale = ref(12)
+	const isMapReady = ref(false)
 	const imei = ref<string | null>('')
 	const carStatus = ref<string | null>('')
 	const plateNo = ref<string | null>('')
@@ -197,6 +198,7 @@ const center = reactive({
 
 		center.latitude = (bounds.minLat + bounds.maxLat) / 2
 		center.longitude = (bounds.minLng + bounds.maxLng) / 2
+		isMapReady.value = true
 
 		const latDiff = bounds.maxLat - bounds.minLat
 		const lngDiff = bounds.maxLng - bounds.minLng
@@ -466,6 +468,7 @@ const center = reactive({
 
 		// 设置标记点
 		markers.value = [marker]
+		isMapReady.value = true
 	}
 
 
@@ -565,7 +568,7 @@ const center = reactive({
 		const requestId = ++replaySessionId
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 606, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 609, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -590,7 +593,7 @@ const center = reactive({
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:631")
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:634")
 			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
@@ -709,7 +712,7 @@ const center = reactive({
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:750")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:753")
 		if(sTime.value != '' && eTime.value != '') {
 			startTime.value = normalizeDateTime(sTime.value)
 			endTime.value = normalizeDateTime(eTime.value)
@@ -756,20 +759,23 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        _cV(_component_map, _uM({
-          id: "myMap",
-          latitude: center.latitude,
-          longitude: center.longitude,
-          markers: markers.value,
-          polyline: polyline.value,
-          scale: mapScale.value,
-          style: _nS(_uM({"width":"100%","height":"100%"})),
-          "show-location": true,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: center.latitude,
+              longitude: center.longitude,
+              markers: markers.value,
+              polyline: polyline.value,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": true,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"])
+          : _cC("v-if", true),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           showTime: false,

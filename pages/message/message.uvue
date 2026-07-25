@@ -3,7 +3,8 @@
 	</custom-navBar>
 	<view class="container">
 		<scroll-view
-			scroll-y
+			scroll-y="true" 
+			:show-scrollbar="false"
 			class="scroll-container"
 			refresher-enabled
 			:refresher-triggered="refresherTriggered"

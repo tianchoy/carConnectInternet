@@ -4,17 +4,17 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { ref, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
 
-	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 62, 7>;
+	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 63, 7>;
 		open: () => void
 		close: () => void
 	}
 
-	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 86, 7>;
+	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 87, 7>;
 		list: Array<UTSJSONObject>
 		total: number
 		totalPage: number
 	};
-	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 91, 7>;
+	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 92, 7>;
 		code: number
 		msg: string
 		data: MessageData
@@ -50,7 +50,7 @@ const _cache = __ins.renderCache;
 	const isPageActive = ref(false)
 	function stopNewMessageCheck() : void {
 		if (checkTimer > 0) {
-			console.log('停止定时消息检查', " at pages/message/message.uvue:100")
+			console.log('停止定时消息检查', " at pages/message/message.uvue:101")
 			clearInterval(checkTimer)
 			checkTimer = 0
 		}
@@ -90,7 +90,7 @@ const _cache = __ins.renderCache;
 				newMessageCount.value = count
 			}
 		} catch (error) {
-			console.error('检查新消息失败:', error, " at pages/message/message.uvue:140")
+			console.error('检查新消息失败:', error, " at pages/message/message.uvue:141")
 		}
 	}
 
@@ -100,11 +100,11 @@ const _cache = __ins.renderCache;
 			stopNewMessageCheck()
 		}
 
-		console.log('启动定时消息检查', " at pages/message/message.uvue:150")
+		console.log('启动定时消息检查', " at pages/message/message.uvue:151")
 		// 每10秒检查一次新消息
 		checkTimer = setInterval(() => {
 			if (isPageActive.value) {
-				console.log('定时检查新消息...', " at pages/message/message.uvue:154")
+				console.log('定时检查新消息...', " at pages/message/message.uvue:155")
 				checkNewMessages()
 			}
 		}, 10000)
@@ -151,7 +151,7 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			loadStatus.value = 'loadmore'
-			console.error('请求异常:', error, " at pages/message/message.uvue:201")
+			console.error('请求异常:', error, " at pages/message/message.uvue:202")
 		} finally {
 			isLoading.value = false
 		}
@@ -159,12 +159,12 @@ const _cache = __ins.renderCache;
 
 	// 加载新消息
 	async function loadNewMessages() : Promise<void> {
-		console.log('加载新消息', " at pages/message/message.uvue:209")
+		console.log('加载新消息', " at pages/message/message.uvue:210")
 		await loadMsgList(true)
 		hasNewMessages.value = false
 		newMessageCount.value = 0
 		lastUpdateTime.value = new Date().getTime()
-		console.log('新消息加载完成', " at pages/message/message.uvue:214")
+		console.log('新消息加载完成', " at pages/message/message.uvue:215")
 	}
 
 
@@ -188,7 +188,7 @@ const _cache = __ins.renderCache;
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:238")
+			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:239")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -198,9 +198,9 @@ const _cache = __ins.renderCache;
 
 	// 页面隐藏时停止定时器
 	onHide(() => {
-		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:248")
+		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:249")
 		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:250")
+			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:251")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -208,18 +208,18 @@ const _cache = __ins.renderCache;
 
 	// 页面卸载时清理资源
 	onUnload(() => {
-		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:258")
+		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:259")
 		if (Login.value) {
-			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:260")
+			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:261")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
 
 	onActivated(() => {
-		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:267")
+		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:268")
 		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:269")
+			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:270")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -228,9 +228,9 @@ const _cache = __ins.renderCache;
 	})
 
 	onDeactivated(() => {
-		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:278")
+		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:279")
 		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:280")
+			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:281")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -238,7 +238,7 @@ const _cache = __ins.renderCache;
 
 	// 下拉刷新处理
 	const onRefresherRefresh = () => {
-		console.log('下拉刷新触发', " at pages/message/message.uvue:288")
+		console.log('下拉刷新触发', " at pages/message/message.uvue:289")
 		refresherTriggered.value = true
 		loadMsgList(true).then(() => {
 			refresherTriggered.value = false
@@ -249,7 +249,7 @@ const _cache = __ins.renderCache;
 
 	// 加载更多
 	const loadMore = async () => {
-		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:299")
+		console.log('准备加载更多 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:300")
 		if (isLoading.value || loadStatus.value != 'loadmore' || currPage.value >= totalPage.value) {
 			if (currPage.value >= totalPage.value) {
 				loadStatus.value = 'nomore'
@@ -263,7 +263,7 @@ const _cache = __ins.renderCache;
 
 	// 滚动到底部加载更多
 	const onScrollToLower = () => {
-		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:313")
+		console.log('滚动到底部 - 当前页:', currPage.value, '总页数:', totalPage.value, " at pages/message/message.uvue:314")
 		if (loadStatus.value == 'loadmore' && !isLoading.value) {
 			loadMore()
 		}
@@ -287,7 +287,7 @@ const _cache = __ins.renderCache;
 					}
 				}
 			} catch (error) {
-				console.error('更新状态失败:', error, " at pages/message/message.uvue:337")
+				console.error('更新状态失败:', error, " at pages/message/message.uvue:338")
 			}
 		}
 	}
@@ -364,7 +364,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
     })),
     _cE("view", _uM({ class: "container" }), [
       _cE("scroll-view", _uM({
-        "scroll-y": "",
+        "scroll-y": "true",
+        "show-scrollbar": false,
         class: "scroll-container",
         "refresher-enabled": "",
         "refresher-triggered": refresherTriggered.value,

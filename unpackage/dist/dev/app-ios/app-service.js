@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_XO-X41";
+    const id = "app-ios_-AT23a";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -4781,7 +4781,7 @@
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:100", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:101", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -4824,7 +4824,7 @@
               newMessageCount.value = count;
             }
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:140", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:141", "检查新消息失败:", error);
           }
         });
       }
@@ -4832,10 +4832,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:150", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:151", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:154", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:155", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -4886,7 +4886,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:201", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:202", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4894,12 +4894,12 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:209", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:210", "加载新消息");
           yield loadMsgList(true);
           hasNewMessages.value = false;
           newMessageCount.value = 0;
           lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
-          uni.__log__("log", "at pages/message/message.uvue:214", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:215", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -4916,47 +4916,47 @@
       };
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:238", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:239", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:248", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:249", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:250", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:251", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:258", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:259", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:260", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:261", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:267", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:268", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:269", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:270", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:278", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:279", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:280", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:281", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:288", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:289", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -4966,7 +4966,7 @@
       };
       const loadMore = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:299", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
+          uni.__log__("log", "at pages/message/message.uvue:300", "准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value);
           if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
             if (currPage.value >= totalPage.value) {
               loadStatus.value = "nomore";
@@ -4978,7 +4978,7 @@
         });
       };
       const onScrollToLower = () => {
-        uni.__log__("log", "at pages/message/message.uvue:313", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
+        uni.__log__("log", "at pages/message/message.uvue:314", "滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value);
         if (loadStatus.value == "loadmore" && !isLoading.value) {
           loadMore();
         }
@@ -5001,7 +5001,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:337", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:338", "更新状态失败:", error);
             }
           }
         });
@@ -5086,7 +5086,8 @@
         }),
         vue.createElementVNode("view", { class: "container" }, [
           vue.createElementVNode("scroll-view", {
-            "scroll-y": "",
+            "scroll-y": "true",
+            "show-scrollbar": false,
             class: "scroll-container",
             "refresher-enabled": "",
             "refresher-triggered": $setup.refresherTriggered,
@@ -8375,6 +8376,7 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(15);
+      const isMapReady = vue.ref(false);
       const datainfo = vue.ref(new UTSJSONObject({}));
       const address = vue.ref("");
       const currentTime = vue.ref("5s");
@@ -8565,7 +8567,7 @@
                       const latitude = item.getNumber("latitude", 0);
                       const longitude = item.getNumber("longitude", 0);
                       if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:358", "位置信息缺失", item);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:359", "位置信息缺失", item);
                         showAppToast({
                           title: "位置信息缺失",
                           icon: "none"
@@ -8575,7 +8577,7 @@
                       const lat = parseFloat(latitude.toString());
                       const lng = parseFloat(longitude.toString());
                       if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:371", "经纬度格式错误", latitude, longitude);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:372", "经纬度格式错误", latitude, longitude);
                         return false;
                       }
                       let convertedLat = lat;
@@ -8585,7 +8587,7 @@
                         convertedLat = coord.lat;
                         convertedLng = coord.lng;
                       } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:383", "坐标转换失败:", transformError);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:384", "坐标转换失败:", transformError);
                       }
                       center.latitude = convertedLat;
                       center.longitude = convertedLng;
@@ -8594,6 +8596,7 @@
                       markers.value = [];
                       yield delay(50);
                       markers.value = [deviceMarker];
+                      isMapReady.value = true;
                       const connectionStatus = item["connectionStatus"];
                       if (connectionStatus != "online" && refreshTimer.value !== null) {
                         const timer = refreshTimer.value;
@@ -8610,7 +8613,7 @@
                       if (signalRssi.value != null) {
                         const signalExp = getSignalDetail(signalRssi.value).experience;
                         if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:425", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:427", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
                         }
                       }
                     }
@@ -8631,10 +8634,10 @@
                 }
                 return true;
               } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:439", "第".concat(attempt, "次加载设备数据失败:"), error);
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:441", "第".concat(attempt, "次加载设备数据失败:"), error);
                 if (attempt < retry) {
                   const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:445", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:447", "等待".concat(delayMs / 1e3, "秒后重试..."));
                   yield delay(delayMs);
                   return false;
                 } else {
@@ -8686,7 +8689,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:507", "手动刷新失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:509", "手动刷新失败:", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -8821,7 +8824,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:685", "操作失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:687", "操作失败:", error);
             showAppToast({
               title: "操作失败，请重试",
               icon: "none"
@@ -8853,7 +8856,7 @@
             const addr = yield getAddress(center.latitude, center.longitude);
             address.value = addr.result.formatted_address;
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:721", "获取地址信息失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:723", "获取地址信息失败:", error);
           }
         });
       };
@@ -8878,7 +8881,7 @@
                 title: "调起地图失败",
                 icon: "none"
               });
-              uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:746", "调起地图失败:", err);
+              uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:748", "调起地图失败:", err);
             }
           });
         });
@@ -8952,7 +8955,7 @@
             const res = yield getDeviceDetail(deviceId.value);
             currentCarInfo.value = res.data;
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:829", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:831", "设备id获取失败");
           }
         });
       };
@@ -8977,20 +8980,20 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:863", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:872", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:874", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:877", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:879", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
-      const __returned__ = { deptId, imei, deviceId, center, mapScale, datainfo, address, currentTime, onCurrentTimeChange, times, refreshTimer, isRefreshing, popupRef, psw, currentOperation, modalTitle, userType, filterNonLatin, markers, showDevicePopup, currentDeviceInfo, currentCarInfo, signalRssi, signalSat, carVoltage, batteryPercent, getBatteryColor, getSignalDetail, getMobileSignalBarClass, createMarker, delay, loadData, manualRefresh, setupAutoRefresh, stopAutoRefresh, baseList, executeOperation, confirm, carDetail, refreshAdress, navTo, handleGridClick, loadDeviceDetail };
+      const __returned__ = { deptId, imei, deviceId, center, mapScale, isMapReady, datainfo, address, currentTime, onCurrentTimeChange, times, refreshTimer, isRefreshing, popupRef, psw, currentOperation, modalTitle, userType, filterNonLatin, markers, showDevicePopup, currentDeviceInfo, currentCarInfo, signalRssi, signalSat, carVoltage, batteryPercent, getBatteryColor, getSignalDetail, getMobileSignalBarClass, createMarker, delay, loadData, manualRefresh, setupAutoRefresh, stopAutoRefresh, baseList, executeOperation, confirm, carDetail, refreshAdress, navTo, handleGridClick, loadDeviceDetail };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -9021,7 +9024,8 @@
             showCapsule: false
           }),
           vue.createElementVNode("view", { class: "map-container" }, [
-            vue.createVNode(_component_map, {
+            $setup.isMapReady ? (vue.openBlock(), vue.createBlock(_component_map, {
+              key: 0,
               id: "myMap",
               latitude: $setup.center.latitude,
               longitude: $setup.center.longitude,
@@ -9033,7 +9037,7 @@
               "enable-overlooking": true,
               "enable-building": true,
               "enable-3D": true
-            }, null, 8, ["latitude", "longitude", "markers", "scale"]),
+            }, null, 8, ["latitude", "longitude", "markers", "scale"])) : vue.createCommentVNode("v-if", true),
             vue.createVNode(_component_sub_navBar, {
               class: "sub-nav-overlay",
               currentTime: $setup.currentTime,
@@ -15555,7 +15559,8 @@
         latitude: 39.90469,
         longitude: 116.40717
       }));
-      const mapScale = vue.ref(15);
+      const mapScale = vue.ref(12);
+      const isMapReady = vue.ref(false);
       const imei = vue.ref("");
       const carStatus = vue.ref("");
       const plateNo = vue.ref("");
@@ -15666,6 +15671,7 @@
         const bounds = nullableBounds;
         center.latitude = (bounds.minLat + bounds.maxLat) / 2;
         center.longitude = (bounds.minLng + bounds.maxLng) / 2;
+        isMapReady.value = true;
         const latDiff = bounds.maxLat - bounds.minLat;
         const lngDiff = bounds.maxLng - bounds.minLng;
         const maxDiff = Math.max(latDiff, lngDiff);
@@ -15854,6 +15860,7 @@
         };
         carMarker.value = marker;
         markers.value = [marker];
+        isMapReady.value = true;
       }
       function clearTrackDisplay() {
         trackPoints.value = [];
@@ -15954,7 +15961,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:631", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:634", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
               showCurrentPosition();
@@ -16057,7 +16064,7 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:750", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:753", sTime.value, eTime.value);
         if (sTime.value != "" && eTime.value != "") {
           startTime.value = normalizeDateTime(sTime.value);
           endTime.value = normalizeDateTime(eTime.value);
@@ -16075,7 +16082,7 @@
         pausePlayback();
         ++replaySessionId;
       });
-      const __returned__ = { center, mapScale, imei, carStatus, plateNo, carType, showDateTimePicker, currentPickerType, pickerTitle, trackPoints, polyline, isPlaying, isTrackPlayable, playbackSpeed, totalDistance, currentSpeed, currentTime, currentIndex, carMarker, get playbackTimer() {
+      const __returned__ = { center, mapScale, isMapReady, imei, carStatus, plateNo, carType, showDateTimePicker, currentPickerType, pickerTitle, trackPoints, polyline, isPlaying, isTrackPlayable, playbackSpeed, totalDistance, currentSpeed, currentTime, currentIndex, carMarker, get playbackTimer() {
         return playbackTimer;
       }, set playbackTimer(v = null) {
         playbackTimer = v;
@@ -16116,7 +16123,8 @@
             showCapsule: false
           }),
           vue.createElementVNode("view", { class: "map-container" }, [
-            vue.createVNode(_component_map, {
+            $setup.isMapReady ? (vue.openBlock(), vue.createBlock(_component_map, {
+              key: 0,
               id: "myMap",
               latitude: $setup.center.latitude,
               longitude: $setup.center.longitude,
@@ -16129,7 +16137,7 @@
               "enable-overlooking": true,
               "enable-building": true,
               "enable-3D": true
-            }, null, 8, ["latitude", "longitude", "markers", "polyline", "scale"]),
+            }, null, 8, ["latitude", "longitude", "markers", "polyline", "scale"])) : vue.createCommentVNode("v-if", true),
             vue.createVNode(_component_sub_navBar, {
               class: "sub-nav-overlay",
               showTime: false,
@@ -19955,7 +19963,9 @@
         latitude: 39.90469,
         longitude: 116.40717
       }));
-      const mapScale = vue.ref(15);
+      const mapScale = vue.ref(12);
+      const isMapReady = vue.ref(false);
+      const isInitialPositionSettled = vue.ref(false);
       const markers = vue.ref([]);
       const carMarker = vue.ref(null);
       const circles = vue.ref([]);
@@ -20030,7 +20040,12 @@
             res.data.forEach((item) => {
               if (item.getString("imei", "") == imei.value) {
                 const deviceData = item;
-                const convertedCoord = CoordTransform.wgs84ToTencent(deviceData.getNumber("latitude", 0), deviceData.getNumber("longitude", 0));
+                const latitude = deviceData.getNumber("latitude", 0);
+                const longitude = deviceData.getNumber("longitude", 0);
+                if (!isFinite(latitude) || !isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || latitude == 0 || longitude == 0) {
+                  return null;
+                }
+                const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
                 center.latitude = convertedCoord.lat;
                 center.longitude = convertedCoord.lng;
                 const position = {
@@ -20058,6 +20073,7 @@
                 const marker = carMarker.value;
                 if (marker != null) {
                   markers.value = [marker];
+                  isMapReady.value = true;
                 }
                 currentSpeed.value = deviceData.speed ? parseFloat(deviceData.speed.toString()) : 0;
                 currentAddress.value = deviceData.positionUpdateTime ? "最后定位: ".concat(deviceData.positionUpdateTime) : "未知位置";
@@ -20065,12 +20081,13 @@
               }
             });
           } catch (err) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:357", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:362", "获取初始位置失败:", err);
             showAppToast({
               title: "获取车辆位置失败",
               icon: "none"
             });
           } finally {
+            isInitialPositionSettled.value = true;
             uni.hideLoading();
           }
         });
@@ -20135,7 +20152,7 @@
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
           if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:427", "无效的圆形围栏数据:", circleStr);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:433", "无效的圆形围栏数据:", circleStr);
             return null;
           }
           const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -20145,7 +20162,7 @@
             radius
           };
         } catch (error) {
-          uni.__log__("error", "at pages/geofencing/geofencing.uvue:437", "解析圆形围栏失败:", error, "数据:", circleStr);
+          uni.__log__("error", "at pages/geofencing/geofencing.uvue:443", "解析圆形围栏失败:", error, "数据:", circleStr);
           return null;
         }
       }
@@ -20260,11 +20277,12 @@
         });
         polygons.value = fencePolygons;
         circles.value = fenceCircles;
-        if (fenceCircles.length > 0 && !selectedFence.value) {
+        if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && !isMapReady.value) {
           const firstCircle = fenceCircles[0];
           center.latitude = firstCircle.latitude;
           center.longitude = firstCircle.longitude;
           mapScale.value = firstCircle.radius > 5e4 ? 8 : firstCircle.radius > 2e4 ? 9 : firstCircle.radius > 1e4 ? 10 : firstCircle.radius > 5e3 ? 11 : firstCircle.radius > 2e3 ? 12 : firstCircle.radius > 1e3 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16;
+          isMapReady.value = true;
         }
       };
       function updateMapDisplay() {
@@ -20312,7 +20330,7 @@
             }
             renderFencesOnMap();
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:632", "加载围栏列表失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:639", "加载围栏列表失败:", error);
             showAppToast({ title: "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
             renderFencesOnMap();
@@ -20478,7 +20496,7 @@
               showAppToast({ title: "删除失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:840", "删除围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:847", "删除围栏失败:", error);
             showAppToast({ title: "删除失败", icon: "none" });
           }
         });
@@ -20567,7 +20585,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:951", "保存围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:958", "保存围栏失败:", error);
             showAppToast({ title: "保存失败，请重试", icon: "none" });
           }
         });
@@ -20667,7 +20685,7 @@
       };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1052", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1059", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -20675,7 +20693,7 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1064", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1071", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
             yield loadUnboundDevices();
@@ -20693,14 +20711,14 @@
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1084", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1091", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1091", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1098", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
@@ -20720,7 +20738,7 @@
               showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1114", "设备绑定操作失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1121", "设备绑定操作失败:", error);
             showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
@@ -20778,10 +20796,10 @@
       }
       function deleteSelectedFence() {
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1184", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1191", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1188", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -20896,7 +20914,7 @@
         loadInitialPosition();
         loadGeofenceList();
       });
-      const __returned__ = { imei, connectionStatus, deptId, carType, deviceName, center, mapScale, markers, carMarker, circles, carInFence, isDrawing, drawingMode, points, polygons, circleCenter, circleRadius, currentSpeed, currentAddress, currentCar, lastDirection, showFenceModal, fenceList, selectedFence, fencesPopup, editDialogPopup, editingFence, alarmTypeOptions, fenceForm, deviceDialogPopup, activeTab, deviceList, boundDevices, currentFenceName, currentFenceId, loading, scrollTop, get loadMoreTimer() {
+      const __returned__ = { imei, connectionStatus, deptId, carType, deviceName, center, mapScale, isMapReady, isInitialPositionSettled, markers, carMarker, circles, carInFence, isDrawing, drawingMode, points, polygons, circleCenter, circleRadius, currentSpeed, currentAddress, currentCar, lastDirection, showFenceModal, fenceList, selectedFence, fencesPopup, editDialogPopup, editingFence, alarmTypeOptions, fenceForm, deviceDialogPopup, activeTab, deviceList, boundDevices, currentFenceName, currentFenceId, loading, scrollTop, get loadMoreTimer() {
         return loadMoreTimer;
       }, set loadMoreTimer(v = null) {
         loadMoreTimer = v;
@@ -20930,7 +20948,8 @@
             showCapsule: false
           }),
           vue.createElementVNode("view", { class: "map-container" }, [
-            vue.createVNode(_component_map, {
+            $setup.isMapReady ? (vue.openBlock(), vue.createBlock(_component_map, {
+              key: 0,
               id: "myMap",
               latitude: $setup.center.latitude,
               longitude: $setup.center.longitude,
@@ -20945,7 +20964,7 @@
               "enable-overlooking": true,
               "enable-building": true,
               "enable-3D": true
-            }, null, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"]),
+            }, null, 8, ["latitude", "longitude", "scale", "polygons", "markers", "circles"])) : vue.createCommentVNode("v-if", true),
             vue.createVNode(_component_sub_navBar, {
               class: "sub-nav-overlay",
               showTime: false,
@@ -20954,7 +20973,7 @@
               carStatus: $setup.connectionStatus
             }, null, 8, ["currentCar", "carStatus"]),
             $setup.isDrawing ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
+              key: 1,
               class: "drag-hint"
             }, [
               $setup.drawingMode === "polygon" ? (vue.openBlock(), vue.createElementBlock("text", {

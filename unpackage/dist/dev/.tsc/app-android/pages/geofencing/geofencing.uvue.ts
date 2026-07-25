@@ -44,7 +44,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		value : boolean;
 	};
 	// 地图状态
-	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 666, 7>;
+	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 673, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
@@ -69,7 +69,9 @@ const imei = ref<string | null>(null)
 		latitude: 39.90469,
 		longitude: 116.40717
 	})
-	const mapScale = ref(15)
+	const mapScale = ref(12)
+	const isMapReady = ref(false)
+	const isInitialPositionSettled = ref(false)
 	const markers = ref<Array<Marker>>([]) // 标记点
 	const carMarker = ref<Marker | null>(null) // 车辆标记点
 	const circles = ref<Array<Circle>>([]) // 圆形围栏
@@ -156,17 +158,19 @@ const imei = ref<string | null>(null)
 		})
 
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 300, 10), deptId: deptId.value, deviceids: imei.value }
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 302, 10), deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			res.data.forEach(item => {
 				if (item.getString('imei', '') == imei.value) {
 					const deviceData = item
+					const latitude = deviceData.getNumber('latitude', 0)
+					const longitude = deviceData.getNumber('longitude', 0)
+					if (!isFinite(latitude) || !isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || latitude == 0 || longitude == 0) {
+						return
+					}
 					// 转换坐标到腾讯地图坐标系
-					const convertedCoord = CoordTransform.wgs84ToTencent(
-						deviceData.getNumber('latitude', 0),
-						deviceData.getNumber('longitude', 0)
-					)
+					const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
 					center.latitude = convertedCoord.lat
 					center.longitude = convertedCoord.lng
 
@@ -201,6 +205,7 @@ const imei = ref<string | null>(null)
 					const marker = carMarker.value
 					if (marker != null) {
 						markers.value = [marker]
+						isMapReady.value = true
 					}
 
 					// 更新车辆信息
@@ -213,12 +218,13 @@ const imei = ref<string | null>(null)
 			})
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:357")
+			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:362")
 			showAppToast({
 				title: '获取车辆位置失败',
 				icon: 'none'
 			})
 		} finally {
+			isInitialPositionSettled.value = true
 			uni.hideLoading()
 		}
 	}
@@ -283,7 +289,7 @@ const imei = ref<string | null>(null)
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
 			if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:427")
+				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:433")
 				return null
 			}
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -293,7 +299,7 @@ const imei = ref<string | null>(null)
 				radius: radius
 			}
 		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:437")
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:443")
 			return null
 		}
 	}
@@ -430,13 +436,14 @@ const imei = ref<string | null>(null)
 		circles.value = fenceCircles
 
 		// 确保圆形围栏能显示在地图视野中
-		if (fenceCircles.length > 0 && !selectedFence.value) {
-			// 自动定位到第一个圆形围栏
+		if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && !isMapReady.value) {
+			// 设备初始位置不可用时，自动定位到第一个圆形围栏
 			const firstCircle = fenceCircles[0]
 			center.latitude = firstCircle.latitude
 			center.longitude = firstCircle.longitude
 			// 根据半径设置合适的缩放级别
 			mapScale.value = firstCircle.radius > 50000 ? 8 : firstCircle.radius > 20000 ? 9 : firstCircle.radius > 10000 ? 10 : firstCircle.radius > 5000 ? 11 : firstCircle.radius > 2000 ? 12 : firstCircle.radius > 1000 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16
+			isMapReady.value = true
 		}
 	}
 
@@ -488,7 +495,7 @@ const imei = ref<string | null>(null)
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
-			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:632")
+			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:639")
 			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
@@ -688,7 +695,7 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: '删除失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:840")
+			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:847")
 			showAppToast({ title: '删除失败', icon: 'none' })
 		}
 	}
@@ -753,7 +760,7 @@ const imei = ref<string | null>(null)
 			return
 		}
 
-		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 905, 9),
+		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 912, 9),
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
@@ -799,7 +806,7 @@ const imei = ref<string | null>(null)
 			}
 		} catch (error) {
 			uni.hideLoading()
-			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:951")
+			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:958")
 			showAppToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
@@ -900,7 +907,7 @@ const imei = ref<string | null>(null)
 	// 切换标签页
 	const switchTab = async (tab : string) : Promise<void> => {
 
-		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1052")
+		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1059")
 		if (activeTab.value === tab) return
 
 		activeTab.value = tab
@@ -912,7 +919,7 @@ const imei = ref<string | null>(null)
 
 		// 加载对应数据
 		if (tab === 'bind') {
-			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1064")
+			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1071")
 			await loadBoundDevices(currentFenceId.value)
 		} else {
 			await loadUnboundDevices()
@@ -932,14 +939,14 @@ const imei = ref<string | null>(null)
 
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1084")
+		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1091")
 		loading.value = true
 		try {
-			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1087, 10),
+			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1094, 10),
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1091")
+			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1098")
 			let result : any
 			if (bound) {
 				result = await bindDevices(params)
@@ -962,7 +969,7 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1114")
+			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1121")
 			showAppToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
@@ -1032,11 +1039,11 @@ const imei = ref<string | null>(null)
 
 	function deleteSelectedFence(): void {
 		const fence = selectedFence.value;
-		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1184");
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1191");
 
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
-			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1188");
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1195");
 
 			if (fenceId !== '') {
 				deleteFence(fenceId);
@@ -1213,22 +1220,25 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         showCapsule: false
       })),
       _cE("view", _uM({ class: "map-container" }), [
-        _cV(_component_map, _uM({
-          id: "myMap",
-          latitude: center.latitude,
-          longitude: center.longitude,
-          scale: mapScale.value,
-          style: _nS(_uM({"width":"100%","height":"100%"})),
-          "show-location": false,
-          polygons: polygons.value,
-          markers: markers.value,
-          circles: circles.value,
-          onTap: handleMapTap,
-          "enable-traffic": true,
-          "enable-overlooking": true,
-          "enable-building": true,
-          "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"]),
+        isTrue(isMapReady.value)
+          ? _cV(_component_map, _uM({
+              key: 0,
+              id: "myMap",
+              latitude: center.latitude,
+              longitude: center.longitude,
+              scale: mapScale.value,
+              style: _nS(_uM({"width":"100%","height":"100%"})),
+              "show-location": false,
+              polygons: polygons.value,
+              markers: markers.value,
+              circles: circles.value,
+              onTap: handleMapTap,
+              "enable-traffic": true,
+              "enable-overlooking": true,
+              "enable-building": true,
+              "enable-3D": true
+            }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "polygons", "markers", "circles"])
+          : _cC("v-if", true),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           showTime: false,
@@ -1238,7 +1248,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         }), null, 8 /* PROPS */, ["currentCar", "carStatus"]),
         isTrue(isDrawing.value)
           ? _cE("view", _uM({
-              key: 0,
+              key: 1,
               class: "drag-hint"
             }), [
               drawingMode.value === 'polygon'

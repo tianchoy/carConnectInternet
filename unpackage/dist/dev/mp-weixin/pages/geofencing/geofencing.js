@@ -214,7 +214,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       latitude: 39.90469,
       longitude: 116.40717
     }));
-    const mapScale = common_vendor.ref(15);
+    const mapScale = common_vendor.ref(12);
+    const isMapReady = common_vendor.ref(false);
+    const isInitialPositionSettled = common_vendor.ref(false);
     const markers = common_vendor.ref([]);
     const carMarker = common_vendor.ref(null);
     const circles = common_vendor.ref([]);
@@ -288,7 +290,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           res.data.forEach((item) => {
             if (item.getString("imei", "") == imei.value) {
               const deviceData = item;
-              const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(deviceData.getNumber("latitude", 0), deviceData.getNumber("longitude", 0));
+              const latitude = deviceData.getNumber("latitude", 0);
+              const longitude = deviceData.getNumber("longitude", 0);
+              if (!isValidCoordinate(latitude, longitude) || latitude == 0 || longitude == 0) {
+                return null;
+              }
+              const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(latitude, longitude);
               center.latitude = convertedCoord.lat;
               center.longitude = convertedCoord.lng;
               const position = {
@@ -316,6 +323,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               const marker = carMarker.value;
               if (marker != null) {
                 markers.value = [marker];
+                isMapReady.value = true;
               }
               currentSpeed.value = deviceData.speed ? parseFloat(deviceData.speed.toString()) : 0;
               currentAddress.value = deviceData.positionUpdateTime ? `最后定位: ${deviceData.positionUpdateTime}` : "未知位置";
@@ -323,12 +331,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           });
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:357", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:362", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "获取车辆位置失败",
             icon: "none"
           });
         } finally {
+          isInitialPositionSettled.value = true;
+          if (!isMapReady.value) {
+            renderFencesOnMap();
+          }
           common_vendor.index.hideLoading();
         }
       });
@@ -385,7 +397,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const lng = parseFloat(centerValues[1]);
         const radius = parseFloat(parts[1].trim());
         if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:427", "无效的圆形围栏数据:", circleStr);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:436", "无效的圆形围栏数据:", circleStr);
           return null;
         }
         const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(lat, lng);
@@ -395,7 +407,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           radius
         };
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:437", "解析圆形围栏失败:", error, "数据:", circleStr);
+        common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:446", "解析圆形围栏失败:", error, "数据:", circleStr);
         return null;
       }
     }
@@ -510,11 +522,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
       polygons.value = fencePolygons;
       circles.value = fenceCircles;
-      if (fenceCircles.length > 0 && !selectedFence.value) {
+      if (fenceCircles.length > 0 && !selectedFence.value && isInitialPositionSettled.value && !isMapReady.value) {
         const firstCircle = fenceCircles[0];
         center.latitude = firstCircle.latitude;
         center.longitude = firstCircle.longitude;
         mapScale.value = firstCircle.radius > 5e4 ? 8 : firstCircle.radius > 2e4 ? 9 : firstCircle.radius > 1e4 ? 10 : firstCircle.radius > 5e3 ? 11 : firstCircle.radius > 2e3 ? 12 : firstCircle.radius > 1e3 ? 13 : firstCircle.radius > 500 ? 14 : firstCircle.radius > 200 ? 15 : 16;
+        isMapReady.value = true;
       }
     };
     function updateMapDisplay() {
@@ -562,7 +575,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           renderFencesOnMap();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:632", "加载围栏列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:642", "加载围栏列表失败:", error);
           utils_toast.showAppToast({ title: "获取围栏列表失败", icon: "none" });
           fenceList.value = [];
           renderFencesOnMap();
@@ -728,7 +741,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: "删除失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:840", "删除围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:850", "删除围栏失败:", error);
           utils_toast.showAppToast({ title: "删除失败", icon: "none" });
         }
       });
@@ -817,7 +830,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:951", "保存围栏失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:961", "保存围栏失败:", error);
           utils_toast.showAppToast({ title: "保存失败，请重试", icon: "none" });
         }
       });
@@ -917,7 +930,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const switchTab = (tab) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1052", "switchTab", tab, currentFenceId.value);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1062", "switchTab", tab, currentFenceId.value);
         if (activeTab.value === tab)
           return Promise.resolve(null);
         activeTab.value = tab;
@@ -925,7 +938,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         deviceList.value = [];
         initPagination(tab);
         if (tab === "bind") {
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1064", "switchTab,bind:", currentFenceId.value);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1074", "switchTab,bind:", currentFenceId.value);
           yield loadBoundDevices(currentFenceId.value);
         } else {
           yield loadUnboundDevices();
@@ -943,14 +956,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toggleDeviceBinding = (deviceImei, bound) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1084", "toggleDeviceBinding", deviceImei, bound);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1094", "toggleDeviceBinding", deviceImei, bound);
         loading.value = true;
         try {
           const params = new common_vendor.UTSJSONObject({
             geofenceId: currentFenceId.value,
             imeis: [deviceImei]
           });
-          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1091", "toggleDeviceBindingparams", params);
+          common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1101", "toggleDeviceBindingparams", params);
           let result = null;
           if (bound) {
             result = yield api_request.bindDevices(params);
@@ -970,7 +983,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             utils_toast.showAppToast({ title: result.msg || "操作失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1114", "设备绑定操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/geofencing/geofencing.uvue:1124", "设备绑定操作失败:", error);
           utils_toast.showAppToast({ title: "操作失败", icon: "none" });
         } finally {
           loading.value = false;
@@ -1028,10 +1041,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function deleteSelectedFence() {
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1184", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1194", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1188", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1198", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {
@@ -1129,110 +1142,113 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: false
         }),
-        b: common_vendor.sei("myMap", "map"),
-        c: center.latitude,
-        d: center.longitude,
-        e: mapScale.value,
-        f: polygons.value,
-        g: markers.value,
-        h: circles.value,
-        i: common_vendor.o(handleMapTap, "c6"),
-        j: common_vendor.p({
+        b: isMapReady.value
+      }, isMapReady.value ? {
+        c: common_vendor.sei("myMap", "map"),
+        d: center.latitude,
+        e: center.longitude,
+        f: mapScale.value,
+        g: polygons.value,
+        h: markers.value,
+        i: circles.value,
+        j: common_vendor.o(handleMapTap, "18")
+      } : {}, {
+        k: common_vendor.p({
           showTime: false,
           currentCar: currentCar.value,
           showCar: true,
           carStatus: connectionStatus.value,
           class: "sub-nav-overlay"
         }),
-        k: isDrawing.value
+        l: isDrawing.value
       }, isDrawing.value ? common_vendor.e({
-        l: drawingMode.value === "polygon"
+        m: drawingMode.value === "polygon"
       }, drawingMode.value === "polygon" ? {} : {}, {
-        m: drawingMode.value === "circle"
+        n: drawingMode.value === "circle"
       }, drawingMode.value === "circle" ? {} : {}) : {}, {
-        n: selectedFence.value
+        o: selectedFence.value
       }, selectedFence.value ? {
-        o: common_vendor.t(getSelectedFenceName()),
-        p: common_vendor.o(($event) => {
+        p: common_vendor.t(getSelectedFenceName()),
+        q: common_vendor.o(($event) => {
           var _a;
           selectedFence.value = null;
           (_a = showFenceModal.value) == null ? void 0 : _a.$callMethod("close");
-        }, "0c"),
-        q: common_vendor.p({
+        }, "d3"),
+        r: common_vendor.p({
           name: "close"
         }),
-        r: common_vendor.o(editSelectedFence, "57"),
-        s: common_vendor.p({
+        s: common_vendor.o(editSelectedFence, "e2"),
+        t: common_vendor.p({
           size: "small"
         }),
-        t: common_vendor.o(deleteSelectedFence, "16"),
-        v: common_vendor.p({
+        v: common_vendor.o(deleteSelectedFence, "68"),
+        w: common_vendor.p({
           size: "small",
           type: "error"
         }),
-        w: common_vendor.o(showSelectedFenceDevices, "ba"),
-        x: common_vendor.p({
+        x: common_vendor.o(showSelectedFenceDevices, "01"),
+        y: common_vendor.p({
           size: "small",
           type: "primary"
         })
       } : {}, {
-        y: common_vendor.sr(showFenceModal, "45be0509-2", {
+        z: common_vendor.sr(showFenceModal, "45be0509-2", {
           "k": "showFenceModal"
         }),
-        z: common_vendor.p({
+        A: common_vendor.p({
           mode: "bottom",
           round: "10",
           showClose: true,
           class: "r"
         }),
-        A: !isDrawing.value && !selectedFence.value
+        B: !isDrawing.value && !selectedFence.value
       }, !isDrawing.value && !selectedFence.value ? {
-        B: common_vendor.o(($event) => {
+        C: common_vendor.o(($event) => {
           return setDrawingMode("polygon");
-        }, "1a"),
-        C: common_vendor.p({
+        }, "77"),
+        D: common_vendor.p({
           type: drawingMode.value == "polygon" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0"
         }),
-        D: common_vendor.o(($event) => {
+        E: common_vendor.o(($event) => {
           return setDrawingMode("circle");
-        }, "9f"),
-        E: common_vendor.p({
+        }, "0b"),
+        F: common_vendor.p({
           type: drawingMode.value == "circle" ? "success" : "default",
           size: "small",
           customStyle: "border:1rpx solid #ebedf0",
           class: "mode-button-spacing"
         })
       } : {}, {
-        F: common_vendor.o(startDrawing, "b3"),
-        G: common_vendor.p({
+        G: common_vendor.o(startDrawing, "98"),
+        H: common_vendor.p({
           disabled: isDrawing.value || selectedFence.value != null,
           size: "small"
         }),
-        H: common_vendor.o(finishDrawing, "17"),
-        I: common_vendor.p({
+        I: common_vendor.o(finishDrawing, "bc"),
+        J: common_vendor.p({
           disabled: !isDrawing.value || !canFinishDrawing.value,
           size: "small"
         }),
-        J: common_vendor.o(clearDrawing, "78"),
-        K: common_vendor.p({
+        K: common_vendor.o(clearDrawing, "80"),
+        L: common_vendor.p({
           size: "small"
         }),
-        L: common_vendor.o(showFenceList, "8b"),
-        M: common_vendor.p({
+        M: common_vendor.o(showFenceList, "f8"),
+        N: common_vendor.p({
           size: "small"
         }),
-        N: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
-        O: drawingMode.value === "polygon"
+        O: common_vendor.t(drawingMode.value === "polygon" ? "多边形" : "圆形"),
+        P: drawingMode.value === "polygon"
       }, drawingMode.value === "polygon" ? {
-        P: common_vendor.t(points.value.length)
+        Q: common_vendor.t(points.value.length)
       } : {}, {
-        Q: drawingMode.value === "circle"
+        R: drawingMode.value === "circle"
       }, drawingMode.value === "circle" ? {
-        R: common_vendor.t(circleRadius.value.toFixed(2))
+        S: common_vendor.t(circleRadius.value.toFixed(2))
       } : {}, {
-        S: common_vendor.f(fenceList.value, (fence, k0, i0) => {
+        T: common_vendor.f(fenceList.value, (fence, k0, i0) => {
           return {
             a: common_vendor.t(fence.name),
             b: common_vendor.t(getFenceType(fence) === "circle" ? "圆形" : "多边形"),
@@ -1244,16 +1260,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, fence.id)
           };
         }),
-        T: common_vendor.p({
+        U: common_vendor.p({
           name: "/static/arrow-right.png",
           fontSize: "15"
         }),
-        U: fenceList.value.length == 0
+        V: fenceList.value.length == 0
       }, fenceList.value.length == 0 ? {} : {}, {
-        V: common_vendor.sr(fencesPopup, "45be0509-13", {
+        W: common_vendor.sr(fencesPopup, "45be0509-13", {
           "k": "fencesPopup"
         }),
-        W: common_vendor.p({
+        X: common_vendor.p({
           mode: "bottom",
           round: "10",
           height: "800rpx",
@@ -1262,72 +1278,72 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showClose: true,
           class: "r"
         }),
-        X: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
-        Y: common_vendor.o(($event) => {
+        Y: common_vendor.t(editingFence.value ? "编辑围栏" : "新增围栏"),
+        Z: common_vendor.o(($event) => {
           return fenceForm.name = $event;
-        }, "d2"),
-        Z: common_vendor.p({
+        }, "3b"),
+        aa: common_vendor.p({
           placeholder: "请输入围栏名称",
           border: "surround",
           modelValue: fenceForm.name
         }),
-        aa: common_vendor.o(($event) => {
+        ab: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "fe"),
-        ab: common_vendor.p({
+        }, "a0"),
+        ac: common_vendor.p({
           name: "0",
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
-        ac: common_vendor.o(($event) => {
+        ad: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "ff"),
-        ad: common_vendor.p({
+        }, "66"),
+        ae: common_vendor.p({
           name: "1",
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
-        ae: common_vendor.o(($event) => {
+        af: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "2e"),
-        af: common_vendor.p({
+        }, "08"),
+        ag: common_vendor.p({
           name: "2",
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
-        ag: common_vendor.o(($event) => {
+        ah: common_vendor.o(($event) => {
           return fenceForm.alarmType = $event;
-        }, "00"),
-        ah: common_vendor.p({
+        }, "b2"),
+        ai: common_vendor.p({
           name: "3",
           iconPlacement: "left",
           modelValue: fenceForm.alarmType
         }),
-        ai: common_vendor.o(closeEditDialog, "80"),
-        aj: common_vendor.o(saveFence, "69"),
-        ak: common_vendor.p({
+        aj: common_vendor.o(closeEditDialog, "13"),
+        ak: common_vendor.o(saveFence, "a7"),
+        al: common_vendor.p({
           type: "primary"
         }),
-        al: common_vendor.sr(editDialogPopup, "45be0509-15", {
+        am: common_vendor.sr(editDialogPopup, "45be0509-15", {
           "k": "editDialogPopup"
         }),
-        am: common_vendor.p({
+        an: common_vendor.p({
           mode: "bottom",
           round: "10",
           contentDraggable: false,
           showClose: true,
           class: "r"
         }),
-        an: common_vendor.t(currentFenceName.value),
-        ao: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
-        ap: common_vendor.o(($event) => {
+        ao: common_vendor.t(currentFenceName.value),
+        ap: common_vendor.n(activeTab.value === "bind" ? "active" : ""),
+        aq: common_vendor.o(($event) => {
           return switchTab("bind");
-        }, "bd"),
-        aq: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
-        ar: common_vendor.o(($event) => {
+        }, "ae"),
+        ar: common_vendor.n(activeTab.value === "unbind" ? "active" : ""),
+        as: common_vendor.o(($event) => {
           return switchTab("unbind");
-        }, "a0"),
-        as: common_vendor.f(deviceList.value, (device, k0, i0) => {
+        }, "a8"),
+        at: common_vendor.f(deviceList.value, (device, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(getDeviceDisplayName(device)),
             b: getDeviceImei(device)
@@ -1346,28 +1362,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: getDeviceImei(device)
           });
         }),
-        at: deviceList.value.length == 0 && !loading.value
+        av: deviceList.value.length == 0 && !loading.value
       }, deviceList.value.length == 0 && !loading.value ? {
-        av: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
+        aw: common_vendor.t(activeTab.value === "bind" ? "暂无绑定设备" : "暂无可用设备")
       } : {}, {
-        aw: loadingMore.value
+        ax: loadingMore.value
       }, loadingMore.value ? {} : {}, {
-        ax: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
+        ay: deviceList.value.length > 0 && !hasMore.value && !loadingMore.value
       }, deviceList.value.length > 0 && !hasMore.value && !loadingMore.value ? {} : {}, {
-        ay: scrollTop.value,
-        az: common_vendor.o(handleLoadMore, "58"),
-        aA: common_vendor.sr(deviceDialogPopup, "45be0509-23", {
+        az: scrollTop.value,
+        aA: common_vendor.o(handleLoadMore, "40"),
+        aB: common_vendor.sr(deviceDialogPopup, "45be0509-23", {
           "k": "deviceDialogPopup"
         }),
-        aB: common_vendor.p({
+        aC: common_vendor.p({
           mode: "bottom",
           round: "10",
           closeOnMask: true,
           showClose: true,
           class: "r"
         }),
-        aC: `${_ctx.u_s_b_h}px`,
-        aD: `${_ctx.u_s_a_i_b}px`
+        aD: `${_ctx.u_s_b_h}px`,
+        aE: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
