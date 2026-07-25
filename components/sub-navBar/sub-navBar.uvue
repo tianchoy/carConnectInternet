@@ -116,11 +116,17 @@
 		}
 
 		.car-box {
-			@extend .tools-box;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
 			padding: 0;
 
 			.selectCar {
-				@extend .tools-box;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
 				margin-right: 20rpx;
 				background-color: rgba(3, 109, 246, 0.71);
 				padding: 10rpx;
@@ -133,10 +139,12 @@
 			}
 
 			.car-state {
-				@extend .tools-box;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
 				border-radius: 10rpx;
 				padding: 10rpx 15rpx;
-				font-size: 25rpx;
 
 				.state {
 					font-size: 25rpx;
@@ -154,19 +162,22 @@
 		}
 
 		.second {
-			@extend .tools-box;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
 			padding: 10rpx;
 			background-color: rgba(3, 109, 246, 0.71);
 			border-radius: 10rpx;
-			color: #fff;
 
 			.times {
 				display: flex;
 				flex-direction: row;
 				justify-content: flex-start;
 				align-items: center;
-				font-size: 30rpx;
+
 				.refresh{
+					font-size: 30rpx;
 					color: #fff;
 				}
 			}

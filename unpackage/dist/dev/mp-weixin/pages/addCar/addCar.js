@@ -294,12 +294,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }, "29"),
         o: common_vendor.p({
           border: "none",
-          placeholder: "请输入车牌名",
+          placeholder: "请输入车牌号",
           modelValue: carInfo.value.plateNo,
           class: "data-v-6409e324"
         }),
         p: common_vendor.p({
-          label: "车牌名",
+          label: "车牌号",
           name: "plateNo",
           labelDirection: "horizontal",
           class: "data-v-6409e324"

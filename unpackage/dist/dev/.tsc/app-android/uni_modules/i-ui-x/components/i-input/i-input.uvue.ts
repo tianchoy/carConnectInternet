@@ -389,7 +389,7 @@ return (): any | null => {
           key: 2,
           class: "i-input__eye",
           onClick: togglePassword
-        }), _tD(passwordVisible.value ? "show" : "hide"), 1 /* TEXT */)
+        }), _tD(passwordVisible.value ? "显示" : "隐藏"), 1 /* TEXT */)
       : _cC("v-if", true),
     renderSlot(_ctx.$slots, "suffix", {}, (): any[] => [
       _ctx.suffiicon.length > 0

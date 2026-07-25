@@ -1,0 +1,160 @@
+<template>
+	<view v-if="visible" class="app-modal-mask">
+		<view class="app-modal" @click.stop>
+			<text v-if="options.title" class="app-modal-title">{{ options.title }}</text>
+			<scroll-view
+				v-if="contentNeedsScroll"
+				class="app-modal-content-scroll"
+				scroll-y="true" 
+				:scroll-top="scrollTop"
+				:show-scrollbar="false"
+			>
+				<view class="app-modal-content">
+					<text class="app-modal-content-text">{{ options.content }}</text>
+				</view>
+			</scroll-view>
+			<view v-else class="app-modal-content">
+				<text class="app-modal-content-text">{{ options.content }}</text>
+			</view>
+			<view class="app-modal-footer">
+				<view v-if="options.showCancel" class="app-modal-button app-modal-cancel" @click="close(false)">
+					<text class="app-modal-cancel-text">{{ options.cancelText }}</text>
+				</view>
+				<view class="app-modal-button" @click="close(true)">
+					<text class="app-modal-confirm-text">{{ options.confirmText }}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { onUnmounted, reactive, ref } from 'vue'
+	import { AppModalSuccess, registerAppModalHandler, unregisterAppModalHandler, type AppModalOptions } from '../../utils/modal.uts'
+
+	defineOptions({ name: 'app-modal' })
+
+	const visible = ref(false)
+	const contentNeedsScroll = ref(false)
+	const scrollTop = ref(0)
+	const options = reactive<AppModalOptions>({
+		title: '',
+		content: '',
+		showCancel: true,
+		confirmText: '确定',
+		cancelText: '取消'
+	})
+
+	const show = (value: AppModalOptions): void => {
+		options.title = value.title ?? ''
+		options.content = value.content ?? ''
+		options.showCancel = value.showCancel ?? true
+		options.confirmText = value.confirmText ?? '确定'
+		options.cancelText = value.cancelText ?? '取消'
+		options.success = value.success
+		contentNeedsScroll.value = options.content.length > 260
+		scrollTop.value = 0
+		visible.value = true
+	}
+
+	const close = (confirm: boolean): void => {
+		const success = options.success
+		visible.value = false
+		options.success = null
+		if (success != null) {
+			const result = new AppModalSuccess()
+			result.confirm = confirm
+			result.cancel = !confirm
+			success(result)
+		}
+	}
+
+	registerAppModalHandler(show)
+
+	onUnmounted(() => {
+		unregisterAppModalHandler(show)
+	})
+</script>
+
+<style scoped>
+	.app-modal-mask {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 10075;
+	}
+
+	.app-modal {
+		width: 640rpx;
+		display: flex;
+		flex-direction: column;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		overflow: hidden;
+	}
+
+	.app-modal-title {
+		padding: 36rpx 44rpx 16rpx;
+		color: #303133;
+		font-size: 34rpx;
+		font-weight: 600;
+		line-height: 48rpx;
+		text-align: center;
+	}
+
+	.app-modal-content-scroll {
+		height: 600rpx;
+		max-height: 600rpx;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.app-modal-content {
+		padding: 16rpx 44rpx 36rpx;
+	}
+
+	.app-modal-content-text {
+		color: #606266;
+		font-size: 28rpx;
+		line-height: 44rpx;
+		text-align: left;
+	}
+
+	.app-modal-footer {
+		display: flex;
+		flex-direction: row;
+		min-height: 96rpx;
+		border-top: 1rpx solid #f3f4f6;
+	}
+
+	.app-modal-button {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.app-modal-cancel {
+		border-right: 1rpx solid #f3f4f6;
+	}
+
+	.app-modal-confirm-text,
+	.app-modal-cancel-text {
+		font-size: 30rpx;
+		font-weight: 600;
+	}
+
+	.app-modal-confirm-text {
+		color: #2979ff;
+	}
+
+	.app-modal-cancel-text {
+		color: #606266;
+	}
+</style>

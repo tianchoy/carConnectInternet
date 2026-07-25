@@ -78,10 +78,14 @@
 		</view>
 	</view>
 	<app-toast></app-toast>
+	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+	<app-modal></app-modal>
+	<!-- #endif -->
 </template>
 
 <script setup lang="uts">
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted, nextTick } from 'vue'
 	import { login, PostWechatlogin } from '../../api/request.uts'
 
@@ -426,7 +430,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// ===== 协议弹窗 =====
 	const gotoAgreement = () => {
-		uni.showModal({
+		showAppModal({
 			title: '用户协议',
 			content: userAgreement,
 			showCancel: false,
@@ -434,7 +438,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	const gotoPrivacy = () => {
-		uni.showModal({
+		showAppModal({
 			title: '隐私政策',
 			content: privacyPolicy,
 			showCancel: false,
@@ -477,7 +481,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		.content {
 			background-color: #fff;
-			padding: 20rpx 100rpx;
+			padding: 20rpx 70rpx;
 
 			.other-login {
 				display: flex;
@@ -502,10 +506,10 @@ import { showAppToast } from '../../utils/toast.uts'
 					white-space: nowrap;
 					.doc-link {
 						color: #007AFF;
-						font-size: 10px;
+						font-size: 28rpx;
 					}
 					.doc-text {
-						font-size: 10px;
+						font-size: 28rpx;
 					}
 				}
 			}

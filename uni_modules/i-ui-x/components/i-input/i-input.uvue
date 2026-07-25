@@ -50,7 +50,7 @@
       class="i-input__eye"
       @click="togglePassword"
     >
-      {{ passwordVisible ? "show" : "hide" }}
+      {{ passwordVisible ? "显示" : "隐藏" }}
     </text>
     <slot name="suffix">
       <text

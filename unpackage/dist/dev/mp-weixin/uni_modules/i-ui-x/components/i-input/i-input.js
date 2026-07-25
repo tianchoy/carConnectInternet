@@ -296,7 +296,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     } : {}, {
       G: __props.password && __props.showPasswordToggle
     }, __props.password && __props.showPasswordToggle ? {
-      H: common_vendor.t(passwordVisible.value ? "show" : "hide"),
+      H: common_vendor.t(passwordVisible.value ? "显示" : "隐藏"),
       I: common_vendor.o(togglePassword, "ef")
     } : {}, {
       J: __props.suffiicon.length > 0

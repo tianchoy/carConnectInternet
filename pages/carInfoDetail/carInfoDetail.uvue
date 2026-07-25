@@ -15,21 +15,21 @@
 		</view>
 
 		<view class="tools-panel">
-			<view class="Imei-box">
+			<view class="imei-box">
 				<view class="imei-info" @click="carDetail">
 					<view class="imeis">
-						<text>ID: {{imei}}</text>
+						<text class="imei-text">ID: {{imei}}</text>
 						<text class="pos-time"></text>
 					</view>
 					<i-icon name="/static/arrow-right.png" fontSize="16"></i-icon>
 				</view>
 				<view class="pos-date">
-					<text class="addree-box">定位时间: {{datainfo.positionUpdateTime}}</text>
-					<text class="addree-box">通信时间: {{datainfo.signalUpdateTime}}</text>
+					<text class="time-item">定位时间: {{datainfo.positionUpdateTime}}</text>
+					<text class="time-item">通信时间: {{datainfo.signalUpdateTime}}</text>
 				</view>
 				<view class="pos-adress">
-					<view class="addree-box">
-						<text style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
+					<view class="address-row">
+						<text class="address-label" style="margin-right:10rpx; font-size: 22rpx;">当前位置:</text>
 						<text v-if="address" class="address-text">{{address}}</text>
 						<text class="address-text" v-else>{{center.latitude}} , {{center.longitude}}</text>
 						<text v-if="!address" style="color: #007AFF; margin-left: 20rpx;font-weight: bold; font-size: 22rpx;"
@@ -994,24 +994,28 @@ import { showAppToast } from '../../utils/toast.uts'
 					font-size: 26rpx;
 				}
 			}
-				.Imei-box {
-				margin: 30rpx 30rpx 0;
-				font-size: 28rpx;
-				border-bottom: 1rpx solid #dcdfe6;
+				.imei-box {
+					margin: 30rpx 30rpx 0;
+					border-bottom: 1rpx solid #dcdfe6;
 
-				.imei-info {
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
-
-					.imeis {
+					.imei-info {
 						display: flex;
 						flex-direction: row;
-						justify-content: flex-start;
+						justify-content: space-between;
 						align-items: center;
+
+						.imeis {
+							display: flex;
+							flex-direction: row;
+							justify-content: flex-start;
+							align-items: center;
+
+							.imei-text {
+								font-size: 28rpx;
+							}
+						}
 					}
-				}
+
 
 				.pos-time {
 					font-size: 20rpx;
@@ -1027,14 +1031,23 @@ import { showAppToast } from '../../utils/toast.uts'
 					align-items: center;
 
 
-					.addree-box {
+					.time-item {
+						font-size: 22rpx;
+						margin: 20rpx 0 0;
+						color: #999;
+					}
+
+					.address-row {
 						display: flex;
 						flex-direction: row;
 						justify-content: flex-start;
 						align-items: center;
-						font-size: 22rpx;
 						margin: 20rpx 0 0;
-						color: #999;
+
+						.address-label {
+							font-size: 22rpx;
+							color: #999;
+						}
 
 						.address-text {
 
@@ -1044,6 +1057,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 							line-height: 1.4;
 						}
+
 
 						.pos-icon {
 							width: 30rpx;

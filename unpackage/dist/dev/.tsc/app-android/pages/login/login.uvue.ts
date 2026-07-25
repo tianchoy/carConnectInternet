@@ -5,15 +5,17 @@ import _easycom_i_checkbox from '@/uni_modules/i-ui-x/components/i-checkbox/i-ch
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_i_form from '@/uni_modules/i-ui-x/components/i-form/i-form.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted, nextTick } from 'vue'
 	import { login, PostWechatlogin } from '../../api/request.uts'
 
-	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 95, 7>;
+	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 99, 7>;
 		username: string
 		password: string
 	}
-	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 99, 7>;
+	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 103, 7>;
 		username: string
 		password: string
 	}
@@ -53,12 +55,12 @@ const docState = ref(false)
 		try {
 			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (rawAccount == null || rawAccount == '') return
-			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:124") as UTSJSONObject : rawAccount as UTSJSONObject
+			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:128") as UTSJSONObject : rawAccount as UTSJSONObject
 			form.value.username = account.getString('username', '')
 			form.value.password = account.getString('password', '')
 			rememberPassword.value = form.value.username != '' || form.value.password != ''
 		} catch (error) {
-			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:129")
+			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:133")
 		}
 	}
 
@@ -101,7 +103,7 @@ const docState = ref(false)
 	const getSystemInfo = () : void => {
 		const res = uni.getSystemInfoSync()
 		deviceModel.value = res.deviceModel
-		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:172")
+		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:176")
 	}
 
 	// ===== 表单验证 =====
@@ -229,18 +231,18 @@ const docState = ref(false)
 
 		try {
 			// 表单验证
-			console.log('准备验证表单...', " at pages/login/login.uvue:300")
+			console.log('准备验证表单...', " at pages/login/login.uvue:304")
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/login/login.uvue:302")
+			console.log('✅ 表单验证通过', " at pages/login/login.uvue:306")
 
 			// 构建请求参数
-			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 305, 10),
+			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 309, 10),
 				username: form.value.username,
 				password: form.value.password,
 				from: deviceModel.value,
 				type: "USER"
 			}
-			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:311")
+			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:315")
 
 			// 显示加载状态
 			loading.value = true
@@ -250,9 +252,9 @@ const docState = ref(false)
 			})
 
 			// 调用登录接口
-			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:321")
+			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:325")
 			const res = await login(newFormData)
-			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:323")
+			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:327")
 
 			// 隐藏加载状态
 			loading.value = false
@@ -281,7 +283,7 @@ const docState = ref(false)
 			}
 
 		} catch (error: any) {
-			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:352")
+			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:356")
 			loading.value = false
 			uni.hideLoading()
 
@@ -358,7 +360,7 @@ const docState = ref(false)
 
 	// ===== 协议弹窗 =====
 	const gotoAgreement = () => {
-		uni.showModal({
+		showAppModal({
 			title: '用户协议',
 			content: userAgreement,
 			showCancel: false,
@@ -366,7 +368,7 @@ const docState = ref(false)
 	}
 
 	const gotoPrivacy = () => {
-		uni.showModal({
+		showAppModal({
 			title: '隐私政策',
 			content: privacyPolicy,
 			showCancel: false,
@@ -377,7 +379,7 @@ const docState = ref(false)
 	onMounted(() => {
 		getSystemInfo()
 		loadSavedAccount()
-		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:448")
+		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:452")
 	})
 
 
@@ -391,6 +393,7 @@ const _component_i_checkbox = resolveEasyComponent("i-checkbox",_easycom_i_check
 const _component_i_button = resolveEasyComponent("i-button",_easycom_i_button)
 const _component_i_form = resolveEasyComponent("i-form",_easycom_i_form)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
   return _cE(Fragment, null, [
     _cE("view", _uM({ class: "container" }), [
@@ -524,11 +527,12 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         }), _tD(pswLogin.value ? '个人用户登录' : '企业用户登录'), 1 /* TEXT */)
       ])
     ]),
-    _cV(_component_app_toast)
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }
 
 })
 export default __sfc__
-const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "100rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "100rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", 10]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", 10]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]
+const GenPagesLoginLoginStyles = [_uM([["container", _pS(_uM([["height", "100%"], ["backgroundColor", "#ffffff"]]))], ["banner", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", "20%"]])]])], ["banner-image", _uM([[".container .banner ", _uM([["width", "180rpx"], ["height", "180rpx"]])]])], ["title", _uM([[".container .banner ", _uM([["fontSize", "40rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["content", _uM([[".container ", _uM([["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", "70rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "70rpx"]])]])], ["other-login", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "30rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["documents", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["marginTop", "40rpx"]])]])], ["doc-info-box", _uM([[".container .content .documents ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-start"], ["alignItems", "center"], ["whiteSpace", "nowrap"]])]])], ["doc-link", _uM([[".container .content .documents .doc-info-box ", _uM([["color", "#007AFF"], ["fontSize", "28rpx"]])]])], ["doc-text", _uM([[".container .content .documents .doc-info-box ", _uM([["fontSize", "28rpx"]])]])], ["remember-password", _uM([[".container .content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["fontSize", "25rpx"]])]])], ["i-checkbox", _uM([[".container .content .remember-password ", _uM([["display", "flex"], ["alignItems", "center"]])]])], ["other-way", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["fontSize", "25rpx"], ["marginTop", "40rpx"], ["color", "#999999"]])]])], ["noLogin", _uM([[".container .other-way ", _uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#999999"], ["paddingRight", "50rpx"]])]])], ["BLogin", _uM([[".container .other-way ", _uM([["paddingLeft", "50rpx"]])]])], ["wechat-login-btn", _uM([[".container ", _uM([["!color", "#ffffff"]])]])], ["i-form-item", _uM([[".container ", _uM([["paddingTop", 12], ["paddingRight", 0], ["paddingBottom", 12], ["paddingLeft", 0]])]])]])]

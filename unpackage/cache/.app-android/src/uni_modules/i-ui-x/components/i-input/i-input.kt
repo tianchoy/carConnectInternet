@@ -245,9 +245,9 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                     }
                     )) {
                         _cE("text", _uM("key" to 2, "class" to "i-input__eye", "onClick" to togglePassword), _tD(if (passwordVisible.value) {
-                            "show"
+                            "显示"
                         } else {
-                            "hide"
+                            "隐藏"
                         }), 1)
                     } else {
                         _cC("v-if", true)

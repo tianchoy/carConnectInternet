@@ -24,21 +24,29 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.tools-box.data-v-f630fc82, .tools-box .second.data-v-f630fc82, .tools-box .car-box .car-state.data-v-f630fc82, .tools-box .car-box .car-state .car-box.data-v-f630fc82, .tools-box .car-box .selectCar.data-v-f630fc82, .tools-box .car-box .selectCar .car-box.data-v-f630fc82, .tools-box .car-box.data-v-f630fc82 {
+.tools-box.data-v-f630fc82 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 20rpx 30rpx;
 }
-.tools-box .slot.data-v-f630fc82, .tools-box .car-box .car-state .slot.data-v-f630fc82, .tools-box .car-box .selectCar .slot.data-v-f630fc82 {
+.tools-box .slot.data-v-f630fc82 {
   width: 50rpx;
   height: 20rpx;
 }
-.tools-box .car-box.data-v-f630fc82, .tools-box .car-box .car-state .car-box.data-v-f630fc82, .tools-box .car-box .selectCar .car-box.data-v-f630fc82 {
+.tools-box .car-box.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 0;
 }
 .tools-box .car-box .selectCar.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   margin-right: 20rpx;
   background-color: rgba(3, 109, 246, 0.71);
   padding: 10rpx;
@@ -49,9 +57,12 @@
   color: #fff;
 }
 .tools-box .car-box .car-state.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   border-radius: 10rpx;
   padding: 10rpx 15rpx;
-  font-size: 25rpx;
 }
 .tools-box .car-box .car-state .state.data-v-f630fc82 {
   font-size: 25rpx;
@@ -64,19 +75,22 @@
   background-color: #f56c6c;
 }
 .tools-box .second.data-v-f630fc82 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 10rpx;
   background-color: rgba(3, 109, 246, 0.71);
   border-radius: 10rpx;
-  color: #fff;
 }
 .tools-box .second .times.data-v-f630fc82 {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  font-size: 30rpx;
 }
 .tools-box .second .times .refresh.data-v-f630fc82 {
+  font-size: 30rpx;
   color: #fff;
 }
 .tools-box .down_icon.data-v-f630fc82 {

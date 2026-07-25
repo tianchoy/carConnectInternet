@@ -22,7 +22,6 @@ import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 open class GenPagesIndexIndex : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -119,7 +118,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val saveSelectedDevice = fun(device: Device){
                 try {
-                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 335, 15), "name" to if (device.deviceName != "") {
+                    val deviceInfo: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("deviceInfo", "pages/index/index.uvue", 339, 15), "name" to if (device.deviceName != "") {
                         device.deviceName
                     } else {
                         if (device.name != "") {
@@ -144,10 +143,10 @@ open class GenPagesIndexIndex : BasePage {
                     }
                     , "deptId" to device.deptId, "deviceId" to device.deviceId, "iccid" to device.iccid, "simMerchant" to device.simMerchant, "connectionStatus" to device.connectionStatus, "carType" to device.carType, "plateNo" to device.plateNo, "latitude" to device.latitude, "longitude" to device.longitude)
                     uni_setStorageSync(SELECTED_DEVICE_STORAGE_KEY, JSON.stringify(deviceInfo))
-                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:350")
+                    console.log("保存选中设备成功:", deviceInfo, " at pages/index/index.uvue:354")
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:352")
+                    console.error("保存选中设备失败:", error, " at pages/index/index.uvue:356")
                 }
             }
             val decodeSavedDevice = fun(raw: Any): SavedDevice? {
@@ -157,7 +156,7 @@ open class GenPagesIndexIndex : BasePage {
                 var data: UTSJSONObject? = null
                 if (UTSAndroid.`typeof`(raw) == "string") {
                     try {
-                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:376") as UTSJSONObject
+                        data = UTSAndroid.consoleDebugError(JSON.parse(raw as String), " at pages/index/index.uvue:380") as UTSJSONObject
                     } catch (error: Throwable) {
                         return null
                     }
@@ -183,17 +182,17 @@ open class GenPagesIndexIndex : BasePage {
                     return decodeSavedDevice(rawDevice)
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:410")
+                    console.error("获取保存设备失败:", error, " at pages/index/index.uvue:414")
                 }
                 return null
             }
             val clearSavedSelectedDevice = fun(){
                 try {
                     uni_removeStorageSync(SELECTED_DEVICE_STORAGE_KEY)
-                    console.log("清除保存设备成功", " at pages/index/index.uvue:419")
+                    console.log("清除保存设备成功", " at pages/index/index.uvue:423")
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:421")
+                    console.error("清除保存设备失败:", error, " at pages/index/index.uvue:425")
                 }
             }
             val saveSelectedDeviceIndex = fun(index: Number){
@@ -201,7 +200,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index)
                 }
                  catch (error: Throwable) {
-                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:430")
+                    console.error("保存选中设备索引失败:", error, " at pages/index/index.uvue:434")
                 }
             }
             val getSavedSelectedDeviceIndex = fun(): Number? {
@@ -217,7 +216,7 @@ open class GenPagesIndexIndex : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:443")
+                    console.error("获取保存设备索引失败:", error, " at pages/index/index.uvue:447")
                 }
                 return null
             }
@@ -226,7 +225,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY)
                 }
                  catch (error: Throwable) {
-                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:453")
+                    console.error("清除保存设备索引失败:", error, " at pages/index/index.uvue:457")
                 }
             }
             val handlePicker = fun(){
@@ -296,7 +295,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:556")
+                            console.error("加载设备详情失败", error, " at pages/index/index.uvue:560")
                         }
                 })
             }
@@ -341,7 +340,7 @@ open class GenPagesIndexIndex : BasePage {
                             uni_hideLoading(null)
                         }
                          catch (error: Throwable) {
-                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:612")
+                            console.error("加载轨迹失败", error, " at pages/index/index.uvue:616")
                         }
                 })
             }
@@ -365,7 +364,7 @@ open class GenPagesIndexIndex : BasePage {
                                 val lat = position.getNumber("latitude", 0)
                                 val lng = position.getNumber("longitude", 0)
                                 if (isNaN(lat) || isNaN(lng)) {
-                                    console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:633")
+                                    console.error("经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""), " at pages/index/index.uvue:637")
                                     showAppToast(ShowToastOptions(title = "定位数据异常", icon = "none"))
                                     return@w1 false
                                 }
@@ -378,17 +377,17 @@ open class GenPagesIndexIndex : BasePage {
                                 markers.value = _uA(
                                     nextMarker
                                 )
-                                console.log("标记点更新完成", " at pages/index/index.uvue:659")
+                                console.log("标记点更新完成", " at pages/index/index.uvue:663")
                                 return@w1 true
                             } else {
-                                console.warn("获取设备位置失败", " at pages/index/index.uvue:662")
+                                console.warn("获取设备位置失败", " at pages/index/index.uvue:666")
                                 isMapReady.value = false
                                 showAppToast(ShowToastOptions(title = "获取位置失败", icon = "none"))
                                 return@w1 false
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:671")
+                            console.error("加载设备位置失败", error, " at pages/index/index.uvue:675")
                             showAppToast(ShowToastOptions(title = "定位失败，请重试", icon = "none"))
                             return@w1 false
                         }
@@ -396,7 +395,7 @@ open class GenPagesIndexIndex : BasePage {
             }
             val loadDeviceData = fun(device: Device): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:682")
+                        console.log("开始加载设备数据:", device, " at pages/index/index.uvue:686")
                         try {
                             await(loadDeviceDetail(device.deviceId))
                             await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
@@ -414,7 +413,7 @@ open class GenPagesIndexIndex : BasePage {
                             showAppToast(ShowToastOptions(title = "切换成功", icon = "none"))
                         }
                          catch (error: Throwable) {
-                            console.error("切换车辆失败", error, " at pages/index/index.uvue:703")
+                            console.error("切换车辆失败", error, " at pages/index/index.uvue:707")
                             showAppToast(ShowToastOptions(title = "切换失败，请重试", icon = "none"))
                         }
                          finally {
@@ -431,17 +430,17 @@ open class GenPagesIndexIndex : BasePage {
                     -1
                 }
                 if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-                    console.warn("无法解析选中的索引，使用当前设备", " at pages/index/index.uvue:725")
+                    console.warn("无法解析选中的索引，使用当前设备", " at pages/index/index.uvue:729")
                     val currentIndex = deviceList.value.findIndex(fun(device): Boolean {
                         return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
                     }
                     )
                     if (currentIndex != -1) {
                         selectedIndex = currentIndex
-                        console.log("使用当前设备索引:", selectedIndex, " at pages/index/index.uvue:731")
+                        console.log("使用当前设备索引:", selectedIndex, " at pages/index/index.uvue:735")
                     } else {
                         selectedIndex = 0
-                        console.log("使用默认索引: 0", " at pages/index/index.uvue:734")
+                        console.log("使用默认索引: 0", " at pages/index/index.uvue:738")
                     }
                 }
                 val selectedDevice = deviceList.value[selectedIndex]
@@ -450,7 +449,7 @@ open class GenPagesIndexIndex : BasePage {
                     return
                 }
                 if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:749")
+                    console.log("选择的设备与当前设备相同，不重复加载", " at pages/index/index.uvue:753")
                     return
                 }
                 val deviceName = if (selectedDevice.deviceName != "") {
@@ -535,7 +534,7 @@ open class GenPagesIndexIndex : BasePage {
                                     selectedIdx = 0
                                     saveSelectedDevice(selectedDevice)
                                     saveSelectedDeviceIndex(0)
-                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:852")
+                                    console.log("使用第一个设备作为默认:", selectedDevice?.deviceName, " at pages/index/index.uvue:856")
                                 }
                                 if (selectedDevice != null) {
                                     val device = selectedDevice
@@ -587,7 +586,7 @@ open class GenPagesIndexIndex : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:898")
+                            console.error("加载车辆列表失败", error, " at pages/index/index.uvue:902")
                             showAppToast(ShowToastOptions(title = "加载失败，请下拉重试", icon = "none"))
                         }
                 })
@@ -607,7 +606,7 @@ open class GenPagesIndexIndex : BasePage {
                             await(loadDeviceList())
                         }
                          catch (error: Throwable) {
-                            console.error("刷新位置失败", error, " at pages/index/index.uvue:927")
+                            console.error("刷新位置失败", error, " at pages/index/index.uvue:931")
                             showAppToast(ShowToastOptions(title = "刷新失败", icon = "none"))
                         }
                          finally {
@@ -634,13 +633,13 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude, fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:959")
+                        console.error("跳转轨迹详情失败:", err, " at pages/index/index.uvue:963")
                     }
                 }
                 ))
             }
             val toDeviceList = fun(){
-                console.log("toDeviceList", " at pages/index/index.uvue:966")
+                console.log("toDeviceList", " at pages/index/index.uvue:970")
                 if (!isLogin()) {
                     return
                 }
@@ -662,7 +661,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 uni_navigateTo(NavigateToOptions(url = "/pages/addCar/addCar", fail = fun(err){
                     if (err.errMsg.indexOf("locked") < 0) {
-                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:994")
+                        console.error("跳转添加设备失败:", err, " at pages/index/index.uvue:998")
                     }
                 }
                 ))
@@ -682,7 +681,7 @@ open class GenPagesIndexIndex : BasePage {
                 }
                 , fail = fun(err){
                     showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                    console.error("调起地图失败:", err, " at pages/index/index.uvue:1026")
+                    console.error("调起地图失败:", err, " at pages/index/index.uvue:1030")
                 }
                 ))
             }
@@ -705,7 +704,7 @@ open class GenPagesIndexIndex : BasePage {
                     iccid = iccid.substring(0, iccid.length - 1)
                 }
                 needRefresh.value = true
-                console.log("iccid", iccid, " at pages/index/index.uvue:1089")
+                console.log("iccid", iccid, " at pages/index/index.uvue:1093")
                 needRefresh.value = false
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none", duration = 2000, mask = true))
             }
@@ -730,7 +729,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
-                uni_showModal(ShowModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: ShowModalSuccess): Unit {
+                showAppModal(AppModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: AppModalSuccess): Unit {
                     if (res.confirm) {
                         unbindCurrentDevice()
                     }
@@ -769,6 +768,7 @@ open class GenPagesIndexIndex : BasePage {
                 val _component_map = resolveComponent("map")
                 val _component_i_picker = resolveEasyComponent("i-picker", GenUniModulesIUiXComponentsIPickerIPickerClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cE("scroll-view", _uM("class" to "container", "scroll-y" to "true", "show-scrollbar" to false), _uA(
                         _cE("view", _uM("class" to "page-bg"), _uA(
@@ -993,7 +993,8 @@ open class GenPagesIndexIndex : BasePage {
                             _cC("v-if", true)
                         }
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }

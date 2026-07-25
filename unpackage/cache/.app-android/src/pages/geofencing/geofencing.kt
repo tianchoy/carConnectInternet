@@ -14,7 +14,6 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
 open class GenPagesGeofencingGeofencing : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -97,7 +96,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "获取车辆位置中..."))
                         try {
-                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 302, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                            val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 306, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                             val res = await(getDevicePos(data))
                             res.data.forEach(fun(item){
                                 if (item.getString("imei", "") == imei.value) {
@@ -164,7 +163,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             )
                         }
                          catch (err: Throwable) {
-                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:362")
+                            console.error("获取初始位置失败:", err, " at pages/geofencing/geofencing.uvue:366")
                             showAppToast(ShowToastOptions(title = "获取车辆位置失败", icon = "none"))
                         }
                          finally {
@@ -243,14 +242,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                     val lng = parseFloat(centerValues[1])
                     val radius = parseFloat(parts[1].trim())
                     if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:433")
+                        console.error("无效的圆形围栏数据:", circleStr, " at pages/geofencing/geofencing.uvue:437")
                         return null
                     }
                     val convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
                     return CircleData(latitude = convertedCoord.lat, longitude = convertedCoord.lng, radius = radius)
                 }
                  catch (error: Throwable) {
-                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:443")
+                    console.error("解析圆形围栏失败:", error, "数据:", circleStr, " at pages/geofencing/geofencing.uvue:447")
                     return null
                 }
             }
@@ -411,7 +410,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             renderFencesOnMap()
                         }
                          catch (error: Throwable) {
-                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:639")
+                            console.error("加载围栏列表失败:", error, " at pages/geofencing/geofencing.uvue:643")
                             showAppToast(ShowToastOptions(title = "获取围栏列表失败", icon = "none"))
                             fenceList.value = _uA()
                             renderFencesOnMap()
@@ -596,14 +595,14 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:847")
+                            console.error("删除围栏失败:", error, " at pages/geofencing/geofencing.uvue:851")
                             showAppToast(ShowToastOptions(title = "删除失败", icon = "none"))
                         }
                 })
             }
             val deleteFenceById = ::gen_deleteFenceById_fn
             val deleteFence = fun(id: String): Unit {
-                uni_showModal(ShowModalOptions(title = "确认删除", content = "确定要删除这个围栏吗？", success = fun(res: ShowModalSuccess): Unit {
+                showAppModal(AppModalOptions(title = "确认删除", content = "确定要删除这个围栏吗？", success = fun(res: AppModalSuccess): Unit {
                     if (res.confirm) {
                         deleteFenceById(id.toString())
                     }
@@ -647,7 +646,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             showAppToast(ShowToastOptions(title = "请选择有效的告警类型", icon = "none"))
                             return@w1
                         }
-                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 912, 9), "name" to fenceForm.name, "area" to area, "alarmType" to parseInt(fenceForm.alarmType), "type" to drawingMode.value)
+                        val fenceData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 916, 9), "name" to fenceForm.name, "area" to area, "alarmType" to parseInt(fenceForm.alarmType), "type" to drawingMode.value)
                         try {
                             var result: Any
                             if (isTruthy(editingFence.value)) {
@@ -687,7 +686,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:958")
+                            console.error("保存围栏失败:", error, " at pages/geofencing/geofencing.uvue:962")
                             showAppToast(ShowToastOptions(title = "保存失败，请重试", icon = "none"))
                         }
                 })
@@ -803,7 +802,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val switchTab = fun(tab: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("switchTab", tab, currentFenceId.value, " at pages/geofencing/geofencing.uvue:1059")
+                        console.log("switchTab", tab, currentFenceId.value, " at pages/geofencing/geofencing.uvue:1063")
                         if (activeTab.value === tab) {
                             return@w1
                         }
@@ -812,7 +811,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         deviceList.value = _uA()
                         initPagination(tab)
                         if (tab === "bind") {
-                            console.log("switchTab,bind:", currentFenceId.value, " at pages/geofencing/geofencing.uvue:1071")
+                            console.log("switchTab,bind:", currentFenceId.value, " at pages/geofencing/geofencing.uvue:1075")
                             await(loadBoundDevices(currentFenceId.value))
                         } else {
                             await(loadUnboundDevices())
@@ -831,13 +830,13 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val toggleDeviceBinding = fun(deviceImei: String, bound: Boolean): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log("toggleDeviceBinding", deviceImei, bound, " at pages/geofencing/geofencing.uvue:1091")
+                        console.log("toggleDeviceBinding", deviceImei, bound, " at pages/geofencing/geofencing.uvue:1095")
                         loading.value = true
                         try {
-                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1094, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
+                            val params: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1098, 10), "geofenceId" to currentFenceId.value, "imeis" to _uA(
                                 deviceImei
                             ))
-                            console.log("toggleDeviceBindingparams", params, " at pages/geofencing/geofencing.uvue:1098")
+                            console.log("toggleDeviceBindingparams", params, " at pages/geofencing/geofencing.uvue:1102")
                             var result: Any
                             if (bound) {
                                 result = await(bindDevices(params))
@@ -867,7 +866,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:1121")
+                            console.error("设备绑定操作失败:", error, " at pages/geofencing/geofencing.uvue:1125")
                             showAppToast(ShowToastOptions(title = "操作失败", icon = "none"))
                         }
                          finally {
@@ -941,10 +940,10 @@ open class GenPagesGeofencingGeofencing : BasePage {
             val editSelectedFence = ::gen_editSelectedFence_fn
             fun gen_deleteSelectedFence_fn(): Unit {
                 val fence = selectedFence.value
-                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1191")
+                console.log("删除电子围栏", fence, " at pages/geofencing/geofencing.uvue:1195")
                 if (fence != null) {
                     val fenceId = fence.getString("id", "")
-                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1195")
+                    console.log("删除电子围栏ID", fenceId, " at pages/geofencing/geofencing.uvue:1199")
                     if (fenceId !== "") {
                         deleteFence(fenceId)
                     } else {
@@ -1051,6 +1050,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 val _component_i_radio = resolveEasyComponent("i-radio", GenUniModulesIUiXComponentsIRadioIRadioClass)
                 val _component_i_switch = resolveEasyComponent("i-switch", GenUniModulesIUiXComponentsISwitchISwitchClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
@@ -1447,7 +1447,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                         ), "_" to 1), 512)
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }

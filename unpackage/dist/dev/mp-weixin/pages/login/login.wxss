@@ -48,7 +48,7 @@
 }
 .container .content.data-v-27a30816 {
   background-color: #fff;
-  padding: 20rpx 100rpx;
+  padding: 20rpx 70rpx;
 }
 .container .content .other-login.data-v-27a30816 {
   display: flex;
@@ -74,10 +74,10 @@
 }
 .container .content .documents .doc-info-box .doc-link.data-v-27a30816 {
   color: #007AFF;
-  font-size: 10px;
+  font-size: 28rpx;
 }
 .container .content .documents .doc-info-box .doc-text.data-v-27a30816 {
-  font-size: 10px;
+  font-size: 28rpx;
 }
 .container .content .remember-password.data-v-27a30816 {
   display: flex;

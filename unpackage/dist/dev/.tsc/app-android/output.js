@@ -11,6 +11,8 @@ const iLineProgress_uvue_vue_type_style_index_0_lang = {};
 
 const iPicker_uvue_vue_type_style_index_0_lang = {};
 
+const appModal_uvue_vue_type_style_index_0_lang = {};
+
 const index_uvue_vue_type_style_index_0_lang$1 = {};
 
 const customNavBar_uvue_vue_type_style_index_0_lang = {};

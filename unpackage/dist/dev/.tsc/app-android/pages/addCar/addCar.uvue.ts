@@ -329,7 +329,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
               _: 1 /* STABLE */
             })),
             _cV(_component_i_form_item, _uM({
-              label: "车牌名",
+              label: "车牌号",
               name: "plateNo",
               labelDirection: "horizontal"
             }), _uM({
@@ -338,7 +338,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                   border: "none",
                   modelValue: carInfo.value.plateNo,
                   "onUpdate:modelValue": $event => {(carInfo.value.plateNo) = $event},
-                  placeholder: "请输入车牌名"
+                  placeholder: "请输入车牌号"
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ]),
               _: 1 /* STABLE */

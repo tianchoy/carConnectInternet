@@ -31,8 +31,8 @@
 						</text>
 					</view>
 				</i-form-item>
-				<i-form-item label="车牌名" name="plateNo"  labelDirection="horizontal">
-					<i-input border="none" v-model="carInfo.plateNo" placeholder="请输入车牌名">
+				<i-form-item label="车牌号" name="plateNo"  labelDirection="horizontal">
+					<i-input border="none" v-model="carInfo.plateNo" placeholder="请输入车牌号">
 					</i-input>
 				</i-form-item>
 				<carIcons :show="carIconSelectorVisible" @update:show="updateCarIconSelectorVisible" @select="selectIcon"></carIcons>

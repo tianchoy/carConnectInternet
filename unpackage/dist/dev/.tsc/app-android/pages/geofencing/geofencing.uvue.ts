@@ -7,44 +7,46 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_radio from '@/uni_modules/i-ui-x/components/i-radio/i-radio.uvue'
 import _easycom_i_switch from '@/uni_modules/i-ui-x/components/i-switch/i-switch.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 
 	type Coordinate = LocationObject;
-	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 179, 7>;
+	type PaginationState = { __$originalPosition?: UTSSourceMapPosition<"PaginationState", "pages/geofencing/geofencing.uvue", 183, 7>;
 		pageNum : number;
 		pageSize : number;
 		hasMore : boolean;
 		loadingMore : boolean;
 	};
-	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 185, 7>;
+	type Pagination = { __$originalPosition?: UTSSourceMapPosition<"Pagination", "pages/geofencing/geofencing.uvue", 189, 7>;
 		bind : PaginationState;
 		unbind : PaginationState;
 	};
-	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 189, 7>;
+	type CircleData = { __$originalPosition?: UTSSourceMapPosition<"CircleData", "pages/geofencing/geofencing.uvue", 193, 7>;
 		latitude : number;
 		longitude : number;
 		radius : number;
 	};
-	type ModalResult = { __$originalPosition?: UTSSourceMapPosition<"ModalResult", "pages/geofencing/geofencing.uvue", 194, 7>;
+	type ModalResult = { __$originalPosition?: UTSSourceMapPosition<"ModalResult", "pages/geofencing/geofencing.uvue", 198, 7>;
 		confirm : boolean;
 	};
-	type FenceForm = { __$originalPosition?: UTSSourceMapPosition<"FenceForm", "pages/geofencing/geofencing.uvue", 197, 7>;
+	type FenceForm = { __$originalPosition?: UTSSourceMapPosition<"FenceForm", "pages/geofencing/geofencing.uvue", 201, 7>;
 		name : string;
 		alarmType : string;
 	};
-	type FenceResponse = { __$originalPosition?: UTSSourceMapPosition<"FenceResponse", "pages/geofencing/geofencing.uvue", 201, 7>;
+	type FenceResponse = { __$originalPosition?: UTSSourceMapPosition<"FenceResponse", "pages/geofencing/geofencing.uvue", 205, 7>;
 		code : number;
 		msg : string;
 	};
-	type SwitchChangeEvent = { __$originalPosition?: UTSSourceMapPosition<"SwitchChangeEvent", "pages/geofencing/geofencing.uvue", 205, 7>;
+	type SwitchChangeEvent = { __$originalPosition?: UTSSourceMapPosition<"SwitchChangeEvent", "pages/geofencing/geofencing.uvue", 209, 7>;
 		value : boolean;
 	};
 	// 地图状态
-	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 673, 7>;
+	type CoordinateBounds = { __$originalPosition?: UTSSourceMapPosition<"CoordinateBounds", "pages/geofencing/geofencing.uvue", 677, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
@@ -158,7 +160,7 @@ const imei = ref<string | null>(null)
 		})
 
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 302, 10), deptId: deptId.value, deviceids: imei.value }
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/geofencing/geofencing.uvue", 306, 10), deptId: deptId.value, deviceids: imei.value }
 			const res = await getDevicePos(data)
 
 			res.data.forEach(item => {
@@ -218,7 +220,7 @@ const imei = ref<string | null>(null)
 			})
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:362")
+			console.error('获取初始位置失败:', err, " at pages/geofencing/geofencing.uvue:366")
 			showAppToast({
 				title: '获取车辆位置失败',
 				icon: 'none'
@@ -289,7 +291,7 @@ const imei = ref<string | null>(null)
 			const lng = parseFloat(centerValues[1])
 			const radius = parseFloat(parts[1].trim())
 			if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:433")
+				console.error('无效的圆形围栏数据:', circleStr, " at pages/geofencing/geofencing.uvue:437")
 				return null
 			}
 			const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng)
@@ -299,7 +301,7 @@ const imei = ref<string | null>(null)
 				radius: radius
 			}
 		} catch (error) {
-			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:443")
+			console.error('解析圆形围栏失败:', error, '数据:', circleStr, " at pages/geofencing/geofencing.uvue:447")
 			return null
 		}
 	}
@@ -495,7 +497,7 @@ const imei = ref<string | null>(null)
 			// 无论数据是否为空，都重新渲染
 			renderFencesOnMap()
 		} catch (error) {
-			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:639")
+			console.error('加载围栏列表失败:', error, " at pages/geofencing/geofencing.uvue:643")
 			showAppToast({ title: '获取围栏列表失败', icon: 'none' })
 			fenceList.value = []; // 异常时强制清空
 			renderFencesOnMap()
@@ -695,17 +697,17 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: '删除失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:847")
+			console.error('删除围栏失败:', error, " at pages/geofencing/geofencing.uvue:851")
 			showAppToast({ title: '删除失败', icon: 'none' })
 		}
 	}
 
 	// 删除围栏
 	const deleteFence = (id : string) : void => {
-		uni.showModal({
+		showAppModal({
 			title: '确认删除',
 			content: '确定要删除这个围栏吗？',
-			success: (res : ShowModalSuccess) : void => {
+			success: (res : AppModalSuccess) : void => {
 				if (res.confirm) {
 					void deleteFenceById(id.toString())
 				}
@@ -760,7 +762,7 @@ const imei = ref<string | null>(null)
 			return
 		}
 
-		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 912, 9),
+		const fenceData = {__$originalPosition: new UTSSourceMapPosition("fenceData", "pages/geofencing/geofencing.uvue", 916, 9),
 			name: fenceForm.name,
 			area: area,
 			alarmType: parseInt(fenceForm.alarmType),
@@ -806,7 +808,7 @@ const imei = ref<string | null>(null)
 			}
 		} catch (error) {
 			uni.hideLoading()
-			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:958")
+			console.error('保存围栏失败:', error, " at pages/geofencing/geofencing.uvue:962")
 			showAppToast({ title: '保存失败，请重试', icon: 'none' })
 		}
 	}
@@ -907,7 +909,7 @@ const imei = ref<string | null>(null)
 	// 切换标签页
 	const switchTab = async (tab : string) : Promise<void> => {
 
-		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1059")
+		console.log('switchTab', tab,currentFenceId.value, " at pages/geofencing/geofencing.uvue:1063")
 		if (activeTab.value === tab) return
 
 		activeTab.value = tab
@@ -919,7 +921,7 @@ const imei = ref<string | null>(null)
 
 		// 加载对应数据
 		if (tab === 'bind') {
-			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1071")
+			console.log('switchTab,bind:', currentFenceId.value, " at pages/geofencing/geofencing.uvue:1075")
 			await loadBoundDevices(currentFenceId.value)
 		} else {
 			await loadUnboundDevices()
@@ -939,14 +941,14 @@ const imei = ref<string | null>(null)
 
 	// 切换设备绑定状态
 	const toggleDeviceBinding = async (deviceImei : string, bound : boolean) : Promise<void> => {
-		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1091")
+		console.log('toggleDeviceBinding', deviceImei, bound, " at pages/geofencing/geofencing.uvue:1095")
 		loading.value = true
 		try {
-			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1094, 10),
+			const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/geofencing/geofencing.uvue", 1098, 10),
 				geofenceId: currentFenceId.value,
 				imeis: [deviceImei]
 			}
-			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1098")
+			console.log('toggleDeviceBindingparams', params, " at pages/geofencing/geofencing.uvue:1102")
 			let result : any
 			if (bound) {
 				result = await bindDevices(params)
@@ -969,7 +971,7 @@ const imei = ref<string | null>(null)
 				showAppToast({ title: result.msg || '操作失败', icon: 'none' })
 			}
 		} catch (error) {
-			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1121")
+			console.error('设备绑定操作失败:', error, " at pages/geofencing/geofencing.uvue:1125")
 			showAppToast({ title: '操作失败', icon: 'none' })
 		} finally {
 			loading.value = false
@@ -1039,11 +1041,11 @@ const imei = ref<string | null>(null)
 
 	function deleteSelectedFence(): void {
 		const fence = selectedFence.value;
-		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1191");
+		console.log('删除电子围栏', fence, " at pages/geofencing/geofencing.uvue:1195");
 
 		if (fence != null) {
 			const fenceId = fence.getString('id', '');
-			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1195");
+			console.log('删除电子围栏ID', fenceId, " at pages/geofencing/geofencing.uvue:1199");
 
 			if (fenceId !== '') {
 				deleteFence(fenceId);
@@ -1209,6 +1211,7 @@ const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_i_radio = resolveEasyComponent("i-radio",_easycom_i_radio)
 const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
   return _cE(Fragment, null, [
     _cE("view", _uM({ class: "container" }), [
@@ -1606,7 +1609,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         _: 1 /* STABLE */
       }), 512 /* NEED_PATCH */)
     ]),
-    _cV(_component_app_toast)
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

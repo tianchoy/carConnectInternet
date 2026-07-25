@@ -123,70 +123,81 @@
   color: #1890ff;
   font-size: 26rpx;
 }
-.container .tools-panel .Imei-box {
+.container .tools-panel .imei-box {
   margin: 30rpx 30rpx 0;
-  font-size: 28rpx;
   border-bottom: 1rpx solid #dcdfe6;
 }
-.container .tools-panel .Imei-box .imei-info {
+.container .tools-panel .imei-box .imei-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.container .tools-panel .Imei-box .imei-info .imeis {
+.container .tools-panel .imei-box .imei-info .imeis {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
 }
-.container .tools-panel .Imei-box .pos-time {
+.container .tools-panel .imei-box .imei-info .imeis .imei-text {
+  font-size: 28rpx;
+}
+.container .tools-panel .imei-box .pos-time {
   font-size: 20rpx;
   color: #999;
   margin-left: 30rpx;
 }
-.container .tools-panel .Imei-box .pos-date,
-.container .tools-panel .Imei-box .pos-adress {
+.container .tools-panel .imei-box .pos-date,
+.container .tools-panel .imei-box .pos-adress {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.container .tools-panel .Imei-box .pos-date .addree-box,
-.container .tools-panel .Imei-box .pos-adress .addree-box {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+.container .tools-panel .imei-box .pos-date .time-item,
+.container .tools-panel .imei-box .pos-adress .time-item {
   font-size: 22rpx;
   margin: 20rpx 0 0;
   color: #999;
 }
-.container .tools-panel .Imei-box .pos-date .addree-box .address-text,
-.container .tools-panel .Imei-box .pos-adress .addree-box .address-text {
+.container .tools-panel .imei-box .pos-date .address-row,
+.container .tools-panel .imei-box .pos-adress .address-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 20rpx 0 0;
+}
+.container .tools-panel .imei-box .pos-date .address-row .address-label,
+.container .tools-panel .imei-box .pos-adress .address-row .address-label {
+  font-size: 22rpx;
+  color: #999;
+}
+.container .tools-panel .imei-box .pos-date .address-row .address-text,
+.container .tools-panel .imei-box .pos-adress .address-row .address-text {
   font-size: 22rpx;
   max-width: 490rpx;
   line-height: 1.4;
 }
-.container .tools-panel .Imei-box .pos-date .addree-box .pos-icon,
-.container .tools-panel .Imei-box .pos-adress .addree-box .pos-icon {
+.container .tools-panel .imei-box .pos-date .address-row .pos-icon,
+.container .tools-panel .imei-box .pos-adress .address-row .pos-icon {
   width: 30rpx;
   height: 30rpx;
   margin-right: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container {
+.container .tools-panel .imei-box .signal-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 20rpx 0;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item {
+.container .tools-panel .imei-box .signal-container .signal-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-right: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -195,49 +206,49 @@
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   height: 40rpx;
   margin-right: 5rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h {
   width: 8rpx;
   margin-right: 3rpx;
   border-radius: 2rpx 2rpx 0 0;
   transition: all 0.3s ease;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-1 {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-1 {
   height: 12rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-2 {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-2 {
   height: 16rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-3 {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-3 {
   height: 20rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-4 {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-4 {
   height: 24rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-5 {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h.signal-bar-h-5 {
   height: 28rpx;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .signal-value {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h .signal-value {
   font-size: 18rpx;
   color: #333;
 }
-.container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h .experience {
+.container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h .experience {
   font-size: 18rpx;
   font-weight: normal;
 }
-.container .tools-panel .Imei-box .signal-container .satellite-item-h {
+.container .tools-panel .imei-box .signal-container .satellite-item-h {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -245,24 +256,24 @@
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container .satellite-item-h .satellite-icon {
+.container .tools-panel .imei-box .signal-container .satellite-item-h .satellite-icon {
   width: 47rpx;
   height: 47rpx;
   margin-right: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container .satellite-item-h .satellite-text {
+.container .tools-panel .imei-box .signal-container .satellite-item-h .satellite-text {
   font-size: 24rpx;
   color: #1890ff;
   font-weight: bold;
 }
-.container .tools-panel .Imei-box .signal-container .power-icon,
-.container .tools-panel .Imei-box .signal-container .battery-icon {
+.container .tools-panel .imei-box .signal-container .power-icon,
+.container .tools-panel .imei-box .signal-container .battery-icon {
   width: 47rpx;
   height: 47rpx;
   margin-right: 10rpx;
 }
-.container .tools-panel .Imei-box .signal-container .power,
-.container .tools-panel .Imei-box .signal-container .battery {
+.container .tools-panel .imei-box .signal-container .power,
+.container .tools-panel .imei-box .signal-container .battery {
   display: flex;
   flex-direction: row;
   align-items: center;

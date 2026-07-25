@@ -9,6 +9,7 @@
     "i-input": "../../uni_modules/i-ui-x/components/i-input/i-input",
     "i-radio": "../../uni_modules/i-ui-x/components/i-radio/i-radio",
     "i-switch": "../../uni_modules/i-ui-x/components/i-switch/i-switch",
-    "app-toast": "../../components/app-toast/app-toast"
+    "app-toast": "../../components/app-toast/app-toast",
+    "app-modal": "../../components/app-modal/app-modal"
   }
 }

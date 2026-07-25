@@ -19,7 +19,6 @@ import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
 open class GenPagesLoginLogin : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -46,7 +45,7 @@ open class GenPagesLoginLogin : BasePage {
                         return
                     }
                     val account = if (UTSAndroid.`typeof`(rawAccount) == "string") {
-                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:124") as UTSJSONObject
+                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:128") as UTSJSONObject
                     } else {
                         rawAccount as UTSJSONObject
                     }
@@ -55,7 +54,7 @@ open class GenPagesLoginLogin : BasePage {
                     rememberPassword.value = form.value.username != "" || form.value.password != ""
                 }
                  catch (error: Throwable) {
-                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:129")
+                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:133")
                 }
             }
             val loadSavedAccount = ::gen_loadSavedAccount_fn
@@ -91,7 +90,7 @@ open class GenPagesLoginLogin : BasePage {
             val getSystemInfo = fun(): Unit {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
-                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:172")
+                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:176")
             }
             val validateForm = fun(): Boolean {
                 if (form.value.username.length == 0) {
@@ -121,18 +120,18 @@ open class GenPagesLoginLogin : BasePage {
                             return@w1
                         }
                         try {
-                            console.log("准备验证表单...", " at pages/login/login.uvue:300")
+                            console.log("准备验证表单...", " at pages/login/login.uvue:304")
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:302")
-                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 305, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
-                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:311")
+                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:306")
+                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 309, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
+                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:315")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "登录中...", mask = true))
-                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:321")
+                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:325")
                             val res = await(login(newFormData))
-                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:323")
+                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:327")
                             loading.value = false
                             uni_hideLoading(null)
                             val loginData = res.data
@@ -153,7 +152,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:352")
+                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:356")
                             loading.value = false
                             uni_hideLoading(null)
                             if (isTruthy(error) && isTruthy(error.message)) {
@@ -170,15 +169,15 @@ open class GenPagesLoginLogin : BasePage {
                 uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
             }
             val gotoAgreement = fun(){
-                uni_showModal(ShowModalOptions(title = "用户协议", content = userAgreement, showCancel = false))
+                showAppModal(AppModalOptions(title = "用户协议", content = userAgreement, showCancel = false))
             }
             val gotoPrivacy = fun(){
-                uni_showModal(ShowModalOptions(title = "隐私政策", content = privacyPolicy, showCancel = false))
+                showAppModal(AppModalOptions(title = "隐私政策", content = privacyPolicy, showCancel = false))
             }
             onMounted(fun(){
                 getSystemInfo()
                 loadSavedAccount()
-                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:448")
+                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:452")
             }
             )
             return fun(): Any? {
@@ -189,6 +188,7 @@ open class GenPagesLoginLogin : BasePage {
                 val _component_i_button = resolveEasyComponent("i-button", GenUniModulesIUiXComponentsIButtonIButtonClass)
                 val _component_i_form = resolveEasyComponent("i-form", GenUniModulesIUiXComponentsIFormIFormClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "登陆", "show-back" to false, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
@@ -276,7 +276,8 @@ open class GenPagesLoginLogin : BasePage {
                             ), 1)
                         ))
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }
@@ -287,7 +288,7 @@ open class GenPagesLoginLogin : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "100rpx", "paddingBottom" to "20rpx", "paddingLeft" to "100rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to 10)), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to 10)), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
+                return _uM("container" to _pS(_uM("height" to "100%", "backgroundColor" to "#ffffff")), "banner" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "height" to "20%")), "banner-image" to _uM(".container .banner " to _uM("width" to "180rpx", "height" to "180rpx")), "title" to _uM(".container .banner " to _uM("fontSize" to "40rpx", "fontWeight" to "bold", "color" to "#333333")), "content" to _uM(".container " to _uM("backgroundColor" to "#ffffff", "paddingTop" to "20rpx", "paddingRight" to "70rpx", "paddingBottom" to "20rpx", "paddingLeft" to "70rpx")), "other-login" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "30rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "documents" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "marginTop" to "40rpx")), "doc-info-box" to _uM(".container .content .documents " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "flex-start", "alignItems" to "center", "whiteSpace" to "nowrap")), "doc-link" to _uM(".container .content .documents .doc-info-box " to _uM("color" to "#007AFF", "fontSize" to "28rpx")), "doc-text" to _uM(".container .content .documents .doc-info-box " to _uM("fontSize" to "28rpx")), "remember-password" to _uM(".container .content " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "marginTop" to "20rpx", "marginRight" to 0, "marginBottom" to "20rpx", "marginLeft" to 0, "fontSize" to "25rpx")), "i-checkbox" to _uM(".container .content .remember-password " to _uM("display" to "flex", "alignItems" to "center")), "other-way" to _uM(".container " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "fontSize" to "25rpx", "marginTop" to "40rpx", "color" to "#999999")), "noLogin" to _uM(".container .other-way " to _uM("borderRightWidth" to "1rpx", "borderRightStyle" to "solid", "borderRightColor" to "#999999", "paddingRight" to "50rpx")), "BLogin" to _uM(".container .other-way " to _uM("paddingLeft" to "50rpx")), "wechat-login-btn" to _uM(".container " to _uM("!color" to "#ffffff")), "i-form-item" to _uM(".container " to _uM("paddingTop" to 12, "paddingRight" to 0, "paddingBottom" to 12, "paddingLeft" to 0)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

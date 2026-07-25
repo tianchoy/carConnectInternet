@@ -161,10 +161,14 @@
 		</i-popup>
 	</view>
 	<app-toast></app-toast>
+	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+	<app-modal></app-modal>
+	<!-- #endif -->
 </template>
 
 <script setup>
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -851,10 +855,10 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// 删除围栏
 	const deleteFence = (id : string) : void => {
-		uni.showModal({
+		showAppModal({
 			title: '确认删除',
 			content: '确定要删除这个围栏吗？',
-			success: (res : ShowModalSuccess) : void => {
+			success: (res : AppModalSuccess) : void => {
 				if (res.confirm) {
 					void deleteFenceById(id.toString())
 				}

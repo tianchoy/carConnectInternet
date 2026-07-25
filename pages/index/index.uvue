@@ -188,10 +188,14 @@
         ></i-picker>
     </scroll-view>
 	<app-toast></app-toast>
+	<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+	<app-modal></app-modal>
+	<!-- #endif -->
 </template>
 
 <script setup lang="ts">
 import { showAppToast } from '../../utils/toast.uts'
+import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
@@ -1125,10 +1129,10 @@ async function unbindCurrentDevice() : Promise<void> {
 // 解绑设备
 const unbindDevice = () : void => {
     if (!isLogin()) return
-    uni.showModal({
+    showAppModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',
-        success: (res: ShowModalSuccess) : void => {
+        success: (res: AppModalSuccess) : void => {
             if (res.confirm) {
                 void unbindCurrentDevice()
             }
@@ -1139,7 +1143,7 @@ const unbindDevice = () : void => {
 // 退出登录
 const handleExit = () => {
     if (!isLogin()) return
-    uni.showModal({
+    showAppModal({
         title: '退出登录',
         content: '确定退出登录吗？',
         success: async (res) => {

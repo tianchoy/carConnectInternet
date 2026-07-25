@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_D0lmNO";
+    const id = "app-ios_z1y0ZY";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -1749,6 +1749,64 @@
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
   };
+  class AppModalSuccess {
+    constructor() {
+      this.confirm = false;
+      this.cancel = false;
+    }
+  }
+  class AppModalOptions extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            title: { type: String, optional: true },
+            content: { type: String, optional: true },
+            showCancel: { type: Boolean, optional: true },
+            confirmText: { type: String, optional: true },
+            cancelText: { type: String, optional: true },
+            success: { type: "Unknown", optional: true }
+          };
+        },
+        name: "AppModalOptions"
+      };
+    }
+    constructor(options, metadata = AppModalOptions.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.title = this.__props__.title;
+      this.content = this.__props__.content;
+      this.showCancel = this.__props__.showCancel;
+      this.confirmText = this.__props__.confirmText;
+      this.cancelText = this.__props__.cancelText;
+      this.success = this.__props__.success;
+      delete this.__props__;
+    }
+  }
+  const modalHandlers = [];
+  function showAppModal(options) {
+    var _a, _b, _c;
+    const handler = modalHandlers.length > 0 ? modalHandlers[modalHandlers.length - 1] : null;
+    if (handler != null) {
+      handler(options);
+      return null;
+    }
+    uni.showModal(new UTSJSONObject({
+      title: (_a = options.title) !== null && _a !== void 0 ? _a : "",
+      content: (_b = options.content) !== null && _b !== void 0 ? _b : "",
+      showCancel: (_c = options.showCancel) !== null && _c !== void 0 ? _c : true,
+      confirmText: options.confirmText,
+      cancelText: options.cancelText,
+      success: (res) => {
+        const result = new AppModalSuccess();
+        result.confirm = res.confirm;
+        result.cancel = res.cancel;
+        if (options.success != null)
+          options.success(result);
+      }
+    }));
+  }
   class RequestOptions extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -3111,9 +3169,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:350", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:354", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:352", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:356", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -3157,23 +3215,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:410", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:414", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:419", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:423", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:421", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:425", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:430", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:434", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -3184,7 +3242,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:443", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:447", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -3192,7 +3250,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:453", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:457", "清除保存设备索引失败:", error);
         }
       };
       const setCurrentCarFromSavedDevice = (savedDevice = null) => {
@@ -3281,7 +3339,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:556", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:560", "加载设备详情失败", error);
           }
         });
       };
@@ -3331,7 +3389,7 @@
             }
             uni.hideLoading();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:612", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:616", "加载轨迹失败", error);
           }
         });
       };
@@ -3350,7 +3408,7 @@
               const lat = position.getNumber("latitude", 0);
               const lng = position.getNumber("longitude", 0);
               if (isNaN(lat) || isNaN(lng)) {
-                uni.__log__("error", "at pages/index/index.uvue:633", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+                uni.__log__("error", "at pages/index/index.uvue:637", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
                 showAppToast({
                   title: "定位数据异常",
                   icon: "none"
@@ -3364,10 +3422,10 @@
               yield delay(100);
               const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
               markers.value = [nextMarker];
-              uni.__log__("log", "at pages/index/index.uvue:659", "标记点更新完成");
+              uni.__log__("log", "at pages/index/index.uvue:663", "标记点更新完成");
               return true;
             } else {
-              uni.__log__("warn", "at pages/index/index.uvue:662", "获取设备位置失败");
+              uni.__log__("warn", "at pages/index/index.uvue:666", "获取设备位置失败");
               isMapReady.value = false;
               showAppToast({
                 title: "获取位置失败",
@@ -3376,7 +3434,7 @@
               return false;
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:671", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:675", "加载设备位置失败", error);
             showAppToast({
               title: "定位失败，请重试",
               icon: "none"
@@ -3387,7 +3445,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:682", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:686", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -3408,7 +3466,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:703", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:707", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -3423,16 +3481,16 @@
         const indexs = e.getArray("indexs");
         let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
         if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:725", "无法解析选中的索引，使用当前设备");
+          uni.__log__("warn", "at pages/index/index.uvue:729", "无法解析选中的索引，使用当前设备");
           const currentIndex = deviceList.value.findIndex((device) => {
             return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
           });
           if (currentIndex != -1) {
             selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:731", "使用当前设备索引:", selectedIndex);
+            uni.__log__("log", "at pages/index/index.uvue:735", "使用当前设备索引:", selectedIndex);
           } else {
             selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:734", "使用默认索引: 0");
+            uni.__log__("log", "at pages/index/index.uvue:738", "使用默认索引: 0");
           }
         }
         const selectedDevice = deviceList.value[selectedIndex];
@@ -3444,7 +3502,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:749", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:753", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -3525,7 +3583,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:852", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:856", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -3566,7 +3624,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:898", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:902", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -3593,7 +3651,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:927", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:931", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -3624,12 +3682,12 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:959", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:963", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:966", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:970", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -3657,7 +3715,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:994", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:998", "跳转添加设备失败:", err);
           }
         });
       };
@@ -3687,7 +3745,7 @@
               title: "调起地图失败",
               icon: "none"
             });
-            uni.__log__("error", "at pages/index/index.uvue:1026", "调起地图失败:", err);
+            uni.__log__("error", "at pages/index/index.uvue:1030", "调起地图失败:", err);
           }
         });
       };
@@ -3712,7 +3770,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1089", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1093", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -3748,7 +3806,7 @@
       const unbindDevice = () => {
         if (!isLogin())
           return null;
-        uni.showModal(new UTSJSONObject({
+        showAppModal(new UTSJSONObject({
           title: "解绑车辆",
           content: "确定解绑当前车辆吗？",
           success: (res) => {
@@ -3761,7 +3819,7 @@
       const handleExit = () => {
         if (!isLogin())
           return null;
-        uni.showModal(new UTSJSONObject({
+        showAppModal(new UTSJSONObject({
           title: "退出登录",
           content: "确定退出登录吗？",
           success: (res) => {
@@ -6091,7 +6149,7 @@
             class: "i-input__eye",
             onClick: $setup.togglePassword
           },
-          vue.toDisplayString($setup.passwordVisible ? "show" : "hide"),
+          vue.toDisplayString($setup.passwordVisible ? "显示" : "隐藏"),
           1
           /* TEXT */
         )) : vue.createCommentVNode("v-if", true),
@@ -7504,7 +7562,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:129", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:133", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -7541,7 +7599,7 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:172", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:176", "设备型号:", deviceModel.value);
       };
       const validateForm = () => {
         if (form.value.username.length == 0) {
@@ -7577,25 +7635,25 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:300", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:304", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:302", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:306", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:311", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:315", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:321", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:325", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:323", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:327", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
@@ -7619,7 +7677,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:352", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:356", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -7642,14 +7700,14 @@
         });
       };
       const gotoAgreement = () => {
-        uni.showModal(new UTSJSONObject({
+        showAppModal(new UTSJSONObject({
           title: "用户协议",
           content: userAgreement,
           showCancel: false
         }));
       };
       const gotoPrivacy = () => {
-        uni.showModal(new UTSJSONObject({
+        showAppModal(new UTSJSONObject({
           title: "隐私政策",
           content: privacyPolicy,
           showCancel: false
@@ -7658,7 +7716,7 @@
       vue.onMounted(() => {
         getSystemInfo();
         loadSavedAccount();
-        uni.__log__("log", "at pages/login/login.uvue:448", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:452", "pswLogin 初始值:", pswLogin.value);
       });
       const __returned__ = { docState, pswLogin, rememberPassword, formValid, loading, form, deviceModel, pswrules, updateFormValid, loadSavedAccount, isPswLogin, toggleRememberPassword, saveAccountPassword, filterNonLatin, isDocState, getSystemInfo, validateForm, loginBt, handleGetPhoneNumber, submit, userAgreement, privacyPolicy, gotoIndex, gotoAgreement, gotoPrivacy };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -7666,7 +7724,7 @@
     }
   });
   const _imports_0$2 = "/static/car_location.png";
-  const _style_0$w = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "100rpx", "paddingBottom": "20rpx", "paddingLeft": "100rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": 10 } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": 10 } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const _style_0$w = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
   function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
@@ -7946,7 +8004,7 @@
       return __returned__;
     }
   });
-  const _style_0$v = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "fontSize": "25rpx" } }, "car-box": { ".tools-box .car-box .car-state ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 }, ".tools-box .car-box .selectCar ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 }, ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" }, ".tools-box .car-box .car-state ": { "width": "50rpx", "height": "20rpx" }, ".tools-box .car-box .selectCar ": { "width": "50rpx", "height": "20rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "30rpx" } }, "refresh": { ".tools-box .second .times ": { "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
+  const _style_0$v = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
   function _sfc_render$v(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "tools-box" }, [
       $props.showTime ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -9043,7 +9101,7 @@
   const _imports_0$1 = "/static/sate.png";
   const _imports_1$1 = "/static/v.png";
   const _imports_2$1 = "/static/pow.png";
-  const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "Imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "fontSize": "28rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .Imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "pos-time": { ".container .tools-panel .Imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "addree-box": { ".container .tools-panel .Imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .Imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-text": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .Imei-box .pos-date .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .Imei-box .pos-adress .addree-box ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .Imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .Imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .Imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .Imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .Imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .Imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
   function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_map = vue.resolveComponent("map");
@@ -9094,7 +9152,7 @@
             }, null, 8, ["currentTime", "currentCar", "times", "carStatus"])
           ]),
           vue.createElementVNode("view", { class: "tools-panel" }, [
-            vue.createElementVNode("view", { class: "Imei-box" }, [
+            vue.createElementVNode("view", { class: "imei-box" }, [
               vue.createElementVNode("view", {
                 class: "imei-info",
                 onClick: $setup.carDetail
@@ -9102,7 +9160,7 @@
                 vue.createElementVNode("view", { class: "imeis" }, [
                   vue.createElementVNode(
                     "text",
-                    null,
+                    { class: "imei-text" },
                     "ID: " + vue.toDisplayString($setup.imei),
                     1
                     /* TEXT */
@@ -9117,22 +9175,25 @@
               vue.createElementVNode("view", { class: "pos-date" }, [
                 vue.createElementVNode(
                   "text",
-                  { class: "addree-box" },
+                  { class: "time-item" },
                   "定位时间: " + vue.toDisplayString($setup.datainfo.positionUpdateTime),
                   1
                   /* TEXT */
                 ),
                 vue.createElementVNode(
                   "text",
-                  { class: "addree-box" },
+                  { class: "time-item" },
                   "通信时间: " + vue.toDisplayString($setup.datainfo.signalUpdateTime),
                   1
                   /* TEXT */
                 )
               ]),
               vue.createElementVNode("view", { class: "pos-adress" }, [
-                vue.createElementVNode("view", { class: "addree-box" }, [
-                  vue.createElementVNode("text", { style: { "margin-right": "10rpx", "font-size": "22rpx" } }, "当前位置:"),
+                vue.createElementVNode("view", { class: "address-row" }, [
+                  vue.createElementVNode("text", {
+                    class: "address-label",
+                    style: { "margin-right": "10rpx", "font-size": "22rpx" }
+                  }, "当前位置:"),
                   $setup.address ? (vue.openBlock(), vue.createElementBlock(
                     "text",
                     {
@@ -10423,7 +10484,7 @@
                   /* STABLE */
                 }),
                 vue.createVNode(_component_i_form_item, {
-                  label: "车牌名",
+                  label: "车牌号",
                   name: "plateNo",
                   labelDirection: "horizontal"
                 }, {
@@ -10432,7 +10493,7 @@
                       border: "none",
                       modelValue: $setup.carInfo.plateNo,
                       "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.carInfo.plateNo = $event),
-                      placeholder: "请输入车牌名"
+                      placeholder: "请输入车牌号"
                     }, null, 8, ["modelValue"])
                   ]),
                   _: 1
@@ -20123,7 +20184,7 @@
               }
             });
           } catch (err) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:362", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:366", "获取初始位置失败:", err);
             showAppToast({
               title: "获取车辆位置失败",
               icon: "none"
@@ -20194,7 +20255,7 @@
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
           if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:433", "无效的圆形围栏数据:", circleStr);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:437", "无效的圆形围栏数据:", circleStr);
             return null;
           }
           const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
@@ -20204,7 +20265,7 @@
             radius
           };
         } catch (error) {
-          uni.__log__("error", "at pages/geofencing/geofencing.uvue:443", "解析圆形围栏失败:", error, "数据:", circleStr);
+          uni.__log__("error", "at pages/geofencing/geofencing.uvue:447", "解析圆形围栏失败:", error, "数据:", circleStr);
           return null;
         }
       }
@@ -20372,7 +20433,7 @@
             }
             renderFencesOnMap();
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:639", "加载围栏列表失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:643", "加载围栏列表失败:", error);
             showAppToast({ title: "获取围栏列表失败", icon: "none" });
             fenceList.value = [];
             renderFencesOnMap();
@@ -20538,13 +20599,13 @@
               showAppToast({ title: "删除失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:847", "删除围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:851", "删除围栏失败:", error);
             showAppToast({ title: "删除失败", icon: "none" });
           }
         });
       }
       const deleteFence = (id) => {
-        uni.showModal(new UTSJSONObject({
+        showAppModal(new UTSJSONObject({
           title: "确认删除",
           content: "确定要删除这个围栏吗？",
           success: (res) => {
@@ -20627,7 +20688,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:958", "保存围栏失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:962", "保存围栏失败:", error);
             showAppToast({ title: "保存失败，请重试", icon: "none" });
           }
         });
@@ -20727,7 +20788,7 @@
       };
       const switchTab = (tab) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1059", "switchTab", tab, currentFenceId.value);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1063", "switchTab", tab, currentFenceId.value);
           if (activeTab.value === tab)
             return Promise.resolve(null);
           activeTab.value = tab;
@@ -20735,7 +20796,7 @@
           deviceList.value = [];
           initPagination(tab);
           if (tab === "bind") {
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1071", "switchTab,bind:", currentFenceId.value);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1075", "switchTab,bind:", currentFenceId.value);
             yield loadBoundDevices(currentFenceId.value);
           } else {
             yield loadUnboundDevices();
@@ -20753,14 +20814,14 @@
       };
       const toggleDeviceBinding = (deviceImei, bound) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1091", "toggleDeviceBinding", deviceImei, bound);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1095", "toggleDeviceBinding", deviceImei, bound);
           loading.value = true;
           try {
             const params = new UTSJSONObject({
               geofenceId: currentFenceId.value,
               imeis: [deviceImei]
             });
-            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1098", "toggleDeviceBindingparams", params);
+            uni.__log__("log", "at pages/geofencing/geofencing.uvue:1102", "toggleDeviceBindingparams", params);
             let result = null;
             if (bound) {
               result = yield bindDevices(params);
@@ -20780,7 +20841,7 @@
               showAppToast({ title: result.msg || "操作失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1121", "设备绑定操作失败:", error);
+            uni.__log__("error", "at pages/geofencing/geofencing.uvue:1125", "设备绑定操作失败:", error);
             showAppToast({ title: "操作失败", icon: "none" });
           } finally {
             loading.value = false;
@@ -20838,10 +20899,10 @@
       }
       function deleteSelectedFence() {
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1191", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1199", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {

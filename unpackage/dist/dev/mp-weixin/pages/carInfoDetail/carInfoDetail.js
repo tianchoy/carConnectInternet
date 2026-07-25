@@ -714,7 +714,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         s: !common_vendor.unref(address)
       }, !common_vendor.unref(address) ? {
-        t: common_vendor.o(refreshAdress, "f5")
+        t: common_vendor.o(refreshAdress, "45")
       } : {}, {
         v: common_vendor.unref(signalRssi) != null
       }, common_vendor.unref(signalRssi) != null ? {
@@ -746,7 +746,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         P: common_vendor.o(($event) => {
           return handleGridClick($event);
-        }, "5a"),
+        }, "3d"),
         Q: common_vendor.p({
           items: common_vendor.unref(baseList),
           col: 5,
@@ -757,17 +757,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#606266",
           showBorder: true
         }),
-        R: common_vendor.o(filterNonLatin, "99"),
+        R: common_vendor.o(filterNonLatin, "e9"),
         S: common_vendor.o(($event) => {
           return common_vendor.isRef(psw) ? psw.value = $event : null;
-        }, "e4"),
+        }, "64"),
         T: common_vendor.p({
           placeholder: "请输入密码",
           clearable: true,
           password: true,
           modelValue: common_vendor.unref(psw)
         }),
-        U: common_vendor.o(confirm, "1e"),
+        U: common_vendor.o(confirm, "c2"),
         V: common_vendor.p({
           show: common_vendor.unref(popupRef),
           title: common_vendor.unref(modalTitle)

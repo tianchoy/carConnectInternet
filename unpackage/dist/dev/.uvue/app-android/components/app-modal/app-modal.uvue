@@ -1,0 +1,106 @@
+import { onUnmounted, reactive, ref } from 'vue';
+import { AppModalSuccess, registerAppModalHandler, unregisterAppModalHandler, type AppModalOptions } from '../../utils/modal.uts';
+const __sfc__ = defineComponent({
+    __name: 'app-modal',
+    name: 'app-modal',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const visible = ref(false);
+        const contentNeedsScroll = ref(false);
+        const scrollTop = ref(0);
+        const options = reactive<AppModalOptions>({
+            title: '',
+            content: '',
+            showCancel: true,
+            confirmText: '确定',
+            cancelText: '取消'
+        } as AppModalOptions);
+        const show = (value: AppModalOptions): void => {
+            options.title = value.title ?? '';
+            options.content = value.content ?? '';
+            options.showCancel = value.showCancel ?? true;
+            options.confirmText = value.confirmText ?? '确定';
+            options.cancelText = value.cancelText ?? '取消';
+            options.success = value.success;
+            contentNeedsScroll.value = options.content!.length > 260;
+            scrollTop.value = 0;
+            visible.value = true;
+        };
+        const close = (confirm: boolean): void => {
+            const success = options.success;
+            visible.value = false;
+            options.success = null;
+            if (success != null) {
+                const result = new AppModalSuccess();
+                result.confirm = confirm;
+                result.cancel = !confirm;
+                success(result);
+            }
+        };
+        registerAppModalHandler(show);
+        onUnmounted(() => {
+            unregisterAppModalHandler(show);
+        });
+        return (): any | null => {
+            return isTrue(visible.value)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "app-modal-mask"
+                }), [
+                    _cE("view", _uM({
+                        class: "app-modal",
+                        onClick: withModifiers(() => { }, ["stop"])
+                    }), [
+                        isTrue(options.title)
+                            ? _cE("text", _uM({
+                                key: 0,
+                                class: "app-modal-title"
+                            }), _tD(options.title), 1 /* TEXT */)
+                            : _cC("v-if", true),
+                        isTrue(contentNeedsScroll.value)
+                            ? _cE("scroll-view", _uM({
+                                key: 1,
+                                class: "app-modal-content-scroll",
+                                "scroll-y": "true",
+                                "scroll-top": scrollTop.value,
+                                "show-scrollbar": false
+                            }), [
+                                _cE("view", _uM({ class: "app-modal-content" }), [
+                                    _cE("text", _uM({ class: "app-modal-content-text" }), _tD(options.content), 1 /* TEXT */)
+                                ])
+                            ], 8 /* PROPS */, ["scroll-top"])
+                            : _cE("view", _uM({
+                                key: 2,
+                                class: "app-modal-content"
+                            }), [
+                                _cE("text", _uM({ class: "app-modal-content-text" }), _tD(options.content), 1 /* TEXT */)
+                            ]),
+                        _cE("view", _uM({ class: "app-modal-footer" }), [
+                            isTrue(options.showCancel)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "app-modal-button app-modal-cancel",
+                                    onClick: () => { close(false); }
+                                }), [
+                                    _cE("text", _uM({ class: "app-modal-cancel-text" }), _tD(options.cancelText), 1 /* TEXT */)
+                                ], 8 /* PROPS */, ["onClick"])
+                                : _cC("v-if", true),
+                            _cE("view", _uM({
+                                class: "app-modal-button",
+                                onClick: () => { close(true); }
+                            }), [
+                                _cE("text", _uM({ class: "app-modal-confirm-text" }), _tD(options.confirmText), 1 /* TEXT */)
+                            ], 8 /* PROPS */, ["onClick"])
+                        ])
+                    ], 8 /* PROPS */, ["onClick"])
+                ])
+                : _cC("v-if", true);
+        };
+    }
+});
+export default __sfc__;
+export type AppModalComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenComponentsAppModalAppModalStyles = [_uM([["app-modal-mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["backgroundColor", "rgba(0,0,0,0.5)"], ["zIndex", 10075]]))], ["app-modal", _pS(_uM([["width", "640rpx"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "12rpx"], ["borderTopRightRadius", "12rpx"], ["borderBottomRightRadius", "12rpx"], ["borderBottomLeftRadius", "12rpx"], ["overflow", "hidden"]]))], ["app-modal-title", _pS(_uM([["paddingTop", "36rpx"], ["paddingRight", "44rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "44rpx"], ["color", "#303133"], ["fontSize", "34rpx"], ["fontWeight", 600], ["lineHeight", "48rpx"], ["textAlign", "center"]]))], ["app-modal-content-scroll", _pS(_uM([["height", "600rpx"], ["maxHeight", "600rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["minHeight", 0]]))], ["app-modal-content", _pS(_uM([["paddingTop", "16rpx"], ["paddingRight", "44rpx"], ["paddingBottom", "36rpx"], ["paddingLeft", "44rpx"]]))], ["app-modal-content-text", _pS(_uM([["color", "#606266"], ["fontSize", "28rpx"], ["lineHeight", "44rpx"], ["textAlign", "left"]]))], ["app-modal-footer", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["minHeight", "96rpx"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#f3f4f6"]]))], ["app-modal-button", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["app-modal-cancel", _pS(_uM([["borderRightWidth", "1rpx"], ["borderRightStyle", "solid"], ["borderRightColor", "#f3f4f6"]]))], ["app-modal-confirm-text", _pS(_uM([["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#2979ff"]]))], ["app-modal-cancel-text", _pS(_uM([["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#606266"]]))]])];
+//# sourceMappingURL=app-modal.uvue.map

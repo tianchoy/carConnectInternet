@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const utils_toast = require("../../utils/toast.js");
+const utils_modal = require("../../utils/modal.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -11,7 +12,8 @@ if (!Array) {
   const _easycom_i_button_1 = common_vendor.resolveComponent("i-button");
   const _easycom_i_form_1 = common_vendor.resolveComponent("i-form");
   const _easycom_app_toast_1 = common_vendor.resolveComponent("app-toast");
-  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_checkbox_1 + _easycom_i_button_1 + _easycom_i_form_1 + _easycom_app_toast_1)();
+  const _easycom_app_modal_1 = common_vendor.resolveComponent("app-modal");
+  (_easycom_custom_navBar_1 + _easycom_i_input_1 + _easycom_i_form_item_1 + _easycom_i_checkbox_1 + _easycom_i_button_1 + _easycom_i_form_1 + _easycom_app_toast_1 + _easycom_app_modal_1)();
 }
 const _easycom_custom_navBar = () => "../../components/custom-navBar/custom-navBar.js";
 const _easycom_i_input = () => "../../uni_modules/i-ui-x/components/i-input/i-input.js";
@@ -20,8 +22,9 @@ const _easycom_i_checkbox = () => "../../uni_modules/i-ui-x/components/i-checkbo
 const _easycom_i_button = () => "../../uni_modules/i-ui-x/components/i-button/i-button.js";
 const _easycom_i_form = () => "../../uni_modules/i-ui-x/components/i-form/i-form.js";
 const _easycom_app_toast = () => "../../components/app-toast/app-toast.js";
+const _easycom_app_modal = () => "../../components/app-modal/app-modal.js";
 if (!Math) {
-  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_checkbox + _easycom_i_button + _easycom_i_form + _easycom_app_toast)();
+  (_easycom_custom_navBar + _easycom_i_input + _easycom_i_form_item + _easycom_i_checkbox + _easycom_i_button + _easycom_i_form + _easycom_app_toast + _easycom_app_modal)();
 }
 class FormData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -141,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:129", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:133", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -178,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:172", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:176", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
@@ -264,7 +267,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }, 500);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:275", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:279", "微信登录失败:", error);
           utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
@@ -284,25 +287,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:300", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:304", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:302", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:306", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:311", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:315", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:321", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:325", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:323", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:327", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
@@ -326,7 +329,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:352", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:356", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -349,14 +352,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const gotoAgreement = () => {
-      common_vendor.index.showModal(new common_vendor.UTSJSONObject({
+      utils_modal.showAppModal(new common_vendor.UTSJSONObject({
         title: "用户协议",
         content: userAgreement,
         showCancel: false
       }));
     };
     const gotoPrivacy = () => {
-      common_vendor.index.showModal(new common_vendor.UTSJSONObject({
+      utils_modal.showAppModal(new common_vendor.UTSJSONObject({
         title: "隐私政策",
         content: privacyPolicy,
         showCancel: false
@@ -365,7 +368,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:448", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:452", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -459,6 +462,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         C: `${_ctx.u_s_b_h}px`,
         D: `${_ctx.u_s_a_i_b}px`,
         E: common_vendor.p({
+          class: "data-v-27a30816"
+        }),
+        F: common_vendor.p({
           class: "data-v-27a30816"
         })
       });

@@ -23,6 +23,7 @@ import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.request as uni_request
 import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
+import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
 val runBlock1 = run {
     __uniConfig.getAppStyles = fun(): Map<String, Map<String, Map<String, Any>>> {
@@ -110,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_xNm0_U"
+    val id: String = "app-android_jJDCSn"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -187,6 +188,135 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
+open class AppModalSuccess : IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("AppModalSuccess", "utils/modal.uts", 1, 14)
+    }
+    open var confirm: Boolean = false
+    open var cancel: Boolean = false
+}
+open class AppModalOptions (
+    open var title: String? = null,
+    open var content: String? = null,
+    open var showCancel: Boolean? = null,
+    open var confirmText: String? = null,
+    open var cancelText: String? = null,
+    open var success: ((res: AppModalSuccess) -> Unit)? = null,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("AppModalOptions", "utils/modal.uts", 5, 13)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return AppModalOptionsReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class AppModalOptionsReactiveObject : AppModalOptions, IUTSReactive<AppModalOptions> {
+    override var __v_raw: AppModalOptions
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: AppModalOptions, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(title = __v_raw.title, content = __v_raw.content, showCancel = __v_raw.showCancel, confirmText = __v_raw.confirmText, cancelText = __v_raw.cancelText, success = __v_raw.success) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): AppModalOptionsReactiveObject {
+        return AppModalOptionsReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var title: String?
+        get() {
+            return _tRG(__v_raw, "title", __v_raw.title, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("title")) {
+                return
+            }
+            val oldValue = __v_raw.title
+            __v_raw.title = value
+            _tRS(__v_raw, "title", oldValue, value)
+        }
+    override var content: String?
+        get() {
+            return _tRG(__v_raw, "content", __v_raw.content, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("content")) {
+                return
+            }
+            val oldValue = __v_raw.content
+            __v_raw.content = value
+            _tRS(__v_raw, "content", oldValue, value)
+        }
+    override var showCancel: Boolean?
+        get() {
+            return _tRG(__v_raw, "showCancel", __v_raw.showCancel, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("showCancel")) {
+                return
+            }
+            val oldValue = __v_raw.showCancel
+            __v_raw.showCancel = value
+            _tRS(__v_raw, "showCancel", oldValue, value)
+        }
+    override var confirmText: String?
+        get() {
+            return _tRG(__v_raw, "confirmText", __v_raw.confirmText, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmText")) {
+                return
+            }
+            val oldValue = __v_raw.confirmText
+            __v_raw.confirmText = value
+            _tRS(__v_raw, "confirmText", oldValue, value)
+        }
+    override var cancelText: String?
+        get() {
+            return _tRG(__v_raw, "cancelText", __v_raw.cancelText, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("cancelText")) {
+                return
+            }
+            val oldValue = __v_raw.cancelText
+            __v_raw.cancelText = value
+            _tRS(__v_raw, "cancelText", oldValue, value)
+        }
+}
+val modalHandlers: UTSArray<(options: AppModalOptions) -> Unit> = _uA()
+fun registerAppModalHandler(handler: (options: AppModalOptions) -> Unit): Unit {
+    if (modalHandlers.indexOf(handler) == -1) {
+        modalHandlers.push(handler)
+    }
+}
+fun unregisterAppModalHandler(handler: (options: AppModalOptions) -> Unit): Unit {
+    val index = modalHandlers.indexOf(handler)
+    if (index >= 0) {
+        modalHandlers.splice(index, 1)
+    }
+}
+fun showAppModal(options: AppModalOptions): Unit {
+    val handler = if (modalHandlers.length > 0) {
+        modalHandlers[modalHandlers.length - 1]
+    } else {
+        null
+    }
+    if (handler != null) {
+        handler(options)
+        return
+    }
+    uni_showModal(ShowModalOptions(title = options.title ?: "", content = options.content ?: "", showCancel = options.showCancel ?: true, confirmText = options.confirmText, cancelText = options.cancelText, success = fun(res: ShowModalSuccess){
+        val result = AppModalSuccess()
+        result.confirm = res.confirm
+        result.cancel = res.cancel
+        if (options.success != null) {
+            options.success!!(result)
+        }
+    }
+    ))
+}
 fun __uts_large_remixCodeMap_fill_fill_1(__map: Map<String, String>): Unit {
     __map.set("home-3-fill", "ee1a")
     __map.set("chat-3-line", "eb51")
@@ -275,6 +405,16 @@ val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToas
 }
 , fun(instance, renderer): GenComponentsAppToastAppToast {
     return GenComponentsAppToastAppToast(instance)
+}
+)
+val GenComponentsAppModalAppModalClass = CreateVueComponent(GenComponentsAppModalAppModal::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenComponentsAppModalAppModal.name, inheritAttrs = GenComponentsAppModalAppModal.inheritAttrs, inject = GenComponentsAppModalAppModal.inject, props = GenComponentsAppModalAppModal.props, propsNeedCastKeys = GenComponentsAppModalAppModal.propsNeedCastKeys, emits = GenComponentsAppModalAppModal.emits, components = GenComponentsAppModalAppModal.components, styles = GenComponentsAppModalAppModal.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsAppModalAppModal.setup(props as GenComponentsAppModalAppModal)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsAppModalAppModal {
+    return GenComponentsAppModalAppModal(instance)
 }
 )
 val `default` = "/static/banner.png"
@@ -1068,7 +1208,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 205, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 209, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1252,7 +1392,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 222, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 226, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1306,7 +1446,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 257, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 261, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1372,7 +1512,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 263, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 267, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1456,7 +1596,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 356, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 360, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -1576,7 +1716,7 @@ open class FormData (
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 95, 7)
+        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 99, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1628,7 +1768,7 @@ open class SavedAccount (
     open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 99, 7)
+        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 103, 7)
     }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
@@ -8026,7 +8166,7 @@ open class PaginationState (
     open var loadingMore: Boolean = false,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 179, 7)
+        return UTSSourceMapPosition("PaginationState", "pages/geofencing/geofencing.uvue", 183, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8102,7 +8242,7 @@ open class Pagination (
     open var unbind: PaginationState,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 185, 7)
+        return UTSSourceMapPosition("Pagination", "pages/geofencing/geofencing.uvue", 189, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return PaginationReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8156,7 +8296,7 @@ open class CircleData (
     open var radius: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 189, 7)
+        return UTSSourceMapPosition("CircleData", "pages/geofencing/geofencing.uvue", 193, 7)
     }
 }
 open class FenceForm (
@@ -8166,7 +8306,7 @@ open class FenceForm (
     open var alarmType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 197, 7)
+        return UTSSourceMapPosition("FenceForm", "pages/geofencing/geofencing.uvue", 201, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FenceFormReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -8222,7 +8362,7 @@ open class CoordinateBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 673, 7)
+        return UTSSourceMapPosition("CoordinateBounds", "pages/geofencing/geofencing.uvue", 677, 7)
     }
 }
 val GenPagesGeofencingGeofencingClass = CreateVueComponent(GenPagesGeofencingGeofencing::class.java, fun(): VueComponentOptions {
