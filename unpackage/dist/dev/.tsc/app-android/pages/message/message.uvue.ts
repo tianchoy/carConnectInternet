@@ -65,34 +65,52 @@ const _cache = __ins.renderCache;
 		}
 	}
 
+	async function prependLatestMessages() : Promise<number> {
+		if (isLoading.value) return 0
+		isLoading.value = true
+		try {
+			const res = await getUserMsgList({ page: 1, pageSize: 50 })
+			if (res.code != 0 || res.data.list == null) return 0
+
+			const existingIds = new Set<string>()
+			msgList.value.forEach((message : UTSJSONObject) : void => {
+				const messageId = message.getString('messageId', '')
+				if (messageId != '') existingIds.add(messageId)
+			})
+
+			const latestMessages : Array<UTSJSONObject> = []
+			res.data.list.forEach((message : UTSJSONObject) : void => {
+				const messageId = message.getString('messageId', '')
+				if (messageId != '' && !existingIds.has(messageId)) {
+					existingIds.add(messageId)
+					latestMessages.push(message)
+				}
+			})
+
+			if (latestMessages.length > 0) {
+				msgList.value = [...latestMessages, ...msgList.value]
+				const newestCreateTime = latestMessages[0].getString('createTime', '')
+				if (newestCreateTime != '') {
+					lastUpdateTime.value = new Date(newestCreateTime.replace(/-/g, '/')).getTime()
+				}
+			}
+			return latestMessages.length
+		} catch (error) {
+			console.error('检查新消息失败:', error, " at pages/message/message.uvue:149")
+			return 0
+		} finally {
+			isLoading.value = false
+		}
+	}
+
 	// 检查新消息
 	async function checkNewMessages() : Promise<void> {
 		if (!isPageActive.value || isLoading.value) return
-		try {
-			const res = await getUserMsgList({ page: 1, pageSize: 1 })
-			const code = res.code
-			if (code != 0) return
-			const data = res.data
-			const list = data.list
-			if (list == null || list.length == 0) return
-			const latestMessage = list[0]
-			const createTime = latestMessage.getString('createTime', '')
-			if (createTime == '') return
-			const messageTime = new Date(createTime).getTime()
-			if (messageTime <= lastUpdateTime.value) return
+		const insertedCount = await prependLatestMessages()
+		if (insertedCount > 0) {
 			hasNewMessages.value = true
+			newMessageCount.value += insertedCount
 			vibrateAlert()
-			const countRes = await getUserMsgList({ page: 1, pageSize: 50 })
-			const newList = countRes.data.list
-			if (newList != null) {
-				let count = 0
-				newList.forEach((message : UTSJSONObject) : void => {
-					if (new Date(message.getString('createTime', '')).getTime() > lastUpdateTime.value) count++
-				})
-				newMessageCount.value = count
-			}
-		} catch (error) {
-			console.error('检查新消息失败:', error, " at pages/message/message.uvue:145")
 		}
 	}
 
@@ -102,11 +120,11 @@ const _cache = __ins.renderCache;
 			stopNewMessageCheck()
 		}
 
-		console.log('启动定时消息检查', " at pages/message/message.uvue:155")
+		console.log('启动定时消息检查', " at pages/message/message.uvue:173")
 		// 每10秒检查一次新消息
 		checkTimer = setInterval(() => {
 			if (isPageActive.value) {
-				console.log('定时检查新消息...', " at pages/message/message.uvue:159")
+				console.log('定时检查新消息...', " at pages/message/message.uvue:177")
 				checkNewMessages()
 			}
 		}, 10000)
@@ -115,13 +133,13 @@ const _cache = __ins.renderCache;
 
 	// 加载消息列表
 	async function loadMsgList(isInit : boolean = false) : Promise<void> {
+		if (isLoading.value) return
 		if (isInit) {
 			currPage.value = 1
 			msgList.value = []
 			loadStatus.value = 'loadmore'
 			isNearMessageListBottom.value = false
 		}
-		if (isLoading.value) return
 		isLoading.value = true
 		try {
 			if (!isInit) loadStatus.value = 'loading'
@@ -154,7 +172,7 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			loadStatus.value = 'loadmore'
-			console.error('请求异常:', error, " at pages/message/message.uvue:207")
+			console.error('请求异常:', error, " at pages/message/message.uvue:225")
 		} finally {
 			isLoading.value = false
 		}
@@ -162,12 +180,11 @@ const _cache = __ins.renderCache;
 
 	// 加载新消息
 	async function loadNewMessages() : Promise<void> {
-		console.log('加载新消息', " at pages/message/message.uvue:215")
-		await loadMsgList(true)
+		console.log('加载新消息', " at pages/message/message.uvue:233")
+		await prependLatestMessages()
 		hasNewMessages.value = false
 		newMessageCount.value = 0
-		lastUpdateTime.value = new Date().getTime()
-		console.log('新消息加载完成', " at pages/message/message.uvue:220")
+		console.log('新消息加载完成', " at pages/message/message.uvue:237")
 	}
 
 
@@ -202,7 +219,7 @@ const _cache = __ins.renderCache;
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:255")
+			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:272")
 			isPageActive.value = true
 			measureMessageScrollViewport()
 			startNewMessageCheck()
@@ -213,9 +230,9 @@ const _cache = __ins.renderCache;
 
 	// 页面隐藏时停止定时器
 	onHide(() => {
-		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:266")
+		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:283")
 		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:268")
+			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:285")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -223,18 +240,18 @@ const _cache = __ins.renderCache;
 
 	// 页面卸载时清理资源
 	onUnload(() => {
-		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:276")
+		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:293")
 		if (Login.value) {
-			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:278")
+			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:295")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
 
 	onActivated(() => {
-		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:285")
+		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:302")
 		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:287")
+			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:304")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -243,9 +260,9 @@ const _cache = __ins.renderCache;
 	})
 
 	onDeactivated(() => {
-		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:296")
+		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:313")
 		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:298")
+			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:315")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -253,7 +270,7 @@ const _cache = __ins.renderCache;
 
 	// 下拉刷新处理
 	const onRefresherRefresh = () => {
-		console.log('下拉刷新触发', " at pages/message/message.uvue:306")
+		console.log('下拉刷新触发', " at pages/message/message.uvue:323")
 		refresherTriggered.value = true
 		loadMsgList(true).then(() => {
 			refresherTriggered.value = false
@@ -315,7 +332,7 @@ const _cache = __ins.renderCache;
 					}
 				}
 			} catch (error) {
-				console.error('更新状态失败:', error, " at pages/message/message.uvue:368")
+				console.error('更新状态失败:', error, " at pages/message/message.uvue:385")
 			}
 		}
 	}
@@ -409,7 +426,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                 key: 0,
                 class: "empty-state"
               }), [
-                _cE("text", null, "暂无消息")
+                _cE("text", _uM({ class: "empty-state-text" }), "暂无消息")
               ])
             : _cC("v-if", true),
           isTrue(hasNewMessages.value)
@@ -479,4 +496,4 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
 
 })
 export default __sfc__
-const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["position", "fixed"], ["top", "170rpx"], ["bottom", 0], ["backgroundColor", "#f5f5f5"]]))], ["scroll-container", _uM([[".container ", _uM([["height", "100%"], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-badge", _uM([[".container .list-box ", _uM([["marginLeft", "16rpx"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#f56c6c"], ["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["textAlign", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0], ["color", "#999999"], ["fontSize", "28rpx"]])]])], ["new-message-tip", _uM([[".container .list-box ", _uM([["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#FFFFFF"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"], ["fontSize", "26rpx"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0], ["textAlign", "center"]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])]
+const GenPagesMessageMessageStyles = [_uM([["container", _pS(_uM([["width", "100%"], ["position", "fixed"], ["top", "170rpx"], ["bottom", 0], ["backgroundColor", "#f5f5f5"]]))], ["scroll-container", _uM([[".container ", _uM([["height", "100%"], ["width", "100%"]])]])], ["list-box", _uM([[".container ", _uM([["width", "100%"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["position", "relative"]])]])], ["message-item", _uM([[".container .list-box ", _uM([["marginBottom", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#ffffff"]])]])], ["message-header", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["message-content-row", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "16rpx"]])]])], ["message-title", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "30rpx"], ["color", "#333333"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["message-content", _uM([[".container .list-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#666666"], ["whiteSpace", "nowrap"], ["textOverflow", "ellipsis"], ["overflow", "hidden"]])]])], ["unread-badge", _uM([[".container .list-box ", _uM([["marginLeft", "16rpx"], ["paddingTop", "4rpx"], ["paddingRight", "12rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "12rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#f56c6c"], ["color", "#ffffff"], ["fontSize", "22rpx"]])]])], ["empty-state", _uM([[".container .list-box ", _uM([["display", "flex"], ["justifyContent", "center"], ["paddingTop", "50rpx"], ["paddingRight", 0], ["paddingBottom", "50rpx"], ["paddingLeft", 0]])]])], ["empty-state-text", _uM([[".container .list-box .empty-state ", _uM([["color", "#999999"], ["fontSize", "28rpx"]])]])], ["new-message-tip", _uM([[".container .list-box ", _uM([["backgroundImage", "linear-gradient(135deg, #2979ff, #07c160)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#FFFFFF"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["textAlign", "center"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginBottom", "20rpx"], ["fontSize", "26rpx"]])]])], ["load-more", _uM([[".container .list-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "30rpx"], ["paddingRight", 0], ["paddingBottom", "30rpx"], ["paddingLeft", 0]])]])], ["tips-text", _uM([[".container .list-box .load-more ", _uM([["color", "#999999"], ["fontSize", "26rpx"], ["textAlign", "center"]])]])]])]

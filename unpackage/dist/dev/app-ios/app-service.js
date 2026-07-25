@@ -4793,40 +4793,54 @@
           uni.vibrateLong(new UTSJSONObject({}));
         }
       }
+      function prependLatestMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value)
+            return 0;
+          isLoading.value = true;
+          try {
+            const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
+            if (res.code != 0 || res.data.list == null)
+              return 0;
+            const existingIds = /* @__PURE__ */ new Set();
+            msgList.value.forEach((message) => {
+              const messageId = message.getString("messageId", "");
+              if (messageId != "")
+                existingIds.add(messageId);
+            });
+            const latestMessages = [];
+            res.data.list.forEach((message) => {
+              const messageId = message.getString("messageId", "");
+              if (messageId != "" && !existingIds.has(messageId)) {
+                existingIds.add(messageId);
+                latestMessages.push(message);
+              }
+            });
+            if (latestMessages.length > 0) {
+              msgList.value = [...latestMessages, ...msgList.value];
+              const newestCreateTime = latestMessages[0].getString("createTime", "");
+              if (newestCreateTime != "") {
+                lastUpdateTime.value = new Date(newestCreateTime.replace(/-/g, "/")).getTime();
+              }
+            }
+            return latestMessages.length;
+          } catch (error) {
+            uni.__log__("error", "at pages/message/message.uvue:149", "检查新消息失败:", error);
+            return 0;
+          } finally {
+            isLoading.value = false;
+          }
+        });
+      }
       function checkNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!isPageActive.value || isLoading.value)
             return Promise.resolve(null);
-          try {
-            const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 1 }));
-            const code = res.code;
-            if (code != 0)
-              return Promise.resolve(null);
-            const data = res.data;
-            const list = data.list;
-            if (list == null || list.length == 0)
-              return Promise.resolve(null);
-            const latestMessage = list[0];
-            const createTime = latestMessage.getString("createTime", "");
-            if (createTime == "")
-              return Promise.resolve(null);
-            const messageTime = new Date(createTime).getTime();
-            if (messageTime <= lastUpdateTime.value)
-              return Promise.resolve(null);
+          const insertedCount = yield prependLatestMessages();
+          if (insertedCount > 0) {
             hasNewMessages.value = true;
+            newMessageCount.value += insertedCount;
             vibrateAlert();
-            const countRes = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
-            const newList = countRes.data.list;
-            if (newList != null) {
-              let count = 0;
-              newList.forEach((message) => {
-                if (new Date(message.getString("createTime", "")).getTime() > lastUpdateTime.value)
-                  count++;
-              });
-              newMessageCount.value = count;
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:145", "检查新消息失败:", error);
           }
         });
       }
@@ -4834,24 +4848,24 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:155", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:173", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:159", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:177", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
       }
       function loadMsgList(isInit = false) {
         return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value)
+            return Promise.resolve(null);
           if (isInit) {
             currPage.value = 1;
             msgList.value = [];
             loadStatus.value = "loadmore";
             isNearMessageListBottom.value = false;
           }
-          if (isLoading.value)
-            return Promise.resolve(null);
           isLoading.value = true;
           try {
             if (!isInit)
@@ -4889,7 +4903,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:207", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:225", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4897,12 +4911,11 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:215", "加载新消息");
-          yield loadMsgList(true);
+          uni.__log__("log", "at pages/message/message.uvue:233", "加载新消息");
+          yield prependLatestMessages();
           hasNewMessages.value = false;
           newMessageCount.value = 0;
-          lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
-          uni.__log__("log", "at pages/message/message.uvue:220", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:237", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -4931,7 +4944,7 @@
       };
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:255", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:272", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           measureMessageScrollViewport();
           startNewMessageCheck();
@@ -4939,40 +4952,40 @@
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:266", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:283", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:268", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:285", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:276", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:293", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:278", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:295", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:285", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:302", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:287", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:304", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:296", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:313", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:298", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:315", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:306", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:323", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -5028,7 +5041,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:368", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:385", "更新状态失败:", error);
             }
           }
         });
@@ -5089,12 +5102,12 @@
         return checkTimer;
       }, set checkTimer(v) {
         checkTimer = v;
-      }, isPageActive, stopNewMessageCheck, vibrateAlert, checkNewMessages, startNewMessageCheck, loadMsgList, loadNewMessages, gotoLogin, measureMessageScrollViewport, onRefresherRefresh, loadMore, onScrollToLower, onMessageScroll, handleItemClick, ReadIt, getMessageId, getMessageCreateTime, getMessageContent, isMessageUnread, getMessageTypeText, getMessageTitle, formatTime };
+      }, isPageActive, stopNewMessageCheck, vibrateAlert, prependLatestMessages, checkNewMessages, startNewMessageCheck, loadMsgList, loadNewMessages, gotoLogin, measureMessageScrollViewport, onRefresherRefresh, loadMore, onScrollToLower, onMessageScroll, handleItemClick, ReadIt, getMessageId, getMessageCreateTime, getMessageContent, isMessageUnread, getMessageTypeText, getMessageTitle, formatTime };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0, "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0, "textAlign": "center" } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
   function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
@@ -5129,7 +5142,7 @@
                 key: 0,
                 class: "empty-state"
               }, [
-                vue.createElementVNode("text", null, "暂无消息")
+                vue.createElementVNode("text", { class: "empty-state-text" }, "暂无消息")
               ])) : vue.createCommentVNode("v-if", true),
               $setup.hasNewMessages ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 1,
