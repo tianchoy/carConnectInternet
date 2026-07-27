@@ -2,6 +2,7 @@ import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_line_progress from '@/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue'
 import _easycom_i_picker from '@/uni_modules/i-ui-x/components/i-picker/i-picker.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import _imports_0 from '../../static/exit.png'
 import _imports_1 from '../../static/banner.png'
 import _imports_2 from '../../static/pos.png'
@@ -12,11 +13,12 @@ import _imports_6 from '../../static/pay.png'
 import _imports_7 from '../../static/online.png'
 import _imports_8 from '../../static/del.png'
 import { showAppToast } from '../../utils/toast.uts'
+import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime, type TodayTimeRange } from '../../utils/gettime.uts'
-import { formatTimes } from '../../utils/formateTime.uts'
+import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
 type Device = {
     name: string,
@@ -376,8 +378,8 @@ const loadDeviceDetail = async (deviceId: string) => {
 
             const updateTime = detail.getString('lastUpdateTime', '')
             if (updateTime) {
-                const date = new Date(updateTime)
-                lastUpdateTime.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+                const formattedTime = formatLocalTime(updateTime)
+                if (formattedTime != '') lastUpdateTime.value = formattedTime
             }
         }
     } catch (error) {
@@ -953,10 +955,10 @@ async function unbindCurrentDevice() : Promise<void> {
 // 解绑设备
 const unbindDevice = () : void => {
     if (!isLogin()) return
-    uni.showModal({
+    showAppModal({
         title: '解绑车辆',
         content: '确定解绑当前车辆吗？',
-        success: (res: ShowModalSuccess) : void => {
+        success: (res: AppModalSuccess) : void => {
             if (res.confirm) {
                 void unbindCurrentDevice()
             }
@@ -967,7 +969,7 @@ const unbindDevice = () : void => {
 // 退出登录
 const handleExit = () => {
     if (!isLogin()) return
-    uni.showModal({
+    showAppModal({
         title: '退出登录',
         content: '确定退出登录吗？',
         success: async (res) => {
@@ -1023,6 +1025,7 @@ const _component_i_line_progress = resolveEasyComponent("i-line-progress",_easyc
 const _component_map = resolveComponent("map")
 const _component_i_picker = resolveEasyComponent("i-picker",_easycom_i_picker)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
   return _cE(Fragment, null, [
     _cE("scroll-view", _uM({
@@ -1354,7 +1357,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           }), null, 8 /* PROPS */, ["show", "columns", "defaultIndex"])
         : _cC("v-if", true)
     ]),
-    _cV(_component_app_toast)
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

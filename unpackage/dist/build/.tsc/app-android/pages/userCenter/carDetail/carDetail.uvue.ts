@@ -43,9 +43,6 @@ const _cache = __ins.renderCache;
 		engineNum: ''
 	})
 
-	const carTitle = computed((): string => carInfo.value.getString('carType', '未知'))
-	const formattedPlateNo = computed((): string => carInfo.value.getString('plateNo', '京A'))
-
 	const getCarTypeText = (carType: string): string => {
 		const carTypeNames = {
 			car: '轿车',
@@ -71,6 +68,9 @@ const _cache = __ins.renderCache;
 		} as UTSJSONObject
 		return carTypeNames.getString(carType, carType)
 	}
+
+	const carTitle = computed((): string => getCarTypeText(carInfo.value.getString('carType', '未知')))
+	const formattedPlateNo = computed((): string => carInfo.value.getString('plateNo', '京A'))
 
 	const createEditInfo = (): VehicleEditInfo => {
 		const carType = carInfo.value.getString('carType', '')

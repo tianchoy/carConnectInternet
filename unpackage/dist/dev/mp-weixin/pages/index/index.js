@@ -441,8 +441,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             };
             const updateTime = detail.getString("lastUpdateTime", "");
             if (updateTime) {
-              const date = new Date(updateTime);
-              lastUpdateTime.value = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+              const formattedTime = utils_formateTime.formatLocalTime(updateTime);
+              if (formattedTime != "")
+                lastUpdateTime.value = formattedTime;
             }
           }
         } catch (error) {

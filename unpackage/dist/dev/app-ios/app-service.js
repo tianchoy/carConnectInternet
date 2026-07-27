@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_z1y0ZY";
+    const id = "app-ios_6F39in";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -2882,15 +2882,40 @@
       todayZero
     });
   }
+  function pad(value) {
+    return value.toString().padStart(2, "0");
+  }
   function formatTimes(timestamp) {
     const d = new Date(timestamp);
-    const y = d.getFullYear();
-    const m = (d.getMonth() + 1).toString().padStart(2, "0");
-    const day = d.getDate().toString().padStart(2, "0");
-    const h = d.getHours().toString().padStart(2, "0");
-    const mi = d.getMinutes().toString().padStart(2, "0");
-    const s = d.getSeconds().toString().padStart(2, "0");
-    return "".concat(y, "-").concat(m, "-").concat(day, " ").concat(h, ":").concat(mi, ":").concat(s);
+    return "".concat(d.getFullYear(), "-").concat(pad(d.getMonth() + 1), "-").concat(pad(d.getDate()), " ").concat(pad(d.getHours()), ":").concat(pad(d.getMinutes()), ":").concat(pad(d.getSeconds()));
+  }
+  function parseLocalDateTime(timestamp) {
+    var _a, _b, _c, _d, _e, _f;
+    const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (match == null)
+      return null;
+    const year = parseInt((_a = match[1]) !== null && _a !== void 0 ? _a : "0");
+    const month = parseInt((_b = match[2]) !== null && _b !== void 0 ? _b : "0");
+    const day = parseInt((_c = match[3]) !== null && _c !== void 0 ? _c : "0");
+    const hour = match[4] == null ? 0 : parseInt((_d = match[4]) !== null && _d !== void 0 ? _d : "0");
+    const minute = match[5] == null ? 0 : parseInt((_e = match[5]) !== null && _e !== void 0 ? _e : "0");
+    const second = match[6] == null ? 0 : parseInt((_f = match[6]) !== null && _f !== void 0 ? _f : "0");
+    const date = new Date(year, month - 1, day, hour, minute, second);
+    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
+      return null;
+    }
+    return date.getTime();
+  }
+  function normalizeLocalDateTime(timestamp) {
+    const milliseconds = parseLocalDateTime(timestamp);
+    return milliseconds == null ? timestamp : formatTimes(milliseconds);
+  }
+  function formatLocalTime(timestamp) {
+    const milliseconds = parseLocalDateTime(timestamp);
+    if (milliseconds == null)
+      return "";
+    const date = new Date(milliseconds);
+    return "".concat(pad(date.getHours()), ":").concat(pad(date.getMinutes()), ":").concat(pad(date.getSeconds()));
   }
   function getDeviceIcon(connectionStatus, carType) {
     const basePath = connectionStatus == "online" ? "/static/cars/online/" : "/static/cars/offline/";
@@ -3334,8 +3359,9 @@
               };
               const updateTime = detail.getString("lastUpdateTime", "");
               if (updateTime) {
-                const date = new Date(updateTime);
-                lastUpdateTime.value = "".concat(date.getHours().toString().padStart(2, "0"), ":").concat(date.getMinutes().toString().padStart(2, "0"), ":").concat(date.getSeconds().toString().padStart(2, "0"));
+                const formattedTime = formatLocalTime(updateTime);
+                if (formattedTime != "")
+                  lastUpdateTime.value = formattedTime;
               }
             }
           } catch (error) {
@@ -4841,7 +4867,7 @@
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:105", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:106", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -4878,12 +4904,14 @@
               msgList.value = [...latestMessages, ...msgList.value];
               const newestCreateTime = latestMessages[0].getString("createTime", "");
               if (newestCreateTime != "") {
-                lastUpdateTime.value = new Date(newestCreateTime.replace(/-/g, "/")).getTime();
+                const newestTime = parseLocalDateTime(newestCreateTime);
+                if (newestTime != null)
+                  lastUpdateTime.value = newestTime;
               }
             }
             return latestMessages.length;
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:149", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:151", "检查新消息失败:", error);
             return 0;
           } finally {
             isLoading.value = false;
@@ -4906,10 +4934,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:173", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:175", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:177", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:179", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -4961,7 +4989,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:225", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:227", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4969,11 +4997,11 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:233", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:235", "加载新消息");
           yield prependLatestMessages();
           hasNewMessages.value = false;
           newMessageCount.value = 0;
-          uni.__log__("log", "at pages/message/message.uvue:237", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:239", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -5002,7 +5030,7 @@
       };
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:272", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:274", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           measureMessageScrollViewport();
           startNewMessageCheck();
@@ -5010,40 +5038,40 @@
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:283", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:285", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:285", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:287", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:293", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:295", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:295", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:297", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:302", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:304", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:304", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:306", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:313", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:315", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:315", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:317", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:323", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:325", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -5099,7 +5127,7 @@
                 }
               }
             } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:385", "更新状态失败:", error);
+              uni.__log__("error", "at pages/message/message.uvue:387", "更新状态失败:", error);
             }
           }
         });
@@ -5137,7 +5165,10 @@
         if (!timeString)
           return "";
         try {
-          const date = new Date(timeString.replace(/-/g, "/"));
+          const milliseconds = parseLocalDateTime(timeString);
+          if (milliseconds == null)
+            return timeString;
+          const date = new Date(milliseconds);
           const now = /* @__PURE__ */ new Date();
           const diff = now.getTime() - date.getTime();
           const minutes = Math.floor(diff / 6e4);
@@ -13913,11 +13944,11 @@
   const INVALID_DATE_STRING = "Invalid Date";
   const REGEX_PARSE = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/;
   const REGEX_FORMAT = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g;
-  function padStart(string, length, pad) {
+  function padStart(string, length, pad3) {
     const str = string;
     if (str.length >= length)
       return str;
-    return str.padStart(length, pad);
+    return str.padStart(length, pad3);
   }
   function padZoneStr(instance) {
     const negMinutes = -instance.utcOffset();
@@ -15692,34 +15723,14 @@
       const eTime = vue.ref("");
       const markers = vue.ref([]);
       function safeParseDate(dateStr) {
-        if (!dateStr)
-          return 0;
-        const iosCompatibleStr = dateStr.replace(/-/g, "/");
-        const date = new Date(iosCompatibleStr);
-        if (isNaN(date.getTime())) {
-          const isoStr = dateStr.replace(" ", "T");
-          const isoDate = new Date(isoStr);
-          if (!isNaN(isoDate.getTime())) {
-            return isoDate.getTime();
-          }
-          return 0;
-        }
-        return date.getTime();
+        var _a2;
+        return (_a2 = parseLocalDateTime(dateStr)) !== null && _a2 !== void 0 ? _a2 : 0;
       }
       function normalizeDateTime(dateStr) {
-        if (!dateStr)
-          return "";
-        let normalized = dateStr.replace(/-/g, "/");
-        const parts = normalized.split(" ");
-        if (parts.length < 2)
-          return normalized;
-        const timeParts = parts[1].split(":");
-        if (timeParts.length == 2)
-          normalized += ":00";
-        return normalized;
+        return normalizeLocalDateTime(dateStr);
       }
       function formatDateForDisplay(dateStr) {
-        return normalizeDateTime(dateStr).replace(/\//g, "-");
+        return normalizeDateTime(dateStr);
       }
       function calculateBearing(lat1, lng1, lat2, lng2) {
         const degToRad = (d) => {
@@ -15795,17 +15806,8 @@
       }
       function initDateTime() {
         const now = /* @__PURE__ */ new Date();
-        const formatTime = (date) => {
-          const month = (date.getMonth() + 1).toString().padStart(2, "0");
-          const day = date.getDate().toString().padStart(2, "0");
-          const hours = date.getHours().toString().padStart(2, "0");
-          const minutes = date.getMinutes().toString().padStart(2, "0");
-          const seconds = date.getSeconds().toString().padStart(2, "0");
-          return "".concat(date.getFullYear(), "/").concat(month, "/").concat(day, " ").concat(hours, ":").concat(minutes, ":").concat(seconds);
-        };
-        endTime.value = formatTime(now);
-        const startDate = new Date(now.getTime() - 36e5 * 24);
-        startTime.value = formatTime(startDate);
+        endTime.value = formatTimes(now.getTime());
+        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
       }
       function initCarMarker() {
         var _a2, _b;
@@ -16064,7 +16066,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:634", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:608", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
               showCurrentPosition();
@@ -16167,7 +16169,7 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:753", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:727", sTime.value, eTime.value);
         if (sTime.value != "" && eTime.value != "") {
           startTime.value = normalizeDateTime(sTime.value);
           endTime.value = normalizeDateTime(eTime.value);
@@ -17795,7 +17797,13 @@
         const groups = [];
         dateGroups.forEach((dateGroup) => {
           dateGroup.trips.sort((a, b) => {
-            return new Date(b.getString("startTime", "")).getTime() - new Date(a.getString("startTime", "")).getTime();
+            const timeA = parseLocalDateTime(a.getString("startTime", ""));
+            const timeB = parseLocalDateTime(b.getString("startTime", ""));
+            if (timeA == null)
+              return timeB == null ? 0 : 1;
+            if (timeB == null)
+              return -1;
+            return timeB - timeA;
           });
           let totalDistance = 0;
           dateGroup.trips.forEach((trip) => {
@@ -17804,7 +17812,13 @@
           groups.push(new GroupType({ date: dateGroup.date, trips: dateGroup.trips, totalDistance }));
         });
         return groups.sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
+          const timeA = parseLocalDateTime(a.date);
+          const timeB = parseLocalDateTime(b.date);
+          if (timeA == null)
+            return timeB == null ? 0 : 1;
+          if (timeB == null)
+            return -1;
+          return timeB - timeA;
         });
       });
       const getTripStartTime = (trip) => {
@@ -17827,17 +17841,8 @@
       });
       const initDateTime = () => {
         const now = /* @__PURE__ */ new Date();
-        const formatTime2 = (date) => {
-          const month = (date.getMonth() + 1).toString().padStart(2, "0");
-          const day = date.getDate().toString().padStart(2, "0");
-          const hours = date.getHours().toString().padStart(2, "0");
-          const minutes = date.getMinutes().toString().padStart(2, "0");
-          const seconds = date.getSeconds().toString().padStart(2, "0");
-          return "".concat(date.getFullYear(), "-").concat(month, "-").concat(day, " ").concat(hours, ":").concat(minutes, ":").concat(seconds);
-        };
-        endTime.value = formatTime2(now);
-        const startDate = new Date(now.getTime() - 36e5 * 24);
-        startTime.value = formatTime2(startDate);
+        endTime.value = formatTimes(now.getTime());
+        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
       };
       const processTripData = (data) => {
         const trips = data.getArray("trips");
@@ -17875,13 +17880,13 @@
               withTrip: true
             });
             const res = yield getTrackPos(data);
-            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:201", "获取里程数据成功:", res);
+            uni.__log__("log", "at pages/mileageRecord/mileageRecord.uvue:202", "获取里程数据成功:", res);
             const trackData = res.data;
             if (trackData != null) {
               processTripData(trackData);
             }
           } catch (e) {
-            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:207", "获取里程数据失败:", e);
+            uni.__log__("error", "at pages/mileageRecord/mileageRecord.uvue:208", "获取里程数据失败:", e);
             showAppToast({
               title: "数据加载失败",
               icon: "none"
@@ -18196,8 +18201,12 @@
       const sortedCarStopDetail = vue.computed(() => {
         const sorted = carStopDetail.value.slice();
         sorted.sort((a, b) => {
-          const timeA = new Date(a.getString("endTime", "")).getTime();
-          const timeB = new Date(b.getString("endTime", "")).getTime();
+          const timeA = parseLocalDateTime(a.getString("endTime", ""));
+          const timeB = parseLocalDateTime(b.getString("endTime", ""));
+          if (timeA == null)
+            return timeB == null ? 0 : 1;
+          if (timeB == null)
+            return -1;
           return timeB - timeA;
         });
         return sorted;
@@ -18207,17 +18216,8 @@
       });
       const initDateTime = () => {
         const now = /* @__PURE__ */ new Date();
-        const formatTime = (date) => {
-          const month = (date.getMonth() + 1).toString().padStart(2, "0");
-          const day = date.getDate().toString().padStart(2, "0");
-          const hours = date.getHours().toString().padStart(2, "0");
-          const minutes = date.getMinutes().toString().padStart(2, "0");
-          const seconds = date.getSeconds().toString().padStart(2, "0");
-          return "".concat(date.getFullYear(), "-").concat(month, "-").concat(day, " ").concat(hours, ":").concat(minutes, ":").concat(seconds);
-        };
-        endTime.value = formatTime(now);
-        const startDate = new Date(now.getTime() - 36e5 * 24);
-        startTime.value = formatTime(startDate);
+        endTime.value = formatTimes(now.getTime());
+        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
       };
       const loadStopData = () => {
         return __awaiter(this, void 0, void 0, function* () {
@@ -18277,21 +18277,21 @@
       };
       const showAddress = (latitude, longitude) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:172", latitude, longitude);
+          uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:165", latitude, longitude);
           uni.openLocation({
             latitude,
             longitude,
             name: "当前位置",
             scale: 18,
             success: () => {
-              uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:179", "成功调起地图");
+              uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:172", "成功调起地图");
             },
             fail: (err) => {
               showAppToast({
                 title: "调起地图失败",
                 icon: "none"
               });
-              uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:186", "调起地图失败:", err);
+              uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:179", "调起地图失败:", err);
             }
           });
         });
@@ -19108,12 +19108,6 @@
         carVin: "",
         engineNum: ""
       }));
-      const carTitle = vue.computed(() => {
-        return carInfo.value.getString("carType", "未知");
-      });
-      const formattedPlateNo = vue.computed(() => {
-        return carInfo.value.getString("plateNo", "京A");
-      });
       const getCarTypeText = (carType) => {
         const carTypeNames = new UTSJSONObject({
           car: "轿车",
@@ -19139,6 +19133,12 @@
         });
         return carTypeNames.getString(carType, carType);
       };
+      const carTitle = vue.computed(() => {
+        return getCarTypeText(carInfo.value.getString("carType", "未知"));
+      });
+      const formattedPlateNo = vue.computed(() => {
+        return carInfo.value.getString("plateNo", "京A");
+      });
       const createEditInfo = () => {
         const carType = carInfo.value.getString("carType", "");
         return new VehicleEditInfo({
@@ -19248,7 +19248,7 @@
           loadCarListData();
         }
       });
-      const __returned__ = { deviceId, carInfo, isEditing, saving, loadingDetail, detailLoaded, carIconSelectorVisible, editInfo, carTitle, formattedPlateNo, getCarTypeText, createEditInfo, toggleEdit, updateCarIconSelectorVisible, openCarIconSelector, selectIcon, normalizePlateNo, cancelEdit, saveChanges, loadCarListData, get carIcons() {
+      const __returned__ = { deviceId, carInfo, isEditing, saving, loadingDetail, detailLoaded, carIconSelectorVisible, editInfo, getCarTypeText, carTitle, formattedPlateNo, createEditInfo, toggleEdit, updateCarIconSelectorVisible, openCarIconSelector, selectIcon, normalizePlateNo, cancelEdit, saveChanges, loadCarListData, get carIcons() {
         return carIcons;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -22070,7 +22070,7 @@
       return __returned__;
     }
   });
-  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "display": "flex", "flexDirection": "column" } }, "device-info": { "": { "display": "flex", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginTop": "30rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0 } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "device-input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "28rpx", "color": "#333333" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#FFFFFF", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginBottom": "30rpx" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "record-list": { "": { "fontSize": "26rpx", "color": "#666666" } }, "type-container": { "": { "width": "100%" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "justifyContent": "flex-start", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#FFFFFF" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "overflow": "hidden", "textOverflow": "ellipsis" } }, "command-list": { "": { "display": "flex", "flexDirection": "row" } }, "command-item": { ".command-item+": { "marginLeft": "20rpx" }, "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { ".param-item+": { "marginTop": "30rpx" }, "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "fontSize": "26rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "radio-item": { ".radio-item+": { "marginTop": "20rpx" }, "": { "display": "flex", "alignItems": "center" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "color": "#FFFFFF", "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "fontSize": "30rpx", "marginTop": "20rpx", "backgroundImage:disabled": "none", "backgroundColor:disabled": "#cccccc", "color:disabled": "#999999" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "100rpx", "paddingRight": 0, "paddingBottom": "100rpx", "paddingLeft": 0 } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "placeholder": { "": { "color": "#cccccc" } } };
+  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "display": "flex", "flexDirection": "column" } }, "device-info": { "": { "display": "flex", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginTop": "30rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0 } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "device-input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "28rpx", "color": "#333333" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#FFFFFF", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginBottom": "30rpx" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "record-list": { "": { "fontSize": "26rpx", "color": "#666666" } }, "type-container": { "": { "width": "100%" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "justifyContent": "flex-start", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#ffffff" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "overflow": "hidden", "textOverflow": "ellipsis" } }, "command-list": { "": { "display": "flex", "flexDirection": "row" } }, "command-item": { ".command-item+": { "marginLeft": "20rpx" }, "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { ".param-item+": { "marginTop": "30rpx" }, "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "fontSize": "26rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "radio-item": { ".radio-item+": { "marginTop": "20rpx" }, "": { "display": "flex", "alignItems": "center" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "color": "#FFFFFF", "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "fontSize": "30rpx", "marginTop": "20rpx", "backgroundImage:disabled": "none", "backgroundColor:disabled": "#cccccc", "color:disabled": "#999999" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "placeholder": { "": { "color": "#cccccc" } } };
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);

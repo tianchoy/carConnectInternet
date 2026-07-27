@@ -7,7 +7,7 @@
     "code": "100"
   },
   "uni-app-x": {
-    "compilerVersion": "5.21"
+    "compilerVersion": "5.22"
   },
   "app-android": {
     "distribute": {
@@ -24,8 +24,8 @@
         "uni-event": {},
         "uni-getSystemInfo": {},
         "uni-vibrate": {},
-        "uni-storage": {},
         "uni-prompt": {},
+        "uni-storage": {},
         "uni-scanCode": {},
         "uni-rpx2px": {},
         "uni-exit": {},

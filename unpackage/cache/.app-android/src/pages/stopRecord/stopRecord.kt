@@ -34,8 +34,18 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
                 sorted.sort(fun(a: StopRecord, b: StopRecord): Number {
-                    val timeA = Date(a.getString("endTime", "")).getTime()
-                    val timeB = Date(b.getString("endTime", "")).getTime()
+                    val timeA = parseLocalDateTime(a.getString("endTime", ""))
+                    val timeB = parseLocalDateTime(b.getString("endTime", ""))
+                    if (timeA == null) {
+                        return if (timeB == null) {
+                            0
+                        } else {
+                            1
+                        }
+                    }
+                    if (timeB == null) {
+                        return -1
+                    }
                     return timeB - timeA
                 }
                 )
@@ -48,22 +58,13 @@ open class GenPagesStopRecordStopRecord : BasePage {
             )
             val initDateTime = fun(){
                 val now = Date()
-                val formatTime = fun(date: Date): String {
-                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
-                    val day = date.getDate().toString(10).padStart(2, "0")
-                    val hours = date.getHours().toString(10).padStart(2, "0")
-                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
-                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
-                    return "" + date.getFullYear() + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
+                endTime.value = formatTimes(now.getTime())
+                startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 103, 9), "imei" to imei.value, "startTime" to startTime.value, "endTime" to endTime.value, "minParkTime" to 10, "withStop" to true, "withPos" to false, "withTrip" to false)
                         val res = await(getTrackPos(data))
                         var stopsWithAddress: UTSArray<StopRecord> = _uA()
                         val trackData = res.data
@@ -113,13 +114,13 @@ open class GenPagesStopRecordStopRecord : BasePage {
             }
             val showAddress = fun(latitude: Number, longitude: Number): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:172")
+                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:165")
                         uni_openLocation(OpenLocationOptions(latitude = latitude, longitude = longitude, name = "当前位置", scale = 18, success = fun(_){
-                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:179")
+                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:172")
                         }
                         , fail = fun(err){
                             showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:186")
+                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:179")
                         }
                         ))
                 })

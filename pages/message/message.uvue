@@ -61,6 +61,7 @@
 <script setup lang="uts">
 	import { ref, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
+	import { parseLocalDateTime } from '../../utils/formateTime.uts'
 
 	type ModalInstance = {
 		open: () => void
@@ -141,7 +142,8 @@
 				msgList.value = [...latestMessages, ...msgList.value]
 				const newestCreateTime = latestMessages[0].getString('createTime', '')
 				if (newestCreateTime != '') {
-					lastUpdateTime.value = new Date(newestCreateTime.replace(/-/g, '/')).getTime()
+					const newestTime = parseLocalDateTime(newestCreateTime)
+					if (newestTime != null) lastUpdateTime.value = newestTime
 				}
 			}
 			return latestMessages.length
@@ -424,7 +426,9 @@
 	const formatTime = (timeString: string) => {
 		if (!timeString) return ''
 		try {
-			const date = new Date(timeString.replace(/-/g, '/'))
+			const milliseconds = parseLocalDateTime(timeString)
+			if (milliseconds == null) return timeString
+			const date = new Date(milliseconds)
 			const now = new Date()
 			const diff = now.getTime() - date.getTime()
 			const minutes = Math.floor(diff / 60000)

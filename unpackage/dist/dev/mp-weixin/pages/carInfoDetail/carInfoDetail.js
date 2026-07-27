@@ -445,13 +445,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         image: "/static/offpower.png",
         text: "断开油电"
       })];
-      const productId = currentCarInfo.value.productId;
-      if (productId === "product-1141811865601576960" || productId === "product-1183161303028600832") {
-        list.push(new common_vendor.UTSJSONObject({
-          image: "/static/cmd.png",
-          text: "发送指令"
-        }));
-      }
+      list.push(new common_vendor.UTSJSONObject({
+        image: "/static/cmd.png",
+        text: "发送指令"
+      }));
       return list;
     });
     function executeOperation(operationType) {
@@ -498,7 +495,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:687", "操作失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:692", "操作失败:", error);
           utils_toast.showAppToast({
             title: "操作失败，请重试",
             icon: "none"
@@ -530,7 +527,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const addr = yield utils_getAdress.getAddress(center.latitude, center.longitude);
           address.value = addr.result.formatted_address;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:723", "获取地址信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:728", "获取地址信息失败:", error);
         }
       });
     };
@@ -555,7 +552,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               title: "调起地图失败",
               icon: "none"
             });
-            common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:748", "调起地图失败:", err);
+            common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:753", "调起地图失败:", err);
           }
         });
       });
@@ -629,7 +626,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_request.getDeviceDetail(deviceId.value);
           currentCarInfo.value = res.data;
         } else {
-          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:831", "设备id获取失败");
+          common_vendor.index.__f__("error", "at pages/carInfoDetail/carInfoDetail.uvue:836", "设备id获取失败");
         }
       });
     };
@@ -654,17 +651,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面显示，检查自动刷新状态");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:870", "页面显示，检查自动刷新状态");
       if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
         setupAutoRefresh(currentTime.value);
       }
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:874", "页面隐藏时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:879", "页面隐藏时停止自动刷新");
       stopAutoRefresh();
     });
     common_vendor.onUnmounted(() => {
-      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:879", "页面卸载时停止自动刷新");
+      common_vendor.index.__f__("log", "at pages/carInfoDetail/carInfoDetail.uvue:884", "页面卸载时停止自动刷新");
       stopAutoRefresh();
     });
     return (_ctx, _cache) => {

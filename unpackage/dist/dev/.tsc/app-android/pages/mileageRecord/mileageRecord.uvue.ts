@@ -8,10 +8,11 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
+	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
 	// import { getAddress } from '../../utils/getAdress.uts'
 
-	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 76, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
-	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 77, 7>; date : string; trips : Array<UTSJSONObject>; }
+	type GroupType = { __$originalPosition?: UTSSourceMapPosition<"GroupType", "pages/mileageRecord/mileageRecord.uvue", 77, 7>; date : string; trips : Array<UTSJSONObject>; totalDistance : number; }
+	type DateTripGroup = { __$originalPosition?: UTSSourceMapPosition<"DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 78, 7>; date : string; trips : Array<UTSJSONObject>; }
 
 	
 const __sfc__ = defineComponent({
@@ -59,7 +60,11 @@ const carStatus = ref('在线')
 		const groups : Array<GroupType> = []
 		dateGroups.forEach((dateGroup : DateTripGroup) : void => {
 			dateGroup.trips.sort((a : UTSJSONObject, b : UTSJSONObject) : number => {
-				return new Date(b.getString('startTime', '')).getTime() - new Date(a.getString('startTime', '')).getTime()
+				const timeA = parseLocalDateTime(a.getString('startTime', ''))
+				const timeB = parseLocalDateTime(b.getString('startTime', ''))
+				if (timeA == null) return timeB == null ? 0 : 1
+				if (timeB == null) return -1
+				return timeB - timeA
 			})
 			let totalDistance = 0
 			dateGroup.trips.forEach((trip : UTSJSONObject) : void => {
@@ -67,7 +72,13 @@ const carStatus = ref('在线')
 			})
 			groups.push({ date: dateGroup.date, trips: dateGroup.trips, totalDistance: totalDistance })
 		})
-		return groups.sort((a : GroupType, b : GroupType) : number => new Date(b.date).getTime() - new Date(a.date).getTime())
+		return groups.sort((a : GroupType, b : GroupType) : number => {
+			const timeA = parseLocalDateTime(a.date)
+			const timeB = parseLocalDateTime(b.date)
+			if (timeA == null) return timeB == null ? 0 : 1
+			if (timeB == null) return -1
+			return timeB - timeA
+		})
 	})
 
 	const getTripStartTime = (trip : UTSJSONObject) : string => trip.getString('startTime', '')
@@ -88,19 +99,9 @@ const carStatus = ref('在线')
 	// 初始化时间
 	const initDateTime = () => {
 		const now = new Date()
-		const formatTime = (date : Date) : string => {
-			const month = (date.getMonth() + 1).toString().padStart(2, '0')
-			const day = date.getDate().toString().padStart(2, '0')
-			const hours = date.getHours().toString().padStart(2, '0')
-			const minutes = date.getMinutes().toString().padStart(2, '0')
-			const seconds = date.getSeconds().toString().padStart(2, '0')
-			return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`
-		}
-
-		endTime.value = formatTime(now)
+		endTime.value = formatTimes(now.getTime())
 		// 开始时间默认为当前时间前1天
-		const startDate = new Date(now.getTime() - 3600000 * 24)
-		startTime.value = formatTime(startDate)
+		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
 	}
 
 
@@ -133,7 +134,7 @@ const carStatus = ref('在线')
 		})
 		if (!imei.value) return;
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 191, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/mileageRecord/mileageRecord.uvue", 192, 10),
 				imei: imei.value,
 				startTime: startTime.value,
 				endTime: endTime.value,
@@ -143,13 +144,13 @@ const carStatus = ref('在线')
 				withTrip: true,
 			};
 			const res = await getTrackPos(data);
-			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:201");
+			console.log('获取里程数据成功:', res, " at pages/mileageRecord/mileageRecord.uvue:202");
 			const trackData = res.data
 			if (trackData != null) {
 				processTripData(trackData)
 			}
 		} catch (e) {
-			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:207");
+			console.error('获取里程数据失败:', e, " at pages/mileageRecord/mileageRecord.uvue:208");
 			showAppToast({
 				title: '数据加载失败',
 				icon: 'none',

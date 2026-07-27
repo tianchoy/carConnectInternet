@@ -7,7 +7,9 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_radio from '@/uni_modules/i-ui-x/components/i-radio/i-radio.uvue'
 import _easycom_i_switch from '@/uni_modules/i-ui-x/components/i-switch/i-switch.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
+import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 	import { ref, reactive, onMounted, computed, watch } from 'vue'
 	import { getDevicePos, getGeofenceList, addGeofence, updateGeofence, deleteGeofence, getBoundDevices, getUnboundDevices, bindDevices, unbindDevices } from '../../api/request.uts'
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -702,10 +704,10 @@ const imei = ref<string | null>(null)
 
 	// 删除围栏
 	const deleteFence = (id : string) : void => {
-		uni.showModal({
+		showAppModal({
 			title: '确认删除',
 			content: '确定要删除这个围栏吗？',
-			success: (res : ShowModalSuccess) : void => {
+			success: (res : AppModalSuccess) : void => {
 				if (res.confirm) {
 					void deleteFenceById(id.toString())
 				}
@@ -1209,6 +1211,7 @@ const _component_i_input = resolveEasyComponent("i-input",_easycom_i_input)
 const _component_i_radio = resolveEasyComponent("i-radio",_easycom_i_radio)
 const _component_i_switch = resolveEasyComponent("i-switch",_easycom_i_switch)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
+const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
   return _cE(Fragment, null, [
     _cE("view", _uM({ class: "container" }), [
@@ -1606,7 +1609,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
         _: 1 /* STABLE */
       }), 512 /* NEED_PATCH */)
     ]),
-    _cV(_component_app_toast)
+    _cV(_component_app_toast),
+    _cV(_component_app_modal)
   ], 64 /* STABLE_FRAGMENT */)
 }
 }

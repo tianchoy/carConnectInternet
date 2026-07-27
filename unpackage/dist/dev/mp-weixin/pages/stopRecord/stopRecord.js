@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
+const utils_formateTime = require("../../utils/formateTime.js");
 require("../../utils/getAdress.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
@@ -37,8 +38,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const sortedCarStopDetail = common_vendor.computed(() => {
       const sorted = carStopDetail.value.slice();
       sorted.sort((a, b) => {
-        const timeA = new Date(a.getString("endTime", "")).getTime();
-        const timeB = new Date(b.getString("endTime", "")).getTime();
+        const timeA = utils_formateTime.parseLocalDateTime(a.getString("endTime", ""));
+        const timeB = utils_formateTime.parseLocalDateTime(b.getString("endTime", ""));
+        if (timeA == null)
+          return timeB == null ? 0 : 1;
+        if (timeB == null)
+          return -1;
         return timeB - timeA;
       });
       return sorted;
@@ -48,17 +53,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
-      const formatTime = (date) => {
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        const seconds = date.getSeconds().toString().padStart(2, "0");
-        return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-      };
-      endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5 * 24);
-      startTime.value = formatTime(startDate);
+      endTime.value = utils_formateTime.formatTimes(now.getTime());
+      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
     };
     const loadStopData = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -118,21 +114,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const showAddress = (latitude, longitude) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:172", latitude, longitude);
+        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:165", latitude, longitude);
         common_vendor.index.openLocation({
           latitude,
           longitude,
           name: "当前位置",
           scale: 18,
           success: () => {
-            common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:179", "成功调起地图");
+            common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:172", "成功调起地图");
           },
           fail: (err) => {
             utils_toast.showAppToast({
               title: "调起地图失败",
               icon: "none"
             });
-            common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:186", "调起地图失败:", err);
+            common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:179", "调起地图失败:", err);
           }
         });
       });

@@ -9,6 +9,7 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, watch } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
+	import { formatTimes, normalizeLocalDateTime, parseLocalDateTime } from '../../utils/formateTime.uts'
 	import { getDeviceIcon } from '../../utils/cars'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -17,7 +18,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
 
 
-	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 66, 7>;
+	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 67, 7>;
 		latitude : number;
 		longitude : number;
 		rotation : number;
@@ -25,19 +26,19 @@ import { showAppToast } from '../../utils/toast.uts'
 		speed : number;
 	}
 
-	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 74, 7>;
+	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 75, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
 		maxLng : number;
 	}
 
-	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 81, 7>;
+	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 82, 7>;
 		latitude: number
 		longitude: number
 	}
 
-	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 86, 7>;
+	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 87, 7>;
 		points: Array<MapPolylinePoint>
 		color: string
 		width: number
@@ -108,34 +109,17 @@ const center = reactive({
 
 	// 日期函数
 	function safeParseDate(dateStr : string) : number {
-		if (!dateStr) return 0
-		const iosCompatibleStr = dateStr.replace(/-/g, '/')
-		const date = new Date(iosCompatibleStr)
-		if (isNaN(date.getTime())) {
-			const isoStr = dateStr.replace(' ', 'T')
-			const isoDate = new Date(isoStr)
-			if (!isNaN(isoDate.getTime())) {
-				return isoDate.getTime()
-			}
-			return 0
-		}
-		return date.getTime()
+		return parseLocalDateTime(dateStr) ?? 0
 	}
 
 	// 规范化日期时间，确保展示和接口查询均精确到秒
 	function normalizeDateTime(dateStr : string) : string {
-		if (!dateStr) return ''
-		let normalized = dateStr.replace(/-/g, '/')
-		const parts = normalized.split(' ')
-		if (parts.length < 2) return normalized
-		const timeParts = parts[1].split(':')
-		if (timeParts.length == 2) normalized += ':00'
-		return normalized
+		return normalizeLocalDateTime(dateStr)
 	}
 
 	// 格式化日期显示
 	function formatDateForDisplay(dateStr : string) : string {
-		return normalizeDateTime(dateStr).replace(/\//g, '-')
+		return normalizeDateTime(dateStr)
 	}
 
 	// 计算两点之间的方向角
@@ -226,18 +210,8 @@ const center = reactive({
 	// 初始化时间
 	function initDateTime() {
 		const now = new Date()
-		const formatTime = (date : Date) : string => {
-			const month = (date.getMonth() + 1).toString().padStart(2, '0')
-			const day = date.getDate().toString().padStart(2, '0')
-			const hours = date.getHours().toString().padStart(2, '0')
-			const minutes = date.getMinutes().toString().padStart(2, '0')
-			const seconds = date.getSeconds().toString().padStart(2, '0')
-			return `${date.getFullYear()}/${month}/${day} ${hours}:${minutes}:${seconds}`
-		}
-
-		endTime.value = formatTime(now)
-		const startDate = new Date(now.getTime() - 3600000 * 24)
-		startTime.value = formatTime(startDate)
+		endTime.value = formatTimes(now.getTime())
+		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
 	}
 
 	// 初始化小车标记
@@ -568,7 +542,7 @@ const center = reactive({
 		const requestId = ++replaySessionId
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 609, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 583, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -593,7 +567,7 @@ const center = reactive({
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:634")
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:608")
 			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
@@ -712,7 +686,7 @@ const center = reactive({
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:753")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:727")
 		if(sTime.value != '' && eTime.value != '') {
 			startTime.value = normalizeDateTime(sTime.value)
 			endTime.value = normalizeDateTime(eTime.value)

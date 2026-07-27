@@ -56,40 +56,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val eTime = ref("")
             val markers = ref(_uA<MapMarker>())
             fun gen_safeParseDate_fn(dateStr: String): Number {
-                if (!(dateStr != "")) {
-                    return 0
-                }
-                val iosCompatibleStr = dateStr.replace(UTSRegExp("-", "g"), "/")
-                val date = Date(iosCompatibleStr)
-                if (isNaN(date.getTime())) {
-                    val isoStr = dateStr.replace(" ", "T")
-                    val isoDate = Date(isoStr)
-                    if (!isNaN(isoDate.getTime())) {
-                        return isoDate.getTime()
-                    }
-                    return 0
-                }
-                return date.getTime()
+                return parseLocalDateTime(dateStr) ?: 0
             }
             val safeParseDate = ::gen_safeParseDate_fn
             fun gen_normalizeDateTime_fn(dateStr: String): String {
-                if (!(dateStr != "")) {
-                    return ""
-                }
-                var normalized = dateStr.replace(UTSRegExp("-", "g"), "/")
-                val parts = normalized.split(" ")
-                if (parts.length < 2) {
-                    return normalized
-                }
-                val timeParts = parts[1].split(":")
-                if (timeParts.length == 2) {
-                    normalized += ":00"
-                }
-                return normalized
+                return normalizeLocalDateTime(dateStr)
             }
             val normalizeDateTime = ::gen_normalizeDateTime_fn
             fun gen_formatDateForDisplay_fn(dateStr: String): String {
-                return normalizeDateTime(dateStr).replace(UTSRegExp("\\/", "g"), "-")
+                return normalizeDateTime(dateStr)
             }
             val formatDateForDisplay = ::gen_formatDateForDisplay_fn
             fun gen_calculateBearing_fn(lat1: Number, lng1: Number, lat2: Number, lng2: Number): Number {
@@ -174,17 +149,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val calculateTrackDistance = ::gen_calculateTrackDistance_fn
             fun gen_initDateTime_fn() {
                 val now = Date()
-                val formatTime = fun(date: Date): String {
-                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
-                    val day = date.getDate().toString(10).padStart(2, "0")
-                    val hours = date.getHours().toString(10).padStart(2, "0")
-                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
-                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
-                    return "" + date.getFullYear() + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
+                endTime.value = formatTimes(now.getTime())
+                startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val initDateTime = ::gen_initDateTime_fn
             fun gen_initCarMarker_fn() {

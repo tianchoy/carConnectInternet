@@ -13,7 +13,6 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
 open class GenPagesGeofencingGeofencing : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -602,7 +601,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val deleteFenceById = ::gen_deleteFenceById_fn
             val deleteFence = fun(id: String): Unit {
-                uni_showModal(ShowModalOptions(title = "确认删除", content = "确定要删除这个围栏吗？", success = fun(res: ShowModalSuccess): Unit {
+                showAppModal(AppModalOptions(title = "确认删除", content = "确定要删除这个围栏吗？", success = fun(res: AppModalSuccess): Unit {
                     if (res.confirm) {
                         deleteFenceById(id.toString())
                     }
@@ -1050,6 +1049,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                 val _component_i_radio = resolveEasyComponent("i-radio", GenUniModulesIUiXComponentsIRadioIRadioClass)
                 val _component_i_switch = resolveEasyComponent("i-switch", GenUniModulesIUiXComponentsISwitchISwitchClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "地理围栏", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
@@ -1446,7 +1446,8 @@ open class GenPagesGeofencingGeofencing : BasePage {
                         }
                         ), "_" to 1), 512)
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }

@@ -72,7 +72,19 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 val groups: UTSArray<GroupType> = _uA()
                 dateGroups.forEach(fun(dateGroup: DateTripGroup): Unit {
                     dateGroup.trips.sort(fun(a: UTSJSONObject, b: UTSJSONObject): Number {
-                        return Date(b.getString("startTime", "")).getTime() - Date(a.getString("startTime", "")).getTime()
+                        val timeA = parseLocalDateTime(a.getString("startTime", ""))
+                        val timeB = parseLocalDateTime(b.getString("startTime", ""))
+                        if (timeA == null) {
+                            return if (timeB == null) {
+                                0
+                            } else {
+                                1
+                            }
+                        }
+                        if (timeB == null) {
+                            return -1
+                        }
+                        return timeB - timeA
                     }
                     )
                     var totalDistance: Number = 0
@@ -84,7 +96,19 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
                 }
                 )
                 return groups.sort(fun(a: GroupType, b: GroupType): Number {
-                    return Date(b.date).getTime() - Date(a.date).getTime()
+                    val timeA = parseLocalDateTime(a.date)
+                    val timeB = parseLocalDateTime(b.date)
+                    if (timeA == null) {
+                        return if (timeB == null) {
+                            0
+                        } else {
+                            1
+                        }
+                    }
+                    if (timeB == null) {
+                        return -1
+                    }
+                    return timeB - timeA
                 }
                 )
             }
@@ -110,17 +134,8 @@ open class GenPagesMileageRecordMileageRecord : BasePage {
             )
             val initDateTime = fun(){
                 val now = Date()
-                val formatTime = fun(date: Date): String {
-                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
-                    val day = date.getDate().toString(10).padStart(2, "0")
-                    val hours = date.getHours().toString(10).padStart(2, "0")
-                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
-                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
-                    return "" + date.getFullYear() + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
+                endTime.value = formatTimes(now.getTime())
+                startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val processTripData = fun(data: UTSJSONObject): Unit {
                 val trips = data.getArray<UTSJSONObject>("trips")

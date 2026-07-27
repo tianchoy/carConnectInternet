@@ -7,6 +7,7 @@ import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
+	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
@@ -38,8 +39,10 @@ const carStatus = ref('在线')
 	const sortedCarStopDetail = computed((): Array<StopRecord> => {
 		const sorted = carStopDetail.value.slice()
 		sorted.sort((a: StopRecord, b: StopRecord): number => {
-			const timeA = new Date(a.getString('endTime', '')).getTime()
-			const timeB = new Date(b.getString('endTime', '')).getTime()
+			const timeA = parseLocalDateTime(a.getString('endTime', ''))
+			const timeB = parseLocalDateTime(b.getString('endTime', ''))
+			if (timeA == null) return timeB == null ? 0 : 1
+			if (timeB == null) return -1
 			return timeB - timeA // 倒序排列
 		})
 		return sorted
@@ -51,26 +54,16 @@ const carStatus = ref('在线')
 
 	const initDateTime = () => {
 		const now = new Date()
-		const formatTime = (date : Date) : string => {
-			const month = (date.getMonth() + 1).toString().padStart(2, '0')
-			const day = date.getDate().toString().padStart(2, '0')
-			const hours = date.getHours().toString().padStart(2, '0')
-			const minutes = date.getMinutes().toString().padStart(2, '0')
-			const seconds = date.getSeconds().toString().padStart(2, '0')
-			return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`
-		}
-
-		endTime.value = formatTime(now)
+		endTime.value = formatTimes(now.getTime())
 		// 开始时间默认为当前时间前24小时
-		const startDate = new Date(now.getTime() - 3600000 * 24)
-		startTime.value = formatTime(startDate)
+		startTime.value = formatTimes(now.getTime() - 3600000 * 24)
 	}
 
 	const loadStopData = async () : Promise<void> => {
 		uni.showLoading({
 			title: '加载中...'
 		})
-		const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 110, 9), 
+		const data = { __$originalPosition: new UTSSourceMapPosition("data", "pages/stopRecord/stopRecord.uvue", 103, 9), 
 			imei: imei.value,
 			startTime: startTime.value,
 			endTime: endTime.value,
@@ -132,21 +125,21 @@ const carStatus = ref('在线')
 	}
 
 	const showAddress = async (latitude : number, longitude : number) => {
-		console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:172")
+		console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:165")
 			uni.openLocation({
 			latitude: latitude,
 			longitude: longitude,
 			name: '当前位置',
 			scale: 18,
 			success: () => {
-				console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:179")
+				console.log('成功调起地图', " at pages/stopRecord/stopRecord.uvue:172")
 			},
 			fail: (err) => {
 				showAppToast({
 					title: '调起地图失败',
 					icon: 'none'
 				});
-				console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:186");
+				console.error('调起地图失败:', err, " at pages/stopRecord/stopRecord.uvue:179");
 			}
 		});
 	}

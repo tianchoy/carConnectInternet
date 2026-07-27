@@ -66,8 +66,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       carVin: "",
       engineNum: ""
     }));
+    const getCarTypeText = (carType) => {
+      const carTypeNames = new common_vendor.UTSJSONObject({
+        car: "轿车",
+        suv: "越野车",
+        bus: "公交车",
+        huoche: "货车",
+        train: "火车",
+        diandong: "电动车",
+        moto: "摩托车",
+        bike: "自行车",
+        sanlun: "三轮车",
+        tuola: "拖拉机",
+        wajue: "挖掘机",
+        tuiche: "手推车",
+        baby: "婴儿车",
+        muma: "木马",
+        tank: "坦克",
+        zhuangjia: "装甲车",
+        plan: "飞机",
+        hangmu: "航母",
+        junjian: "军舰",
+        walk: "步行"
+      });
+      return carTypeNames.getString(carType, carType);
+    };
     const carTitle = common_vendor.computed(() => {
-      return carInfo.value.getString("carType", "未知");
+      return getCarTypeText(carInfo.value.getString("carType", "未知"));
     });
     const formattedPlateNo = common_vendor.computed(() => {
       return carInfo.value.getString("plateNo", "京A");

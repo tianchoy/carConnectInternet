@@ -21,7 +21,6 @@ import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
-import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 open class GenPagesIndexIndex : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -289,8 +288,10 @@ open class GenPagesIndexIndex : BasePage {
                                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = deviceStatus?.getNumber("batteryPercent", 0) ?: 0, voltage = deviceStatus?.getNumber("voltage", 0) ?: 0, signalStrength = deviceStatus?.getNumber("signalStrength", 0) ?: 0), connectionStatus = detail.getString("connectionStatus", "offline"), lastUpdateTime = detail.getString("lastUpdateTime", ""))
                                 val updateTime = detail.getString("lastUpdateTime", "")
                                 if (updateTime != "") {
-                                    val date = Date(updateTime)
-                                    lastUpdateTime.value = "" + date.getHours().toString(10).padStart(2, "0") + ":" + date.getMinutes().toString(10).padStart(2, "0") + ":" + date.getSeconds().toString(10).padStart(2, "0")
+                                    val formattedTime = formatLocalTime(updateTime)
+                                    if (formattedTime != "") {
+                                        lastUpdateTime.value = formattedTime
+                                    }
                                 }
                             }
                         }
@@ -729,7 +730,7 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
-                uni_showModal(ShowModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: ShowModalSuccess): Unit {
+                showAppModal(AppModalOptions(title = "解绑车辆", content = "确定解绑当前车辆吗？", success = fun(res: AppModalSuccess): Unit {
                     if (res.confirm) {
                         unbindCurrentDevice()
                     }
@@ -768,6 +769,7 @@ open class GenPagesIndexIndex : BasePage {
                 val _component_map = resolveComponent("map")
                 val _component_i_picker = resolveEasyComponent("i-picker", GenUniModulesIUiXComponentsIPickerIPickerClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
+                val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
                     _cE("scroll-view", _uM("class" to "container", "scroll-y" to "true", "show-scrollbar" to false), _uA(
                         _cE("view", _uM("class" to "page-bg"), _uA(
@@ -992,7 +994,8 @@ open class GenPagesIndexIndex : BasePage {
                             _cC("v-if", true)
                         }
                     )),
-                    _cV(_component_app_toast)
+                    _cV(_component_app_toast),
+                    _cV(_component_app_modal)
                 ), 64)
             }
         }

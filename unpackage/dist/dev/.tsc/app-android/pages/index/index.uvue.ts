@@ -18,7 +18,7 @@ import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime, type TodayTimeRange } from '../../utils/gettime.uts'
-import { formatTimes } from '../../utils/formateTime.uts'
+import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
 type Device = { __$originalPosition?: UTSSourceMapPosition<"Device", "pages/index/index.uvue", 209, 6>;
     name: string,
@@ -378,8 +378,8 @@ const loadDeviceDetail = async (deviceId: string) => {
 
             const updateTime = detail.getString('lastUpdateTime', '')
             if (updateTime) {
-                const date = new Date(updateTime)
-                lastUpdateTime.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+                const formattedTime = formatLocalTime(updateTime)
+                if (formattedTime != '') lastUpdateTime.value = formattedTime
             }
         }
     } catch (error) {

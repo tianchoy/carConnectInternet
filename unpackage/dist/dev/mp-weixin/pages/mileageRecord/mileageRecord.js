@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
+const utils_formateTime = require("../../utils/formateTime.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
@@ -103,7 +104,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const groups = [];
       dateGroups.forEach((dateGroup) => {
         dateGroup.trips.sort((a, b) => {
-          return new Date(b.getString("startTime", "")).getTime() - new Date(a.getString("startTime", "")).getTime();
+          const timeA = utils_formateTime.parseLocalDateTime(a.getString("startTime", ""));
+          const timeB = utils_formateTime.parseLocalDateTime(b.getString("startTime", ""));
+          if (timeA == null)
+            return timeB == null ? 0 : 1;
+          if (timeB == null)
+            return -1;
+          return timeB - timeA;
         });
         let totalDistance = 0;
         dateGroup.trips.forEach((trip) => {
@@ -112,7 +119,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         groups.push(new GroupType({ date: dateGroup.date, trips: dateGroup.trips, totalDistance }));
       });
       return groups.sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
+        const timeA = utils_formateTime.parseLocalDateTime(a.date);
+        const timeB = utils_formateTime.parseLocalDateTime(b.date);
+        if (timeA == null)
+          return timeB == null ? 0 : 1;
+        if (timeB == null)
+          return -1;
+        return timeB - timeA;
       });
     });
     const getTripStartTime = (trip) => {
@@ -135,17 +148,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const initDateTime = () => {
       const now = /* @__PURE__ */ new Date();
-      const formatTime = (date) => {
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        const seconds = date.getSeconds().toString().padStart(2, "0");
-        return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-      };
-      endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5 * 24);
-      startTime.value = formatTime(startDate);
+      endTime.value = utils_formateTime.formatTimes(now.getTime());
+      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
     };
     const processTripData = (data) => {
       const trips = data.getArray("trips");
@@ -183,13 +187,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             withTrip: true
           });
           const res = yield api_request.getTrackPos(data);
-          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:201", "获取里程数据成功:", res);
+          common_vendor.index.__f__("log", "at pages/mileageRecord/mileageRecord.uvue:202", "获取里程数据成功:", res);
           const trackData = res.data;
           if (trackData != null) {
             processTripData(trackData);
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:207", "获取里程数据失败:", e);
+          common_vendor.index.__f__("error", "at pages/mileageRecord/mileageRecord.uvue:208", "获取里程数据失败:", e);
           utils_toast.showAppToast({
             title: "数据加载失败",
             icon: "none"

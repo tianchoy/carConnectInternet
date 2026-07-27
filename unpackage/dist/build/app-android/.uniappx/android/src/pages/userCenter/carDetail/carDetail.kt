@@ -29,8 +29,12 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
             val detailLoaded = ref<Boolean>(false)
             val carIconSelectorVisible = ref<Boolean>(false)
             val editInfo = ref<VehicleEditInfo>(VehicleEditInfo(deviceName = "", carType = "", carTypeValue = "", plateNo = "", carVin = "", engineNum = ""))
+            val getCarTypeText = fun(carType: String): String {
+                val carTypeNames = __uts_large_carTypeNames_build_0()
+                return carTypeNames.getString(carType, carType)
+            }
             val carTitle = computed(fun(): String {
-                return carInfo.value.getString("carType", "未知")
+                return getCarTypeText(carInfo.value.getString("carType", "未知"))
             }
             )
             val formattedPlateNo = computed(fun(): String {

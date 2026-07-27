@@ -85,7 +85,7 @@
   background: #007AFF;
 }
 .type-item.active .type-name.data-v-c4271740 {
-  color: white;
+  color: #fff;
 }
 .type-name.data-v-c4271740 {
   font-size: 26rpx;
@@ -190,7 +190,8 @@
 }
 .empty-state.data-v-c4271740 {
   text-align: center;
-  padding: 100rpx 0;
+  padding: 50rpx 20rpx;
+  background: #fff;
 }
 .loading.data-v-c4271740 {
   text-align: center;

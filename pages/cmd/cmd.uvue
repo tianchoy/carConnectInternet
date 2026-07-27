@@ -351,7 +351,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	}
 
 	.type-item.active .type-name {
-		color: white;
+		color: #fff;
 	}
 
 	.type-name {
@@ -474,7 +474,8 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	.empty-state {
 		text-align: center;
-		padding: 100rpx 0;
+		padding: 50rpx 20rpx;
+		background: #fff;
 	}
 
 

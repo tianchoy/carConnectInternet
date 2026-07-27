@@ -57,40 +57,15 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val eTime = ref("")
             val markers = ref(_uA<MapMarker>())
             fun gen_safeParseDate_fn(dateStr: String): Number {
-                if (!(dateStr != "")) {
-                    return 0
-                }
-                val iosCompatibleStr = dateStr.replace(UTSRegExp("-", "g"), "/")
-                val date = Date(iosCompatibleStr)
-                if (isNaN(date.getTime())) {
-                    val isoStr = dateStr.replace(" ", "T")
-                    val isoDate = Date(isoStr)
-                    if (!isNaN(isoDate.getTime())) {
-                        return isoDate.getTime()
-                    }
-                    return 0
-                }
-                return date.getTime()
+                return parseLocalDateTime(dateStr) ?: 0
             }
             val safeParseDate = ::gen_safeParseDate_fn
             fun gen_normalizeDateTime_fn(dateStr: String): String {
-                if (!(dateStr != "")) {
-                    return ""
-                }
-                var normalized = dateStr.replace(UTSRegExp("-", "g"), "/")
-                val parts = normalized.split(" ")
-                if (parts.length < 2) {
-                    return normalized
-                }
-                val timeParts = parts[1].split(":")
-                if (timeParts.length == 2) {
-                    normalized += ":00"
-                }
-                return normalized
+                return normalizeLocalDateTime(dateStr)
             }
             val normalizeDateTime = ::gen_normalizeDateTime_fn
             fun gen_formatDateForDisplay_fn(dateStr: String): String {
-                return normalizeDateTime(dateStr).replace(UTSRegExp("\\/", "g"), "-")
+                return normalizeDateTime(dateStr)
             }
             val formatDateForDisplay = ::gen_formatDateForDisplay_fn
             fun gen_calculateBearing_fn(lat1: Number, lng1: Number, lat2: Number, lng2: Number): Number {
@@ -175,17 +150,8 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val calculateTrackDistance = ::gen_calculateTrackDistance_fn
             fun gen_initDateTime_fn() {
                 val now = Date()
-                val formatTime = fun(date: Date): String {
-                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
-                    val day = date.getDate().toString(10).padStart(2, "0")
-                    val hours = date.getHours().toString(10).padStart(2, "0")
-                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
-                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
-                    return "" + date.getFullYear() + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
+                endTime.value = formatTimes(now.getTime())
+                startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val initDateTime = ::gen_initDateTime_fn
             fun gen_initCarMarker_fn() {
@@ -389,7 +355,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 609, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 583, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -409,7 +375,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:634")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:608")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -519,7 +485,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:753")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:727")
                 if (sTime.value != "" && eTime.value != "") {
                     startTime.value = normalizeDateTime(sTime.value)
                     endTime.value = normalizeDateTime(eTime.value)

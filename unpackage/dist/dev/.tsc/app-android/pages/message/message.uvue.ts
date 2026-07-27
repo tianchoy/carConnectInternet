@@ -3,18 +3,19 @@ import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uv
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { ref, onActivated, onDeactivated } from 'vue'
 	import { getUserMsgList, setMsgState } from '../../api/request.uts'
+	import { parseLocalDateTime } from '../../utils/formateTime.uts'
 
-	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 65, 7>;
+	type ModalInstance = { __$originalPosition?: UTSSourceMapPosition<"ModalInstance", "pages/message/message.uvue", 66, 7>;
 		open: () => void
 		close: () => void
 	}
 
-	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 91, 7>;
+	type MessageData = { __$originalPosition?: UTSSourceMapPosition<"MessageData", "pages/message/message.uvue", 92, 7>;
 		list: Array<UTSJSONObject>
 		total: number
 		totalPage: number
 	};
-	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 96, 7>;
+	type MessageResponse = { __$originalPosition?: UTSSourceMapPosition<"MessageResponse", "pages/message/message.uvue", 97, 7>;
 		code: number
 		msg: string
 		data: MessageData
@@ -52,7 +53,7 @@ const _cache = __ins.renderCache;
 	const isPageActive = ref(false)
 	function stopNewMessageCheck() : void {
 		if (checkTimer > 0) {
-			console.log('停止定时消息检查', " at pages/message/message.uvue:105")
+			console.log('停止定时消息检查', " at pages/message/message.uvue:106")
 			clearInterval(checkTimer)
 			checkTimer = 0
 		}
@@ -91,12 +92,13 @@ const _cache = __ins.renderCache;
 				msgList.value = [...latestMessages, ...msgList.value]
 				const newestCreateTime = latestMessages[0].getString('createTime', '')
 				if (newestCreateTime != '') {
-					lastUpdateTime.value = new Date(newestCreateTime.replace(/-/g, '/')).getTime()
+					const newestTime = parseLocalDateTime(newestCreateTime)
+					if (newestTime != null) lastUpdateTime.value = newestTime
 				}
 			}
 			return latestMessages.length
 		} catch (error) {
-			console.error('检查新消息失败:', error, " at pages/message/message.uvue:149")
+			console.error('检查新消息失败:', error, " at pages/message/message.uvue:151")
 			return 0
 		} finally {
 			isLoading.value = false
@@ -120,11 +122,11 @@ const _cache = __ins.renderCache;
 			stopNewMessageCheck()
 		}
 
-		console.log('启动定时消息检查', " at pages/message/message.uvue:173")
+		console.log('启动定时消息检查', " at pages/message/message.uvue:175")
 		// 每10秒检查一次新消息
 		checkTimer = setInterval(() => {
 			if (isPageActive.value) {
-				console.log('定时检查新消息...', " at pages/message/message.uvue:177")
+				console.log('定时检查新消息...', " at pages/message/message.uvue:179")
 				checkNewMessages()
 			}
 		}, 10000)
@@ -172,7 +174,7 @@ const _cache = __ins.renderCache;
 			}
 		} catch (error) {
 			loadStatus.value = 'loadmore'
-			console.error('请求异常:', error, " at pages/message/message.uvue:225")
+			console.error('请求异常:', error, " at pages/message/message.uvue:227")
 		} finally {
 			isLoading.value = false
 		}
@@ -180,11 +182,11 @@ const _cache = __ins.renderCache;
 
 	// 加载新消息
 	async function loadNewMessages() : Promise<void> {
-		console.log('加载新消息', " at pages/message/message.uvue:233")
+		console.log('加载新消息', " at pages/message/message.uvue:235")
 		await prependLatestMessages()
 		hasNewMessages.value = false
 		newMessageCount.value = 0
-		console.log('新消息加载完成', " at pages/message/message.uvue:237")
+		console.log('新消息加载完成', " at pages/message/message.uvue:239")
 	}
 
 
@@ -219,7 +221,7 @@ const _cache = __ins.renderCache;
 	// 页面显示时启动定时器
 	onShow(() => {
 		if (Login.value) {
-			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:272")
+			console.log('页面显示 - 启动自动刷新', " at pages/message/message.uvue:274")
 			isPageActive.value = true
 			measureMessageScrollViewport()
 			startNewMessageCheck()
@@ -230,9 +232,9 @@ const _cache = __ins.renderCache;
 
 	// 页面隐藏时停止定时器
 	onHide(() => {
-		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:283")
+		console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:285")
 		if (Login.value) {
-			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:285")
+			console.log('页面隐藏 - 停止自动刷新', " at pages/message/message.uvue:287")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -240,18 +242,18 @@ const _cache = __ins.renderCache;
 
 	// 页面卸载时清理资源
 	onUnload(() => {
-		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:293")
+		console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:295")
 		if (Login.value) {
-			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:295")
+			console.log('页面卸载 - 清理资源', " at pages/message/message.uvue:297")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
 	})
 
 	onActivated(() => {
-		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:302")
+		console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:304")
 		if (Login.value) {
-			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:304")
+			console.log('页面激活 - 启动自动刷新', " at pages/message/message.uvue:306")
 			isPageActive.value = true
 			startNewMessageCheck()
 			// 立即检查一次新消息
@@ -260,9 +262,9 @@ const _cache = __ins.renderCache;
 	})
 
 	onDeactivated(() => {
-		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:313")
+		console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:315")
 		if (Login.value) {
-			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:315")
+			console.log('页面停用 - 停止自动刷新', " at pages/message/message.uvue:317")
 			isPageActive.value = false
 			stopNewMessageCheck()
 		}
@@ -270,7 +272,7 @@ const _cache = __ins.renderCache;
 
 	// 下拉刷新处理
 	const onRefresherRefresh = () => {
-		console.log('下拉刷新触发', " at pages/message/message.uvue:323")
+		console.log('下拉刷新触发', " at pages/message/message.uvue:325")
 		refresherTriggered.value = true
 		loadMsgList(true).then(() => {
 			refresherTriggered.value = false
@@ -332,7 +334,7 @@ const _cache = __ins.renderCache;
 					}
 				}
 			} catch (error) {
-				console.error('更新状态失败:', error, " at pages/message/message.uvue:385")
+				console.error('更新状态失败:', error, " at pages/message/message.uvue:387")
 			}
 		}
 	}
@@ -374,7 +376,9 @@ const _cache = __ins.renderCache;
 	const formatTime = (timeString: string) => {
 		if (!timeString) return ''
 		try {
-			const date = new Date(timeString.replace(/-/g, '/'))
+			const milliseconds = parseLocalDateTime(timeString)
+			if (milliseconds == null) return timeString
+			const date = new Date(milliseconds)
 			const now = new Date()
 			const diff = now.getTime() - date.getTime()
 			const minutes = Math.floor(diff / 60000)

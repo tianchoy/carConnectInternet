@@ -289,8 +289,10 @@ open class GenPagesIndexIndex : BasePage {
                                 deviceDetail.value = DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = deviceStatus?.getNumber("batteryPercent", 0) ?: 0, voltage = deviceStatus?.getNumber("voltage", 0) ?: 0, signalStrength = deviceStatus?.getNumber("signalStrength", 0) ?: 0), connectionStatus = detail.getString("connectionStatus", "offline"), lastUpdateTime = detail.getString("lastUpdateTime", ""))
                                 val updateTime = detail.getString("lastUpdateTime", "")
                                 if (updateTime != "") {
-                                    val date = Date(updateTime)
-                                    lastUpdateTime.value = "" + date.getHours().toString(10).padStart(2, "0") + ":" + date.getMinutes().toString(10).padStart(2, "0") + ":" + date.getSeconds().toString(10).padStart(2, "0")
+                                    val formattedTime = formatLocalTime(updateTime)
+                                    if (formattedTime != "") {
+                                        lastUpdateTime.value = formattedTime
+                                    }
                                 }
                             }
                         }

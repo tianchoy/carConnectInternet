@@ -111,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_jJDCSn"
+    val id: String = "app-android_5ed0Xy"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1135,15 +1135,57 @@ fun getTodayZeroTime(): TodayTimeRange {
     val todayZero = Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime()
     return TodayTimeRange(nowTime = nowTime, todayZero = todayZero)
 }
+fun pad(value: Number): String {
+    return value.toString(10).padStart(2, "0")
+}
 fun formatTimes(timestamp: Number): String {
     val d = Date(timestamp)
-    val y = d.getFullYear()
-    val m = (d.getMonth() + 1).toString(10).padStart(2, "0")
-    val day = d.getDate().toString(10).padStart(2, "0")
-    val h = d.getHours().toString(10).padStart(2, "0")
-    val mi = d.getMinutes().toString(10).padStart(2, "0")
-    val s = d.getSeconds().toString(10).padStart(2, "0")
-    return "" + y + "-" + m + "-" + day + " " + h + ":" + mi + ":" + s
+    return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+}
+fun parseLocalDateTime(timestamp: String): Number? {
+    val match = timestamp.match(UTSRegExp("^(\\d{4})[-\\/](\\d{2})[-\\/](\\d{2})(?:\\s+(\\d{2}):(\\d{2})(?::(\\d{2}))?)?\$", ""))
+    if (match == null) {
+        return null
+    }
+    val year = parseInt(match[1] ?: "0")
+    val month = parseInt(match[2] ?: "0")
+    val day = parseInt(match[3] ?: "0")
+    val hour = if (match[4] == null) {
+        0
+    } else {
+        parseInt(match[4] ?: "0")
+    }
+    val minute = if (match[5] == null) {
+        0
+    } else {
+        parseInt(match[5] ?: "0")
+    }
+    val second = if (match[6] == null) {
+        0
+    } else {
+        parseInt(match[6] ?: "0")
+    }
+    val date = Date(year, month - 1, day, hour, minute, second)
+    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
+        return null
+    }
+    return date.getTime()
+}
+fun normalizeLocalDateTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    return if (milliseconds == null) {
+        timestamp
+    } else {
+        formatTimes(milliseconds)
+    }
+}
+fun formatLocalTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    if (milliseconds == null) {
+        return ""
+    }
+    val date = Date(milliseconds)
+    return "" + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds())
 }
 fun getDeviceIcon(connectionStatus: String, carType: String): String {
     val basePath = if (connectionStatus == "online") {
@@ -7335,7 +7377,7 @@ open class TrackPoint (
     open var speed: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 66, 7)
+        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 67, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return TrackPointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7427,7 +7469,7 @@ open class TrackBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 74, 7)
+        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 75, 7)
     }
 }
 typealias MapMarker = Marker
@@ -7794,7 +7836,7 @@ open class GroupType (
     open var totalDistance: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("GroupType", "pages/mileageRecord/mileageRecord.uvue", 76, 7)
+        return UTSSourceMapPosition("GroupType", "pages/mileageRecord/mileageRecord.uvue", 77, 7)
     }
 }
 open class DateTripGroup (
@@ -7804,7 +7846,7 @@ open class DateTripGroup (
     open var trips: UTSArray<UTSJSONObject>,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 77, 7)
+        return UTSSourceMapPosition("DateTripGroup", "pages/mileageRecord/mileageRecord.uvue", 78, 7)
     }
 }
 val GenPagesMileageRecordMileageRecordClass = CreateVueComponent(GenPagesMileageRecordMileageRecord::class.java, fun(): VueComponentOptions {
@@ -8599,7 +8641,7 @@ open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"
-    override var uniCompilerVersion: String = "5.21"
+    override var uniCompilerVersion: String = "5.22"
     constructor() : super() {}
 }
 fun definePageRoutes() {

@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_toast = require("../../utils/toast.js");
 const api_request = require("../../api/request.js");
+const utils_formateTime = require("../../utils/formateTime.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 if (!Array) {
@@ -167,34 +168,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const eTime = common_vendor.ref("");
     const markers = common_vendor.ref([]);
     function safeParseDate(dateStr) {
-      if (!dateStr)
-        return 0;
-      const iosCompatibleStr = dateStr.replace(/-/g, "/");
-      const date = new Date(iosCompatibleStr);
-      if (isNaN(date.getTime())) {
-        const isoStr = dateStr.replace(" ", "T");
-        const isoDate = new Date(isoStr);
-        if (!isNaN(isoDate.getTime())) {
-          return isoDate.getTime();
-        }
-        return 0;
-      }
-      return date.getTime();
+      var _a;
+      return (_a = utils_formateTime.parseLocalDateTime(dateStr)) !== null && _a !== void 0 ? _a : 0;
     }
     function normalizeDateTime(dateStr) {
-      if (!dateStr)
-        return "";
-      let normalized = dateStr.replace(/-/g, "/");
-      const parts = normalized.split(" ");
-      if (parts.length < 2)
-        return normalized;
-      const timeParts = parts[1].split(":");
-      if (timeParts.length == 2)
-        normalized += ":00";
-      return normalized;
+      return utils_formateTime.normalizeLocalDateTime(dateStr);
     }
     function formatDateForDisplay(dateStr) {
-      return normalizeDateTime(dateStr).replace(/\//g, "-");
+      return normalizeDateTime(dateStr);
     }
     function calculateBearing(lat1, lng1, lat2, lng2) {
       const degToRad = (d) => {
@@ -270,17 +251,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function initDateTime() {
       const now = /* @__PURE__ */ new Date();
-      const formatTime = (date) => {
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        const seconds = date.getSeconds().toString().padStart(2, "0");
-        return `${date.getFullYear()}/${month}/${day} ${hours}:${minutes}:${seconds}`;
-      };
-      endTime.value = formatTime(now);
-      const startDate = new Date(now.getTime() - 36e5 * 24);
-      startTime.value = formatTime(startDate);
+      endTime.value = utils_formateTime.formatTimes(now.getTime());
+      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
     }
     function initCarMarker() {
       var _a, _b;
@@ -539,7 +511,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } catch (error) {
           if (requestId != replaySessionId)
             return Promise.resolve(null);
-          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:634", "加载轨迹失败:", error);
+          common_vendor.index.__f__("error", "at pages/playBack/playBack.uvue:608", "加载轨迹失败:", error);
           utils_toast.showAppToast({ title: "轨迹加载失败", icon: "none" });
           if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
             showCurrentPosition();
@@ -642,7 +614,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       lng.value = (_g = option.lng) !== null && _g !== void 0 ? _g : null;
       sTime.value = (_h = option.startTime) !== null && _h !== void 0 ? _h : "";
       eTime.value = (_j = option.endTime) !== null && _j !== void 0 ? _j : "";
-      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:753", sTime.value, eTime.value);
+      common_vendor.index.__f__("log", "at pages/playBack/playBack.uvue:727", sTime.value, eTime.value);
       if (sTime.value != "" && eTime.value != "") {
         startTime.value = normalizeDateTime(sTime.value);
         endTime.value = normalizeDateTime(eTime.value);

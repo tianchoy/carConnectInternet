@@ -30,8 +30,12 @@ open class GenPagesUserCenterCarDetailCarDetail : BasePage {
             val detailLoaded = ref<Boolean>(false)
             val carIconSelectorVisible = ref<Boolean>(false)
             val editInfo = ref<VehicleEditInfo>(VehicleEditInfo(deviceName = "", carType = "", carTypeValue = "", plateNo = "", carVin = "", engineNum = ""))
+            val getCarTypeText = fun(carType: String): String {
+                val carTypeNames: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("carTypeNames", "pages/userCenter/carDetail/carDetail.uvue", 87, 9), "car" to "轿车", "suv" to "越野车", "bus" to "公交车", "huoche" to "货车", "train" to "火车", "diandong" to "电动车", "moto" to "摩托车", "bike" to "自行车", "sanlun" to "三轮车", "tuola" to "拖拉机", "wajue" to "挖掘机", "tuiche" to "手推车", "baby" to "婴儿车", "muma" to "木马", "tank" to "坦克", "zhuangjia" to "装甲车", "plan" to "飞机", "hangmu" to "航母", "junjian" to "军舰", "walk" to "步行")
+                return carTypeNames.getString(carType, carType)
+            }
             val carTitle = computed(fun(): String {
-                return carInfo.value.getString("carType", "未知")
+                return getCarTypeText(carInfo.value.getString("carType", "未知"))
             }
             )
             val formattedPlateNo = computed(fun(): String {
