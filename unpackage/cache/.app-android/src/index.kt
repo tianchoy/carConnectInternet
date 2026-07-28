@@ -111,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_5ed0Xy"
+    val id: String = "app-android_C6b4GE"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -8637,7 +8637,7 @@ fun main(app: IApp) {
     (createApp()["app"] as VueApp).mount(app, GenUniApp())
 }
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
-    override var name: String = "carConnectInternet"
+    override var name: String = "车载GPS"
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"

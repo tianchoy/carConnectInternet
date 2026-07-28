@@ -1040,11 +1040,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function deleteSelectedFence() {
+      var _a;
+      (_a = showFenceModal.value) === null || _a === void 0 ? null : _a.$callMethod("close");
       const fence = selectedFence.value;
-      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏", fence);
+      common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1196", "删除电子围栏", fence);
       if (fence != null) {
         const fenceId = fence.getString("id", "");
-        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1199", "删除电子围栏ID", fenceId);
+        common_vendor.index.__f__("log", "at pages/geofencing/geofencing.uvue:1200", "删除电子围栏ID", fenceId);
         if (fenceId !== "") {
           deleteFence(fenceId);
         } else {

@@ -79,8 +79,25 @@ const __sfc__ = defineComponent({
         let playbackTimer: number | null = null;
         let lastTimestamp = 0;
         let replaySessionId = 0;
-        const startTime = ref('');
-        const endTime = ref('');
+        function formatPlaybackTime(timestamp: number): string {
+            return formatTimes(timestamp) ?? '';
+        }
+        const initialEndTime = formatPlaybackTime(Date.now());
+        const initialStartTime = formatPlaybackTime(Date.now() - 3600000 * 6);
+        const startTime = ref(initialStartTime);
+        const endTime = ref(initialEndTime);
+        const displayStartTime = ref(initialStartTime);
+        const displayEndTime = ref(initialEndTime);
+        function setPlaybackTimeRange(startValue: string, endValue: string): void {
+            const startMilliseconds = parseLocalDateTime(startValue);
+            const endMilliseconds = parseLocalDateTime(endValue);
+            const normalizedStartTime = startMilliseconds == null ? startValue : formatPlaybackTime(startMilliseconds);
+            const normalizedEndTime = endMilliseconds == null ? endValue : formatPlaybackTime(endMilliseconds);
+            startTime.value = normalizedStartTime;
+            endTime.value = normalizedEndTime;
+            displayStartTime.value = normalizedStartTime;
+            displayEndTime.value = normalizedEndTime;
+        }
         const lat = ref<string | null>('');
         const lng = ref<string | null>('');
         const sTime = ref('');
@@ -95,7 +112,24 @@ const __sfc__ = defineComponent({
         function normalizeDateTime(dateStr: string): string {
             return normalizeLocalDateTime(dateStr);
         }
+        function resolveRouteDateTime(dateStr: string): string | null {
+            if (dateStr == '')
+                return null;
+            try {
+                const decoded = decodeURIComponent(dateStr) ?? '';
+                const milliseconds = parseLocalDateTime(decoded);
+                return milliseconds == null ? null : formatPlaybackTime(milliseconds);
+            }
+            catch (error: any) {
+                console.error('解析回放时间失败:', error);
+                return null;
+            }
+        }
         // 格式化日期显示
+        function formatTimeForDisplay(dateStr: string): string {
+            const milliseconds = parseLocalDateTime(dateStr);
+            return milliseconds == null ? dateStr : formatPlaybackTime(milliseconds);
+        }
         function formatDateForDisplay(dateStr: string): string {
             return normalizeDateTime(dateStr);
         }
@@ -174,8 +208,7 @@ const __sfc__ = defineComponent({
         // 初始化时间
         function initDateTime() {
             const now = new Date();
-            endTime.value = formatTimes(now.getTime());
-            startTime.value = formatTimes(now.getTime() - 3600000 * 24);
+            setPlaybackTimeRange(formatPlaybackTime(now.getTime() - 3600000 * 6), formatPlaybackTime(now.getTime()));
         }
         // 初始化小车标记
         function initCarMarker() {
@@ -517,10 +550,10 @@ const __sfc__ = defineComponent({
         function onConfirm(value: string) {
             const formattedValue = normalizeDateTime(value);
             if (currentPickerType.value == 'start') {
-                startTime.value = formattedValue;
+                setPlaybackTimeRange(formattedValue, endTime.value ?? '');
             }
             else {
-                endTime.value = formattedValue;
+                setPlaybackTimeRange(startTime.value ?? '', formattedValue);
             }
             resetPlayback();
             void loadTrackPos();
@@ -552,9 +585,10 @@ const __sfc__ = defineComponent({
             sTime.value = option["startTime"] ?? '';
             eTime.value = option["endTime"] ?? '';
             console.log(sTime.value, eTime.value);
-            if (sTime.value != '' && eTime.value != '') {
-                startTime.value = normalizeDateTime(sTime.value);
-                endTime.value = normalizeDateTime(eTime.value);
+            const routeStartTime = resolveRouteDateTime(sTime.value);
+            const routeEndTime = resolveRouteDateTime(eTime.value);
+            if (routeStartTime != null && routeEndTime != null) {
+                setPlaybackTimeRange(routeStartTime, routeEndTime);
                 loadTrackPos();
             }
             else {
@@ -625,12 +659,12 @@ const __sfc__ = defineComponent({
                                 _cE("text", _uM({
                                     class: "Date",
                                     onClick: () => { showPicker('start'); }
-                                }), _tD(startTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
-                                _cE("text", null, "至"),
+                                }), _tD(displayStartTime.value), 9 /* TEXT, PROPS */, ["onClick"]),
+                                _cE("text", _uM({ class: "date-separator" }), "至"),
                                 _cE("text", _uM({
                                     class: "Date",
                                     onClick: () => { showPicker('end'); }
-                                }), _tD(endTime.value), 9 /* TEXT, PROPS */, ["onClick"])
+                                }), _tD(displayEndTime.value), 9 /* TEXT, PROPS */, ["onClick"])
                             ])
                         ]),
                         _cE("view", _uM({ class: "tool-tag-item" }), [
@@ -678,6 +712,7 @@ const __sfc__ = defineComponent({
                                     "cancel-btn": "取消",
                                     title: pickerTitle.value,
                                     mode: 63,
+                                    format: "YYYY-MM-DD HH:mm:ss",
                                     onConfirm: onConfirm,
                                     onCancel: onCancel
                                 }), null, 8 /* PROPS */, ["title"])
@@ -692,4 +727,4 @@ const __sfc__ = defineComponent({
     }
 });
 export default __sfc__;
-const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["sub-nav-overlay", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", 0], ["left", 0], ["right", 0], ["zIndex", 100]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "30rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])];
+const GenPagesPlayBackPlayBackStyles = [_uM([["container", _pS(_uM([["position", "relative"], ["width", "100%"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f5f7fa"]]))], ["map-container", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["position", "relative"]])]])], ["sub-nav-overlay", _uM([[".container .map-container ", _uM([["position", "absolute"], ["top", 0], ["left", 0], ["right", 0], ["zIndex", 100]])]])], ["tools-panel", _uM([[".container ", _uM([["width", "100%"], ["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["paddingTop", "50rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "50rpx"], ["paddingLeft", "20rpx"], ["boxShadow", "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)"]])]])], ["Datetime-box", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "30rpx"]])]])], ["date-box", _uM([[".container .tools-panel .Datetime-box ", _uM([["display", "flex"], ["width", "100%"], ["boxSizing", "border-box"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["justifyContent", "flex-start"], ["alignItems", "center"]])]])], ["Date", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["fontSize", "26rpx"], ["borderTopLeftRadius", "5rpx"], ["borderTopRightRadius", "5rpx"], ["borderBottomRightRadius", "5rpx"], ["borderBottomLeftRadius", "5rpx"], ["backgroundColor", "#f5f5f5"], ["paddingTop", 0], ["paddingRight", "10rpx"], ["paddingBottom", 0], ["paddingLeft", "10rpx"], ["marginTop", "8rpx"], ["marginRight", 0], ["marginBottom", "8rpx"], ["marginLeft", 0]])]])], ["date-separator", _uM([[".container .tools-panel .Datetime-box .date-box ", _uM([["marginTop", 0], ["marginRight", "10rpx"], ["marginBottom", 0], ["marginLeft", "10rpx"], ["fontSize", "26rpx"]])]])], ["playbackdetail", _uM([[".container .tools-panel .Datetime-box ", _uM([["fontSize", "25rpx"], ["color", "#1890FF"]])]])], ["tool-tag-item", _uM([[".container .tools-panel ", _uM([["paddingTop", "40rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "20rpx"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"]])]])], ["speed-label", _uM([[".container .tools-panel .tool-tag-item ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#1890FF"], ["borderRightColor", "#1890FF"], ["borderBottomColor", "#1890FF"], ["borderLeftColor", "#1890FF"], ["fontSize", "25rpx"], ["color", "#1890FF"], ["paddingTop", "5rpx"], ["paddingRight", "15rpx"], ["paddingBottom", "5rpx"], ["paddingLeft", "15rpx"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["marginLeft", "20rpx"]])]])], ["slider", _uM([[".container .tools-panel .tool-tag-item ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "20rpx"], ["paddingBottom", 0], ["paddingLeft", "30rpx"], ["overflow", "visible"]])]])], ["play-btn", _uM([[".container .tools-panel .tool-tag-item ", _uM([["fontSize", "25rpx"], ["color", "#ffffff"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "10rpx"], ["borderTopRightRadius", "10rpx"], ["borderBottomRightRadius", "10rpx"], ["borderBottomLeftRadius", "10rpx"], ["marginLeft", "20rpx"], ["backgroundColor", "#1890FF"]])]])], ["play-back-info", _uM([[".container .tools-panel ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"], ["backgroundColor", "#f9f9f9"], ["borderTopLeftRadius", "15rpx"], ["borderTopRightRadius", "15rpx"], ["borderBottomRightRadius", "15rpx"], ["borderBottomLeftRadius", "15rpx"]])]])], ["item-info", _uM([[".container .tools-panel .play-back-info ", _uM([["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]])]])], ["info-label", _uM([[".container .tools-panel .play-back-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["color", "#999999"]])]])]])];

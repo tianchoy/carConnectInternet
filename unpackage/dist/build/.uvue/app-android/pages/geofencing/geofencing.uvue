@@ -990,6 +990,7 @@ const __sfc__ = defineComponent({
             }
         }
         function deleteSelectedFence(): void {
+            showFenceModal.value?.$callMethod('close');
             const fence = selectedFence.value;
             console.log('删除电子围栏', fence);
             if (fence != null) {

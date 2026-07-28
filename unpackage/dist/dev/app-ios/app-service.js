@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_6F39in";
+    const id = "app-ios_14WNkf";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -8903,7 +8903,7 @@
           text: "断开油电"
         })];
         const productId = currentCarInfo.value.productId;
-        if (productId === "product-1141811865601576960" || productId === "product-1183161303028600832") {
+        if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
           list.push(new UTSJSONObject({
             image: "/static/cmd.png",
             text: "发送指令"
@@ -15715,8 +15715,26 @@
       let playbackTimer = null;
       let lastTimestamp = 0;
       let replaySessionId = 0;
-      const startTime = vue.ref("");
-      const endTime = vue.ref("");
+      function formatPlaybackTime(timestamp) {
+        var _a2;
+        return (_a2 = formatTimes(timestamp)) !== null && _a2 !== void 0 ? _a2 : "";
+      }
+      const initialEndTime = formatPlaybackTime(Date.now());
+      const initialStartTime = formatPlaybackTime(Date.now() - 36e5 * 6);
+      const startTime = vue.ref(initialStartTime);
+      const endTime = vue.ref(initialEndTime);
+      const displayStartTime = vue.ref(initialStartTime);
+      const displayEndTime = vue.ref(initialEndTime);
+      function setPlaybackTimeRange(startValue, endValue) {
+        const startMilliseconds = parseLocalDateTime(startValue);
+        const endMilliseconds = parseLocalDateTime(endValue);
+        const normalizedStartTime = startMilliseconds == null ? startValue : formatPlaybackTime(startMilliseconds);
+        const normalizedEndTime = endMilliseconds == null ? endValue : formatPlaybackTime(endMilliseconds);
+        startTime.value = normalizedStartTime;
+        endTime.value = normalizedEndTime;
+        displayStartTime.value = normalizedStartTime;
+        displayEndTime.value = normalizedEndTime;
+      }
       const lat = vue.ref("");
       const lng = vue.ref("");
       const sTime = vue.ref("");
@@ -15728,6 +15746,23 @@
       }
       function normalizeDateTime(dateStr) {
         return normalizeLocalDateTime(dateStr);
+      }
+      function resolveRouteDateTime(dateStr) {
+        var _a2;
+        if (dateStr == "")
+          return null;
+        try {
+          const decoded = (_a2 = decodeURIComponent(dateStr)) !== null && _a2 !== void 0 ? _a2 : "";
+          const milliseconds = parseLocalDateTime(decoded);
+          return milliseconds == null ? null : formatPlaybackTime(milliseconds);
+        } catch (error) {
+          uni.__log__("error", "at pages/playBack/playBack.uvue:185", "解析回放时间失败:", error);
+          return null;
+        }
+      }
+      function formatTimeForDisplay(dateStr) {
+        const milliseconds = parseLocalDateTime(dateStr);
+        return milliseconds == null ? dateStr : formatPlaybackTime(milliseconds);
       }
       function formatDateForDisplay(dateStr) {
         return normalizeDateTime(dateStr);
@@ -15806,8 +15841,7 @@
       }
       function initDateTime() {
         const now = /* @__PURE__ */ new Date();
-        endTime.value = formatTimes(now.getTime());
-        startTime.value = formatTimes(now.getTime() - 36e5 * 24);
+        setPlaybackTimeRange(formatPlaybackTime(now.getTime() - 36e5 * 6), formatPlaybackTime(now.getTime()));
       }
       function initCarMarker() {
         var _a2, _b;
@@ -16066,7 +16100,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:608", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:647", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
               showCurrentPosition();
@@ -16136,11 +16170,12 @@
         }
       }
       function onConfirm(value) {
+        var _a2, _b;
         const formattedValue = normalizeDateTime(value);
         if (currentPickerType.value == "start") {
-          startTime.value = formattedValue;
+          setPlaybackTimeRange(formattedValue, (_a2 = endTime.value) !== null && _a2 !== void 0 ? _a2 : "");
         } else {
-          endTime.value = formattedValue;
+          setPlaybackTimeRange((_b = startTime.value) !== null && _b !== void 0 ? _b : "", formattedValue);
         }
         resetPlayback();
         void loadTrackPos();
@@ -16169,10 +16204,11 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:727", sTime.value, eTime.value);
-        if (sTime.value != "" && eTime.value != "") {
-          startTime.value = normalizeDateTime(sTime.value);
-          endTime.value = normalizeDateTime(eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:766", sTime.value, eTime.value);
+        const routeStartTime = resolveRouteDateTime(sTime.value);
+        const routeEndTime = resolveRouteDateTime(eTime.value);
+        if (routeStartTime != null && routeEndTime != null) {
+          setPlaybackTimeRange(routeStartTime, routeEndTime);
           loadTrackPos();
         } else {
           initDateTime();
@@ -16199,12 +16235,12 @@
         return replaySessionId;
       }, set replaySessionId(v) {
         replaySessionId = v;
-      }, startTime, endTime, lat, lng, sTime, eTime, markers, safeParseDate, normalizeDateTime, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, toMpPoints, updatePolyline, initPolyline, updateCarPosition, showPicker, showCurrentPosition, clearTrackDisplay, pausePlayback, renderPlaybackIndex, processTrackData, loadTrackPos, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, onConfirm, onCancel, setPlaybackSpeed };
+      }, formatPlaybackTime, initialEndTime, initialStartTime, startTime, endTime, displayStartTime, displayEndTime, setPlaybackTimeRange, lat, lng, sTime, eTime, markers, safeParseDate, normalizeDateTime, resolveRouteDateTime, formatTimeForDisplay, formatDateForDisplay, calculateBearing, getDistance, calculateTrackBounds, adjustMapToFitTrack, calculateTrackDistance, initDateTime, initCarMarker, toMpPoints, updatePolyline, initPolyline, updateCarPosition, showPicker, showCurrentPosition, clearTrackDisplay, pausePlayback, renderPlaybackIndex, processTrackData, loadTrackPos, resetPlayback, playNextPoint, playbackStep, startPlayback, togglePlayback, onConfirm, onCancel, setPlaybackSpeed };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$k = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "30rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "backgroundColor": "#f5f5f5", "paddingTop": 0, "paddingRight": "10rpx", "paddingBottom": 0, "paddingLeft": "10rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "24rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
+  const _style_0$k = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "tools-panel": { ".container ": { "width": "100%", "boxSizing": "border-box", "backgroundColor": "#ffffff", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "boxShadow": "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)" } }, "Datetime-box": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "30rpx" } }, "date-box": { ".container .tools-panel .Datetime-box ": { "display": "flex", "width": "100%", "boxSizing": "border-box", "flexDirection": "row", "flexWrap": "wrap", "justifyContent": "flex-start", "alignItems": "center" } }, "Date": { ".container .tools-panel .Datetime-box .date-box ": { "fontSize": "26rpx", "borderTopLeftRadius": "5rpx", "borderTopRightRadius": "5rpx", "borderBottomRightRadius": "5rpx", "borderBottomLeftRadius": "5rpx", "backgroundColor": "#f5f5f5", "paddingTop": 0, "paddingRight": "10rpx", "paddingBottom": 0, "paddingLeft": "10rpx", "marginTop": "8rpx", "marginRight": 0, "marginBottom": "8rpx", "marginLeft": 0 } }, "date-separator": { ".container .tools-panel .Datetime-box .date-box ": { "marginTop": 0, "marginRight": "10rpx", "marginBottom": 0, "marginLeft": "10rpx", "fontSize": "26rpx" } }, "playbackdetail": { ".container .tools-panel .Datetime-box ": { "fontSize": "25rpx", "color": "#1890FF" } }, "tool-tag-item": { ".container .tools-panel ": { "paddingTop": "40rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "speed-label": { ".container .tools-panel .tool-tag-item ": { "borderTopWidth": "2rpx", "borderRightWidth": "2rpx", "borderBottomWidth": "2rpx", "borderLeftWidth": "2rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#1890FF", "borderRightColor": "#1890FF", "borderBottomColor": "#1890FF", "borderLeftColor": "#1890FF", "fontSize": "25rpx", "color": "#1890FF", "paddingTop": "5rpx", "paddingRight": "15rpx", "paddingBottom": "5rpx", "paddingLeft": "15rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx", "marginLeft": "20rpx" } }, "slider": { ".container .tools-panel .tool-tag-item ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "30rpx", "overflow": "visible" } }, "play-btn": { ".container .tools-panel .tool-tag-item ": { "fontSize": "25rpx", "color": "#ffffff", "paddingTop": "10rpx", "paddingRight": "25rpx", "paddingBottom": "10rpx", "paddingLeft": "25rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginLeft": "20rpx", "backgroundColor": "#1890FF" } }, "play-back-info": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": "20rpx", "backgroundColor": "#f9f9f9", "borderTopLeftRadius": "15rpx", "borderTopRightRadius": "15rpx", "borderBottomRightRadius": "15rpx", "borderBottomLeftRadius": "15rpx" } }, "item-info": { ".container .tools-panel .play-back-info ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "info-label": { ".container .tools-panel .play-back-info ": { "fontSize": "24rpx", "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": "10rpx", "paddingLeft": 0, "color": "#999999" } } };
   function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_map = vue.resolveComponent("map");
@@ -16264,18 +16300,18 @@
                     class: "Date",
                     onClick: _cache[0] || (_cache[0] = ($event) => $setup.showPicker("start"))
                   },
-                  vue.toDisplayString($setup.startTime),
+                  vue.toDisplayString($setup.displayStartTime),
                   1
                   /* TEXT */
                 ),
-                vue.createElementVNode("text", null, "至"),
+                vue.createElementVNode("text", { class: "date-separator" }, "至"),
                 vue.createElementVNode(
                   "text",
                   {
                     class: "Date",
                     onClick: _cache[1] || (_cache[1] = ($event) => $setup.showPicker("end"))
                   },
-                  vue.toDisplayString($setup.endTime),
+                  vue.toDisplayString($setup.displayEndTime),
                   1
                   /* TEXT */
                 )
@@ -16350,6 +16386,7 @@
                   "cancel-btn": "取消",
                   title: $setup.pickerTitle,
                   mode: 63,
+                  format: "YYYY-MM-DD HH:mm:ss",
                   onConfirm: $setup.onConfirm,
                   onCancel: $setup.onCancel
                 }, null, 8, ["title"])
@@ -20898,11 +20935,13 @@
         }
       }
       function deleteSelectedFence() {
+        var _a2;
+        (_a2 = showFenceModal.value) === null || _a2 === void 0 ? null : _a2.$callMethod("close");
         const fence = selectedFence.value;
-        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1195", "删除电子围栏", fence);
+        uni.__log__("log", "at pages/geofencing/geofencing.uvue:1196", "删除电子围栏", fence);
         if (fence != null) {
           const fenceId = fence.getString("id", "");
-          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1199", "删除电子围栏ID", fenceId);
+          uni.__log__("log", "at pages/geofencing/geofencing.uvue:1200", "删除电子围栏ID", fenceId);
           if (fenceId !== "") {
             deleteFence(fenceId);
           } else {
@@ -21873,34 +21912,16 @@
       const commands = vue.ref([]);
       const selectedCommandId = vue.ref(null);
       const selectedCommand = vue.ref(null);
+      const paramConfigs = vue.ref([]);
       const paramValues = vue.ref([]);
+      const paramConfigError = vue.ref("");
       const loading = vue.ref(false);
-      const commandRecords = vue.ref(null);
-      const commandRecordReason = vue.computed(() => {
-        var _a2;
-        if (commandRecords.value == null)
-          return "暂无指令返回记录";
-        return (_a2 = commandRecords.value["reason"]) !== null && _a2 !== void 0 ? _a2 : "暂无指令返回记录";
-      });
-      const selectedCommandDetails = vue.computed(() => {
-        if (selectedCommand.value == null)
-          return null;
-        return selectedCommand.value["details"];
-      });
-      const paramConfigs = vue.computed(() => {
-        const details = selectedCommandDetails.value;
-        if (details == null || details.length == 0)
-          return [];
-        try {
-          return UTS.JSON.parse(details);
-        } catch (e) {
-          uni.__log__("error", "at pages/cmd/cmd.uvue:103", "解析参数配置失败:", e);
-          return [];
-        }
-      });
+      const sending = vue.ref(false);
       const isFormValid = vue.computed(() => {
-        return paramValues.value.length > 0 && paramValues.value.every((val) => {
-          return val != "";
+        if (selectedCommand.value == null || paramConfigError.value != "")
+          return false;
+        return paramValues.value.length == paramConfigs.value.length && paramValues.value.every((value) => {
+          return value != "";
         });
       });
       const sortByCmdNameLengthAndAlphabet = (data) => {
@@ -21909,35 +21930,109 @@
           var _a2, _b;
           const aName = (_a2 = a["cmdName"]) !== null && _a2 !== void 0 ? _a2 : "";
           const bName = (_b = b["cmdName"]) !== null && _b !== void 0 ? _b : "";
-          if (aName.length != bName.length) {
+          if (aName.length != bName.length)
             return aName.length - bName.length;
-          }
           if (aName == bName)
             return 0;
           return aName < bName ? -1 : 1;
         });
         return sortedData;
       };
+      const getParamLabel = (config) => {
+        const label = config["label"];
+        return label == null ? "参数" : label.toString();
+      };
+      const getParamMaxLength = (config) => {
+        const max = config["max"];
+        return typeof max == "number" ? max : -1;
+      };
+      const getRadioItems = (config) => {
+        var _a2;
+        return (_a2 = config["items"]) !== null && _a2 !== void 0 ? _a2 : [];
+      };
+      const getRadioValue = (item) => {
+        const value = item["value"];
+        return value == null ? "" : value.toString();
+      };
+      const getRadioDescription = (item) => {
+        const desc = item["desc"];
+        return desc == null ? "" : desc.toString();
+      };
+      const parseParamConfigs = (details = null) => {
+        paramConfigError.value = "";
+        if (details == null || details.trim().length == 0)
+          return [];
+        try {
+          const parsed = UTS.JSON.parse(details);
+          if (!Array.isArray(parsed)) {
+            paramConfigError.value = "指令参数配置格式无效";
+            return [];
+          }
+          const configs = parsed;
+          for (let index = 0; index < configs.length; index++) {
+            const config = configs[index];
+            if (config == null) {
+              paramConfigError.value = "指令参数配置无效";
+              return [];
+            }
+            const type = config["type"];
+            if (type != "input" && type != "number" && type != "radio") {
+              paramConfigError.value = "该指令包含暂不支持的参数类型";
+              return [];
+            }
+            if (type == "radio") {
+              const items = getRadioItems(config);
+              if (items.length == 0 || items.some((item) => {
+                return getRadioValue(item) == "" || getRadioDescription(item) == "";
+              })) {
+                paramConfigError.value = "指令单选参数配置无效";
+                return [];
+              }
+            }
+          }
+          return configs;
+        } catch (error) {
+          uni.__log__("error", "at pages/cmd/cmd.uvue:158", "解析参数配置失败:", error);
+          paramConfigError.value = "指令参数配置无效";
+          return [];
+        }
+      };
+      const initializeParamValues = (configs) => {
+        const values = [];
+        for (let index = 0; index < configs.length; index++) {
+          const config = configs[index];
+          const defaultValue = config["default"];
+          let value = "";
+          if (defaultValue != null) {
+            value = defaultValue.toString();
+          } else if (config["type"] == "radio") {
+            value = getRadioValue(getRadioItems(config)[0]);
+          }
+          values.push(value);
+        }
+        return values;
+      };
+      const getParamValue = (index) => {
+        return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
+      };
+      const updateParamValueFromEvent = (index, value = null) => {
+        if (sending.value || index < 0 || index >= paramValues.value.length)
+          return null;
+        paramValues.value[index] = value == null ? "" : value.toString();
+      };
       const loadCommandTypes = () => {
         return __awaiter(this, void 0, void 0, function* () {
           try {
             loading.value = true;
             const response = yield getCmdAction();
-            uni.__log__("log", "at pages/cmd/cmd.uvue:135", "加载指令类型响应:", response);
             if (response.code == 0) {
               commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
             } else {
-              showAppToast({
-                title: "加载指令类型失败",
-                icon: "none"
-              });
+              showAppToast({ title: response.msg != "" ? response.msg : "加载指令类型失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:146", "加载指令类型出错:", error);
-            showAppToast({
-              title: "网络错误",
-              icon: "none"
-            });
+            uni.__log__("error", "at pages/cmd/cmd.uvue:199", "加载指令类型出错:", error);
+            showAppToast({ title: "网络错误", icon: "none" });
           } finally {
             loading.value = false;
           }
@@ -21950,27 +22045,28 @@
       });
       const selectTypeByItem = (type) => {
         return __awaiter(this, void 0, void 0, function* () {
+          if (sending.value)
+            return Promise.resolve(null);
           const typeId = type["cmdmId"];
           if (typeId == null)
             return Promise.resolve(null);
           selectedTypeId.value = typeId;
           selectedCommandId.value = null;
           selectedCommand.value = null;
+          paramConfigs.value = [];
           paramValues.value = [];
-          commandRecords.value = null;
+          paramConfigError.value = "";
+          commands.value = [];
           try {
             loading.value = true;
-            const response = yield getCmdByMid(new UTSJSONObject({
-              imei: imei.value,
-              cmdmId: typeId
-            }));
+            const response = yield getCmdByMid(new UTSJSONObject({ imei: imei.value, cmdmId: typeId }));
             if (response.code == 0) {
               commands.value = response.data;
             } else {
-              showAppToast({ title: "加载指令列表失败", icon: "none" });
+              showAppToast({ title: response.msg != "" ? response.msg : "加载指令列表失败", icon: "none" });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:181", "加载指令列表出错:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:232", "加载指令列表出错:", error);
             showAppToast({ title: "网络错误", icon: "none" });
           } finally {
             loading.value = false;
@@ -21978,59 +22074,33 @@
         });
       };
       const selectCommand = (command) => {
-        var _a2;
+        if (sending.value)
+          return null;
         selectedCommandId.value = command["predictCmdId"];
         selectedCommand.value = command;
-        paramValues.value = [];
-        const details = command["details"];
-        if (details == null || details.length == 0)
-          return null;
-        try {
-          const configs = UTS.JSON.parse(details);
-          const values = [];
-          for (let index = 0; index < configs.length; index++) {
-            const config = configs[index];
-            const defaultValue = config["default"];
-            if (defaultValue != null) {
-              values[index] = defaultValue.toString();
-              continue;
-            }
-            const configType = config["type"];
-            const items = config["items"];
-            if (configType == "radio" && items != null && items.length > 0) {
-              values[index] = (_a2 = items[0]["value"]) !== null && _a2 !== void 0 ? _a2 : "";
-            } else {
-              values[index] = "";
-            }
-          }
-          paramValues.value = values;
-        } catch (e) {
-          uni.__log__("error", "at pages/cmd/cmd.uvue:216", "初始化参数值失败:", e);
-          paramValues.value = [];
-        }
-      };
-      const getRadioItems = (config) => {
-        var _a2;
-        return (_a2 = config["items"]) !== null && _a2 !== void 0 ? _a2 : [];
-      };
-      const getRadioValue = (item) => {
-        var _a2;
-        return (_a2 = item["value"]) !== null && _a2 !== void 0 ? _a2 : "";
-      };
-      const getRadioDescription = (item) => {
-        var _a2;
-        return (_a2 = item["desc"]) !== null && _a2 !== void 0 ? _a2 : "";
+        const configs = parseParamConfigs(command["details"]);
+        paramConfigs.value = configs;
+        paramValues.value = paramConfigError.value == "" ? initializeParamValues(configs) : [];
       };
       const selectRadio = (index, value) => {
-        while (paramValues.value.length <= index) {
-          paramValues.value.push("");
-        }
+        if (sending.value || index < 0 || index >= paramValues.value.length)
+          return null;
         paramValues.value[index] = value;
       };
       const sendCommand2 = () => {
         return __awaiter(this, void 0, void 0, function* () {
           var _a2, _b;
-          if (!isFormValid.value || selectedCommand.value == null) {
+          if (sending.value)
+            return Promise.resolve(null);
+          if (selectedCommand.value == null) {
+            showAppToast({ title: "请选择指令", icon: "none" });
+            return Promise.resolve(null);
+          }
+          if (paramConfigError.value != "") {
+            showAppToast({ title: paramConfigError.value, icon: "none" });
+            return Promise.resolve(null);
+          }
+          if (!isFormValid.value) {
             showAppToast({ title: "请填写所有参数", icon: "none" });
             return Promise.resolve(null);
           }
@@ -22038,13 +22108,12 @@
           let cmdData = (_a2 = command["params"]) !== null && _a2 !== void 0 ? _a2 : "";
           for (let index = 0; index < paramConfigs.value.length; index++) {
             const config = paramConfigs.value[index];
-            const value = paramValues.value[index];
             const configuredPlaceholder = config["placeholder"];
             const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0 ? configuredPlaceholder : "${param" + (index + 1).toString() + "}";
-            cmdData = cmdData.replace(placeholder, value);
+            cmdData = cmdData.split(placeholder).join(paramValues.value[index]);
           }
           try {
-            loading.value = true;
+            sending.value = true;
             const response = yield sendCmd(new UTSJSONObject({
               imei: imei.value,
               type: (_b = command["cmdCode"]) !== null && _b !== void 0 ? _b : "",
@@ -22053,24 +22122,24 @@
               predictCmdId: command["predictCmdId"]
             }));
             if (response.code == 0) {
-              showAppToast({ title: "指令发送成功", icon: "success" });
+              showAppToast({ title: response.msg != "" ? response.msg : "指令发送成功", icon: "success" });
             } else {
-              showAppToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
+              showAppToast({ title: response.msg != "" ? response.msg : "指令发送失败", icon: "none", duration: 3e3 });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/cmd/cmd.uvue:273", "发送指令出错:", error);
+            uni.__log__("error", "at pages/cmd/cmd.uvue:294", "发送指令出错:", error);
             showAppToast({ title: "网络错误", icon: "none" });
           } finally {
-            loading.value = false;
+            sending.value = false;
           }
         });
       };
-      const __returned__ = { imei, commandTypes, selectedTypeId, commands, selectedCommandId, selectedCommand, paramValues, loading, commandRecords, commandRecordReason, selectedCommandDetails, paramConfigs, isFormValid, sortByCmdNameLengthAndAlphabet, loadCommandTypes, selectTypeByItem, selectCommand, getRadioItems, getRadioValue, getRadioDescription, selectRadio, sendCommand: sendCommand2 };
+      const __returned__ = { imei, commandTypes, selectedTypeId, commands, selectedCommandId, selectedCommand, paramConfigs, paramValues, paramConfigError, loading, sending, isFormValid, sortByCmdNameLengthAndAlphabet, getParamLabel, getParamMaxLength, getRadioItems, getRadioValue, getRadioDescription, parseParamConfigs, initializeParamValues, getParamValue, updateParamValueFromEvent, loadCommandTypes, selectTypeByItem, selectCommand, selectRadio, sendCommand: sendCommand2 };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "display": "flex", "flexDirection": "column" } }, "device-info": { "": { "display": "flex", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginTop": "30rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0 } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "device-input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "28rpx", "color": "#333333" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#FFFFFF", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginBottom": "30rpx" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "record-list": { "": { "fontSize": "26rpx", "color": "#666666" } }, "type-container": { "": { "width": "100%" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "justifyContent": "flex-start", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#ffffff" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "overflow": "hidden", "textOverflow": "ellipsis" } }, "command-list": { "": { "display": "flex", "flexDirection": "row" } }, "command-item": { ".command-item+": { "marginLeft": "20rpx" }, "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { ".param-item+": { "marginTop": "30rpx" }, "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "fontSize": "26rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "radio-item": { ".radio-item+": { "marginTop": "20rpx" }, "": { "display": "flex", "alignItems": "center" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "color": "#FFFFFF", "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "fontSize": "30rpx", "marginTop": "20rpx", "backgroundImage:disabled": "none", "backgroundColor:disabled": "#cccccc", "color:disabled": "#999999" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "placeholder": { "": { "color": "#cccccc" } } };
+  const _style_0$4 = { "container": { "": { "backgroundColor": "#f5f5f5", "display": "flex", "flexDirection": "column", "paddingBottom": "30rpx" } }, "device-info": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx", "display": "flex", "alignItems": "center" } }, "section": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "device-label": { "": { "fontSize": "28rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "section-title": { "": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "marginBottom": "20rpx" } }, "type-list": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap", "alignItems": "center" } }, "type-item": { "": { "marginRight": "20rpx", "marginBottom": "20rpx", "paddingTop": "15rpx", "paddingRight": "30rpx", "paddingBottom": "15rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f0f0f0", "borderTopLeftRadius": "50rpx", "borderTopRightRadius": "50rpx", "borderBottomRightRadius": "50rpx", "borderBottomLeftRadius": "50rpx" }, ".active": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "type-name": { ".type-item.active ": { "color": "#ffffff" }, "": { "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap" } }, "command-list": { "": { "display": "flex", "flexDirection": "column" } }, "command-item": { "": { "width": "100%", "boxSizing": "border-box", "paddingTop": "25rpx", "paddingRight": "25rpx", "paddingBottom": "25rpx", "paddingLeft": "25rpx", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" }, ".command-item+": { "marginTop": "20rpx" }, ".active": { "borderTopColor": "#007AFF", "borderRightColor": "#007AFF", "borderBottomColor": "#007AFF", "borderLeftColor": "#007AFF", "backgroundColor": "#f0f8ff" } }, "command-name": { "": { "fontSize": "30rpx", "color": "#333333", "marginBottom": "10rpx" } }, "command-descr": { "": { "fontSize": "24rpx", "color": "#999999", "lineHeight": "36rpx" } }, "param-form": { "": { "display": "flex", "flexDirection": "column" } }, "param-item": { "": { "display": "flex", "flexDirection": "column" }, ".param-item+": { "marginTop": "30rpx" } }, "radio-group": { "": { "display": "flex", "flexDirection": "column" } }, "param-label": { "": { "marginBottom": "15rpx", "fontSize": "28rpx", "color": "#333333" } }, "param-input": { "": { "width": "100%", "boxSizing": "border-box", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#e0e0e0", "borderRightColor": "#e0e0e0", "borderBottomColor": "#e0e0e0", "borderLeftColor": "#e0e0e0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx", "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "param-error": { "": { "color": "#e43d33", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "no-param-tip": { "": { "color": "#999999", "fontSize": "26rpx", "marginBottom": "20rpx" } }, "radio-item": { "": { "display": "flex", "alignItems": "center" }, ".radio-item+": { "marginTop": "20rpx" } }, "radio-icon": { "": { "marginRight": "20rpx", "width": "36rpx", "height": "36rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopWidth": "1rpx", "borderRightWidth": "1rpx", "borderBottomWidth": "1rpx", "borderLeftWidth": "1rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#cccccc", "borderRightColor": "#cccccc", "borderBottomColor": "#cccccc", "borderLeftColor": "#cccccc", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "radio-inner": { "": { "width": "25rpx", "height": "25rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0)" }, ".checked": { "backgroundImage": "none", "backgroundColor": "#007AFF" } }, "radio-label": { "": { "fontSize": "26rpx", "color": "#333333" } }, "submit-btn": { "": { "marginTop": "30rpx" } }, "empty-state": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "loading": { "": { "textAlign": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx", "backgroundImage": "none", "backgroundColor": "#ffffff", "marginTop": 0, "marginRight": "20rpx", "marginBottom": "30rpx", "marginLeft": "20rpx" } }, "placeholder": { "": { "color": "#cccccc" } } };
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
     const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
@@ -22112,10 +22181,13 @@
                     }, [
                       vue.createElementVNode(
                         "text",
-                        { class: "type-name" },
+                        {
+                          class: "type-name",
+                          style: vue.normalizeStyle({ color: $setup.selectedTypeId == type.cmdmId ? "#ffffff" : "#666666" })
+                        },
                         vue.toDisplayString(type.cmdName),
-                        1
-                        /* TEXT */
+                        5
+                        /* TEXT, STYLE */
                       )
                     ], 10, ["onClick"]);
                   }),
@@ -22161,11 +22233,21 @@
               ))
             ])
           ])) : vue.createCommentVNode("v-if", true),
-          $setup.selectedCommandDetails ? (vue.openBlock(), vue.createElementBlock("view", {
+          $setup.selectedCommand != null ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "section"
           }, [
             vue.createElementVNode("view", { class: "param-form" }, [
+              $setup.paramConfigError != "" ? (vue.openBlock(), vue.createElementBlock(
+                "text",
+                {
+                  key: 0,
+                  class: "param-error"
+                },
+                vue.toDisplayString($setup.paramConfigError),
+                1
+                /* TEXT */
+              )) : vue.createCommentVNode("v-if", true),
               (vue.openBlock(true), vue.createElementBlock(
                 vue.Fragment,
                 null,
@@ -22176,29 +22258,35 @@
                   }, [
                     vue.createElementVNode(
                       "text",
-                      { class: "section-title" },
-                      vue.toDisplayString(param.label),
+                      { class: "param-label" },
+                      vue.toDisplayString($setup.getParamLabel(param)),
                       1
                       /* TEXT */
                     ),
                     param.type == "input" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
                       key: 0,
                       class: "param-input",
-                      modelValue: $setup.paramValues[index],
-                      "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
-                      placeholder: "请输入" + param.label,
-                      "placeholder-class": "placeholder"
-                    }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder"])) : vue.createCommentVNode("v-if", true),
+                      "model-value": $setup.getParamValue(index),
+                      "onUpdate:modelValue": ($event) => $setup.updateParamValueFromEvent(index, $event),
+                      placeholder: "请输入" + $setup.getParamLabel(param),
+                      "placeholder-class": "placeholder",
+                      border: "none",
+                      height: "44px",
+                      "font-size": "15px"
+                    }, null, 8, ["model-value", "onUpdate:modelValue", "placeholder"])) : vue.createCommentVNode("v-if", true),
                     param.type == "number" ? (vue.openBlock(), vue.createBlock(_component_i_input, {
                       key: 1,
                       class: "param-input",
                       type: "number",
-                      modelValue: $setup.paramValues[index],
-                      "onUpdate:modelValue": ($event) => $setup.paramValues[index] = $event,
-                      placeholder: "请输入" + param.label,
+                      "model-value": $setup.getParamValue(index),
+                      "onUpdate:modelValue": ($event) => $setup.updateParamValueFromEvent(index, $event),
+                      placeholder: "请输入" + $setup.getParamLabel(param),
                       "placeholder-class": "placeholder",
-                      maxlength: param.max
-                    }, null, 8, ["modelValue", "onUpdate:modelValue", "placeholder", "maxlength"])) : vue.createCommentVNode("v-if", true),
+                      maxlength: $setup.getParamMaxLength(param),
+                      border: "none",
+                      height: "44px",
+                      "font-size": "15px"
+                    }, null, 8, ["model-value", "onUpdate:modelValue", "placeholder", "maxlength"])) : vue.createCommentVNode("v-if", true),
                     param.type == "radio" ? (vue.openBlock(), vue.createElementBlock("view", {
                       key: 2,
                       class: "radio-group"
@@ -22216,7 +22304,7 @@
                               vue.createElementVNode(
                                 "view",
                                 {
-                                  class: vue.normalizeClass(["radio-inner", { checked: $setup.paramValues[index] == $setup.getRadioValue(item) }])
+                                  class: vue.normalizeClass(["radio-inner", { checked: $setup.getParamValue(index) == $setup.getRadioValue(item) }])
                                 },
                                 null,
                                 2
@@ -22241,41 +22329,33 @@
                 128
                 /* KEYED_FRAGMENT */
               )),
+              $setup.paramConfigs.length == 0 && $setup.paramConfigError == "" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 1,
+                class: "no-param-tip"
+              }, "该指令无需填写参数")) : vue.createCommentVNode("v-if", true),
               vue.createVNode(_component_i_button, {
                 type: "primary",
                 text: "发送指令",
                 class: "submit-btn",
-                disabled: !$setup.isFormValid,
+                loading: $setup.sending,
+                disabled: $setup.sending || $setup.loading || !$setup.isFormValid,
                 onClick: $setup.sendCommand
-              }, null, 8, ["disabled"])
+              }, null, 8, ["loading", "disabled"])
             ])
           ])) : vue.createCommentVNode("v-if", true),
-          $setup.commandRecords ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 2,
-            class: "section"
-          }, [
-            vue.createElementVNode("text", { class: "section-title" }, "指令记录"),
-            vue.createElementVNode(
-              "view",
-              { class: "record-list" },
-              vue.toDisplayString($setup.commandRecordReason),
-              1
-              /* TEXT */
-            )
-          ])) : vue.createCommentVNode("v-if", true),
           !$setup.selectedTypeId ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 3,
+            key: 2,
             class: "empty-state"
           }, [
             vue.createElementVNode("text", { class: "empty-text" }, "请先选择指令类型")
           ])) : vue.createCommentVNode("v-if", true),
           $setup.loading ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 4,
+            key: 3,
             class: "loading"
           }, [
             vue.createElementVNode("text", { class: "loading-text" }, "加载中...")
           ])) : $setup.commands.length == 0 && $setup.selectedTypeId != null ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 5,
+            key: 4,
             class: "empty-state"
           }, [
             vue.createElementVNode("text", { class: "empty-text" }, "暂无指令")

@@ -11,6 +11,7 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import io.dcloud.uniapp.extapi.createSelectorQuery as uni_createSelectorQuery
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.vibrateLong as uni_vibrateLong
 open class GenPagesMessageMessage : BasePage {
@@ -34,6 +35,8 @@ open class GenPagesMessageMessage : BasePage {
             val newMessageCount = ref(0)
             val lastUpdateTime = ref(Date().getTime())
             val Login = ref(false)
+            val messageScrollViewportHeight = ref(0)
+            val isNearMessageListBottom = ref(false)
             var checkTimer: Number = 0
             val isPageActive = ref(false)
             fun gen_stopNewMessageCheck_fn(): Unit {
@@ -54,48 +57,66 @@ open class GenPagesMessageMessage : BasePage {
                 }
             }
             val vibrateAlert = ::gen_vibrateAlert_fn
+            fun gen_prependLatestMessages_fn(): UTSPromise<Number> {
+                return wrapUTSPromise(suspend w1@{
+                        if (isLoading.value) {
+                            return@w1 0
+                        }
+                        isLoading.value = true
+                        try {
+                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
+                            if (res.code != 0 || res.data.list == null) {
+                                return@w1 0
+                            }
+                            val existingIds = Set<String>()
+                            msgList.value.forEach(fun(message: UTSJSONObject): Unit {
+                                val messageId = message.getString("messageId", "")
+                                if (messageId != "") {
+                                    existingIds.add(messageId)
+                                }
+                            }
+                            )
+                            val latestMessages: UTSArray<UTSJSONObject> = _uA()
+                            res.data.list.forEach(fun(message: UTSJSONObject): Unit {
+                                val messageId = message.getString("messageId", "")
+                                if (messageId != "" && !existingIds.has(messageId)) {
+                                    existingIds.add(messageId)
+                                    latestMessages.push(message)
+                                }
+                            }
+                            )
+                            if (latestMessages.length > 0) {
+                                msgList.value = latestMessages.concat(msgList.value)
+                                val newestCreateTime = latestMessages[0].getString("createTime", "")
+                                if (newestCreateTime != "") {
+                                    val newestTime = parseLocalDateTime(newestCreateTime)
+                                    if (newestTime != null) {
+                                        lastUpdateTime.value = newestTime
+                                    }
+                                }
+                            }
+                            return@w1 latestMessages.length
+                        }
+                         catch (error: Throwable) {
+                            console.error("检查新消息失败:", error)
+                            return@w1 0
+                        }
+                         finally {
+                            isLoading.value = false
+                        }
+                })
+            }
+            val prependLatestMessages = ::gen_prependLatestMessages_fn
             fun gen_checkNewMessages_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
                         if (!isPageActive.value || isLoading.value) {
                             return@w1
                         }
-                        try {
-                            val res = await(getUserMsgList(_uO("page" to 1, "pageSize" to 1)))
-                            val code = res.code
-                            if (code != 0) {
-                                return@w1
-                            }
-                            val data = res.data
-                            val list = data.list
-                            if (list == null || list.length == 0) {
-                                return@w1
-                            }
-                            val latestMessage = list[0]
-                            val createTime = latestMessage.getString("createTime", "")
-                            if (createTime == "") {
-                                return@w1
-                            }
-                            val messageTime = Date(createTime).getTime()
-                            if (messageTime <= lastUpdateTime.value) {
-                                return@w1
-                            }
+                        val insertedCount = await(prependLatestMessages())
+                        if (insertedCount > 0) {
                             hasNewMessages.value = true
+                            newMessageCount.value += insertedCount
                             vibrateAlert()
-                            val countRes = await(getUserMsgList(_uO("page" to 1, "pageSize" to 50)))
-                            val newList = countRes.data.list
-                            if (newList != null) {
-                                var count: Number = 0
-                                newList.forEach(fun(message: UTSJSONObject): Unit {
-                                    if (Date(message.getString("createTime", "")).getTime() > lastUpdateTime.value) {
-                                        count++
-                                    }
-                                }
-                                )
-                                newMessageCount.value = count
-                            }
-                        }
-                         catch (error: Throwable) {
-                            console.error("检查新消息失败:", error)
                         }
                 })
             }
@@ -116,13 +137,14 @@ open class GenPagesMessageMessage : BasePage {
             val startNewMessageCheck = ::gen_startNewMessageCheck_fn
             fun loadMsgList(isInit: Boolean = false): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
+                        if (isLoading.value) {
+                            return@w1
+                        }
                         if (isInit) {
                             currPage.value = 1
                             msgList.value = _uA()
                             loadStatus.value = "loadmore"
-                        }
-                        if (isLoading.value) {
-                            return@w1
+                            isNearMessageListBottom.value = false
                         }
                         isLoading.value = true
                         try {
@@ -182,10 +204,9 @@ open class GenPagesMessageMessage : BasePage {
             fun gen_loadNewMessages_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         console.log("加载新消息")
-                        await(loadMsgList(true))
+                        await(prependLatestMessages())
                         hasNewMessages.value = false
                         newMessageCount.value = 0
-                        lastUpdateTime.value = Date().getTime()
                         console.log("新消息加载完成")
                 })
             }
@@ -200,10 +221,24 @@ open class GenPagesMessageMessage : BasePage {
                 }
             }
             )
+            val measureMessageScrollViewport = fun(): Unit {
+                uni_createSelectorQuery().select("#message-scroll-container").boundingClientRect(fun(rect: Any){
+                    if (rect == null) {
+                        return
+                    }
+                    val nodeInfo = rect as NodeInfo
+                    val height = nodeInfo.height ?: 0
+                    if (height > 0) {
+                        messageScrollViewportHeight.value = height
+                    }
+                }
+                ).exec()
+            }
             onShow(fun(){
                 if (Login.value) {
                     console.log("页面显示 - 启动自动刷新")
                     isPageActive.value = true
+                    measureMessageScrollViewport()
                     startNewMessageCheck()
                     checkNewMessages()
                 }
@@ -259,7 +294,6 @@ open class GenPagesMessageMessage : BasePage {
             }
             val loadMore = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("准备加载更多 - 当前页:", currPage.value, "总页数:", totalPage.value)
                         if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
                             if (currPage.value >= totalPage.value) {
                                 loadStatus.value = "nomore"
@@ -271,11 +305,11 @@ open class GenPagesMessageMessage : BasePage {
                 })
             }
             val onScrollToLower = fun(){
-                console.log("滚动到底部 - 当前页:", currPage.value, "总页数:", totalPage.value)
                 if (loadStatus.value == "loadmore" && !isLoading.value) {
                     loadMore()
                 }
             }
+            val onMessageScroll = fun(event: UniScrollEvent): Unit {}
             val handleItemClick = fun(item: UTSJSONObject): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
                         modalContent.value = item
@@ -339,7 +373,11 @@ open class GenPagesMessageMessage : BasePage {
                     return ""
                 }
                 try {
-                    val date = Date(timeString)
+                    val milliseconds = parseLocalDateTime(timeString)
+                    if (milliseconds == null) {
+                        return timeString
+                    }
+                    val date = Date(milliseconds)
                     val now = Date()
                     val diff = now.getTime() - date.getTime()
                     val minutes = Math.floor(diff / 60000)
@@ -370,11 +408,11 @@ open class GenPagesMessageMessage : BasePage {
                 return _cE(Fragment, null, _uA(
                     _cV(_component_custom_navBar, _uM("title" to "消息中心", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false, "isShowStyle" to true)),
                     _cE("view", _uM("class" to "container"), _uA(
-                        _cE("scroll-view", _uM("scroll-y" to "true", "show-scrollbar" to false, "class" to "scroll-container", "refresher-enabled" to "", "refresher-triggered" to refresherTriggered.value, "lower-threshold" to 100, "onRefresherrefresh" to onRefresherRefresh, "onScrolltolower" to onScrollToLower), _uA(
+                        _cE("scroll-view", _uM("scroll-y" to "true", "show-scrollbar" to false, "class" to "scroll-container", "id" to "message-scroll-container", "refresher-enabled" to "", "refresher-triggered" to refresherTriggered.value, "lower-threshold" to 100, "onRefresherrefresh" to onRefresherRefresh, "onScrolltolower" to onScrollToLower, "onScroll" to onMessageScroll), _uA(
                             _cE("view", _uM("class" to "list-box"), _uA(
                                 if (isTrue(msgList.value.length == 0 && !isLoading.value)) {
                                     _cE("view", _uM("key" to 0, "class" to "empty-state"), _uA(
-                                        _cE("text", null, "暂无消息")
+                                        _cE("text", _uM("class" to "empty-state-text"), "暂无消息")
                                     ))
                                 } else {
                                     _cC("v-if", true)
@@ -446,7 +484,7 @@ open class GenPagesMessageMessage : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("width" to "100%", "height" to "100%", "backgroundColor" to "#f5f5f5", "marginTop" to "170rpx", "position" to "relative")), "scroll-container" to _uM(".container " to _uM("height" to "100%", "width" to "100%")), "list-box" to _uM(".container " to _uM("width" to "100%", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "position" to "relative")), "message-item" to _uM(".container .list-box " to _uM("marginBottom" to "20rpx", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff")), "message-header" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between")), "message-content-row" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "marginTop" to "16rpx")), "message-title" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "30rpx", "color" to "#333333", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "message-content" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "26rpx", "color" to "#666666", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "unread-badge" to _uM(".container .list-box " to _uM("marginLeft" to "16rpx", "paddingTop" to "4rpx", "paddingRight" to "12rpx", "paddingBottom" to "4rpx", "paddingLeft" to "12rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#f56c6c", "color" to "#ffffff", "fontSize" to "22rpx")), "empty-state" to _uM(".container .list-box " to _uM("textAlign" to "center", "paddingTop" to "50rpx", "paddingRight" to 0, "paddingBottom" to "50rpx", "paddingLeft" to 0, "color" to "#999999", "fontSize" to "28rpx")), "new-message-tip" to _uM(".container .list-box " to _uM("backgroundImage" to "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor" to "rgba(0,0,0,0)", "color" to "#FFFFFF", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "textAlign" to "center", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx", "fontSize" to "26rpx")), "load-more" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0, "textAlign" to "center")), "tips-text" to _uM(".container .list-box .load-more " to _uM("color" to "#999999", "fontSize" to "26rpx", "textAlign" to "center")))
+                return _uM("container" to _pS(_uM("width" to "100%", "position" to "fixed", "top" to "170rpx", "bottom" to 0, "backgroundColor" to "#f5f5f5")), "scroll-container" to _uM(".container " to _uM("height" to "100%", "width" to "100%")), "list-box" to _uM(".container " to _uM("width" to "100%", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "position" to "relative")), "message-item" to _uM(".container .list-box " to _uM("marginBottom" to "20rpx", "paddingTop" to "24rpx", "paddingRight" to "24rpx", "paddingBottom" to "24rpx", "paddingLeft" to "24rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#ffffff")), "message-header" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between")), "message-content-row" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "space-between", "marginTop" to "16rpx")), "message-title" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "30rpx", "color" to "#333333", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "message-content" to _uM(".container .list-box " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "fontSize" to "26rpx", "color" to "#666666", "whiteSpace" to "nowrap", "textOverflow" to "ellipsis", "overflow" to "hidden")), "unread-badge" to _uM(".container .list-box " to _uM("marginLeft" to "16rpx", "paddingTop" to "4rpx", "paddingRight" to "12rpx", "paddingBottom" to "4rpx", "paddingLeft" to "12rpx", "borderTopLeftRadius" to "20rpx", "borderTopRightRadius" to "20rpx", "borderBottomRightRadius" to "20rpx", "borderBottomLeftRadius" to "20rpx", "backgroundColor" to "#f56c6c", "color" to "#ffffff", "fontSize" to "22rpx")), "empty-state" to _uM(".container .list-box " to _uM("display" to "flex", "justifyContent" to "center", "paddingTop" to "50rpx", "paddingRight" to 0, "paddingBottom" to "50rpx", "paddingLeft" to 0)), "empty-state-text" to _uM(".container .list-box .empty-state " to _uM("color" to "#999999", "fontSize" to "28rpx")), "new-message-tip" to _uM(".container .list-box " to _uM("backgroundImage" to "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor" to "rgba(0,0,0,0)", "color" to "#FFFFFF", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "textAlign" to "center", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginBottom" to "20rpx", "fontSize" to "26rpx")), "load-more" to _uM(".container .list-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "paddingTop" to "30rpx", "paddingRight" to 0, "paddingBottom" to "30rpx", "paddingLeft" to 0)), "tips-text" to _uM(".container .list-box .load-more " to _uM("color" to "#999999", "fontSize" to "26rpx", "textAlign" to "center")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

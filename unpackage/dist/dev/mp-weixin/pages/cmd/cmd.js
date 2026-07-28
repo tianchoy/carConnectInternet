@@ -25,34 +25,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const commands = common_vendor.ref([]);
     const selectedCommandId = common_vendor.ref(null);
     const selectedCommand = common_vendor.ref(null);
+    const paramConfigs = common_vendor.ref([]);
     const paramValues = common_vendor.ref([]);
+    const paramConfigError = common_vendor.ref("");
     const loading = common_vendor.ref(false);
-    const commandRecords = common_vendor.ref(null);
-    const commandRecordReason = common_vendor.computed(() => {
-      var _a;
-      if (commandRecords.value == null)
-        return "暂无指令返回记录";
-      return (_a = commandRecords.value["reason"]) !== null && _a !== void 0 ? _a : "暂无指令返回记录";
-    });
-    const selectedCommandDetails = common_vendor.computed(() => {
-      if (selectedCommand.value == null)
-        return null;
-      return selectedCommand.value["details"];
-    });
-    const paramConfigs = common_vendor.computed(() => {
-      const details = selectedCommandDetails.value;
-      if (details == null || details.length == 0)
-        return [];
-      try {
-        return common_vendor.UTS.JSON.parse(details);
-      } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:103", "解析参数配置失败:", e);
-        return [];
-      }
-    });
+    const sending = common_vendor.ref(false);
     const isFormValid = common_vendor.computed(() => {
-      return paramValues.value.length > 0 && paramValues.value.every((val) => {
-        return val != "";
+      if (selectedCommand.value == null || paramConfigError.value != "")
+        return false;
+      return paramValues.value.length == paramConfigs.value.length && paramValues.value.every((value) => {
+        return value != "";
       });
     });
     const sortByCmdNameLengthAndAlphabet = (data) => {
@@ -61,35 +43,109 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         var _a, _b;
         const aName = (_a = a["cmdName"]) !== null && _a !== void 0 ? _a : "";
         const bName = (_b = b["cmdName"]) !== null && _b !== void 0 ? _b : "";
-        if (aName.length != bName.length) {
+        if (aName.length != bName.length)
           return aName.length - bName.length;
-        }
         if (aName == bName)
           return 0;
         return aName < bName ? -1 : 1;
       });
       return sortedData;
     };
+    const getParamLabel = (config) => {
+      const label = config["label"];
+      return label == null ? "参数" : label.toString();
+    };
+    const getParamMaxLength = (config) => {
+      const max = config["max"];
+      return typeof max == "number" ? max : -1;
+    };
+    const getRadioItems = (config) => {
+      var _a;
+      return (_a = config["items"]) !== null && _a !== void 0 ? _a : [];
+    };
+    const getRadioValue = (item) => {
+      const value = item["value"];
+      return value == null ? "" : value.toString();
+    };
+    const getRadioDescription = (item) => {
+      const desc = item["desc"];
+      return desc == null ? "" : desc.toString();
+    };
+    const parseParamConfigs = (details = null) => {
+      paramConfigError.value = "";
+      if (details == null || details.trim().length == 0)
+        return [];
+      try {
+        const parsed = common_vendor.UTS.JSON.parse(details);
+        if (!Array.isArray(parsed)) {
+          paramConfigError.value = "指令参数配置格式无效";
+          return [];
+        }
+        const configs = parsed;
+        for (let index = 0; index < configs.length; index++) {
+          const config = configs[index];
+          if (config == null) {
+            paramConfigError.value = "指令参数配置无效";
+            return [];
+          }
+          const type = config["type"];
+          if (type != "input" && type != "number" && type != "radio") {
+            paramConfigError.value = "该指令包含暂不支持的参数类型";
+            return [];
+          }
+          if (type == "radio") {
+            const items = getRadioItems(config);
+            if (items.length == 0 || items.some((item) => {
+              return getRadioValue(item) == "" || getRadioDescription(item) == "";
+            })) {
+              paramConfigError.value = "指令单选参数配置无效";
+              return [];
+            }
+          }
+        }
+        return configs;
+      } catch (error) {
+        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:158", "解析参数配置失败:", error);
+        paramConfigError.value = "指令参数配置无效";
+        return [];
+      }
+    };
+    const initializeParamValues = (configs) => {
+      const values = [];
+      for (let index = 0; index < configs.length; index++) {
+        const config = configs[index];
+        const defaultValue = config["default"];
+        let value = "";
+        if (defaultValue != null) {
+          value = defaultValue.toString();
+        } else if (config["type"] == "radio") {
+          value = getRadioValue(getRadioItems(config)[0]);
+        }
+        values.push(value);
+      }
+      return values;
+    };
+    const getParamValue = (index) => {
+      return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : "";
+    };
+    const updateParamValueFromEvent = (index, value = null) => {
+      if (sending.value || index < 0 || index >= paramValues.value.length)
+        return null;
+      paramValues.value[index] = value == null ? "" : value.toString();
+    };
     const loadCommandTypes = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
           loading.value = true;
           const response = yield api_request.getCmdAction();
-          common_vendor.index.__f__("log", "at pages/cmd/cmd.uvue:135", "加载指令类型响应:", response);
           if (response.code == 0) {
             commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data);
           } else {
-            utils_toast.showAppToast({
-              title: "加载指令类型失败",
-              icon: "none"
-            });
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令类型失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:146", "加载指令类型出错:", error);
-          utils_toast.showAppToast({
-            title: "网络错误",
-            icon: "none"
-          });
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:199", "加载指令类型出错:", error);
+          utils_toast.showAppToast({ title: "网络错误", icon: "none" });
         } finally {
           loading.value = false;
         }
@@ -102,27 +158,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const selectTypeByItem = (type) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (sending.value)
+          return Promise.resolve(null);
         const typeId = type["cmdmId"];
         if (typeId == null)
           return Promise.resolve(null);
         selectedTypeId.value = typeId;
         selectedCommandId.value = null;
         selectedCommand.value = null;
+        paramConfigs.value = [];
         paramValues.value = [];
-        commandRecords.value = null;
+        paramConfigError.value = "";
+        commands.value = [];
         try {
           loading.value = true;
-          const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({
-            imei: imei.value,
-            cmdmId: typeId
-          }));
+          const response = yield api_request.getCmdByMid(new common_vendor.UTSJSONObject({ imei: imei.value, cmdmId: typeId }));
           if (response.code == 0) {
             commands.value = response.data;
           } else {
-            utils_toast.showAppToast({ title: "加载指令列表失败", icon: "none" });
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "加载指令列表失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:181", "加载指令列表出错:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:232", "加载指令列表出错:", error);
           utils_toast.showAppToast({ title: "网络错误", icon: "none" });
         } finally {
           loading.value = false;
@@ -130,59 +187,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const selectCommand = (command) => {
-      var _a;
+      if (sending.value)
+        return null;
       selectedCommandId.value = command["predictCmdId"];
       selectedCommand.value = command;
-      paramValues.value = [];
-      const details = command["details"];
-      if (details == null || details.length == 0)
-        return null;
-      try {
-        const configs = common_vendor.UTS.JSON.parse(details);
-        const values = [];
-        for (let index = 0; index < configs.length; index++) {
-          const config = configs[index];
-          const defaultValue = config["default"];
-          if (defaultValue != null) {
-            values[index] = defaultValue.toString();
-            continue;
-          }
-          const configType = config["type"];
-          const items = config["items"];
-          if (configType == "radio" && items != null && items.length > 0) {
-            values[index] = (_a = items[0]["value"]) !== null && _a !== void 0 ? _a : "";
-          } else {
-            values[index] = "";
-          }
-        }
-        paramValues.value = values;
-      } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:216", "初始化参数值失败:", e);
-        paramValues.value = [];
-      }
-    };
-    const getRadioItems = (config) => {
-      var _a;
-      return (_a = config["items"]) !== null && _a !== void 0 ? _a : [];
-    };
-    const getRadioValue = (item) => {
-      var _a;
-      return (_a = item["value"]) !== null && _a !== void 0 ? _a : "";
-    };
-    const getRadioDescription = (item) => {
-      var _a;
-      return (_a = item["desc"]) !== null && _a !== void 0 ? _a : "";
+      const configs = parseParamConfigs(command["details"]);
+      paramConfigs.value = configs;
+      paramValues.value = paramConfigError.value == "" ? initializeParamValues(configs) : [];
     };
     const selectRadio = (index, value) => {
-      while (paramValues.value.length <= index) {
-        paramValues.value.push("");
-      }
+      if (sending.value || index < 0 || index >= paramValues.value.length)
+        return null;
       paramValues.value[index] = value;
     };
     const sendCommand = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a, _b;
-        if (!isFormValid.value || selectedCommand.value == null) {
+        if (sending.value)
+          return Promise.resolve(null);
+        if (selectedCommand.value == null) {
+          utils_toast.showAppToast({ title: "请选择指令", icon: "none" });
+          return Promise.resolve(null);
+        }
+        if (paramConfigError.value != "") {
+          utils_toast.showAppToast({ title: paramConfigError.value, icon: "none" });
+          return Promise.resolve(null);
+        }
+        if (!isFormValid.value) {
           utils_toast.showAppToast({ title: "请填写所有参数", icon: "none" });
           return Promise.resolve(null);
         }
@@ -190,13 +221,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         let cmdData = (_a = command["params"]) !== null && _a !== void 0 ? _a : "";
         for (let index = 0; index < paramConfigs.value.length; index++) {
           const config = paramConfigs.value[index];
-          const value = paramValues.value[index];
           const configuredPlaceholder = config["placeholder"];
           const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0 ? configuredPlaceholder : "${param" + (index + 1).toString() + "}";
-          cmdData = cmdData.replace(placeholder, value);
+          cmdData = cmdData.split(placeholder).join(paramValues.value[index]);
         }
         try {
-          loading.value = true;
+          sending.value = true;
           const response = yield api_request.sendCmd(new common_vendor.UTSJSONObject({
             imei: imei.value,
             type: (_b = command["cmdCode"]) !== null && _b !== void 0 ? _b : "",
@@ -205,15 +235,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             predictCmdId: command["predictCmdId"]
           }));
           if (response.code == 0) {
-            utils_toast.showAppToast({ title: "指令发送成功", icon: "success" });
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送成功", icon: "success" });
           } else {
-            utils_toast.showAppToast({ title: "指令发送失败", icon: "none", duration: 3e3 });
+            utils_toast.showAppToast({ title: response.msg != "" ? response.msg : "指令发送失败", icon: "none", duration: 3e3 });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:273", "发送指令出错:", error);
+          common_vendor.index.__f__("error", "at pages/cmd/cmd.uvue:294", "发送指令出错:", error);
           utils_toast.showAppToast({ title: "网络错误", icon: "none" });
         } finally {
-          loading.value = false;
+          sending.value = false;
         }
       });
     };
@@ -232,9 +262,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.f(commandTypes.value, (type, index, i0) => {
           return {
             a: common_vendor.t(type.cmdName),
-            b: type.cmdmId,
-            c: selectedTypeId.value == type.cmdmId ? 1 : "",
-            d: common_vendor.o(($event) => {
+            b: selectedTypeId.value == type.cmdmId ? "#ffffff" : "#666666",
+            c: type.cmdmId,
+            d: selectedTypeId.value == type.cmdmId ? 1 : "",
+            e: common_vendor.o(($event) => {
               return selectTypeByItem(type);
             }, type.cmdmId)
           };
@@ -253,36 +284,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       } : {}, {
-        f: selectedCommandDetails.value
-      }, selectedCommandDetails.value ? {
-        g: common_vendor.f(paramConfigs.value, (param, index, i0) => {
+        f: selectedCommand.value != null
+      }, selectedCommand.value != null ? common_vendor.e({
+        g: paramConfigError.value != ""
+      }, paramConfigError.value != "" ? {
+        h: common_vendor.t(paramConfigError.value)
+      } : {}, {
+        i: common_vendor.f(paramConfigs.value, (param, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(param.label),
+            a: common_vendor.t(getParamLabel(param)),
             b: param.type == "input"
           }, param.type == "input" ? {
-            c: "c4271740-1-" + i0,
-            d: common_vendor.o(($event) => {
-              return paramValues.value[index] = $event;
+            c: common_vendor.o(($event) => {
+              return updateParamValueFromEvent(index, $event);
             }, "param_" + index),
+            d: "c4271740-1-" + i0,
             e: common_vendor.p({
-              placeholder: "请输入" + param.label,
+              ["model-value"]: getParamValue(index),
+              placeholder: "请输入" + getParamLabel(param),
               ["placeholder-class"]: "placeholder",
-              modelValue: paramValues.value[index],
+              border: "none",
+              height: "44px",
+              ["font-size"]: "15px",
               class: "param-input data-v-c4271740"
             })
           } : {}, {
             f: param.type == "number"
           }, param.type == "number" ? {
-            g: "c4271740-2-" + i0,
-            h: common_vendor.o(($event) => {
-              return paramValues.value[index] = $event;
+            g: common_vendor.o(($event) => {
+              return updateParamValueFromEvent(index, $event);
             }, "param_" + index),
+            h: "c4271740-2-" + i0,
             i: common_vendor.p({
               type: "number",
-              placeholder: "请输入" + param.label,
+              ["model-value"]: getParamValue(index),
+              placeholder: "请输入" + getParamLabel(param),
               ["placeholder-class"]: "placeholder",
-              maxlength: param.max,
-              modelValue: paramValues.value[index],
+              maxlength: getParamMaxLength(param),
+              border: "none",
+              height: "44px",
+              ["font-size"]: "15px",
               class: "param-input data-v-c4271740"
             })
           } : {}, {
@@ -290,7 +331,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, param.type == "radio" ? {
             k: common_vendor.f(getRadioItems(param), (item, k1, i1) => {
               return {
-                a: paramValues.value[index] == getRadioValue(item) ? 1 : "",
+                a: getParamValue(index) == getRadioValue(item) ? 1 : "",
                 b: common_vendor.t(getRadioDescription(item)),
                 c: "radio_" + item.value,
                 d: common_vendor.o(($event) => {
@@ -302,26 +343,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             l: "param_" + index
           });
         }),
-        h: common_vendor.o(sendCommand, "46"),
-        i: common_vendor.p({
+        j: paramConfigs.value.length == 0 && paramConfigError.value == ""
+      }, paramConfigs.value.length == 0 && paramConfigError.value == "" ? {} : {}, {
+        k: common_vendor.o(sendCommand, "c2"),
+        l: common_vendor.p({
           type: "primary",
           text: "发送指令",
-          disabled: !isFormValid.value,
+          loading: sending.value,
+          disabled: sending.value || loading.value || !isFormValid.value,
           class: "submit-btn data-v-c4271740"
         })
-      } : {}, {
-        j: commandRecords.value
-      }, commandRecords.value ? {
-        k: common_vendor.t(commandRecordReason.value)
-      } : {}, {
-        l: !selectedTypeId.value
+      }) : {}, {
+        m: !selectedTypeId.value
       }, !selectedTypeId.value ? {} : {}, {
-        m: loading.value
+        n: loading.value
       }, loading.value ? {} : commands.value.length == 0 && selectedTypeId.value != null ? {} : {}, {
-        n: commands.value.length == 0 && selectedTypeId.value != null,
-        o: `${_ctx.u_s_b_h}px`,
-        p: `${_ctx.u_s_a_i_b}px`,
-        q: common_vendor.p({
+        o: commands.value.length == 0 && selectedTypeId.value != null,
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`,
+        r: common_vendor.p({
           class: "data-v-c4271740"
         })
       });

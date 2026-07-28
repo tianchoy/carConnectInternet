@@ -252,7 +252,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function initDateTime() {
       const now = /* @__PURE__ */ new Date();
       endTime.value = utils_formateTime.formatTimes(now.getTime());
-      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 24);
+      startTime.value = utils_formateTime.formatTimes(now.getTime() - 36e5 * 6);
     }
     function initCarMarker() {
       var _a, _b;

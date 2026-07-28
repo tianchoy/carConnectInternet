@@ -20,6 +20,7 @@ import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.request as uni_request
 import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
+import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
 val runBlock1 = run {
     __uniConfig.getAppStyles = fun(): Map<String, Map<String, Map<String, Any>>> {
@@ -81,6 +82,129 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
+open class AppModalSuccess {
+    open var confirm: Boolean = false
+    open var cancel: Boolean = false
+}
+open class AppModalOptions (
+    open var title: String? = null,
+    open var content: String? = null,
+    open var showCancel: Boolean? = null,
+    open var confirmText: String? = null,
+    open var cancelText: String? = null,
+    open var success: ((res: AppModalSuccess) -> Unit)? = null,
+) : UTSReactiveObject() {
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return AppModalOptionsReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class AppModalOptionsReactiveObject : AppModalOptions, IUTSReactive<AppModalOptions> {
+    override var __v_raw: AppModalOptions
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: AppModalOptions, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(title = __v_raw.title, content = __v_raw.content, showCancel = __v_raw.showCancel, confirmText = __v_raw.confirmText, cancelText = __v_raw.cancelText, success = __v_raw.success) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): AppModalOptionsReactiveObject {
+        return AppModalOptionsReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var title: String?
+        get() {
+            return _tRG(__v_raw, "title", __v_raw.title, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("title")) {
+                return
+            }
+            val oldValue = __v_raw.title
+            __v_raw.title = value
+            _tRS(__v_raw, "title", oldValue, value)
+        }
+    override var content: String?
+        get() {
+            return _tRG(__v_raw, "content", __v_raw.content, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("content")) {
+                return
+            }
+            val oldValue = __v_raw.content
+            __v_raw.content = value
+            _tRS(__v_raw, "content", oldValue, value)
+        }
+    override var showCancel: Boolean?
+        get() {
+            return _tRG(__v_raw, "showCancel", __v_raw.showCancel, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("showCancel")) {
+                return
+            }
+            val oldValue = __v_raw.showCancel
+            __v_raw.showCancel = value
+            _tRS(__v_raw, "showCancel", oldValue, value)
+        }
+    override var confirmText: String?
+        get() {
+            return _tRG(__v_raw, "confirmText", __v_raw.confirmText, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("confirmText")) {
+                return
+            }
+            val oldValue = __v_raw.confirmText
+            __v_raw.confirmText = value
+            _tRS(__v_raw, "confirmText", oldValue, value)
+        }
+    override var cancelText: String?
+        get() {
+            return _tRG(__v_raw, "cancelText", __v_raw.cancelText, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("cancelText")) {
+                return
+            }
+            val oldValue = __v_raw.cancelText
+            __v_raw.cancelText = value
+            _tRS(__v_raw, "cancelText", oldValue, value)
+        }
+}
+val modalHandlers: UTSArray<(options: AppModalOptions) -> Unit> = _uA()
+fun registerAppModalHandler(handler: (options: AppModalOptions) -> Unit): Unit {
+    if (modalHandlers.indexOf(handler) == -1) {
+        modalHandlers.push(handler)
+    }
+}
+fun unregisterAppModalHandler(handler: (options: AppModalOptions) -> Unit): Unit {
+    val index = modalHandlers.indexOf(handler)
+    if (index >= 0) {
+        modalHandlers.splice(index, 1)
+    }
+}
+fun showAppModal(options: AppModalOptions): Unit {
+    val handler = if (modalHandlers.length > 0) {
+        modalHandlers[modalHandlers.length - 1]
+    } else {
+        null
+    }
+    if (handler != null) {
+        handler(options)
+        return
+    }
+    uni_showModal(ShowModalOptions(title = options.title ?: "", content = options.content ?: "", showCancel = options.showCancel ?: true, confirmText = options.confirmText, cancelText = options.cancelText, success = fun(res: ShowModalSuccess){
+        val result = AppModalSuccess()
+        result.confirm = res.confirm
+        result.cancel = res.cancel
+        if (options.success != null) {
+            options.success!!(result)
+        }
+    }
+    ))
+}
 fun __uts_large_remixCodeMap_fill_fill_1(__map: Map<String, String>): Unit {
     __map.set("home-3-fill", "ee1a")
     __map.set("chat-3-line", "eb51")
@@ -165,6 +289,16 @@ val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToas
 }
 , fun(instance, renderer): GenComponentsAppToastAppToast {
     return GenComponentsAppToastAppToast(instance)
+}
+)
+val GenComponentsAppModalAppModalClass = CreateVueComponent(GenComponentsAppModalAppModal::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenComponentsAppModalAppModal.name, inheritAttrs = GenComponentsAppModalAppModal.inheritAttrs, inject = GenComponentsAppModalAppModal.inject, props = GenComponentsAppModalAppModal.props, propsNeedCastKeys = GenComponentsAppModalAppModal.propsNeedCastKeys, emits = GenComponentsAppModalAppModal.emits, components = GenComponentsAppModalAppModal.components, styles = GenComponentsAppModalAppModal.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenComponentsAppModalAppModal.setup(props as GenComponentsAppModalAppModal)
+    }
+    )
+}
+, fun(instance, renderer): GenComponentsAppModalAppModal {
+    return GenComponentsAppModalAppModal(instance)
 }
 )
 val `default` = "/static/banner.png"
@@ -806,15 +940,57 @@ fun getTodayZeroTime(): TodayTimeRange {
     val todayZero = Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime()
     return TodayTimeRange(nowTime = nowTime, todayZero = todayZero)
 }
+fun pad(value: Number): String {
+    return value.toString(10).padStart(2, "0")
+}
 fun formatTimes(timestamp: Number): String {
     val d = Date(timestamp)
-    val y = d.getFullYear()
-    val m = (d.getMonth() + 1).toString(10).padStart(2, "0")
-    val day = d.getDate().toString(10).padStart(2, "0")
-    val h = d.getHours().toString(10).padStart(2, "0")
-    val mi = d.getMinutes().toString(10).padStart(2, "0")
-    val s = d.getSeconds().toString(10).padStart(2, "0")
-    return "" + y + "-" + m + "-" + day + " " + h + ":" + mi + ":" + s
+    return "" + d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+}
+fun parseLocalDateTime(timestamp: String): Number? {
+    val match = timestamp.match(UTSRegExp("^(\\d{4})[-\\/](\\d{2})[-\\/](\\d{2})(?:\\s+(\\d{2}):(\\d{2})(?::(\\d{2}))?)?\$", ""))
+    if (match == null) {
+        return null
+    }
+    val year = parseInt(match[1] ?: "0")
+    val month = parseInt(match[2] ?: "0")
+    val day = parseInt(match[3] ?: "0")
+    val hour = if (match[4] == null) {
+        0
+    } else {
+        parseInt(match[4] ?: "0")
+    }
+    val minute = if (match[5] == null) {
+        0
+    } else {
+        parseInt(match[5] ?: "0")
+    }
+    val second = if (match[6] == null) {
+        0
+    } else {
+        parseInt(match[6] ?: "0")
+    }
+    val date = Date(year, month - 1, day, hour, minute, second)
+    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
+        return null
+    }
+    return date.getTime()
+}
+fun normalizeLocalDateTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    return if (milliseconds == null) {
+        timestamp
+    } else {
+        formatTimes(milliseconds)
+    }
+}
+fun formatLocalTime(timestamp: String): String {
+    val milliseconds = parseLocalDateTime(timestamp)
+    if (milliseconds == null) {
+        return ""
+    }
+    val date = Date(milliseconds)
+    return "" + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds())
 }
 fun getDeviceIcon(connectionStatus: String, carType: String): String {
     val basePath = if (connectionStatus == "online") {
@@ -7483,6 +7659,33 @@ val GenPagesUserCenterCarListCarListClass = CreateVueComponent(GenPagesUserCente
     return GenPagesUserCenterCarListCarList(instance, renderer)
 }
 )
+fun __uts_large_carTypeNames_fill_fill_1(__obj: UTSJSONObject): Unit {
+    __obj["car"] = "轿车"
+    __obj["suv"] = "越野车"
+    __obj["bus"] = "公交车"
+    __obj["huoche"] = "货车"
+    __obj["train"] = "火车"
+    __obj["diandong"] = "电动车"
+    __obj["moto"] = "摩托车"
+    __obj["bike"] = "自行车"
+    __obj["sanlun"] = "三轮车"
+    __obj["tuola"] = "拖拉机"
+    __obj["wajue"] = "挖掘机"
+    __obj["tuiche"] = "手推车"
+    __obj["baby"] = "婴儿车"
+    __obj["muma"] = "木马"
+    __obj["tank"] = "坦克"
+    __obj["zhuangjia"] = "装甲车"
+    __obj["plan"] = "飞机"
+    __obj["hangmu"] = "航母"
+    __obj["junjian"] = "军舰"
+    __obj["walk"] = "步行"
+}
+fun __uts_large_carTypeNames_build_0(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO()
+    __uts_large_carTypeNames_fill_fill_1(__obj)
+    return __obj
+}
 open class VehicleEditInfo (
     @JsonNotNull
     open var deviceName: String,
@@ -8040,11 +8243,11 @@ fun main(app: IApp) {
     (createApp()["app"] as VueApp).mount(app, GenUniApp())
 }
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
-    override var name: String = "carConnectInternet"
+    override var name: String = "车载GPS"
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"
-    override var uniCompilerVersion: String = "5.21"
+    override var uniCompilerVersion: String = "5.22"
     constructor() : super() {}
 }
 fun definePageRoutes() {

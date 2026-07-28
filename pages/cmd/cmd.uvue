@@ -11,7 +11,7 @@
 				<view class="type-list">
 					<view v-for="(type,index) in commandTypes" :key="type.cmdmId" class="type-item"
 						:class="{ active: selectedTypeId == type.cmdmId }" @click="selectTypeByItem(type)">
-						<text class="type-name">{{ type.cmdName }}</text>
+						<text class="type-name" :style="{ color: selectedTypeId == type.cmdmId ? '#ffffff' : '#666666' }">{{ type.cmdName }}</text>
 					</view>
 				</view>
 			</view>
@@ -27,35 +27,28 @@
 			</view>
 		</view>
 
-		<view class="section" v-if="selectedCommandDetails">
+		<view class="section" v-if="selectedCommand != null">
 			<view class="param-form">
+				<text v-if="paramConfigError != ''" class="param-error">{{ paramConfigError }}</text>
 				<view v-for="(param, index) in paramConfigs" :key="'param_' + index" class="param-item">
-					<text class="section-title">{{ param.label }}</text>
-					<i-input v-if="param.type == 'input'" class="param-input" v-model="paramValues[index]"
-						:placeholder="'请输入' + param.label" placeholder-class="placeholder" />
-
+					<text class="param-label">{{ getParamLabel(param) }}</text>
+					<i-input v-if="param.type == 'input'" class="param-input" :model-value="getParamValue(index)"
+						@update:model-value="updateParamValueFromEvent(index, $event)" :placeholder="'请输入' + getParamLabel(param)"
+						placeholder-class="placeholder" border="none" height="44px" font-size="15px" />
 					<i-input v-if="param.type == 'number'" class="param-input" type="number"
-						v-model="paramValues[index]" :placeholder="'请输入' + param.label" placeholder-class="placeholder"
-						:maxlength="param.max" />
-
+						:model-value="getParamValue(index)" @update:model-value="updateParamValueFromEvent(index, $event)"
+						:placeholder="'请输入' + getParamLabel(param)" placeholder-class="placeholder" :maxlength="getParamMaxLength(param)"
+						border="none" height="44px" font-size="15px" />
 					<view v-if="param.type == 'radio'" class="radio-group">
 						<view v-for="item in getRadioItems(param)" :key="'radio_' + item.value" class="radio-item"
 							@click="selectRadio(index, getRadioValue(item))">
-							<view class="radio-icon">
-								<view class="radio-inner" :class="{ checked: paramValues[index] == getRadioValue(item) }">
-								</view>
-							</view>
+							<view class="radio-icon"><view class="radio-inner" :class="{ checked: getParamValue(index) == getRadioValue(item) }"></view></view>
 							<text class="radio-label">{{ getRadioDescription(item) }}</text>
 						</view>
 					</view>
 				</view>
-				<i-button type="primary" text="发送指令" class="submit-btn" :disabled="!isFormValid" @click="sendCommand"></i-button>
-			</view>
-		</view>
-		<view class="section" v-if="commandRecords">
-			<text class="section-title">指令记录</text>
-			<view class="record-list">
-				{{ commandRecordReason }}
+				<text v-if="paramConfigs.length == 0 && paramConfigError == ''" class="no-param-tip">该指令无需填写参数</text>
+				<i-button type="primary" text="发送指令" class="submit-btn" :loading="sending" :disabled="sending || loading || !isFormValid" @click="sendCommand"></i-button>
 			</view>
 		</view>
 		<view class="empty-state" v-if="!selectedTypeId">
@@ -72,420 +65,269 @@
 </template>
 <script setup lang="uts">
 import { showAppToast } from '../../utils/toast.uts'
-	import { ref, reactive, computed, onMounted } from 'vue'
-	import { getCmdAction, getCmdByMid, sendCmd, getCmdRecordById } from '@/api/request'
-	const imei = ref('')
-	const commandTypes = ref<Array<UTSJSONObject>>([])
-	const selectedTypeId = ref<string | number | null>(null)
-	const commands = ref<Array<UTSJSONObject>>([])
-	const selectedCommandId = ref<string | number | null>(null)
-	const selectedCommand = ref<UTSJSONObject | null>(null)
-	const paramValues = ref<Array<string>>([])
-	const loading = ref(false)
-	const commandRecords = ref<UTSJSONObject | null>(null)
-	const commandRecordReason = computed<string>(() => {
-		if (commandRecords.value == null) return '暂无指令返回记录'
-		return (commandRecords.value['reason'] as string | null) ?? '暂无指令返回记录'
+import { ref, computed } from 'vue'
+import { getCmdAction, getCmdByMid, sendCmd } from '@/api/request'
+
+const imei = ref('')
+const commandTypes = ref<Array<UTSJSONObject>>([])
+const selectedTypeId = ref<string | number | null>(null)
+const commands = ref<Array<UTSJSONObject>>([])
+const selectedCommandId = ref<string | number | null>(null)
+const selectedCommand = ref<UTSJSONObject | null>(null)
+const paramConfigs = ref<Array<UTSJSONObject>>([])
+const paramValues = ref<Array<string>>([])
+const paramConfigError = ref('')
+const loading = ref(false)
+const sending = ref(false)
+
+const isFormValid = computed<boolean>(() => {
+	if (selectedCommand.value == null || paramConfigError.value != '') return false
+	return paramValues.value.length == paramConfigs.value.length &&
+		paramValues.value.every((value: string) : boolean => value != '')
+})
+
+const sortByCmdNameLengthAndAlphabet = (data: Array<UTSJSONObject>): Array<UTSJSONObject> => {
+	const sortedData = data.slice()
+	sortedData.sort((a: UTSJSONObject, b: UTSJSONObject): number => {
+		const aName = (a['cmdName'] as string | null) ?? ''
+		const bName = (b['cmdName'] as string | null) ?? ''
+		if (aName.length != bName.length) return aName.length - bName.length
+		if (aName == bName) return 0
+		return aName < bName ? -1 : 1
 	})
+	return sortedData
+}
 
-	const selectedCommandDetails = computed<string | null>(() => {
-		if (selectedCommand.value == null) return null
-		return selectedCommand.value['details'] as string | null
-	})
+const getParamLabel = (config: UTSJSONObject): string => {
+	const label = config['label']
+	return label == null ? '参数' : label.toString()
+}
 
-	const paramConfigs = computed<Array<UTSJSONObject>>(() => {
-		const details = selectedCommandDetails.value
-		if (details == null || details.length == 0) return []
+const getParamMaxLength = (config: UTSJSONObject): number => {
+	const max = config['max']
+	return typeof max == 'number' ? max : -1
+}
 
-		try {
-			return JSON.parse(details) as Array<UTSJSONObject>
-		} catch (e) {
-			console.error('解析参数配置失败:', e)
+const getRadioItems = (config: UTSJSONObject): Array<UTSJSONObject> => {
+	return (config['items'] as Array<UTSJSONObject> | null) ?? []
+}
+
+const getRadioValue = (item: UTSJSONObject): string => {
+	const value = item['value']
+	return value == null ? '' : value.toString()
+}
+
+const getRadioDescription = (item: UTSJSONObject): string => {
+	const desc = item['desc']
+	return desc == null ? '' : desc.toString()
+}
+
+const parseParamConfigs = (details: string | null): Array<UTSJSONObject> => {
+	paramConfigError.value = ''
+	if (details == null || details.trim().length == 0) return []
+
+	try {
+		const parsed = JSON.parse(details)
+		if (!Array.isArray(parsed)) {
+			paramConfigError.value = '指令参数配置格式无效'
 			return []
 		}
-	})
 
-	const isFormValid = computed(() => {
-		return paramValues.value.length > 0 &&
-			paramValues.value.every((val: string) => val != '')
-	})
-
-
-
-	const sortByCmdNameLengthAndAlphabet = (data: Array<UTSJSONObject>): Array<UTSJSONObject> => {
-		const sortedData = data.slice()
-		sortedData.sort((a: UTSJSONObject, b: UTSJSONObject): number => {
-			const aName = (a['cmdName'] as string | null) ?? ''
-			const bName = (b['cmdName'] as string | null) ?? ''
-			if (aName.length != bName.length) {
-				return aName.length - bName.length
+		const configs = parsed as Array<UTSJSONObject>
+		for (let index = 0; index < configs.length; index++) {
+			const config = configs[index]
+			if (config == null) {
+				paramConfigError.value = '指令参数配置无效'
+				return []
 			}
-			if (aName == bName) return 0
-			return aName < bName ? -1 : 1
-		})
-		return sortedData
-	}
-
-	// 加载指令类型
-	const loadCommandTypes = async () => {
-		try {
-			loading.value = true
-			const response = await getCmdAction()
-
-			console.log('加载指令类型响应:', response)
-
-			if (response.code == 0) {
-				commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
-			} else {
-				showAppToast({
-					title: '加载指令类型失败',
-					icon: 'none'
-				})
+			const type = config['type'] as string | null
+			if (type != 'input' && type != 'number' && type != 'radio') {
+				paramConfigError.value = '该指令包含暂不支持的参数类型'
+				return []
 			}
-		} catch (error) {
-			console.error('加载指令类型出错:', error)
-			showAppToast({
-				title: '网络错误',
-				icon: 'none'
-			})
-		} finally {
-			loading.value = false
-		}
-	}
-
-	onLoad((options) => {
-		imei.value = options.imei ?? ''
-		loadCommandTypes()
-	})
-	const selectTypeByItem = async (type: UTSJSONObject): Promise<void> => {
-		const typeId = type['cmdmId'] as string | number | null
-		if (typeId == null) return
-		selectedTypeId.value = typeId
-		selectedCommandId.value = null
-		selectedCommand.value = null
-		paramValues.value = []
-		commandRecords.value = null
-
-		try {
-			loading.value = true
-			const response = await getCmdByMid({
-				imei: imei.value,
-				cmdmId: typeId
-			} as UTSJSONObject)
-			if (response.code == 0) {
-				commands.value = response.data
-			} else {
-				showAppToast({ title: '加载指令列表失败', icon: 'none' })
-			}
-		} catch (error) {
-			console.error('加载指令列表出错:', error)
-			showAppToast({ title: '网络错误', icon: 'none' })
-		} finally {
-			loading.value = false
-		}
-	}
-
-	const selectCommand = (command: UTSJSONObject) => {
-		selectedCommandId.value = command['predictCmdId'] as string | number | null
-		selectedCommand.value = command
-		paramValues.value = []
-
-		const details = command['details'] as string | null
-		if (details == null || details.length == 0) return
-
-		try {
-			const configs = JSON.parse(details) as Array<UTSJSONObject>
-			const values: Array<string> = []
-			for (let index = 0; index < configs.length; index++) {
-				const config = configs[index]
-				const defaultValue = config['default']
-				if (defaultValue != null) {
-					values[index] = defaultValue.toString()
-					continue
-				}
-				const configType = config['type'] as string | null
-				const items = config['items'] as Array<UTSJSONObject> | null
-				if (configType == 'radio' && items != null && items.length > 0) {
-					values[index] = (items[0]['value'] as string | null) ?? ''
-				} else {
-					values[index] = ''
+			if (type == 'radio') {
+				const items = getRadioItems(config)
+				if (items.length == 0 || items.some((item: UTSJSONObject): boolean => getRadioValue(item) == '' || getRadioDescription(item) == '')) {
+					paramConfigError.value = '指令单选参数配置无效'
+					return []
 				}
 			}
-			paramValues.value = values
-		} catch (e) {
-			console.error('初始化参数值失败:', e)
-			paramValues.value = []
 		}
+		return configs
+	} catch (error) {
+		console.error('解析参数配置失败:', error)
+		paramConfigError.value = '指令参数配置无效'
+		return []
 	}
+}
 
-	const getRadioItems = (config: UTSJSONObject): Array<UTSJSONObject> => {
-		return (config['items'] as Array<UTSJSONObject> | null) ?? []
-	}
-
-	const getRadioValue = (item: UTSJSONObject): string => {
-		return (item['value'] as string | null) ?? ''
-	}
-
-	const getRadioDescription = (item: UTSJSONObject): string => {
-		return (item['desc'] as string | null) ?? ''
-	}
-
-	const selectRadio = (index: number, value: string) => {
-		while (paramValues.value.length <= index) {
-			paramValues.value.push('')
+const initializeParamValues = (configs: Array<UTSJSONObject>): Array<string> => {
+	const values: Array<string> = []
+	for (let index = 0; index < configs.length; index++) {
+		const config = configs[index]
+		const defaultValue = config['default']
+		let value = ''
+		if (defaultValue != null) {
+			value = defaultValue.toString()
+		} else if ((config['type'] as string | null) == 'radio') {
+			value = getRadioValue(getRadioItems(config)[0])
 		}
-		paramValues.value[index] = value
+		values.push(value)
+	}
+	return values
+}
+
+const getParamValue = (index: number): string => {
+	return index >= 0 && index < paramValues.value.length ? paramValues.value[index] : ''
+}
+
+const updateParamValueFromEvent = (index: number, value: any): void => {
+	if (sending.value || index < 0 || index >= paramValues.value.length) return
+	paramValues.value[index] = value == null ? '' : value.toString()
+}
+
+const loadCommandTypes = async (): Promise<void> => {
+	try {
+		loading.value = true
+		const response = await getCmdAction()
+		if (response.code == 0) {
+			commandTypes.value = sortByCmdNameLengthAndAlphabet(response.data)
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '加载指令类型失败', icon: 'none' })
+		}
+	} catch (error) {
+		console.error('加载指令类型出错:', error)
+		showAppToast({ title: '网络错误', icon: 'none' })
+	} finally {
+		loading.value = false
+	}
+}
+
+onLoad((options) => {
+	imei.value = options.imei ?? ''
+	loadCommandTypes()
+})
+
+const selectTypeByItem = async (type: UTSJSONObject): Promise<void> => {
+	if (sending.value) return
+	const typeId = type['cmdmId'] as string | number | null
+	if (typeId == null) return
+	selectedTypeId.value = typeId
+	selectedCommandId.value = null
+	selectedCommand.value = null
+	paramConfigs.value = []
+	paramValues.value = []
+	paramConfigError.value = ''
+	commands.value = []
+
+	try {
+		loading.value = true
+		const response = await getCmdByMid({ imei: imei.value, cmdmId: typeId } as UTSJSONObject)
+		if (response.code == 0) {
+			commands.value = response.data
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '加载指令列表失败', icon: 'none' })
+		}
+	} catch (error) {
+		console.error('加载指令列表出错:', error)
+		showAppToast({ title: '网络错误', icon: 'none' })
+	} finally {
+		loading.value = false
+	}
+}
+
+const selectCommand = (command: UTSJSONObject): void => {
+	if (sending.value) return
+	selectedCommandId.value = command['predictCmdId'] as string | number | null
+	selectedCommand.value = command
+	const configs = parseParamConfigs(command['details'] as string | null)
+	paramConfigs.value = configs
+	paramValues.value = paramConfigError.value == '' ? initializeParamValues(configs) : []
+}
+
+const selectRadio = (index: number, value: string): void => {
+	if (sending.value || index < 0 || index >= paramValues.value.length) return
+	paramValues.value[index] = value
+}
+
+const sendCommand = async (): Promise<void> => {
+	if (sending.value) return
+	if (selectedCommand.value == null) {
+		showAppToast({ title: '请选择指令', icon: 'none' })
+		return
+	}
+	if (paramConfigError.value != '') {
+		showAppToast({ title: paramConfigError.value, icon: 'none' })
+		return
+	}
+	if (!isFormValid.value) {
+		showAppToast({ title: '请填写所有参数', icon: 'none' })
+		return
 	}
 
-	const sendCommand = async (): Promise<void> => {
-		if (!isFormValid.value || selectedCommand.value == null) {
-			showAppToast({ title: '请填写所有参数', icon: 'none' })
-			return
-		}
-
-		const command = selectedCommand.value
-		let cmdData = (command['params'] as string | null) ?? ''
-		for (let index = 0; index < paramConfigs.value.length; index++) {
-			const config = paramConfigs.value[index]
-			const value = paramValues.value[index]
-			const configuredPlaceholder = config['placeholder'] as string | null
-			const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0
-				? configuredPlaceholder
-				: '${param' + (index + 1).toString() + '}'
-			cmdData = cmdData.replace(placeholder, value)
-		}
-
-		try {
-			loading.value = true
-			const response = await sendCmd({
-				imei: imei.value,
-				type: (command['cmdCode'] as string | null) ?? '',
-				password: null,
-				cmdData: encodeURIComponent(cmdData),
-				predictCmdId: command['predictCmdId']
-			} as UTSJSONObject)
-			if (response.code == 0) {
-				showAppToast({ title: '指令发送成功', icon: 'success' })
-			} else {
-				showAppToast({ title: '指令发送失败', icon: 'none', duration: 3000 })
-			}
-		} catch (error) {
-			console.error('发送指令出错:', error)
-			showAppToast({ title: '网络错误', icon: 'none' })
-		} finally {
-			loading.value = false
-		}
+	const command = selectedCommand.value
+	let cmdData = (command['params'] as string | null) ?? ''
+	for (let index = 0; index < paramConfigs.value.length; index++) {
+		const config = paramConfigs.value[index]
+		const configuredPlaceholder = config['placeholder'] as string | null
+		const placeholder = configuredPlaceholder != null && configuredPlaceholder.length > 0
+			? configuredPlaceholder
+			: '${param' + (index + 1).toString() + '}'
+		cmdData = cmdData.split(placeholder).join(paramValues.value[index])
 	}
+
+	try {
+		sending.value = true
+		const response = await sendCmd({
+			imei: imei.value,
+			type: (command['cmdCode'] as string | null) ?? '',
+			password: null,
+			cmdData: encodeURIComponent(cmdData),
+			predictCmdId: command['predictCmdId']
+		} as UTSJSONObject)
+		if (response.code == 0) {
+			showAppToast({ title: response.msg != '' ? response.msg : '指令发送成功', icon: 'success' })
+		} else {
+			showAppToast({ title: response.msg != '' ? response.msg : '指令发送失败', icon: 'none', duration: 3000 })
+		}
+	} catch (error) {
+		console.error('发送指令出错:', error)
+		showAppToast({ title: '网络错误', icon: 'none' })
+	} finally {
+		sending.value = false
+	}
+}
 </script>
 <style scoped lang="scss">
-	.container {
-		background-color: #f5f5f5;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.device-info {
-		display: flex;
-		align-items: center;
-		background: white;
-		padding: 20rpx;
-		border-radius: 10rpx;
-		margin: 30rpx 0;
-	}
-
-	.device-label {
-		font-size: 28rpx;
-		color: #666;
-		white-space: nowrap;
-	}
-
-	.device-input {
-		flex: 1;
-		font-size: 28rpx;
-		color: #333;
-	}
-
-	.section {
-		background: white;
-		border-radius: 10rpx;
-		padding: 20rpx;
-		margin-bottom: 30rpx;
-	}
-
-	.section-title {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #333;
-		margin-bottom: 20rpx;
-
-	}
-
-	.record-list {
-		font-size: 26rpx;
-		color: #666;
-	}
-
-	.type-container {
-		width: 100%;
-	}
-
-	.type-list {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		align-items: center;
-	}
-
-	.type-item {
-		margin-right: 20rpx;
-		margin-bottom: 20rpx;
-		padding: 15rpx 30rpx;
-		background: #f0f0f0;
-		border-radius: 50rpx;
-	}
-
-
-	.type-item.active {
-		background: #007AFF;
-	}
-
-	.type-item.active .type-name {
-		color: #fff;
-	}
-
-	.type-name {
-		font-size: 26rpx;
-		color: #666;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.command-list {
-		display: flex;
-		flex-direction: row;
-	}
-
-	.command-item + .command-item { margin-left: 20rpx; }
-
-	.command-item {
-		flex: 1;
-		padding: 25rpx;
-		border: 1rpx solid #e0e0e0;
-		border-radius: 10rpx;
-	}
-
-	.command-item.active {
-		border-color: #007AFF;
-		background-color: #f0f8ff;
-	}
-
-	.command-name {
-		font-size: 30rpx;
-		color: #333;
-
-		margin-bottom: 10rpx;
-	}
-
-	.command-descr {
-		font-size: 24rpx;
-		color: #999;
-
-	}
-
-	.param-form {
-		display: flex;
-		flex-direction: column;
-	}
-
+	.container { background-color: #f5f5f5; display: flex; flex-direction: column; padding-bottom: 30rpx; }
+	.device-info, .section { background: #fff; border-radius: 10rpx; padding: 20rpx; margin: 0 20rpx 30rpx; }
+	.device-info { display: flex; align-items: center; }
+	.device-label { font-size: 28rpx; color: #666; white-space: nowrap; }
+	.section-title { font-size: 32rpx; font-weight: bold; color: #333; margin-bottom: 20rpx; }
+	.type-list { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; }
+	.type-item { margin-right: 20rpx; margin-bottom: 20rpx; padding: 15rpx 30rpx; background: #f0f0f0; border-radius: 50rpx; }
+	.type-item.active { background: #007AFF; }
+	.type-item.active .type-name { color: #fff; }
+	.type-name { font-size: 26rpx; color: #666; white-space: nowrap; }
+	.command-list { display: flex; flex-direction: column; }
+	.command-item { width: 100%; box-sizing: border-box; padding: 25rpx; border: 1rpx solid #e0e0e0; border-radius: 10rpx; }
+	.command-item + .command-item { margin-top: 20rpx; }
+	.command-item.active { border-color: #007AFF; background-color: #f0f8ff; }
+	.command-name { font-size: 30rpx; color: #333; margin-bottom: 10rpx; }
+	.command-descr { font-size: 24rpx; color: #999; line-height: 36rpx; }
+	.param-form, .param-item, .radio-group { display: flex; flex-direction: column; }
 	.param-item + .param-item { margin-top: 30rpx; }
-
-	.param-item {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.param-label {
-		margin-bottom: 15rpx;
-		font-size: 28rpx;
-		color: #333;
-	}
-
-	.param-input {
-		border: 1rpx solid #e0e0e0;
-		border-radius: 8rpx;
-		padding: 20rpx;
-		font-size: 26rpx;
-	}
-
-	.radio-group {
-		display: flex;
-		flex-direction: column;
-	}
-
+	.param-label { margin-bottom: 15rpx; font-size: 28rpx; color: #333; }
+	.param-input { width: 100%; box-sizing: border-box; border: 1rpx solid #e0e0e0; border-radius: 8rpx; background: #fff; }
+	.param-error { color: #e43d33; font-size: 26rpx; margin-bottom: 20rpx; }
+	.no-param-tip { color: #999; font-size: 26rpx; margin-bottom: 20rpx; }
+	.radio-item { display: flex; align-items: center; }
 	.radio-item + .radio-item { margin-top: 20rpx; }
-
-	.radio-item {
-		display: flex;
-		align-items: center;
-	}
-
-	.radio-icon {
-		margin-right: 20rpx;
-		width: 36rpx;
-		height: 36rpx;
-		border-radius: 50%;
-		border: 1rpx solid #ccc;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.radio-inner {
-		width: 25rpx;
-		height: 25rpx;
-		border-radius: 50%;
-		background: transparent;
-	}
-
-	.radio-inner.checked {
-		background: #007AFF;
-	}
-
-	.radio-label {
-		font-size: 26rpx;
-		color: #333;
-	}
-
-	.submit-btn {
-		color: white;
-		border: none;
-		border-radius: 10rpx;
-		padding: 25rpx;
-		font-size: 30rpx;
-		margin-top: 20rpx;
-	}
-
-	.submit-btn:disabled {
-		background: #ccc;
-		color: #999;
-	}
-
-	.empty-state {
-		text-align: center;
-		padding: 50rpx 20rpx;
-		background: #fff;
-	}
-
-
-	.loading {
-		text-align: center;
-		padding: 50rpx 0;
-	}
-
-
-	.placeholder {
-		color: #ccc;
-	}
+	.radio-icon { margin-right: 20rpx; width: 36rpx; height: 36rpx; border-radius: 50%; border: 1rpx solid #ccc; display: flex; align-items: center; justify-content: center; }
+	.radio-inner { width: 25rpx; height: 25rpx; border-radius: 50%; background: transparent; }
+	.radio-inner.checked { background: #007AFF; }
+	.radio-label { font-size: 26rpx; color: #333; }
+	.submit-btn { margin-top: 30rpx; }
+	.empty-state, .loading { text-align: center; padding: 50rpx 20rpx; background: #fff; margin: 0 20rpx 30rpx; }
+	.placeholder { color: #ccc; }
 </style>

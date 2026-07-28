@@ -33,8 +33,18 @@ open class GenPagesStopRecordStopRecord : BasePage {
             val sortedCarStopDetail = computed(fun(): UTSArray<StopRecord> {
                 val sorted = carStopDetail.value.slice()
                 sorted.sort(fun(a: StopRecord, b: StopRecord): Number {
-                    val timeA = Date(a.getString("endTime", "")).getTime()
-                    val timeB = Date(b.getString("endTime", "")).getTime()
+                    val timeA = parseLocalDateTime(a.getString("endTime", ""))
+                    val timeB = parseLocalDateTime(b.getString("endTime", ""))
+                    if (timeA == null) {
+                        return if (timeB == null) {
+                            0
+                        } else {
+                            1
+                        }
+                    }
+                    if (timeB == null) {
+                        return -1
+                    }
                     return timeB - timeA
                 }
                 )
@@ -47,17 +57,8 @@ open class GenPagesStopRecordStopRecord : BasePage {
             )
             val initDateTime = fun(){
                 val now = Date()
-                val formatTime = fun(date: Date): String {
-                    val month = (date.getMonth() + 1).toString(10).padStart(2, "0")
-                    val day = date.getDate().toString(10).padStart(2, "0")
-                    val hours = date.getHours().toString(10).padStart(2, "0")
-                    val minutes = date.getMinutes().toString(10).padStart(2, "0")
-                    val seconds = date.getSeconds().toString(10).padStart(2, "0")
-                    return "" + date.getFullYear() + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
-                }
-                endTime.value = formatTime(now)
-                val startDate = Date(now.getTime() - 86400000)
-                startTime.value = formatTime(startDate)
+                endTime.value = formatTimes(now.getTime())
+                startTime.value = formatTimes(now.getTime() - 86400000)
             }
             val loadStopData = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {

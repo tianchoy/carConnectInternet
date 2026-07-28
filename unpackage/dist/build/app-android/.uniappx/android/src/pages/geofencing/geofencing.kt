@@ -938,6 +938,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
             }
             val editSelectedFence = ::gen_editSelectedFence_fn
             fun gen_deleteSelectedFence_fn(): Unit {
+                showFenceModal.value?.`$callMethod`("close")
                 val fence = selectedFence.value
                 console.log("删除电子围栏", fence)
                 if (fence != null) {

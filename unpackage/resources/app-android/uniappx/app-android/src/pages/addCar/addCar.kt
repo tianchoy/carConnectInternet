@@ -199,12 +199,12 @@ open class GenPagesAddCarAddCar : BasePage {
                                         )
                                     }
                                     ), "_" to 1)),
-                                    _cV(_component_i_form_item, _uM("label" to "车牌名", "name" to "plateNo", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                                    _cV(_component_i_form_item, _uM("label" to "车牌号", "name" to "plateNo", "labelDirection" to "horizontal"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                         return _uA(
                                             _cV(_component_i_input, _uM("border" to "none", "modelValue" to carInfo.value.plateNo, "onUpdate:modelValue" to fun(`$event`: String){
                                                 carInfo.value.plateNo = `$event`
                                             }
-                                            , "placeholder" to "请输入车牌名"), null, 8, _uA(
+                                            , "placeholder" to "请输入车牌号"), null, 8, _uA(
                                                 "modelValue",
                                                 "onUpdate:modelValue"
                                             ))

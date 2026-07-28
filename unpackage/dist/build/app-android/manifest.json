@@ -1,6 +1,6 @@
 {
   "id": "__UNI__662B0B4",
-  "name": "carConnectInternet",
+  "name": "车载GPS",
   "description": "",
   "version": {
     "name": "1.0.0",
@@ -21,6 +21,11 @@
       ],
       "modules": {
         "uni-barcode-scanning": {},
+        "uni-map": {
+          "tencent": {
+            "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+          }
+        },
         "uni-event": {},
         "uni-getSystemInfo": {},
         "uni-vibrate": {},

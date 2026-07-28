@@ -1,13 +1,13 @@
 {
   "id": "__UNI__662B0B4",
-  "name": "carConnectInternet",
+  "name": "车载GPS",
   "description": "",
   "version": {
     "name": "1.0.0",
     "code": "100"
   },
   "uni-app-x": {
-    "compilerVersion": "5.21"
+    "compilerVersion": "5.22"
   },
   "app-android": {
     "distribute": {
@@ -21,11 +21,16 @@
       ],
       "modules": {
         "uni-barcode-scanning": {},
+        "uni-map": {
+          "tencent": {
+            "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+          }
+        },
         "uni-event": {},
         "uni-getSystemInfo": {},
         "uni-vibrate": {},
-        "uni-storage": {},
         "uni-prompt": {},
+        "uni-storage": {},
         "uni-scanCode": {},
         "uni-rpx2px": {},
         "uni-exit": {},

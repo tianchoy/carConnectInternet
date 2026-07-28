@@ -1,28 +1,34 @@
 {
   "id": "__UNI__662B0B4",
-  "name": "carConnectInternet",
+  "name": "车载GPS",
   "description": "",
   "version": {
     "name": "1.0.0",
     "code": "100"
   },
   "uni-app-x": {
-    "compilerVersion": "5.21"
+    "compilerVersion": "5.22"
   },
   "app-ios": {
     "distribute": {
       "modules": {
-        "uni-showLoading": {},
-        "uni-getSystemInfo": {},
+        "uni-barcode-scanning": {},
+        "uni-map": {
+          "tencent": {
+            "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
+          }
+        },
         "uni-storage": {},
-        "uni-event": {},
-        "uni-prompt": {},
-        "uni-openLocation": {},
-        "uni-location": {},
-        "uni-scanCode": {},
+        "uni-getSystemInfo": {},
+        "uni-showLoading": {},
         "uni-dialogPage": {},
+        "uni-event": {},
+        "uni-location": {},
+        "uni-openLocation": {},
         "uni-vibrate": {},
+        "uni-scanCode": {},
         "uni-network": {},
+        "uni-prompt": {},
         "uni-map-tencent": {},
         "uni-web-view": {}
       }

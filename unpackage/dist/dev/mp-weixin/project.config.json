@@ -16,7 +16,7 @@
   "compileType": "miniprogram",
   "libVersion": "",
   "appid": "wx197f5f7e9b9833bc",
-  "projectname": "carConnectInternet",
+  "projectname": "车载GPS",
   "condition": {
     "search": {
       "current": -1,

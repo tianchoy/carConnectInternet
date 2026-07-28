@@ -1040,6 +1040,7 @@ const imei = ref<string | null>(null)
 	}
 
 	function deleteSelectedFence(): void {
+		showFenceModal.value?.$callMethod('close')
 		const fence = selectedFence.value;
 		console.log('删除电子围栏', fence);
 

@@ -7399,7 +7399,11 @@ const createEditorContextAsync = defineAsyncApi(API_CREATE_EDITOR_CONTEXT_ASYNC,
   }
 });
 function normalizeDatasetResult(result) {
-  if (result && result.dataset) {
+  if (Array.isArray(result)) {
+    result.forEach(normalizeDatasetResult);
+    return result;
+  }
+  if (result && result.dataset && !(result.dataset instanceof UniDOMStringMap)) {
     result.dataset = createUniDOMStringMap(result.dataset);
   }
   return result;
@@ -7409,13 +7413,29 @@ function normalizeDatasetCallback(callback) {
     return callback;
   }
   return function datasetCallback(result) {
-    if (Array.isArray(result)) {
-      result.forEach(normalizeDatasetResult);
-    } else {
-      normalizeDatasetResult(result);
-    }
+    normalizeDatasetResult(result);
     return callback.call(this, result);
   };
+}
+function normalizeSelectorQueryMethods(target) {
+  if (!target) {
+    return target;
+  }
+  ["boundingClientRect", "scrollOffset"].forEach((name) => {
+    const method = target[name];
+    if (isFunction(method)) {
+      target[name] = function datasetMethod(callback) {
+        return method.call(this, normalizeDatasetCallback(callback));
+      };
+    }
+  });
+  const oldFields = target.fields;
+  if (isFunction(oldFields)) {
+    target.fields = function fields(fields, callback) {
+      return oldFields.call(this, fields, normalizeDatasetCallback(callback));
+    };
+  }
+  return target;
 }
 function normalizeSelectorQueryDataset(query) {
   if (!query) {
@@ -7427,20 +7447,16 @@ function normalizeSelectorQueryDataset(query) {
       return oldExec.call(this, normalizeDatasetCallback(callback));
     };
   }
-  ["boundingClientRect", "scrollOffset"].forEach((name) => {
+  normalizeSelectorQueryMethods(query);
+  ["select", "selectAll", "selectViewport"].forEach((name) => {
     const method = query[name];
     if (isFunction(method)) {
-      query[name] = function datasetMethod(callback) {
-        return method.call(this, normalizeDatasetCallback(callback));
+      query[name] = function datasetMethod(...args) {
+        const target = method.apply(this, args);
+        return target === query ? target : normalizeSelectorQueryMethods(target);
       };
     }
   });
-  const oldFields = query.fields;
-  if (isFunction(oldFields)) {
-    query.fields = function fields(fields, callback) {
-      return oldFields.call(this, fields, normalizeDatasetCallback(callback));
-    };
-  }
   return query;
 }
 function normalizeIntersectionObserverDataset(observer) {
@@ -8047,13 +8063,13 @@ function populateParameters(fromRes, toRes) {
   const hostLanguage = (language || "").replace(/_/g, "-");
   const parameters = {
     appId: "__UNI__662B0B4",
-    appName: "carConnectInternet",
+    appName: "车载GPS",
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.21",
-    uniCompilerVersion: "5.21",
-    uniRuntimeVersion: "5.21",
+    uniCompileVersion: "5.22",
+    uniCompilerVersion: "5.22",
+    uniRuntimeVersion: "5.22",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -8083,8 +8099,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.21");
-      parameters.uniRuntimeVersionCode = parseFloat("5.21");
+      parameters.uniCompilerVersionCode = parseFloat("5.22");
+      parameters.uniRuntimeVersionCode = parseFloat("5.22");
     } catch (error) {
     }
   }
@@ -8209,7 +8225,7 @@ const getAppBaseInfo = {
     let hostLanguage = (language || "").replace(/_/g, "-");
     const parameters = {
       appId: "__UNI__662B0B4",
-      appName: "carConnectInternet",
+      appName: "车载GPS",
       appVersion: "1.0.0",
       appVersionCode: "100",
       appLanguage: getAppLanguage(hostLanguage),
@@ -8220,9 +8236,9 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.21",
-      uniCompilerVersion: "5.21",
-      uniRuntimeVersion: "5.21"
+      uniCompileVersion: "5.22",
+      uniCompilerVersion: "5.22",
+      uniRuntimeVersion: "5.22"
     };
     try {
       if (typeof wx.getAccountInfoSync === "function") {
@@ -8232,8 +8248,8 @@ const getAppBaseInfo = {
     }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.21");
-        parameters.uniRuntimeVersionCode = parseFloat("5.21");
+        parameters.uniCompilerVersionCode = parseFloat("5.22");
+        parameters.uniRuntimeVersionCode = parseFloat("5.22");
       } catch (error) {
       }
     }
@@ -9074,7 +9090,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.1.252";
   const port = "8090";
-  const id = "mp-weixin_sMJHJJ";
+  const id = "mp-weixin_jDIVLg";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -10327,7 +10343,7 @@ function getAppVm() {
 }
 function removeAppHook(vm, name, hook, originalHook, target) {
   const hooks = vm.$[name];
-  if (!isArray(hooks)) {
+  if (!Array.isArray(hooks)) {
     return;
   }
   for (let i = hooks.length - 1; i >= 0; i--) {
