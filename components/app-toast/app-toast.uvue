@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="uts">
-import { onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { registerIosToastHandler, unregisterIosToastHandler } from '../../utils/toast.uts'
 
 defineOptions({ name: 'app-toast' })
@@ -13,9 +13,9 @@ defineOptions({ name: 'app-toast' })
 // #ifdef APP-IOS
 const toastRef = ref<any>(null)
 
-const handleToast = (options: ShowToastOptions): void => {
+const handleToast = (options: ShowToastOptions): boolean => {
 	const toast = toastRef.value
-	if (toast == null) return
+	if (toast == null) return false
 
 	const toastOptions = {
 		title: options.title,
@@ -31,9 +31,14 @@ const handleToast = (options: ShowToastOptions): void => {
 	} else {
 		toast.open(toastOptions)
 	}
+	return true
 }
 
-registerIosToastHandler(handleToast)
+onMounted(() => {
+	nextTick(() => {
+		registerIosToastHandler(handleToast)
+	})
+})
 
 onUnmounted(() => {
 	unregisterIosToastHandler(handleToast)

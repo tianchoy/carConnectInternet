@@ -1,13 +1,31 @@
-const iosToastHandlers: Array<(options: ShowToastOptions) => void> = []
+type IosToastHandler = (options: ShowToastOptions) => boolean
 
-export function registerIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+const iosToastHandlers: Array<IosToastHandler> = []
+const pendingIosToasts: Array<ShowToastOptions> = []
+const maxPendingToastCount = 10
+
+function dispatchIosToast(options: ShowToastOptions): boolean {
+	const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null
+	return handler != null && handler(options)
+}
+
+function flushPendingIosToasts(): void {
+	while (pendingIosToasts.length > 0) {
+		const options = pendingIosToasts[0]
+		if (!dispatchIosToast(options)) return
+		pendingIosToasts.splice(0, 1)
+	}
+}
+
+export function registerIosToastHandler(handler: IosToastHandler): void {
 	// #ifdef APP-IOS
 	const index = iosToastHandlers.indexOf(handler)
 	if (index == -1) iosToastHandlers.push(handler)
+	flushPendingIosToasts()
 	// #endif
 }
 
-export function unregisterIosToastHandler(handler: (options: ShowToastOptions) => void): void {
+export function unregisterIosToastHandler(handler: IosToastHandler): void {
 	// #ifdef APP-IOS
 	const index = iosToastHandlers.indexOf(handler)
 	if (index >= 0) iosToastHandlers.splice(index, 1)
@@ -16,8 +34,10 @@ export function unregisterIosToastHandler(handler: (options: ShowToastOptions) =
 
 export function showAppToast(options: ShowToastOptions): void {
 	// #ifdef APP-IOS
-	const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null
-	if (handler != null) handler(options)
+	if (!dispatchIosToast(options)) {
+		if (pendingIosToasts.length >= maxPendingToastCount) pendingIosToasts.splice(0, 1)
+		pendingIosToasts.push(options)
+	}
 	// #endif
 
 	// #ifndef APP-IOS

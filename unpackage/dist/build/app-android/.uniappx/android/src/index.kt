@@ -1278,6 +1278,7 @@ class MapCenterReactiveObject : MapCenter, IUTSReactive<MapCenter> {
             _tRS(__v_raw, "longitude", oldValue, value)
         }
 }
+typealias PositionState = String
 open class DeviceStatus (
     @JsonNotNull
     open var batteryPercent: Number,
