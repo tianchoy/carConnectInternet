@@ -48,6 +48,12 @@
 
 <script setup lang="ts">
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal } from '../../utils/modal.uts'
+	import {
+		ensureCameraPermission,
+		openCameraPermissionSettings,
+		type CameraPermissionStatus
+	} from '../../utils/cameraPermission.uts'
 	import { ref } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
 	import carIcons from '../../components/car-icons/car-icons.uvue'
@@ -73,6 +79,8 @@ import { showAppToast } from '../../utils/toast.uts'
 		data: CarFormData
 	}
 
+	const isRequestingCameraPermission = ref<boolean>(false)
+	const isNavigatingToScanner = ref<boolean>(false)
 	const carIconSelectorVisible = ref<boolean>(false)
 	const loading = ref<boolean>(false)
 	const formValid = ref<boolean>(false)
@@ -98,34 +106,64 @@ import { showAppToast } from '../../utils/toast.uts'
 	const handleModelValid = (value: any) => {
 		// 使用双重否定或比较运算符来转换为布尔值，避免使用 Boolean()
 		formValid.value = !!value
-		// 或者使用
-		// formValid.value = value === true
-		// formValid.value = value ? true : false
 	}
 
 	// ===== 核心功能函数 =====
 
 	// 扫码功能
-	const scanCode = () => {
+	const openScanPage = () => {
+		if (isNavigatingToScanner.value) return
+		isNavigatingToScanner.value = true
 		uni.navigateTo({
-			url: '/pages/scancode/scancode?source=addCar'
+			url: '/pages/scancode/scancode?source=addCar',
+			fail: () => {
+				isNavigatingToScanner.value = false
+			}
 		})
+	}
+
+	const handleCameraPermission = (status : CameraPermissionStatus) => {
+		isRequestingCameraPermission.value = false
+		if (status == 'granted') {
+			openScanPage()
+			return
+		}
+		if (status == 'settingsRequired') {
+			showAppModal({
+				title: '需要相机权限',
+				content: '请在系统设置中开启相机权限后再扫码',
+				confirmText: '去设置',
+				cancelText: '取消',
+				success: (res) => {
+					if (res.confirm) openCameraPermissionSettings()
+				}
+			})
+			return
+		}
+		showAppToast({ title: '未获得相机权限，无法扫码', icon: 'none' })
+	}
+
+	const scanCode = () => {
+		if (isRequestingCameraPermission.value) return
+		isRequestingCameraPermission.value = true
+		ensureCameraPermission(handleCameraPermission)
 	}
 
 	// 扫码结果事件处理
 	const handleScanResult = (data: ScanResultData) => {
 		console.log('接收到扫码结果:', data.result)
-		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
 		if (data.result.length == 15) {
 			carInfo.value.imei = '0' + data.result.slice(4, 15)
-		} else if (data.result.length == 11) {
-			carInfo.value.imei = '0' + data.result
-		} else {
-			showAppToast({
-				title: '请输入正确的设备ID',
-				icon: 'none'
-			})
+			return
 		}
+		if (data.result.length == 11) {
+			carInfo.value.imei = '0' + data.result
+			return
+		}
+		showAppToast({
+			title: '扫码结果长度不是标准设备ID，请确认后提交',
+			icon: 'none'
+		})
 	}
 
 	const updateCarIconSelectorVisible = (visible: boolean) => {
@@ -236,11 +274,10 @@ import { showAppToast } from '../../utils/toast.uts'
 	// ===== 生命周期 =====
 	onLoad(() => {
 		// loadCarTypeData()
-		// 注册扫码结果事件监听
-		uni.$on('scanCodeResult', handleScanResult)
 	})
 
 	onShow(() => {
+		isNavigatingToScanner.value = false
 		const rawResult = uni.getStorageSync('scanCodeResult')
 			const result = rawResult != null ? rawResult.toString() : ''
 		if (result.length > 0) {
@@ -250,8 +287,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	})
 
 	onUnload(() => {
-		// 移除事件监听，防止内存泄漏
-		uni.$off('scanCodeResult', handleScanResult)
+		// 页面卸载时无需额外移除扫码结果监听
 	})
 
 	// ===== 加载车辆类型（注释掉，如需使用请取消注释） =====

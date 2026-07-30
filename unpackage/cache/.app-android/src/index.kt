@@ -111,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_C6b4GE"
+    val id: String = "app-android_DYoVUL"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1250,7 +1250,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 209, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 212, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1434,7 +1434,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 226, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 229, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1479,6 +1479,7 @@ class MapCenterReactiveObject : MapCenter, IUTSReactive<MapCenter> {
             _tRS(__v_raw, "longitude", oldValue, value)
         }
 }
+typealias PositionState = String
 open class DeviceStatus (
     @JsonNotNull
     open var batteryPercent: Number,
@@ -1488,7 +1489,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 261, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 272, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1554,7 +1555,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 267, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 278, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1638,7 +1639,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 360, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 371, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -2031,6 +2032,45 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
     return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
 }
 )
+typealias CameraPermissionStatus = String
+val CAMERA_PERMISSION = _uA(
+    "android.permission.CAMERA"
+) as UTSArray<String>
+fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        callback("unavailable")
+        return
+    }
+    if (isTruthy(UTSAndroid.checkSystemPermissionGranted(activity, CAMERA_PERMISSION))) {
+        callback("granted")
+        return
+    }
+    UTSAndroid.requestSystemPermission(activity, CAMERA_PERMISSION, fun(allRight, _){
+        callback(if (isTruthy(allRight)) {
+            "granted"
+        } else {
+            "denied"
+        }
+        )
+    }
+    , fun(doNotAskAgain, _){
+        callback(if (isTruthy(doNotAskAgain)) {
+            "settingsRequired"
+        } else {
+            "denied"
+        }
+        )
+    }
+    )
+    return
+}
+fun openCameraPermissionSettings(): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity != null) {
+        UTSAndroid.gotoSystemPermissionActivity(activity, CAMERA_PERMISSION)
+    }
+}
 val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)
@@ -2074,7 +2114,7 @@ open class CarFormData (
     open var carType: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 55, 7)
+        return UTSSourceMapPosition("CarFormData", "pages/addCar/addCar.uvue", 61, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return CarFormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -2172,7 +2212,7 @@ open class ScanResultData (
     open var result: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 64, 7)
+        return UTSSourceMapPosition("ScanResultData", "pages/addCar/addCar.uvue", 70, 7)
     }
 }
 typealias CarIconItem__1 = UTSJSONObject

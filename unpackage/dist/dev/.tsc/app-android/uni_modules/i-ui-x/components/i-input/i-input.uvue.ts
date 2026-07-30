@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 
 const __sfc__ = defineComponent({
@@ -225,6 +225,21 @@ const inputBgColor = computed(() => {
   return props.bgColor
 })
 const current = ref(initialValue())
+
+watch(
+  () : string => props.modelValue,
+  () => {
+    current.value = props.modelValue
+  },
+)
+
+watch(
+  () : string => props.value,
+  () => {
+    if (props.modelValue.length == 0) current.value = props.value
+  },
+)
+
 const focused = ref(false)
 const passwordVisible = ref(props.password)
 

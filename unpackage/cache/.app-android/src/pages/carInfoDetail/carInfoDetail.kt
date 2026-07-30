@@ -309,7 +309,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             val baseList = computed(fun(): UTSArray<UTSJSONObject> {
                 val list = __uts_large_list_build_0()
                 val productId = currentCarInfo.value["productId"]
-                if (productId !== "product-1141811865601576960" || productId !== "product-1183161303028600832") {
+                if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
                     list.push(_uO("image" to "/static/cmd.png", "text" to "发送指令"))
                 }
                 return list

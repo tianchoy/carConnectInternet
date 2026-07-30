@@ -13,52 +13,106 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "scancode",
   setup(__props) {
     const scanFunctionIsUseable = common_vendor.ref(true);
-    const goBack = () => {
+    const cameraVisible = common_vendor.ref(true);
+    const hasFinished = common_vendor.ref(false);
+    const pendingBack = common_vendor.ref(false);
+    let backTimer = null;
+    const clearBackTimer = () => {
+      const timer = backTimer;
+      if (timer != null) {
+        clearTimeout(timer);
+        backTimer = null;
+      }
+    };
+    const releaseCamera = () => {
+      cameraVisible.value = false;
+    };
+    const completeBack = () => {
+      if (!pendingBack.value)
+        return null;
+      pendingBack.value = false;
+      clearBackTimer();
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:47", "扫码页已释放相机，返回添加设备页");
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
     };
-    const handleScanResult = (scanResult) => {
-      if (!scanFunctionIsUseable.value || scanResult.length == 0)
+    const requestBack = () => {
+      if (pendingBack.value)
         return null;
+      pendingBack.value = true;
+      releaseCamera();
+      backTimer = setTimeout(() => {
+        completeBack();
+      }, 1200);
+    };
+    const handleCameraInitDone = () => {
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:61", "扫码摄像头初始化完成");
+    };
+    const handleScan = (e) => {
+      if (hasFinished.value || !scanFunctionIsUseable.value)
+        return null;
+      const scanResult = e.detail.result;
+      if (scanResult == null)
+        return null;
+      const result = scanResult;
+      if (result.length == 0)
+        return null;
+      hasFinished.value = true;
       scanFunctionIsUseable.value = false;
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:19", "扫码结果:", scanResult);
-      common_vendor.index.setStorageSync("scanCodeResult", scanResult);
-      common_vendor.index.$emit("scanCodeResult", new common_vendor.UTSJSONObject({ result: scanResult }));
+      common_vendor.index.vibrateLong(new common_vendor.UTSJSONObject({}));
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:74", "扫码结果:", result);
+      common_vendor.index.setStorageSync("scanCodeResult", result);
       utils_toast.showAppToast({
         title: "扫码成功",
         icon: "success",
-        duration: 1e3
+        duration: 500
       });
-      setTimeout(() => {
-        common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
-      }, 1e3);
+      requestBack();
     };
-    const startScan = () => {
-      if (!scanFunctionIsUseable.value)
+    const handleCameraStop = () => {
+      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:85", "扫码摄像头已停止");
+      if (pendingBack.value) {
+        completeBack();
         return null;
-      common_vendor.index.scanCode(new common_vendor.UTSJSONObject({
-        onlyFromCamera: true,
-        success: (res) => {
-          common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:37", "扫码成功res:", res);
-          const result = res.result;
-          if (result != null)
-            handleScanResult(result);
-        },
-        fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:42", "扫码失败:", err);
-          utils_toast.showAppToast({ title: "扫码失败", icon: "none" });
-          goBack();
-        }
-      }));
+      }
+      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:90", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
     };
-    common_vendor.onLoad(() => {
-      startScan();
+    const handleCameraError = (e) => {
+      if (hasFinished.value)
+        return null;
+      hasFinished.value = true;
+      common_vendor.index.__f__("error", "at pages/scancode/scancode.uvue:96", "摄像头初始化失败:", e.detail);
+      utils_toast.showAppToast({
+        title: "摄像头初始化失败，请检查相机权限",
+        icon: "none",
+        duration: 500
+      });
+      requestBack();
+    };
+    common_vendor.onHide(() => {
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:106", "扫码页隐藏");
+      clearBackTimer();
+      releaseCamera();
+    });
+    common_vendor.onUnload(() => {
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:112", "扫码页卸载");
+      clearBackTimer();
+      releaseCamera();
     });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
-        a: `${_ctx.u_s_b_h}px`,
-        b: `${_ctx.u_s_a_i_b}px`
-      };
+      const __returned__ = common_vendor.e({
+        a: cameraVisible.value
+      }, cameraVisible.value ? {
+        b: common_vendor.o(handleCameraInitDone, "e1"),
+        c: common_vendor.o(handleScan, "ee"),
+        d: common_vendor.o(handleCameraStop, "39"),
+        e: common_vendor.o(handleCameraError, "2b")
+      } : {}, {
+        f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        g: `${_ctx.u_s_b_h}px`,
+        h: `${_ctx.u_s_a_i_b}px`,
+        i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      });
       return __returned__;
     };
   }

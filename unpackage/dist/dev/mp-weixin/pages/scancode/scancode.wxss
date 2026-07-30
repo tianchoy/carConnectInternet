@@ -31,39 +31,14 @@
   flex-direction: column;
   background-color: #000;
 }
-.scan-header {
-  height: 88rpx;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: #fff;
-}
-.back-button {
-  width: 120rpx;
-  color: #333;
-  font-size: 28rpx;
-  text-align: center;
-}
-.title {
-  flex: 1;
-  color: #333;
-  font-size: 36rpx;
-  font-weight: bold;
-  text-align: center;
-  margin-right: 120rpx;
-}
 .scancode-box {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 0;
+  padding: 0;
 }
-.scan-button {
-  color: #fff;
-  font-size: 32rpx;
-  background-color: #007aff;
-  border-radius: 12rpx;
-  padding: 24rpx 60rpx;
+.scan-code {
+  width: 100%;
+  height: 100%;
 }
 .tip {
   position: fixed;

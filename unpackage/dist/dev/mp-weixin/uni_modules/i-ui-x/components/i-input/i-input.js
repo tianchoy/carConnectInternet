@@ -183,6 +183,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     return props.bgColor;
   });
   const current = common_vendor.ref(initialValue());
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, () => {
+    current.value = props.modelValue;
+  });
+  common_vendor.watch(() => {
+    return props.value;
+  }, () => {
+    if (props.modelValue.length == 0)
+      current.value = props.value;
+  });
   const focused = common_vendor.ref(false);
   const passwordVisible = common_vendor.ref(props.password);
   const wrapClass = common_vendor.computed(() => {

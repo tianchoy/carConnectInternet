@@ -1,4 +1,4 @@
-import { onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { registerIosToastHandler, unregisterIosToastHandler } from '../../utils/toast.uts';
 const __sfc__ = defineComponent({
     __name: 'app-toast',

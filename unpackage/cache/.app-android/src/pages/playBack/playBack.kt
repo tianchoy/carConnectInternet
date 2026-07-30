@@ -49,8 +49,35 @@ open class GenPagesPlayBackPlayBack : BasePage {
             var playbackTimer: Number? = null
             var lastTimestamp: Number = 0
             var replaySessionId: Number = 0
-            val startTime = ref("")
-            val endTime = ref("")
+            fun gen_formatPlaybackTime_fn(timestamp: Number): String {
+                return formatTimes(timestamp) ?: ""
+            }
+            val formatPlaybackTime = ::gen_formatPlaybackTime_fn
+            val initialEndTime = formatPlaybackTime(Date.now())
+            val initialStartTime = formatPlaybackTime(Date.now() - 21600000)
+            val startTime = ref(initialStartTime)
+            val endTime = ref(initialEndTime)
+            val displayStartTime = ref(initialStartTime)
+            val displayEndTime = ref(initialEndTime)
+            fun gen_setPlaybackTimeRange_fn(startValue: String, endValue: String): Unit {
+                val startMilliseconds = parseLocalDateTime(startValue)
+                val endMilliseconds = parseLocalDateTime(endValue)
+                val normalizedStartTime = if (startMilliseconds == null) {
+                    startValue
+                } else {
+                    formatPlaybackTime(startMilliseconds)
+                }
+                val normalizedEndTime = if (endMilliseconds == null) {
+                    endValue
+                } else {
+                    formatPlaybackTime(endMilliseconds)
+                }
+                startTime.value = normalizedStartTime
+                endTime.value = normalizedEndTime
+                displayStartTime.value = normalizedStartTime
+                displayEndTime.value = normalizedEndTime
+            }
+            val setPlaybackTimeRange = ::gen_setPlaybackTimeRange_fn
             val lat = ref<String?>("")
             val lng = ref<String?>("")
             val sTime = ref("")
@@ -64,6 +91,34 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 return normalizeLocalDateTime(dateStr)
             }
             val normalizeDateTime = ::gen_normalizeDateTime_fn
+            fun gen_resolveRouteDateTime_fn(dateStr: String): String? {
+                if (dateStr == "") {
+                    return null
+                }
+                try {
+                    val decoded = UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:181") ?: ""
+                    val milliseconds = parseLocalDateTime(decoded)
+                    return if (milliseconds == null) {
+                        null
+                    } else {
+                        formatPlaybackTime(milliseconds)
+                    }
+                }
+                 catch (error: Throwable) {
+                    console.error("解析回放时间失败:", error, " at pages/playBack/playBack.uvue:185")
+                    return null
+                }
+            }
+            val resolveRouteDateTime = ::gen_resolveRouteDateTime_fn
+            fun gen_formatTimeForDisplay_fn(dateStr: String): String {
+                val milliseconds = parseLocalDateTime(dateStr)
+                return if (milliseconds == null) {
+                    dateStr
+                } else {
+                    formatPlaybackTime(milliseconds)
+                }
+            }
+            val formatTimeForDisplay = ::gen_formatTimeForDisplay_fn
             fun gen_formatDateForDisplay_fn(dateStr: String): String {
                 return normalizeDateTime(dateStr)
             }
@@ -150,8 +205,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
             val calculateTrackDistance = ::gen_calculateTrackDistance_fn
             fun gen_initDateTime_fn() {
                 val now = Date()
-                endTime.value = formatTimes(now.getTime())
-                startTime.value = formatTimes(now.getTime() - 86400000)
+                setPlaybackTimeRange(formatPlaybackTime(now.getTime() - 21600000), formatPlaybackTime(now.getTime()))
             }
             val initDateTime = ::gen_initDateTime_fn
             fun gen_initCarMarker_fn() {
@@ -355,7 +409,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 583, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 622, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -375,7 +429,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:608")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:647")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -452,9 +506,9 @@ open class GenPagesPlayBackPlayBack : BasePage {
             fun gen_onConfirm_fn(value: String) {
                 val formattedValue = normalizeDateTime(value)
                 if (currentPickerType.value == "start") {
-                    startTime.value = formattedValue
+                    setPlaybackTimeRange(formattedValue, endTime.value ?: "")
                 } else {
-                    endTime.value = formattedValue
+                    setPlaybackTimeRange(startTime.value ?: "", formattedValue)
                 }
                 resetPlayback()
                 loadTrackPos()
@@ -485,10 +539,11 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:727")
-                if (sTime.value != "" && eTime.value != "") {
-                    startTime.value = normalizeDateTime(sTime.value)
-                    endTime.value = normalizeDateTime(eTime.value)
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:766")
+                val routeStartTime = resolveRouteDateTime(sTime.value)
+                val routeEndTime = resolveRouteDateTime(eTime.value)
+                if (routeStartTime != null && routeEndTime != null) {
+                    setPlaybackTimeRange(routeStartTime, routeEndTime)
                     loadTrackPos()
                 } else {
                     initDateTime()
@@ -545,14 +600,14 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cE("text", _uM("class" to "Date", "onClick" to fun(){
                                         showPicker("start")
                                     }
-                                    ), _tD(startTime.value), 9, _uA(
+                                    ), _tD(displayStartTime.value), 9, _uA(
                                         "onClick"
                                     )),
-                                    _cE("text", null, "至"),
+                                    _cE("text", _uM("class" to "date-separator"), "至"),
                                     _cE("text", _uM("class" to "Date", "onClick" to fun(){
                                         showPicker("end")
                                     }
-                                    ), _tD(endTime.value), 9, _uA(
+                                    ), _tD(displayEndTime.value), 9, _uA(
                                         "onClick"
                                     ))
                                 ))
@@ -596,7 +651,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             }
                             , "position" to "bottom", "closeable" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                 return _uA(
-                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
+                                    _cV(_component_l_date_time_picker, _uM("confirm-btn" to "确认", "cancel-btn" to "取消", "title" to pickerTitle.value, "mode" to 63, "format" to "YYYY-MM-DD HH:mm:ss", "onConfirm" to onConfirm, "onCancel" to onCancel), null, 8, _uA(
                                         "title"
                                     ))
                                 )
@@ -618,7 +673,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "sub-nav-overlay" to _uM(".container .map-container " to _uM("position" to "absolute", "top" to 0, "left" to 0, "right" to 0, "zIndex" to 100)), "tools-panel" to _uM(".container " to _uM("width" to "100%", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "30rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "24rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
+                return _uM("container" to _pS(_uM("position" to "relative", "width" to "100%", "height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#f5f7fa")), "map-container" to _uM(".container " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "width" to "100%", "position" to "relative")), "sub-nav-overlay" to _uM(".container .map-container " to _uM("position" to "absolute", "top" to 0, "left" to 0, "right" to 0, "zIndex" to 100)), "tools-panel" to _uM(".container " to _uM("width" to "100%", "boxSizing" to "border-box", "backgroundColor" to "#ffffff", "paddingTop" to "50rpx", "paddingRight" to "20rpx", "paddingBottom" to "50rpx", "paddingLeft" to "20rpx", "boxShadow" to "0 -10rpx 20rpx rgba(0, 0, 0, 0.1)")), "Datetime-box" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "marginBottom" to "30rpx")), "date-box" to _uM(".container .tools-panel .Datetime-box " to _uM("display" to "flex", "width" to "100%", "boxSizing" to "border-box", "flexDirection" to "row", "flexWrap" to "wrap", "justifyContent" to "flex-start", "alignItems" to "center")), "Date" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("fontSize" to "26rpx", "borderTopLeftRadius" to "5rpx", "borderTopRightRadius" to "5rpx", "borderBottomRightRadius" to "5rpx", "borderBottomLeftRadius" to "5rpx", "backgroundColor" to "#f5f5f5", "paddingTop" to 0, "paddingRight" to "10rpx", "paddingBottom" to 0, "paddingLeft" to "10rpx", "marginTop" to "8rpx", "marginRight" to 0, "marginBottom" to "8rpx", "marginLeft" to 0)), "date-separator" to _uM(".container .tools-panel .Datetime-box .date-box " to _uM("marginTop" to 0, "marginRight" to "10rpx", "marginBottom" to 0, "marginLeft" to "10rpx", "fontSize" to "26rpx")), "playbackdetail" to _uM(".container .tools-panel .Datetime-box " to _uM("fontSize" to "25rpx", "color" to "#1890FF")), "tool-tag-item" to _uM(".container .tools-panel " to _uM("paddingTop" to "40rpx", "paddingRight" to "20rpx", "paddingBottom" to "40rpx", "paddingLeft" to "20rpx", "display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center")), "speed-label" to _uM(".container .tools-panel .tool-tag-item " to _uM("borderTopWidth" to "2rpx", "borderRightWidth" to "2rpx", "borderBottomWidth" to "2rpx", "borderLeftWidth" to "2rpx", "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#1890FF", "borderRightColor" to "#1890FF", "borderBottomColor" to "#1890FF", "borderLeftColor" to "#1890FF", "fontSize" to "25rpx", "color" to "#1890FF", "paddingTop" to "5rpx", "paddingRight" to "15rpx", "paddingBottom" to "5rpx", "paddingLeft" to "15rpx", "borderTopLeftRadius" to "30rpx", "borderTopRightRadius" to "30rpx", "borderBottomRightRadius" to "30rpx", "borderBottomLeftRadius" to "30rpx", "marginLeft" to "20rpx")), "slider" to _uM(".container .tools-panel .tool-tag-item " to _uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "paddingTop" to 0, "paddingRight" to "20rpx", "paddingBottom" to 0, "paddingLeft" to "30rpx", "overflow" to "visible")), "play-btn" to _uM(".container .tools-panel .tool-tag-item " to _uM("fontSize" to "25rpx", "color" to "#ffffff", "paddingTop" to "10rpx", "paddingRight" to "25rpx", "paddingBottom" to "10rpx", "paddingLeft" to "25rpx", "borderTopLeftRadius" to "10rpx", "borderTopRightRadius" to "10rpx", "borderBottomRightRadius" to "10rpx", "borderBottomLeftRadius" to "10rpx", "marginLeft" to "20rpx", "backgroundColor" to "#1890FF")), "play-back-info" to _uM(".container .tools-panel " to _uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-between", "alignItems" to "center", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx", "marginTop" to "20rpx", "backgroundColor" to "#f9f9f9", "borderTopLeftRadius" to "15rpx", "borderTopRightRadius" to "15rpx", "borderBottomRightRadius" to "15rpx", "borderBottomLeftRadius" to "15rpx")), "item-info" to _uM(".container .tools-panel .play-back-info " to _uM("display" to "flex", "flexDirection" to "column", "justifyContent" to "center", "alignItems" to "center")), "info-label" to _uM(".container .tools-panel .play-back-info " to _uM("fontSize" to "24rpx", "paddingTop" to "10rpx", "paddingRight" to 0, "paddingBottom" to "10rpx", "paddingLeft" to 0, "color" to "#999999")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

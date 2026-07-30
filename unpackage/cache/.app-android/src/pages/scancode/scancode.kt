@@ -12,10 +12,9 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.`$emit` as uni__emit
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
-import io.dcloud.uniapp.extapi.scanCode as uni_scanCode
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
+import io.dcloud.uniapp.extapi.vibrateLong as uni_vibrateLong
 open class GenPagesScancodeScancode : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -25,51 +24,106 @@ open class GenPagesScancodeScancode : BasePage {
             val _ctx = __ins.proxy as GenPagesScancodeScancode
             val _cache = __ins.renderCache
             val scanFunctionIsUseable = ref(true)
-            val goBack = fun(){
+            val cameraVisible = ref(true)
+            val hasFinished = ref(false)
+            val pendingBack = ref(false)
+            var backTimer: Number? = null
+            val clearBackTimer = fun(){
+                val timer = backTimer
+                if (timer != null) {
+                    clearTimeout(timer)
+                    backTimer = null
+                }
+            }
+            val releaseCamera = fun(){
+                cameraVisible.value = false
+            }
+            val completeBack = fun(){
+                if (!pendingBack.value) {
+                    return
+                }
+                pendingBack.value = false
+                clearBackTimer()
+                console.log("扫码页已释放相机，返回添加设备页", " at pages/scancode/scancode.uvue:47")
                 uni_navigateBack(NavigateBackOptions(delta = 1))
             }
-            val handleScanResult = fun(scanResult: String){
-                if (!scanFunctionIsUseable.value || scanResult.length == 0) {
+            val requestBack = fun(){
+                if (pendingBack.value) {
                     return
                 }
+                pendingBack.value = true
+                releaseCamera()
+                backTimer = setTimeout(fun(){
+                    completeBack()
+                }
+                , 1200)
+            }
+            val handleCameraInitDone = fun(){
+                console.log("扫码摄像头初始化完成", " at pages/scancode/scancode.uvue:61")
+            }
+            val handleScan = fun(e: UniCameraScanCodeEvent){
+                if (hasFinished.value || !scanFunctionIsUseable.value) {
+                    return
+                }
+                val scanResult = e.detail.result
+                if (scanResult == null) {
+                    return
+                }
+                val result = scanResult!!!!
+                if (result.length == 0) {
+                    return
+                }
+                hasFinished.value = true
                 scanFunctionIsUseable.value = false
-                console.log("扫码结果:", scanResult, " at pages/scancode/scancode.uvue:19")
-                uni_setStorageSync("scanCodeResult", scanResult)
-                uni__emit("scanCodeResult", _uO("result" to scanResult))
-                showAppToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 1000))
-                setTimeout(fun(){
-                    uni_navigateBack(NavigateBackOptions(delta = 1))
-                }
-                , 1000)
+                uni_vibrateLong(VibrateLongOptions())
+                console.log("扫码结果:", result, " at pages/scancode/scancode.uvue:74")
+                uni_setStorageSync("scanCodeResult", result)
+                showAppToast(ShowToastOptions(title = "扫码成功", icon = "success", duration = 500))
+                requestBack()
             }
-            val startScan = fun(){
-                if (!scanFunctionIsUseable.value) {
+            val handleCameraStop = fun(){
+                console.warn("扫码摄像头已停止", " at pages/scancode/scancode.uvue:85")
+                if (pendingBack.value) {
+                    completeBack()
                     return
                 }
-                uni_scanCode(ScanCodeOptions(onlyFromCamera = true, success = fun(res){
-                    console.log("扫码成功res:", res, " at pages/scancode/scancode.uvue:37")
-                    val result = res.result
-                    if (result != null) {
-                        handleScanResult(result)
-                    }
-                }
-                , fail = fun(err){
-                    console.log("扫码失败:", err, " at pages/scancode/scancode.uvue:42")
-                    showAppToast(ShowToastOptions(title = "扫码失败", icon = "none"))
-                    goBack()
-                }
-                ))
+                console.warn("摄像头停止但扫码页仍保持打开，等待用户返回或重试", " at pages/scancode/scancode.uvue:90")
             }
-            onLoad(fun(_options){
-                startScan()
+            val handleCameraError = fun(e: UniCameraErrorEvent){
+                if (hasFinished.value) {
+                    return
+                }
+                hasFinished.value = true
+                console.error("摄像头初始化失败:", e.detail, " at pages/scancode/scancode.uvue:96")
+                showAppToast(ShowToastOptions(title = "摄像头初始化失败，请检查相机权限", icon = "none", duration = 500))
+                requestBack()
+            }
+            onHide(fun(){
+                console.log("扫码页隐藏", " at pages/scancode/scancode.uvue:106")
+                clearBackTimer()
+                releaseCamera()
+            }
+            )
+            onUnload(fun(){
+                console.log("扫码页卸载", " at pages/scancode/scancode.uvue:112")
+                clearBackTimer()
+                releaseCamera()
             }
             )
             return fun(): Any? {
+                val _component_camera = resolveComponent("camera")
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
-                return _cE(Fragment, null, _uA(
-                    _cE("view"),
+                return _cE("view", _uM("class" to "container"), _uA(
+                    _cE("view", _uM("class" to "scancode-box"), _uA(
+                        if (isTrue(cameraVisible.value)) {
+                            _cV(_component_camera, _uM("key" to 0, "device-position" to "back", "mode" to "scanCode", "flash" to "auto", "class" to "scan-code", "onInitdone" to handleCameraInitDone, "onScancode" to handleScan, "onStop" to handleCameraStop, "onError" to handleCameraError))
+                        } else {
+                            _cC("v-if", true)
+                        }
+                    )),
+                    _cE("view", _uM("class" to "tip"), "请将设备二维码或条形码放入框内，自动扫描"),
                     _cV(_component_app_toast)
-                ), 64)
+                ))
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
@@ -79,7 +133,7 @@ open class GenPagesScancodeScancode : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scan-header" to _pS(_uM("height" to "88rpx", "display" to "flex", "flexDirection" to "row", "alignItems" to "center", "backgroundColor" to "#ffffff")), "back-button" to _pS(_uM("width" to "120rpx", "color" to "#333333", "fontSize" to "28rpx", "textAlign" to "center")), "title" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "color" to "#333333", "fontSize" to "36rpx", "fontWeight" to "bold", "textAlign" to "center", "marginRight" to "120rpx")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "display" to "flex", "alignItems" to "center", "justifyContent" to "center")), "scan-button" to _pS(_uM("color" to "#ffffff", "fontSize" to "32rpx", "backgroundColor" to "#007aff", "borderTopLeftRadius" to "12rpx", "borderTopRightRadius" to "12rpx", "borderBottomRightRadius" to "12rpx", "borderBottomLeftRadius" to "12rpx", "paddingTop" to "24rpx", "paddingRight" to "60rpx", "paddingBottom" to "24rpx", "paddingLeft" to "60rpx")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
+                return _uM("container" to _pS(_uM("height" to "100%", "display" to "flex", "flexDirection" to "column", "backgroundColor" to "#000000")), "scancode-box" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%", "minHeight" to 0, "paddingTop" to 0, "paddingRight" to 0, "paddingBottom" to 0, "paddingLeft" to 0)), "scan-code" to _pS(_uM("width" to "100%", "height" to "100%")), "tip" to _pS(_uM("position" to "fixed", "bottom" to "100rpx", "left" to 0, "right" to 0, "textAlign" to "center", "color" to "#ffffff", "fontSize" to "28rpx", "backgroundColor" to "rgba(0,0,0,0.5)", "paddingTop" to "20rpx", "paddingRight" to "20rpx", "paddingBottom" to "20rpx", "paddingLeft" to "20rpx")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

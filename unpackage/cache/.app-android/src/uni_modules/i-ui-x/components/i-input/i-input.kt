@@ -90,6 +90,22 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
             }
             )
             val current = ref(initialValue())
+            watch(fun(): String {
+                return props.modelValue
+            }
+            , fun(){
+                current.value = props.modelValue
+            }
+            )
+            watch(fun(): String {
+                return props.value
+            }
+            , fun(){
+                if (props.modelValue.length == 0) {
+                    current.value = props.value
+                }
+            }
+            )
             val focused = ref(false)
             val passwordVisible = ref(props.password)
             val wrapClass = computed(fun(): String {

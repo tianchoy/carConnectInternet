@@ -13,8 +13,6 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.`$emit` as uni__emit
-import io.dcloud.uniapp.extapi.`$off` as uni__off
-import io.dcloud.uniapp.extapi.`$on` as uni__on
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
@@ -30,6 +28,8 @@ open class GenPagesAddCarAddCar : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesAddCarAddCar
             val _cache = __ins.renderCache
+            val isRequestingCameraPermission = ref<Boolean>(false)
+            val isNavigatingToScanner = ref<Boolean>(false)
             val carIconSelectorVisible = ref<Boolean>(false)
             val loading = ref<Boolean>(false)
             val formValid = ref<Boolean>(false)
@@ -39,18 +39,51 @@ open class GenPagesAddCarAddCar : BasePage {
             val handleModelValid = fun(value: Any){
                 formValid.value = !!isTruthy(value)
             }
+            val openScanPage = fun(){
+                if (isNavigatingToScanner.value) {
+                    return
+                }
+                isNavigatingToScanner.value = true
+                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar", fail = fun(_){
+                    isNavigatingToScanner.value = false
+                }
+                ))
+            }
+            val handleCameraPermission = fun(status: CameraPermissionStatus){
+                isRequestingCameraPermission.value = false
+                if (status == "granted") {
+                    openScanPage()
+                    return
+                }
+                if (status == "settingsRequired") {
+                    showAppModal(AppModalOptions(title = "需要相机权限", content = "请在系统设置中开启相机权限后再扫码", confirmText = "去设置", cancelText = "取消", success = fun(res){
+                        if (res.confirm) {
+                            openCameraPermissionSettings()
+                        }
+                    }
+                    ))
+                    return
+                }
+                showAppToast(ShowToastOptions(title = "未获得相机权限，无法扫码", icon = "none"))
+            }
             val scanCode = fun(){
-                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar"))
+                if (isRequestingCameraPermission.value) {
+                    return
+                }
+                isRequestingCameraPermission.value = true
+                ensureCameraPermission(handleCameraPermission)
             }
             val handleScanResult = fun(data: ScanResultData){
-                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:117")
+                console.log("接收到扫码结果:", data.result, " at pages/addCar/addCar.uvue:154")
                 if (data.result.length == 15) {
                     carInfo.value.imei = "0" + data.result.slice(4, 15)
-                } else if (data.result.length == 11) {
-                    carInfo.value.imei = "0" + data.result
-                } else {
-                    showAppToast(ShowToastOptions(title = "请输入正确的设备ID", icon = "none"))
+                    return
                 }
+                if (data.result.length == 11) {
+                    carInfo.value.imei = "0" + data.result
+                    return
+                }
+                showAppToast(ShowToastOptions(title = "扫码结果长度不是标准设备ID，请确认后提交", icon = "none"))
             }
             val updateCarIconSelectorVisible = fun(visible: Boolean){
                 carIconSelectorVisible.value = visible
@@ -58,7 +91,7 @@ open class GenPagesAddCarAddCar : BasePage {
             val selectIcon = fun(item: CarIconItem__1){
                 val name = item.getString("name", "")
                 val text = item.getString("text", "")
-                console.log(name, " at pages/addCar/addCar.uvue:139")
+                console.log(name, " at pages/addCar/addCar.uvue:177")
                 carInfo.value.deviceType = name
                 carInfo.value.deviceTypeValue = text
                 carIconSelectorVisible.value = false
@@ -82,18 +115,18 @@ open class GenPagesAddCarAddCar : BasePage {
             }
             val submit = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
-                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:176")
+                        console.log("=== 开始提交设备 ===", " at pages/addCar/addCar.uvue:214")
                         try {
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:181")
+                            console.log("✅ 表单验证通过", " at pages/addCar/addCar.uvue:219")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "添加中...", mask = true))
-                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 189, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
-                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:196")
+                            val submitData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 227, 10), "deviceName" to carInfo.value.deviceName, "imei" to carInfo.value.imei, "carType" to carInfo.value.deviceType, "plateNo" to carInfo.value.plateNo)
+                            console.log("📤 提交数据:", submitData, " at pages/addCar/addCar.uvue:234")
                             val res = await(addDevice(submitData))
-                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:199")
+                            console.log("✅ 添加设备返回:", res, " at pages/addCar/addCar.uvue:237")
                             uni_hideLoading(null)
                             loading.value = false
                             if (res.code == 0) {
@@ -113,18 +146,16 @@ open class GenPagesAddCarAddCar : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:226")
+                            console.error("❌ 添加设备失败:", error, " at pages/addCar/addCar.uvue:264")
                             uni_hideLoading(null)
                             loading.value = false
                             showAppToast(ShowToastOptions(title = "添加设备失败", icon = "none"))
                         }
                 })
             }
-            onLoad(fun(_options){
-                uni__on("scanCodeResult", handleScanResult)
-            }
-            )
+            onLoad(fun(_options){})
             onShow(fun(){
+                isNavigatingToScanner.value = false
                 val rawResult = uni_getStorageSync("scanCodeResult")
                 val result = if (rawResult != null) {
                     rawResult.toString()
@@ -137,10 +168,7 @@ open class GenPagesAddCarAddCar : BasePage {
                 }
             }
             )
-            onUnload(fun(){
-                uni__off("scanCodeResult", handleScanResult)
-            }
-            )
+            onUnload(fun(){})
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)
                 val _component_i_input = resolveEasyComponent("i-input", GenUniModulesIUiXComponentsIInputIInputClass)

@@ -1,6 +1,8 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_toast = require("../../utils/toast.js");
+const utils_modal = require("../../utils/modal.js");
+const utils_cameraPermission = require("../../utils/cameraPermission.js");
 const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -97,6 +99,8 @@ class AddDeviceResponse extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "addCar",
   setup(__props) {
+    const isRequestingCameraPermission = common_vendor.ref(false);
+    const isNavigatingToScanner = common_vendor.ref(false);
     const carIconSelectorVisible = common_vendor.ref(false);
     const loading = common_vendor.ref(false);
     const formValid = common_vendor.ref(false);
@@ -116,23 +120,58 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleModelValid = (value = null) => {
       formValid.value = !!value;
     };
-    const scanCode = () => {
+    const openScanPage = () => {
+      if (isNavigatingToScanner.value)
+        return null;
+      isNavigatingToScanner.value = true;
       common_vendor.index.navigateTo({
-        url: "/pages/scancode/scancode?source=addCar"
+        url: "/pages/scancode/scancode?source=addCar",
+        fail: () => {
+          isNavigatingToScanner.value = false;
+        }
       });
     };
+    const handleCameraPermission = (status) => {
+      isRequestingCameraPermission.value = false;
+      if (status == "granted") {
+        openScanPage();
+        return null;
+      }
+      if (status == "settingsRequired") {
+        utils_modal.showAppModal(new common_vendor.UTSJSONObject({
+          title: "需要相机权限",
+          content: "请在系统设置中开启相机权限后再扫码",
+          confirmText: "去设置",
+          cancelText: "取消",
+          success: (res) => {
+            if (res.confirm)
+              ;
+          }
+        }));
+        return null;
+      }
+      utils_toast.showAppToast({ title: "未获得相机权限，无法扫码", icon: "none" });
+    };
+    const scanCode = () => {
+      if (isRequestingCameraPermission.value)
+        return null;
+      isRequestingCameraPermission.value = true;
+      utils_cameraPermission.ensureCameraPermission(handleCameraPermission);
+    };
     const handleScanResult = (data) => {
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:117", "接收到扫码结果:", data.result);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:154", "接收到扫码结果:", data.result);
       if (data.result.length == 15) {
         carInfo.value.imei = "0" + data.result.slice(4, 15);
-      } else if (data.result.length == 11) {
-        carInfo.value.imei = "0" + data.result;
-      } else {
-        utils_toast.showAppToast({
-          title: "请输入正确的设备ID",
-          icon: "none"
-        });
+        return null;
       }
+      if (data.result.length == 11) {
+        carInfo.value.imei = "0" + data.result;
+        return null;
+      }
+      utils_toast.showAppToast({
+        title: "扫码结果长度不是标准设备ID，请确认后提交",
+        icon: "none"
+      });
     };
     const updateCarIconSelectorVisible = (visible) => {
       carIconSelectorVisible.value = visible;
@@ -140,7 +179,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectIcon = (item) => {
       const name = item.getString("name", "");
       const text = item.getString("text", "");
-      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:139", name);
+      common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:177", name);
       carInfo.value.deviceType = name;
       carInfo.value.deviceTypeValue = text;
       carIconSelectorVisible.value = false;
@@ -170,11 +209,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const submit = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:176", "=== 开始提交设备 ===");
+        common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:214", "=== 开始提交设备 ===");
         try {
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:181", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:219", "✅ 表单验证通过");
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "添加中...",
@@ -186,9 +225,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             carType: carInfo.value.deviceType,
             plateNo: carInfo.value.plateNo
           });
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:196", "📤 提交数据:", submitData);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:234", "📤 提交数据:", submitData);
           const res = yield api_request.addDevice(submitData);
-          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:199", "✅ 添加设备返回:", res);
+          common_vendor.index.__f__("log", "at pages/addCar/addCar.uvue:237", "✅ 添加设备返回:", res);
           common_vendor.index.hideLoading();
           loading.value = false;
           if (res.code == 0) {
@@ -209,7 +248,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:226", "❌ 添加设备失败:", error);
+          common_vendor.index.__f__("error", "at pages/addCar/addCar.uvue:264", "❌ 添加设备失败:", error);
           common_vendor.index.hideLoading();
           loading.value = false;
           utils_toast.showAppToast({
@@ -220,9 +259,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad(() => {
-      common_vendor.index.$on("scanCodeResult", handleScanResult);
     });
     common_vendor.onShow(() => {
+      isNavigatingToScanner.value = false;
       const rawResult = common_vendor.index.getStorageSync("scanCodeResult");
       const result = rawResult != null ? rawResult.toString() : "";
       if (result.length > 0) {
@@ -231,7 +270,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     common_vendor.onUnload(() => {
-      common_vendor.index.$off("scanCodeResult", handleScanResult);
     });
     return (_ctx, _cache) => {
       "raw js";

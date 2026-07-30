@@ -180,7 +180,30 @@
   border-radius: 8rpx;
 }
 .container .page-bg .content .map-box .map-container.data-v-00a60067 {
+  position: relative;
   height: 300rpx;
+}
+.container .page-bg .content .map-box .map-container .map-status.data-v-00a60067 {
+  position: absolute;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: 24rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background-color: rgba(0, 0, 0, 0.68);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.container .page-bg .content .map-box .map-container .map-status .map-status-text.data-v-00a60067 {
+  color: #ffffff;
+  font-size: 24rpx;
+}
+.container .page-bg .content .map-box .map-container .map-status .map-status-retry.data-v-00a60067 {
+  margin-left: 20rpx;
+  color: #8de39b;
+  font-size: 24rpx;
 }
 .container .page-bg .content .mile-record.data-v-00a60067 {
   width: 100%;

@@ -6,11 +6,17 @@ import _easycom_i_form from '@/uni_modules/i-ui-x/components/i-form/i-form.uvue'
 import _easycom_i_button from '@/uni_modules/i-ui-x/components/i-button/i-button.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
+	import { showAppModal } from '../../utils/modal.uts'
+	import {
+		ensureCameraPermission,
+		openCameraPermissionSettings,
+		type CameraPermissionStatus
+	} from '../../utils/cameraPermission.uts'
 	import { ref } from 'vue'
 	import { addDevice, getCarType } from '../../api/request'
 	import carIcons from '../../components/car-icons/car-icons.uvue'
 
-	type CarFormData = { __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 55, 7>;
+	type CarFormData = { __$originalPosition?: UTSSourceMapPosition<"CarFormData", "pages/addCar/addCar.uvue", 61, 7>;
 		deviceName: string
 		imei: string
 		deviceType: string
@@ -19,13 +25,13 @@ import { showAppToast } from '../../utils/toast.uts'
 		carType: string
 	}
 
-	type ScanResultData = { __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 64, 7>;
+	type ScanResultData = { __$originalPosition?: UTSSourceMapPosition<"ScanResultData", "pages/addCar/addCar.uvue", 70, 7>;
 		result: string
 	}
 
 	type CarIconItem = UTSJSONObject
 
-	type AddDeviceResponse = { __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 70, 7>;
+	type AddDeviceResponse = { __$originalPosition?: UTSSourceMapPosition<"AddDeviceResponse", "pages/addCar/addCar.uvue", 76, 7>;
 		code: number
 		msg: string
 		data: CarFormData
@@ -39,7 +45,9 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const carIconSelectorVisible = ref<boolean>(false)
+const isRequestingCameraPermission = ref<boolean>(false)
+	const isNavigatingToScanner = ref<boolean>(false)
+	const carIconSelectorVisible = ref<boolean>(false)
 	const loading = ref<boolean>(false)
 	const formValid = ref<boolean>(false)
 
@@ -64,34 +72,64 @@ const carIconSelectorVisible = ref<boolean>(false)
 	const handleModelValid = (value: any) => {
 		// 使用双重否定或比较运算符来转换为布尔值，避免使用 Boolean()
 		formValid.value = !!value
-		// 或者使用
-		// formValid.value = value === true
-		// formValid.value = value ? true : false
 	}
 
 	// ===== 核心功能函数 =====
 
 	// 扫码功能
-	const scanCode = () => {
+	const openScanPage = () => {
+		if (isNavigatingToScanner.value) return
+		isNavigatingToScanner.value = true
 		uni.navigateTo({
-			url: '/pages/scancode/scancode?source=addCar'
+			url: '/pages/scancode/scancode?source=addCar',
+			fail: () => {
+				isNavigatingToScanner.value = false
+			}
 		})
+	}
+
+	const handleCameraPermission = (status : CameraPermissionStatus) => {
+		isRequestingCameraPermission.value = false
+		if (status == 'granted') {
+			openScanPage()
+			return
+		}
+		if (status == 'settingsRequired') {
+			showAppModal({
+				title: '需要相机权限',
+				content: '请在系统设置中开启相机权限后再扫码',
+				confirmText: '去设置',
+				cancelText: '取消',
+				success: (res) => {
+					if (res.confirm) openCameraPermissionSettings()
+				}
+			})
+			return
+		}
+		showAppToast({ title: '未获得相机权限，无法扫码', icon: 'none' })
+	}
+
+	const scanCode = () => {
+		if (isRequestingCameraPermission.value) return
+		isRequestingCameraPermission.value = true
+		ensureCameraPermission(handleCameraPermission)
 	}
 
 	// 扫码结果事件处理
 	const handleScanResult = (data: ScanResultData) => {
-		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:117")
-		// 检查长度是15位，取后11位，并在前面补零0，若为11位，则直接补0
+		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:154")
 		if (data.result.length == 15) {
 			carInfo.value.imei = '0' + data.result.slice(4, 15)
-		} else if (data.result.length == 11) {
-			carInfo.value.imei = '0' + data.result
-		} else {
-			showAppToast({
-				title: '请输入正确的设备ID',
-				icon: 'none'
-			})
+			return
 		}
+		if (data.result.length == 11) {
+			carInfo.value.imei = '0' + data.result
+			return
+		}
+		showAppToast({
+			title: '扫码结果长度不是标准设备ID，请确认后提交',
+			icon: 'none'
+		})
 	}
 
 	const updateCarIconSelectorVisible = (visible: boolean) => {
@@ -102,7 +140,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 	const selectIcon = (item: CarIconItem) => {
 		const name = item.getString('name', '')
 		const text = item.getString('text', '')
-		console.log(name, " at pages/addCar/addCar.uvue:139")
+		console.log(name, " at pages/addCar/addCar.uvue:177")
 		carInfo.value.deviceType = name
 		carInfo.value.deviceTypeValue = text
 		carIconSelectorVisible.value = false
@@ -139,12 +177,12 @@ const carIconSelectorVisible = ref<boolean>(false)
 
 	// ===== 提交表单 =====
 	const submit = async () => {
-		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:176")
+		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:214")
 
 		try {
 			// 表单验证
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:181")
+			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:219")
 
 			loading.value = true
 			uni.showLoading({
@@ -152,17 +190,17 @@ const carIconSelectorVisible = ref<boolean>(false)
 				mask: true
 			})
 
-			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 189, 10),
+			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 227, 10),
 				deviceName: carInfo.value.deviceName,
 				imei: carInfo.value.imei,
 				carType: carInfo.value.deviceType,
 				plateNo: carInfo.value.plateNo
 			}
 
-			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:196")
+			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:234")
 
 			const res = await addDevice(submitData)
-			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:199")
+			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:237")
 
 			uni.hideLoading()
 			loading.value = false
@@ -189,7 +227,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 				})
 			}
 		} catch (error: any) {
-			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:226")
+			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:264")
 			uni.hideLoading()
 			loading.value = false
 			showAppToast({
@@ -202,11 +240,10 @@ const carIconSelectorVisible = ref<boolean>(false)
 	// ===== 生命周期 =====
 	onLoad(() => {
 		// loadCarTypeData()
-		// 注册扫码结果事件监听
-		uni.$on('scanCodeResult', handleScanResult)
 	})
 
 	onShow(() => {
+		isNavigatingToScanner.value = false
 		const rawResult = uni.getStorageSync('scanCodeResult')
 			const result = rawResult != null ? rawResult.toString() : ''
 		if (result.length > 0) {
@@ -216,8 +253,7 @@ const carIconSelectorVisible = ref<boolean>(false)
 	})
 
 	onUnload(() => {
-		// 移除事件监听，防止内存泄漏
-		uni.$off('scanCodeResult', handleScanResult)
+		// 页面卸载时无需额外移除扫码结果监听
 	})
 
 	// ===== 加载车辆类型（注释掉，如需使用请取消注释） =====

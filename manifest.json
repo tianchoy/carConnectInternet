@@ -69,6 +69,7 @@
 		"distribute": {
 			"android": {
 				"permissions": [
+					"<uses-permission android:name=\"android.permission.CAMERA\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
@@ -125,6 +126,9 @@
 	},
 	"app-ios": {
 		"distribute": {
+			"privacyDescription": {
+				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
+			},
 			"modules": {
 				"uni-barcode-scanning": {},
 				"uni-map": {

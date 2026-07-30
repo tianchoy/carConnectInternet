@@ -1796,6 +1796,45 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
     return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
 }
 )
+typealias CameraPermissionStatus = String
+val CAMERA_PERMISSION = _uA(
+    "android.permission.CAMERA"
+) as UTSArray<String>
+fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        callback("unavailable")
+        return
+    }
+    if (isTruthy(UTSAndroid.checkSystemPermissionGranted(activity, CAMERA_PERMISSION))) {
+        callback("granted")
+        return
+    }
+    UTSAndroid.requestSystemPermission(activity, CAMERA_PERMISSION, fun(allRight, _){
+        callback(if (isTruthy(allRight)) {
+            "granted"
+        } else {
+            "denied"
+        }
+        )
+    }
+    , fun(doNotAskAgain, _){
+        callback(if (isTruthy(doNotAskAgain)) {
+            "settingsRequired"
+        } else {
+            "denied"
+        }
+        )
+    }
+    )
+    return
+}
+fun openCameraPermissionSettings(): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity != null) {
+        UTSAndroid.gotoSystemPermissionActivity(activity, CAMERA_PERMISSION)
+    }
+}
 val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)
