@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       pendingBack.value = false;
       clearBackTimer();
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:47", "扫码页已释放相机，返回添加设备页");
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:48", "扫码页已释放相机，返回添加设备页");
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
     };
     const requestBack = () => {
@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, 1200);
     };
     const handleCameraInitDone = () => {
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:61", "扫码摄像头初始化完成");
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:62", "扫码摄像头初始化完成");
     };
     const handleScan = (e) => {
       if (hasFinished.value || !scanFunctionIsUseable.value)
@@ -59,7 +59,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       hasFinished.value = true;
       scanFunctionIsUseable.value = false;
       common_vendor.index.vibrateLong(new common_vendor.UTSJSONObject({}));
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:74", "扫码结果:", result);
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:75", "扫码结果:", result);
       common_vendor.index.setStorageSync("scanCodeResult", result);
       utils_toast.showAppToast({
         title: "扫码成功",
@@ -69,18 +69,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       requestBack();
     };
     const handleCameraStop = () => {
-      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:85", "扫码摄像头已停止");
+      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:86", "扫码摄像头已停止");
       if (pendingBack.value) {
-        completeBack();
+        common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:88", "等待相机资源释放完成后返回添加设备页");
         return null;
       }
-      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:90", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
+      common_vendor.index.__f__("warn", "at pages/scancode/scancode.uvue:91", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
     };
     const handleCameraError = (e) => {
       if (hasFinished.value)
         return null;
       hasFinished.value = true;
-      common_vendor.index.__f__("error", "at pages/scancode/scancode.uvue:96", "摄像头初始化失败:", e.detail);
+      common_vendor.index.__f__("error", "at pages/scancode/scancode.uvue:97", "摄像头初始化失败:", e.detail);
       utils_toast.showAppToast({
         title: "摄像头初始化失败，请检查相机权限",
         icon: "none",
@@ -89,8 +89,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       requestBack();
     };
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:106", "扫码页隐藏");
-      clearBackTimer();
+      common_vendor.index.__f__("log", "at pages/scancode/scancode.uvue:107", "扫码页隐藏");
       releaseCamera();
     });
     common_vendor.onUnload(() => {
@@ -103,10 +102,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: cameraVisible.value
       }, cameraVisible.value ? {
-        b: common_vendor.o(handleCameraInitDone, "e1"),
-        c: common_vendor.o(handleScan, "ee"),
-        d: common_vendor.o(handleCameraStop, "39"),
-        e: common_vendor.o(handleCameraError, "2b")
+        b: common_vendor.o(handleCameraInitDone, "f5"),
+        c: common_vendor.o(handleScan, "81"),
+        d: common_vendor.o(handleCameraStop, "c6"),
+        e: common_vendor.o(handleCameraError, "a4")
       } : {}, {
         f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         g: `${_ctx.u_s_b_h}px`,

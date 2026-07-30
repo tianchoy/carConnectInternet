@@ -83,7 +83,7 @@ open class GenPagesScancodeScancode : BasePage {
             val handleCameraStop = fun(){
                 console.warn("扫码摄像头已停止")
                 if (pendingBack.value) {
-                    completeBack()
+                    console.log("等待相机资源释放完成后返回添加设备页")
                     return
                 }
                 console.warn("摄像头停止但扫码页仍保持打开，等待用户返回或重试")
@@ -99,7 +99,6 @@ open class GenPagesScancodeScancode : BasePage {
             }
             onHide(fun(){
                 console.log("扫码页隐藏")
-                clearBackTimer()
                 releaseCamera()
             }
             )
@@ -115,7 +114,7 @@ open class GenPagesScancodeScancode : BasePage {
                 return _cE("view", _uM("class" to "container"), _uA(
                     _cE("view", _uM("class" to "scancode-box"), _uA(
                         if (isTrue(cameraVisible.value)) {
-                            _cV(_component_camera, _uM("key" to 0, "device-position" to "back", "mode" to "scanCode", "flash" to "auto", "class" to "scan-code", "onInitdone" to handleCameraInitDone, "onScancode" to handleScan, "onStop" to handleCameraStop, "onError" to handleCameraError))
+                            _cV(_component_camera, _uM("key" to 0, "device-position" to "back", "mode" to "scanCode", "flash" to "auto", "class" to "scan-code", "resolution" to "high", "onInitdone" to handleCameraInitDone, "onScancode" to handleScan, "onStop" to handleCameraStop, "onError" to handleCameraError))
                         } else {
                             _cC("v-if", true)
                         }

@@ -80,9 +80,14 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	const openScanPage = () => {
 		if (isNavigatingToScanner.value) return
 		isNavigatingToScanner.value = true
+		console.log('打开扫码页')
 		uni.navigateTo({
 			url: '/pages/scancode/scancode?source=addCar',
-			fail: () => {
+			fail: (error) => {
+				console.error('打开扫码页失败:', error)
+				showAppToast({ title: '无法打开扫码页，请重试', icon: 'none' })
+			},
+			complete: () => {
 				isNavigatingToScanner.value = false
 			}
 		})
@@ -110,7 +115,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	}
 
 	const scanCode = () => {
-		if (isRequestingCameraPermission.value) return
+		if (isRequestingCameraPermission.value || isNavigatingToScanner.value) return
 		isRequestingCameraPermission.value = true
 		ensureCameraPermission(handleCameraPermission)
 	}

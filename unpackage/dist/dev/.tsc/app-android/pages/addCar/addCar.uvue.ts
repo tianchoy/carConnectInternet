@@ -80,9 +80,14 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	const openScanPage = () => {
 		if (isNavigatingToScanner.value) return
 		isNavigatingToScanner.value = true
+		console.log('打开扫码页', " at pages/addCar/addCar.uvue:117")
 		uni.navigateTo({
 			url: '/pages/scancode/scancode?source=addCar',
-			fail: () => {
+			fail: (error) => {
+				console.error('打开扫码页失败:', error, " at pages/addCar/addCar.uvue:121")
+				showAppToast({ title: '无法打开扫码页，请重试', icon: 'none' })
+			},
+			complete: () => {
 				isNavigatingToScanner.value = false
 			}
 		})
@@ -110,14 +115,14 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	}
 
 	const scanCode = () => {
-		if (isRequestingCameraPermission.value) return
+		if (isRequestingCameraPermission.value || isNavigatingToScanner.value) return
 		isRequestingCameraPermission.value = true
 		ensureCameraPermission(handleCameraPermission)
 	}
 
 	// 扫码结果事件处理
 	const handleScanResult = (data: ScanResultData) => {
-		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:154")
+		console.log('接收到扫码结果:', data.result, " at pages/addCar/addCar.uvue:159")
 		if (data.result.length == 15) {
 			carInfo.value.imei = '0' + data.result.slice(4, 15)
 			return
@@ -140,7 +145,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 	const selectIcon = (item: CarIconItem) => {
 		const name = item.getString('name', '')
 		const text = item.getString('text', '')
-		console.log(name, " at pages/addCar/addCar.uvue:177")
+		console.log(name, " at pages/addCar/addCar.uvue:182")
 		carInfo.value.deviceType = name
 		carInfo.value.deviceTypeValue = text
 		carIconSelectorVisible.value = false
@@ -177,12 +182,12 @@ const isRequestingCameraPermission = ref<boolean>(false)
 
 	// ===== 提交表单 =====
 	const submit = async () => {
-		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:214")
+		console.log('=== 开始提交设备 ===', " at pages/addCar/addCar.uvue:219")
 
 		try {
 			// 表单验证
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:219")
+			console.log('✅ 表单验证通过', " at pages/addCar/addCar.uvue:224")
 
 			loading.value = true
 			uni.showLoading({
@@ -190,17 +195,17 @@ const isRequestingCameraPermission = ref<boolean>(false)
 				mask: true
 			})
 
-			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 227, 10),
+			const submitData = {__$originalPosition: new UTSSourceMapPosition("submitData", "pages/addCar/addCar.uvue", 232, 10),
 				deviceName: carInfo.value.deviceName,
 				imei: carInfo.value.imei,
 				carType: carInfo.value.deviceType,
 				plateNo: carInfo.value.plateNo
 			}
 
-			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:234")
+			console.log('📤 提交数据:', submitData, " at pages/addCar/addCar.uvue:239")
 
 			const res = await addDevice(submitData)
-			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:237")
+			console.log('✅ 添加设备返回:', res, " at pages/addCar/addCar.uvue:242")
 
 			uni.hideLoading()
 			loading.value = false
@@ -227,7 +232,7 @@ const isRequestingCameraPermission = ref<boolean>(false)
 				})
 			}
 		} catch (error: any) {
-			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:264")
+			console.error('❌ 添加设备失败:', error, " at pages/addCar/addCar.uvue:269")
 			uni.hideLoading()
 			loading.value = false
 			showAppToast({

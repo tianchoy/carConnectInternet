@@ -43,7 +43,12 @@ open class GenPagesAddCarAddCar : BasePage {
                     return
                 }
                 isNavigatingToScanner.value = true
-                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar", fail = fun(_){
+                console.log("打开扫码页")
+                uni_navigateTo(NavigateToOptions(url = "/pages/scancode/scancode?source=addCar", fail = fun(error){
+                    console.error("打开扫码页失败:", error)
+                    showAppToast(ShowToastOptions(title = "无法打开扫码页，请重试", icon = "none"))
+                }
+                , complete = fun(_){
                     isNavigatingToScanner.value = false
                 }
                 ))
@@ -66,7 +71,7 @@ open class GenPagesAddCarAddCar : BasePage {
                 showAppToast(ShowToastOptions(title = "未获得相机权限，无法扫码", icon = "none"))
             }
             val scanCode = fun(){
-                if (isRequestingCameraPermission.value) {
+                if (isRequestingCameraPermission.value || isNavigatingToScanner.value) {
                     return
                 }
                 isRequestingCameraPermission.value = true

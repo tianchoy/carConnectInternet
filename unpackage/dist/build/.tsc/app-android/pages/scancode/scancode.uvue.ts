@@ -72,7 +72,7 @@ const _cache = __ins.renderCache;
 	const handleCameraStop = () => {
 		console.warn('扫码摄像头已停止')
 		if (pendingBack.value) {
-			completeBack()
+			console.log('等待相机资源释放完成后返回添加设备页')
 			return
 		}
 		console.warn('摄像头停止但扫码页仍保持打开，等待用户返回或重试')
@@ -92,7 +92,6 @@ const _cache = __ins.renderCache;
 
 	onHide(() => {
 		console.log('扫码页隐藏')
-		clearBackTimer()
 		releaseCamera()
 	})
 
@@ -116,6 +115,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             mode: "scanCode",
             flash: "auto",
             class: "scan-code",
+            resolution: "high",
             onInitdone: handleCameraInitDone,
             onScancode: handleScan,
             onStop: handleCameraStop,

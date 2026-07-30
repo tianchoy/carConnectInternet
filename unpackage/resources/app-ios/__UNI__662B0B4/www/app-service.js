@@ -8387,7 +8387,13 @@
   const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
   const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
   function ensureCameraPermission(callback) {
+    uni.__log__("log", "at utils/cameraPermission.uts:10", "📷 [ensureCameraPermission] 开始检查相机权限");
+    uni.__log__("log", "at utils/cameraPermission.uts:94", "📷 [ensureCameraPermission] 非Android平台，默认授予权限");
     callback("granted");
+  }
+  function openCameraPermissionSettings() {
+    uni.__log__("log", "at utils/cameraPermission.uts:103", "📷 [openCameraPermissionSettings] 打开系统权限设置");
+    uni.__log__("log", "at utils/cameraPermission.uts:125", "📷 [openCameraPermissionSettings] 非Android平台，无需打开设置");
   }
   const _sfc_main$t = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
     show: { type: Boolean, default: false },
@@ -9139,9 +9145,14 @@
         if (isNavigatingToScanner.value)
           return null;
         isNavigatingToScanner.value = true;
+        uni.__log__("log", "at pages/addCar/addCar.uvue:117", "打开扫码页");
         uni.navigateTo({
           url: "/pages/scancode/scancode?source=addCar",
-          fail: () => {
+          fail: (error) => {
+            uni.__log__("error", "at pages/addCar/addCar.uvue:121", "打开扫码页失败:", error);
+            showAppToast({ title: "无法打开扫码页，请重试", icon: "none" });
+          },
+          complete: () => {
             isNavigatingToScanner.value = false;
           }
         });
@@ -9160,7 +9171,7 @@
             cancelText: "取消",
             success: (res) => {
               if (res.confirm)
-                ;
+                openCameraPermissionSettings();
             }
           }));
           return null;
@@ -9168,13 +9179,13 @@
         showAppToast({ title: "未获得相机权限，无法扫码", icon: "none" });
       };
       const scanCode = () => {
-        if (isRequestingCameraPermission.value)
+        if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
           return null;
         isRequestingCameraPermission.value = true;
         ensureCameraPermission(handleCameraPermission);
       };
       const handleScanResult = (data) => {
-        uni.__log__("log", "at pages/addCar/addCar.uvue:154", "接收到扫码结果:", data.result);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:159", "接收到扫码结果:", data.result);
         if (data.result.length == 15) {
           carInfo.value.imei = "0" + data.result.slice(4, 15);
           return null;
@@ -9194,7 +9205,7 @@
       const selectIcon = (item) => {
         const name = item.getString("name", "");
         const text = item.getString("text", "");
-        uni.__log__("log", "at pages/addCar/addCar.uvue:177", name);
+        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name);
         carInfo.value.deviceType = name;
         carInfo.value.deviceTypeValue = text;
         carIconSelectorVisible.value = false;
@@ -9224,11 +9235,11 @@
       };
       const submit = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/addCar/addCar.uvue:214", "=== 开始提交设备 ===");
+          uni.__log__("log", "at pages/addCar/addCar.uvue:219", "=== 开始提交设备 ===");
           try {
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:219", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/addCar/addCar.uvue:224", "✅ 表单验证通过");
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "添加中...",
@@ -9240,9 +9251,9 @@
               carType: carInfo.value.deviceType,
               plateNo: carInfo.value.plateNo
             });
-            uni.__log__("log", "at pages/addCar/addCar.uvue:234", "📤 提交数据:", submitData);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:239", "📤 提交数据:", submitData);
             const res = yield addDevice(submitData);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:237", "✅ 添加设备返回:", res);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
             uni.hideLoading();
             loading.value = false;
             if (res.code == 0) {
@@ -9263,7 +9274,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:264", "❌ 添加设备失败:", error);
+            uni.__log__("error", "at pages/addCar/addCar.uvue:269", "❌ 添加设备失败:", error);
             uni.hideLoading();
             loading.value = false;
             showAppToast({
@@ -19663,7 +19674,7 @@
           return null;
         pendingBack.value = false;
         clearBackTimer();
-        uni.__log__("log", "at pages/scancode/scancode.uvue:47", "扫码页已释放相机，返回添加设备页");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:48", "扫码页已释放相机，返回添加设备页");
         uni.navigateBack(new UTSJSONObject({ delta: 1 }));
       };
       const requestBack = () => {
@@ -19676,7 +19687,7 @@
         }, 1200);
       };
       const handleCameraInitDone = () => {
-        uni.__log__("log", "at pages/scancode/scancode.uvue:61", "扫码摄像头初始化完成");
+        uni.__log__("log", "at pages/scancode/scancode.uvue:62", "扫码摄像头初始化完成");
       };
       const handleScan = (e) => {
         if (hasFinished.value || !scanFunctionIsUseable.value)
@@ -19690,7 +19701,7 @@
         hasFinished.value = true;
         scanFunctionIsUseable.value = false;
         uni.vibrateLong(new UTSJSONObject({}));
-        uni.__log__("log", "at pages/scancode/scancode.uvue:74", "扫码结果:", result);
+        uni.__log__("log", "at pages/scancode/scancode.uvue:75", "扫码结果:", result);
         uni.setStorageSync("scanCodeResult", result);
         showAppToast({
           title: "扫码成功",
@@ -19700,18 +19711,18 @@
         requestBack();
       };
       const handleCameraStop = () => {
-        uni.__log__("warn", "at pages/scancode/scancode.uvue:85", "扫码摄像头已停止");
+        uni.__log__("warn", "at pages/scancode/scancode.uvue:86", "扫码摄像头已停止");
         if (pendingBack.value) {
-          completeBack();
+          uni.__log__("log", "at pages/scancode/scancode.uvue:88", "等待相机资源释放完成后返回添加设备页");
           return null;
         }
-        uni.__log__("warn", "at pages/scancode/scancode.uvue:90", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
+        uni.__log__("warn", "at pages/scancode/scancode.uvue:91", "摄像头停止但扫码页仍保持打开，等待用户返回或重试");
       };
       const handleCameraError = (e) => {
         if (hasFinished.value)
           return null;
         hasFinished.value = true;
-        uni.__log__("error", "at pages/scancode/scancode.uvue:96", "摄像头初始化失败:", e.detail);
+        uni.__log__("error", "at pages/scancode/scancode.uvue:97", "摄像头初始化失败:", e.detail);
         showAppToast({
           title: "摄像头初始化失败，请检查相机权限",
           icon: "none",
@@ -19720,8 +19731,7 @@
         requestBack();
       };
       vue.onHide(() => {
-        uni.__log__("log", "at pages/scancode/scancode.uvue:106", "扫码页隐藏");
-        clearBackTimer();
+        uni.__log__("log", "at pages/scancode/scancode.uvue:107", "扫码页隐藏");
         releaseCamera();
       });
       vue.onUnload(() => {
@@ -19740,6 +19750,7 @@
               mode: "scanCode",
               flash: "auto",
               class: "scan-code",
+              resolution: "high",
               onInitdone: handleCameraInitDone,
               onScancode: handleScan,
               onStop: handleCameraStop,

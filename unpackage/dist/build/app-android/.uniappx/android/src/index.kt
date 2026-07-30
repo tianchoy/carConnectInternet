@@ -1797,42 +1797,105 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
 }
 )
 typealias CameraPermissionStatus = String
-val CAMERA_PERMISSION = _uA(
-    "android.permission.CAMERA"
-) as UTSArray<String>
 fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    console.log("📷 [ensureCameraPermission] 开始检查相机权限")
     val activity = UTSAndroid.getUniActivity()
     if (activity == null) {
+        console.error("❌ [ensureCameraPermission] 获取 Activity 失败")
         callback("unavailable")
         return
     }
-    if (isTruthy(UTSAndroid.checkSystemPermissionGranted(activity, CAMERA_PERMISSION))) {
-        callback("granted")
+    val permission: String = "android.permission.CAMERA"
+    val permissions = _uA(
+        permission
+    ) as UTSArray<String>
+    console.log("📷 [ensureCameraPermission] 权限:", permissions)
+    try {
+        val isGranted = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+        console.log("📷 [ensureCameraPermission] 当前权限状态:", if (isTruthy(isGranted)) {
+            "已授予"
+        } else {
+            "未授予"
+        }
+        )
+        if (isTruthy(isGranted)) {
+            console.log("✅ [ensureCameraPermission] 相机权限已授予")
+            callback("granted")
+            return
+        }
+    }
+     catch (error: Throwable) {
+        console.error("❌ [ensureCameraPermission] 检查权限失败:", error)
+        callback("unavailable")
         return
     }
-    UTSAndroid.requestSystemPermission(activity, CAMERA_PERMISSION, fun(allRight, _){
-        callback(if (isTruthy(allRight)) {
-            "granted"
-        } else {
-            "denied"
+    console.log("📷 [ensureCameraPermission] 开始请求相机权限...")
+    try {
+        UTSAndroid.requestSystemPermission(activity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
+            console.log("📷 [ensureCameraPermission] 权限请求结果:", if (allRight) {
+                "成功"
+            } else {
+                "失败"
+            }
+            )
+            console.log("📷 [ensureCameraPermission] 授予的权限:", grantedPermissions)
+            if (allRight) {
+                console.log("✅ [ensureCameraPermission] 权限授予成功")
+                callback("granted")
+            } else {
+                try {
+                    val isGrantedNow = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+                    if (isTruthy(isGrantedNow)) {
+                        console.log("✅ [ensureCameraPermission] 权限实际已授予")
+                        callback("granted")
+                    } else {
+                        console.log("❌ [ensureCameraPermission] 权限被拒绝")
+                        callback("denied")
+                    }
+                }
+                 catch (error: Throwable) {
+                    console.error("❌ [ensureCameraPermission] 再次检查权限失败:", error)
+                    callback("denied")
+                }
+            }
+        }
+        , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
+            console.log("📷 [ensureCameraPermission] 权限被拒绝")
+            console.log("📷 [ensureCameraPermission] 是否不再询问:", doNotAskAgain)
+            console.log("📷 [ensureCameraPermission] 被拒绝的权限:", deniedPermissions)
+            if (doNotAskAgain) {
+                console.log("⚠️ [ensureCameraPermission] 用户选择不再询问，需要去系统设置")
+                callback("settingsRequired")
+            } else {
+                console.log("❌ [ensureCameraPermission] 用户拒绝权限")
+                callback("denied")
+            }
         }
         )
     }
-    , fun(doNotAskAgain, _){
-        callback(if (isTruthy(doNotAskAgain)) {
-            "settingsRequired"
-        } else {
-            "denied"
-        }
-        )
+     catch (error: Throwable) {
+        console.error("❌ [ensureCameraPermission] 请求权限异常:", error)
+        callback("unavailable")
     }
-    )
     return
 }
 fun openCameraPermissionSettings(): Unit {
+    console.log("📷 [openCameraPermissionSettings] 打开系统权限设置")
     val activity = UTSAndroid.getUniActivity()
-    if (activity != null) {
-        UTSAndroid.gotoSystemPermissionActivity(activity, CAMERA_PERMISSION)
+    if (activity == null) {
+        console.error("❌ [openCameraPermissionSettings] 获取 Activity 失败")
+        return
+    }
+    val permission: String = "android.permission.CAMERA"
+    val permissions = _uA(
+        permission
+    ) as UTSArray<String>
+    try {
+        UTSAndroid.gotoSystemPermissionActivity(activity, permissions)
+        console.log("✅ [openCameraPermissionSettings] 已跳转到权限设置")
+    }
+     catch (error: Throwable) {
+        console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error)
     }
 }
 val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
