@@ -19,7 +19,7 @@
 				<i-form-item label="*设备ID" name="imei"  labelDirection="horizontal">
 					<i-input border="none" v-model="carInfo.imei" placeholder="请输入设备ID(必填)">
 						<template v-slot:suffix>
-							<i-icon name="/static/sancode.png" fontSize="20" @click="scanCode"></i-icon>
+							<i-icon name="/static/sancode.png" fontSize="24" @click="scanCode"></i-icon>
 						</template>
 					</i-input>
 				</i-form-item>

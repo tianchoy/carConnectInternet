@@ -207,7 +207,7 @@ open class GenPagesAddCarAddCar : BasePage {
                                             }
                                             , "placeholder" to "请输入设备ID(必填)"), _uM("suffix" to withSlotCtx(fun(): UTSArray<Any> {
                                                 return _uA(
-                                                    _cV(_component_i_icon, _uM("name" to "/static/sancode.png", "fontSize" to "20", "onClick" to scanCode))
+                                                    _cV(_component_i_icon, _uM("name" to "/static/sancode.png", "fontSize" to "24", "onClick" to scanCode))
                                                 )
                                             }
                                             ), "_" to 1), 8, _uA(
