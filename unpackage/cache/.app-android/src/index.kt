@@ -111,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_jTW2cw"
+    val id: String = "app-android_KyOinX"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1250,7 +1250,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 212, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 210, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1434,7 +1434,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 229, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 227, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1489,7 +1489,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 272, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 270, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1555,7 +1555,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 278, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 276, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1639,7 +1639,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 371, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 369, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {

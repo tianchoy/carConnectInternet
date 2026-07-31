@@ -30,9 +30,6 @@ open class GenPagesIndexIndex : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesIndexIndex
             val _cache = __ins.renderCache
-            val timeRange: TodayTimeRange = getTodayZeroTime()
-            val nowTime: Number = timeRange.nowTime
-            val todayZero: Number = timeRange.todayZero
             val center = reactive<MapCenter>(MapCenter(latitude = 39.90469, longitude = 116.40717))
             val userDeviceList = ref(_uA<UTSJSONObject>())
             val positionState = ref<PositionState>("loading")
@@ -320,6 +317,12 @@ open class GenPagesIndexIndex : BasePage {
             val tripData = ref(_uA<UTSJSONObject>())
             val totalMileage = ref(0)
             val averageSpeed = ref(0)
+            var trackRequestId: Number = 0
+            val clearTripData = fun(): Unit {
+                tripData.value = _uA()
+                totalMileage.value = 0
+                averageSpeed.value = 0
+            }
             val processTripData = fun(data: UTSJSONObject): Unit {
                 val trips = data.getArray<UTSJSONObject>("trips")
                 if (trips != null && trips.length > 0) {
@@ -335,29 +338,40 @@ open class GenPagesIndexIndex : BasePage {
                     totalMileage.value = totalDistance
                     averageSpeed.value = totalAvgSpeed / trips.length
                 } else {
-                    tripData.value = _uA()
-                    totalMileage.value = 0
-                    averageSpeed.value = 0
+                    clearTripData()
                 }
+            }
+            val createTrackRequestData = fun(imei: String): UTSJSONObject {
+                val timeRange = getTodayZeroTime()
+                return _uO("imei" to imei, "startTime" to formatTimes(timeRange.todayZero), "endTime" to formatTimes(timeRange.nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)
             }
             val loadTrackPos = fun(data: UTSJSONObject): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend w1@{
+                        val requestId = ++trackRequestId
                         try {
                             val res = await(getTrackPos(data))
+                            if (requestId != trackRequestId) {
+                                return@w1
+                            }
                             if (res.code == 401) {
                                 showAppToast(ShowToastOptions(title = "登录过期，请重新登录", icon = "none", duration = 2000))
                                 uni_removeStorageSync("token")
                                 uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
                                 return@w1
                             }
-                            val trackData = res.data
-                            if (trackData != null) {
-                                processTripData(trackData)
+                            if (res.code != 0) {
+                                console.error("加载轨迹失败:", res.msg)
+                                clearTripData()
+                                return@w1
                             }
-                            uni_hideLoading(null)
+                            processTripData(res.data)
                         }
                          catch (error: Throwable) {
+                            if (requestId != trackRequestId) {
+                                return@w1
+                            }
                             console.error("加载轨迹失败", error)
+                            clearTripData()
                         }
                 })
             }
@@ -425,12 +439,12 @@ open class GenPagesIndexIndex : BasePage {
                                 device.value
                             }
                             )))
-                            await(loadTrackPos(_uO("imei" to if (device.imei != "") {
+                            await(loadTrackPos(createTrackRequestData(if (device.imei != "") {
                                 device.imei
                             } else {
                                 device.value
                             }
-                            , "startTime" to formatTimes(todayZero), "endTime" to formatTimes(nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)))
+                            )))
                             showAppToast(ShowToastOptions(title = "切换成功", icon = "none"))
                         }
                          catch (error: Throwable) {
@@ -595,12 +609,12 @@ open class GenPagesIndexIndex : BasePage {
                                         device.value
                                     }
                                     )))
-                                    await(loadTrackPos(_uO("imei" to if (device.imei != "") {
+                                    await(loadTrackPos(createTrackRequestData(if (device.imei != "") {
                                         device.imei
                                     } else {
                                         device.value
                                     }
-                                    , "startTime" to formatTimes(todayZero), "endTime" to formatTimes(nowTime), "minParkTime" to 120, "withStop" to false, "withPos" to false, "withTrip" to true)))
+                                    )))
                                 }
                             } else {
                                 showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))

@@ -17,9 +17,11 @@ import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
-import { getTodayZeroTime, type TodayTimeRange } from '../../utils/gettime.uts'
+import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
+
+
 type Device = {
     name: string,
     deviceName: string,
@@ -81,10 +83,6 @@ const __sfc__ = defineComponent({
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
-
-const timeRange: TodayTimeRange = getTodayZeroTime()
-const nowTime: number = timeRange.nowTime
-const todayZero: number = timeRange.todayZero
 
 const center = reactive<MapCenter>({
     latitude: 39.90469,
@@ -400,6 +398,13 @@ const trackPosInfo = ref<any>({})
 const tripData = ref<Array<UTSJSONObject>>([])
 const totalMileage = ref(0)
 const averageSpeed = ref(0)
+let trackRequestId = 0
+
+const clearTripData = () : void => {
+    tripData.value = []
+    totalMileage.value = 0
+    averageSpeed.value = 0
+}
 
 // 处理行程数据
 const processTripData = (data : UTSJSONObject) : void => {
@@ -420,15 +425,29 @@ const processTripData = (data : UTSJSONObject) : void => {
         totalMileage.value = totalDistance
         averageSpeed.value = totalAvgSpeed / trips.length
     } else {
-        tripData.value = []
-        totalMileage.value = 0
-        averageSpeed.value = 0
+        clearTripData()
     }
 }
 
+const createTrackRequestData = (imei: string) : UTSJSONObject => {
+    const timeRange = getTodayZeroTime()
+    return {
+        imei: imei,
+        startTime: formatTimes(timeRange.todayZero),
+        endTime: formatTimes(timeRange.nowTime),
+        minParkTime: 120,
+        withStop: false,
+        withPos: false,
+        withTrip: true,
+    } as UTSJSONObject
+}
+
 const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
+    const requestId = ++trackRequestId
     try {
         const res = await getTrackPos(data)
+        if (requestId != trackRequestId) return
+
         if (res.code == 401) {
             showAppToast({
                 title: '登录过期，请重新登录',
@@ -441,13 +460,18 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
             })
             return
         }
-        const trackData = res.data
-        if (trackData != null) {
-            processTripData(trackData)
+
+        if (res.code != 0) {
+            console.error('加载轨迹失败:', res.msg)
+            clearTripData()
+            return
         }
-        uni.hideLoading()
+
+        processTripData(res.data)
     } catch (error) {
+        if (requestId != trackRequestId) return
         console.error('加载轨迹失败', error)
+        clearTripData()
     }
 }
 
@@ -526,15 +550,7 @@ const loadDeviceData = async (device: Device) => {
             deviceId: device.deviceId,
             deviceids: device.imei || device.value
         })
-        await loadTrackPos({
-            imei: device.imei || device.value,
-            startTime: formatTimes(todayZero),
-            endTime: formatTimes(nowTime),
-            minParkTime: 120,
-            withStop: false,
-            withPos: false,
-            withTrip: true,
-        })
+        await loadTrackPos(createTrackRequestData(device.imei || device.value))
         showAppToast({
             title: '切换成功',
             icon: 'none'
@@ -718,15 +734,7 @@ const loadDeviceList = async () => {
                     deviceId: device.deviceId,
                     deviceids: device.imei != '' ? device.imei : device.value
                 })
-                await loadTrackPos({
-                    imei: device.imei != '' ? device.imei : device.value,
-                    startTime: formatTimes(todayZero),
-                    endTime: formatTimes(nowTime),
-                    minParkTime: 120,
-                    withStop: false,
-                    withPos: false,
-                    withTrip: true,
-                })
+                await loadTrackPos(createTrackRequestData(device.imei != '' ? device.imei : device.value))
             }
         } else {
             showAppToast({
