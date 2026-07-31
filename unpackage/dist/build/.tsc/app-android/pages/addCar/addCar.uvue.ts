@@ -343,7 +343,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
                   suffix: withSlotCtx((): any[] => [
                     _cV(_component_i_icon, _uM({
                       name: "/static/sancode.png",
-                      fontSize: "20",
+                      fontSize: "24",
                       onClick: scanCode
                     }))
                   ]),

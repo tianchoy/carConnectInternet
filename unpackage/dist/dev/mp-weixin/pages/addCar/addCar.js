@@ -305,7 +305,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.o(scanCode, "bf"),
         f: common_vendor.p({
           name: "/static/sancode.png",
-          fontSize: "20",
+          fontSize: "24",
           class: "data-v-6409e324"
         }),
         g: common_vendor.o(($event) => {

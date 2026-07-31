@@ -1,3 +1,4 @@
+import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import { computed, ref, watch } from 'vue'
 
 
@@ -347,6 +348,8 @@ __expose({
 
 return (): any | null => {
 
+const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
+
   return _cE("view", _uM({
     class: _nC(wrapClass.value),
     style: _nS(wrapStyle.value)
@@ -400,11 +403,13 @@ return (): any | null => {
         }), " × ")
       : _cC("v-if", true),
     isTrue(_ctx.password && _ctx.showPasswordToggle)
-      ? _cE("text", _uM({
+      ? _cV(_component_i_icon, _uM({
           key: 2,
           class: "i-input__eye",
-          onClick: togglePassword
-        }), _tD(passwordVisible.value ? "显示" : "隐藏"), 1 /* TEXT */)
+          onClick: togglePassword,
+          name: passwordVisible.value ? '../../../../static/eye-close.png' : '../../../../static/eye-open.png',
+          size: "24"
+        }), null, 8 /* PROPS */, ["name"])
       : _cC("v-if", true),
     renderSlot(_ctx.$slots, "suffix", {}, (): any[] => [
       _ctx.suffiicon.length > 0

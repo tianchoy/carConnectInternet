@@ -1,5 +1,13 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+if (!Array) {
+  const _easycom_i_icon_1 = common_vendor.resolveComponent("i-icon");
+  _easycom_i_icon_1();
+}
+const _easycom_i_icon = () => "../i-icon/i-icon.js";
+if (!Math) {
+  _easycom_i_icon();
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
   modelValue: {
     type: String,
@@ -307,8 +315,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({ 
     } : {}, {
       G: __props.password && __props.showPasswordToggle
     }, __props.password && __props.showPasswordToggle ? {
-      H: common_vendor.t(passwordVisible.value ? "显示" : "隐藏"),
-      I: common_vendor.o(togglePassword, "ef")
+      H: common_vendor.o(togglePassword, "2a"),
+      I: common_vendor.p({
+        name: passwordVisible.value ? "../../../../static/eye-close.png" : "../../../../static/eye-open.png",
+        size: "24",
+        class: "i-input__eye"
+      })
     } : {}, {
       J: __props.suffiicon.length > 0
     }, __props.suffiicon.length > 0 ? {

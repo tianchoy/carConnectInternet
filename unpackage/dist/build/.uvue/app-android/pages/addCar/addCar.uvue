@@ -307,7 +307,7 @@ const __sfc__ = defineComponent({
                                             suffix: withSlotCtx((): any[] => [
                                                 _cV(_component_i_icon, _uM({
                                                     name: "/static/sancode.png",
-                                                    fontSize: "20",
+                                                    fontSize: "24",
                                                     onClick: scanCode
                                                 }))
                                             ]),

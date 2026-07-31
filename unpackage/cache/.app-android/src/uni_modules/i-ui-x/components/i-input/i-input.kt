@@ -203,6 +203,7 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
             val togglePassword = ::gen_togglePassword_fn
             __expose(_uM("setFormatter" to fun() {}))
             return fun(): Any? {
+                val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 return _cE("view", _uM("class" to _nC(wrapClass.value), "style" to _nS(wrapStyle.value)), _uA(
                     renderSlot(_ctx.`$slots`, "prefix", _uO(), fun(): UTSArray<Any> {
                         return _uA(
@@ -260,11 +261,13 @@ open class GenUniModulesIUiXComponentsIInputIInput : VueComponent {
                         _ctx.password
                     }
                     )) {
-                        _cE("text", _uM("key" to 2, "class" to "i-input__eye", "onClick" to togglePassword), _tD(if (passwordVisible.value) {
-                            "显示"
+                        _cV(_component_i_icon, _uM("key" to 2, "class" to "i-input__eye", "onClick" to togglePassword, "name" to if (passwordVisible.value) {
+                            "../../../../static/eye-close.png"
                         } else {
-                            "隐藏"
-                        }), 1)
+                            "../../../../static/eye-open.png"
+                        }, "size" to "24"), null, 8, _uA(
+                            "name"
+                        ))
                     } else {
                         _cC("v-if", true)
                     }

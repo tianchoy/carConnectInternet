@@ -45,13 +45,14 @@
     >
       ×
     </text>
-    <text
+    <i-icon
       v-if="password && showPasswordToggle"
       class="i-input__eye"
       @click="togglePassword"
+      :name="passwordVisible ? '../../../../static/eye-close.png' : '../../../../static/eye-open.png'"
+      size="24"
     >
-      {{ passwordVisible ? "显示" : "隐藏" }}
-    </text>
+    </i-icon>
     <slot name="suffix">
       <text
         v-if="suffiicon.length > 0"

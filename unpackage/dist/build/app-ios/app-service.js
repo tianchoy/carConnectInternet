@@ -5460,6 +5460,7 @@
       }
     });
     return (_ctx = null, _cache = null) => {
+      const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
       return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
         class: vue.normalizeClass(wrapClass.value),
         style: vue.normalizeStyle(wrapStyle.value)
@@ -5508,11 +5509,13 @@
           class: "i-input__clear",
           onClick: clear
         }), " × ")) : vue.createCommentVNode("", true),
-        __props.password && __props.showPasswordToggle ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+        __props.password && __props.showPasswordToggle ? (vue.openBlock(), vue.createBlock(_component_i_icon, new UTSJSONObject({
           key: 2,
           class: "i-input__eye",
-          onClick: togglePassword
-        }), vue.toDisplayString(passwordVisible.value ? "显示" : "隐藏"), 1)) : vue.createCommentVNode("", true),
+          onClick: togglePassword,
+          name: passwordVisible.value ? "../../../../static/eye-close.png" : "../../../../static/eye-open.png",
+          size: "24"
+        }), null, 8, ["name"])) : vue.createCommentVNode("", true),
         vue.renderSlot(_ctx.$slots, "suffix", new UTSJSONObject({}), () => {
           return [
             __props.suffiicon.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
@@ -9363,7 +9366,7 @@
                               return [
                                 vue.createVNode(_component_i_icon, new UTSJSONObject({
                                   name: "/static/sancode.png",
-                                  fontSize: "20",
+                                  fontSize: "24",
                                   onClick: scanCode
                                 }))
                               ];
