@@ -1,0 +1,92 @@
+import { showAppToast } from './toast.uts'
+
+import { openExternalMap } from '../uni_modules/external-map-navigation/utssdk/app-android/index.uts'
+
+
+export type OpenLocationParams = {
+	latitude: number
+	longitude: number
+	name: string
+}
+
+function isValidCoordinate(latitude: number, longitude: number): boolean {
+	return !isNaN(latitude) && !isNaN(longitude) &&
+		latitude >= -90 && latitude <= 90 &&
+		longitude >= -180 && longitude <= 180 &&
+		!(latitude == 0 && longitude == 0)
+}
+
+function showInvalidLocationToast(): void {
+	showAppToast({
+		title: '暂无有效车辆位置',
+		icon: 'none'
+	})
+}
+
+
+function openAndroidExternalMap(params: OpenLocationParams): void {
+	const result = openExternalMap({
+		latitude: params.latitude,
+		longitude: params.longitude,
+		name: params.name
+	})
+	if (result.code == 'opened') return
+
+	if (result.code == 'invalid_coordinate') {
+		showInvalidLocationToast()
+		return
+	}
+
+	if (result.code == 'no_map_app') {
+		showAppToast({
+			title: '未检测到可用地图应用',
+			icon: 'none'
+		})
+		return
+	}
+
+	showAppToast({
+		title: '无法打开地图，请稍后重试',
+		icon: 'none'
+	})
+}
+
+
+export function openLocation(params: OpenLocationParams): void {
+	if (!isValidCoordinate(params.latitude, params.longitude)) {
+		showInvalidLocationToast()
+		return
+	}
+
+
+	openAndroidExternalMap(params)
+	return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

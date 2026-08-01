@@ -15,7 +15,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.openLocation as uni_openLocation
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -185,14 +184,14 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                 val latitude = item.getNumber("latitude", 0)
                                                 val longitude = item.getNumber("longitude", 0)
                                                 if (latitude == null || longitude == null || latitude.toString(10).length == 0 || longitude.toString(10).length == 0) {
-                                                    console.error("位置信息缺失", item, " at pages/carInfoDetail/carInfoDetail.uvue:359")
+                                                    console.error("位置信息缺失", item, " at pages/carInfoDetail/carInfoDetail.uvue:360")
                                                     showAppToast(ShowToastOptions(title = "位置信息缺失", icon = "none"))
                                                     return@w2 false
                                                 }
                                                 val lat = parseFloat(latitude.toString(10))
                                                 val lng = parseFloat(longitude.toString(10))
                                                 if (isNaN(lat) || isNaN(lng)) {
-                                                    console.error("经纬度格式错误", latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:372")
+                                                    console.error("经纬度格式错误", latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:373")
                                                     return@w2 false
                                                 }
                                                 var convertedLat: Number = lat
@@ -203,7 +202,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                     convertedLng = coord.lng
                                                 }
                                                  catch (transformError: Throwable) {
-                                                    console.error("坐标转换失败:", transformError, " at pages/carInfoDetail/carInfoDetail.uvue:384")
+                                                    console.error("坐标转换失败:", transformError, " at pages/carInfoDetail/carInfoDetail.uvue:385")
                                                 }
                                                 center.latitude = convertedLat
                                                 center.longitude = convertedLng
@@ -228,7 +227,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                                 if (signalRssi.value != null) {
                                                     val signalExp = getSignalDetail(signalRssi.value).experience
                                                     if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                                                        console.warn("设备 " + imei.value!! + " 信号较弱: " + signalRssi.value!! + "dBm", " at pages/carInfoDetail/carInfoDetail.uvue:427")
+                                                        console.warn("设备 " + imei.value!! + " 信号较弱: " + signalRssi.value!! + "dBm", " at pages/carInfoDetail/carInfoDetail.uvue:428")
                                                     }
                                                 }
                                             }
@@ -239,10 +238,10 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                                         return@w2 true
                                     }
                                      catch (error: Throwable) {
-                                        console.error("第" + attempt + "次加载设备数据失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:441")
+                                        console.error("第" + attempt + "次加载设备数据失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:442")
                                         if (attempt < retry) {
                                             val delayMs = Math.pow(2, attempt) * 1000
-                                            console.log("等待" + delayMs / 1000 + "秒后重试...", " at pages/carInfoDetail/carInfoDetail.uvue:447")
+                                            console.log("等待" + delayMs / 1000 + "秒后重试...", " at pages/carInfoDetail/carInfoDetail.uvue:448")
                                             await(delay(delayMs))
                                             return@w2 false
                                         } else {
@@ -358,7 +357,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         }
                          catch (error: Throwable) {
                             uni_hideLoading(null)
-                            console.error("操作失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:687")
+                            console.error("操作失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:688")
                             showAppToast(ShowToastOptions(title = "操作失败，请重试", icon = "none"))
                         }
                 })
@@ -384,29 +383,16 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             address.value = addr.result.formatted_address
                         }
                          catch (error: Throwable) {
-                            console.error("获取地址信息失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:723")
+                            console.error("获取地址信息失败:", error, " at pages/carInfoDetail/carInfoDetail.uvue:724")
                         }
                 })
             }
-            fun gen_navTo_fn(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        if (!(address.value != "")) {
-                            await(refreshAdress())
-                        }
-                        uni_openLocation(OpenLocationOptions(latitude = center.latitude, longitude = center.longitude, name = if (address.value != "") {
-                            address.value
-                        } else {
-                            "当前位置"
-                        }
-                        , scale = 18, success = fun(_){
-                            showAppToast(ShowToastOptions(title = "成功调起地图", icon = "none"))
-                        }
-                        , fail = fun(err){
-                            showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err, " at pages/carInfoDetail/carInfoDetail.uvue:748")
-                        }
-                        ))
-                })
+            fun gen_navTo_fn(): Unit {
+                var locationName = address.value
+                if (locationName == "") {
+                    locationName = currentCarInfo.value.getString("deviceName", "当前位置")
+                }
+                openLocation(OpenLocationParams(latitude = center.latitude, longitude = center.longitude, name = locationName))
             }
             val navTo = ::gen_navTo_fn
             val handleGridClick = fun(event: Any){
@@ -466,7 +452,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                             val res = await(getDeviceDetail(deviceId.value!!))
                             currentCarInfo.value = res.data
                         } else {
-                            console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:831")
+                            console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:817")
                         }
                 })
             }
@@ -477,7 +463,7 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                 val storedUserType = uni_getStorageSync("userType") as String?
                 userType.value = storedUserType ?: ""
                 loadDeviceDetail().then(fun(){
-                    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 843, 10), "deptId" to deptId.value, "deviceids" to imei.value)
+                    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 829, 10), "deptId" to deptId.value, "deviceids" to imei.value)
                     uni_showLoading(ShowLoadingOptions(title = "加载中..."))
                     loadData(data, 3).then(fun(success: Boolean){
                         uni_hideLoading(null)
@@ -491,19 +477,19 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
             }
             )
             onShow(fun(){
-                console.log("页面显示，检查自动刷新状态", " at pages/carInfoDetail/carInfoDetail.uvue:865")
+                console.log("页面显示，检查自动刷新状态", " at pages/carInfoDetail/carInfoDetail.uvue:851")
                 if (datainfo.value["connectionStatus"] == "online" && !isRefreshing.value) {
                     setupAutoRefresh(currentTime.value)
                 }
             }
             )
             onHide(fun(){
-                console.log("页面隐藏时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:874")
+                console.log("页面隐藏时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:860")
                 stopAutoRefresh()
             }
             )
             onUnmounted(fun(){
-                console.log("页面卸载时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:879")
+                console.log("页面卸载时停止自动刷新", " at pages/carInfoDetail/carInfoDetail.uvue:865")
                 stopAutoRefresh()
             }
             )

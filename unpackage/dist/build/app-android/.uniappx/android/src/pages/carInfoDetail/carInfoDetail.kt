@@ -14,7 +14,6 @@ import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.openLocation as uni_openLocation
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -387,25 +386,12 @@ open class GenPagesCarInfoDetailCarInfoDetail : BasePage {
                         }
                 })
             }
-            fun gen_navTo_fn(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        if (!(address.value != "")) {
-                            await(refreshAdress())
-                        }
-                        uni_openLocation(OpenLocationOptions(latitude = center.latitude, longitude = center.longitude, name = if (address.value != "") {
-                            address.value
-                        } else {
-                            "当前位置"
-                        }
-                        , scale = 18, success = fun(_){
-                            showAppToast(ShowToastOptions(title = "成功调起地图", icon = "none"))
-                        }
-                        , fail = fun(err){
-                            showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err)
-                        }
-                        ))
-                })
+            fun gen_navTo_fn(): Unit {
+                var locationName = address.value
+                if (locationName == "") {
+                    locationName = currentCarInfo.value.getString("deviceName", "当前位置")
+                }
+                openLocation(OpenLocationParams(latitude = center.latitude, longitude = center.longitude, name = locationName))
             }
             val navTo = ::gen_navTo_fn
             val handleGridClick = fun(event: Any){

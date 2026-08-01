@@ -16,7 +16,6 @@ import io.dcloud.uniapp.extapi.getSystemInfoSync as uni_getSystemInfoSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import io.dcloud.uniapp.extapi.hideTabBar as uni_hideTabBar
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
-import io.dcloud.uniapp.extapi.openLocation as uni_openLocation
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
@@ -711,14 +710,16 @@ open class GenPagesIndexIndex : BasePage {
                 if (!isLogin()) {
                     return
                 }
-                uni_openLocation(OpenLocationOptions(latitude = center.latitude, longitude = center.longitude, name = currentCarName.value, scale = 18, success = fun(_){
-                    showAppToast(ShowToastOptions(title = "成功调起地图", icon = "none"))
+                if (positionState.value != "available") {
+                    showAppToast(ShowToastOptions(title = if (positionMessage.value != "") {
+                        positionMessage.value
+                    } else {
+                        "暂无有效车辆位置"
+                    }
+                    , icon = "none"))
+                    return
                 }
-                , fail = fun(err){
-                    showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                    console.error("调起地图失败:", err)
-                }
-                ))
+                openLocation(OpenLocationParams(latitude = center.latitude, longitude = center.longitude, name = currentCarName.value))
             }
             val toFence = fun(){
                 if (!isLogin()) {

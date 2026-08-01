@@ -1,6 +1,9 @@
 'use strict';
 
 require('vue');
+require('android.content.Intent');
+require('android.net.Uri');
+require('android.app.Activity');
 require('java.math.BigDecimal');
 require('uts.sdk.modules.DCloudUniMapTencent.Polyline');
 require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');

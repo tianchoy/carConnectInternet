@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-const utils_toast = require("../../utils/toast.js");
+const utils_openLocation = require("../../utils/openLocation.js");
 const api_request = require("../../api/request.js");
 const utils_formateTime = require("../../utils/formateTime.js");
 require("../../utils/getAdress.js");
@@ -113,25 +113,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return `${hours}小时${minutes}分${seconds}秒`;
     };
     const showAddress = (latitude, longitude) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:165", latitude, longitude);
-        common_vendor.index.openLocation({
-          latitude,
-          longitude,
-          name: "当前位置",
-          scale: 18,
-          success: () => {
-            common_vendor.index.__f__("log", "at pages/stopRecord/stopRecord.uvue:172", "成功调起地图");
-          },
-          fail: (err) => {
-            utils_toast.showAppToast({
-              title: "调起地图失败",
-              icon: "none"
-            });
-            common_vendor.index.__f__("error", "at pages/stopRecord/stopRecord.uvue:179", "调起地图失败:", err);
-          }
-        });
-      });
+      utils_openLocation.openLocation(new utils_openLocation.OpenLocationParams({
+        latitude,
+        longitude,
+        name: "停车位置"
+      }));
     };
     return (_ctx, _cache) => {
       "raw js";

@@ -9,17 +9,31 @@ import { showAppToast } from '../../utils/toast.uts'
 	// 导入坐标转换插件
 	import CoordTransform from '../../utils/coordTransform.uts'
 
-	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 43, 7>;
+	import Polyline from 'uts.sdk.modules.DCloudUniMapTencent.Polyline'
+	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
+
+
+	type CoordinatePoint = { __$originalPosition?: UTSSourceMapPosition<"CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7>;
 		latitude : number
 		longitude : number
 	}
 
-	type AnimationQueueItem = { __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 48, 7>;
+	type AnimationQueueItem = { __$originalPosition?: UTSSourceMapPosition<"AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 52, 7>;
 		position : CoordinatePoint
 		rotation : number
 		speed : number
 		address : string
 		connectionStatus : string
+	}
+
+	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/vehicleTracking/vehicleTracking.uvue", 60, 7>;
+		points: Array<CoordinatePoint>
+		color: string
+		width: number
+		dottedLine: boolean
+		arrowLine: boolean
+		borderColor: string
+		borderWidth: number
 	}
 
 	
@@ -42,6 +56,15 @@ const imei = ref<string>('')
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
+	const travelledPoints = ref<Array<CoordinatePoint>>([])
+	const ROUTE_POINT_MIN_DISTANCE = 1
+
+	const polyline = ref<Array<Polyline>>([])
+	let trackingPolyline : Polyline | null = null
+
+
+
+
 
 	// 动画相关状态
 	const isAnimating = ref(false)
@@ -72,6 +95,10 @@ const imei = ref<string>('')
 	const isTracking = ref(false)
 	const trackingInterval = ref<number | null>(null)
 	const lastDirection = ref(0)
+	const hasValidPosition = ref(false)
+	let trackingSessionId = 0
+	let isTrackRequestPending = false
+	let lastAcceptedPosition : CoordinatePoint | null = null
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
@@ -108,7 +135,7 @@ const imei = ref<string>('')
 
 	async function loadInitialPosition() {
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 134, 10),
+			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 161, 10),
 				deptId: deptId.value,
 				deviceids: imei.value
 			}
@@ -141,6 +168,7 @@ const imei = ref<string>('')
 						// 设置初始位置
 						currentPosition.latitude = convertedCoord.lat
 						currentPosition.longitude = convertedCoord.lng
+					hasValidPosition.value = true
 						targetPosition.latitude = convertedCoord.lat
 						targetPosition.longitude = convertedCoord.lng
 						center.latitude = convertedCoord.lat
@@ -184,7 +212,7 @@ const imei = ref<string>('')
 			}
 
 		} catch (err) {
-			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:210")
+			console.error('获取初始位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:238")
 			showAppToast({
 				title: '网络请求失败',
 				icon: 'none'
@@ -205,7 +233,7 @@ const imei = ref<string>('')
 
 		markers.value = [marker]
 		markerInitialized.value = true
-		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:231")
+		console.log('初始化标记点完成', " at pages/vehicleTracking/vehicleTracking.uvue:259")
 	}
 
 	// 计算地图上的旋转角度
@@ -226,7 +254,7 @@ const imei = ref<string>('')
 	}
 
 	onLoad((option) => {
-		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:252")
+		console.log('option', option, " at pages/vehicleTracking/vehicleTracking.uvue:280")
 		connectionStatus.value = option.connectionStatus ?? ''
 		imei.value = option.imei ?? ''
 		currentCar.value = option.plateNo ?? '未知车辆'
@@ -306,214 +334,87 @@ const imei = ref<string>('')
 	}
 
 
-	// 开始位置动画
-	const startPositionAnimation = (duration : number, onComplete : () => void) => {
-		if (isAnimating.value && animationTimer.value != null) {
-			clearInterval(animationTimer.value as number)
-		}
+	function copyPosition(p : CoordinatePoint) : CoordinatePoint { return { latitude: p.latitude, longitude: p.longitude } }
+	function updateTrackingPolyline() : void {
+		if (travelledPoints.value.length < 2) { polyline.value = []; return }
 
+		const points = travelledPoints.value.map((p : CoordinatePoint) : LocationObject => new LocationObject(p.latitude, p.longitude))
+		let currentTrackingPolyline = trackingPolyline
+		if (currentTrackingPolyline == null) {
+			currentTrackingPolyline = new Polyline(points, '#888787', 3, false, false, '', '#888787', 0, [])
+			trackingPolyline = currentTrackingPolyline
+		}
+		currentTrackingPolyline.points = points
+		polyline.value = [currentTrackingPolyline]
+
+
+
+
+	}
+	function appendTravelledPoint(p : CoordinatePoint) : void {
+		const last = travelledPoints.value.length > 0 ? travelledPoints.value[travelledPoints.value.length - 1] : null
+		if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE) return
+		travelledPoints.value.push(copyPosition(p)); updateTrackingPolyline()
+	}
+	function clearTrackingRoute() : void {
+		travelledPoints.value = []
+
+		trackingPolyline = null
+
+		polyline.value = []
+	}
+	const startPositionAnimation = (duration : number, sessionId : number, done : () => void) => {
+		if (animationTimer.value != null) clearInterval(animationTimer.value as number)
 		isAnimating.value = true
-		const startTime = Date.now()
-		const startLat = currentPosition.latitude
-		const startLng = currentPosition.longitude
-		const startRot = currentRotation.value
-
-		const latDiff = targetPosition.latitude - startLat
-		const lngDiff = targetPosition.longitude - startLng
-		const rotDiff = calculateShortestRotation(startRot, targetRotation.value)
-
-		// 使用更短的时间间隔
-		const interval = 30
-		let lastMarkerUpdate = startTime
-
+		const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value
+		const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value)
+		let lastDraw = begin
 		animationTimer.value = setInterval(() => {
-			const now = Date.now()
-			const elapsed = now - startTime
-			const progress = Math.min(elapsed / duration, 1)
-
-			// 使用线性运动，保持匀速
-			const linearProgress = progress
-
-			// 更新当前位置
-			currentPosition.latitude = startLat + latDiff * linearProgress
-			currentPosition.longitude = startLng + lngDiff * linearProgress
-			currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress)
-
-			// 更新地图中心点
-			center.latitude = currentPosition.latitude
-			center.longitude = currentPosition.longitude
-
-			// 提高流畅度
-			if (now - lastMarkerUpdate >= MARKER_UPDATE_INTERVAL || progress >= 1) {
-				updateMarkerSmooth()
-				lastMarkerUpdate = now
-			}
-
-			if (progress >= 1) {
-				// 动画完成
-				clearInterval(animationTimer.value as number)
-				animationTimer.value = null
-				isAnimating.value = false
-
-				// 确保最终位置准确
-				currentPosition.latitude = targetPosition.latitude
-				currentPosition.longitude = targetPosition.longitude
-				currentRotation.value = normalizeRotation(targetRotation.value)
-				updateMarkerSmooth()
-				onComplete()
-			}
-		}, interval) as number
+			if (!isTracking.value || sessionId != trackingSessionId) return
+			const now = Date.now(), progress = Math.min((now - begin) / duration, 1)
+			currentPosition.latitude = lat + latDiff * progress; currentPosition.longitude = lng + lngDiff * progress
+			currentRotation.value = normalizeRotation(rot + rotDiff * progress); center.latitude = currentPosition.latitude; center.longitude = currentPosition.longitude
+			if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) { updateMarkerSmooth(); lastDraw = now }
+			if (progress >= 1) { clearInterval(animationTimer.value as number); animationTimer.value = null; isAnimating.value = false; currentPosition.latitude = targetPosition.latitude; currentPosition.longitude = targetPosition.longitude; currentRotation.value = normalizeRotation(targetRotation.value); updateMarkerSmooth(); appendTravelledPoint(currentPosition); done() }
+		}, 30) as number
 	}
-
-
-	// 处理动画队列
-	function processAnimationQueue() : void {
-		if (animationQueue.value.length == 0) {
-			isProcessingQueue.value = false
-			return
-		}
-
-		isProcessingQueue.value = true
-		const nextAnimation = animationQueue.value[0]
-		animationQueue.value.splice(0, 1)
-
-		targetPosition.latitude = nextAnimation.position.latitude
-		targetPosition.longitude = nextAnimation.position.longitude
-		targetRotation.value = nextAnimation.rotation
-		currentSpeed.value = nextAnimation.speed
-		currentAddress.value = nextAnimation.address
-		connectionStatus.value = nextAnimation.connectionStatus
-
-		const distance = calculateDistance(
-			currentPosition.latitude,
-			currentPosition.longitude,
-			targetPosition.latitude,
-			targetPosition.longitude
-		)
-		const animationDuration = calculateRealisticAnimationDuration(distance, currentSpeed.value)
-
-		startPositionAnimation(animationDuration, () => {
-			isProcessingQueue.value = false
-			if (animationQueue.value.length > 0) {
-				setTimeout(() => {
-					processAnimationQueue()
-				}, 50)
-			}
-		})
+	function processAnimationQueue(sessionId : number) : void {
+		if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) { isProcessingQueue.value = false; return }
+		isProcessingQueue.value = true; const next = animationQueue.value.shift() as AnimationQueueItem
+		targetPosition.latitude = next.position.latitude; targetPosition.longitude = next.position.longitude; targetRotation.value = next.rotation; currentSpeed.value = next.speed; currentAddress.value = next.address; connectionStatus.value = next.connectionStatus
+		startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, () => { if (!isTracking.value || sessionId != trackingSessionId) return; isProcessingQueue.value = false; if (animationQueue.value.length > 0) setTimeout(() => processAnimationQueue(sessionId), 50) })
 	}
-
-	// 添加到动画队列
-	const addToAnimationQueue = (animationData : AnimationQueueItem) : void => {
-		if (animationQueue.value.length > 2) {
-			animationQueue.value = animationQueue.value.slice(-1)
-		}
-		animationQueue.value.push(animationData)
-		if (!isProcessingQueue.value && !isAnimating.value) {
-			processAnimationQueue()
-		}
-	}
-
-	// 请求位置数据
-	const loadTrackData = async () => {
+	const loadTrackData = async (sessionId : number) => {
+		if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending) return
+		isTrackRequestPending = true
 		try {
-			const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/vehicleTracking/vehicleTracking.uvue", 442, 10),
-				deptId: deptId.value,
-				deviceids: imei.value
-			}
-
-			const res = await getDevicePos(data)
-			console.log('222222', " at pages/vehicleTracking/vehicleTracking.uvue:448")
-			if (res?.code == 0 && res.data && res.data.length > 0) {
-				const deviceData = res.data.find((item : UTSJSONObject) => item.getString('imei', '') == imei.value)
-				if (deviceData != null) {
-					const latitude = deviceData.getNumber('latitude', 0)
-					const longitude = deviceData.getNumber('longitude', 0)
-					const speed = deviceData.getNumber('speed', 0)
-					const address = deviceData.getString('positionUpdateTime', '未知位置')
-					const status = deviceData.getString('connectionStatus', 'unknown')
-					const direction = deviceData.getNumber('direction', lastDirection.value)
-					const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
-
-					const newDirection = direction
-
-					const animationData : AnimationQueueItem = {
-						position: {
-							latitude: convertedCoord.lat,
-							longitude: convertedCoord.lng
-						},
-						rotation: normalizeRotation(calculateMapRotation(newDirection)),
-						speed: speed,
-						address: address,
-						connectionStatus: status
-					}
-					addToAnimationQueue(animationData)
-					lastDirection.value = newDirection
-				}
-			}
-		} catch (err) {
-			console.error('获取跟踪位置失败:', err, " at pages/vehicleTracking/vehicleTracking.uvue:477")
+			const res = await getDevicePos({ deptId: deptId.value, deviceids: imei.value })
+			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !res.data) return
+			const item = res.data.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
+			if (item == null) return
+			const rawLat = item.getNumber('latitude', 0)
+			const rawLng = item.getNumber('longitude', 0)
+			if (rawLat == 0 || rawLng == 0) return
+			const converted = CoordTransform.wgs84ToTencent(rawLat, rawLng)
+			if (!isFinite(converted.lat) || !isFinite(converted.lng)) return
+			const position : CoordinatePoint = { latitude: converted.lat, longitude: converted.lng }
+			const previousPosition = lastAcceptedPosition
+			if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE) return
+			const direction = item.getNumber('direction', lastDirection.value)
+			const animationData : AnimationQueueItem = { position: position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber('speed', 0), address: item.getString('positionUpdateTime', '未知位置'), connectionStatus: item.getString('connectionStatus', 'unknown') }
+			lastAcceptedPosition = copyPosition(position)
+			animationQueue.value.push(animationData)
+			lastDirection.value = direction
+			if (!isProcessingQueue.value && !isAnimating.value) processAnimationQueue(sessionId)
+		} catch (error) {
+			console.error('获取跟踪位置失败:', error, " at pages/vehicleTracking/vehicleTracking.uvue:433")
+		} finally {
+			if (sessionId == trackingSessionId) isTrackRequestPending = false
 		}
 	}
 
-	// 停止跟踪
-	function stopTracking() : void {
-		isTracking.value = false
-
-		// 清除定时器
-		if (trackingInterval.value != null) {
-			clearInterval(trackingInterval.value as number)
-			trackingInterval.value = null
-		}
-
-		// 清理动画状态
-		animationQueue.value = []
-		isProcessingQueue.value = false
-
-		if (animationTimer.value != null) {
-			clearInterval(animationTimer.value as number)
-			animationTimer.value = null
-		}
-		isAnimating.value = false
-
-		showAppToast({
-			title: '停止跟踪',
-			icon: 'success',
-			duration: 1500
-		})
-	}
-
-	// 开始跟踪
-	function startTracking() : void {
-		if (!markerInitialized.value) {
-			initMarker()
-		}
-
-		// 清理状态
-		animationQueue.value = []
-		isProcessingQueue.value = false
-
-		const interval = 3000
-		isTracking.value = true
-
-		// 清除之前的定时器
-		if (trackingInterval.value != null) {
-			clearInterval(trackingInterval.value as number)
-		}
-
-		// 立即获取一次位置
-		loadTrackData()
-
-		// 设置定时器
-		trackingInterval.value = setInterval(() => {
-			loadTrackData()
-		}, interval) as number
-
-		showAppToast({
-			title: '开始跟踪',
-			icon: 'success',
-			duration: 1500
-		})
-	}
+	function stopTracking(showToast : boolean = true) : void { trackingSessionId += 1; isTracking.value = false; if (trackingInterval.value != null) { clearInterval(trackingInterval.value as number); trackingInterval.value = null }; if (animationTimer.value != null) { clearInterval(animationTimer.value as number); animationTimer.value = null; appendTravelledPoint(currentPosition) }; animationQueue.value = []; isAnimating.value = false; isProcessingQueue.value = false; isTrackRequestPending = false; if (showToast) showAppToast({ title: '停止跟踪', icon: 'success', duration: 1500 }) }
+	function startTracking() : void { if (!hasValidPosition.value) { showAppToast({ title: '暂无有效定位信息', icon: 'none' }); return }; if (!markerInitialized.value) initMarker(); clearTrackingRoute(); appendTravelledPoint(currentPosition); animationQueue.value = []; isProcessingQueue.value = false; lastAcceptedPosition = copyPosition(currentPosition); trackingSessionId += 1; const sessionId = trackingSessionId; isTracking.value = true; loadTrackData(sessionId); trackingInterval.value = setInterval(() => { loadTrackData(sessionId); }, 3000) as number; showAppToast({ title: '开始跟踪', icon: 'success', duration: 1500 }) }
 
 	// 开始/停止跟踪
 	const toggleTracking = () => {
@@ -525,47 +426,9 @@ const imei = ref<string>('')
 	}
 
 
-	onHide(() => {
-		console.log('页面隐藏时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:552")
-		isTracking.value = false
+	onHide(() => { stopTracking(false) })
+	onUnmounted(() => { stopTracking(false) })
 
-		// 清除定时器
-		if (trackingInterval.value != null) {
-			clearInterval(trackingInterval.value as number)
-			trackingInterval.value = null
-		}
-
-		// 清理动画状态
-		animationQueue.value = []
-		isProcessingQueue.value = false
-
-		if (animationTimer.value != null) {
-			clearInterval(animationTimer.value as number)
-			animationTimer.value = null
-		}
-		isAnimating.value = false
-	})
-
-	onUnmounted(() => {
-		console.log('页面卸载时停止自动刷新', " at pages/vehicleTracking/vehicleTracking.uvue:573")
-		isTracking.value = false
-
-		// 清除定时器
-		if (trackingInterval.value != null) {
-			clearInterval(trackingInterval.value as number)
-			trackingInterval.value = null
-		}
-
-		// 清理动画状态
-		animationQueue.value = []
-		isProcessingQueue.value = false
-
-		if (animationTimer.value != null) {
-			clearInterval(animationTimer.value as number)
-			animationTimer.value = null
-		}
-		isAnimating.value = false
-	})
 
 return (): any | null => {
 
@@ -590,6 +453,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           latitude: center.latitude,
           longitude: center.longitude,
           markers: markers.value,
+          polyline: polyline.value,
           scale: mapScale.value,
           style: _nS(_uM({"width":"100%","height":"100%"})),
           "show-location": false,
@@ -597,7 +461,7 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
           "enable-overlooking": true,
           "enable-building": true,
           "enable-3D": true
-        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "scale", "style"]),
+        }), null, 8 /* PROPS */, ["latitude", "longitude", "markers", "polyline", "scale", "style"]),
         _cV(_component_sub_navBar, _uM({
           class: "sub-nav-overlay",
           currentTime: currentTime.value,

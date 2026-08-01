@@ -1,3 +1,4 @@
+import { OpenLocationParams } from "../../utils/openLocation";
 import _easycom_custom_navBar from '@/components/custom-navBar/custom-navBar.uvue';
 import _easycom_sub_navBar from '@/components/sub-navBar/sub-navBar.uvue';
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue';
@@ -6,6 +7,7 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue';
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue';
 import { showAppToast } from '../../utils/toast.uts';
+import { openLocation } from '../../utils/openLocation.uts';
 import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts';
 import { getAddress } from '../../utils/getAdress.uts';
 import { getDeviceIcon } from '../../utils/cars';
@@ -51,12 +53,12 @@ function __uts_large_list_build_0(): UTSJSONObject[] {
     return __arr;
 }
 type MapCenter = {
-    __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 124, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 125, 7>;
     latitude: number;
     longitude: number;
 };
 type SignalDetail = {
-    __$originalPosition?: UTSSourceMapPosition<"SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 203, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 204, 7>;
     experience: string;
     quality: string;
     color: string;
@@ -281,7 +283,7 @@ const __sfc__ = defineComponent({
                             const latitude = item.getNumber('latitude', 0);
                             const longitude = item.getNumber('longitude', 0);
                             if (latitude == null || longitude == null || latitude.toString(10).length == 0 || longitude.toString(10).length == 0) {
-                                console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:359");
+                                console.error('位置信息缺失', item, " at pages/carInfoDetail/carInfoDetail.uvue:360");
                                 showAppToast({
                                     title: '位置信息缺失',
                                     icon: 'none'
@@ -292,7 +294,7 @@ const __sfc__ = defineComponent({
                             const lat = parseFloat(latitude.toString(10));
                             const lng = parseFloat(longitude.toString(10));
                             if (isNaN(lat) || isNaN(lng)) {
-                                console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:372");
+                                console.error('经纬度格式错误', latitude, longitude, " at pages/carInfoDetail/carInfoDetail.uvue:373");
                                 return false;
                             }
                             // 使用明确的基础类型，避免 Kotlin 无法推断局部对象类型。
@@ -304,7 +306,7 @@ const __sfc__ = defineComponent({
                                 convertedLng = coord.lng;
                             }
                             catch (transformError: any) {
-                                console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:384");
+                                console.error('坐标转换失败:', transformError, " at pages/carInfoDetail/carInfoDetail.uvue:385");
                             }
                             center.latitude = convertedLat;
                             center.longitude = convertedLng;
@@ -335,7 +337,7 @@ const __sfc__ = defineComponent({
                             if (signalRssi.value != null) {
                                 const signalExp = getSignalDetail(signalRssi.value).experience;
                                 if (signalExp === '差' || signalExp === '非常差' || signalExp === '无信号') {
-                                    console.warn(`设备 ${imei.value!} 信号较弱: ${signalRssi.value!}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:427");
+                                    console.warn(`设备 ${imei.value!} 信号较弱: ${signalRssi.value!}dBm`, " at pages/carInfoDetail/carInfoDetail.uvue:428");
                                 }
                             }
                         }
@@ -347,12 +349,12 @@ const __sfc__ = defineComponent({
                     return true; // 成功标志
                 }
                 catch (error: any) {
-                    console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:441");
+                    console.error(`第${attempt}次加载设备数据失败:`, error, " at pages/carInfoDetail/carInfoDetail.uvue:442");
                     // 如果不是最后一次重试，则继续重试
                     if (attempt < retry) {
                         // 等待一段时间后重试（指数退避）
                         const delayMs = Math.pow(2, attempt) * 1000; // 2^attempt 秒
-                        console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:447");
+                        console.log(`等待${delayMs / 1000}秒后重试...`, " at pages/carInfoDetail/carInfoDetail.uvue:448");
                         await delay(delayMs);
                         return false;
                     }
@@ -408,7 +410,7 @@ const __sfc__ = defineComponent({
                 }
             }
             catch (error: any) {
-                console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:509");
+                console.error('手动刷新失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:510");
                 showAppToast({
                     title: '刷新失败',
                     icon: 'none'
@@ -541,7 +543,7 @@ const __sfc__ = defineComponent({
             catch (error: any) {
                 // 隐藏加载中
                 uni.hideLoading();
-                console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:687");
+                console.error('操作失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:688");
                 showAppToast({
                     title: '操作失败，请重试',
                     icon: 'none'
@@ -571,33 +573,19 @@ const __sfc__ = defineComponent({
                 address.value = addr.result.formatted_address;
             }
             catch (error: any) {
-                console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:723");
+                console.error('获取地址信息失败:', error, " at pages/carInfoDetail/carInfoDetail.uvue:724");
             }
         };
-        async function navTo(): Promise<void> {
-            if (!(address.value != "")) {
-                await refreshAdress();
+        function navTo(): void {
+            let locationName = address.value;
+            if (locationName == '') {
+                locationName = currentCarInfo.value.getString('deviceName', '当前位置');
             }
-            //导航去此位置
-            uni.openLocation({
+            openLocation({
                 latitude: center.latitude,
                 longitude: center.longitude,
-                name: address.value != "" ? address.value : '当前位置',
-                scale: 18,
-                success: () => {
-                    showAppToast({
-                        title: '成功调起地图',
-                        icon: 'none'
-                    } as ShowToastOptions);
-                },
-                fail: (err) => {
-                    showAppToast({
-                        title: '调起地图失败',
-                        icon: 'none'
-                    } as ShowToastOptions);
-                    console.error('调起地图失败:', err, " at pages/carInfoDetail/carInfoDetail.uvue:748");
-                }
-            });
+                name: locationName
+            } as OpenLocationParams);
         }
         const handleGridClick = (event: any) => {
             const name = event as UTSJSONObject;
@@ -676,7 +664,7 @@ const __sfc__ = defineComponent({
                 currentCarInfo.value = res.data;
             }
             else {
-                console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:831");
+                console.error("设备id获取失败", " at pages/carInfoDetail/carInfoDetail.uvue:817");
             }
         };
         onLoad((option) => {
@@ -686,7 +674,7 @@ const __sfc__ = defineComponent({
             const storedUserType = uni.getStorageSync('userType') as string | null;
             userType.value = storedUserType ?? '';
             loadDeviceDetail().then(() => {
-                const data: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 843, 10),
+                const data: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("data", "pages/carInfoDetail/carInfoDetail.uvue", 829, 10),
                     deptId: deptId.value,
                     deviceids: imei.value
                 };
@@ -700,7 +688,7 @@ const __sfc__ = defineComponent({
             });
         });
         onShow(() => {
-            console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:865");
+            console.log('页面显示，检查自动刷新状态', " at pages/carInfoDetail/carInfoDetail.uvue:851");
             // 如果设备在线且没有在刷新，重新启动自动刷新
             if (datainfo.value["connectionStatus"] == 'online' && !isRefreshing.value) {
                 setupAutoRefresh(currentTime.value);
@@ -708,11 +696,11 @@ const __sfc__ = defineComponent({
         });
         // 新增页面隐藏时的处理
         onHide(() => {
-            console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:874");
+            console.log('页面隐藏时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:860");
             stopAutoRefresh();
         });
         onUnmounted(() => {
-            console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:879");
+            console.log('页面卸载时停止自动刷新', " at pages/carInfoDetail/carInfoDetail.uvue:865");
             stopAutoRefresh();
         });
         return (): any | null => {

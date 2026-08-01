@@ -1430,6 +1430,67 @@
   const _imports_6 = "/static/pay.png";
   const _imports_7 = "/static/online.png";
   const _imports_8 = "/static/del.png";
+  class OpenLocationParams extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false },
+            name: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = OpenLocationParams.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      this.name = this.__props__.name;
+      delete this.__props__;
+    }
+  }
+  function isValidCoordinate(latitude, longitude) {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
+  }
+  function showInvalidLocationToast() {
+    showAppToast({
+      title: "暂无有效车辆位置",
+      icon: "none"
+    });
+  }
+  function openLocation(params) {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+      showInvalidLocationToast();
+      return null;
+    }
+    try {
+      uni.openLocation({
+        latitude: params.latitude,
+        longitude: params.longitude,
+        name: params.name != "" ? params.name : "当前位置",
+        scale: 18,
+        success: () => {
+          uni.__log__("log", "at utils/openLocation.uts:74", "成功打开位置地图");
+        },
+        fail: (err) => {
+          uni.__log__("error", "at utils/openLocation.uts:77", "打开位置地图失败:", err);
+          showAppToast({
+            title: "打开位置地图失败，请稍后重试",
+            icon: "none"
+          });
+        }
+      });
+    } catch (error) {
+      uni.__log__("error", "at utils/openLocation.uts:85", "打开位置地图异常:", error);
+      showAppToast({
+        title: "打开位置地图失败，请稍后重试",
+        icon: "none"
+      });
+    }
+  }
   class AppModalSuccess {
     constructor() {
       this.confirm = false;
@@ -2852,9 +2913,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:363", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:364", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:365", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:366", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -2898,23 +2959,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:423", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:424", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:432", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:433", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:434", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:435", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:443", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:444", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -2925,7 +2986,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:456", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:457", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -2933,7 +2994,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:466", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:467", "清除保存设备索引失败:", error);
         }
       };
       const handlePicker = () => {
@@ -3009,7 +3070,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:569", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:570", "加载设备详情失败", error);
           }
         });
       };
@@ -3073,7 +3134,7 @@
               return Promise.resolve(null);
             }
             if (res.code != 0) {
-              uni.__log__("error", "at pages/index/index.uvue:642", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:643", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -3081,7 +3142,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:650", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:651", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -3099,7 +3160,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 0 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:668", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:669", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -3107,9 +3168,9 @@
             devicePosInfo.value = position;
             const lat = position.getNumber("latitude", 0);
             const lng = position.getNumber("longitude", 0);
-            const isValidCoordinate = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
-            if (!isValidCoordinate) {
-              uni.__log__("error", "at pages/index/index.uvue:683", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+            const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
+            if (!isValidCoordinate2) {
+              uni.__log__("error", "at pages/index/index.uvue:684", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -3124,10 +3185,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:708", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:709", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:711", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:712", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -3139,7 +3200,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:723", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:724", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -3152,7 +3213,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:736", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:737", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -3167,16 +3228,16 @@
         const indexs = e.getArray("indexs");
         let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
         if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:758", "无法解析选中的索引，使用当前设备");
+          uni.__log__("warn", "at pages/index/index.uvue:759", "无法解析选中的索引，使用当前设备");
           const currentIndex = deviceList.value.findIndex((device) => {
             return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
           });
           if (currentIndex != -1) {
             selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:764", "使用当前设备索引:", selectedIndex);
+            uni.__log__("log", "at pages/index/index.uvue:765", "使用当前设备索引:", selectedIndex);
           } else {
             selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:767", "使用默认索引: 0");
+            uni.__log__("log", "at pages/index/index.uvue:768", "使用默认索引: 0");
           }
         }
         const selectedDevice = deviceList.value[selectedIndex];
@@ -3188,7 +3249,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:782", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:783", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -3269,7 +3330,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:885", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:886", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -3302,7 +3363,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:923", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:924", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -3329,7 +3390,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:952", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:953", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -3360,12 +3421,12 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:984", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:985", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:991", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:992", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -3393,7 +3454,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1019", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1020", "跳转添加设备失败:", err);
           }
         });
       };
@@ -3407,25 +3468,18 @@
       const toFindCar = () => {
         if (!isLogin())
           return null;
-        uni.openLocation({
+        if (positionState.value != "available") {
+          showAppToast({
+            title: positionMessage.value || "暂无有效车辆位置",
+            icon: "none"
+          });
+          return null;
+        }
+        openLocation(new OpenLocationParams({
           latitude: center.latitude,
           longitude: center.longitude,
-          name: currentCarName.value,
-          scale: 18,
-          success: () => {
-            showAppToast({
-              title: "成功调起地图",
-              icon: "none"
-            });
-          },
-          fail: (err) => {
-            showAppToast({
-              title: "调起地图失败",
-              icon: "none"
-            });
-            uni.__log__("error", "at pages/index/index.uvue:1051", "调起地图失败:", err);
-          }
-        });
+          name: currentCarName.value
+        }));
       };
       const toFence = () => {
         if (!isLogin())
@@ -3448,7 +3502,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1114", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1108", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -7794,7 +7848,7 @@
                       const latitude = item.getNumber("latitude", 0);
                       const longitude = item.getNumber("longitude", 0);
                       if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:359", "位置信息缺失", item);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:360", "位置信息缺失", item);
                         showAppToast({
                           title: "位置信息缺失",
                           icon: "none"
@@ -7804,7 +7858,7 @@
                       const lat = parseFloat(latitude.toString());
                       const lng = parseFloat(longitude.toString());
                       if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:372", "经纬度格式错误", latitude, longitude);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:373", "经纬度格式错误", latitude, longitude);
                         return false;
                       }
                       let convertedLat = lat;
@@ -7814,7 +7868,7 @@
                         convertedLat = coord.lat;
                         convertedLng = coord.lng;
                       } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:384", "坐标转换失败:", transformError);
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:385", "坐标转换失败:", transformError);
                       }
                       center.latitude = convertedLat;
                       center.longitude = convertedLng;
@@ -7840,7 +7894,7 @@
                       if (signalRssi.value != null) {
                         const signalExp = getSignalDetail(signalRssi.value).experience;
                         if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:427", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:428", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
                         }
                       }
                     }
@@ -7861,10 +7915,10 @@
                 }
                 return true;
               } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:441", "第".concat(attempt, "次加载设备数据失败:"), error);
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:442", "第".concat(attempt, "次加载设备数据失败:"), error);
                 if (attempt < retry) {
                   const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:447", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:448", "等待".concat(delayMs / 1e3, "秒后重试..."));
                   yield delay(delayMs);
                   return false;
                 } else {
@@ -8018,7 +8072,7 @@
             }
           } catch (error) {
             uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:687", "操作失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:688", "操作失败:", error);
             showAppToast({
               title: "操作失败，请重试",
               icon: "none"
@@ -8050,35 +8104,20 @@
             const addr = yield getAddress(center.latitude, center.longitude);
             address.value = addr.result.formatted_address;
           } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:723", "获取地址信息失败:", error);
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:724", "获取地址信息失败:", error);
           }
         });
       };
       function navTo() {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!address.value) {
-            yield refreshAdress();
-          }
-          uni.openLocation({
-            latitude: center.latitude,
-            longitude: center.longitude,
-            name: address.value || "当前位置",
-            scale: 18,
-            success: () => {
-              showAppToast({
-                title: "成功调起地图",
-                icon: "none"
-              });
-            },
-            fail: (err) => {
-              showAppToast({
-                title: "调起地图失败",
-                icon: "none"
-              });
-              uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:748", "调起地图失败:", err);
-            }
-          });
-        });
+        let locationName = address.value;
+        if (locationName == "") {
+          locationName = currentCarInfo.value.getString("deviceName", "当前位置");
+        }
+        openLocation(new OpenLocationParams({
+          latitude: center.latitude,
+          longitude: center.longitude,
+          name: locationName
+        }));
       }
       const handleGridClick = (event = null) => {
         const name = event;
@@ -8149,7 +8188,7 @@
             const res = yield getDeviceDetail(deviceId.value);
             currentCarInfo.value = res.data;
           } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:831", "设备id获取失败");
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:817", "设备id获取失败");
           }
         });
       };
@@ -8174,17 +8213,17 @@
         });
       });
       vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面显示，检查自动刷新状态");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:851", "页面显示，检查自动刷新状态");
         if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
           setupAutoRefresh(currentTime.value);
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:874", "页面隐藏时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:860", "页面隐藏时停止自动刷新");
         stopAutoRefresh();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:879", "页面卸载时停止自动刷新");
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面卸载时停止自动刷新");
         stopAutoRefresh();
       });
       return (_ctx = null, _cache = null) => {
@@ -14349,7 +14388,7 @@
       delete this.__props__;
     }
   }
-  class MpPolylineData extends UTS.UTSType {
+  let MpPolylineData$1 = class MpPolylineData2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -14366,7 +14405,7 @@
         }
       };
     }
-    constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = MpPolylineData2.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.points = this.__props__.points;
@@ -14378,7 +14417,7 @@
       this.borderWidth = this.__props__.borderWidth;
       delete this.__props__;
     }
-  }
+  };
   const _sfc_main$k = /* @__PURE__ */ vue.defineComponent({
     __name: "playBack",
     setup(__props) {
@@ -14587,7 +14626,7 @@
         const lines = [];
         const unplayedPoints = trackPoints.value.slice(currentIndex.value);
         if (unplayedPoints.length >= 2) {
-          lines.push(new MpPolylineData({
+          lines.push(new MpPolylineData$1({
             points: toMpPoints(unplayedPoints),
             color: "#999999",
             width: 3,
@@ -14598,7 +14637,7 @@
           }));
         }
         if (currentIndex.value > 0) {
-          lines.push(new MpPolylineData({
+          lines.push(new MpPolylineData$1({
             points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
             color: "#1890FF",
             width: 6,
@@ -15332,6 +15371,37 @@
       delete this.__props__;
     }
   }
+  class MpPolylineData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            points: { type: "Unknown", optional: false },
+            color: { type: String, optional: false },
+            width: { type: Number, optional: false },
+            dottedLine: { type: Boolean, optional: false },
+            arrowLine: { type: Boolean, optional: false },
+            borderColor: { type: String, optional: false },
+            borderWidth: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.points = this.__props__.points;
+      this.color = this.__props__.color;
+      this.width = this.__props__.width;
+      this.dottedLine = this.__props__.dottedLine;
+      this.arrowLine = this.__props__.arrowLine;
+      this.borderColor = this.__props__.borderColor;
+      this.borderWidth = this.__props__.borderWidth;
+      delete this.__props__;
+    }
+  }
+  const ROUTE_POINT_MIN_DISTANCE = 1;
   const MARKER_UPDATE_INTERVAL = 100;
   const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
     __name: "vehicleTracking",
@@ -15346,6 +15416,8 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(15);
+      const travelledPoints = vue.ref([]);
+      const polyline = vue.ref([]);
       const isAnimating = vue.ref(false);
       const animationTimer = vue.ref(null);
       const currentPosition = vue.reactive(new CoordinatePoint({
@@ -15366,6 +15438,10 @@
       const isTracking = vue.ref(false);
       const trackingInterval = vue.ref(null);
       const lastDirection = vue.ref(0);
+      const hasValidPosition = vue.ref(false);
+      let trackingSessionId = 0;
+      let isTrackRequestPending = false;
+      let lastAcceptedPosition = null;
       const currentSpeed = vue.ref(0);
       const currentAddress = vue.ref("获取中...");
       const currentTime = vue.ref("1s");
@@ -15424,6 +15500,7 @@
                   const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
                   currentPosition.latitude = convertedCoord.lat;
                   currentPosition.longitude = convertedCoord.lng;
+                  hasValidPosition.value = true;
                   targetPosition.latitude = convertedCoord.lat;
                   targetPosition.longitude = convertedCoord.lng;
                   center.latitude = convertedCoord.lat;
@@ -15459,7 +15536,7 @@
               });
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:210", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:238", "获取初始位置失败:", err);
             showAppToast({
               title: "网络请求失败",
               icon: "none"
@@ -15476,7 +15553,7 @@
         const marker = createVehicleMarker(iconPath);
         markers.value = [marker];
         markerInitialized.value = true;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:231", "初始化标记点完成");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:259", "初始化标记点完成");
       }
       function calculateMapRotation(direction) {
         let rotation = direction;
@@ -15495,7 +15572,7 @@
       }
       vue.onLoad((option) => {
         var _a, _b, _c, _d, _e;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:252", "option", option);
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:280", "option", option);
         connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
         imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
         currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -15549,33 +15626,48 @@
           lastIconPath = newIconPath;
         }
       };
-      const startPositionAnimation = (duration, onComplete) => {
-        if (isAnimating.value && animationTimer.value != null) {
-          clearInterval(animationTimer.value);
+      function copyPosition(p) {
+        return new CoordinatePoint({ latitude: p.latitude, longitude: p.longitude });
+      }
+      function updateTrackingPolyline() {
+        if (travelledPoints.value.length < 2) {
+          polyline.value = [];
+          return null;
         }
+        polyline.value = [{ points: travelledPoints.value.map((p) => {
+          return copyPosition(p);
+        }), color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
+      }
+      function appendTravelledPoint(p) {
+        const last = travelledPoints.value.length > 0 ? travelledPoints.value[travelledPoints.value.length - 1] : null;
+        if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE)
+          return null;
+        travelledPoints.value.push(copyPosition(p));
+        updateTrackingPolyline();
+      }
+      function clearTrackingRoute() {
+        travelledPoints.value = [];
+        polyline.value = [];
+      }
+      const startPositionAnimation = (duration, sessionId, done) => {
+        if (animationTimer.value != null)
+          clearInterval(animationTimer.value);
         isAnimating.value = true;
-        const startTime = Date.now();
-        const startLat = currentPosition.latitude;
-        const startLng = currentPosition.longitude;
-        const startRot = currentRotation.value;
-        const latDiff = targetPosition.latitude - startLat;
-        const lngDiff = targetPosition.longitude - startLng;
-        const rotDiff = calculateShortestRotation(startRot, targetRotation.value);
-        const interval = 30;
-        let lastMarkerUpdate = startTime;
+        const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value;
+        const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value);
+        let lastDraw = begin;
         animationTimer.value = setInterval(() => {
-          const now = Date.now();
-          const elapsed = now - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const linearProgress = progress;
-          currentPosition.latitude = startLat + latDiff * linearProgress;
-          currentPosition.longitude = startLng + lngDiff * linearProgress;
-          currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress);
+          if (!isTracking.value || sessionId != trackingSessionId)
+            return null;
+          const now = Date.now(), progress = Math.min((now - begin) / duration, 1);
+          currentPosition.latitude = lat + latDiff * progress;
+          currentPosition.longitude = lng + lngDiff * progress;
+          currentRotation.value = normalizeRotation(rot + rotDiff * progress);
           center.latitude = currentPosition.latitude;
           center.longitude = currentPosition.longitude;
-          if (now - lastMarkerUpdate >= MARKER_UPDATE_INTERVAL || progress >= 1) {
+          if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
             updateMarkerSmooth();
-            lastMarkerUpdate = now;
+            lastDraw = now;
           }
           if (progress >= 1) {
             clearInterval(animationTimer.value);
@@ -15585,124 +15677,113 @@
             currentPosition.longitude = targetPosition.longitude;
             currentRotation.value = normalizeRotation(targetRotation.value);
             updateMarkerSmooth();
-            onComplete();
+            appendTravelledPoint(currentPosition);
+            done();
           }
-        }, interval);
+        }, 30);
       };
-      function processAnimationQueue() {
-        if (animationQueue.value.length == 0) {
+      function processAnimationQueue(sessionId) {
+        if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) {
           isProcessingQueue.value = false;
           return null;
         }
         isProcessingQueue.value = true;
-        const nextAnimation = animationQueue.value[0];
-        animationQueue.value.splice(0, 1);
-        targetPosition.latitude = nextAnimation.position.latitude;
-        targetPosition.longitude = nextAnimation.position.longitude;
-        targetRotation.value = nextAnimation.rotation;
-        currentSpeed.value = nextAnimation.speed;
-        currentAddress.value = nextAnimation.address;
-        connectionStatus.value = nextAnimation.connectionStatus;
-        const distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude);
-        const animationDuration = calculateRealisticAnimationDuration(distance, currentSpeed.value);
-        startPositionAnimation(animationDuration, () => {
+        const next = UTS.arrayShift(animationQueue.value);
+        targetPosition.latitude = next.position.latitude;
+        targetPosition.longitude = next.position.longitude;
+        targetRotation.value = next.rotation;
+        currentSpeed.value = next.speed;
+        currentAddress.value = next.address;
+        connectionStatus.value = next.connectionStatus;
+        startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, () => {
+          if (!isTracking.value || sessionId != trackingSessionId)
+            return null;
           isProcessingQueue.value = false;
-          if (animationQueue.value.length > 0) {
+          if (animationQueue.value.length > 0)
             setTimeout(() => {
-              processAnimationQueue();
+              return processAnimationQueue(sessionId);
             }, 50);
-          }
         });
       }
-      const addToAnimationQueue = (animationData) => {
-        if (animationQueue.value.length > 2) {
-          animationQueue.value = animationQueue.value.slice(-1);
-        }
-        animationQueue.value.push(animationData);
-        if (!isProcessingQueue.value && !isAnimating.value) {
-          processAnimationQueue();
-        }
-      };
-      const loadTrackData = () => {
+      const loadTrackData = (sessionId) => {
         return __awaiter(this, void 0, void 0, function* () {
+          if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending)
+            return Promise.resolve(null);
+          isTrackRequestPending = true;
           try {
-            const data = new UTSJSONObject({
-              deptId: deptId.value,
-              deviceids: imei.value
+            const res = yield getDevicePos(new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value }));
+            if (!isTracking.value || sessionId != trackingSessionId || (res === null || res === void 0 ? null : res.code) != 0 || !res.data)
+              return Promise.resolve(null);
+            const item = UTS.arrayFind(res.data, (value) => {
+              return value.getString("imei", "") == imei.value;
             });
-            const res = yield getDevicePos(data);
-            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:448", "222222");
-            if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
-              const deviceData = UTS.arrayFind(res.data, (item) => {
-                return item.getString("imei", "") == imei.value;
-              });
-              if (deviceData != null) {
-                const latitude = deviceData.getNumber("latitude", 0);
-                const longitude = deviceData.getNumber("longitude", 0);
-                const speed = deviceData.getNumber("speed", 0);
-                const address = deviceData.getString("positionUpdateTime", "未知位置");
-                const status = deviceData.getString("connectionStatus", "unknown");
-                const direction = deviceData.getNumber("direction", lastDirection.value);
-                const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
-                const newDirection = direction;
-                const animationData = new AnimationQueueItem({
-                  position: new CoordinatePoint({
-                    latitude: convertedCoord.lat,
-                    longitude: convertedCoord.lng
-                  }),
-                  rotation: normalizeRotation(calculateMapRotation(newDirection)),
-                  speed,
-                  address,
-                  connectionStatus: status
-                });
-                addToAnimationQueue(animationData);
-                lastDirection.value = newDirection;
-              }
-            }
-          } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:477", "获取跟踪位置失败:", err);
+            if (item == null)
+              return Promise.resolve(null);
+            const rawLat = item.getNumber("latitude", 0);
+            const rawLng = item.getNumber("longitude", 0);
+            if (rawLat == 0 || rawLng == 0)
+              return Promise.resolve(null);
+            const converted = CoordTransform.wgs84ToTencent(rawLat, rawLng);
+            if (!isFinite(converted.lat) || !isFinite(converted.lng))
+              return Promise.resolve(null);
+            const position = new CoordinatePoint({ latitude: converted.lat, longitude: converted.lng });
+            const previousPosition = lastAcceptedPosition;
+            if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE)
+              return Promise.resolve(null);
+            const direction = item.getNumber("direction", lastDirection.value);
+            const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: item.getString("positionUpdateTime", "未知位置"), connectionStatus: item.getString("connectionStatus", "unknown") });
+            lastAcceptedPosition = copyPosition(position);
+            animationQueue.value.push(animationData);
+            lastDirection.value = direction;
+            if (!isProcessingQueue.value && !isAnimating.value)
+              processAnimationQueue(sessionId);
+          } catch (error) {
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:433", "获取跟踪位置失败:", error);
+          } finally {
+            if (sessionId == trackingSessionId)
+              isTrackRequestPending = false;
           }
         });
       };
-      function stopTracking() {
+      function stopTracking(showToast = true) {
+        trackingSessionId += 1;
         isTracking.value = false;
         if (trackingInterval.value != null) {
           clearInterval(trackingInterval.value);
           trackingInterval.value = null;
         }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
         if (animationTimer.value != null) {
           clearInterval(animationTimer.value);
           animationTimer.value = null;
-        }
-        isAnimating.value = false;
-        showAppToast({
-          title: "停止跟踪",
-          icon: "success",
-          duration: 1500
-        });
-      }
-      function startTracking() {
-        if (!markerInitialized.value) {
-          initMarker();
+          appendTravelledPoint(currentPosition);
         }
         animationQueue.value = [];
+        isAnimating.value = false;
         isProcessingQueue.value = false;
-        const interval = 3e3;
-        isTracking.value = true;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
+        isTrackRequestPending = false;
+        if (showToast)
+          showAppToast({ title: "停止跟踪", icon: "success", duration: 1500 });
+      }
+      function startTracking() {
+        if (!hasValidPosition.value) {
+          showAppToast({ title: "暂无有效定位信息", icon: "none" });
+          return null;
         }
-        loadTrackData();
+        if (!markerInitialized.value)
+          initMarker();
+        clearTrackingRoute();
+        appendTravelledPoint(currentPosition);
+        animationQueue.value = [];
+        isProcessingQueue.value = false;
+        lastAcceptedPosition = copyPosition(currentPosition);
+        trackingSessionId += 1;
+        const sessionId = trackingSessionId;
+        isTracking.value = true;
+        loadTrackData(sessionId);
         trackingInterval.value = setInterval(() => {
-          loadTrackData();
-        }, interval);
-        showAppToast({
-          title: "开始跟踪",
-          icon: "success",
-          duration: 1500
-        });
+          loadTrackData(sessionId);
+        }, 3e3);
+        showAppToast({ title: "开始跟踪", icon: "success", duration: 1500 });
       }
       const toggleTracking = () => {
         if (isTracking.value) {
@@ -15712,34 +15793,10 @@
         }
       };
       vue.onHide(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:552", "页面隐藏时停止自动刷新");
-        isTracking.value = false;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
-          trackingInterval.value = null;
-        }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
-        if (animationTimer.value != null) {
-          clearInterval(animationTimer.value);
-          animationTimer.value = null;
-        }
-        isAnimating.value = false;
+        stopTracking(false);
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:573", "页面卸载时停止自动刷新");
-        isTracking.value = false;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
-          trackingInterval.value = null;
-        }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
-        if (animationTimer.value != null) {
-          clearInterval(animationTimer.value);
-          animationTimer.value = null;
-        }
-        isAnimating.value = false;
+        stopTracking(false);
       });
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
@@ -15762,6 +15819,7 @@
                 latitude: center.latitude,
                 longitude: center.longitude,
                 markers: markers.value,
+                polyline: polyline.value,
                 scale: mapScale.value,
                 style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
                 "show-location": false,
@@ -15769,7 +15827,7 @@
                 "enable-overlooking": true,
                 "enable-building": true,
                 "enable-3D": true
-              }), null, 8, ["latitude", "longitude", "markers", "scale"]),
+              }), null, 8, ["latitude", "longitude", "markers", "polyline", "scale"]),
               vue.createVNode(_component_sub_navBar, new UTSJSONObject({
                 class: "sub-nav-overlay",
                 currentTime: currentTime.value,
@@ -16709,25 +16767,11 @@
         return "".concat(hours, "小时").concat(minutes, "分").concat(seconds, "秒");
       };
       const showAddress = (latitude, longitude) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:165", latitude, longitude);
-          uni.openLocation({
-            latitude,
-            longitude,
-            name: "当前位置",
-            scale: 18,
-            success: () => {
-              uni.__log__("log", "at pages/stopRecord/stopRecord.uvue:172", "成功调起地图");
-            },
-            fail: (err) => {
-              showAppToast({
-                title: "调起地图失败",
-                icon: "none"
-              });
-              uni.__log__("error", "at pages/stopRecord/stopRecord.uvue:179", "调起地图失败:", err);
-            }
-          });
-        });
+        openLocation(new OpenLocationParams({
+          latitude,
+          longitude,
+          name: "停车位置"
+        }));
       };
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
@@ -18400,7 +18444,7 @@
         }
         return "polygon";
       }
-      function isValidCoordinate(latitude, longitude) {
+      function isValidCoordinate2(latitude, longitude) {
         return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
       }
       function parsePolygon(polygonStr) {
@@ -18414,7 +18458,7 @@
             return null;
           const latitude = parseFloat(values[0]);
           const longitude = parseFloat(values[1]);
-          if (!isValidCoordinate(latitude, longitude))
+          if (!isValidCoordinate2(latitude, longitude))
             return null;
           const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
           points2.push({
@@ -18438,7 +18482,7 @@
           const lat = parseFloat(centerValues[0]);
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
-          if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
+          if (!isValidCoordinate2(lat, lng) || !isFinite(radius) || radius <= 0) {
             uni.__log__("error", "at pages/geofencing/geofencing.uvue:437", "无效的圆形围栏数据:", circleStr);
             return null;
           }

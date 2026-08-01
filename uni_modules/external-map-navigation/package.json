@@ -1,0 +1,13 @@
+{
+  "id": "external-map-navigation",
+  "displayName": "外部地图导航",
+  "version": "1.0.0",
+  "description": "通过 Android 系统地图选择器导航至指定位置",
+  "uni_modules": {
+    "platforms": {
+      "app-android": {
+        "minSdkVersion": 21
+      }
+    }
+  }
+}

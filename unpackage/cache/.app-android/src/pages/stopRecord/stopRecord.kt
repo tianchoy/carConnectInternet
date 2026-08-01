@@ -13,7 +13,6 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
-import io.dcloud.uniapp.extapi.openLocation as uni_openLocation
 import io.dcloud.uniapp.extapi.showLoading as uni_showLoading
 open class GenPagesStopRecordStopRecord : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
@@ -112,18 +111,8 @@ open class GenPagesStopRecordStopRecord : BasePage {
                 val seconds = Math.floor((diff % 60000) / 1000)
                 return "" + hours + "小时" + minutes + "分" + seconds + "秒"
             }
-            val showAddress = fun(latitude: Number, longitude: Number): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        console.log(latitude, longitude, " at pages/stopRecord/stopRecord.uvue:165")
-                        uni_openLocation(OpenLocationOptions(latitude = latitude, longitude = longitude, name = "当前位置", scale = 18, success = fun(_){
-                            console.log("成功调起地图", " at pages/stopRecord/stopRecord.uvue:172")
-                        }
-                        , fail = fun(err){
-                            showAppToast(ShowToastOptions(title = "调起地图失败", icon = "none"))
-                            console.error("调起地图失败:", err, " at pages/stopRecord/stopRecord.uvue:179")
-                        }
-                        ))
-                })
+            val showAddress = fun(latitude: Number, longitude: Number){
+                openLocation(OpenLocationParams(latitude = latitude, longitude = longitude, name = "停车位置"))
             }
             return fun(): Any? {
                 val _component_custom_navBar = resolveEasyComponent("custom-navBar", GenComponentsCustomNavBarCustomNavBarClass)

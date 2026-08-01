@@ -1,0 +1,9 @@
+export type ExternalMapNavigationParams = {
+	latitude: number
+	longitude: number
+	name: string
+}
+
+export type ExternalMapNavigationResult = {
+	code: string
+}

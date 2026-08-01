@@ -11,6 +11,8 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
+import uts.sdk.modules.DCloudUniMapTencent.Polyline
+import uts.sdk.modules.DCloudUniMapTencent.LocationObject as LocationObject__1
 open class GenPagesVehicleTrackingVehicleTracking : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -26,6 +28,10 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val carType = ref<String>("")
             val center = reactive(_uO("latitude" to 39.90469, "longitude" to 116.40717))
             val mapScale = ref(15)
+            val travelledPoints = ref(_uA<CoordinatePoint>())
+            val ROUTE_POINT_MIN_DISTANCE: Number = 1
+            val polyline = ref(_uA<Polyline>())
+            var trackingPolyline: Polyline? = null
             val isAnimating = ref(false)
             val animationTimer = ref<Number?>(null)
             val currentPosition = reactive<CoordinatePoint>(CoordinatePoint(latitude = 39.90469, longitude = 116.40717))
@@ -41,6 +47,10 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
             val isTracking = ref(false)
             val trackingInterval = ref<Number?>(null)
             val lastDirection = ref(0)
+            val hasValidPosition = ref(false)
+            var trackingSessionId: Number = 0
+            var isTrackRequestPending = false
+            var lastAcceptedPosition: CoordinatePoint? = null
             val currentSpeed = ref(0)
             val currentAddress = ref("获取中...")
             val currentTime = ref("1s")
@@ -85,6 +95,7 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                                         val convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
                                         currentPosition.latitude = convertedCoord.lat
                                         currentPosition.longitude = convertedCoord.lng
+                                        hasValidPosition.value = true
                                         targetPosition.latitude = convertedCoord.lat
                                         targetPosition.longitude = convertedCoord.lng
                                         center["latitude"] = convertedCoord.lat
@@ -222,33 +233,76 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     lastIconPath = newIconPath
                 }
             }
-            val startPositionAnimation = fun(duration: Number, onComplete: () -> Unit){
-                if (isAnimating.value && animationTimer.value != null) {
+            fun gen_copyPosition_fn(p: CoordinatePoint): CoordinatePoint {
+                return CoordinatePoint(latitude = p.latitude, longitude = p.longitude)
+            }
+            val copyPosition = ::gen_copyPosition_fn
+            fun gen_updateTrackingPolyline_fn(): Unit {
+                if (travelledPoints.value.length < 2) {
+                    polyline.value = _uA()
+                    return
+                }
+                val points = travelledPoints.value.map(fun(p: CoordinatePoint): LocationObject__1 {
+                    return LocationObject__1(p.latitude, p.longitude)
+                }
+                )
+                var currentTrackingPolyline = trackingPolyline
+                if (currentTrackingPolyline == null) {
+                    currentTrackingPolyline = Polyline(points, "#888787", 3, false, false, "", "#888787", 0, _uA())
+                    trackingPolyline = currentTrackingPolyline
+                }
+                currentTrackingPolyline.points = points
+                polyline.value = _uA(
+                    currentTrackingPolyline
+                )
+            }
+            val updateTrackingPolyline = ::gen_updateTrackingPolyline_fn
+            fun gen_appendTravelledPoint_fn(p: CoordinatePoint): Unit {
+                val last = if (travelledPoints.value.length > 0) {
+                    travelledPoints.value[travelledPoints.value.length - 1]
+                } else {
+                    null
+                }
+                if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE) {
+                    return
+                }
+                travelledPoints.value.push(copyPosition(p))
+                updateTrackingPolyline()
+            }
+            val appendTravelledPoint = ::gen_appendTravelledPoint_fn
+            fun gen_clearTrackingRoute_fn(): Unit {
+                travelledPoints.value = _uA()
+                trackingPolyline = null
+                polyline.value = _uA()
+            }
+            val clearTrackingRoute = ::gen_clearTrackingRoute_fn
+            val startPositionAnimation = fun(duration: Number, sessionId: Number, done: () -> Unit){
+                if (animationTimer.value != null) {
                     clearInterval(animationTimer.value as Number)
                 }
                 isAnimating.value = true
-                val startTime = Date.now()
-                val startLat = currentPosition.latitude
-                val startLng = currentPosition.longitude
-                val startRot = currentRotation.value
-                val latDiff = targetPosition.latitude - startLat
-                val lngDiff = targetPosition.longitude - startLng
-                val rotDiff = calculateShortestRotation(startRot, targetRotation.value)
-                val interval: Number = 30
-                var lastMarkerUpdate = startTime
+                val begin = Date.now()
+                val lat = currentPosition.latitude
+                val lng = currentPosition.longitude
+                val rot = currentRotation.value
+                val latDiff = targetPosition.latitude - lat
+                val lngDiff = targetPosition.longitude - lng
+                val rotDiff = calculateShortestRotation(rot, targetRotation.value)
+                var lastDraw = begin
                 animationTimer.value = setInterval(fun(){
+                    if (!isTracking.value || sessionId != trackingSessionId) {
+                        return
+                    }
                     val now = Date.now()
-                    val elapsed = now - startTime
-                    val progress = Math.min(elapsed / duration, 1)
-                    val linearProgress = progress
-                    currentPosition.latitude = startLat + latDiff * linearProgress
-                    currentPosition.longitude = startLng + lngDiff * linearProgress
-                    currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress)
+                    val progress = Math.min((now - begin) / duration, 1)
+                    currentPosition.latitude = lat + latDiff * progress
+                    currentPosition.longitude = lng + lngDiff * progress
+                    currentRotation.value = normalizeRotation(rot + rotDiff * progress)
                     center["latitude"] = currentPosition.latitude
                     center["longitude"] = currentPosition.longitude
-                    if (now - lastMarkerUpdate >= MARKER_UPDATE_INTERVAL || progress >= 1) {
+                    if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
                         updateMarkerSmooth()
-                        lastMarkerUpdate = now
+                        lastDraw = now
                     }
                     if (progress >= 1) {
                         clearInterval(animationTimer.value as Number)
@@ -258,32 +312,33 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                         currentPosition.longitude = targetPosition.longitude
                         currentRotation.value = normalizeRotation(targetRotation.value)
                         updateMarkerSmooth()
-                        onComplete()
+                        appendTravelledPoint(currentPosition)
+                        done()
                     }
                 }
-                , interval) as Number
+                , 30) as Number
             }
-            fun gen_processAnimationQueue_fn(): Unit {
-                if (animationQueue.value.length == 0) {
+            fun gen_processAnimationQueue_fn(sessionId: Number): Unit {
+                if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) {
                     isProcessingQueue.value = false
                     return
                 }
                 isProcessingQueue.value = true
-                val nextAnimation = animationQueue.value[0]
-                animationQueue.value.splice(0, 1)
-                targetPosition.latitude = nextAnimation.position.latitude
-                targetPosition.longitude = nextAnimation.position.longitude
-                targetRotation.value = nextAnimation.rotation
-                currentSpeed.value = nextAnimation.speed
-                currentAddress.value = nextAnimation.address
-                connectionStatus.value = nextAnimation.connectionStatus
-                val distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude)
-                val animationDuration = calculateRealisticAnimationDuration(distance, currentSpeed.value)
-                startPositionAnimation(animationDuration, fun(){
+                val next = animationQueue.value.shift() as AnimationQueueItem
+                targetPosition.latitude = next.position.latitude
+                targetPosition.longitude = next.position.longitude
+                targetRotation.value = next.rotation
+                currentSpeed.value = next.speed
+                currentAddress.value = next.address
+                connectionStatus.value = next.connectionStatus
+                startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, fun(){
+                    if (!isTracking.value || sessionId != trackingSessionId) {
+                        return
+                    }
                     isProcessingQueue.value = false
                     if (animationQueue.value.length > 0) {
                         setTimeout(fun(){
-                            gen_processAnimationQueue_fn()
+                            return gen_processAnimationQueue_fn(sessionId)
                         }
                         , 50)
                     }
@@ -291,78 +346,98 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 )
             }
             val processAnimationQueue = ::gen_processAnimationQueue_fn
-            val addToAnimationQueue = fun(animationData: AnimationQueueItem): Unit {
-                if (animationQueue.value.length > 2) {
-                    animationQueue.value = animationQueue.value.slice(-1)
-                }
-                animationQueue.value.push(animationData)
-                if (!isProcessingQueue.value && !isAnimating.value) {
-                    processAnimationQueue()
-                }
-            }
-            val loadTrackData = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
+            val loadTrackData = fun(sessionId: Number): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending) {
+                            return@w1
+                        }
+                        isTrackRequestPending = true
                         try {
-                            val data: UTSJSONObject = _uO("deptId" to deptId.value, "deviceids" to imei.value)
-                            val res = await(getDevicePos(data))
-                            console.log("222222")
-                            if (res?.code == 0 && res.data != null && res.data.length > 0) {
-                                val deviceData = res.data.find(fun(item: UTSJSONObject): Boolean {
-                                    return item.getString("imei", "") == imei.value
-                                }
-                                )
-                                if (deviceData != null) {
-                                    val latitude = deviceData.getNumber("latitude", 0)
-                                    val longitude = deviceData.getNumber("longitude", 0)
-                                    val speed = deviceData.getNumber("speed", 0)
-                                    val address = deviceData.getString("positionUpdateTime", "未知位置")
-                                    val status = deviceData.getString("connectionStatus", "unknown")
-                                    val direction = deviceData.getNumber("direction", lastDirection.value)
-                                    val convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
-                                    val newDirection = direction
-                                    val animationData = AnimationQueueItem(position = CoordinatePoint(latitude = convertedCoord.lat, longitude = convertedCoord.lng), rotation = normalizeRotation(calculateMapRotation(newDirection)), speed = speed, address = address, connectionStatus = status)
-                                    addToAnimationQueue(animationData)
-                                    lastDirection.value = newDirection
-                                }
+                            val res = await(getDevicePos(_uO("deptId" to deptId.value, "deviceids" to imei.value)))
+                            if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !(res.data != null)) {
+                                return@w1
+                            }
+                            val item = res.data.find(fun(value: UTSJSONObject): Boolean {
+                                return value.getString("imei", "") == imei.value
+                            }
+                            )
+                            if (item == null) {
+                                return@w1
+                            }
+                            val rawLat = item.getNumber("latitude", 0)
+                            val rawLng = item.getNumber("longitude", 0)
+                            if (rawLat == 0 || rawLng == 0) {
+                                return@w1
+                            }
+                            val converted = CoordTransform.wgs84ToTencent(rawLat, rawLng)
+                            if (!isFinite(converted.lat) || !isFinite(converted.lng)) {
+                                return@w1
+                            }
+                            val position = CoordinatePoint(latitude = converted.lat, longitude = converted.lng)
+                            val previousPosition = lastAcceptedPosition
+                            if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE) {
+                                return@w1
+                            }
+                            val direction = item.getNumber("direction", lastDirection.value)
+                            val animationData = AnimationQueueItem(position = position, rotation = normalizeRotation(calculateMapRotation(direction)), speed = item.getNumber("speed", 0), address = item.getString("positionUpdateTime", "未知位置"), connectionStatus = item.getString("connectionStatus", "unknown"))
+                            lastAcceptedPosition = copyPosition(position)
+                            animationQueue.value.push(animationData)
+                            lastDirection.value = direction
+                            if (!isProcessingQueue.value && !isAnimating.value) {
+                                processAnimationQueue(sessionId)
                             }
                         }
-                         catch (err: Throwable) {
-                            console.error("获取跟踪位置失败:", err)
+                         catch (error: Throwable) {
+                            console.error("获取跟踪位置失败:", error)
+                        }
+                         finally {
+                            if (sessionId == trackingSessionId) {
+                                isTrackRequestPending = false
+                            }
                         }
                 })
             }
-            fun gen_stopTracking_fn(): Unit {
+            fun stopTracking(showToast: Boolean = true): Unit {
+                trackingSessionId += 1
                 isTracking.value = false
                 if (trackingInterval.value != null) {
                     clearInterval(trackingInterval.value as Number)
                     trackingInterval.value = null
                 }
-                animationQueue.value = _uA()
-                isProcessingQueue.value = false
                 if (animationTimer.value != null) {
                     clearInterval(animationTimer.value as Number)
                     animationTimer.value = null
+                    appendTravelledPoint(currentPosition)
                 }
+                animationQueue.value = _uA()
                 isAnimating.value = false
-                showAppToast(ShowToastOptions(title = "停止跟踪", icon = "success", duration = 1500))
+                isProcessingQueue.value = false
+                isTrackRequestPending = false
+                if (showToast) {
+                    showAppToast(ShowToastOptions(title = "停止跟踪", icon = "success", duration = 1500))
+                }
             }
-            val stopTracking = ::gen_stopTracking_fn
             fun gen_startTracking_fn(): Unit {
+                if (!hasValidPosition.value) {
+                    showAppToast(ShowToastOptions(title = "暂无有效定位信息", icon = "none"))
+                    return
+                }
                 if (!markerInitialized.value) {
                     initMarker()
                 }
+                clearTrackingRoute()
+                appendTravelledPoint(currentPosition)
                 animationQueue.value = _uA()
                 isProcessingQueue.value = false
-                val interval: Number = 3000
+                lastAcceptedPosition = copyPosition(currentPosition)
+                trackingSessionId += 1
+                val sessionId = trackingSessionId
                 isTracking.value = true
-                if (trackingInterval.value != null) {
-                    clearInterval(trackingInterval.value as Number)
-                }
-                loadTrackData()
+                loadTrackData(sessionId)
                 trackingInterval.value = setInterval(fun(){
-                    loadTrackData()
+                    loadTrackData(sessionId)
                 }
-                , interval) as Number
+                , 3000) as Number
                 showAppToast(ShowToastOptions(title = "开始跟踪", icon = "success", duration = 1500))
             }
             val startTracking = ::gen_startTracking_fn
@@ -374,35 +449,11 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                 }
             }
             onHide(fun(){
-                console.log("页面隐藏时停止自动刷新")
-                isTracking.value = false
-                if (trackingInterval.value != null) {
-                    clearInterval(trackingInterval.value as Number)
-                    trackingInterval.value = null
-                }
-                animationQueue.value = _uA()
-                isProcessingQueue.value = false
-                if (animationTimer.value != null) {
-                    clearInterval(animationTimer.value as Number)
-                    animationTimer.value = null
-                }
-                isAnimating.value = false
+                stopTracking(false)
             }
             )
             onUnmounted(fun(){
-                console.log("页面卸载时停止自动刷新")
-                isTracking.value = false
-                if (trackingInterval.value != null) {
-                    clearInterval(trackingInterval.value as Number)
-                    trackingInterval.value = null
-                }
-                animationQueue.value = _uA()
-                isProcessingQueue.value = false
-                if (animationTimer.value != null) {
-                    clearInterval(animationTimer.value as Number)
-                    animationTimer.value = null
-                }
-                isAnimating.value = false
+                stopTracking(false)
             }
             )
             return fun(): Any? {
@@ -415,10 +466,11 @@ open class GenPagesVehicleTrackingVehicleTracking : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cV(_component_custom_navBar, _uM("title" to "车辆跟踪", "show-back" to true, "backgroundColor" to "#fff", "textColor" to "#333", "showCapsule" to false)),
                         _cE("view", _uM("class" to "map-container"), _uA(
-                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
+                            _cV(_component_map, _uM("id" to "myMap", "latitude" to center["latitude"], "longitude" to center["longitude"], "markers" to markers.value, "polyline" to polyline.value, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to false, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to true), null, 8, _uA(
                                 "latitude",
                                 "longitude",
                                 "markers",
+                                "polyline",
                                 "scale",
                                 "style"
                             )),

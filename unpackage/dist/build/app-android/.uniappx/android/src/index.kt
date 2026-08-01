@@ -1,5 +1,8 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI662B0B4
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -82,6 +85,91 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
+open class ExternalMapNavigationParams (
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+    @JsonNotNull
+    open var name: String,
+) : UTSObject()
+open class ExternalMapNavigationResult (
+    @JsonNotNull
+    open var code: String,
+) : UTSObject()
+fun showAppToast(options: ShowToastOptions): Unit {
+    uni_showToast(options)
+}
+fun result(code: String): ExternalMapNavigationResult {
+    return ExternalMapNavigationResult(code = code)
+}
+fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
+}
+fun openExternalMap(params: ExternalMapNavigationParams): ExternalMapNavigationResult {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+        return result("invalid_coordinate")
+    }
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        console.error("获取当前页面失败，无法打开地图")
+        return result("launch_failed")
+    }
+    try {
+        val currentActivity = activity as Activity
+        val geoUri = "geo:0,0?q=" + params.latitude.toString(10) + "," + params.longitude.toString(10)
+        val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri))
+        val handlers = currentActivity.getPackageManager().queryIntentActivities(mapIntent, 0)
+        if (handlers.size == 0) {
+            return result("no_map_app")
+        }
+        val chooser = Intent.createChooser(mapIntent, "选择地图应用")
+        currentActivity.startActivity(chooser)
+        console.log("已请求打开外部地图:", geoUri)
+        return result("opened")
+    }
+     catch (error: Throwable) {
+        console.error("打开外部地图失败:", error)
+        return result("launch_failed")
+    }
+}
+open class OpenLocationParams (
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+    @JsonNotNull
+    open var name: String,
+) : UTSObject()
+fun isValidCoordinate__1(latitude: Number, longitude: Number): Boolean {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
+}
+fun showInvalidLocationToast(): Unit {
+    showAppToast(ShowToastOptions(title = "暂无有效车辆位置", icon = "none"))
+}
+fun openAndroidExternalMap(params: OpenLocationParams): Unit {
+    val result = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
+    if (result.code == "opened") {
+        return
+    }
+    if (result.code == "invalid_coordinate") {
+        showInvalidLocationToast()
+        return
+    }
+    if (result.code == "no_map_app") {
+        showAppToast(ShowToastOptions(title = "未检测到可用地图应用", icon = "none"))
+        return
+    }
+    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+}
+fun openLocation(params: OpenLocationParams): Unit {
+    if (!isValidCoordinate__1(params.latitude, params.longitude)) {
+        showInvalidLocationToast()
+        return
+    }
+    openAndroidExternalMap(params)
+    return
+}
 open class AppModalSuccess {
     open var confirm: Boolean = false
     open var cancel: Boolean = false
@@ -278,9 +366,6 @@ val GenUniModulesIUiXComponentsIPickerIPickerClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsIPickerIPicker(instance)
 }
 )
-fun showAppToast(options: ShowToastOptions): Unit {
-    uni_showToast(options)
-}
 val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToastAppToast::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenComponentsAppToastAppToast.name, inheritAttrs = GenComponentsAppToastAppToast.inheritAttrs, inject = GenComponentsAppToastAppToast.inject, props = GenComponentsAppToastAppToast.props, propsNeedCastKeys = GenComponentsAppToastAppToast.propsNeedCastKeys, emits = GenComponentsAppToastAppToast.emits, components = GenComponentsAppToastAppToast.components, styles = GenComponentsAppToastAppToast.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenComponentsAppToastAppToast.setup(props as GenComponentsAppToastAppToast)

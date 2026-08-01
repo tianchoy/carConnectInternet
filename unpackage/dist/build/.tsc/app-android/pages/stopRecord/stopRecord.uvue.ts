@@ -4,7 +4,7 @@ import _easycom_l_date_time_picker from '@/uni_modules/lime-date-time-picker/com
 import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
 import _easycom_i_empty from '@/uni_modules/i-ui-x/components/i-empty/i-empty.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
-import { showAppToast } from '../../utils/toast.uts'
+import { openLocation } from '../../utils/openLocation.uts'
 	import { ref, reactive, onMounted, computed } from 'vue'
 	import { getTrackPos } from '../../api/request.uts'
 	import { formatTimes, parseLocalDateTime } from '../../utils/formateTime.uts'
@@ -124,24 +124,12 @@ const carStatus = ref('在线')
 		return `${hours}小时${minutes}分${seconds}秒`
 	}
 
-	const showAddress = async (latitude : number, longitude : number) => {
-		console.log(latitude, longitude)
-			uni.openLocation({
+	const showAddress = (latitude : number, longitude : number) => {
+		openLocation({
 			latitude: latitude,
 			longitude: longitude,
-			name: '当前位置',
-			scale: 18,
-			success: () => {
-				console.log('成功调起地图')
-			},
-			fail: (err) => {
-				showAppToast({
-					title: '调起地图失败',
-					icon: 'none'
-				});
-				console.error('调起地图失败:', err);
-			}
-		});
+			name: '停车位置'
+		})
 	}
 
 return (): any | null => {

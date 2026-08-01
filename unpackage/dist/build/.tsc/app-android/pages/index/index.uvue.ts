@@ -13,6 +13,7 @@ import _imports_6 from '../../static/pay.png'
 import _imports_7 from '../../static/online.png'
 import _imports_8 from '../../static/del.png'
 import { showAppToast } from '../../utils/toast.uts'
+import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
@@ -855,25 +856,18 @@ const toMsgCenter = () => {
 // 跳转查找车辆
 const toFindCar = () => {
     if (!isLogin()) return
-    uni.openLocation({
+    if (positionState.value != 'available') {
+        showAppToast({
+            title: positionMessage.value || '暂无有效车辆位置',
+            icon: 'none'
+        })
+        return
+    }
+    openLocation({
         latitude: center.latitude,
         longitude: center.longitude,
-        name: currentCarName.value,
-        scale: 18,
-        success: () => {
-            showAppToast({
-                title: '成功调起地图',
-                icon: 'none'
-            });
-        },
-        fail: (err) => {
-            showAppToast({
-                title: '调起地图失败',
-                icon: 'none'
-            });
-            console.error('调起地图失败:', err);
-        }
-    });
+        name: currentCarName.value
+    })
 }
 
 // 跳转围栏

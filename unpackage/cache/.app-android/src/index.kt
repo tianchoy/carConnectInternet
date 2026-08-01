@@ -13,11 +13,13 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import java.math.BigDecimal
 import kotlin.properties.Delegates
+import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.connectSocket as uni_connectSocket
 import io.dcloud.uniapp.extapi.exit as uni_exit
 import io.dcloud.uniapp.extapi.getFileSystemManager as uni_getFileSystemManager
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
+import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
@@ -111,7 +113,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_KyOinX"
+    val id: String = "app-android_7eDcY5"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -188,6 +190,50 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
+fun showAppToast(options: ShowToastOptions): Unit {
+    uni_showToast(options)
+}
+open class OpenLocationParams (
+    @JsonNotNull
+    open var latitude: Number,
+    @JsonNotNull
+    open var longitude: Number,
+    @JsonNotNull
+    open var name: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("OpenLocationParams", "utils/openLocation.uts", 4, 13)
+    }
+}
+fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
+}
+fun showInvalidLocationToast(): Unit {
+    showAppToast(ShowToastOptions(title = "暂无有效车辆位置", icon = "none"))
+}
+fun openAndroidExternalMap(params: OpenLocationParams): Unit {
+    val result = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
+    if (result.code == "opened") {
+        return
+    }
+    if (result.code == "invalid_coordinate") {
+        showInvalidLocationToast()
+        return
+    }
+    if (result.code == "no_map_app") {
+        showAppToast(ShowToastOptions(title = "未检测到可用地图应用", icon = "none"))
+        return
+    }
+    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+}
+fun openLocation(params: OpenLocationParams): Unit {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+        showInvalidLocationToast()
+        return
+    }
+    openAndroidExternalMap(params)
+    return
+}
 open class AppModalSuccess : IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("AppModalSuccess", "utils/modal.uts", 1, 14)
@@ -394,9 +440,6 @@ val GenUniModulesIUiXComponentsIPickerIPickerClass = CreateVueComponent(GenUniMo
     return GenUniModulesIUiXComponentsIPickerIPicker(instance)
 }
 )
-fun showAppToast(options: ShowToastOptions): Unit {
-    uni_showToast(options)
-}
 val GenComponentsAppToastAppToastClass = CreateVueComponent(GenComponentsAppToastAppToast::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenComponentsAppToastAppToast.name, inheritAttrs = GenComponentsAppToastAppToast.inheritAttrs, inject = GenComponentsAppToastAppToast.inject, props = GenComponentsAppToastAppToast.props, propsNeedCastKeys = GenComponentsAppToastAppToast.propsNeedCastKeys, emits = GenComponentsAppToastAppToast.emits, components = GenComponentsAppToastAppToast.components, styles = GenComponentsAppToastAppToast.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenComponentsAppToastAppToast.setup(props as GenComponentsAppToastAppToast)
@@ -1250,7 +1293,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 210, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 211, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1434,7 +1477,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 227, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 228, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1489,7 +1532,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 270, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 271, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1555,7 +1598,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 276, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 277, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1639,7 +1682,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 369, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 370, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -1963,7 +2006,7 @@ open class MapCenter__1 (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 124, 7)
+        return UTSSourceMapPosition("MapCenter", "pages/carInfoDetail/carInfoDetail.uvue", 125, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenter__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -2019,7 +2062,7 @@ open class SignalDetail (
     open var level: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 203, 7)
+        return UTSSourceMapPosition("SignalDetail", "pages/carInfoDetail/carInfoDetail.uvue", 204, 7)
     }
 }
 val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfoDetailCarInfoDetail::class.java, fun(): VueComponentOptions {
@@ -7761,7 +7804,7 @@ open class CoordinatePoint (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 43, 7)
+        return UTSSourceMapPosition("CoordinatePoint", "pages/vehicleTracking/vehicleTracking.uvue", 47, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return CoordinatePointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7819,7 +7862,7 @@ open class AnimationQueueItem (
     open var connectionStatus: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 48, 7)
+        return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 52, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return AnimationQueueItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)

@@ -1,0 +1,10 @@
+framework module unimoduleExternalMapNavigation {
+  umbrella header "unimoduleExternalMapNavigation.h"
+  export *
+
+  module * { export * }
+}
+
+module unimoduleExternalMapNavigation.Swift {
+  header "unimoduleExternalMapNavigation-Swift.h"
+}

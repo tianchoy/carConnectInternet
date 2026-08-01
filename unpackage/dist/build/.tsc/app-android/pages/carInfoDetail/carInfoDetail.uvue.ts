@@ -6,6 +6,7 @@ import _easycom_i_input from '@/uni_modules/i-ui-x/components/i-input/i-input.uv
 import _easycom_i_modal from '@/uni_modules/i-ui-x/components/i-modal/i-modal.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import { showAppToast } from '../../utils/toast.uts'
+import { openLocation } from '../../utils/openLocation.uts'
 	import { getDevicePos, getUserDeviceList, getDeviceDetail, sendCommand } from '../../api/request.uts'
 	import { getAddress } from '../../utils/getAdress.uts'
 	import { getDeviceIcon } from '../../utils/cars'
@@ -627,32 +628,17 @@ const deptId = ref<string | null>('')
 		}
 	}
 
-	async function navTo(): Promise<void> {
-		if (!address.value) {
-			await refreshAdress()
+	function navTo(): void {
+		let locationName = address.value
+		if (locationName == '') {
+			locationName = currentCarInfo.value.getString('deviceName', '当前位置')
 		}
-		//导航去此位置
-		uni.openLocation({
+		openLocation({
 			latitude: center.latitude,
 			longitude: center.longitude,
-			name: address.value || '当前位置',
-			scale: 18,
-			success: () => {
-				showAppToast({
-					title: '成功调起地图',
-					icon: 'none'
-				});
-			},
-			fail: (err) => {
-				showAppToast({
-					title: '调起地图失败',
-					icon: 'none'
-				});
-				console.error('调起地图失败:', err);
-			}
-		});
+			name: locationName
+		})
 	}
-
 
 	const handleGridClick = (event: any) => {
 		const name = event as UTSJSONObject

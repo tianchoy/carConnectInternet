@@ -1,0 +1,1930 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "unimoduleExternalMapNavigation",
+    "printedName": "unimoduleExternalMapNavigation",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "DCloudUTSFoundation",
+        "printedName": "DCloudUTSFoundation",
+        "declKind": "Import",
+        "moduleName": "unimoduleExternalMapNavigation"
+      },
+      {
+        "kind": "Import",
+        "name": "DCloudUniappRuntime",
+        "printedName": "DCloudUniappRuntime",
+        "declKind": "Import",
+        "moduleName": "unimoduleExternalMapNavigation"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ExternalMapNavigationParams",
+        "printedName": "ExternalMapNavigationParams",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "__$getOriginalPosition",
+            "printedName": "__$getOriginalPosition()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSSourceMapPosition?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSSourceMapPosition",
+                    "printedName": "DCloudUTSFoundation.UTSSourceMapPosition",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSSourceMapPosition"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)__$getOriginalPosition",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC22__$getOriginalPosition19DCloudUTSFoundation09UTSSourcecH0CSgyF",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "latitude",
+            "printedName": "latitude",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Foundation.NSNumber?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSNumber",
+                    "printedName": "Foundation.NSNumber",
+                    "usr": "c:objc(cs)NSNumber"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(py)latitude",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC8latitudeSo8NSNumberCSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)latitude",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC8latitudeSo8NSNumberCSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)setLatitude:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC8latitudeSo8NSNumberCSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ParamsC8latitudeSo8NSNumberCSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC8latitudeSo8NSNumberCSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "longitude",
+            "printedName": "longitude",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Foundation.NSNumber?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSNumber",
+                    "printedName": "Foundation.NSNumber",
+                    "usr": "c:objc(cs)NSNumber"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(py)longitude",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC9longitudeSo8NSNumberCSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)longitude",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC9longitudeSo8NSNumberCSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)setLongitude:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC9longitudeSo8NSNumberCSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ParamsC9longitudeSo8NSNumberCSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC9longitudeSo8NSNumberCSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "name",
+            "printedName": "name",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(py)name",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC4nameSSSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)name",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC4nameSSSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)setName:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC4nameSSSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ParamsC4nameSSSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC4nameSSSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Subscript",
+            "name": "subscript",
+            "printedName": "subscript(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Subscript",
+            "usr": "s:30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSScip",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSScip",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)objectForKeyedSubscript:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSScig",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)setObject:forKeyedSubscript:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSScis",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSSciM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCyypSgSSciM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationParams",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParams",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)init",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCACycfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "overriding": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override",
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationParams",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParams",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UTSJSONObject",
+                "printedName": "DCloudUTSFoundation.UTSJSONObject",
+                "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSJSONObject"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams(im)init:",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsCyAC19DCloudUTSFoundation13UTSJSONObjectCcfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams",
+        "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ParamsC",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParams",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "UTSObject",
+            "printedName": "UTSObject",
+            "usr": "s:19DCloudUTSFoundation9UTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation9UTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSSourceMap",
+            "printedName": "IUTSSourceMap",
+            "usr": "s:19DCloudUTSFoundation13IUTSSourceMapP",
+            "mangledName": "$s19DCloudUTSFoundation13IUTSSourceMapP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "DCUTSSequence",
+            "printedName": "DCUTSSequence",
+            "usr": "s:19DCloudUTSFoundation13DCUTSSequenceP",
+            "mangledName": "$s19DCloudUTSFoundation13DCUTSSequenceP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSObject",
+            "printedName": "IUTSObject",
+            "usr": "s:19DCloudUTSFoundation10IUTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation10IUTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DCUniIterator",
+                    "printedName": "DCloudUTSFoundation.DCUniIterator",
+                    "usr": "s:19DCloudUTSFoundation13DCUniIteratorV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ExternalMapNavigationResult",
+        "printedName": "ExternalMapNavigationResult",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "__$getOriginalPosition",
+            "printedName": "__$getOriginalPosition()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "DCloudUTSFoundation.UTSSourceMapPosition?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTSSourceMapPosition",
+                    "printedName": "DCloudUTSFoundation.UTSSourceMapPosition",
+                    "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSSourceMapPosition"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)__$getOriginalPosition",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC22__$getOriginalPosition19DCloudUTSFoundation09UTSSourcecH0CSgyF",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "code",
+            "printedName": "code",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(py)code",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC4codeSSSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)code",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC4codeSSSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)setCode:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC4codeSSSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ResultC4codeSSSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC4codeSSSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Subscript",
+            "name": "subscript",
+            "printedName": "subscript(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Subscript",
+            "usr": "s:30unimoduleExternalMapNavigation0bcD6ResultCyypSgSScip",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCyypSgSScip",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)objectForKeyedSubscript:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCyypSgSScig",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Any?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ProtocolComposition",
+                        "printedName": "Any"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)setObject:forKeyedSubscript:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCyypSgSScis",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD6ResultCyypSgSSciM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCyypSgSSciM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationResult",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationResult",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)init",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCACycfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "overriding": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override",
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationResult",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationResult",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UTSJSONObject",
+                "printedName": "DCloudUTSFoundation.UTSJSONObject",
+                "usr": "c:@M@DCloudUTSFoundation@objc(cs)UTSJSONObject"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult(im)init:",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultCyAC19DCloudUTSFoundation13UTSJSONObjectCcfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "declAttributes": [
+              "AccessControl",
+              "ObjC"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult",
+        "mangledName": "$s30unimoduleExternalMapNavigation0bcD6ResultC",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesExternalMapNavigationExternalMapNavigationResult",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "UTSObject",
+            "printedName": "UTSObject",
+            "usr": "s:19DCloudUTSFoundation9UTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation9UTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSSourceMap",
+            "printedName": "IUTSSourceMap",
+            "usr": "s:19DCloudUTSFoundation13IUTSSourceMapP",
+            "mangledName": "$s19DCloudUTSFoundation13IUTSSourceMapP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "DCUTSSequence",
+            "printedName": "DCUTSSequence",
+            "usr": "s:19DCloudUTSFoundation13DCUTSSequenceP",
+            "mangledName": "$s19DCloudUTSFoundation13DCUTSSequenceP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "IUTSObject",
+            "printedName": "IUTSObject",
+            "usr": "s:19DCloudUTSFoundation10IUTSObjectP",
+            "mangledName": "$s19DCloudUTSFoundation10IUTSObjectP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DCUniIterator",
+                    "printedName": "DCloudUTSFoundation.DCUniIterator",
+                    "usr": "s:19DCloudUTSFoundation13DCUniIteratorV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          }
+        ]
+      },
+      {
+        "kind": "Function",
+        "name": "openExternalMap",
+        "printedName": "openExternalMap(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "ExternalMapNavigationResult",
+            "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationResult",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "ExternalMapNavigationParams",
+            "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParams",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParams"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:30unimoduleExternalMapNavigation04openbC0yAA0bcD6ResultCAA0bcD6ParamsCF",
+        "mangledName": "$s30unimoduleExternalMapNavigation04openbC0yAA0bcD6ResultCAA0bcD6ParamsCF",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ExternalMapNavigationParamsJSONObject",
+        "printedName": "ExternalMapNavigationParamsJSONObject",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "latitude",
+            "printedName": "latitude",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Foundation.NSNumber?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSNumber",
+                    "printedName": "Foundation.NSNumber",
+                    "usr": "c:objc(cs)NSNumber"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(py)latitude",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC8latitudeSo8NSNumberCSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)latitude",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC8latitudeSo8NSNumberCSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)setLatitude:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC8latitudeSo8NSNumberCSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC8latitudeSo8NSNumberCSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC8latitudeSo8NSNumberCSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "longitude",
+            "printedName": "longitude",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Foundation.NSNumber?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSNumber",
+                    "printedName": "Foundation.NSNumber",
+                    "usr": "c:objc(cs)NSNumber"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(py)longitude",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC9longitudeSo8NSNumberCSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)longitude",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC9longitudeSo8NSNumberCSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Foundation.NSNumber?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "NSNumber",
+                        "printedName": "Foundation.NSNumber",
+                        "usr": "c:objc(cs)NSNumber"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)setLongitude:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC9longitudeSo8NSNumberCSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC9longitudeSo8NSNumberCSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC9longitudeSo8NSNumberCSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "name",
+            "printedName": "name",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ImplicitlyUnwrappedOptional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(py)name",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC4nameSSSgvp",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl",
+              "ObjC"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)name",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC4nameSSSgvg",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ImplicitlyUnwrappedOptional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)setName:",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC4nameSSSgvs",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC4nameSSSgvM",
+                "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC4nameSSSgvM",
+                "moduleName": "unimoduleExternalMapNavigation",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationParamsJSONObject",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParamsJSONObject",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject(im)init",
+            "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectCACycfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject",
+        "mangledName": "$s30unimoduleExternalMapNavigation0bcD16ParamsJSONObjectC",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "Function",
+        "name": "openExternalMapByJs",
+        "printedName": "openExternalMapByJs(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "ExternalMapNavigationResult",
+            "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationResult",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "ExternalMapNavigationParamsJSONObject",
+            "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParamsJSONObject",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:30unimoduleExternalMapNavigation04openbC4ByJsyAA0bcD6ResultCAA0bcD16ParamsJSONObjectCF",
+        "mangledName": "$s30unimoduleExternalMapNavigation04openbC4ByJsyAA0bcD6ResultCAA0bcD16ParamsJSONObjectCF",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "UTSSDKModulesExternalMapNavigationIndexSwift",
+        "printedName": "UTSSDKModulesExternalMapNavigationIndexSwift",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "s_openExternalMapByJs",
+            "printedName": "s_openExternalMapByJs(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationResult",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationResult",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationResult"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ExternalMapNavigationParamsJSONObject",
+                "printedName": "unimoduleExternalMapNavigation.ExternalMapNavigationParamsJSONObject",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationIndexSwift(cm)s_openExternalMapByJs:",
+            "mangledName": "$s30unimoduleExternalMapNavigation013UTSSDKModulesbcD10IndexSwiftC06s_openbC4ByJsyAA0bcD6ResultCAA0bcD16ParamsJSONObjectCFZ",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "ObjC"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UTSSDKModulesExternalMapNavigationIndexSwift",
+                "printedName": "unimoduleExternalMapNavigation.UTSSDKModulesExternalMapNavigationIndexSwift",
+                "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationIndexSwift"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationIndexSwift(im)init",
+            "mangledName": "$s30unimoduleExternalMapNavigation013UTSSDKModulesbcD10IndexSwiftCACycfc",
+            "moduleName": "unimoduleExternalMapNavigation",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "init",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@unimoduleExternalMapNavigation@objc(cs)UTSSDKModulesExternalMapNavigationIndexSwift",
+        "mangledName": "$s30unimoduleExternalMapNavigation013UTSSDKModulesbcD10IndexSwiftC",
+        "moduleName": "unimoduleExternalMapNavigation",
+        "isOpen": true,
+        "objc_name": "UTSSDKModulesExternalMapNavigationIndexSwift",
+        "declAttributes": [
+          "AccessControl",
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}
