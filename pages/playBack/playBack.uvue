@@ -21,9 +21,16 @@
 			<view class="tool-tag-item">
 				<i-button type="primary" @click="togglePlayback" size="small" :text="isPlaying ? '暂停':'播放'"></i-button>
 				<view class="slider">
-					<i-slider v-model="playbackSpeed"  :min="1" :max="50" :step="5"
-						@change="setPlaybackSpeed">
+					<!-- #ifdef APP-ANDROID || MP-WEIXIN -->
+					<i-slider v-model="playbackSpeed" :min="5" :max="50" :step="5"
+						@change="setPlaybackSpeedFromValue">
 					</i-slider>
+					<!-- #endif -->
+					<!-- #ifdef APP-IOS -->
+					<slider :value="playbackSpeed" :min="5" :max="50" :step="5"
+						@changing="setPlaybackSpeed" @change="setPlaybackSpeed">
+					</slider>
+					<!-- #endif -->
 				</view>
 				<text class="speed-label">{{playbackSpeed}}x</text>
 			</view>
@@ -178,7 +185,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	function resolveRouteDateTime(dateStr : string) : string | null {
 		if (dateStr == '') return null
 		try {
-			const decoded = decodeURIComponent(dateStr) ?? ''
+			const decoded = (decodeURIComponent(dateStr) ?? '').replace(/\+/g, ' ').replace('T', ' ')
 			const milliseconds = parseLocalDateTime(decoded)
 			return milliseconds == null ? null : formatPlaybackTime(milliseconds)
 		} catch (error) {
@@ -740,18 +747,28 @@ import { showAppToast } from '../../utils/toast.uts'
 
 	// 重置回放
 
-	// 设置回放速度
-	function setPlaybackSpeed(e : number) : void {
-		const wasPlaying = isPlaying.value
-		if (wasPlaying) {
-			pausePlayback()
-		}
+	function applyPlaybackSpeed(value : number) : void {
+		if (!isFinite(value)) return
+		playbackSpeed.value = Math.min(50, Math.max(5, value))
+		if (!isPlaying.value) return
 
-		playbackSpeed.value = e
-
-		if (wasPlaying) {
-			startPlayback()
+		const timer = playbackTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			playbackTimer = null
 		}
+		lastTimestamp = Date.now()
+		const sessionId = replaySessionId
+		playbackTimer = setTimeout(() => { playbackStep(sessionId) }, 16)
+	}
+
+	// i-slider 对外发送数值，原生 slider 发送事件对象
+	function setPlaybackSpeedFromValue(value : number) : void {
+		applyPlaybackSpeed(value)
+	}
+
+	function setPlaybackSpeed(event : UniSliderChangeEvent) : void {
+		applyPlaybackSpeed(event.detail.value)
 	}
 
 	onLoad((option) => {

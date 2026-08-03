@@ -1,6 +1,6 @@
 import { showAppToast } from './toast.uts'
 
-import { openExternalMap } from '../uni_modules/external-map-navigation/utssdk/app-android/index.uts'
+import { openExternalMap } from '@/uni_modules/external-map-navigation'
 
 
 export type OpenLocationParams = {
@@ -23,21 +23,28 @@ function showInvalidLocationToast(): void {
 	})
 }
 
+function showOpenMapFailedToast(): void {
+	showAppToast({
+		title: '无法打开地图，请稍后重试',
+		icon: 'none'
+	})
+}
+
 
 function openAndroidExternalMap(params: OpenLocationParams): void {
-	const result = openExternalMap({
+	const navigationResult = openExternalMap({
 		latitude: params.latitude,
 		longitude: params.longitude,
 		name: params.name
 	})
-	if (result.code == 'opened') return
+	if (navigationResult.code == 'opened') return
 
-	if (result.code == 'invalid_coordinate') {
+	if (navigationResult.code == 'invalid_coordinate') {
 		showInvalidLocationToast()
 		return
 	}
 
-	if (result.code == 'no_map_app') {
+	if (navigationResult.code == 'no_map_app') {
 		showAppToast({
 			title: '未检测到可用地图应用',
 			icon: 'none'
@@ -45,12 +52,36 @@ function openAndroidExternalMap(params: OpenLocationParams): void {
 		return
 	}
 
-	showAppToast({
-		title: '无法打开地图，请稍后重试',
-		icon: 'none'
-	})
+	showOpenMapFailedToast()
 }
 
+
+function openBuiltInLocation(params: OpenLocationParams): void {
+	try {
+		uni.openLocation({
+			latitude: params.latitude,
+			longitude: params.longitude,
+			name: params.name != '' ? params.name : '当前位置',
+			scale: 18,
+			success: () => {
+				console.log('成功打开位置地图')
+			},
+			fail: (error) => {
+				console.error('打开位置地图失败:', error)
+				showAppToast({
+					title: '打开位置地图失败，请稍后重试',
+					icon: 'none'
+				})
+			}
+		})
+	} catch (error) {
+		console.error('打开位置地图异常:', error)
+		showAppToast({
+			title: '打开位置地图失败，请稍后重试',
+			icon: 'none'
+		})
+	}
+}
 
 export function openLocation(params: OpenLocationParams): void {
 	if (!isValidCoordinate(params.latitude, params.longitude)) {
@@ -61,29 +92,6 @@ export function openLocation(params: OpenLocationParams): void {
 
 	openAndroidExternalMap(params)
 	return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

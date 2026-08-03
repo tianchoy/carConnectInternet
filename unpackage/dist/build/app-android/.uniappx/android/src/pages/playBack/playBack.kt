@@ -95,7 +95,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     return null
                 }
                 try {
-                    val decoded = decodeURIComponent(dateStr) ?: ""
+                    val decoded = (decodeURIComponent(dateStr) ?: "").replace(UTSRegExp("\\+", "g"), " ").replace("T", " ")
                     val milliseconds = parseLocalDateTime(decoded)
                     return if (milliseconds == null) {
                         null
@@ -518,15 +518,33 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = false
             }
             val onCancel = ::gen_onCancel_fn
-            fun gen_setPlaybackSpeed_fn(e: Number): Unit {
-                val wasPlaying = isPlaying.value
-                if (wasPlaying) {
-                    pausePlayback()
+            fun gen_applyPlaybackSpeed_fn(value: Number): Unit {
+                if (!isFinite(value)) {
+                    return
                 }
-                playbackSpeed.value = e
-                if (wasPlaying) {
-                    startPlayback()
+                playbackSpeed.value = Math.min(50, Math.max(5, value))
+                if (!isPlaying.value) {
+                    return
                 }
+                val timer = playbackTimer
+                if (timer != null) {
+                    clearTimeout(timer)
+                    playbackTimer = null
+                }
+                lastTimestamp = Date.now()
+                val sessionId = replaySessionId
+                playbackTimer = setTimeout(fun(){
+                    playbackStep(sessionId)
+                }
+                , 16)
+            }
+            val applyPlaybackSpeed = ::gen_applyPlaybackSpeed_fn
+            fun gen_setPlaybackSpeedFromValue_fn(value: Number): Unit {
+                applyPlaybackSpeed(value)
+            }
+            val setPlaybackSpeedFromValue = ::gen_setPlaybackSpeedFromValue_fn
+            fun gen_setPlaybackSpeed_fn(event: UniSliderChangeEvent): Unit {
+                applyPlaybackSpeed(event.detail.value)
             }
             val setPlaybackSpeed = ::gen_setPlaybackSpeed_fn
             onLoad(fun(option){
@@ -624,7 +642,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                         playbackSpeed.value = `$event`
                                     }
-                                    , "min" to 1, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeed), null, 8, _uA(
+                                    , "min" to 5, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     ))

@@ -48,6 +48,23 @@ class CoordTransform {
     });
   }
   /**
+   * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
+   */
+  static wgs84ToTencentPrecise(wgLat, wgLon) {
+    if (!this.isInChina(wgLon, wgLat)) {
+      return new Coordinate({ lat: wgLat, lng: wgLon });
+    }
+    let dLat = this.transformLat(wgLon - 105, wgLat - 35);
+    let dLng = this.transformLng(wgLon - 105, wgLat - 35);
+    let radLat = wgLat / 180 * this.pi;
+    let magic = Math.sin(radLat);
+    magic = 1 - this.ee * magic * magic;
+    let sqrtMagic = Math.sqrt(magic);
+    dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
+    dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+    return new Coordinate({ lat: wgLat + dLat, lng: wgLon + dLng });
+  }
+  /**
    * 腾讯地图坐标系转WGS84（使用高精度算法）
    * @param tcLat 腾讯地图纬度
    * @param tcLon 腾讯地图经度
@@ -95,7 +112,7 @@ class CoordTransform {
       const lat = parseFloat(latitude.toString());
       const lng = parseFloat(longitude.toString());
       if (isNaN(lat) || isNaN(lng)) {
-        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:108", "设备经纬度无效", device);
+        common_vendor.index.__f__("warn", "at utils/coordTransform.uts:126", "设备经纬度无效", device);
         return device;
       }
       let converted = new Coordinate({ lat, lng });
@@ -125,7 +142,7 @@ class CoordTransform {
     } else if (fromSystem === "tencent" && toSystem === "wgs84") {
       return this.tencentToWgs84(lat, lng);
     } else {
-      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:143", "不支持的坐标系转换", fromSystem, "->", toSystem);
+      common_vendor.index.__f__("warn", "at utils/coordTransform.uts:161", "不支持的坐标系转换", fromSystem, "->", toSystem);
       return new Coordinate({ lat, lng });
     }
   }

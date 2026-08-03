@@ -66,7 +66,7 @@
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
   };
-  const _sfc_main$N = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
+  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
       type: String,
       default: "home-3-fill"
@@ -396,7 +396,7 @@
       ], 6);
     };
   } }));
-  const _style_0$L = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
+  const _style_0$K = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -404,11 +404,11 @@
     }
     return target;
   };
-  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["styles", [_style_0$L]]]);
+  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["styles", [_style_0$K]]]);
   function resolveEasycom(component, easycom) {
     return typeof component === "string" ? easycom : component;
   }
-  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
+  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
     title: { type: String, default: "" },
     activeColor: { type: String, default: "#19be6b" },
@@ -454,8 +454,8 @@
       ]);
     };
   } }));
-  const _style_0$K = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
-  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["styles", [_style_0$K]]]);
+  const _style_0$J = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
+  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
   let PickerItem$1 = class PickerItem2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -478,7 +478,7 @@
       delete this.__props__;
     }
   };
-  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
+  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
     modelValue: {
       type: [String, Number, Array],
       default: ""
@@ -1100,9 +1100,9 @@
       ]);
     };
   } }));
-  const _style_0$J = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
-  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
-  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
+  const _style_0$I = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
+  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
+  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
     zIndex: { type: [String, Number], default: 10090 },
     loading: { type: Boolean, default: false },
     title: { type: String, default: "" },
@@ -1349,8 +1349,8 @@
       ], 64);
     };
   } }));
-  const _style_0$I = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
-  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
+  const _style_0$H = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
   const iosToastHandlers = [];
   const pendingIosToasts = [];
   const maxPendingToastCount = 10;
@@ -1384,7 +1384,7 @@
       pendingIosToasts.push(options);
     }
   }
-  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
+  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
     const toastRef = vue.ref(null);
     const handleToast = (options) => {
       var _a, _b, _c;
@@ -1422,14 +1422,15 @@
       }), null, 512);
     };
   } }));
-  const _imports_1$2 = "/static/banner.png";
-  const _imports_2$2 = "/static/pos.png";
-  const _imports_3$1 = "/static/car.png";
-  const _imports_4 = "/static/dzwl.png";
-  const _imports_5 = "/static/msg.png";
-  const _imports_6 = "/static/pay.png";
-  const _imports_7 = "/static/online.png";
-  const _imports_8 = "/static/del.png";
+  const _imports_1$2 = "/static/addNew.png";
+  const _imports_2$2 = "/static/banner.png";
+  const _imports_3$1 = "/static/pos.png";
+  const _imports_4 = "/static/car.png";
+  const _imports_5 = "/static/dzwl.png";
+  const _imports_6 = "/static/msg.png";
+  const _imports_7 = "/static/pay.png";
+  const _imports_8 = "/static/online.png";
+  const _imports_9 = "/static/del.png";
   class OpenLocationParams extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -1461,11 +1462,7 @@
       icon: "none"
     });
   }
-  function openLocation(params) {
-    if (!isValidCoordinate(params.latitude, params.longitude)) {
-      showInvalidLocationToast();
-      return null;
-    }
+  function openBuiltInLocation(params) {
     try {
       uni.openLocation({
         latitude: params.latitude,
@@ -1473,10 +1470,10 @@
         name: params.name != "" ? params.name : "当前位置",
         scale: 18,
         success: () => {
-          uni.__log__("log", "at utils/openLocation.uts:74", "成功打开位置地图");
+          uni.__log__("log", "at utils/openLocation.uts:67", "成功打开位置地图");
         },
-        fail: (err) => {
-          uni.__log__("error", "at utils/openLocation.uts:77", "打开位置地图失败:", err);
+        fail: (error) => {
+          uni.__log__("error", "at utils/openLocation.uts:70", "打开位置地图失败:", error);
           showAppToast({
             title: "打开位置地图失败，请稍后重试",
             icon: "none"
@@ -1484,12 +1481,19 @@
         }
       });
     } catch (error) {
-      uni.__log__("error", "at utils/openLocation.uts:85", "打开位置地图异常:", error);
+      uni.__log__("error", "at utils/openLocation.uts:78", "打开位置地图异常:", error);
       showAppToast({
         title: "打开位置地图失败，请稍后重试",
         icon: "none"
       });
     }
+  }
+  function openLocation(params) {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+      showInvalidLocationToast();
+      return null;
+    }
+    openBuiltInLocation(params);
   }
   class AppModalSuccess {
     constructor() {
@@ -2462,6 +2466,23 @@
       });
     }
     /**
+     * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
+     */
+    static wgs84ToTencentPrecise(wgLat, wgLon) {
+      if (!this.isInChina(wgLon, wgLat)) {
+        return new Coordinate({ lat: wgLat, lng: wgLon });
+      }
+      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
+      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
+      let radLat = wgLat / 180 * this.pi;
+      let magic = Math.sin(radLat);
+      magic = 1 - this.ee * magic * magic;
+      let sqrtMagic = Math.sqrt(magic);
+      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
+      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+      return new Coordinate({ lat: wgLat + dLat, lng: wgLon + dLng });
+    }
+    /**
      * 腾讯地图坐标系转WGS84（使用高精度算法）
      * @param tcLat 腾讯地图纬度
      * @param tcLon 腾讯地图经度
@@ -2509,7 +2530,7 @@
         const lat = parseFloat(latitude.toString());
         const lng = parseFloat(longitude.toString());
         if (isNaN(lat) || isNaN(lng)) {
-          uni.__log__("warn", "at utils/coordTransform.uts:108", "设备经纬度无效", device);
+          uni.__log__("warn", "at utils/coordTransform.uts:126", "设备经纬度无效", device);
           return device;
         }
         let converted = new Coordinate({ lat, lng });
@@ -2539,7 +2560,7 @@
       } else if (fromSystem === "tencent" && toSystem === "wgs84") {
         return this.tencentToWgs84(lat, lng);
       } else {
-        uni.__log__("warn", "at utils/coordTransform.uts:143", "不支持的坐标系转换", fromSystem, "->", toSystem);
+        uni.__log__("warn", "at utils/coordTransform.uts:161", "不支持的坐标系转换", fromSystem, "->", toSystem);
         return new Coordinate({ lat, lng });
       }
     }
@@ -2811,7 +2832,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props) {
       const center = vue.reactive(new MapCenter$1({
@@ -2913,9 +2934,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:364", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:370", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:366", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:372", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -2959,23 +2980,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:424", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:430", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:433", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:439", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:435", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:441", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:444", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:450", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -2986,7 +3007,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:457", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:463", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -2994,7 +3015,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:467", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:473", "清除保存设备索引失败:", error);
         }
       };
       const handlePicker = () => {
@@ -3070,7 +3091,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:570", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:576", "加载设备详情失败", error);
           }
         });
       };
@@ -3134,7 +3155,7 @@
               return Promise.resolve(null);
             }
             if (res.code != 0) {
-              uni.__log__("error", "at pages/index/index.uvue:643", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:649", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -3142,7 +3163,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:651", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:657", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -3160,7 +3181,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 0 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:669", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:675", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -3170,7 +3191,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:684", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:690", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -3185,10 +3206,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:709", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:715", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:712", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:718", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -3200,7 +3221,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:724", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:730", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -3213,7 +3234,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:737", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:743", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -3228,16 +3249,16 @@
         const indexs = e.getArray("indexs");
         let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
         if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:759", "无法解析选中的索引，使用当前设备");
+          uni.__log__("warn", "at pages/index/index.uvue:765", "无法解析选中的索引，使用当前设备");
           const currentIndex = deviceList.value.findIndex((device) => {
             return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
           });
           if (currentIndex != -1) {
             selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:765", "使用当前设备索引:", selectedIndex);
+            uni.__log__("log", "at pages/index/index.uvue:771", "使用当前设备索引:", selectedIndex);
           } else {
             selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:768", "使用默认索引: 0");
+            uni.__log__("log", "at pages/index/index.uvue:774", "使用默认索引: 0");
           }
         }
         const selectedDevice = deviceList.value[selectedIndex];
@@ -3249,7 +3270,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:783", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:789", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -3330,7 +3351,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:886", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:892", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -3363,7 +3384,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:924", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:930", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -3390,7 +3411,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:953", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:959", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -3421,12 +3442,12 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:985", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:991", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:992", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:998", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -3454,7 +3475,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1020", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1026", "跳转添加设备失败:", err);
           }
         });
       };
@@ -3502,7 +3523,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1108", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1114", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -3577,7 +3598,7 @@
         const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
         const _component_map = vue.resolveComponent("map");
         const _component_i_picker = resolveEasycom(vue.resolveDynamicComponent("i-picker"), __easycom_2$4);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("scroll-view", new UTSJSONObject({
             class: "container",
@@ -3623,12 +3644,16 @@
                       fontSize: "20",
                       onClick: toDeviceList
                     })),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      class: "nav-tool-spacing",
-                      name: "/static/addNew.png",
-                      fontSize: "18",
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "nav-tool-spacing nav-tool-add",
                       onClick: toAdd
-                    }))
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_1$2,
+                        mode: "aspectFit",
+                        class: "nav-tool-add-image"
+                      }))
+                    ])
                   ])
                 ]),
                 safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
@@ -3650,7 +3675,7 @@
                 ])) : vue.createCommentVNode("", true),
                 vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
                   vue.createElementVNode("image", new UTSJSONObject({
-                    src: _imports_1$2,
+                    src: _imports_2$2,
                     mode: "aspectFit",
                     class: "banner-image"
                   }))
@@ -3672,10 +3697,12 @@
                 vue.createElementVNode("view", new UTSJSONObject({ class: "map-box" }), [
                   vue.createElementVNode("view", new UTSJSONObject({ class: "map-header" }), [
                     vue.createElementVNode("text", new UTSJSONObject({ class: "map-title" }), "车辆定位"),
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "map-refresh",
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "map-refresh-wrap",
                       onClick: refreshLocation
-                    }), "刷新位置")
+                    }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-refresh" }), "刷新位置")
+                    ])
                   ]),
                   vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
                     vue.createVNode(_component_map, new UTSJSONObject({
@@ -3707,10 +3734,12 @@
                 vue.createElementVNode("view", new UTSJSONObject({ class: "mile-record" }), [
                   vue.createElementVNode("view", new UTSJSONObject({ class: "record-header" }), [
                     vue.createElementVNode("text", new UTSJSONObject({ class: "record-title" }), "轨迹记录"),
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "record-desc",
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "record-desc-wrap",
                       onClick: toRecordDetail
-                    }), "更多轨迹")
+                    }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "record-desc" }), "更多轨迹")
+                    ])
                   ]),
                   vue.createElementVNode("view", new UTSJSONObject({ class: "ring-container" }), [
                     vue.createElementVNode("view", new UTSJSONObject({ class: "ring-item" }), [
@@ -3765,7 +3794,7 @@
                     vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
                       vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-device" }), [
                         vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_2$2,
+                          src: _imports_3$1,
                           mode: "aspectFill",
                           class: "icon-image"
                         }))
@@ -3787,7 +3816,7 @@
                     vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
                       vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-car" }), [
                         vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_3$1,
+                          src: _imports_4,
                           mode: "aspectFill",
                           class: "icon-image"
                         }))
@@ -3809,7 +3838,7 @@
                     vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
                       vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-fence" }), [
                         vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_4,
+                          src: _imports_5,
                           mode: "aspectFill",
                           class: "icon-image"
                         }))
@@ -3833,8 +3862,8 @@
                       onClick: toMsgCenter
                     }), [
                       vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_5,
-                        mode: "aspectFill",
+                        src: _imports_6,
+                        mode: "aspectFit",
                         class: "icon-image"
                       })),
                       vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "警报消息")
@@ -3846,8 +3875,8 @@
                       })
                     }), [
                       vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_6,
-                        mode: "aspectFill",
+                        src: _imports_7,
+                        mode: "aspectFit",
                         class: "icon-image"
                       })),
                       vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "一键续费")
@@ -3857,8 +3886,8 @@
                       onClick: contactCustomerService
                     }), [
                       vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_7,
-                        mode: "aspectFill",
+                        src: _imports_8,
+                        mode: "aspectFit",
                         class: "icon-image"
                       })),
                       vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "在线客服")
@@ -3868,8 +3897,8 @@
                       onClick: unbindDevice
                     }), [
                       vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_8,
-                        mode: "aspectFill",
+                        src: _imports_9,
+                        mode: "aspectFit",
                         class: "icon-image"
                       })),
                       vue.createElementVNode("text", new UTSJSONObject({
@@ -3897,10 +3926,10 @@
       };
     }
   });
-  const _style_0$H = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "marginLeft": "30rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header ": { "fontSize": "26rpx", "color": "#07C160", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["styles", [_style_0$H]]]);
+  const _style_0$G = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "30rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "36rpx", "height": "36rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["styles", [_style_0$G]]]);
   const _imports_0$3 = "/static/back.png";
-  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
     __name: "custom-navBar",
     props: {
       title: String,
@@ -4008,9 +4037,9 @@
       };
     }
   });
-  const _style_0$G = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
-  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["styles", [_style_0$G]]]);
-  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
+  const _style_0$F = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
+  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$F]]]);
+  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
     show: { type: Boolean, default: false },
     title: { type: String, default: "" },
     content: { type: String, default: "" },
@@ -4284,8 +4313,8 @@
       ], 4)) : vue.createCommentVNode("", true);
     };
   } }));
-  const _style_0$F = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$F]]]);
+  const _style_0$E = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
+  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$E]]]);
   class ModalInstance extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4350,7 +4379,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent({
     __name: "message",
     setup(__props) {
       const modal = vue.ref(false);
@@ -4692,7 +4721,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
         const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "消息中心",
@@ -4779,9 +4808,9 @@
       };
     }
   });
-  const _style_0$E = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
-  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$E]]]);
-  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
+  const _style_0$D = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-badge": { ".container .list-box ": { "marginLeft": "16rpx", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#f56c6c", "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["styles", [_style_0$D]]]);
+  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
     label: {
       type: String,
       default: ""
@@ -5052,11 +5081,11 @@
       ], 2);
     };
   } }));
-  const _style_0$D = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
-  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["styles", [_style_0$D]]]);
+  const _style_0$C = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
+  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
   const buttonWidth = 120;
   const buttonHeight = 200;
-  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent({
     __name: "userCenter",
     setup(__props) {
       const userInfo = vue.ref(new UTSJSONObject({
@@ -5154,7 +5183,7 @@
         const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$3);
         const _component_movable_view = vue.resolveComponent("movable-view");
         const _component_movable_area = vue.resolveComponent("movable-area");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -5250,9 +5279,9 @@
       };
     }
   });
-  const _style_0$C = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
-  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
-  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
+  const _style_0$B = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
+  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
+  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
     modelValue: {
       type: String,
       default: ""
@@ -5586,9 +5615,9 @@
       ], 6);
     };
   } }));
-  const _style_0$B = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
-  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
-  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
+  const _style_0$A = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
+  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
+  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
     name: {
       type: String,
       default: ""
@@ -5740,9 +5769,9 @@
       ], 10, ["id"]);
     };
   } }));
-  const _style_0$A = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
-  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
-  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
+  const _style_0$z = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
+  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
+  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
     name: {
       type: [String, Number],
       default: ""
@@ -5990,9 +6019,9 @@
       ], 2);
     };
   } }));
-  const _style_0$z = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
-  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
-  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
+  const _style_0$y = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
+  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
+  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
     hairline: {
       type: Boolean,
       default: true
@@ -6418,9 +6447,9 @@
       ], 14, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]));
     };
   } }));
-  const _style_0$y = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
-  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
-  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
+  const _style_0$x = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
+  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
+  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
     modelValue: {
       type: Object,
       default() {
@@ -6752,8 +6781,8 @@
       ], 2);
     };
   } }));
-  const _style_0$x = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
-  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
+  const _style_0$w = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
+  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
   const _imports_0$2 = "/static/car_location.png";
   class FormData extends UTS.UTSType {
     static get$UTSMetadata$() {
@@ -6797,7 +6826,7 @@
   }
   const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
   const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
-  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
     setup(__props) {
       const docState = vue.ref(false);
@@ -6990,7 +7019,7 @@
         const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$2);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -7136,8 +7165,8 @@
       };
     }
   });
-  const _style_0$w = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
+  const _style_0$v = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
   class PickerItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -7176,7 +7205,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
     __name: "sub-navBar",
     props: {
       showTime: {
@@ -7277,9 +7306,9 @@
       };
     }
   });
-  const _style_0$v = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
-  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
-  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
+  const _style_0$u = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
+  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
+  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
     items: {
       type: Array,
       default() {
@@ -7523,8 +7552,8 @@
       ], 4);
     };
   } }));
-  const _style_0$u = { "i-grid": { "": { "flexDirection": "row", "flexWrap": "wrap", "overflow": "hidden" } }, "i-grid__item": { "": { "boxSizing": "border-box", "overflow": "hidden", "alignItems": "center", "justifyContent": "center" } }, "i-grid__item--hover": { "": { "backgroundColor": "#f3f4f6" } }, "i-grid__item--active": { "": { "backgroundColor": "#ecf5ff" } }, "i-grid__image": { "": { "marginBottom": 8 } }, "i-grid__icon": { "": { "marginBottom": 8, "textAlign": "center", "lines": 1 } }, "i-grid__text": { "": { "lineHeight": "18px", "textAlign": "center", "lines": 1 } } };
-  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
+  const _style_0$t = { "i-grid": { "": { "flexDirection": "row", "flexWrap": "wrap", "overflow": "hidden" } }, "i-grid__item": { "": { "boxSizing": "border-box", "overflow": "hidden", "alignItems": "center", "justifyContent": "center" } }, "i-grid__item--hover": { "": { "backgroundColor": "#f3f4f6" } }, "i-grid__item--active": { "": { "backgroundColor": "#ecf5ff" } }, "i-grid__image": { "": { "marginBottom": 8 } }, "i-grid__icon": { "": { "marginBottom": 8, "textAlign": "center", "lines": 1 } }, "i-grid__text": { "": { "lineHeight": "18px", "textAlign": "center", "lines": 1 } } };
+  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
   const _imports_0$1 = "/static/sate.png";
   const _imports_1$1 = "/static/v.png";
   const _imports_2$1 = "/static/pow.png";
@@ -7646,7 +7675,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
     __name: "carInfoDetail",
     setup(__props) {
       const deptId = vue.ref("");
@@ -8234,7 +8263,7 @@
         const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -8430,8 +8459,8 @@
       };
     }
   });
-  const _style_0$t = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
+  const _style_0$s = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
   function ensureCameraPermission(callback) {
     uni.__log__("log", "at utils/cameraPermission.uts:10", "📷 [ensureCameraPermission] 开始检查相机权限");
     uni.__log__("log", "at utils/cameraPermission.uts:94", "📷 [ensureCameraPermission] 非Android平台，默认授予权限");
@@ -8441,7 +8470,7 @@
     uni.__log__("log", "at utils/cameraPermission.uts:103", "📷 [openCameraPermissionSettings] 打开系统权限设置");
     uni.__log__("log", "at utils/cameraPermission.uts:125", "📷 [openCameraPermissionSettings] 非Android平台，无需打开设置");
   }
-  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
+  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
     show: { type: Boolean, default: false },
     overlay: { type: Boolean, default: true },
     mode: { type: String, default: "bottom" },
@@ -9000,9 +9029,9 @@
       ]);
     };
   } }));
-  const _style_0$s = { "i-popup__trigger": { "": { "flexDirection": "column" } }, "i-popup": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0 } }, "i-popup__overlay": { "": { "position": "absolute", "left": 0, "right": 0, "top": 0, "bottom": 0, "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-popup__panel": { "": { "position": "absolute", "overflow": "hidden", "flexDirection": "column", "boxShadow": "0 12px 34px rgba(15, 23, 42, 0.18)", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-popup__panel--bottom": { "": { "left": 0, "right": 0, "bottom": 0, "minHeight": 160 } }, "i-popup__panel--top": { "": { "left": 0, "right": 0, "top": 0, "minHeight": 160 } }, "i-popup__panel--left": { "": { "left": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--right": { "": { "right": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--center": { "": { "left": "50%", "top": "50%", "width": 300 } }, "i-popup__panel--cover-center": { "": { "left": "50%", "right": "auto", "width": "100%", "transformOrigin": "center center" } }, "i-popup__swipe-handle": { "": { "height": 24, "alignItems": "center", "justifyContent": "center" } }, "i-popup__swipe-bar": { "": { "width": 38, "height": 4, "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99, "backgroundColor": "#d9dee8" } }, "i-popup__header": { "": { "minHeight": 54, "paddingTop": 0, "paddingRight": 52, "paddingBottom": 0, "paddingLeft": 18, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#f2f3f5", "alignItems": "center", "justifyContent": "center" } }, "i-popup__title": { "": { "color": "#303133", "fontSize": 16, "fontWeight": 600, "lineHeight": "24px" } }, "i-popup__close": { "": { "position": "absolute", "zIndex": 2, "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34, "backgroundColor": "rgba(245,247,250,0.92)", "alignItems": "center", "justifyContent": "center" } }, "i-popup__close--top-right": { "": { "right": 12, "top": 10 } }, "i-popup__close--top-left": { "": { "left": 12, "top": 10 } }, "i-popup__close--bottom-left": { "": { "left": 12, "bottom": 10 } }, "i-popup__close--bottom-right": { "": { "right": 12, "bottom": 10 } }, "i-popup__close-text": { "": { "color": "#606266", "fontSize": 22, "lineHeight": "34px", "textAlign": "center" } }, "i-popup__body": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__body--scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__footer": { "": { "minHeight": 58, "paddingTop": 10, "paddingRight": 14, "paddingBottom": 10, "paddingLeft": 14, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5", "backgroundColor": "#ffffff", "flexDirection": "row" } }, "i-popup__footer-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 40, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "alignItems": "center", "justifyContent": "center" } }, "i-popup__footer-button--cancel": { "": { "marginRight": 8, "backgroundColor": "#f5f7fb" } }, "i-popup__footer-button--confirm": { "": { "backgroundColor": "#eef6ff" } }, "i-popup__footer-button--disabled": { "": { "opacity": 0.45 } }, "i-popup__footer-cancel": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px", "color": "#606266" } }, "i-popup__footer-confirm": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-popup__overlay": { "property": "opacity", "timingFunction": "ease" }, "i-popup__panel": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  const __easycom_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
-  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
+  const _style_0$r = { "i-popup__trigger": { "": { "flexDirection": "column" } }, "i-popup": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0 } }, "i-popup__overlay": { "": { "position": "absolute", "left": 0, "right": 0, "top": 0, "bottom": 0, "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-popup__panel": { "": { "position": "absolute", "overflow": "hidden", "flexDirection": "column", "boxShadow": "0 12px 34px rgba(15, 23, 42, 0.18)", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-popup__panel--bottom": { "": { "left": 0, "right": 0, "bottom": 0, "minHeight": 160 } }, "i-popup__panel--top": { "": { "left": 0, "right": 0, "top": 0, "minHeight": 160 } }, "i-popup__panel--left": { "": { "left": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--right": { "": { "right": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--center": { "": { "left": "50%", "top": "50%", "width": 300 } }, "i-popup__panel--cover-center": { "": { "left": "50%", "right": "auto", "width": "100%", "transformOrigin": "center center" } }, "i-popup__swipe-handle": { "": { "height": 24, "alignItems": "center", "justifyContent": "center" } }, "i-popup__swipe-bar": { "": { "width": 38, "height": 4, "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99, "backgroundColor": "#d9dee8" } }, "i-popup__header": { "": { "minHeight": 54, "paddingTop": 0, "paddingRight": 52, "paddingBottom": 0, "paddingLeft": 18, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#f2f3f5", "alignItems": "center", "justifyContent": "center" } }, "i-popup__title": { "": { "color": "#303133", "fontSize": 16, "fontWeight": 600, "lineHeight": "24px" } }, "i-popup__close": { "": { "position": "absolute", "zIndex": 2, "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34, "backgroundColor": "rgba(245,247,250,0.92)", "alignItems": "center", "justifyContent": "center" } }, "i-popup__close--top-right": { "": { "right": 12, "top": 10 } }, "i-popup__close--top-left": { "": { "left": 12, "top": 10 } }, "i-popup__close--bottom-left": { "": { "left": 12, "bottom": 10 } }, "i-popup__close--bottom-right": { "": { "right": 12, "bottom": 10 } }, "i-popup__close-text": { "": { "color": "#606266", "fontSize": 22, "lineHeight": "34px", "textAlign": "center" } }, "i-popup__body": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__body--scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__footer": { "": { "minHeight": 58, "paddingTop": 10, "paddingRight": 14, "paddingBottom": 10, "paddingLeft": 14, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5", "backgroundColor": "#ffffff", "flexDirection": "row" } }, "i-popup__footer-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 40, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "alignItems": "center", "justifyContent": "center" } }, "i-popup__footer-button--cancel": { "": { "marginRight": 8, "backgroundColor": "#f5f7fb" } }, "i-popup__footer-button--confirm": { "": { "backgroundColor": "#eef6ff" } }, "i-popup__footer-button--disabled": { "": { "opacity": 0.45 } }, "i-popup__footer-cancel": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px", "color": "#606266" } }, "i-popup__footer-confirm": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-popup__overlay": { "property": "opacity", "timingFunction": "ease" }, "i-popup__panel": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
+  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
+  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
     __name: "car-icons",
     props: {
       show: { type: Boolean, default: false },
@@ -9056,7 +9085,7 @@
       };
       return (_ctx = null, _cache = null) => {
         const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
-        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
+        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
         return vue.openBlock(), vue.createBlock(_component_i_popup, new UTSJSONObject({
           show: props.show,
           title: _ctx.title,
@@ -9093,8 +9122,8 @@
       };
     }
   });
-  const _style_0$r = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
+  const _style_0$q = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["styles", [_style_0$q]]]);
   class CarFormData extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -9163,7 +9192,7 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent({
     __name: "addCar",
     setup(__props) {
       const isRequestingCameraPermission = vue.ref(false);
@@ -9350,7 +9379,7 @@
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -9488,380 +9517,8 @@
       };
     }
   });
-  const _style_0$q = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "clickable": { ".container ": { "marginTop": 10, "color": "#999999", "fontSize": "28rpx" } }, "btn": { ".container ": { "marginTop": "50rpx", "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx" } }, "plate-input": { ".container ": { "width": "100%" } }, "input-wrapper": { ".container .plate-input ": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000" } }, "car-input-container": { ".container ": { "display": "flex", "flexDirection": "row" } }, "car-number-input": { ".container ": { "width": "60%", "textAlign": "right" } }, "plate-close": { ".container .car-number-container ": { "height": 40, "display": "flex", "textAlign": "right", "backgroundColor": "#FFFFFF", "flexDirection": "row", "justifyContent": "flex-end", "alignItems": "center" } }, "car-input-item": { ".container .car-input-container .car-input-box ": { "position": "relative", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#E2E2E2", "borderRightColor": "#E2E2E2", "borderBottomColor": "#E2E2E2", "borderLeftColor": "#E2E2E2", "height": 40, "lineHeight": "40px", "textAlign": "center", "fontSize": 17 } }, "new-item-img": { ".container .car-input-container .car-input-box .car-input-item ": { "position": "absolute", "top": -2, "left": "50%", "marginLeft": -15, "height": 13, "width": 30, "zIndex": 9 } }, "i-form-item": { ".container ": { "paddingTop": "5rpx", "paddingRight": "10rpx", "paddingBottom": "5rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#99999924" } } };
-  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["styles", [_style_0$q]]]);
-  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-slider" }, { __name: "i-slider", props: {
-    modelValue: {
-      type: [Number, String, Array],
-      default: 0
-    },
-    value: {
-      type: [Number, String, Array],
-      default: 0
-    },
-    min: {
-      type: Number,
-      default: 0
-    },
-    max: {
-      type: Number,
-      default: 100
-    },
-    step: {
-      type: Number,
-      default: 1
-    },
-    range: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    noCross: {
-      type: Boolean,
-      default: false
-    },
-    vertical: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: "24px"
-    },
-    railColor: {
-      type: String,
-      default: "rgba(0, 0, 0, 0.1)"
-    },
-    railRadius: {
-      type: String,
-      default: "2px"
-    },
-    railSize: {
-      type: String,
-      default: "4px"
-    },
-    trackColor: {
-      type: String,
-      default: "#1677ff"
-    },
-    thumbSize: {
-      type: String,
-      default: "20px"
-    },
-    thumbColor: {
-      type: String,
-      default: "#ffffff"
-    },
-    thumbBorder: {
-      type: String,
-      default: "3px solid #1677ff"
-    },
-    thumbRadius: {
-      type: String,
-      default: "50%"
-    },
-    showValue: {
-      type: Boolean,
-      default: false
-    }
-  }, emits: [
-    "update:modelValue",
-    "update:value",
-    "change",
-    "changing",
-    "dragStart",
-    "dragEnd"
-  ], setup(__props, _a) {
-    var __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function initialValue() {
-      if (props.modelValue.toString().length > 0)
-        return props.modelValue;
-      return props.value;
-    }
-    function normalizeSingle(value = null) {
-      let nextValue = parseFloat(value.toString());
-      if (isNaN(nextValue))
-        nextValue = props.min;
-      if (nextValue < props.min)
-        nextValue = props.min;
-      if (nextValue > props.max)
-        nextValue = props.max;
-      return nextValue;
-    }
-    function normalizeRange(value = null) {
-      let start = props.min;
-      let end = props.max;
-      if (Array.isArray(value) && value.length > 1) {
-        start = parseFloat(value[0].toString());
-        end = parseFloat(value[1].toString());
-      } else {
-        const text = value.toString();
-        if (text.indexOf(",") >= 0) {
-          start = parseFloat(text.split(",")[0]);
-          end = parseFloat(text.split(",")[1]);
-        }
-      }
-      start = normalizeSingle(start);
-      end = normalizeSingle(end);
-      if (props.noCross && start > end)
-        start = end;
-      return [start, end];
-    }
-    function valuePercent(value) {
-      const distance = props.max - props.min;
-      if (distance <= 0)
-        return 0;
-      const percent = (value - props.min) / distance * 100;
-      if (percent < 0)
-        return 0;
-      if (percent > 100)
-        return 100;
-      return percent;
-    }
-    function formatSize(value = null) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
-    }
-    function thumbStyle(value) {
-      const size = parseFloat(props.thumbSize.toString());
-      const halfSize = isNaN(size) ? 10 : size / 2;
-      return "left:" + valuePercent(value).toString() + "%;width:" + formatSize(props.thumbSize) + ";height:" + formatSize(props.thumbSize) + ";margin-left:" + formatSize(0 - halfSize) + ";border:" + props.thumbBorder + ";border-radius:" + props.thumbRadius + ";background-color:" + props.thumbColor + ";";
-    }
-    const singleValue = vue.ref(normalizeSingle(initialValue()));
-    const rangeStart = vue.ref(normalizeRange(initialValue())[0]);
-    const rangeEnd = vue.ref(normalizeRange(initialValue())[1]);
-    const dragging = vue.ref(false);
-    const rangeId = "i-slider-range-" + Math.floor(Math.random() * 1e6).toString();
-    const rangeRectLeft = vue.ref(0);
-    const rangeRectWidth = vue.ref(0);
-    const activeRangeThumb = vue.ref("");
-    const wrapClass = vue.computed(() => {
-      const classes = ["i-slider"];
-      if (props.vertical)
-        classes.push("i-slider--vertical");
-      if (props.disabled)
-        classes.push("i-slider--disabled");
-      return classes.join(" ");
-    });
-    const displayValue = vue.computed(() => {
-      if (props.range)
-        return rangeStart.value.toString() + " - " + rangeEnd.value.toString();
-      return singleValue.value.toString();
-    });
-    const rangeRailStyle = vue.computed(() => {
-      return "height:" + formatSize(props.railSize) + ";border-radius:" + formatSize(props.railRadius) + ";background-color:" + props.railColor + ";";
-    });
-    const rangeTrackStyle = vue.computed(() => {
-      const startPercent = valuePercent(rangeStart.value);
-      const endPercent = valuePercent(rangeEnd.value);
-      return "left:" + startPercent.toString() + "%;width:" + (endPercent - startPercent).toString() + "%;height:" + formatSize(props.railSize) + ";border-radius:" + formatSize(props.railRadius) + ";background-color:" + props.trackColor + ";";
-    });
-    const startThumbStyle = vue.computed(() => {
-      return thumbStyle(rangeStart.value);
-    });
-    const endThumbStyle = vue.computed(() => {
-      return thumbStyle(rangeEnd.value);
-    });
-    const syncFromProps = () => {
-      singleValue.value = normalizeSingle(initialValue());
-      const values = normalizeRange(initialValue());
-      rangeStart.value = values[0];
-      rangeEnd.value = values[1];
-    };
-    vue.watch(() => {
-      return props.modelValue;
-    }, () => {
-      syncFromProps();
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      syncFromProps();
-    });
-    function normalizeStart(value) {
-      let nextValue = normalizeSingle(value);
-      if (props.noCross && nextValue > rangeEnd.value)
-        nextValue = rangeEnd.value;
-      return nextValue;
-    }
-    function normalizeEnd(value) {
-      let nextValue = normalizeSingle(value);
-      if (props.noCross && nextValue < rangeStart.value)
-        nextValue = rangeStart.value;
-      return nextValue;
-    }
-    const startDrag = () => {
-      if (dragging.value)
-        return null;
-      dragging.value = true;
-      emit("dragStart");
-    };
-    const endDrag = () => {
-      dragging.value = false;
-      emit("dragEnd");
-    };
-    const emitValue = (value = null) => {
-      emit("update:modelValue", value);
-      emit("update:value", value);
-      emit("change", value);
-    };
-    function handleSingleChanging(event) {
-      startDrag();
-      singleValue.value = normalizeSingle(event.detail.value);
-      emit("changing", singleValue.value);
-    }
-    function handleSingleChange(event) {
-      singleValue.value = normalizeSingle(event.detail.value);
-      emitValue(singleValue.value);
-      endDrag();
-    }
-    function normalizeStep(value) {
-      const stepValue = props.step <= 0 ? 1 : props.step;
-      const nextValue = props.min + Math.round((value - props.min) / stepValue) * stepValue;
-      return normalizeSingle(parseFloat(nextValue.toFixed(6)));
-    }
-    function valueFromPoint(x) {
-      let percent = (x - rangeRectLeft.value) / rangeRectWidth.value;
-      if (percent < 0)
-        percent = 0;
-      if (percent > 1)
-        percent = 1;
-      const rawValue = props.min + (props.max - props.min) * percent;
-      return normalizeStep(rawValue);
-    }
-    function pickRangeThumb(value) {
-      const startDistance = Math.abs(value - rangeStart.value);
-      const endDistance = Math.abs(value - rangeEnd.value);
-      activeRangeThumb.value = startDistance <= endDistance ? "start" : "end";
-    }
-    function readTouchX(event) {
-      let point = null;
-      if (event.touches.length > 0)
-        point = event.touches[0];
-      else if (event.changedTouches.length > 0)
-        point = event.changedTouches[0];
-      if (point == null)
-        return NaN;
-      return point.clientX;
-    }
-    function updateRangeByTouch(event, shouldPickThumb) {
-      const x = readTouchX(event);
-      if (isNaN(x) || rangeRectWidth.value <= 0)
-        return null;
-      const nextValue = valueFromPoint(x);
-      if (shouldPickThumb)
-        pickRangeThumb(nextValue);
-      if (activeRangeThumb.value == "start")
-        rangeStart.value = normalizeStart(nextValue);
-      else
-        rangeEnd.value = normalizeEnd(nextValue);
-      emit("changing", [rangeStart.value, rangeEnd.value]);
-    }
-    function setRangeRect(rect = null) {
-      const rects = rect;
-      if (rects.length == 0)
-        return null;
-      const nodeInfo = rects[0];
-      rangeRectLeft.value = nodeInfo.left != null ? nodeInfo.left : 0;
-      rangeRectWidth.value = nodeInfo.width != null ? nodeInfo.width : 0;
-    }
-    function refreshRangeRect(event, shouldPickThumb, shouldUpdate) {
-      uni.createSelectorQuery().select("#" + rangeId).boundingClientRect((rect = null) => {
-        setRangeRect(rect);
-        if (shouldUpdate)
-          updateRangeByTouch(event, shouldPickThumb);
-      }).exec();
-    }
-    function handleRangeTouchStart(event) {
-      if (props.disabled || props.readonly)
-        return null;
-      startDrag();
-      refreshRangeRect(event, true, true);
-    }
-    function handleRangeTouchMove(event) {
-      if (props.disabled || props.readonly || activeRangeThumb.value.length == 0)
-        return null;
-      updateRangeByTouch(event, false);
-    }
-    function handleRangeTouchEnd() {
-      if (activeRangeThumb.value.length == 0)
-        return null;
-      emitValue([rangeStart.value, rangeEnd.value]);
-      activeRangeThumb.value = "";
-      endDrag();
-    }
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: vue.normalizeClass(wrapClass.value)
-      }), [
-        !__props.range ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: "i-slider__line"
-        }), [
-          vue.createElementVNode("slider", new UTSJSONObject({
-            class: "i-slider__native",
-            value: singleValue.value,
-            min: __props.min,
-            max: __props.max,
-            step: __props.step,
-            disabled: __props.disabled || __props.readonly,
-            activeColor: __props.trackColor,
-            backgroundColor: __props.railColor,
-            onChanging: handleSingleChanging,
-            onChange: handleSingleChange
-          }), null, 40, ["value", "min", "max", "step", "disabled", "activeColor", "backgroundColor"]),
-          vue.renderSlot(_ctx.$slots, "startThumb")
-        ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 1,
-          id: rangeId,
-          class: "i-slider__range",
-          onTouchstart: vue.withModifiers(handleRangeTouchStart, ["stop", "prevent"]),
-          onTouchmove: vue.withModifiers(handleRangeTouchMove, ["stop", "prevent"]),
-          onTouchend: vue.withModifiers(handleRangeTouchEnd, ["stop", "prevent"]),
-          onTouchcancel: vue.withModifiers(handleRangeTouchEnd, ["stop", "prevent"])
-        }), [
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "i-slider__range-rail",
-            style: vue.normalizeStyle(rangeRailStyle.value)
-          }), null, 4),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "i-slider__range-track",
-            style: vue.normalizeStyle(rangeTrackStyle.value)
-          }), null, 4),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "i-slider__thumb",
-            style: vue.normalizeStyle(startThumbStyle.value)
-          }), [
-            vue.renderSlot(_ctx.$slots, "startThumb")
-          ], 4),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "i-slider__thumb",
-            style: vue.normalizeStyle(endThumbStyle.value)
-          }), [
-            vue.renderSlot(_ctx.$slots, "endThumb")
-          ], 4)
-        ], 32)),
-        __props.showValue ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-          key: 2,
-          class: "i-slider__value"
-        }), vue.toDisplayString(displayValue.value), 1)) : vue.createCommentVNode("", true)
-      ], 2);
-    };
-  } }));
-  const _style_0$p = { "i-slider": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-slider--vertical": { "": { "flexDirection": "column", "alignItems": "stretch" } }, "i-slider--disabled": { "": { "opacity": 0.55 } }, "i-slider__line": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-slider__native": { "": { "width": "100%" } }, "i-slider__range": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 64 } }, "i-slider__range-rail": { "": { "position": "absolute", "top": 20, "left": 0, "right": 0 } }, "i-slider__range-track": { "": { "position": "absolute", "top": 20, "left": 0 } }, "i-slider__thumb": { "": { "position": "absolute", "top": 10, "zIndex": 3, "alignItems": "center", "justifyContent": "center", "boxShadow": "0 2px 8px rgba(31, 45, 61, 0.16)" } }, "i-slider__value": { "": { "minWidth": 58, "marginLeft": 8, "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } } };
-  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["styles", [_style_0$p]]]);
+  const _style_0$p = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "clickable": { ".container ": { "marginTop": 10, "color": "#999999", "fontSize": "28rpx" } }, "btn": { ".container ": { "marginTop": "50rpx", "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx" } }, "plate-input": { ".container ": { "width": "100%" } }, "input-wrapper": { ".container .plate-input ": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000" } }, "car-input-container": { ".container ": { "display": "flex", "flexDirection": "row" } }, "car-number-input": { ".container ": { "width": "60%", "textAlign": "right" } }, "plate-close": { ".container .car-number-container ": { "height": 40, "display": "flex", "textAlign": "right", "backgroundColor": "#FFFFFF", "flexDirection": "row", "justifyContent": "flex-end", "alignItems": "center" } }, "car-input-item": { ".container .car-input-container .car-input-box ": { "position": "relative", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#E2E2E2", "borderRightColor": "#E2E2E2", "borderBottomColor": "#E2E2E2", "borderLeftColor": "#E2E2E2", "height": 40, "lineHeight": "40px", "textAlign": "center", "fontSize": 17 } }, "new-item-img": { ".container .car-input-container .car-input-box .car-input-item ": { "position": "absolute", "top": -2, "left": "50%", "marginLeft": -15, "height": 13, "width": 30, "zIndex": 9 } }, "i-form-item": { ".container ": { "paddingTop": "5rpx", "paddingRight": "10rpx", "paddingBottom": "5rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#99999924" } } };
+  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["styles", [_style_0$p]]]);
   function isString$1(str) {
     return typeof str == "string";
   }
@@ -14484,11 +14141,11 @@
         if (dateStr == "")
           return null;
         try {
-          const decoded = (_a = decodeURIComponent(dateStr)) !== null && _a !== void 0 ? _a : "";
+          const decoded = ((_a = decodeURIComponent(dateStr)) !== null && _a !== void 0 ? _a : "").replace(/\+/g, " ").replace("T", " ");
           const milliseconds = parseLocalDateTime(decoded);
           return milliseconds == null ? null : formatPlaybackTime(milliseconds);
         } catch (error) {
-          uni.__log__("error", "at pages/playBack/playBack.uvue:185", "解析回放时间失败:", error);
+          uni.__log__("error", "at pages/playBack/playBack.uvue:192", "解析回放时间失败:", error);
           return null;
         }
       }
@@ -14828,7 +14485,7 @@
           } catch (error) {
             if (requestId != replaySessionId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/playBack/playBack.uvue:647", "加载轨迹失败:", error);
+            uni.__log__("error", "at pages/playBack/playBack.uvue:654", "加载轨迹失败:", error);
             showAppToast({ title: "轨迹加载失败", icon: "none" });
             if (!isNaN(parseFloat((_b = lat.value) !== null && _b !== void 0 ? _b : "")) && !isNaN(parseFloat((_c = lng.value) !== null && _c !== void 0 ? _c : ""))) {
               showCurrentPosition();
@@ -14912,15 +14569,25 @@
       function onCancel() {
         showDateTimePicker.value = false;
       }
-      function setPlaybackSpeed(e) {
-        const wasPlaying = isPlaying.value;
-        if (wasPlaying) {
-          pausePlayback();
+      function applyPlaybackSpeed(value) {
+        if (!isFinite(value))
+          return null;
+        playbackSpeed.value = Math.min(50, Math.max(5, value));
+        if (!isPlaying.value)
+          return null;
+        const timer = playbackTimer;
+        if (timer != null) {
+          clearTimeout(timer);
+          playbackTimer = null;
         }
-        playbackSpeed.value = e;
-        if (wasPlaying) {
-          startPlayback();
-        }
+        lastTimestamp = Date.now();
+        const sessionId = replaySessionId;
+        playbackTimer = setTimeout(() => {
+          playbackStep(sessionId);
+        }, 16);
+      }
+      function setPlaybackSpeed(event) {
+        applyPlaybackSpeed(event.detail.value);
       }
       vue.onLoad((option) => {
         var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -14932,7 +14599,7 @@
         lng.value = (_f = option.lng) !== null && _f !== void 0 ? _f : null;
         sTime.value = (_g = option.startTime) !== null && _g !== void 0 ? _g : "";
         eTime.value = (_h = option.endTime) !== null && _h !== void 0 ? _h : "";
-        uni.__log__("log", "at pages/playBack/playBack.uvue:766", sTime.value, eTime.value);
+        uni.__log__("log", "at pages/playBack/playBack.uvue:783", sTime.value, eTime.value);
         const routeStartTime = resolveRouteDateTime(sTime.value);
         const routeEndTime = resolveRouteDateTime(eTime.value);
         if (routeStartTime != null && routeEndTime != null) {
@@ -14957,10 +14624,9 @@
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_i_slider = resolveEasycom(vue.resolveDynamicComponent("i-slider"), __easycom_4);
         const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$n);
         const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -15024,16 +14690,14 @@
                   text: isPlaying.value ? "暂停" : "播放"
                 }), null, 8, ["text"]),
                 vue.createElementVNode("view", new UTSJSONObject({ class: "slider" }), [
-                  vue.createVNode(_component_i_slider, new UTSJSONObject({
-                    modelValue: playbackSpeed.value,
-                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
-                      return playbackSpeed.value = $event;
-                    }),
-                    min: 1,
+                  vue.createElementVNode("slider", new UTSJSONObject({
+                    value: playbackSpeed.value,
+                    min: 5,
                     max: 50,
                     step: 5,
+                    onChanging: setPlaybackSpeed,
                     onChange: setPlaybackSpeed
-                  }), null, 8, ["modelValue"])
+                  }), null, 40, ["value"])
                 ]),
                 vue.createElementVNode("text", new UTSJSONObject({ class: "speed-label" }), vue.toDisplayString(playbackSpeed.value) + "x", 1)
               ]),
@@ -15053,7 +14717,7 @@
               ]),
               vue.createVNode(_component_l_popup, new UTSJSONObject({
                 modelValue: showDateTimePicker.value,
-                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event = null) => {
+                "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
                   return showDateTimePicker.value = $event;
                 }),
                 position: "bottom",
@@ -15355,7 +15019,8 @@
             rotation: { type: Number, optional: false },
             speed: { type: Number, optional: false },
             address: { type: String, optional: false },
-            connectionStatus: { type: String, optional: false }
+            connectionStatus: { type: String, optional: false },
+            positionTime: { type: String, optional: false }
           };
         }
       };
@@ -15368,6 +15033,7 @@
       this.speed = this.__props__.speed;
       this.address = this.__props__.address;
       this.connectionStatus = this.__props__.connectionStatus;
+      this.positionTime = this.__props__.positionTime;
       delete this.__props__;
     }
   }
@@ -15401,8 +15067,10 @@
       delete this.__props__;
     }
   }
-  const ROUTE_POINT_MIN_DISTANCE = 1;
-  const MARKER_UPDATE_INTERVAL = 100;
+  const TRACKING_POLL_INTERVAL_MS = 1e3;
+  const TRACKING_ANIMATION_DURATION_MS = 900;
+  const MAX_POSITION_JUMP_DISTANCE = 500;
+  const MARKER_UPDATE_INTERVAL = 30;
   const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
     __name: "vehicleTracking",
     setup(__props) {
@@ -15416,7 +15084,7 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(15);
-      const travelledPoints = vue.ref([]);
+      const temporaryRenderPoints = vue.ref([]);
       const polyline = vue.ref([]);
       const isAnimating = vue.ref(false);
       const animationTimer = vue.ref(null);
@@ -15442,6 +15110,10 @@
       let trackingSessionId = 0;
       let isTrackRequestPending = false;
       let lastAcceptedPosition = null;
+      let lastAcceptedPositionTime = "";
+      let lastAcceptedReceivedTime = 0;
+      let pendingJumpPosition = null;
+      let pendingJumpTime = "";
       const currentSpeed = vue.ref(0);
       const currentAddress = vue.ref("获取中...");
       const currentTime = vue.ref("1s");
@@ -15497,7 +15169,7 @@
                   const speed = item.getNumber("speed", 0);
                   const positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知");
                   const status = item.getString("connectionStatus", "unknown");
-                  const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
+                  const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
                   currentPosition.latitude = convertedCoord.lat;
                   currentPosition.longitude = convertedCoord.lng;
                   hasValidPosition.value = true;
@@ -15536,7 +15208,7 @@
               });
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:238", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:244", "获取初始位置失败:", err);
             showAppToast({
               title: "网络请求失败",
               icon: "none"
@@ -15553,7 +15225,7 @@
         const marker = createVehicleMarker(iconPath);
         markers.value = [marker];
         markerInitialized.value = true;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:259", "初始化标记点完成");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:265", "初始化标记点完成");
       }
       function calculateMapRotation(direction) {
         let rotation = direction;
@@ -15572,7 +15244,7 @@
       }
       vue.onLoad((option) => {
         var _a, _b, _c, _d, _e;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:280", "option", option);
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:286", "option", option);
         connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
         imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
         currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -15587,22 +15259,6 @@
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
-      };
-      const calculateRealisticAnimationDuration = (distance, speedKmh) => {
-        if (speedKmh <= 0 || distance <= 0) {
-          return 2e3;
-        }
-        const speedMs = speedKmh / 3.6;
-        const realTimeSeconds = distance / speedMs;
-        let duration = realTimeSeconds * 1e3;
-        if (duration < 1e3)
-          duration = 1e3;
-        if (duration > 15e3)
-          duration = 15e3;
-        if (speedKmh < 10 && duration < 3e3) {
-          duration = 3e3;
-        }
-        return duration;
       };
       function calculateShortestRotation(from, to) {
         let diff = to - from;
@@ -15629,24 +15285,40 @@
       function copyPosition(p) {
         return new CoordinatePoint({ latitude: p.latitude, longitude: p.longitude });
       }
+      function isSamePosition(first, second) {
+        return first.latitude == second.latitude && first.longitude == second.longitude;
+      }
+      function parsePositionTime(value) {
+        const time = Date.parse(value.replace(/-/g, "/"));
+        return isNaN(time) ? 0 : time;
+      }
       function updateTrackingPolyline() {
-        if (travelledPoints.value.length < 2) {
+        const renderPoints = temporaryRenderPoints.value.map((point) => {
+          return copyPosition(point);
+        });
+        if (isAnimating.value && renderPoints.length > 0 && !isSamePosition(renderPoints[renderPoints.length - 1], currentPosition))
+          renderPoints.push(copyPosition(currentPosition));
+        if (renderPoints.length < 2) {
           polyline.value = [];
           return null;
         }
-        polyline.value = [{ points: travelledPoints.value.map((p) => {
-          return copyPosition(p);
-        }), color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
+        polyline.value = [{ points: renderPoints, color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
       }
-      function appendTravelledPoint(p) {
-        const last = travelledPoints.value.length > 0 ? travelledPoints.value[travelledPoints.value.length - 1] : null;
-        if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE)
+      function appendTemporaryRenderPoint(position) {
+        const last = temporaryRenderPoints.value.length > 0 ? temporaryRenderPoints.value[temporaryRenderPoints.value.length - 1] : null;
+        if (last != null && isSamePosition(last, position))
           return null;
-        travelledPoints.value.push(copyPosition(p));
+        temporaryRenderPoints.value.push(copyPosition(position));
+        if (temporaryRenderPoints.value.length > 1e3)
+          temporaryRenderPoints.value.splice(0, temporaryRenderPoints.value.length - 1e3);
         updateTrackingPolyline();
       }
-      function clearTrackingRoute() {
-        travelledPoints.value = [];
+      function resetTemporaryRenderSegment(position) {
+        temporaryRenderPoints.value = [copyPosition(position)];
+        polyline.value = [];
+      }
+      function clearTemporaryRoute() {
+        temporaryRenderPoints.value = [];
         polyline.value = [];
       }
       const startPositionAnimation = (duration, sessionId, done) => {
@@ -15667,6 +15339,7 @@
           center.longitude = currentPosition.longitude;
           if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
             updateMarkerSmooth();
+            updateTrackingPolyline();
             lastDraw = now;
           }
           if (progress >= 1) {
@@ -15677,7 +15350,7 @@
             currentPosition.longitude = targetPosition.longitude;
             currentRotation.value = normalizeRotation(targetRotation.value);
             updateMarkerSmooth();
-            appendTravelledPoint(currentPosition);
+            appendTemporaryRenderPoint(currentPosition);
             done();
           }
         }, 30);
@@ -15695,7 +15368,7 @@
         currentSpeed.value = next.speed;
         currentAddress.value = next.address;
         connectionStatus.value = next.connectionStatus;
-        startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, () => {
+        startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => {
           if (!isTracking.value || sessionId != trackingSessionId)
             return null;
           isProcessingQueue.value = false;
@@ -15704,6 +15377,45 @@
               return processAnimationQueue(sessionId);
             }, 50);
         });
+      }
+      function acceptLivePosition(item, position, positionTime, sessionId) {
+        const direction = item.getNumber("direction", lastDirection.value);
+        const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: positionTime == "" ? "未知位置" : positionTime, connectionStatus: item.getString("connectionStatus", "unknown"), positionTime });
+        lastAcceptedPosition = copyPosition(position);
+        lastAcceptedPositionTime = positionTime;
+        lastAcceptedReceivedTime = Date.now();
+        if (isAnimating.value || animationQueue.value.length > 0)
+          animationQueue.value = [];
+        animationQueue.value.push(animationData);
+        lastDirection.value = direction;
+        if (!isProcessingQueue.value && !isAnimating.value)
+          processAnimationQueue(sessionId);
+      }
+      function relocateToConfirmedPosition(item, position, positionTime) {
+        if (animationTimer.value != null)
+          clearInterval(animationTimer.value);
+        animationTimer.value = null;
+        isAnimating.value = false;
+        isProcessingQueue.value = false;
+        animationQueue.value = [];
+        currentPosition.latitude = position.latitude;
+        currentPosition.longitude = position.longitude;
+        targetPosition.latitude = position.latitude;
+        targetPosition.longitude = position.longitude;
+        const direction = item.getNumber("direction", lastDirection.value);
+        currentRotation.value = normalizeRotation(calculateMapRotation(direction));
+        targetRotation.value = currentRotation.value;
+        center.latitude = position.latitude;
+        center.longitude = position.longitude;
+        currentSpeed.value = item.getNumber("speed", 0);
+        currentAddress.value = positionTime;
+        connectionStatus.value = item.getString("connectionStatus", "unknown");
+        lastDirection.value = direction;
+        lastAcceptedPosition = copyPosition(position);
+        lastAcceptedPositionTime = positionTime;
+        lastAcceptedReceivedTime = Date.now();
+        resetTemporaryRenderSegment(position);
+        updateMarkerSmooth();
       }
       const loadTrackData = (sessionId) => {
         return __awaiter(this, void 0, void 0, function* () {
@@ -15719,26 +15431,41 @@
             });
             if (item == null)
               return Promise.resolve(null);
-            const rawLat = item.getNumber("latitude", 0);
-            const rawLng = item.getNumber("longitude", 0);
-            if (rawLat == 0 || rawLng == 0)
+            const rawLat = item.getNumber("latitude", 0), rawLng = item.getNumber("longitude", 0);
+            if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng))
               return Promise.resolve(null);
-            const converted = CoordTransform.wgs84ToTencent(rawLat, rawLng);
+            const converted = CoordTransform.wgs84ToTencentPrecise(rawLat, rawLng);
             if (!isFinite(converted.lat) || !isFinite(converted.lng))
               return Promise.resolve(null);
             const position = new CoordinatePoint({ latitude: converted.lat, longitude: converted.lng });
-            const previousPosition = lastAcceptedPosition;
-            if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE)
+            const positionTime = item.getString("positionUpdateTime", "");
+            const previous = lastAcceptedPosition;
+            if (positionTime != "" && positionTime == lastAcceptedPositionTime)
               return Promise.resolve(null);
-            const direction = item.getNumber("direction", lastDirection.value);
-            const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: item.getString("positionUpdateTime", "未知位置"), connectionStatus: item.getString("connectionStatus", "unknown") });
-            lastAcceptedPosition = copyPosition(position);
-            animationQueue.value.push(animationData);
-            lastDirection.value = direction;
-            if (!isProcessingQueue.value && !isAnimating.value)
-              processAnimationQueue(sessionId);
+            if (previous == null || isSamePosition(previous, position))
+              return Promise.resolve(null);
+            const sourceTime = parsePositionTime(positionTime);
+            const previousTime = parsePositionTime(lastAcceptedPositionTime);
+            const elapsedSeconds = sourceTime > previousTime && previousTime > 0 ? (sourceTime - previousTime) / 1e3 : Math.max((Date.now() - lastAcceptedReceivedTime) / 1e3, 1);
+            const distance = calculateDistance(previous.latitude, previous.longitude, position.latitude, position.longitude);
+            const impliedSpeed = distance / elapsedSeconds * 3.6;
+            if (distance > MAX_POSITION_JUMP_DISTANCE || impliedSpeed > 210) {
+              const pending = pendingJumpPosition;
+              if (pending != null && calculateDistance(pending.latitude, pending.longitude, position.latitude, position.longitude) <= MAX_POSITION_JUMP_DISTANCE && positionTime != pendingJumpTime) {
+                pendingJumpPosition = null;
+                pendingJumpTime = "";
+                relocateToConfirmedPosition(item, position, positionTime);
+              } else {
+                pendingJumpPosition = copyPosition(position);
+                pendingJumpTime = positionTime;
+              }
+              return Promise.resolve(null);
+            }
+            pendingJumpPosition = null;
+            pendingJumpTime = "";
+            acceptLivePosition(item, position, positionTime, sessionId);
           } catch (error) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:433", "获取跟踪位置失败:", error);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:483", "获取跟踪位置失败:", error);
           } finally {
             if (sessionId == trackingSessionId)
               isTrackRequestPending = false;
@@ -15755,12 +15482,17 @@
         if (animationTimer.value != null) {
           clearInterval(animationTimer.value);
           animationTimer.value = null;
-          appendTravelledPoint(currentPosition);
+        }
+        if (temporaryRenderPoints.value.length > 0) {
+          const lastIndex = temporaryRenderPoints.value.length - 1;
+          temporaryRenderPoints.value[lastIndex] = copyPosition(currentPosition);
+          updateTrackingPolyline();
         }
         animationQueue.value = [];
         isAnimating.value = false;
         isProcessingQueue.value = false;
         isTrackRequestPending = false;
+        pendingJumpPosition = null;
         if (showToast)
           showAppToast({ title: "停止跟踪", icon: "success", duration: 1500 });
       }
@@ -15771,18 +15503,21 @@
         }
         if (!markerInitialized.value)
           initMarker();
-        clearTrackingRoute();
-        appendTravelledPoint(currentPosition);
+        clearTemporaryRoute();
+        resetTemporaryRenderSegment(currentPosition);
         animationQueue.value = [];
         isProcessingQueue.value = false;
         lastAcceptedPosition = copyPosition(currentPosition);
+        lastAcceptedPositionTime = "";
+        lastAcceptedReceivedTime = Date.now();
+        pendingJumpPosition = null;
         trackingSessionId += 1;
         const sessionId = trackingSessionId;
         isTracking.value = true;
         loadTrackData(sessionId);
         trackingInterval.value = setInterval(() => {
           loadTrackData(sessionId);
-        }, 3e3);
+        }, TRACKING_POLL_INTERVAL_MS);
         showAppToast({ title: "开始跟踪", icon: "success", duration: 1500 });
       }
       const toggleTracking = () => {
@@ -15795,6 +15530,10 @@
       vue.onHide(() => {
         stopTracking(false);
       });
+      vue.onUnload(() => {
+        stopTracking(false);
+        clearTemporaryRoute();
+      });
       vue.onUnmounted(() => {
         stopTracking(false);
       });
@@ -15803,7 +15542,7 @@
         const _component_map = vue.resolveComponent("map");
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -15816,8 +15555,8 @@
             vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
               vue.createVNode(_component_map, new UTSJSONObject({
                 id: "myMap",
-                latitude: center.latitude,
-                longitude: center.longitude,
+                latitude: currentPosition.latitude,
+                longitude: currentPosition.longitude,
                 markers: markers.value,
                 polyline: polyline.value,
                 scale: mapScale.value,
@@ -16527,7 +16266,7 @@
         const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "里程记录",
@@ -16779,7 +16518,7 @@
         const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$n);
         const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -16989,7 +16728,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17179,7 +16918,7 @@
         const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
         const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17366,7 +17105,7 @@
       };
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "车辆管理",
@@ -17607,7 +17346,7 @@
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -19226,11 +18965,11 @@
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
         const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4$1);
+        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_radio = resolveEasycom(vue.resolveDynamicComponent("i-radio"), __easycom_6);
         const _component_i_switch = resolveEasycom(vue.resolveDynamicComponent("i-switch"), __easycom_7);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -19284,7 +19023,7 @@
               ref: showFenceModal,
               mode: "bottom",
               round: "10",
-              showClose: true
+              showClose: false
             }), {
               default: vue.withCtx(() => {
                 return [
@@ -19792,7 +19531,7 @@
       });
       return (_ctx = null, _cache = null) => {
         const _component_camera = vue.resolveComponent("camera");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "container" }), [
           vue.createElementVNode("view", new UTSJSONObject({ class: "scancode-box" }), [
             cameraVisible.value ? (vue.openBlock(), vue.createBlock(_component_camera, new UTSJSONObject({
@@ -19913,7 +19652,7 @@
       });
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "续费管理",
@@ -20222,7 +19961,7 @@
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -20453,7 +20192,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_web_view = vue.resolveComponent("web-view");
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "webview-container" }), [
             webviewUrl.value ? (vue.openBlock(), vue.createBlock(_component_web_view, new UTSJSONObject({
@@ -20810,7 +20549,7 @@
         const _component_map = vue.resolveComponent("map");
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
         const _component_indexListMode = resolveEasycom(vue.resolveDynamicComponent("indexListMode"), __easycom_2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$J);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({

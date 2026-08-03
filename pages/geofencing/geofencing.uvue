@@ -19,7 +19,7 @@
 		</view>
 
 		<!-- 围栏操作面板 -->
-		<i-popup ref="showFenceModal"  mode="bottom" round="10" :showClose="true">
+		<i-popup ref="showFenceModal"  mode="bottom" round="10" :showClose="false">
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ getSelectedFenceName() }}</text>

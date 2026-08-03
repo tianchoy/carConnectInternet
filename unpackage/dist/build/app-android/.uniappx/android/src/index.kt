@@ -1,8 +1,5 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI662B0B4
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -15,9 +12,11 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import java.math.BigDecimal
 import kotlin.properties.Delegates
+import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.exit as uni_exit
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
+import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
@@ -85,53 +84,8 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
-open class ExternalMapNavigationParams (
-    @JsonNotNull
-    open var latitude: Number,
-    @JsonNotNull
-    open var longitude: Number,
-    @JsonNotNull
-    open var name: String,
-) : UTSObject()
-open class ExternalMapNavigationResult (
-    @JsonNotNull
-    open var code: String,
-) : UTSObject()
 fun showAppToast(options: ShowToastOptions): Unit {
     uni_showToast(options)
-}
-fun result(code: String): ExternalMapNavigationResult {
-    return ExternalMapNavigationResult(code = code)
-}
-fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
-    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
-}
-fun openExternalMap(params: ExternalMapNavigationParams): ExternalMapNavigationResult {
-    if (!isValidCoordinate(params.latitude, params.longitude)) {
-        return result("invalid_coordinate")
-    }
-    val activity = UTSAndroid.getUniActivity()
-    if (activity == null) {
-        console.error("获取当前页面失败，无法打开地图")
-        return result("launch_failed")
-    }
-    try {
-        val currentActivity = activity as Activity
-        val geoUri = "geo:0,0?q=" + params.latitude.toString(10) + "," + params.longitude.toString(10)
-        val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri))
-        val handlers = currentActivity.getPackageManager().queryIntentActivities(mapIntent, 0)
-        if (handlers.size == 0) {
-            return result("no_map_app")
-        }
-        val chooser = Intent.createChooser(mapIntent, "选择地图应用")
-        currentActivity.startActivity(chooser)
-        console.log("已请求打开外部地图:", geoUri)
-        return result("opened")
-    }
-     catch (error: Throwable) {
-        console.error("打开外部地图失败:", error)
-        return result("launch_failed")
-    }
 }
 open class OpenLocationParams (
     @JsonNotNull
@@ -141,29 +95,32 @@ open class OpenLocationParams (
     @JsonNotNull
     open var name: String,
 ) : UTSObject()
-fun isValidCoordinate__1(latitude: Number, longitude: Number): Boolean {
+fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
     return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0)
 }
 fun showInvalidLocationToast(): Unit {
     showAppToast(ShowToastOptions(title = "暂无有效车辆位置", icon = "none"))
 }
+fun showOpenMapFailedToast(): Unit {
+    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+}
 fun openAndroidExternalMap(params: OpenLocationParams): Unit {
-    val result = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
-    if (result.code == "opened") {
+    val navigationResult = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
+    if (navigationResult.code == "opened") {
         return
     }
-    if (result.code == "invalid_coordinate") {
+    if (navigationResult.code == "invalid_coordinate") {
         showInvalidLocationToast()
         return
     }
-    if (result.code == "no_map_app") {
+    if (navigationResult.code == "no_map_app") {
         showAppToast(ShowToastOptions(title = "未检测到可用地图应用", icon = "none"))
         return
     }
-    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+    showOpenMapFailedToast()
 }
 fun openLocation(params: OpenLocationParams): Unit {
-    if (!isValidCoordinate__1(params.latitude, params.longitude)) {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
         showInvalidLocationToast()
         return
     }
@@ -927,6 +884,20 @@ open class CoordTransform {
             val mgLat = wgLat + dLat
             val mgLng = wgLon + dLng
             return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
+        }
+        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
         }
         fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
             if (!this.isInChina(tcLon, tcLat)) {
@@ -7524,6 +7495,8 @@ open class AnimationQueueItem (
     open var address: String,
     @JsonNotNull
     open var connectionStatus: String,
+    @JsonNotNull
+    open var positionTime: String,
 ) : UTSReactiveObject() {
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return AnimationQueueItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7534,7 +7507,7 @@ class AnimationQueueItemReactiveObject : AnimationQueueItem, IUTSReactive<Animat
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: AnimationQueueItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(position = __v_raw.position, rotation = __v_raw.rotation, speed = __v_raw.speed, address = __v_raw.address, connectionStatus = __v_raw.connectionStatus) {
+    constructor(__v_raw: AnimationQueueItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(position = __v_raw.position, rotation = __v_raw.rotation, speed = __v_raw.speed, address = __v_raw.address, connectionStatus = __v_raw.connectionStatus, positionTime = __v_raw.positionTime) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
@@ -7602,6 +7575,18 @@ class AnimationQueueItemReactiveObject : AnimationQueueItem, IUTSReactive<Animat
             val oldValue = __v_raw.connectionStatus
             __v_raw.connectionStatus = value
             _tRS(__v_raw, "connectionStatus", oldValue, value)
+        }
+    override var positionTime: String
+        get() {
+            return _tRG(__v_raw, "positionTime", __v_raw.positionTime, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("positionTime")) {
+                return
+            }
+            val oldValue = __v_raw.positionTime
+            __v_raw.positionTime = value
+            _tRS(__v_raw, "positionTime", oldValue, value)
         }
 }
 val GenPagesVehicleTrackingVehicleTrackingClass = CreateVueComponent(GenPagesVehicleTrackingVehicleTracking::class.java, fun(): VueComponentOptions {

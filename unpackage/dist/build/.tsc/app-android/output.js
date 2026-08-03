@@ -1,9 +1,6 @@
 'use strict';
 
 require('vue');
-require('android.content.Intent');
-require('android.net.Uri');
-require('android.app.Activity');
 require('java.math.BigDecimal');
 require('uts.sdk.modules.DCloudUniMapTencent.Polyline');
 require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');
@@ -15,6 +12,8 @@ const iLineProgress_uvue_vue_type_style_index_0_lang = {};
 const iPicker_uvue_vue_type_style_index_0_lang = {};
 
 const appModal_uvue_vue_type_style_index_0_lang = {};
+
+uni;
 
 const index_uvue_vue_type_style_index_0_lang$1 = {};
 

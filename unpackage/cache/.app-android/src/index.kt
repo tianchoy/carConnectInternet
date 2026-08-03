@@ -211,20 +211,23 @@ fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
 fun showInvalidLocationToast(): Unit {
     showAppToast(ShowToastOptions(title = "暂无有效车辆位置", icon = "none"))
 }
+fun showOpenMapFailedToast(): Unit {
+    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+}
 fun openAndroidExternalMap(params: OpenLocationParams): Unit {
-    val result = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
-    if (result.code == "opened") {
+    val navigationResult = openExternalMap(ExternalMapNavigationParams(latitude = params.latitude, longitude = params.longitude, name = params.name))
+    if (navigationResult.code == "opened") {
         return
     }
-    if (result.code == "invalid_coordinate") {
+    if (navigationResult.code == "invalid_coordinate") {
         showInvalidLocationToast()
         return
     }
-    if (result.code == "no_map_app") {
+    if (navigationResult.code == "no_map_app") {
         showAppToast(ShowToastOptions(title = "未检测到可用地图应用", icon = "none"))
         return
     }
-    showAppToast(ShowToastOptions(title = "无法打开地图，请稍后重试", icon = "none"))
+    showOpenMapFailedToast()
 }
 fun openLocation(params: OpenLocationParams): Unit {
     if (!isValidCoordinate(params.latitude, params.longitude)) {
@@ -1077,6 +1080,20 @@ open class CoordTransform : IUTSSourceMap {
             val mgLng = wgLon + dLng
             return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
         }
+        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
+        }
         fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
             if (!this.isInChina(tcLon, tcLat)) {
                 return Coordinate(lat = tcLat, lng = tcLon)
@@ -1116,7 +1133,7 @@ open class CoordTransform : IUTSSourceMap {
                 val lat = parseFloat(latitude.toString())
                 val lng = parseFloat(longitude.toString())
                 if (isNaN(lat) || isNaN(lng)) {
-                    console.warn("设备经纬度无效", device, " at utils/coordTransform.uts:108")
+                    console.warn("设备经纬度无效", device, " at utils/coordTransform.uts:126")
                     return device
                 }
                 var converted = Coordinate(lat = lat, lng = lng)
@@ -1139,7 +1156,7 @@ open class CoordTransform : IUTSSourceMap {
             } else if (fromSystem === "tencent" && toSystem === "wgs84") {
                 return this.tencentToWgs84(lat, lng)
             } else {
-                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem, " at utils/coordTransform.uts:143")
+                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem, " at utils/coordTransform.uts:161")
                 return Coordinate(lat = lat, lng = lng)
             }
         }
@@ -1293,7 +1310,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 211, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 217, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1477,7 +1494,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 228, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 234, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1532,7 +1549,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 271, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 277, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1598,7 +1615,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 277, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 283, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1682,7 +1699,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 370, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 376, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -7523,7 +7540,7 @@ open class TrackPoint (
     open var speed: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 67, 7)
+        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 74, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return TrackPointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7615,7 +7632,7 @@ open class TrackBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 75, 7)
+        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 82, 7)
     }
 }
 typealias MapMarker = Marker
@@ -7860,6 +7877,8 @@ open class AnimationQueueItem (
     open var address: String,
     @JsonNotNull
     open var connectionStatus: String,
+    @JsonNotNull
+    open var positionTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("AnimationQueueItem", "pages/vehicleTracking/vehicleTracking.uvue", 52, 7)
@@ -7873,7 +7892,7 @@ class AnimationQueueItemReactiveObject : AnimationQueueItem, IUTSReactive<Animat
     override var __v_isReadonly: Boolean
     override var __v_isShallow: Boolean
     override var __v_skip: Boolean
-    constructor(__v_raw: AnimationQueueItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(position = __v_raw.position, rotation = __v_raw.rotation, speed = __v_raw.speed, address = __v_raw.address, connectionStatus = __v_raw.connectionStatus) {
+    constructor(__v_raw: AnimationQueueItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(position = __v_raw.position, rotation = __v_raw.rotation, speed = __v_raw.speed, address = __v_raw.address, connectionStatus = __v_raw.connectionStatus, positionTime = __v_raw.positionTime) {
         this.__v_raw = __v_raw
         this.__v_isReadonly = __v_isReadonly
         this.__v_isShallow = __v_isShallow
@@ -7941,6 +7960,18 @@ class AnimationQueueItemReactiveObject : AnimationQueueItem, IUTSReactive<Animat
             val oldValue = __v_raw.connectionStatus
             __v_raw.connectionStatus = value
             _tRS(__v_raw, "connectionStatus", oldValue, value)
+        }
+    override var positionTime: String
+        get() {
+            return _tRG(__v_raw, "positionTime", __v_raw.positionTime, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("positionTime")) {
+                return
+            }
+            val oldValue = __v_raw.positionTime
+            __v_raw.positionTime = value
+            _tRS(__v_raw, "positionTime", oldValue, value)
         }
 }
 val GenPagesVehicleTrackingVehicleTrackingClass = CreateVueComponent(GenPagesVehicleTrackingVehicleTracking::class.java, fun(): VueComponentOptions {

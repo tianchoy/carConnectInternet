@@ -26,6 +26,8 @@ open class ExternalMapNavigationParams (
     open var longitude: Number,
     @JsonNotNull
     open var name: String,
+    open var wgs84Latitude: Number? = null,
+    open var wgs84Longitude: Number? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("ExternalMapNavigationParams", "uni_modules/external-map-navigation/utssdk/interface.uts", 1, 13)
@@ -36,7 +38,7 @@ open class ExternalMapNavigationResult (
     open var code: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ExternalMapNavigationResult", "uni_modules/external-map-navigation/utssdk/interface.uts", 6, 13)
+        return UTSSourceMapPosition("ExternalMapNavigationResult", "uni_modules/external-map-navigation/utssdk/interface.uts", 8, 13)
     }
 }
 fun result(code: String): ExternalMapNavigationResult {

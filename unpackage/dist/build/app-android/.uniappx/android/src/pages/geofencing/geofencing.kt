@@ -1090,7 +1090,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                 _cC("v-if", true)
                             }
                         )),
-                        _cV(_component_i_popup, _uM("ref_key" to "showFenceModal", "ref" to showFenceModal, "mode" to "bottom", "round" to "10", "showClose" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                        _cV(_component_i_popup, _uM("ref_key" to "showFenceModal", "ref" to showFenceModal, "mode" to "bottom", "round" to "10", "showClose" to false), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
                                 if (isTrue(selectedFence.value)) {
                                     _cE("view", _uM("key" to 0, "class" to "fence-operations"), _uA(

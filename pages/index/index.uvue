@@ -22,7 +22,9 @@
                         </view>
                         <i-icon name="/static/reload.png" fontSize="18" @click="handleReload"></i-icon>
                         <i-icon class="nav-tool-spacing" name="/static/maps.png" fontSize="20"  @click="toDeviceList"></i-icon>
-                        <i-icon class="nav-tool-spacing" name="/static/addNew.png" fontSize="18" @click="toAdd"></i-icon>
+                        <view class="nav-tool-spacing nav-tool-add" @click="toAdd">
+                            <image src="/static/addNew.png" mode="aspectFit" class="nav-tool-add-image"></image>
+                        </view>
                     </view>
                 </view>
                 <view class="device-info" v-if="safeDeviceDetail.deviceStatus.batteryPercent && safeDeviceDetail.deviceStatus.voltage">
@@ -50,7 +52,9 @@
                 <view class="map-box">
                     <view class="map-header">
                         <text class="map-title">车辆定位</text>
-                        <text class="map-refresh" @click="refreshLocation">刷新位置</text>
+                        <view class="map-refresh-wrap" @click="refreshLocation">
+                            <text class="map-refresh">刷新位置</text>
+                        </view>
                     </view>
                     <view class="map-container">
                         <map
@@ -76,7 +80,9 @@
                 <view class="mile-record">
                     <view class="record-header">
                         <text class="record-title">轨迹记录</text>
-                        <text class="record-desc" @click="toRecordDetail">更多轨迹</text>
+                        <view class="record-desc-wrap" @click="toRecordDetail">
+                            <text class="record-desc">更多轨迹</text>
+                        </view>
                     </view>
                     <view class="ring-container">
                         <view class="ring-item">
@@ -159,19 +165,19 @@
                     <text class="service-header">服务中心</text>
                     <view class="service-content">
                         <view class="service-item" @click="toMsgCenter">
-                            <image src="../../static/msg.png" mode="aspectFill" class="icon-image"></image>
+                            <image src="../../static/msg.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">警报消息</text>
                         </view>
                         <view class="service-item" @tap="toPay(currentCarIccId,currentCarSimMerchant)">
-                            <image src="../../static/pay.png" mode="aspectFill" class="icon-image"></image>
+                            <image src="../../static/pay.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">一键续费</text>
                         </view>
                         <view class="service-item" @click="contactCustomerService">
-                            <image src="../../static/online.png" mode="aspectFill" class="icon-image"></image>
+                            <image src="../../static/online.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title">在线客服</text>
                         </view>
                         <view class="service-item" @click="unbindDevice">
-                            <image src="../../static/del.png" mode="aspectFill" class="icon-image"></image>
+                            <image src="../../static/del.png" mode="aspectFit" class="icon-image"></image>
                             <text class="item-title" style="color: #d81e06;">删除设备</text>
                         </view>
                     </view>
@@ -1274,10 +1280,25 @@ onLoad(() => {
 
             .nav-tools {
                 display: flex;
+                flex-shrink: 0;
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                .nav-tool-spacing { margin-left: 30rpx; }
+                .nav-tool-spacing {
+                    flex-shrink: 0;
+                    margin-left: 30rpx;
+                }
+                .nav-tool-add {
+                    display: flex;
+                    width: 36rpx;
+                    height: 36rpx;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .nav-tool-add-image {
+                    width: 36rpx;
+                    height: 36rpx;
+                }
                 .exit {
                     display: flex;
                     align-items: center;
@@ -1370,17 +1391,27 @@ onLoad(() => {
                 border-bottom: 1rpx solid #f0f0f0;
 
                 .map-title {
+                    flex-shrink: 0;
                     font-size: 32rpx;
                     font-weight: bold;
                     color: #333;
                 }
 
-                .map-refresh {
-                    font-size: 26rpx;
-                    color: #07C160;
+                .map-refresh-wrap {
+                    display: flex;
+                    flex-shrink: 0;
+                    align-items: center;
+                    justify-content: center;
                     padding: 8rpx 16rpx;
                     background: #f0f9f0;
                     border-radius: 8rpx;
+
+                    .map-refresh {
+                        font-size: 26rpx;
+                        line-height: 42rpx;
+                        color: #07C160;
+                        white-space: nowrap;
+                    }
                 }
             }
 
@@ -1407,6 +1438,7 @@ onLoad(() => {
                     }
 
                     .map-status-retry {
+                        flex-shrink: 0;
                         margin-left: 20rpx;
                         color: #8de39b;
                         font-size: 24rpx;
@@ -1431,16 +1463,26 @@ onLoad(() => {
                 border-bottom: 1rpx solid #f0f0f0;
 
                 .record-title {
+                    flex-shrink: 0;
                     font-size: 32rpx;
                     font-weight: bold;
                     color: #333;
                 }
-                .record-desc {
-                    font-size: 26rpx;
-                    color: #07C160;
+                .record-desc-wrap {
+                    display: flex;
+                    flex-shrink: 0;
+                    align-items: center;
+                    justify-content: center;
                     padding: 8rpx 16rpx;
                     background: #f0f9f0;
                     border-radius: 8rpx;
+
+                    .record-desc {
+                        font-size: 26rpx;
+                        line-height: 42rpx;
+                        color: #07C160;
+                        white-space: nowrap;
+                    }
                 }
             }
             .ring-container {

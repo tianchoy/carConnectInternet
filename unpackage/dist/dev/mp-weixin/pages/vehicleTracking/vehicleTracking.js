@@ -49,7 +49,8 @@ class AnimationQueueItem extends common_vendor.UTS.UTSType {
           rotation: { type: Number, optional: false },
           speed: { type: Number, optional: false },
           address: { type: String, optional: false },
-          connectionStatus: { type: String, optional: false }
+          connectionStatus: { type: String, optional: false },
+          positionTime: { type: String, optional: false }
         };
       },
       name: "AnimationQueueItem"
@@ -63,6 +64,7 @@ class AnimationQueueItem extends common_vendor.UTS.UTSType {
     this.speed = this.__props__.speed;
     this.address = this.__props__.address;
     this.connectionStatus = this.__props__.connectionStatus;
+    this.positionTime = this.__props__.positionTime;
     delete this.__props__;
   }
 }
@@ -97,8 +99,10 @@ class MpPolylineData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const ROUTE_POINT_MIN_DISTANCE = 1;
-const MARKER_UPDATE_INTERVAL = 100;
+const TRACKING_POLL_INTERVAL_MS = 1e3;
+const TRACKING_ANIMATION_DURATION_MS = 900;
+const MAX_POSITION_JUMP_DISTANCE = 500;
+const MARKER_UPDATE_INTERVAL = 30;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "vehicleTracking",
   setup(__props) {
@@ -112,7 +116,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       longitude: 116.40717
     }));
     const mapScale = common_vendor.ref(15);
-    const travelledPoints = common_vendor.ref([]);
+    const temporaryRenderPoints = common_vendor.ref([]);
     const polyline = common_vendor.ref([]);
     const isAnimating = common_vendor.ref(false);
     const animationTimer = common_vendor.ref(null);
@@ -138,6 +142,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     let trackingSessionId = 0;
     let isTrackRequestPending = false;
     let lastAcceptedPosition = null;
+    let lastAcceptedPositionTime = "";
+    let lastAcceptedReceivedTime = 0;
+    let pendingJumpPosition = null;
+    let pendingJumpTime = "";
     const currentSpeed = common_vendor.ref(0);
     const currentAddress = common_vendor.ref("获取中...");
     const currentTime = common_vendor.ref("1s");
@@ -193,7 +201,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 const speed = item.getNumber("speed", 0);
                 const positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知");
                 const status = item.getString("connectionStatus", "unknown");
-                const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencent(latitude, longitude);
+                const convertedCoord = utils_coordTransform.CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
                 currentPosition.latitude = convertedCoord.lat;
                 currentPosition.longitude = convertedCoord.lng;
                 hasValidPosition.value = true;
@@ -232,7 +240,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:238", "获取初始位置失败:", err);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:244", "获取初始位置失败:", err);
           utils_toast.showAppToast({
             title: "网络请求失败",
             icon: "none"
@@ -249,7 +257,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const marker = createVehicleMarker(iconPath);
       markers.value = [marker];
       markerInitialized.value = true;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:259", "初始化标记点完成");
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:265", "初始化标记点完成");
     }
     function calculateMapRotation(direction) {
       let rotation = direction;
@@ -268,7 +276,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((option) => {
       var _a, _b, _c, _d, _e;
-      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:280", "option", option);
+      common_vendor.index.__f__("log", "at pages/vehicleTracking/vehicleTracking.uvue:286", "option", option);
       connectionStatus.value = (_a = option.connectionStatus) !== null && _a !== void 0 ? _a : "";
       imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
       currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -283,22 +291,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
-    };
-    const calculateRealisticAnimationDuration = (distance, speedKmh) => {
-      if (speedKmh <= 0 || distance <= 0) {
-        return 2e3;
-      }
-      const speedMs = speedKmh / 3.6;
-      const realTimeSeconds = distance / speedMs;
-      let duration = realTimeSeconds * 1e3;
-      if (duration < 1e3)
-        duration = 1e3;
-      if (duration > 15e3)
-        duration = 15e3;
-      if (speedKmh < 10 && duration < 3e3) {
-        duration = 3e3;
-      }
-      return duration;
     };
     function calculateShortestRotation(from, to) {
       let diff = to - from;
@@ -325,24 +317,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function copyPosition(p) {
       return new CoordinatePoint({ latitude: p.latitude, longitude: p.longitude });
     }
+    function isSamePosition(first, second) {
+      return first.latitude == second.latitude && first.longitude == second.longitude;
+    }
+    function parsePositionTime(value) {
+      const time = Date.parse(value.replace(/-/g, "/"));
+      return isNaN(time) ? 0 : time;
+    }
     function updateTrackingPolyline() {
-      if (travelledPoints.value.length < 2) {
+      const renderPoints = temporaryRenderPoints.value.map((point) => {
+        return copyPosition(point);
+      });
+      if (isAnimating.value && renderPoints.length > 0 && !isSamePosition(renderPoints[renderPoints.length - 1], currentPosition))
+        renderPoints.push(copyPosition(currentPosition));
+      if (renderPoints.length < 2) {
         polyline.value = [];
         return null;
       }
-      polyline.value = [{ points: travelledPoints.value.map((p) => {
-        return copyPosition(p);
-      }), color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
+      polyline.value = [{ points: renderPoints, color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
     }
-    function appendTravelledPoint(p) {
-      const last = travelledPoints.value.length > 0 ? travelledPoints.value[travelledPoints.value.length - 1] : null;
-      if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE)
+    function appendTemporaryRenderPoint(position) {
+      const last = temporaryRenderPoints.value.length > 0 ? temporaryRenderPoints.value[temporaryRenderPoints.value.length - 1] : null;
+      if (last != null && isSamePosition(last, position))
         return null;
-      travelledPoints.value.push(copyPosition(p));
+      temporaryRenderPoints.value.push(copyPosition(position));
+      if (temporaryRenderPoints.value.length > 1e3)
+        temporaryRenderPoints.value.splice(0, temporaryRenderPoints.value.length - 1e3);
       updateTrackingPolyline();
     }
-    function clearTrackingRoute() {
-      travelledPoints.value = [];
+    function resetTemporaryRenderSegment(position) {
+      temporaryRenderPoints.value = [copyPosition(position)];
+      polyline.value = [];
+    }
+    function clearTemporaryRoute() {
+      temporaryRenderPoints.value = [];
       polyline.value = [];
     }
     const startPositionAnimation = (duration, sessionId, done) => {
@@ -363,6 +371,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         center.longitude = currentPosition.longitude;
         if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
           updateMarkerSmooth();
+          updateTrackingPolyline();
           lastDraw = now;
         }
         if (progress >= 1) {
@@ -373,7 +382,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           currentPosition.longitude = targetPosition.longitude;
           currentRotation.value = normalizeRotation(targetRotation.value);
           updateMarkerSmooth();
-          appendTravelledPoint(currentPosition);
+          appendTemporaryRenderPoint(currentPosition);
           done();
         }
       }, 30);
@@ -391,7 +400,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentSpeed.value = next.speed;
       currentAddress.value = next.address;
       connectionStatus.value = next.connectionStatus;
-      startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, () => {
+      startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => {
         if (!isTracking.value || sessionId != trackingSessionId)
           return null;
         isProcessingQueue.value = false;
@@ -400,6 +409,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             return processAnimationQueue(sessionId);
           }, 50);
       });
+    }
+    function acceptLivePosition(item, position, positionTime, sessionId) {
+      const direction = item.getNumber("direction", lastDirection.value);
+      const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: positionTime == "" ? "未知位置" : positionTime, connectionStatus: item.getString("connectionStatus", "unknown"), positionTime });
+      lastAcceptedPosition = copyPosition(position);
+      lastAcceptedPositionTime = positionTime;
+      lastAcceptedReceivedTime = Date.now();
+      if (isAnimating.value || animationQueue.value.length > 0)
+        animationQueue.value = [];
+      animationQueue.value.push(animationData);
+      lastDirection.value = direction;
+      if (!isProcessingQueue.value && !isAnimating.value)
+        processAnimationQueue(sessionId);
+    }
+    function relocateToConfirmedPosition(item, position, positionTime) {
+      if (animationTimer.value != null)
+        clearInterval(animationTimer.value);
+      animationTimer.value = null;
+      isAnimating.value = false;
+      isProcessingQueue.value = false;
+      animationQueue.value = [];
+      currentPosition.latitude = position.latitude;
+      currentPosition.longitude = position.longitude;
+      targetPosition.latitude = position.latitude;
+      targetPosition.longitude = position.longitude;
+      const direction = item.getNumber("direction", lastDirection.value);
+      currentRotation.value = normalizeRotation(calculateMapRotation(direction));
+      targetRotation.value = currentRotation.value;
+      center.latitude = position.latitude;
+      center.longitude = position.longitude;
+      currentSpeed.value = item.getNumber("speed", 0);
+      currentAddress.value = positionTime;
+      connectionStatus.value = item.getString("connectionStatus", "unknown");
+      lastDirection.value = direction;
+      lastAcceptedPosition = copyPosition(position);
+      lastAcceptedPositionTime = positionTime;
+      lastAcceptedReceivedTime = Date.now();
+      resetTemporaryRenderSegment(position);
+      updateMarkerSmooth();
     }
     const loadTrackData = (sessionId) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -415,26 +463,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           if (item == null)
             return Promise.resolve(null);
-          const rawLat = item.getNumber("latitude", 0);
-          const rawLng = item.getNumber("longitude", 0);
-          if (rawLat == 0 || rawLng == 0)
+          const rawLat = item.getNumber("latitude", 0), rawLng = item.getNumber("longitude", 0);
+          if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng))
             return Promise.resolve(null);
-          const converted = utils_coordTransform.CoordTransform.wgs84ToTencent(rawLat, rawLng);
+          const converted = utils_coordTransform.CoordTransform.wgs84ToTencentPrecise(rawLat, rawLng);
           if (!isFinite(converted.lat) || !isFinite(converted.lng))
             return Promise.resolve(null);
           const position = new CoordinatePoint({ latitude: converted.lat, longitude: converted.lng });
-          const previousPosition = lastAcceptedPosition;
-          if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE)
+          const positionTime = item.getString("positionUpdateTime", "");
+          const previous = lastAcceptedPosition;
+          if (positionTime != "" && positionTime == lastAcceptedPositionTime)
             return Promise.resolve(null);
-          const direction = item.getNumber("direction", lastDirection.value);
-          const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: item.getString("positionUpdateTime", "未知位置"), connectionStatus: item.getString("connectionStatus", "unknown") });
-          lastAcceptedPosition = copyPosition(position);
-          animationQueue.value.push(animationData);
-          lastDirection.value = direction;
-          if (!isProcessingQueue.value && !isAnimating.value)
-            processAnimationQueue(sessionId);
+          if (previous == null || isSamePosition(previous, position))
+            return Promise.resolve(null);
+          const sourceTime = parsePositionTime(positionTime);
+          const previousTime = parsePositionTime(lastAcceptedPositionTime);
+          const elapsedSeconds = sourceTime > previousTime && previousTime > 0 ? (sourceTime - previousTime) / 1e3 : Math.max((Date.now() - lastAcceptedReceivedTime) / 1e3, 1);
+          const distance = calculateDistance(previous.latitude, previous.longitude, position.latitude, position.longitude);
+          const impliedSpeed = distance / elapsedSeconds * 3.6;
+          if (distance > MAX_POSITION_JUMP_DISTANCE || impliedSpeed > 210) {
+            const pending = pendingJumpPosition;
+            if (pending != null && calculateDistance(pending.latitude, pending.longitude, position.latitude, position.longitude) <= MAX_POSITION_JUMP_DISTANCE && positionTime != pendingJumpTime) {
+              pendingJumpPosition = null;
+              pendingJumpTime = "";
+              relocateToConfirmedPosition(item, position, positionTime);
+            } else {
+              pendingJumpPosition = copyPosition(position);
+              pendingJumpTime = positionTime;
+            }
+            return Promise.resolve(null);
+          }
+          pendingJumpPosition = null;
+          pendingJumpTime = "";
+          acceptLivePosition(item, position, positionTime, sessionId);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:433", "获取跟踪位置失败:", error);
+          common_vendor.index.__f__("error", "at pages/vehicleTracking/vehicleTracking.uvue:483", "获取跟踪位置失败:", error);
         } finally {
           if (sessionId == trackingSessionId)
             isTrackRequestPending = false;
@@ -451,12 +514,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (animationTimer.value != null) {
         clearInterval(animationTimer.value);
         animationTimer.value = null;
-        appendTravelledPoint(currentPosition);
+      }
+      if (temporaryRenderPoints.value.length > 0) {
+        const lastIndex = temporaryRenderPoints.value.length - 1;
+        temporaryRenderPoints.value[lastIndex] = copyPosition(currentPosition);
+        updateTrackingPolyline();
       }
       animationQueue.value = [];
       isAnimating.value = false;
       isProcessingQueue.value = false;
       isTrackRequestPending = false;
+      pendingJumpPosition = null;
       if (showToast)
         utils_toast.showAppToast({ title: "停止跟踪", icon: "success", duration: 1500 });
     }
@@ -467,18 +535,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (!markerInitialized.value)
         initMarker();
-      clearTrackingRoute();
-      appendTravelledPoint(currentPosition);
+      clearTemporaryRoute();
+      resetTemporaryRenderSegment(currentPosition);
       animationQueue.value = [];
       isProcessingQueue.value = false;
       lastAcceptedPosition = copyPosition(currentPosition);
+      lastAcceptedPositionTime = "";
+      lastAcceptedReceivedTime = Date.now();
+      pendingJumpPosition = null;
       trackingSessionId += 1;
       const sessionId = trackingSessionId;
       isTracking.value = true;
       loadTrackData(sessionId);
       trackingInterval.value = setInterval(() => {
         loadTrackData(sessionId);
-      }, 3e3);
+      }, TRACKING_POLL_INTERVAL_MS);
       utils_toast.showAppToast({ title: "开始跟踪", icon: "success", duration: 1500 });
     }
     const toggleTracking = () => {
@@ -490,6 +561,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onHide(() => {
       stopTracking(false);
+    });
+    common_vendor.onUnload(() => {
+      stopTracking(false);
+      clearTemporaryRoute();
     });
     common_vendor.onUnmounted(() => {
       stopTracking(false);
@@ -505,12 +580,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false
         }),
         b: common_vendor.sei("myMap", "map"),
-        c: center.latitude,
-        d: center.longitude,
+        c: currentPosition.latitude,
+        d: currentPosition.longitude,
         e: markers.value,
         f: polyline.value,
         g: mapScale.value,
-        h: common_vendor.o(handleCurrentTimeUpdate, "08"),
+        h: common_vendor.o(handleCurrentTimeUpdate, "ad"),
         i: common_vendor.p({
           currentTime: currentTime.value,
           currentCar: currentCar.value,
@@ -519,7 +594,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           carStatus: connectionStatus.value,
           class: "sub-nav-overlay"
         }),
-        j: common_vendor.o(toggleTracking, "f7"),
+        j: common_vendor.o(toggleTracking, "42"),
         k: isTracking.value ? "#e64340" : "#1296db",
         l: common_vendor.p({
           type: isTracking.value ? "danger" : "primary",

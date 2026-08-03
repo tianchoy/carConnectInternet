@@ -18,7 +18,7 @@ import { showAppToast } from '../../utils/toast.uts'
 	import LocationObject from 'uts.sdk.modules.DCloudUniMapTencent.LocationObject'
 
 
-	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 67, 7>;
+	type TrackPoint = { __$originalPosition?: UTSSourceMapPosition<"TrackPoint", "pages/playBack/playBack.uvue", 74, 7>;
 		latitude : number;
 		longitude : number;
 		rotation : number;
@@ -26,19 +26,19 @@ import { showAppToast } from '../../utils/toast.uts'
 		speed : number;
 	}
 
-	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 75, 7>;
+	type TrackBounds = { __$originalPosition?: UTSSourceMapPosition<"TrackBounds", "pages/playBack/playBack.uvue", 82, 7>;
 		minLat : number;
 		maxLat : number;
 		minLng : number;
 		maxLng : number;
 	}
 
-	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 82, 7>;
+	type MapPolylinePoint = { __$originalPosition?: UTSSourceMapPosition<"MapPolylinePoint", "pages/playBack/playBack.uvue", 89, 7>;
 		latitude: number
 		longitude: number
 	}
 
-	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 87, 7>;
+	type MpPolylineData = { __$originalPosition?: UTSSourceMapPosition<"MpPolylineData", "pages/playBack/playBack.uvue", 94, 7>;
 		points: Array<MapPolylinePoint>
 		color: string
 		width: number
@@ -140,11 +140,11 @@ const center = reactive({
 	function resolveRouteDateTime(dateStr : string) : string | null {
 		if (dateStr == '') return null
 		try {
-			const decoded = UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:181") ?? ''
+			const decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:188") ?? '').replace(/\+/g, ' ').replace('T', ' ')
 			const milliseconds = parseLocalDateTime(decoded)
 			return milliseconds == null ? null : formatPlaybackTime(milliseconds)
 		} catch (error) {
-			console.error('解析回放时间失败:', error, " at pages/playBack/playBack.uvue:185")
+			console.error('解析回放时间失败:', error, " at pages/playBack/playBack.uvue:192")
 			return null
 		}
 	}
@@ -581,7 +581,7 @@ const center = reactive({
 		const requestId = ++replaySessionId
 		clearTrackDisplay()
 		uni.showLoading({ title: '加载中...' })
-		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 622, 9),
+		const data = {__$originalPosition: new UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 629, 9),
 			imei: imei.value,
 			startTime: startTime.value.replace(/\//g, '-'),
 			endTime: endTime.value.replace(/\//g, '-'),
@@ -606,7 +606,7 @@ const center = reactive({
 			}
 		} catch (error) {
 			if (requestId != replaySessionId) return
-			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:647")
+			console.error('加载轨迹失败:', error, " at pages/playBack/playBack.uvue:654")
 			showAppToast({ title: '轨迹加载失败', icon: 'none' })
 			if (!isNaN(parseFloat(lat.value ?? '')) && !isNaN(parseFloat(lng.value ?? ''))) {
 				showCurrentPosition()
@@ -702,18 +702,28 @@ const center = reactive({
 
 	// 重置回放
 
-	// 设置回放速度
-	function setPlaybackSpeed(e : number) : void {
-		const wasPlaying = isPlaying.value
-		if (wasPlaying) {
-			pausePlayback()
-		}
+	function applyPlaybackSpeed(value : number) : void {
+		if (!isFinite(value)) return
+		playbackSpeed.value = Math.min(50, Math.max(5, value))
+		if (!isPlaying.value) return
 
-		playbackSpeed.value = e
-
-		if (wasPlaying) {
-			startPlayback()
+		const timer = playbackTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			playbackTimer = null
 		}
+		lastTimestamp = Date.now()
+		const sessionId = replaySessionId
+		playbackTimer = setTimeout(() => { playbackStep(sessionId) }, 16)
+	}
+
+	// i-slider 对外发送数值，原生 slider 发送事件对象
+	function setPlaybackSpeedFromValue(value : number) : void {
+		applyPlaybackSpeed(value)
+	}
+
+	function setPlaybackSpeed(event : UniSliderChangeEvent) : void {
+		applyPlaybackSpeed(event.detail.value)
 	}
 
 	onLoad((option) => {
@@ -725,7 +735,7 @@ const center = reactive({
 		lng.value = option.lng ?? null
 		sTime.value = option.startTime ?? ''
 		eTime.value = option.endTime ?? ''
-		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:766")
+		console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:783")
 		const routeStartTime = resolveRouteDateTime(sTime.value)
 		const routeEndTime = resolveRouteDateTime(eTime.value)
 		if (routeStartTime != null && routeEndTime != null) {
@@ -827,10 +837,10 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_i_slider, _uM({
               modelValue: playbackSpeed.value,
               "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
-              min: 1,
+              min: 5,
               max: 50,
               step: 5,
-              onChange: setPlaybackSpeed
+              onChange: setPlaybackSpeedFromValue
             }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
           ]),
           _cE("text", _uM({ class: "speed-label" }), _tD(playbackSpeed.value) + "x", 1 /* TEXT */)

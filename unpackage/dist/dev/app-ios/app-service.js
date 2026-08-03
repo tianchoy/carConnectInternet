@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.1.252";
     const port = "8090";
-    const id = "app-ios_123ohi";
+    const id = "app-ios_0jCwpo";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -1771,57 +1771,6 @@
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
   };
-  const { registerUTSInterface, initUTSProxyClass, initUTSElementProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
-  const name = "externalMapNavigation";
-  const moduleName = "外部地图导航";
-  const moduleType = "";
-  const errMsg = "";
-  const is_uni_modules = true;
-  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
-  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
-  const openExternalMap = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "openExternalMapByJs", keepAlive: false, params: [{ "name": "params", "type": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject" }], return: "" });
-  class ExternalMapNavigationParams extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false },
-            name: { type: String, optional: false }
-          };
-        },
-        name: "ExternalMapNavigationParams"
-      };
-    }
-    constructor(options, metadata = ExternalMapNavigationParams.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      this.name = this.__props__.name;
-      delete this.__props__;
-    }
-  }
-  class ExternalMapNavigationResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: String, optional: false }
-          };
-        },
-        name: "ExternalMapNavigationResult"
-      };
-    }
-    constructor(options, metadata = ExternalMapNavigationResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      delete this.__props__;
-    }
-  }
   class OpenLocationParams extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -1845,40 +1794,47 @@
       delete this.__props__;
     }
   }
-  function openLocation(params) {
-    const result = openExternalMap(new ExternalMapNavigationParams({
-      latitude: params.latitude,
-      longitude: params.longitude,
-      name: params.name
-    }));
-    if (result.code == "opened") {
-      return null;
-    }
-    if (result.code == "invalid_coordinate") {
-      showAppToast({
-        title: "暂无有效车辆位置",
-        icon: "none"
-      });
-      return null;
-    }
-    if (result.code == "unsupported_platform") {
-      showAppToast({
-        title: "当前平台暂不支持地图导航",
-        icon: "none"
-      });
-      return null;
-    }
-    if (result.code == "no_map_app") {
-      showAppToast({
-        title: "未检测到可用地图应用",
-        icon: "none"
-      });
-      return null;
-    }
+  function isValidCoordinate(latitude, longitude) {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
+  }
+  function showInvalidLocationToast() {
     showAppToast({
-      title: "无法打开地图，请稍后重试",
+      title: "暂无有效车辆位置",
       icon: "none"
     });
+  }
+  function openBuiltInLocation(params) {
+    try {
+      uni.openLocation({
+        latitude: params.latitude,
+        longitude: params.longitude,
+        name: params.name != "" ? params.name : "当前位置",
+        scale: 18,
+        success: () => {
+          uni.__log__("log", "at utils/openLocation.uts:67", "成功打开位置地图");
+        },
+        fail: (error) => {
+          uni.__log__("error", "at utils/openLocation.uts:70", "打开位置地图失败:", error);
+          showAppToast({
+            title: "打开位置地图失败，请稍后重试",
+            icon: "none"
+          });
+        }
+      });
+    } catch (error) {
+      uni.__log__("error", "at utils/openLocation.uts:78", "打开位置地图异常:", error);
+      showAppToast({
+        title: "打开位置地图失败，请稍后重试",
+        icon: "none"
+      });
+    }
+  }
+  function openLocation(params) {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+      showInvalidLocationToast();
+      return null;
+    }
+    openBuiltInLocation(params);
   }
   class AppModalSuccess {
     constructor() {
@@ -2873,6 +2829,23 @@
       });
     }
     /**
+     * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
+     */
+    static wgs84ToTencentPrecise(wgLat, wgLon) {
+      if (!this.isInChina(wgLon, wgLat)) {
+        return new Coordinate({ lat: wgLat, lng: wgLon });
+      }
+      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
+      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
+      let radLat = wgLat / 180 * this.pi;
+      let magic = Math.sin(radLat);
+      magic = 1 - this.ee * magic * magic;
+      let sqrtMagic = Math.sqrt(magic);
+      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
+      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+      return new Coordinate({ lat: wgLat + dLat, lng: wgLon + dLng });
+    }
+    /**
      * 腾讯地图坐标系转WGS84（使用高精度算法）
      * @param tcLat 腾讯地图纬度
      * @param tcLon 腾讯地图经度
@@ -2920,7 +2893,7 @@
         const lat = parseFloat(latitude.toString());
         const lng = parseFloat(longitude.toString());
         if (isNaN(lat) || isNaN(lng)) {
-          uni.__log__("warn", "at utils/coordTransform.uts:108", "设备经纬度无效", device);
+          uni.__log__("warn", "at utils/coordTransform.uts:126", "设备经纬度无效", device);
           return device;
         }
         let converted = new Coordinate({ lat, lng });
@@ -2950,7 +2923,7 @@
       } else if (fromSystem === "tencent" && toSystem === "wgs84") {
         return this.tencentToWgs84(lat, lng);
       } else {
-        uni.__log__("warn", "at utils/coordTransform.uts:143", "不支持的坐标系转换", fromSystem, "->", toSystem);
+        uni.__log__("warn", "at utils/coordTransform.uts:161", "不支持的坐标系转换", fromSystem, "->", toSystem);
         return new Coordinate({ lat, lng });
       }
     }
@@ -3602,8 +3575,8 @@
             devicePosInfo.value = position;
             const lat = position.getNumber("latitude", 0);
             const lng = position.getNumber("longitude", 0);
-            const isValidCoordinate = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
-            if (!isValidCoordinate) {
+            const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
+            if (!isValidCoordinate2) {
               uni.__log__("error", "at pages/index/index.uvue:684", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
@@ -6436,10 +6409,10 @@
       }
       return text + "px";
     }
-    function normalizeIdName(name2) {
+    function normalizeIdName(name) {
       let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
+      for (let i = 0; i < name.length; i++) {
+        const char = name.charAt(i);
         const isNumber2 = char >= "0" && char <= "9";
         const isUpper = char >= "A" && char <= "Z";
         const isLower = char >= "a" && char <= "z";
@@ -7445,12 +7418,12 @@
       const configuredValue = item["value"];
       if (configuredValue != null)
         return configuredValue;
-      const name2 = item.getString("name", "");
-      if (name2.length == 0)
+      const name = item.getString("name", "");
+      if (name.length == 0)
         return "";
       const values = props.modelValue;
       if (values != null) {
-        const modelValue = values[name2];
+        const modelValue = values[name];
         if (modelValue != null)
           return modelValue;
       }
@@ -7470,8 +7443,8 @@
       return fieldLabel(item) + "不能为空";
     }
     function checkField(item, selectedKeys) {
-      const name2 = item.getString("name", "");
-      if (selectedKeys.length > 0 && selectedKeys.indexOf(name2) < 0)
+      const name = item.getString("name", "");
+      if (selectedKeys.length > 0 && selectedKeys.indexOf(name) < 0)
         return "";
       const value = fieldValue(item);
       if (fieldRequired(item) && valueText(value).length == 0) {
@@ -7484,9 +7457,9 @@
       const list = activeFields();
       for (let i = 0; i < list.length; i++) {
         const item = list[i];
-        const name2 = item.getString("name", "");
-        if (name2.length > 0)
-          values[name2] = fieldValue(item);
+        const name = item.getString("name", "");
+        if (name.length > 0)
+          values[name] = fieldValue(item);
       }
       return values;
     }
@@ -7495,10 +7468,10 @@
         return value;
       return Number.from(parseFloat(value));
     }
-    function normalizeIdName(name2) {
+    function normalizeIdName(name) {
       let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
+      for (let i = 0; i < name.length; i++) {
+        const char = name.charAt(i);
         const isNumber2 = char >= "0" && char <= "9";
         const isUpper = char >= "A" && char <= "Z";
         const isLower = char >= "a" && char <= "z";
@@ -7510,8 +7483,8 @@
       }
       return result;
     }
-    function scrollTargetId(name2) {
-      return props.scrollIdPrefix + normalizeIdName(name2);
+    function scrollTargetId(name) {
+      return props.scrollIdPrefix + normalizeIdName(name);
     }
     function scrollToFirstError(nextErrors) {
       if (!props.errorAutoPage || nextErrors.length == 0)
@@ -9171,8 +9144,8 @@
         }));
       }
       const handleGridClick = (event = null) => {
-        const name2 = event;
-        const itemTo = name2.text;
+        const name = event;
+        const itemTo = name.text;
         if (itemTo == "轨迹回放") {
           stopAutoRefresh();
           uni.navigateTo({
@@ -10311,10 +10284,10 @@
       const handlePopupClick = () => {
         uni.__log__("log", "at components/car-icons/car-icons.uvue:100", "Popup clicked");
       };
-      const getIconByName = (name2) => {
+      const getIconByName = (name) => {
         for (let index = 0; index < iconList.length; index++) {
           const item = iconList[index];
-          if (item.getString("name", "") == name2)
+          if (item.getString("name", "") == name)
             return item;
         }
         return null;
@@ -10519,10 +10492,10 @@
         carIconSelectorVisible.value = visible;
       };
       const selectIcon = (item) => {
-        const name2 = item.getString("name", "");
+        const name = item.getString("name", "");
         const text = item.getString("text", "");
-        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name2);
-        carInfo.value.deviceType = name2;
+        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name);
+        carInfo.value.deviceType = name;
         carInfo.value.deviceTypeValue = text;
         carIconSelectorVisible.value = false;
       };
@@ -14360,11 +14333,11 @@
     get locale() {
       return localeState.lang;
     }
-    set(name2, locale2) {
-      localeState.locales.set(name2, locale2);
+    set(name, locale2) {
+      localeState.locales.set(name, locale2);
     }
-    has(name2) {
-      return localeState.locales.has(name2);
+    has(name) {
+      return localeState.locales.has(name);
     }
   }
   const dayutsIntl = new DayutsIntl();
@@ -15351,7 +15324,7 @@
     const display = vue.ref(false);
     const inited = vue.ref(false);
     const classes = vue.ref("");
-    const name2 = vue.ref((_a = options.defaultName) !== null && _a !== void 0 ? _a : "fade");
+    const name = vue.ref((_a = options.defaultName) !== null && _a !== void 0 ? _a : "fade");
     const enterClass = (_b = options.enterClass) !== null && _b !== void 0 ? _b : "";
     const enterActiveClass = (_c = options.enterActiveClass) !== null && _c !== void 0 ? _c : "";
     const enterToClass = (_d = options.enterToClass) !== null && _d !== void 0 ? _d : "";
@@ -15399,12 +15372,12 @@
         });
       });
     };
-    const getClassNames = (name3) => {
+    const getClassNames = (name2) => {
       return /* @__PURE__ */ new Map([
-        ["enter", "l-".concat(name3, "-enter l-").concat(name3, "-enter-active ").concat(enterClass, " ").concat(enterActiveClass)],
-        ["enter-to", "l-".concat(name3, "-enter-to l-").concat(name3, "-enter-active ").concat(enterToClass, " ").concat(enterActiveClass)],
-        ["leave", "l-".concat(name3, "-leave l-").concat(name3, "-leave-active ").concat(leaveClass, " ").concat(leaveActiveClass)],
-        ["leave-to", "l-".concat(name3, "-leave-to l-").concat(name3, "-leave-active ").concat(leaveToClass, " ").concat(leaveActiveClass)]
+        ["enter", "l-".concat(name2, "-enter l-").concat(name2, "-enter-active ").concat(enterClass, " ").concat(enterActiveClass)],
+        ["enter-to", "l-".concat(name2, "-enter-to l-").concat(name2, "-enter-active ").concat(enterToClass, " ").concat(enterActiveClass)],
+        ["leave", "l-".concat(name2, "-leave l-").concat(name2, "-leave-active ").concat(leaveClass, " ").concat(leaveActiveClass)],
+        ["leave-to", "l-".concat(name2, "-leave-to l-").concat(name2, "-leave-active ").concat(leaveToClass, " ").concat(leaveActiveClass)]
       ]);
     };
     const transitionQueue = vue.ref([]);
@@ -15429,7 +15402,7 @@
           yield sleep();
           if (status != currentStatus)
             continue;
-          const classNames = getClassNames(name2.value);
+          const classNames = getClassNames(name.value);
           inited.value = true;
           display.value = true;
           classes.value = classNames.get(eventName);
@@ -15485,7 +15458,7 @@
     vue.watchEffect(() => {
       if (options.name == null)
         return;
-      name2.value = options.name();
+      name.value = options.name();
     });
     const toggle = (v) => {
       state.value = v;
@@ -15500,7 +15473,7 @@
       inited,
       display,
       classes,
-      name: name2,
+      name,
       finished,
       toggle
     };
@@ -15527,8 +15500,8 @@
       const _b = useTransition({
         defaultName: "fade",
         appear: props.visible,
-        emits: (name2) => {
-          emit(name2);
+        emits: (name) => {
+          emit(name);
         },
         visible: () => {
           return props.visible;
@@ -15661,18 +15634,18 @@
       const _c = useTransition({
         defaultName: (_b = props.transitionName) !== null && _b !== void 0 ? _b : "popup-fade",
         appear: innerValue.value,
-        emits: (name2) => {
-          status.value = name2;
-          if (name2 == "before-enter") {
+        emits: (name) => {
+          status.value = name;
+          if (name == "before-enter") {
             emit("open");
-          } else if (name2 == "after-enter") {
+          } else if (name == "after-enter") {
             emit("opened");
-          } else if (name2 == "before-leave") {
+          } else if (name == "before-leave") {
             emit("close");
-          } else if (name2 == "after-leave") {
+          } else if (name == "after-leave") {
             emit("closed");
           }
-          emit(name2);
+          emit(name);
         },
         visible: () => {
           return innerValue.value;
@@ -15856,7 +15829,7 @@
       delete this.__props__;
     }
   }
-  class MpPolylineData extends UTS.UTSType {
+  let MpPolylineData$1 = class MpPolylineData2 extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
         kind: 2,
@@ -15874,7 +15847,7 @@
         name: "MpPolylineData"
       };
     }
-    constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
+    constructor(options, metadata = MpPolylineData2.get$UTSMetadata$(), isJSONParse = false) {
       super();
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.points = this.__props__.points;
@@ -15886,7 +15859,7 @@
       this.borderWidth = this.__props__.borderWidth;
       delete this.__props__;
     }
-  }
+  };
   const _sfc_main$k = /* @__PURE__ */ vue.defineComponent({
     __name: "playBack",
     setup(__props, _a) {
@@ -16101,7 +16074,7 @@
         const lines = [];
         const unplayedPoints = trackPoints.value.slice(currentIndex.value);
         if (unplayedPoints.length >= 2) {
-          lines.push(new MpPolylineData({
+          lines.push(new MpPolylineData$1({
             points: toMpPoints(unplayedPoints),
             color: "#999999",
             width: 3,
@@ -16112,7 +16085,7 @@
           }));
         }
         if (currentIndex.value > 0) {
-          lines.push(new MpPolylineData({
+          lines.push(new MpPolylineData$1({
             points: toMpPoints(trackPoints.value.slice(0, currentIndex.value + 1)),
             color: "#1890FF",
             width: 6,
@@ -16636,10 +16609,10 @@
         closeable.value = (_h = param.getBoolean("closeable")) !== null && _h !== void 0 ? _h : true;
         rowCol.value = param.getArray("rowCol");
         const list = param.getArray("list");
-        const isImage = (name2 = null) => {
-          if (name2 == null)
+        const isImage = (name = null) => {
+          if (name == null)
             return false;
-          return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name2) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name2);
+          return /\.(jpe?g|png|gif|bmp|webp|tiff?)$/i.test(name) || /^data:image\/(jpeg|png|gif|bmp|webp|tiff);base64,/.test(name);
         };
         actionItems.value = (_j = list === null || list === void 0 ? null : list.map((it, index) => {
           var _a3, _b2, _c2;
@@ -16943,7 +16916,8 @@
             rotation: { type: Number, optional: false },
             speed: { type: Number, optional: false },
             address: { type: String, optional: false },
-            connectionStatus: { type: String, optional: false }
+            connectionStatus: { type: String, optional: false },
+            positionTime: { type: String, optional: false }
           };
         },
         name: "AnimationQueueItem"
@@ -16957,10 +16931,45 @@
       this.speed = this.__props__.speed;
       this.address = this.__props__.address;
       this.connectionStatus = this.__props__.connectionStatus;
+      this.positionTime = this.__props__.positionTime;
       delete this.__props__;
     }
   }
-  const MARKER_UPDATE_INTERVAL = 100;
+  class MpPolylineData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            points: { type: "Unknown", optional: false },
+            color: { type: String, optional: false },
+            width: { type: Number, optional: false },
+            dottedLine: { type: Boolean, optional: false },
+            arrowLine: { type: Boolean, optional: false },
+            borderColor: { type: String, optional: false },
+            borderWidth: { type: Number, optional: false }
+          };
+        },
+        name: "MpPolylineData"
+      };
+    }
+    constructor(options, metadata = MpPolylineData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.points = this.__props__.points;
+      this.color = this.__props__.color;
+      this.width = this.__props__.width;
+      this.dottedLine = this.__props__.dottedLine;
+      this.arrowLine = this.__props__.arrowLine;
+      this.borderColor = this.__props__.borderColor;
+      this.borderWidth = this.__props__.borderWidth;
+      delete this.__props__;
+    }
+  }
+  const TRACKING_POLL_INTERVAL_MS = 1e3;
+  const TRACKING_ANIMATION_DURATION_MS = 900;
+  const MAX_POSITION_JUMP_DISTANCE = 500;
+  const MARKER_UPDATE_INTERVAL = 30;
   const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
     __name: "vehicleTracking",
     setup(__props, _a) {
@@ -16976,6 +16985,8 @@
         longitude: 116.40717
       }));
       const mapScale = vue.ref(15);
+      const temporaryRenderPoints = vue.ref([]);
+      const polyline = vue.ref([]);
       const isAnimating = vue.ref(false);
       const animationTimer = vue.ref(null);
       const currentPosition = vue.reactive(new CoordinatePoint({
@@ -16997,6 +17008,14 @@
       const isTracking = vue.ref(false);
       const trackingInterval = vue.ref(null);
       const lastDirection = vue.ref(0);
+      const hasValidPosition = vue.ref(false);
+      let trackingSessionId = 0;
+      let isTrackRequestPending = false;
+      let lastAcceptedPosition = null;
+      let lastAcceptedPositionTime = "";
+      let lastAcceptedReceivedTime = 0;
+      let pendingJumpPosition = null;
+      let pendingJumpTime = "";
       const currentSpeed = vue.ref(0);
       const currentAddress = vue.ref("获取中...");
       const currentTime = vue.ref("1s");
@@ -17052,9 +17071,10 @@
                   const speed = item.getNumber("speed", 0);
                   const positionUpdateTime = item.getString("positionUpdateTime", "定位时间未知");
                   const status = item.getString("connectionStatus", "unknown");
-                  const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
+                  const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude);
                   currentPosition.latitude = convertedCoord.lat;
                   currentPosition.longitude = convertedCoord.lng;
+                  hasValidPosition.value = true;
                   targetPosition.latitude = convertedCoord.lat;
                   targetPosition.longitude = convertedCoord.lng;
                   center.latitude = convertedCoord.lat;
@@ -17090,7 +17110,7 @@
               });
             }
           } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:210", "获取初始位置失败:", err);
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:244", "获取初始位置失败:", err);
             showAppToast({
               title: "网络请求失败",
               icon: "none"
@@ -17107,7 +17127,7 @@
         const marker = createVehicleMarker(iconPath);
         markers.value = [marker];
         markerInitialized.value = true;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:231", "初始化标记点完成");
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:265", "初始化标记点完成");
       }
       function calculateMapRotation(direction) {
         let rotation = direction;
@@ -17126,7 +17146,7 @@
       }
       vue.onLoad((option) => {
         var _a2, _b, _c, _d, _e;
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:252", "option", option);
+        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:286", "option", option);
         connectionStatus.value = (_a2 = option.connectionStatus) !== null && _a2 !== void 0 ? _a2 : "";
         imei.value = (_b = option.imei) !== null && _b !== void 0 ? _b : "";
         currentCar.value = (_c = option.plateNo) !== null && _c !== void 0 ? _c : "未知车辆";
@@ -17151,10 +17171,10 @@
         let duration = realTimeSeconds * 1e3;
         if (duration < 1e3)
           duration = 1e3;
-        if (duration > 15e3)
-          duration = 15e3;
-        if (speedKmh < 10 && duration < 3e3) {
-          duration = 3e3;
+        if (duration > 2800)
+          duration = 2800;
+        if (speedKmh < 10 && duration < 2e3) {
+          duration = 2e3;
         }
         return duration;
       };
@@ -17180,33 +17200,65 @@
           lastIconPath = newIconPath;
         }
       };
-      const startPositionAnimation = (duration, onComplete) => {
-        if (isAnimating.value && animationTimer.value != null) {
-          clearInterval(animationTimer.value);
+      function copyPosition(p) {
+        return new CoordinatePoint({ latitude: p.latitude, longitude: p.longitude });
+      }
+      function isSamePosition(first, second) {
+        return first.latitude == second.latitude && first.longitude == second.longitude;
+      }
+      function parsePositionTime(value) {
+        const time = Date.parse(value.replace(/-/g, "/"));
+        return isNaN(time) ? 0 : time;
+      }
+      function updateTrackingPolyline() {
+        const renderPoints = temporaryRenderPoints.value.map((point) => {
+          return copyPosition(point);
+        });
+        if (isAnimating.value && renderPoints.length > 0 && !isSamePosition(renderPoints[renderPoints.length - 1], currentPosition))
+          renderPoints.push(copyPosition(currentPosition));
+        if (renderPoints.length < 2) {
+          polyline.value = [];
+          return null;
         }
+        polyline.value = [{ points: renderPoints, color: "#888787", width: 3, dottedLine: false, arrowLine: false, borderColor: "#888787", borderWidth: 0 }];
+      }
+      function appendTemporaryRenderPoint(position) {
+        const last = temporaryRenderPoints.value.length > 0 ? temporaryRenderPoints.value[temporaryRenderPoints.value.length - 1] : null;
+        if (last != null && isSamePosition(last, position))
+          return null;
+        temporaryRenderPoints.value.push(copyPosition(position));
+        if (temporaryRenderPoints.value.length > 300)
+          temporaryRenderPoints.value.splice(0, temporaryRenderPoints.value.length - 300);
+        updateTrackingPolyline();
+      }
+      function resetTemporaryRenderSegment(position) {
+        temporaryRenderPoints.value = [copyPosition(position)];
+        polyline.value = [];
+      }
+      function clearTemporaryRoute() {
+        temporaryRenderPoints.value = [];
+        polyline.value = [];
+      }
+      const startPositionAnimation = (duration, sessionId, done) => {
+        if (animationTimer.value != null)
+          clearInterval(animationTimer.value);
         isAnimating.value = true;
-        const startTime = Date.now();
-        const startLat = currentPosition.latitude;
-        const startLng = currentPosition.longitude;
-        const startRot = currentRotation.value;
-        const latDiff = targetPosition.latitude - startLat;
-        const lngDiff = targetPosition.longitude - startLng;
-        const rotDiff = calculateShortestRotation(startRot, targetRotation.value);
-        const interval = 30;
-        let lastMarkerUpdate = startTime;
+        const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value;
+        const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value);
+        let lastDraw = begin;
         animationTimer.value = setInterval(() => {
-          const now = Date.now();
-          const elapsed = now - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const linearProgress = progress;
-          currentPosition.latitude = startLat + latDiff * linearProgress;
-          currentPosition.longitude = startLng + lngDiff * linearProgress;
-          currentRotation.value = normalizeRotation(startRot + rotDiff * linearProgress);
+          if (!isTracking.value || sessionId != trackingSessionId)
+            return null;
+          const now = Date.now(), progress = Math.min((now - begin) / duration, 1);
+          currentPosition.latitude = lat + latDiff * progress;
+          currentPosition.longitude = lng + lngDiff * progress;
+          currentRotation.value = normalizeRotation(rot + rotDiff * progress);
           center.latitude = currentPosition.latitude;
           center.longitude = currentPosition.longitude;
-          if (now - lastMarkerUpdate >= MARKER_UPDATE_INTERVAL || progress >= 1) {
+          if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
             updateMarkerSmooth();
-            lastMarkerUpdate = now;
+            updateTrackingPolyline();
+            lastDraw = now;
           }
           if (progress >= 1) {
             clearInterval(animationTimer.value);
@@ -17216,124 +17268,170 @@
             currentPosition.longitude = targetPosition.longitude;
             currentRotation.value = normalizeRotation(targetRotation.value);
             updateMarkerSmooth();
-            onComplete();
+            appendTemporaryRenderPoint(currentPosition);
+            done();
           }
-        }, interval);
+        }, 30);
       };
-      function processAnimationQueue() {
-        if (animationQueue.value.length == 0) {
+      function processAnimationQueue(sessionId) {
+        if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) {
           isProcessingQueue.value = false;
           return null;
         }
         isProcessingQueue.value = true;
-        const nextAnimation = animationQueue.value[0];
-        animationQueue.value.splice(0, 1);
-        targetPosition.latitude = nextAnimation.position.latitude;
-        targetPosition.longitude = nextAnimation.position.longitude;
-        targetRotation.value = nextAnimation.rotation;
-        currentSpeed.value = nextAnimation.speed;
-        currentAddress.value = nextAnimation.address;
-        connectionStatus.value = nextAnimation.connectionStatus;
-        const distance = calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude);
-        const animationDuration = calculateRealisticAnimationDuration(distance, currentSpeed.value);
-        startPositionAnimation(animationDuration, () => {
+        const next = UTS.arrayShift(animationQueue.value);
+        targetPosition.latitude = next.position.latitude;
+        targetPosition.longitude = next.position.longitude;
+        targetRotation.value = next.rotation;
+        currentSpeed.value = next.speed;
+        currentAddress.value = next.address;
+        connectionStatus.value = next.connectionStatus;
+        startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => {
+          if (!isTracking.value || sessionId != trackingSessionId)
+            return null;
           isProcessingQueue.value = false;
-          if (animationQueue.value.length > 0) {
+          if (animationQueue.value.length > 0)
             setTimeout(() => {
-              processAnimationQueue();
+              return processAnimationQueue(sessionId);
             }, 50);
-          }
         });
       }
-      const addToAnimationQueue = (animationData) => {
-        if (animationQueue.value.length > 2) {
-          animationQueue.value = animationQueue.value.slice(-1);
-        }
+      function acceptLivePosition(item, position, positionTime, sessionId) {
+        const direction = item.getNumber("direction", lastDirection.value);
+        const animationData = new AnimationQueueItem({ position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber("speed", 0), address: positionTime == "" ? "未知位置" : positionTime, connectionStatus: item.getString("connectionStatus", "unknown"), positionTime });
+        lastAcceptedPosition = copyPosition(position);
+        lastAcceptedPositionTime = positionTime;
+        lastAcceptedReceivedTime = Date.now();
+        if (isAnimating.value || animationQueue.value.length > 0)
+          animationQueue.value = [];
         animationQueue.value.push(animationData);
-        if (!isProcessingQueue.value && !isAnimating.value) {
-          processAnimationQueue();
-        }
-      };
-      const loadTrackData = () => {
+        lastDirection.value = direction;
+        if (!isProcessingQueue.value && !isAnimating.value)
+          processAnimationQueue(sessionId);
+      }
+      function relocateToConfirmedPosition(item, position, positionTime) {
+        if (animationTimer.value != null)
+          clearInterval(animationTimer.value);
+        animationTimer.value = null;
+        isAnimating.value = false;
+        isProcessingQueue.value = false;
+        animationQueue.value = [];
+        currentPosition.latitude = position.latitude;
+        currentPosition.longitude = position.longitude;
+        targetPosition.latitude = position.latitude;
+        targetPosition.longitude = position.longitude;
+        const direction = item.getNumber("direction", lastDirection.value);
+        currentRotation.value = normalizeRotation(calculateMapRotation(direction));
+        targetRotation.value = currentRotation.value;
+        center.latitude = position.latitude;
+        center.longitude = position.longitude;
+        currentSpeed.value = item.getNumber("speed", 0);
+        currentAddress.value = positionTime;
+        connectionStatus.value = item.getString("connectionStatus", "unknown");
+        lastDirection.value = direction;
+        lastAcceptedPosition = copyPosition(position);
+        lastAcceptedPositionTime = positionTime;
+        lastAcceptedReceivedTime = Date.now();
+        resetTemporaryRenderSegment(position);
+        updateMarkerSmooth();
+      }
+      const loadTrackData = (sessionId) => {
         return __awaiter(this, void 0, void 0, function* () {
+          if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending)
+            return Promise.resolve(null);
+          isTrackRequestPending = true;
           try {
-            const data = new UTSJSONObject({
-              deptId: deptId.value,
-              deviceids: imei.value
+            const res = yield getDevicePos(new UTSJSONObject({ deptId: deptId.value, deviceids: imei.value }));
+            if (!isTracking.value || sessionId != trackingSessionId || (res === null || res === void 0 ? null : res.code) != 0 || !res.data)
+              return Promise.resolve(null);
+            const item = UTS.arrayFind(res.data, (value) => {
+              return value.getString("imei", "") == imei.value;
             });
-            const res = yield getDevicePos(data);
-            uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:448", "222222");
-            if ((res === null || res === void 0 ? null : res.code) == 0 && res.data && res.data.length > 0) {
-              const deviceData = UTS.arrayFind(res.data, (item) => {
-                return item.getString("imei", "") == imei.value;
-              });
-              if (deviceData != null) {
-                const latitude = deviceData.getNumber("latitude", 0);
-                const longitude = deviceData.getNumber("longitude", 0);
-                const speed = deviceData.getNumber("speed", 0);
-                const address = deviceData.getString("positionUpdateTime", "未知位置");
-                const status = deviceData.getString("connectionStatus", "unknown");
-                const direction = deviceData.getNumber("direction", lastDirection.value);
-                const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
-                const newDirection = direction;
-                const animationData = new AnimationQueueItem({
-                  position: new CoordinatePoint({
-                    latitude: convertedCoord.lat,
-                    longitude: convertedCoord.lng
-                  }),
-                  rotation: normalizeRotation(calculateMapRotation(newDirection)),
-                  speed,
-                  address,
-                  connectionStatus: status
-                });
-                addToAnimationQueue(animationData);
-                lastDirection.value = newDirection;
+            if (item == null)
+              return Promise.resolve(null);
+            const rawLat = item.getNumber("latitude", 0), rawLng = item.getNumber("longitude", 0);
+            if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng))
+              return Promise.resolve(null);
+            const converted = CoordTransform.wgs84ToTencentPrecise(rawLat, rawLng);
+            if (!isFinite(converted.lat) || !isFinite(converted.lng))
+              return Promise.resolve(null);
+            const position = new CoordinatePoint({ latitude: converted.lat, longitude: converted.lng });
+            const positionTime = item.getString("positionUpdateTime", "");
+            const previous = lastAcceptedPosition;
+            if (positionTime != "" && positionTime == lastAcceptedPositionTime)
+              return Promise.resolve(null);
+            if (previous == null || isSamePosition(previous, position))
+              return Promise.resolve(null);
+            const sourceTime = parsePositionTime(positionTime);
+            const previousTime = parsePositionTime(lastAcceptedPositionTime);
+            const elapsedSeconds = sourceTime > previousTime && previousTime > 0 ? (sourceTime - previousTime) / 1e3 : Math.max((Date.now() - lastAcceptedReceivedTime) / 1e3, 1);
+            const distance = calculateDistance(previous.latitude, previous.longitude, position.latitude, position.longitude);
+            const impliedSpeed = distance / elapsedSeconds * 3.6;
+            if (distance > MAX_POSITION_JUMP_DISTANCE || impliedSpeed > 210) {
+              const pending = pendingJumpPosition;
+              if (pending != null && calculateDistance(pending.latitude, pending.longitude, position.latitude, position.longitude) <= MAX_POSITION_JUMP_DISTANCE && positionTime != pendingJumpTime) {
+                pendingJumpPosition = null;
+                pendingJumpTime = "";
+                relocateToConfirmedPosition(item, position, positionTime);
+              } else {
+                pendingJumpPosition = copyPosition(position);
+                pendingJumpTime = positionTime;
               }
+              return Promise.resolve(null);
             }
-          } catch (err) {
-            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:477", "获取跟踪位置失败:", err);
+            pendingJumpPosition = null;
+            pendingJumpTime = "";
+            acceptLivePosition(item, position, positionTime, sessionId);
+          } catch (error) {
+            uni.__log__("error", "at pages/vehicleTracking/vehicleTracking.uvue:483", "获取跟踪位置失败:", error);
+          } finally {
+            if (sessionId == trackingSessionId)
+              isTrackRequestPending = false;
           }
         });
       };
-      function stopTracking() {
+      function stopTracking(showToast = true) {
+        trackingSessionId += 1;
         isTracking.value = false;
         if (trackingInterval.value != null) {
           clearInterval(trackingInterval.value);
           trackingInterval.value = null;
         }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
         if (animationTimer.value != null) {
           clearInterval(animationTimer.value);
           animationTimer.value = null;
         }
+        animationQueue.value = [];
         isAnimating.value = false;
-        showAppToast({
-          title: "停止跟踪",
-          icon: "success",
-          duration: 1500
-        });
+        isProcessingQueue.value = false;
+        isTrackRequestPending = false;
+        pendingJumpPosition = null;
+        if (showToast)
+          showAppToast({ title: "停止跟踪", icon: "success", duration: 1500 });
       }
       function startTracking() {
-        if (!markerInitialized.value) {
-          initMarker();
+        if (!hasValidPosition.value) {
+          showAppToast({ title: "暂无有效定位信息", icon: "none" });
+          return null;
         }
+        if (!markerInitialized.value)
+          initMarker();
+        if (temporaryRenderPoints.value.length == 0)
+          resetTemporaryRenderSegment(currentPosition);
         animationQueue.value = [];
         isProcessingQueue.value = false;
-        const interval = 3e3;
+        lastAcceptedPosition = copyPosition(currentPosition);
+        lastAcceptedPositionTime = "";
+        lastAcceptedReceivedTime = Date.now();
+        pendingJumpPosition = null;
+        trackingSessionId += 1;
+        const sessionId = trackingSessionId;
         isTracking.value = true;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
-        }
-        loadTrackData();
+        loadTrackData(sessionId);
         trackingInterval.value = setInterval(() => {
-          loadTrackData();
-        }, interval);
-        showAppToast({
-          title: "开始跟踪",
-          icon: "success",
-          duration: 1500
-        });
+          loadTrackData(sessionId);
+        }, TRACKING_POLL_INTERVAL_MS);
+        showAppToast({ title: "开始跟踪", icon: "success", duration: 1500 });
       }
       const toggleTracking = () => {
         if (isTracking.value) {
@@ -17343,36 +17441,16 @@
         }
       };
       vue.onHide(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:552", "页面隐藏时停止自动刷新");
-        isTracking.value = false;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
-          trackingInterval.value = null;
-        }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
-        if (animationTimer.value != null) {
-          clearInterval(animationTimer.value);
-          animationTimer.value = null;
-        }
-        isAnimating.value = false;
+        stopTracking(false);
+      });
+      vue.onUnload(() => {
+        stopTracking(false);
+        clearTemporaryRoute();
       });
       vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/vehicleTracking/vehicleTracking.uvue:573", "页面卸载时停止自动刷新");
-        isTracking.value = false;
-        if (trackingInterval.value != null) {
-          clearInterval(trackingInterval.value);
-          trackingInterval.value = null;
-        }
-        animationQueue.value = [];
-        isProcessingQueue.value = false;
-        if (animationTimer.value != null) {
-          clearInterval(animationTimer.value);
-          animationTimer.value = null;
-        }
-        isAnimating.value = false;
+        stopTracking(false);
       });
-      const __returned__ = { imei, connectionStatus, deviceId, deptId, carType, center, mapScale, isAnimating, animationTimer, currentPosition, targetPosition, currentRotation, targetRotation, animationQueue, isProcessingQueue, markers, markerInitialized, get lastIconPath() {
+      const __returned__ = { imei, connectionStatus, deviceId, deptId, carType, center, mapScale, temporaryRenderPoints, TRACKING_POLL_INTERVAL_MS, TRACKING_ANIMATION_DURATION_MS, MAX_POSITION_JUMP_DISTANCE, polyline, isAnimating, animationTimer, currentPosition, targetPosition, currentRotation, targetRotation, animationQueue, isProcessingQueue, markers, markerInitialized, get lastIconPath() {
         return lastIconPath;
       }, set lastIconPath(v) {
         lastIconPath = v;
@@ -17380,7 +17458,35 @@
         return lastMarkerUpdateTime;
       }, set lastMarkerUpdateTime(v) {
         lastMarkerUpdateTime = v;
-      }, MARKER_UPDATE_INTERVAL, isTracking, trackingInterval, lastDirection, currentSpeed, currentAddress, currentTime, currentCar, times, handleCurrentTimeUpdate, createVehicleMarker, loadInitialPosition, initMarker, calculateMapRotation, normalizeRotation, calculateDistance, calculateRealisticAnimationDuration, calculateShortestRotation, updateMarkerSmooth, startPositionAnimation, processAnimationQueue, addToAnimationQueue, loadTrackData, stopTracking, startTracking, toggleTracking };
+      }, MARKER_UPDATE_INTERVAL, isTracking, trackingInterval, lastDirection, hasValidPosition, get trackingSessionId() {
+        return trackingSessionId;
+      }, set trackingSessionId(v) {
+        trackingSessionId = v;
+      }, get isTrackRequestPending() {
+        return isTrackRequestPending;
+      }, set isTrackRequestPending(v) {
+        isTrackRequestPending = v;
+      }, get lastAcceptedPosition() {
+        return lastAcceptedPosition;
+      }, set lastAcceptedPosition(v = null) {
+        lastAcceptedPosition = v;
+      }, get lastAcceptedPositionTime() {
+        return lastAcceptedPositionTime;
+      }, set lastAcceptedPositionTime(v) {
+        lastAcceptedPositionTime = v;
+      }, get lastAcceptedReceivedTime() {
+        return lastAcceptedReceivedTime;
+      }, set lastAcceptedReceivedTime(v) {
+        lastAcceptedReceivedTime = v;
+      }, get pendingJumpPosition() {
+        return pendingJumpPosition;
+      }, set pendingJumpPosition(v = null) {
+        pendingJumpPosition = v;
+      }, get pendingJumpTime() {
+        return pendingJumpTime;
+      }, set pendingJumpTime(v) {
+        pendingJumpTime = v;
+      }, currentSpeed, currentAddress, currentTime, currentCar, times, handleCurrentTimeUpdate, createVehicleMarker, loadInitialPosition, initMarker, calculateMapRotation, normalizeRotation, calculateDistance, calculateRealisticAnimationDuration, calculateShortestRotation, updateMarkerSmooth, copyPosition, isSamePosition, parsePositionTime, updateTrackingPolyline, appendTemporaryRenderPoint, resetTemporaryRenderSegment, clearTemporaryRoute, startPositionAnimation, processAnimationQueue, acceptLivePosition, relocateToConfirmedPosition, loadTrackData, stopTracking, startTracking, toggleTracking };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -17407,9 +17513,10 @@
           vue.createElementVNode("view", { class: "map-container" }, [
             vue.createVNode(_component_map, {
               id: "myMap",
-              latitude: $setup.center.latitude,
-              longitude: $setup.center.longitude,
+              latitude: $setup.currentPosition.latitude,
+              longitude: $setup.currentPosition.longitude,
               markers: $setup.markers,
+              polyline: $setup.polyline,
               scale: $setup.mapScale,
               style: { "width": "100%", "height": "100%" },
               "show-location": false,
@@ -17417,7 +17524,7 @@
               "enable-overlooking": true,
               "enable-building": true,
               "enable-3D": true
-            }, null, 8, ["latitude", "longitude", "markers", "scale"]),
+            }, null, 8, ["latitude", "longitude", "markers", "polyline", "scale"]),
             vue.createVNode(_component_sub_navBar, {
               class: "sub-nav-overlay",
               currentTime: $setup.currentTime,
@@ -20442,7 +20549,7 @@
         }
         return "polygon";
       }
-      function isValidCoordinate(latitude, longitude) {
+      function isValidCoordinate2(latitude, longitude) {
         return isFinite(latitude) && isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
       }
       function parsePolygon(polygonStr) {
@@ -20456,7 +20563,7 @@
             return null;
           const latitude = parseFloat(values[0]);
           const longitude = parseFloat(values[1]);
-          if (!isValidCoordinate(latitude, longitude))
+          if (!isValidCoordinate2(latitude, longitude))
             return null;
           const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude);
           points2.push({
@@ -20480,7 +20587,7 @@
           const lat = parseFloat(centerValues[0]);
           const lng = parseFloat(centerValues[1]);
           const radius = parseFloat(parts[1].trim());
-          if (!isValidCoordinate(lat, lng) || !isFinite(radius) || radius <= 0) {
+          if (!isValidCoordinate2(lat, lng) || !isFinite(radius) || radius <= 0) {
             uni.__log__("error", "at pages/geofencing/geofencing.uvue:437", "无效的圆形围栏数据:", circleStr);
             return null;
           }
@@ -21249,7 +21356,7 @@
         return loadMoreTimer;
       }, set loadMoreTimer(v = null) {
         loadMoreTimer = v;
-      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, isValidCoordinate, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, resetPagination, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, closeEditDialog, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing };
+      }, pagination, canFinishDrawing, loadingMore, hasMore, loadInitialPosition, calculateMapRotation, getFenceType, isValidCoordinate: isValidCoordinate2, parsePolygon, parseCircle, updateMarkers, renderFencesOnMap, updateMapDisplay, loadGeofenceList, generatePolygonString, generateCircleString, calculateZoomLevelFromRadius, calculateBounds, setMapCenterToFence, showFenceList, selectFence, editFence, deleteFenceById, deleteFence, saveFence, resetPagination, initPagination, loadBoundDevices, loadUnboundDevices, showBindDevices, switchTab, handleLoadMore, toggleDeviceBinding, isDeviceBound, setDrawingMode, startDrawing, handleDeviceBindingChange, getDeviceImei, isDeviceOnline, getDeviceDisplayName, closeEditDialog, getSelectedFenceName, editSelectedFence, deleteSelectedFence, showSelectedFenceDevices, calculateDistance, addNewPoint, handleMapTap, finishDrawing, updateFencePolygon, updateFenceCircle, clearDrawing };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }

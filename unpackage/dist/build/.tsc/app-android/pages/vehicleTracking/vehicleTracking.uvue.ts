@@ -24,6 +24,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		speed : number
 		address : string
 		connectionStatus : string
+		positionTime : string
 	}
 
 	type MpPolylineData = {
@@ -56,11 +57,12 @@ const imei = ref<string>('')
 		longitude: 116.40717
 	})
 	const mapScale = ref(15)
-	const travelledPoints = ref<Array<CoordinatePoint>>([])
-	const ROUTE_POINT_MIN_DISTANCE = 1
+	const temporaryRenderPoints = ref<Array<CoordinatePoint>>([])
+	const TRACKING_POLL_INTERVAL_MS = 1000
+	const TRACKING_ANIMATION_DURATION_MS = 900
+	const MAX_POSITION_JUMP_DISTANCE = 500
 
 	const polyline = ref<Array<Polyline>>([])
-	let trackingPolyline : Polyline | null = null
 
 
 
@@ -89,7 +91,7 @@ const imei = ref<string>('')
 	const markerInitialized = ref(false)
 	let lastIconPath = ''
 	let lastMarkerUpdateTime = 0
-	const MARKER_UPDATE_INTERVAL = 100 // 降低标记点更新间隔，提高流畅度
+	const MARKER_UPDATE_INTERVAL = 30 // 与动画帧同步，兼容 Android 和微信小程序地图的 marker 刷新
 
 	// 跟踪状态
 	const isTracking = ref(false)
@@ -99,6 +101,10 @@ const imei = ref<string>('')
 	let trackingSessionId = 0
 	let isTrackRequestPending = false
 	let lastAcceptedPosition : CoordinatePoint | null = null
+	let lastAcceptedPositionTime = ''
+	let lastAcceptedReceivedTime = 0
+	let pendingJumpPosition : CoordinatePoint | null = null
+	let pendingJumpTime = ''
 
 	// 当前车辆信息
 	const currentSpeed = ref(0)
@@ -163,7 +169,7 @@ const imei = ref<string>('')
 						const positionUpdateTime = item.getString('positionUpdateTime', '定位时间未知')
 						const status = item.getString('connectionStatus', 'unknown')
 						// 转换坐标到腾讯地图坐标系
-						const convertedCoord = CoordTransform.wgs84ToTencent(latitude, longitude)
+						const convertedCoord = CoordTransform.wgs84ToTencentPrecise(latitude, longitude)
 
 						// 设置初始位置
 						currentPosition.latitude = convertedCoord.lat
@@ -292,11 +298,11 @@ const imei = ref<string>('')
 
 		// 限制最小和最大动画时长
 		if (duration < 1000) duration = 1000 // 最小1秒
-		if (duration > 15000) duration = 15000 // 最大15秒
+		if (duration > 2800) duration = 2800 // 小于轮询周期，避免过期定位在队列中滞后播放
 
 		// 低速运动
-		if (speedKmh < 10 && duration < 3000) {
-			duration = 3000
+		if (speedKmh < 10 && duration < 2000) {
+			duration = 2000
 		}
 
 		return duration
@@ -326,6 +332,8 @@ const imei = ref<string>('')
 		// 创建新的标记点对象
 		const updatedMarker = createVehicleMarker(needUpdateIcon ? newIconPath : lastIconPath)
 
+		// Android 与微信小程序对数组中 Marker 的原地变更不一定触发地图刷新；
+		// 每次提供新的数组和 Marker 实例，确保动画帧都会被地图组件接收。
 		markers.value = [updatedMarker]
 
 		if (needUpdateIcon) {
@@ -335,54 +343,87 @@ const imei = ref<string>('')
 
 
 	function copyPosition(p : CoordinatePoint) : CoordinatePoint { return { latitude: p.latitude, longitude: p.longitude } }
+	function isSamePosition(first : CoordinatePoint, second : CoordinatePoint) : boolean { return first.latitude == second.latitude && first.longitude == second.longitude }
+	function parsePositionTime(value : string) : number { const time = Date.parse(value.replace(/-/g, '/')); return isNaN(time) ? 0 : time }
 	function updateTrackingPolyline() : void {
-		if (travelledPoints.value.length < 2) { polyline.value = []; return }
+		const renderPoints = temporaryRenderPoints.value.map((point : CoordinatePoint) : CoordinatePoint => copyPosition(point))
+		if (isAnimating.value && renderPoints.length > 0 && !isSamePosition(renderPoints[renderPoints.length - 1], currentPosition)) renderPoints.push(copyPosition(currentPosition))
+		if (renderPoints.length < 2) { polyline.value = []; return }
 
-		const points = travelledPoints.value.map((p : CoordinatePoint) : LocationObject => new LocationObject(p.latitude, p.longitude))
-		let currentTrackingPolyline = trackingPolyline
-		if (currentTrackingPolyline == null) {
-			currentTrackingPolyline = new Polyline(points, '#888787', 3, false, false, '', '#888787', 0, [])
-			trackingPolyline = currentTrackingPolyline
-		}
-		currentTrackingPolyline.points = points
-		polyline.value = [currentTrackingPolyline]
+		const points = renderPoints.map((point : CoordinatePoint) : LocationObject => new LocationObject(point.latitude, point.longitude))
+		polyline.value = [new Polyline(points, '#888787', 3, false, false, '', '#888787', 0, [])]
 
 
 
 
 	}
-	function appendTravelledPoint(p : CoordinatePoint) : void {
-		const last = travelledPoints.value.length > 0 ? travelledPoints.value[travelledPoints.value.length - 1] : null
-		if (last != null && calculateDistance(last.latitude, last.longitude, p.latitude, p.longitude) < ROUTE_POINT_MIN_DISTANCE) return
-		travelledPoints.value.push(copyPosition(p)); updateTrackingPolyline()
+	function appendTemporaryRenderPoint(position : CoordinatePoint) : void {
+		const last = temporaryRenderPoints.value.length > 0 ? temporaryRenderPoints.value[temporaryRenderPoints.value.length - 1] : null
+		if (last != null && isSamePosition(last, position)) return
+		temporaryRenderPoints.value.push(copyPosition(position))
+		if (temporaryRenderPoints.value.length > 1000) temporaryRenderPoints.value.splice(0, temporaryRenderPoints.value.length - 1000)
+		updateTrackingPolyline()
 	}
-	function clearTrackingRoute() : void {
-		travelledPoints.value = []
-
-		trackingPolyline = null
-
+	function resetTemporaryRenderSegment(position : CoordinatePoint) : void {
+		temporaryRenderPoints.value = [copyPosition(position)]
 		polyline.value = []
 	}
+	function clearTemporaryRoute() : void {
+		temporaryRenderPoints.value = []
+		polyline.value = []
+	}
+
 	const startPositionAnimation = (duration : number, sessionId : number, done : () => void) => {
 		if (animationTimer.value != null) clearInterval(animationTimer.value as number)
 		isAnimating.value = true
 		const begin = Date.now(), lat = currentPosition.latitude, lng = currentPosition.longitude, rot = currentRotation.value
 		const latDiff = targetPosition.latitude - lat, lngDiff = targetPosition.longitude - lng, rotDiff = calculateShortestRotation(rot, targetRotation.value)
 		let lastDraw = begin
-		animationTimer.value = setInterval(() => {
+				animationTimer.value = setInterval(() => {
 			if (!isTracking.value || sessionId != trackingSessionId) return
 			const now = Date.now(), progress = Math.min((now - begin) / duration, 1)
 			currentPosition.latitude = lat + latDiff * progress; currentPosition.longitude = lng + lngDiff * progress
 			currentRotation.value = normalizeRotation(rot + rotDiff * progress); center.latitude = currentPosition.latitude; center.longitude = currentPosition.longitude
-			if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) { updateMarkerSmooth(); lastDraw = now }
-			if (progress >= 1) { clearInterval(animationTimer.value as number); animationTimer.value = null; isAnimating.value = false; currentPosition.latitude = targetPosition.latitude; currentPosition.longitude = targetPosition.longitude; currentRotation.value = normalizeRotation(targetRotation.value); updateMarkerSmooth(); appendTravelledPoint(currentPosition); done() }
+			if (now - lastDraw >= MARKER_UPDATE_INTERVAL || progress >= 1) {
+				updateMarkerSmooth()
+				updateTrackingPolyline()
+				lastDraw = now
+			}
+			if (progress >= 1) { clearInterval(animationTimer.value as number); animationTimer.value = null; isAnimating.value = false; currentPosition.latitude = targetPosition.latitude; currentPosition.longitude = targetPosition.longitude; currentRotation.value = normalizeRotation(targetRotation.value); updateMarkerSmooth(); appendTemporaryRenderPoint(currentPosition); done() }
 		}, 30) as number
 	}
 	function processAnimationQueue(sessionId : number) : void {
 		if (!isTracking.value || sessionId != trackingSessionId || animationQueue.value.length == 0) { isProcessingQueue.value = false; return }
 		isProcessingQueue.value = true; const next = animationQueue.value.shift() as AnimationQueueItem
 		targetPosition.latitude = next.position.latitude; targetPosition.longitude = next.position.longitude; targetRotation.value = next.rotation; currentSpeed.value = next.speed; currentAddress.value = next.address; connectionStatus.value = next.connectionStatus
-		startPositionAnimation(calculateRealisticAnimationDuration(calculateDistance(currentPosition.latitude, currentPosition.longitude, targetPosition.latitude, targetPosition.longitude), currentSpeed.value), sessionId, () => { if (!isTracking.value || sessionId != trackingSessionId) return; isProcessingQueue.value = false; if (animationQueue.value.length > 0) setTimeout(() => processAnimationQueue(sessionId), 50) })
+		startPositionAnimation(TRACKING_ANIMATION_DURATION_MS, sessionId, () => { if (!isTracking.value || sessionId != trackingSessionId) return; isProcessingQueue.value = false; if (animationQueue.value.length > 0) setTimeout(() => processAnimationQueue(sessionId), 50) })
+	}
+	function acceptLivePosition(item : UTSJSONObject, position : CoordinatePoint, positionTime : string, sessionId : number) : void {
+		const direction = item.getNumber('direction', lastDirection.value)
+		const animationData : AnimationQueueItem = { position: position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber('speed', 0), address: positionTime == '' ? '未知位置' : positionTime, connectionStatus: item.getString('connectionStatus', 'unknown'), positionTime: positionTime }
+		lastAcceptedPosition = copyPosition(position)
+		lastAcceptedPositionTime = positionTime
+		lastAcceptedReceivedTime = Date.now()
+		if (isAnimating.value || animationQueue.value.length > 0) animationQueue.value = []
+		animationQueue.value.push(animationData)
+		lastDirection.value = direction
+		if (!isProcessingQueue.value && !isAnimating.value) processAnimationQueue(sessionId)
+	}
+	function relocateToConfirmedPosition(item : UTSJSONObject, position : CoordinatePoint, positionTime : string) : void {
+		if (animationTimer.value != null) clearInterval(animationTimer.value as number)
+		animationTimer.value = null
+		isAnimating.value = false
+		isProcessingQueue.value = false
+		animationQueue.value = []
+		currentPosition.latitude = position.latitude; currentPosition.longitude = position.longitude
+		targetPosition.latitude = position.latitude; targetPosition.longitude = position.longitude
+		const direction = item.getNumber('direction', lastDirection.value)
+		currentRotation.value = normalizeRotation(calculateMapRotation(direction)); targetRotation.value = currentRotation.value
+		center.latitude = position.latitude; center.longitude = position.longitude
+		currentSpeed.value = item.getNumber('speed', 0); currentAddress.value = positionTime; connectionStatus.value = item.getString('connectionStatus', 'unknown')
+		lastDirection.value = direction; lastAcceptedPosition = copyPosition(position); lastAcceptedPositionTime = positionTime; lastAcceptedReceivedTime = Date.now()
+		resetTemporaryRenderSegment(position)
+		updateMarkerSmooth()
 	}
 	const loadTrackData = async (sessionId : number) => {
 		if (!isTracking.value || sessionId != trackingSessionId || isTrackRequestPending) return
@@ -392,29 +433,68 @@ const imei = ref<string>('')
 			if (!isTracking.value || sessionId != trackingSessionId || res?.code != 0 || !res.data) return
 			const item = res.data.find((value : UTSJSONObject) => value.getString('imei', '') == imei.value)
 			if (item == null) return
-			const rawLat = item.getNumber('latitude', 0)
-			const rawLng = item.getNumber('longitude', 0)
-			if (rawLat == 0 || rawLng == 0) return
-			const converted = CoordTransform.wgs84ToTencent(rawLat, rawLng)
+			const rawLat = item.getNumber('latitude', 0), rawLng = item.getNumber('longitude', 0)
+			if (rawLat == 0 || rawLng == 0 || !isFinite(rawLat) || !isFinite(rawLng)) return
+			const converted = CoordTransform.wgs84ToTencentPrecise(rawLat, rawLng)
 			if (!isFinite(converted.lat) || !isFinite(converted.lng)) return
 			const position : CoordinatePoint = { latitude: converted.lat, longitude: converted.lng }
-			const previousPosition = lastAcceptedPosition
-			if (previousPosition != null && calculateDistance(previousPosition.latitude, previousPosition.longitude, position.latitude, position.longitude) < ROUTE_POINT_MIN_DISTANCE) return
-			const direction = item.getNumber('direction', lastDirection.value)
-			const animationData : AnimationQueueItem = { position: position, rotation: normalizeRotation(calculateMapRotation(direction)), speed: item.getNumber('speed', 0), address: item.getString('positionUpdateTime', '未知位置'), connectionStatus: item.getString('connectionStatus', 'unknown') }
-			lastAcceptedPosition = copyPosition(position)
-			animationQueue.value.push(animationData)
-			lastDirection.value = direction
-			if (!isProcessingQueue.value && !isAnimating.value) processAnimationQueue(sessionId)
-		} catch (error) {
-			console.error('获取跟踪位置失败:', error)
-		} finally {
-			if (sessionId == trackingSessionId) isTrackRequestPending = false
-		}
+			const positionTime = item.getString('positionUpdateTime', '')
+			const previous = lastAcceptedPosition
+			if (positionTime != '' && positionTime == lastAcceptedPositionTime) return
+			if (previous == null || isSamePosition(previous, position)) return
+			const sourceTime = parsePositionTime(positionTime)
+			const previousTime = parsePositionTime(lastAcceptedPositionTime)
+			const elapsedSeconds = sourceTime > previousTime && previousTime > 0 ? (sourceTime - previousTime) / 1000 : Math.max((Date.now() - lastAcceptedReceivedTime) / 1000, 1)
+			const distance = calculateDistance(previous.latitude, previous.longitude, position.latitude, position.longitude)
+			const impliedSpeed = distance / elapsedSeconds * 3.6
+			if (distance > MAX_POSITION_JUMP_DISTANCE || impliedSpeed > 210) {
+				const pending = pendingJumpPosition
+				if (pending != null && calculateDistance(pending.latitude, pending.longitude, position.latitude, position.longitude) <= MAX_POSITION_JUMP_DISTANCE && positionTime != pendingJumpTime) {
+					pendingJumpPosition = null; pendingJumpTime = ''
+					relocateToConfirmedPosition(item, position, positionTime)
+				} else { pendingJumpPosition = copyPosition(position); pendingJumpTime = positionTime }
+				return
+			}
+			pendingJumpPosition = null; pendingJumpTime = ''
+			acceptLivePosition(item, position, positionTime, sessionId)
+		} catch (error) { console.error('获取跟踪位置失败:', error) } finally { if (sessionId == trackingSessionId) isTrackRequestPending = false }
 	}
 
-	function stopTracking(showToast : boolean = true) : void { trackingSessionId += 1; isTracking.value = false; if (trackingInterval.value != null) { clearInterval(trackingInterval.value as number); trackingInterval.value = null }; if (animationTimer.value != null) { clearInterval(animationTimer.value as number); animationTimer.value = null; appendTravelledPoint(currentPosition) }; animationQueue.value = []; isAnimating.value = false; isProcessingQueue.value = false; isTrackRequestPending = false; if (showToast) showAppToast({ title: '停止跟踪', icon: 'success', duration: 1500 }) }
-	function startTracking() : void { if (!hasValidPosition.value) { showAppToast({ title: '暂无有效定位信息', icon: 'none' }); return }; if (!markerInitialized.value) initMarker(); clearTrackingRoute(); appendTravelledPoint(currentPosition); animationQueue.value = []; isProcessingQueue.value = false; lastAcceptedPosition = copyPosition(currentPosition); trackingSessionId += 1; const sessionId = trackingSessionId; isTracking.value = true; loadTrackData(sessionId); trackingInterval.value = setInterval(() => { loadTrackData(sessionId); }, 3000) as number; showAppToast({ title: '开始跟踪', icon: 'success', duration: 1500 }) }
+	function stopTracking(showToast : boolean = true) : void {
+		trackingSessionId += 1
+		isTracking.value = false
+		if (trackingInterval.value != null) { clearInterval(trackingInterval.value as number); trackingInterval.value = null }
+		if (animationTimer.value != null) { clearInterval(animationTimer.value as number); animationTimer.value = null }
+		if (temporaryRenderPoints.value.length > 0) {
+			const lastIndex = temporaryRenderPoints.value.length - 1
+			temporaryRenderPoints.value[lastIndex] = copyPosition(currentPosition)
+			updateTrackingPolyline()
+		}
+		animationQueue.value = []
+		isAnimating.value = false
+		isProcessingQueue.value = false
+		isTrackRequestPending = false
+		pendingJumpPosition = null
+		if (showToast) showAppToast({ title: '停止跟踪', icon: 'success', duration: 1500 })
+	}
+	function startTracking() : void {
+		if (!hasValidPosition.value) { showAppToast({ title: '暂无有效定位信息', icon: 'none' }); return }
+		if (!markerInitialized.value) initMarker()
+		clearTemporaryRoute()
+		resetTemporaryRenderSegment(currentPosition)
+		animationQueue.value = []
+		isProcessingQueue.value = false
+		lastAcceptedPosition = copyPosition(currentPosition)
+		lastAcceptedPositionTime = ''
+		lastAcceptedReceivedTime = Date.now()
+		pendingJumpPosition = null
+		trackingSessionId += 1
+		const sessionId = trackingSessionId
+		isTracking.value = true
+		loadTrackData(sessionId)
+		trackingInterval.value = setInterval(() => { loadTrackData(sessionId); }, TRACKING_POLL_INTERVAL_MS) as number
+		showAppToast({ title: '开始跟踪', icon: 'success', duration: 1500 })
+	}
 
 	// 开始/停止跟踪
 	const toggleTracking = () => {
@@ -427,6 +507,10 @@ const imei = ref<string>('')
 
 
 	onHide(() => { stopTracking(false) })
+	onUnload(() => {
+		stopTracking(false)
+		clearTemporaryRoute()
+	})
 	onUnmounted(() => { stopTracking(false) })
 
 
@@ -450,8 +534,8 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
       _cE("view", _uM({ class: "map-container" }), [
         _cV(_component_map, _uM({
           id: "myMap",
-          latitude: center.latitude,
-          longitude: center.longitude,
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
           markers: markers.value,
           polyline: polyline.value,
           scale: mapScale.value,

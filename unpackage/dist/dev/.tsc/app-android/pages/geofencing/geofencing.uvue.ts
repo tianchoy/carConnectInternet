@@ -1275,7 +1275,7 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
         ref: showFenceModal,
         mode: "bottom",
         round: "10",
-        showClose: true
+        showClose: false
       }), _uM({
         default: withSlotCtx((): any[] => [
           isTrue(selectedFence.value)

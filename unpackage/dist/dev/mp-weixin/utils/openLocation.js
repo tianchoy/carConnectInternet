@@ -33,11 +33,7 @@ function showInvalidLocationToast() {
     icon: "none"
   });
 }
-function openLocation(params) {
-  if (!isValidCoordinate(params.latitude, params.longitude)) {
-    showInvalidLocationToast();
-    return null;
-  }
+function openBuiltInLocation(params) {
   try {
     common_vendor.index.openLocation({
       latitude: params.latitude,
@@ -45,10 +41,10 @@ function openLocation(params) {
       name: params.name != "" ? params.name : "当前位置",
       scale: 18,
       success: () => {
-        common_vendor.index.__f__("log", "at utils/openLocation.uts:74", "成功打开位置地图");
+        common_vendor.index.__f__("log", "at utils/openLocation.uts:67", "成功打开位置地图");
       },
-      fail: (err) => {
-        common_vendor.index.__f__("error", "at utils/openLocation.uts:77", "打开位置地图失败:", err);
+      fail: (error) => {
+        common_vendor.index.__f__("error", "at utils/openLocation.uts:70", "打开位置地图失败:", error);
         utils_toast.showAppToast({
           title: "打开位置地图失败，请稍后重试",
           icon: "none"
@@ -56,12 +52,19 @@ function openLocation(params) {
       }
     });
   } catch (error) {
-    common_vendor.index.__f__("error", "at utils/openLocation.uts:85", "打开位置地图异常:", error);
+    common_vendor.index.__f__("error", "at utils/openLocation.uts:78", "打开位置地图异常:", error);
     utils_toast.showAppToast({
       title: "打开位置地图失败，请稍后重试",
       icon: "none"
     });
   }
+}
+function openLocation(params) {
+  if (!isValidCoordinate(params.latitude, params.longitude)) {
+    showInvalidLocationToast();
+    return null;
+  }
+  openBuiltInLocation(params);
 }
 exports.OpenLocationParams = OpenLocationParams;
 exports.openLocation = openLocation;

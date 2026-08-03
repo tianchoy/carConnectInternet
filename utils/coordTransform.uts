@@ -47,6 +47,24 @@ class CoordTransform {
     }
     
     /**
+     * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
+     */
+    static wgs84ToTencentPrecise(wgLat: number, wgLon: number): Coordinate {
+        if (!this.isInChina(wgLon, wgLat)) {
+            return { lat: wgLat, lng: wgLon }
+        }
+        let dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+        let dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+        let radLat = wgLat / 180.0 * this.pi
+        let magic = Math.sin(radLat)
+        magic = 1 - this.ee * magic * magic
+        let sqrtMagic = Math.sqrt(magic)
+        dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+        dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+        return { lat: wgLat + dLat, lng: wgLon + dLng }
+    }
+
+    /**
      * 腾讯地图坐标系转WGS84（使用高精度算法）
      * @param tcLat 腾讯地图纬度
      * @param tcLon 腾讯地图经度

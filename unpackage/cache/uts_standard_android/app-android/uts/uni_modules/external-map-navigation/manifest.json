@@ -5,23 +5,20 @@
     "compilerVersion": "5.22.2026072503-alpha"
   },
   "files": {
-    "index.uts": {
-      "md5": "9c5f3e84e3180af95dd72d264fb46c38"
-    },
     "utssdk/app-android/index.uts": {
       "md5": "41058b72b627232605ec17437d63bb6f"
     },
-    "utssdk/index.uts": {
-      "md5": "5bae2b95a50cd67de6aae73c0557f570"
-    },
     "utssdk/interface.uts": {
-      "md5": "c840f939d17285b2d2f4694c911a29fb"
+      "md5": "d2c3a9aaedfc11cdf35bcd875f777197"
     },
     "package.json": {
-      "md5": "4a752f9b74fc59b96240128c50ac661a"
+      "md5": "94dadb2de4aea2c07f92380e6c96accb"
     },
     "utssdk/app-android/AndroidManifest.xml": {
       "md5": "84ccbefac768cb3e42155c6240440247"
+    },
+    "utssdk/app-android/config.json": {
+      "md5": "55c6f49734540e5f7adfe07f45895f65"
     }
   }
 }

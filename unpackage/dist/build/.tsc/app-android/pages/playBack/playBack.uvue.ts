@@ -140,7 +140,7 @@ const center = reactive({
 	function resolveRouteDateTime(dateStr : string) : string | null {
 		if (dateStr == '') return null
 		try {
-			const decoded = decodeURIComponent(dateStr) ?? ''
+			const decoded = (decodeURIComponent(dateStr) ?? '').replace(/\+/g, ' ').replace('T', ' ')
 			const milliseconds = parseLocalDateTime(decoded)
 			return milliseconds == null ? null : formatPlaybackTime(milliseconds)
 		} catch (error) {
@@ -702,18 +702,28 @@ const center = reactive({
 
 	// 重置回放
 
-	// 设置回放速度
-	function setPlaybackSpeed(e : number) : void {
-		const wasPlaying = isPlaying.value
-		if (wasPlaying) {
-			pausePlayback()
-		}
+	function applyPlaybackSpeed(value : number) : void {
+		if (!isFinite(value)) return
+		playbackSpeed.value = Math.min(50, Math.max(5, value))
+		if (!isPlaying.value) return
 
-		playbackSpeed.value = e
-
-		if (wasPlaying) {
-			startPlayback()
+		const timer = playbackTimer
+		if (timer != null) {
+			clearTimeout(timer)
+			playbackTimer = null
 		}
+		lastTimestamp = Date.now()
+		const sessionId = replaySessionId
+		playbackTimer = setTimeout(() => { playbackStep(sessionId) }, 16)
+	}
+
+	// i-slider 对外发送数值，原生 slider 发送事件对象
+	function setPlaybackSpeedFromValue(value : number) : void {
+		applyPlaybackSpeed(value)
+	}
+
+	function setPlaybackSpeed(event : UniSliderChangeEvent) : void {
+		applyPlaybackSpeed(event.detail.value)
 	}
 
 	onLoad((option) => {
@@ -827,10 +837,10 @@ const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast
             _cV(_component_i_slider, _uM({
               modelValue: playbackSpeed.value,
               "onUpdate:modelValue": $event => {(playbackSpeed).value = $event},
-              min: 1,
+              min: 5,
               max: 50,
               step: 5,
-              onChange: setPlaybackSpeed
+              onChange: setPlaybackSpeedFromValue
             }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
           ]),
           _cE("text", _uM({ class: "speed-label" }), _tD(playbackSpeed.value) + "x", 1 /* TEXT */)

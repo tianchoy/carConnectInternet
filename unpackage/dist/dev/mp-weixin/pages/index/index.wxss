@@ -77,12 +77,25 @@
 }
 .container .page-bg .top .device-car .nav-tools.data-v-00a60067 {
   display: flex;
+  flex-shrink: 0;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
 .container .page-bg .top .device-car .nav-tools .nav-tool-spacing.data-v-00a60067 {
+  flex-shrink: 0;
   margin-left: 30rpx;
+}
+.container .page-bg .top .device-car .nav-tools .nav-tool-add.data-v-00a60067 {
+  display: flex;
+  width: 36rpx;
+  height: 36rpx;
+  align-items: center;
+  justify-content: center;
+}
+.container .page-bg .top .device-car .nav-tools .nav-tool-add-image.data-v-00a60067 {
+  width: 36rpx;
+  height: 36rpx;
 }
 .container .page-bg .top .device-car .nav-tools .exit.data-v-00a60067 {
   display: flex;
@@ -168,16 +181,25 @@
   border-bottom: 1rpx solid #f0f0f0;
 }
 .container .page-bg .content .map-box .map-header .map-title.data-v-00a60067 {
+  flex-shrink: 0;
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
 }
-.container .page-bg .content .map-box .map-header .map-refresh.data-v-00a60067 {
-  font-size: 26rpx;
-  color: #07C160;
+.container .page-bg .content .map-box .map-header .map-refresh-wrap.data-v-00a60067 {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   padding: 8rpx 16rpx;
   background: #f0f9f0;
   border-radius: 8rpx;
+}
+.container .page-bg .content .map-box .map-header .map-refresh-wrap .map-refresh.data-v-00a60067 {
+  font-size: 26rpx;
+  line-height: 42rpx;
+  color: #07C160;
+  white-space: nowrap;
 }
 .container .page-bg .content .map-box .map-container.data-v-00a60067 {
   position: relative;
@@ -201,6 +223,7 @@
   font-size: 24rpx;
 }
 .container .page-bg .content .map-box .map-container .map-status .map-status-retry.data-v-00a60067 {
+  flex-shrink: 0;
   margin-left: 20rpx;
   color: #8de39b;
   font-size: 24rpx;
@@ -223,16 +246,25 @@
   border-bottom: 1rpx solid #f0f0f0;
 }
 .container .page-bg .content .mile-record .record-header .record-title.data-v-00a60067 {
+  flex-shrink: 0;
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
 }
-.container .page-bg .content .mile-record .record-header .record-desc.data-v-00a60067 {
-  font-size: 26rpx;
-  color: #07C160;
+.container .page-bg .content .mile-record .record-header .record-desc-wrap.data-v-00a60067 {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   padding: 8rpx 16rpx;
   background: #f0f9f0;
   border-radius: 8rpx;
+}
+.container .page-bg .content .mile-record .record-header .record-desc-wrap .record-desc.data-v-00a60067 {
+  font-size: 26rpx;
+  line-height: 42rpx;
+  color: #07C160;
+  white-space: nowrap;
 }
 .container .page-bg .content .mile-record .ring-container.data-v-00a60067 {
   display: flex;

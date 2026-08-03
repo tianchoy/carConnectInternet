@@ -96,7 +96,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     return null
                 }
                 try {
-                    val decoded = UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:181") ?: ""
+                    val decoded = (UTSAndroid.consoleDebugError(decodeURIComponent(dateStr), " at pages/playBack/playBack.uvue:188") ?: "").replace(UTSRegExp("\\+", "g"), " ").replace("T", " ")
                     val milliseconds = parseLocalDateTime(decoded)
                     return if (milliseconds == null) {
                         null
@@ -105,7 +105,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                     }
                 }
                  catch (error: Throwable) {
-                    console.error("解析回放时间失败:", error, " at pages/playBack/playBack.uvue:185")
+                    console.error("解析回放时间失败:", error, " at pages/playBack/playBack.uvue:192")
                     return null
                 }
             }
@@ -409,7 +409,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                         val requestId = ++replaySessionId
                         clearTrackDisplay()
                         uni_showLoading(ShowLoadingOptions(title = "加载中..."))
-                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 622, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
+                        val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "pages/playBack/playBack.uvue", 629, 9), "imei" to imei.value, "startTime" to startTime.value.replace(UTSRegExp("\\/", "g"), "-"), "endTime" to endTime.value.replace(UTSRegExp("\\/", "g"), "-"), "minParkTime" to 2, "withStop" to false, "withPos" to true, "withTrip" to false)
                         try {
                             val res = await(getTrackPos(data))
                             if (requestId != replaySessionId) {
@@ -429,7 +429,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                             if (requestId != replaySessionId) {
                                 return@w1
                             }
-                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:647")
+                            console.error("加载轨迹失败:", error, " at pages/playBack/playBack.uvue:654")
                             showAppToast(ShowToastOptions(title = "轨迹加载失败", icon = "none"))
                             if (!isNaN(parseFloat(lat.value ?: "")) && !isNaN(parseFloat(lng.value ?: ""))) {
                                 showCurrentPosition()
@@ -519,15 +519,33 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 showDateTimePicker.value = false
             }
             val onCancel = ::gen_onCancel_fn
-            fun gen_setPlaybackSpeed_fn(e: Number): Unit {
-                val wasPlaying = isPlaying.value
-                if (wasPlaying) {
-                    pausePlayback()
+            fun gen_applyPlaybackSpeed_fn(value: Number): Unit {
+                if (!isFinite(value)) {
+                    return
                 }
-                playbackSpeed.value = e
-                if (wasPlaying) {
-                    startPlayback()
+                playbackSpeed.value = Math.min(50, Math.max(5, value))
+                if (!isPlaying.value) {
+                    return
                 }
+                val timer = playbackTimer
+                if (timer != null) {
+                    clearTimeout(timer)
+                    playbackTimer = null
+                }
+                lastTimestamp = Date.now()
+                val sessionId = replaySessionId
+                playbackTimer = setTimeout(fun(){
+                    playbackStep(sessionId)
+                }
+                , 16)
+            }
+            val applyPlaybackSpeed = ::gen_applyPlaybackSpeed_fn
+            fun gen_setPlaybackSpeedFromValue_fn(value: Number): Unit {
+                applyPlaybackSpeed(value)
+            }
+            val setPlaybackSpeedFromValue = ::gen_setPlaybackSpeedFromValue_fn
+            fun gen_setPlaybackSpeed_fn(event: UniSliderChangeEvent): Unit {
+                applyPlaybackSpeed(event.detail.value)
             }
             val setPlaybackSpeed = ::gen_setPlaybackSpeed_fn
             onLoad(fun(option){
@@ -539,7 +557,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                 lng.value = option["lng"] ?: null
                 sTime.value = option["startTime"] ?: ""
                 eTime.value = option["endTime"] ?: ""
-                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:766")
+                console.log(sTime.value, eTime.value, " at pages/playBack/playBack.uvue:783")
                 val routeStartTime = resolveRouteDateTime(sTime.value)
                 val routeEndTime = resolveRouteDateTime(eTime.value)
                 if (routeStartTime != null && routeEndTime != null) {
@@ -625,7 +643,7 @@ open class GenPagesPlayBackPlayBack : BasePage {
                                     _cV(_component_i_slider, _uM("modelValue" to playbackSpeed.value, "onUpdate:modelValue" to fun(`$event`: Number){
                                         playbackSpeed.value = `$event`
                                     }
-                                    , "min" to 1, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeed), null, 8, _uA(
+                                    , "min" to 5, "max" to 50, "step" to 5, "onChange" to setPlaybackSpeedFromValue), null, 8, _uA(
                                         "modelValue",
                                         "onUpdate:modelValue"
                                     ))
