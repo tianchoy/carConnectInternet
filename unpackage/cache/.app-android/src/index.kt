@@ -111,7 +111,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
     )
 }
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
-    val hosts: String = "127.0.0.1,192.168.1.252"
+    val hosts: String = "127.0.0.1,192.168.1.252,169.254.71.85"
     val port: String = "8090"
     val id: String = "app-android_7eDcY5"
     if (hosts == "" || port == "" || id == "") {
@@ -7540,7 +7540,7 @@ open class TrackPoint (
     open var speed: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 74, 7)
+        return UTSSourceMapPosition("TrackPoint", "pages/playBack/playBack.uvue", 80, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return TrackPointReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -7632,7 +7632,7 @@ open class TrackBounds (
     open var maxLng: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 82, 7)
+        return UTSSourceMapPosition("TrackBounds", "pages/playBack/playBack.uvue", 88, 7)
     }
 }
 typealias MapMarker = Marker
