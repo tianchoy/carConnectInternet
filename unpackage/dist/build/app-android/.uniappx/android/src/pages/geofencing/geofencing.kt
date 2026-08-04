@@ -1096,7 +1096,7 @@ open class GenPagesGeofencingGeofencing : BasePage {
                                     _cE("view", _uM("key" to 0, "class" to "fence-operations"), _uA(
                                         _cE("view", _uM("class" to "fence-header"), _uA(
                                             _cE("text", _uM("class" to "fence-name"), _tD(getSelectedFenceName()), 1),
-                                            _cV(_component_i_icon, _uM("name" to "close", "onClick" to fun(){
+                                            _cV(_component_i_icon, _uM("size" to "22", "name" to "/static/close.png", "onClick" to fun(){
                                                 selectedFence.value = null
                                                 showFenceModal.value?.`$callMethod`("close")
                                             }), null, 8, _uA(

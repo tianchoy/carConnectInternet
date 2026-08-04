@@ -1286,7 +1286,8 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
                 _cE("view", _uM({ class: "fence-header" }), [
                   _cE("text", _uM({ class: "fence-name" }), _tD(getSelectedFenceName()), 1 /* TEXT */),
                   _cV(_component_i_icon, _uM({
-                    name: "close",
+                    size: "22",
+                    name: "/static/close.png",
                     onClick: () => {selectedFence.value = null; showFenceModal.value?.$callMethod('close')}
                   }), null, 8 /* PROPS */, ["onClick"])
                 ]),

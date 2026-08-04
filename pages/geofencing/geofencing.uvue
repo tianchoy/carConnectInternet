@@ -23,7 +23,7 @@
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ getSelectedFenceName() }}</text>
-					<i-icon name="close" @click="selectedFence = null; showFenceModal?.$callMethod('close')"></i-icon>
+					<i-icon size="22" name="/static/close.png" @click="selectedFence = null; showFenceModal?.$callMethod('close')"></i-icon>
 				</view>
 				<view class="fence-actions">
 					<i-button size="small" @click="editSelectedFence">编辑</i-button>

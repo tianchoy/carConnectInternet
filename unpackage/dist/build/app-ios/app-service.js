@@ -19068,7 +19068,8 @@
                     vue.createElementVNode("view", new UTSJSONObject({ class: "fence-header" }), [
                       vue.createElementVNode("text", new UTSJSONObject({ class: "fence-name" }), vue.toDisplayString(getSelectedFenceName()), 1),
                       vue.createVNode(_component_i_icon, new UTSJSONObject({
-                        name: "close",
+                        size: "22",
+                        name: "/static/close.png",
                         onClick: _cache[0] || (_cache[0] = ($event = null) => {
                           var _a;
                           selectedFence.value = null;
