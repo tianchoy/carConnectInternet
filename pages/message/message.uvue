@@ -35,7 +35,9 @@
 					</view>
 					<view class="message-content-row">
 						<text class="message-content">{{ getMessageContent(item) }}</text>
-						<text v-if="isMessageUnread(item)" class="unread-badge">未读</text>
+						<view class="unread-box" v-if="isMessageUnread(item)">
+							<text class="unread-badge">未读</text>
+						</view>
 					</view>
 				</view>
 				<view v-if="Login" class="load-more">
@@ -501,14 +503,23 @@
 				overflow: hidden;
 			}
 
-			.unread-badge {
-				margin-left: 16rpx;
+			.unread-box{
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
 				padding: 4rpx 12rpx;
-				border-radius: 20rpx;
 				background-color: #f56c6c;
-				color: #fff;
-				font-size: 22rpx;
+				margin-left: 16rpx;
+				border-radius: 20rpx;
+
+				.unread-badge {
+					color: #fff;
+					font-size: 22rpx;
+				}
 			}
+
+			
 
 			.empty-state {
 				display: flex;

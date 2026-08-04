@@ -73,11 +73,17 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.container .list-box .unread-badge {
-  margin-left: 16rpx;
+.container .list-box .unread-box {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   padding: 4rpx 12rpx;
-  border-radius: 20rpx;
   background-color: #f56c6c;
+  margin-left: 16rpx;
+  border-radius: 20rpx;
+}
+.container .list-box .unread-box .unread-badge {
   color: #fff;
   font-size: 22rpx;
 }
