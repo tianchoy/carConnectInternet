@@ -25,7 +25,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
+.container[class] {
   position: relative;
   width: 100%;
   height: 100%;
@@ -34,12 +34,12 @@
   flex-direction: column;
   background-color: #f5f7fa;
 }
-.container .map-container {
+.container .map-container[class] {
   flex: 1;
   width: 100%;
   position: relative;
 }
-.container .tool-nav {
+.container .tool-nav[class] {
   position: absolute;
   top: 200rpx;
   right: 20rpx;
@@ -50,13 +50,13 @@
   align-items: center;
   font-size: 35rpx;
 }
-.container .tool-nav .btn-map-list {
+.container .tool-nav .btn-map-list[class] {
   padding: 10rpx;
   background-color: #1296db;
   color: #fff;
   border-radius: 10rpx;
 }
-.container .right-bar {
+.container .right-bar[class] {
   position: absolute;
   top: 25rpx;
   left: 20rpx;
@@ -66,15 +66,15 @@
   justify-content: center;
   align-items: center;
 }
-.container .right-bar .status-spacing {
+.container .right-bar .status-spacing[class] {
   margin-left: 20rpx;
 }
-.container .right-bar .allCar {
+.container .right-bar .allCar[class] {
   background-color: #1296db;
 }
-.container .right-bar .onlineCar {
+.container .right-bar .onlineCar[class] {
   background-color: #0da117;
 }
-.container .right-bar .offlineCar {
+.container .right-bar .offlineCar[class] {
   background-color: #d81e06;
 }

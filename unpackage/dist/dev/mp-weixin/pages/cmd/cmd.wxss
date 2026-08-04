@@ -25,122 +25,122 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-c4271740 {
+.container[class].data-v-c4271740 {
   background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   padding-bottom: 30rpx;
 }
-.device-info.data-v-c4271740, .section.data-v-c4271740 {
+.device-info[class].data-v-c4271740, .section[class].data-v-c4271740 {
   background: #fff;
   border-radius: 10rpx;
   padding: 20rpx;
   margin: 0 20rpx 30rpx;
 }
-.device-info.data-v-c4271740 {
+.device-info[class].data-v-c4271740 {
   display: flex;
   align-items: center;
 }
-.device-label.data-v-c4271740 {
+.device-label[class].data-v-c4271740 {
   font-size: 28rpx;
   color: #666;
   white-space: nowrap;
 }
-.section-title.data-v-c4271740 {
+.section-title[class].data-v-c4271740 {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 20rpx;
 }
-.type-list.data-v-c4271740 {
+.type-list[class].data-v-c4271740 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
 }
-.type-item.data-v-c4271740 {
+.type-item[class].data-v-c4271740 {
   margin-right: 20rpx;
   margin-bottom: 20rpx;
   padding: 15rpx 30rpx;
   background: #f0f0f0;
   border-radius: 50rpx;
 }
-.type-item.active.data-v-c4271740 {
+.type-item.active[class].data-v-c4271740 {
   background: #007AFF;
 }
-.type-item.active .type-name.data-v-c4271740 {
+.type-item.active .type-name[class].data-v-c4271740 {
   color: #fff;
 }
-.type-name.data-v-c4271740 {
+.type-name[class].data-v-c4271740 {
   font-size: 26rpx;
   color: #666;
   white-space: nowrap;
 }
-.command-list.data-v-c4271740 {
+.command-list[class].data-v-c4271740 {
   display: flex;
   flex-direction: column;
 }
-.command-item.data-v-c4271740 {
+.command-item[class].data-v-c4271740 {
   width: 100%;
   box-sizing: border-box;
   padding: 25rpx;
   border: 1rpx solid #e0e0e0;
   border-radius: 10rpx;
 }
-.command-item + .command-item.data-v-c4271740 {
+.command-item + .command-item[class].data-v-c4271740 {
   margin-top: 20rpx;
 }
-.command-item.active.data-v-c4271740 {
+.command-item.active[class].data-v-c4271740 {
   border-color: #007AFF;
   background-color: #f0f8ff;
 }
-.command-name.data-v-c4271740 {
+.command-name[class].data-v-c4271740 {
   font-size: 30rpx;
   color: #333;
   margin-bottom: 10rpx;
 }
-.command-descr.data-v-c4271740 {
+.command-descr[class].data-v-c4271740 {
   font-size: 24rpx;
   color: #999;
   line-height: 36rpx;
 }
-.param-form.data-v-c4271740, .param-item.data-v-c4271740, .radio-group.data-v-c4271740 {
+.param-form[class].data-v-c4271740, .param-item[class].data-v-c4271740, .radio-group[class].data-v-c4271740 {
   display: flex;
   flex-direction: column;
 }
-.param-item + .param-item.data-v-c4271740 {
+.param-item + .param-item[class].data-v-c4271740 {
   margin-top: 30rpx;
 }
-.param-label.data-v-c4271740 {
+.param-label[class].data-v-c4271740 {
   margin-bottom: 15rpx;
   font-size: 28rpx;
   color: #333;
 }
-.param-input.data-v-c4271740 {
+.param-input[class].data-v-c4271740 {
   width: 100%;
   box-sizing: border-box;
   border: 1rpx solid #e0e0e0;
   border-radius: 8rpx;
   background: #fff;
 }
-.param-error.data-v-c4271740 {
+.param-error[class].data-v-c4271740 {
   color: #e43d33;
   font-size: 26rpx;
   margin-bottom: 20rpx;
 }
-.no-param-tip.data-v-c4271740 {
+.no-param-tip[class].data-v-c4271740 {
   color: #999;
   font-size: 26rpx;
   margin-bottom: 20rpx;
 }
-.radio-item.data-v-c4271740 {
+.radio-item[class].data-v-c4271740 {
   display: flex;
   align-items: center;
 }
-.radio-item + .radio-item.data-v-c4271740 {
+.radio-item + .radio-item[class].data-v-c4271740 {
   margin-top: 20rpx;
 }
-.radio-icon.data-v-c4271740 {
+.radio-icon[class].data-v-c4271740 {
   margin-right: 20rpx;
   width: 36rpx;
   height: 36rpx;
@@ -150,28 +150,28 @@
   align-items: center;
   justify-content: center;
 }
-.radio-inner.data-v-c4271740 {
+.radio-inner[class].data-v-c4271740 {
   width: 25rpx;
   height: 25rpx;
   border-radius: 50%;
   background: transparent;
 }
-.radio-inner.checked.data-v-c4271740 {
+.radio-inner.checked[class].data-v-c4271740 {
   background: #007AFF;
 }
-.radio-label.data-v-c4271740 {
+.radio-label[class].data-v-c4271740 {
   font-size: 26rpx;
   color: #333;
 }
-.submit-btn.data-v-c4271740 {
+.submit-btn[class].data-v-c4271740 {
   margin-top: 30rpx;
 }
-.empty-state.data-v-c4271740, .loading.data-v-c4271740 {
+.empty-state[class].data-v-c4271740, .loading[class].data-v-c4271740 {
   text-align: center;
   padding: 50rpx 20rpx;
   background: #fff;
   margin: 0 20rpx 30rpx;
 }
-.placeholder.data-v-c4271740 {
+.placeholder[class].data-v-c4271740 {
   color: #ccc;
 }

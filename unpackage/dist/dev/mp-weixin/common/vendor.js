@@ -4318,7 +4318,12 @@ function setFullProps(instance, rawProps, props, attrs) {
       if (options && hasOwn(options, camelKey = camelize(key))) {
         if (!needCastKeys || !needCastKeys.includes(camelKey)) {
           {
-            props[camelKey] = value;
+            props[camelKey] = resolveExternalClassesPropValue(
+              camelKey,
+              value,
+              options,
+              false
+            );
           }
         } else {
           (rawCastValues || (rawCastValues = {}))[camelKey] = value;
@@ -4348,7 +4353,36 @@ function setFullProps(instance, rawProps, props, attrs) {
   }
   return hasAttrsChanged;
 }
+function toExternalClasses(classes) {
+  const trimmed = classes.trim();
+  return trimmed ? trimmed.split(/\s+/).map((item) => "^" + item) : [];
+}
+function normalizeExternalClasses(classes) {
+  return toExternalClasses(normalizeClass(classes));
+}
 function normalizeInheritAttrsValue(instance, key, value) {
+  if (!instance.type.__reserved) {
+    if (key === "class") {
+      return toExternalClasses(normalizeClass(value)).join(" ");
+    }
+  }
+  return value;
+}
+function resolveExternalClassesPropValue(key, value, options, isAbsent) {
+  if (
+    // 只有外部传入的 externalClasses 才走这里，没有传入，但有默认值的不应该处理，比如button组件内部hover-class有默认值button-hover
+    !isAbsent
+  ) {
+    const opt = options[key];
+    if (opt && opt[
+      2
+      /* BooleanFlags.externalClasses */
+    ]) {
+      {
+        return normalizeExternalClasses(value);
+      }
+    }
+  }
   return value;
 }
 function resolvePropValue$1(options, props, key, value, instance, isAbsent) {
@@ -4360,7 +4394,9 @@ function resolvePropValue$1(options, props, key, value, instance, isAbsent) {
     instance,
     isAbsent
   );
-  return result;
+  {
+    return resolveExternalClassesPropValue(key, result, options, isAbsent);
+  }
 }
 function _resolvePropValue(options, props, key, value, instance, isAbsent) {
   const opt = options[key];
@@ -4399,6 +4435,16 @@ function _resolvePropValue(options, props, key, value, instance, isAbsent) {
     }
   }
   return value;
+}
+function initExternalClassesOptions(comp) {
+  if (isArray(comp.externalClasses)) {
+    const cached = comp.__externalClassesOptions;
+    if (!cached) {
+      comp.__externalClassesOptions = comp.externalClasses.map(
+        (className) => camelize(className)
+      );
+    }
+  }
 }
 function normalizePropsOptions(comp, appContext, asMixin = false) {
   const cache = appContext.propsCache;
@@ -4464,6 +4510,13 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
             1
             /* shouldCastTrue */
           ] = stringIndex < 0 || booleanIndex < stringIndex;
+          if (comp.__externalClassesOptions && comp.__externalClassesOptions.includes(key)) {
+            prop[
+              2
+              /* externalClasses */
+            ] = true;
+            prop.skipCheck = true;
+          }
           if (booleanIndex > -1 || hasOwn(prop, "default")) {
             needCastKeys.push(normalizedKey);
           }
@@ -4668,6 +4721,9 @@ const emptyAppContext = createAppContext();
 let uid = 0;
 function createComponentInstance(vnode, parent, suspense) {
   const type = vnode.type;
+  {
+    initExternalClassesOptions(type);
+  }
   const appContext = (parent ? parent.appContext : vnode.appContext) || emptyAppContext;
   const instance = {
     uid: uid++,
@@ -9936,6 +9992,9 @@ function parseComponent(vueOptions, { parse, mocks: mocks2, isPage: isPage2, isP
     addGlobalClass: true,
     pureDataPattern: /^uP$/
   };
+  {
+    options.addGlobalClass = false;
+  }
   if (!isPageInProject) {
     options.virtualHost = true;
   }
@@ -9979,6 +10038,27 @@ function parseComponent(vueOptions, { parse, mocks: mocks2, isPage: isPage2, isP
   }
   if (parse) {
     parse(mpComponentOptions, { handleLink: handleLink2 });
+  }
+  {
+    if (vueOptions.externalClasses) {
+      mpComponentOptions.externalClasses = vueOptions.externalClasses;
+    }
+    if (vueOptions.styleIsolation) {
+      const styleIsolation = vueOptions.styleIsolation;
+      {
+        if (styleIsolation === "isolated") {
+          mpComponentOptions.options.styleIsolation = isPageInProject ? "page-apply-shared" : "isolated";
+        } else if (styleIsolation === "app") {
+          if (isPageInProject) {
+            mpComponentOptions.options.styleIsolation = "apply-shared";
+          } else {
+            mpComponentOptions.options.styleIsolation = "isolated";
+          }
+        } else if (styleIsolation === "app-and-page") {
+          mpComponentOptions.options.styleIsolation = "apply-shared";
+        }
+      }
+    }
   }
   return mpComponentOptions;
 }

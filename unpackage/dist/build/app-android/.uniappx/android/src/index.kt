@@ -8411,6 +8411,7 @@ fun createApp(): UTSJSONObject {
     return _uO("app" to app)
 }
 fun main(app: IApp) {
+    enableStyleIsolation()
     definePageRoutes()
     defineAppConfig()
     (createApp()["app"] as VueApp).mount(app, GenUniApp())

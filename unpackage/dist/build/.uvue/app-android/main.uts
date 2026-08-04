@@ -7,6 +7,7 @@ export function createApp(): UTSJSONObject {
     };
 }
 export function main(app: IApp) {
+    enableStyleIsolation();
     definePageRoutes();
     defineAppConfig();
     (createApp()['app'] as VueApp).mount(app, GenUniApp());

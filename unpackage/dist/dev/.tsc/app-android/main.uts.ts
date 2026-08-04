@@ -8,6 +8,7 @@ export function createApp() {
 	}
 }
 export function main(app: IApp) {
+    enableStyleIsolation();
     definePageRoutes();
     defineAppConfig();
     (createApp()['app'] as VueApp).mount(app, GenUniApp());

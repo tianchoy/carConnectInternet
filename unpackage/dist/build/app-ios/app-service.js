@@ -20689,6 +20689,7 @@
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+  enableStyleIsolation();
   const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
   __global__.__uniX = true;
   function createApp() {

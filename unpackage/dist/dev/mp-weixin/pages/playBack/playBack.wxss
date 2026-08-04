@@ -25,7 +25,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
+.container[class] {
   position: relative;
   width: 100%;
   height: 100%;
@@ -33,39 +33,39 @@
   flex-direction: column;
   background-color: #f5f7fa;
 }
-.container .map-container {
+.container .map-container[class] {
   flex: 1;
   width: 100%;
   position: relative;
 }
-.container .map-container .sub-nav-overlay {
+.container .map-container .sub-nav-overlay[class] {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
 }
-.container .tools-panel {
+.container .tools-panel[class] {
   width: 100%;
   box-sizing: border-box;
   background-color: #fff;
   padding: 50rpx 20rpx;
   box-shadow: 0 -10rpx 20rpx rgba(0, 0, 0, 0.1);
 }
-.container .tools-panel .Datetime-box {
+.container .tools-panel .Datetime-box[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30rpx;
 }
-.container .tools-panel .Datetime-box .date-box {
+.container .tools-panel .Datetime-box .date-box[class] {
   display: flex;
   box-sizing: border-box;
   flex-direction: row;
   align-items: center;
 }
-.container .tools-panel .Datetime-box .date-box .date-time-control {
+.container .tools-panel .Datetime-box .date-box .date-time-control[class] {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -75,32 +75,32 @@
   border-radius: 5rpx;
   padding: 6rpx 4rpx;
 }
-.container .tools-panel .Datetime-box .date-box .date-part,
-.container .tools-panel .Datetime-box .date-box .time-part {
+.container .tools-panel .Datetime-box .date-box .date-part[class],
+.container .tools-panel .Datetime-box .date-box .time-part[class] {
   font-size: 24rpx;
   line-height: 32rpx;
   white-space: nowrap;
 }
-.container .tools-panel .Datetime-box .date-box .date-arrow,
-.container .tools-panel .Datetime-box .date-box .date-separator {
+.container .tools-panel .Datetime-box .date-box .date-arrow[class],
+.container .tools-panel .Datetime-box .date-box .date-separator[class] {
   flex-shrink: 0;
 }
-.container .tools-panel .Datetime-box .date-box .date-separator {
+.container .tools-panel .Datetime-box .date-box .date-separator[class] {
   margin: 0 20rpx;
   font-size: 26rpx;
 }
-.container .tools-panel .Datetime-box .playbackdetail {
+.container .tools-panel .Datetime-box .playbackdetail[class] {
   font-size: 25rpx;
   color: #1890FF;
 }
-.container .tools-panel .tool-tag-item {
+.container .tools-panel .tool-tag-item[class] {
   padding: 40rpx 20rpx;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.container .tools-panel .tool-tag-item .speed-label {
+.container .tools-panel .tool-tag-item .speed-label[class] {
   border: 2rpx solid #1890FF;
   font-size: 25rpx;
   color: #1890FF;
@@ -108,12 +108,12 @@
   border-radius: 30rpx;
   margin-left: 20rpx;
 }
-.container .tools-panel .tool-tag-item .slider {
+.container .tools-panel .tool-tag-item .slider[class] {
   flex: 1;
   padding: 0 20rpx 0 30rpx;
   overflow: visible;
 }
-.container .tools-panel .tool-tag-item .play-btn {
+.container .tools-panel .tool-tag-item .play-btn[class] {
   font-size: 25rpx;
   color: #fff;
   padding: 10rpx 25rpx;
@@ -121,7 +121,7 @@
   margin-left: 20rpx;
   background-color: #1890FF;
 }
-.container .tools-panel .play-back-info {
+.container .tools-panel .play-back-info[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -131,13 +131,13 @@
   background-color: #f9f9f9;
   border-radius: 15rpx;
 }
-.container .tools-panel .play-back-info .item-info {
+.container .tools-panel .play-back-info .item-info[class] {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.container .tools-panel .play-back-info .info-label {
+.container .tools-panel .play-back-info .info-label[class] {
   font-size: 24rpx;
   padding: 10rpx 0;
   color: #999;

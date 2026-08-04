@@ -25,37 +25,37 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
+.container[class] {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #f5f7fa;
 }
-.container .tools-panel {
+.container .tools-panel[class] {
   background-color: #fff;
   border: 1rpx solid #69c2f1;
   padding: 20rpx;
   margin: 20rpx;
   border-radius: 20rpx;
 }
-.container .tools-panel .Datetime-box {
+.container .tools-panel .Datetime-box[class] {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-.container .tools-panel .Datetime-box .date-box {
+.container .tools-panel .Datetime-box .date-box[class] {
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.container .tools-panel .Datetime-box .date-box .Date {
+.container .tools-panel .Datetime-box .date-box .Date[class] {
   font-size: 25rpx;
   border-radius: 5rpx;
 }
-.container .mileage_title, .container .content {
+.container .mileage_title[class], .container .content[class] {
   margin: 20rpx 40rpx 0;
   padding: 20rpx;
   display: flex;
@@ -63,12 +63,12 @@
   justify-content: space-between;
   align-items: center;
 }
-.container .content-box {
+.container .content-box[class] {
   flex: 1;
   min-height: 0;
   margin-bottom: 30rpx;
 }
-.container .content {
+.container .content[class] {
   background-color: #fff;
   border-radius: 15rpx;
   margin-bottom: 20rpx;
@@ -77,13 +77,13 @@
   justify-content: flex-start;
   align-items: flex-start;
 }
-.container .content .item {
+.container .content .item[class] {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 15rpx 0;
 }
-.container .content .item .icons {
+.container .content .item .icons[class] {
   width: 40rpx;
   height: 40rpx;
   margin-right: 15rpx;

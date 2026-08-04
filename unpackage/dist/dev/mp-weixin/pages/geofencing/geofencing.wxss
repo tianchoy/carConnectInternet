@@ -25,7 +25,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
+.container[class] {
   position: relative;
   width: 100%;
   height: 100%;
@@ -33,19 +33,19 @@
   flex-direction: column;
   background-color: #f5f7fa;
 }
-.container .map-container {
+.container .map-container[class] {
   flex: 1;
   width: 100%;
   position: relative;
 }
-.container .map-container .sub-nav-overlay {
+.container .map-container .sub-nav-overlay[class] {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
 }
-.container .map-container .drag-hint {
+.container .map-container .drag-hint[class] {
   position: absolute;
   top: 150rpx;
   left: 0;
@@ -55,11 +55,11 @@
   padding: 16rpx;
   box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
 }
-.container .fence-operations {
+.container .fence-operations[class] {
   background-color: #fff;
   padding: 20rpx 20rpx 50rpx 20rpx;
 }
-.container .fence-operations .fence-header {
+.container .fence-operations .fence-header[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -68,16 +68,16 @@
   padding-bottom: 20rpx;
   border-bottom: 1rpx solid #eee;
 }
-.container .fence-operations .fence-header .fence-name {
+.container .fence-operations .fence-header .fence-name[class] {
   font-size: 32rpx;
   font-weight: bold;
 }
-.container .fence-operations .fence-actions {
+.container .fence-operations .fence-actions[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-.container .tools-panel {
+.container .tools-panel[class] {
   width: 100%;
   background-color: #fff;
   padding: 20rpx;
@@ -85,46 +85,46 @@
   flex-direction: column;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
-.container .tools-panel .drawing-mode-selector {
+.container .tools-panel .drawing-mode-selector[class] {
   margin-bottom: 20rpx;
   padding-bottom: 20rpx;
   border-bottom: 1rpx solid #eee;
 }
-.container .tools-panel .drawing-mode-selector .mode-title {
+.container .tools-panel .drawing-mode-selector .mode-title[class] {
   font-size: 28rpx;
   margin-bottom: 15rpx;
   color: #333;
   font-weight: 500;
 }
-.container .tools-panel .drawing-mode-selector .mode-buttons {
+.container .tools-panel .drawing-mode-selector .mode-buttons[class] {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
 }
-.container .tools-panel .drawing-mode-selector .mode-buttons .mode-button-spacing {
+.container .tools-panel .drawing-mode-selector .mode-buttons .mode-button-spacing[class] {
   margin-left: 20rpx;
 }
-.container .tools-panel .tool-tag-item {
+.container .tools-panel .tool-tag-item[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20rpx;
 }
-.container .tools-panel .status-info {
+.container .tools-panel .status-info[class] {
   display: flex;
   flex-direction: column;
   padding: 20rpx 0;
   border-top: 1rpx solid #eee;
 }
-.container .fence-list {
+.container .fence-list[class] {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #fff;
 }
-.container .fence-list .list-header {
+.container .fence-list .list-header[class] {
   flex-shrink: 0;
   display: flex;
   flex-direction: row;
@@ -133,16 +133,16 @@
   padding: 30rpx;
   border-bottom: 1rpx solid #eee;
 }
-.container .fence-list .list-header .title {
+.container .fence-list .list-header .title[class] {
   font-size: 32rpx;
   font-weight: bold;
 }
-.container .fence-list .list-content {
+.container .fence-list .list-content[class] {
   height: 640rpx;
   box-sizing: border-box;
   padding: 20rpx;
 }
-.container .fence-list .list-content .fence-item {
+.container .fence-list .list-content .fence-item[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -150,71 +150,71 @@
   padding: 24rpx;
   border-bottom: 1rpx solid #f5f5f5;
 }
-.container .fence-list .list-content .fence-item .fence-info {
+.container .fence-list .list-content .fence-item .fence-info[class] {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-.container .fence-list .list-content .fence-item .fence-info .name {
+.container .fence-list .list-content .fence-item .fence-info .name[class] {
   font-size: 30rpx;
   font-weight: 500;
   margin-bottom: 8rpx;
 }
-.container .fence-list .list-content .fence-item .fence-info .type {
+.container .fence-list .list-content .fence-item .fence-info .type[class] {
   font-size: 24rpx;
   color: #2979ff;
   margin-bottom: 8rpx;
 }
-.container .fence-list .list-content .fence-item .fence-info .devices {
+.container .fence-list .list-content .fence-item .fence-info .devices[class] {
   font-size: 24rpx;
   color: #999;
 }
-.container .fence-list .list-content .empty {
+.container .fence-list .list-content .empty[class] {
   padding: 100rpx 0;
 }
-.container .edit-dialog {
+.container .edit-dialog[class] {
   background-color: #fff;
   border-radius: 16rpx;
   overflow: hidden;
 }
-.container .edit-dialog .dialog-header {
+.container .edit-dialog .dialog-header[class] {
   padding: 30rpx;
   border-bottom: 1rpx solid #eee;
 }
-.container .edit-dialog .dialog-title {
+.container .edit-dialog .dialog-title[class] {
   text-align: center;
   font-size: 32rpx;
   font-weight: bold;
 }
-.container .edit-dialog .dialog-content {
+.container .edit-dialog .dialog-content[class] {
   padding: 30rpx;
 }
-.container .edit-dialog .dialog-content .radio-group {
+.container .edit-dialog .dialog-content .radio-group[class] {
   margin-top: 30rpx;
 }
-.container .edit-dialog .dialog-content .radio-group .label {
+.container .edit-dialog .dialog-content .radio-group .label[class] {
   margin-bottom: 30rpx;
   font-size: 28rpx;
   font-weight: 500;
 }
-.container .edit-dialog .dialog-content .radio-group .radio-options {
+.container .edit-dialog .dialog-content .radio-group .radio-options[class] {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
 }
-.container .edit-dialog .dialog-actions {
+.container .edit-dialog .dialog-actions[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
 }
-.container .device-dialog {
+.container .device-dialog[class] {
   height: 800rpx;
   background-color: #fff;
 }
-.container .device-dialog .dialog-header {
+.container .device-dialog .dialog-header[class] {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
@@ -222,27 +222,27 @@
   padding: 30rpx;
   border-bottom: 1rpx solid #eee;
 }
-.container .device-dialog .dialog-tabs {
+.container .device-dialog .dialog-tabs[class] {
   display: flex;
   flex-direction: row;
   border-bottom: 1rpx solid #eee;
 }
-.container .device-dialog .dialog-tabs .tab {
+.container .device-dialog .dialog-tabs .tab[class] {
   flex: 1;
   text-align: center;
   padding: 24rpx;
   font-size: 28rpx;
 }
-.container .device-dialog .dialog-tabs .tab.active {
+.container .device-dialog .dialog-tabs .tab.active[class] {
   color: #2979ff;
   border-bottom: 4rpx solid #2979ff;
 }
-.container .device-dialog .device-list {
+.container .device-dialog .device-list[class] {
   height: 100%;
   padding: 20rpx 20rpx 75rpx 20rpx;
   box-sizing: border-box;
 }
-.container .device-dialog .device-list .device-item {
+.container .device-dialog .device-list .device-item[class] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -250,59 +250,59 @@
   padding: 24rpx;
   border-bottom: 1rpx solid #f5f5f5;
 }
-.container .device-dialog .device-list .device-item .device-info {
+.container .device-dialog .device-list .device-item .device-info[class] {
   display: flex;
   flex-direction: column;
 }
-.container .device-dialog .device-list .device-item .device-info .name {
+.container .device-dialog .device-list .device-item .device-info .name[class] {
   font-size: 30rpx;
   margin-bottom: 8rpx;
 }
-.container .device-dialog .device-list .device-item .device-info .status {
+.container .device-dialog .device-list .device-item .device-info .status[class] {
   font-size: 24rpx;
   color: #999;
 }
-.container .device-dialog .device-list .empty {
+.container .device-dialog .device-list .empty[class] {
   padding: 100rpx 0;
 }
-.container .device-dialog .device-list .loading-tip {
+.container .device-dialog .device-list .loading-tip[class] {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 30rpx 0;
 }
-.container .device-dialog .device-list .no-more {
+.container .device-dialog .device-list .no-more[class] {
   text-align: center;
   padding: 30rpx 0;
   color: #999;
   font-size: 26rpx;
 }
-.container .device-dialog .dialog-actions {
+.container .device-dialog .dialog-actions[class] {
   padding: 20rpx 30rpx;
   border-top: 1rpx solid #eee;
 }
-.container .drag-hint-text {
+.container .drag-hint-text[class] {
   font-size: 28rpx;
   color: #00aa00;
   font-weight: bold;
   text-align: center;
 }
-.container .status-text {
+.container .status-text[class] {
   font-size: 28rpx;
   color: #333;
 }
-.container .empty-text-box {
+.container .empty-text-box[class] {
   margin-top: 30rpx;
 }
-.container .empty-text {
+.container .empty-text[class] {
   text-align: center;
   font-size: 22rpx;
   color: #999;
 }
-.container .i-popup__content {
+.container .i-popup__content[class] {
   border-radius: 20rpx;
 }
-.container .i-grid-item {
+.container .i-grid-item[class] {
   align-items: flex-start !important;
   margin: 10rpx 0;
 }

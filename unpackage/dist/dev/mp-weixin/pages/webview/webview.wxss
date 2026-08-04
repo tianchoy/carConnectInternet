@@ -25,12 +25,12 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.webview-container.data-v-fa7ac34d {
+.webview-container[class].data-v-fa7ac34d {
   width: 100%;
   height: 100%;
   background-color: #f5f5f5;
 }
-.webview-container .error-page.data-v-fa7ac34d {
+.webview-container .error-page[class].data-v-fa7ac34d {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,7 +38,7 @@
   height: 100%;
   padding: 40rpx;
 }
-.webview-container .error-page .back-btn.data-v-fa7ac34d {
+.webview-container .error-page .back-btn[class].data-v-fa7ac34d {
   margin-top: 60rpx;
   width: 400rpx;
   background-color: #007aff;

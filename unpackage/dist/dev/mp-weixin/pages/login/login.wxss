@@ -25,11 +25,11 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-27a30816 {
+.container[class].data-v-27a30816 {
   height: 100%;
   background-color: #fff;
 }
-.container .banner.data-v-27a30816 {
+.container .banner[class].data-v-27a30816 {
   background-color: #fff;
   display: flex;
   flex-direction: row;
@@ -37,20 +37,20 @@
   align-items: center;
   height: 20%;
 }
-.container .banner .banner-image.data-v-27a30816 {
+.container .banner .banner-image[class].data-v-27a30816 {
   width: 180rpx;
   height: 180rpx;
 }
-.container .banner .title.data-v-27a30816 {
+.container .banner .title[class].data-v-27a30816 {
   font-size: 40rpx;
   font-weight: bold;
   color: #333;
 }
-.container .content.data-v-27a30816 {
+.container .content[class].data-v-27a30816 {
   background-color: #fff;
   padding: 20rpx 70rpx;
 }
-.container .content .other-login.data-v-27a30816 {
+.container .content .other-login[class].data-v-27a30816 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -58,39 +58,39 @@
   margin: 20rpx 0 30rpx;
   font-size: 25rpx;
 }
-.container .content .documents.data-v-27a30816 {
+.container .content .documents[class].data-v-27a30816 {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   margin-top: 40rpx;
 }
-.container .content .documents .doc-info-box.data-v-27a30816 {
+.container .content .documents .doc-info-box[class].data-v-27a30816 {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   white-space: nowrap;
 }
-.container .content .documents .doc-info-box .doc-link.data-v-27a30816 {
+.container .content .documents .doc-info-box .doc-link[class].data-v-27a30816 {
   color: #007AFF;
   font-size: 28rpx;
 }
-.container .content .documents .doc-info-box .doc-text.data-v-27a30816 {
+.container .content .documents .doc-info-box .doc-text[class].data-v-27a30816 {
   font-size: 28rpx;
 }
-.container .content .remember-password.data-v-27a30816 {
+.container .content .remember-password[class].data-v-27a30816 {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 20rpx 0;
   font-size: 25rpx;
 }
-.container .content .remember-password.data-v-27a30816 .i-checkbox {
+.container .content .remember-password.data-v-27a30816 .i-checkbox[class] {
   display: flex;
   align-items: center;
 }
-.container .other-way.data-v-27a30816 {
+.container .other-way[class].data-v-27a30816 {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -99,16 +99,16 @@
   margin-top: 40rpx;
   color: #999;
 }
-.container .other-way .noLogin.data-v-27a30816 {
+.container .other-way .noLogin[class].data-v-27a30816 {
   border-right: 1rpx solid #999;
   padding-right: 50rpx;
 }
-.container .other-way .BLogin.data-v-27a30816 {
+.container .other-way .BLogin[class].data-v-27a30816 {
   padding-left: 50rpx;
 }
-.container .wechat-login-btn.data-v-27a30816 {
+.container .wechat-login-btn[class].data-v-27a30816 {
   color: #fff !important;
 }
-.container.data-v-27a30816 .i-form-item {
+.container.data-v-27a30816 .i-form-item[class] {
   padding: 12px 0;
 }

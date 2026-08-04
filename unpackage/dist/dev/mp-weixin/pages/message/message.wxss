@@ -25,36 +25,36 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container {
+.container[class] {
   width: 100%;
   position: fixed;
   top: 170rpx;
   bottom: 0;
   background-color: #f5f5f5;
 }
-.container .scroll-container {
+.container .scroll-container[class] {
   height: 100%;
   width: 100%;
 }
-.container .list-box {
+.container .list-box[class] {
   width: 100%;
   padding: 20rpx;
   position: relative;
 }
-.container .list-box .message-item {
+.container .list-box .message-item[class] {
   margin-bottom: 20rpx;
   padding: 24rpx;
   border-radius: 20rpx;
   background-color: #fff;
 }
-.container .list-box .message-header,
-.container .list-box .message-content-row {
+.container .list-box .message-header[class],
+.container .list-box .message-content-row[class] {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
-.container .list-box .message-title {
+.container .list-box .message-title[class] {
   flex: 1;
   font-size: 30rpx;
   color: #333;
@@ -62,10 +62,10 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.container .list-box .message-content-row {
+.container .list-box .message-content-row[class] {
   margin-top: 16rpx;
 }
-.container .list-box .message-content {
+.container .list-box .message-content[class] {
   flex: 1;
   font-size: 26rpx;
   color: #666;
@@ -73,7 +73,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.container .list-box .unread-box {
+.container .list-box .unread-box[class] {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -83,20 +83,20 @@
   margin-left: 16rpx;
   border-radius: 20rpx;
 }
-.container .list-box .unread-box .unread-badge {
+.container .list-box .unread-box .unread-badge[class] {
   color: #fff;
   font-size: 22rpx;
 }
-.container .list-box .empty-state {
+.container .list-box .empty-state[class] {
   display: flex;
   justify-content: center;
   padding: 50rpx 0;
 }
-.container .list-box .empty-state .empty-state-text {
+.container .list-box .empty-state .empty-state-text[class] {
   color: #999;
   font-size: 28rpx;
 }
-.container .list-box .new-message-tip {
+.container .list-box .new-message-tip[class] {
   background: linear-gradient(135deg, #2979ff, #07c160);
   color: white;
   padding: 20rpx;
@@ -105,14 +105,14 @@
   margin-bottom: 20rpx;
   font-size: 26rpx;
 }
-.container .list-box .load-more {
+.container .list-box .load-more[class] {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   padding: 30rpx 0;
 }
-.container .list-box .load-more .tips-text {
+.container .list-box .load-more .tips-text[class] {
   color: #999;
   font-size: 26rpx;
   text-align: center;

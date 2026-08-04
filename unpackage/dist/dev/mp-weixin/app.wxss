@@ -1,4 +1,6 @@
-/*每个页面公共css */
+@import "/uvue.wxss";
+
+	/*每个页面公共css */
 .uni-row {
 		flex-direction: row;
 }
