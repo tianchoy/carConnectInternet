@@ -1,14 +1,16 @@
 "use strict";
-const common_vendor = require("../common/vendor.js");
-function ensureCameraPermission(callback) {
-  common_vendor.index.__f__("log", "at utils/cameraPermission.uts:10", "📷 [ensureCameraPermission] 开始检查相机权限");
-  common_vendor.index.__f__("log", "at utils/cameraPermission.uts:94", "📷 [ensureCameraPermission] 非Android平台，默认授予权限");
+const CAMERA_PERMISSION = "android.permission.CAMERA";
+const COARSE_LOCATION_PERMISSION = "android.permission.ACCESS_COARSE_LOCATION";
+const FINE_LOCATION_PERMISSION = "android.permission.ACCESS_FINE_LOCATION";
+function requestAndroidPermission(permissions, name, callback, acceptGranted) {
   callback("granted");
 }
-function openCameraPermissionSettings() {
-  common_vendor.index.__f__("log", "at utils/cameraPermission.uts:103", "📷 [openCameraPermissionSettings] 打开系统权限设置");
-  common_vendor.index.__f__("log", "at utils/cameraPermission.uts:125", "📷 [openCameraPermissionSettings] 非Android平台，无需打开设置");
+function ensureCameraPermission(callback) {
+  requestAndroidPermission([CAMERA_PERMISSION], "ensureCameraPermission", callback);
+}
+function ensureLocationPermission(callback) {
+  requestAndroidPermission([COARSE_LOCATION_PERMISSION, FINE_LOCATION_PERMISSION], "ensureLocationPermission", callback);
 }
 exports.ensureCameraPermission = ensureCameraPermission;
-exports.openCameraPermissionSettings = openCameraPermissionSettings;
+exports.ensureLocationPermission = ensureLocationPermission;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/cameraPermission.js.map

@@ -1,127 +1,110 @@
 // utils/cameraPermission.uts
 
 export type CameraPermissionStatus = 'granted' | 'denied' | 'settingsRequired' | 'unavailable'
+export type LocationPermissionStatus = CameraPermissionStatus
 
-/**
- * 确保相机权限
- * @param callback 权限状态回调
- */
-export function ensureCameraPermission(callback: (status: CameraPermissionStatus) => void): void {
-	__f__('log','at utils/cameraPermission.uts:10','📷 [ensureCameraPermission] 开始检查相机权限')
-	
 
+import Activity from 'android.app.Activity'
+
+const CAMERA_PERMISSION = 'android.permission.CAMERA'
+const COARSE_LOCATION_PERMISSION = 'android.permission.ACCESS_COARSE_LOCATION'
+const FINE_LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION'
+
+function hasPermission(activity: Activity, permissions: Array<string>): boolean {
+	return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+}
+
+function requestAndroidPermission(
+	permissions: Array<string>,
+	name: string,
+	callback: (status: CameraPermissionStatus) => void,
+	isGranted: (activity: Activity) => boolean
+): void {
 	const activity = UTSAndroid.getUniActivity()
 	if (activity == null) {
-		__f__('error','at utils/cameraPermission.uts:15','❌ [ensureCameraPermission] 获取 Activity 失败')
+		__f__('error','at utils/cameraPermission.uts:25','❌ [' + name + '] 获取 Activity 失败')
 		callback('unavailable')
 		return
 	}
+	const currentActivity = activity as Activity
 
-	// 【修复】直接定义权限数组，避免引用问题
-	const permission: string = 'android.permission.CAMERA'
-	const permissions: Array<string> = [permission]
-	
-	__f__('log','at utils/cameraPermission.uts:24','📷 [ensureCameraPermission] 权限:', permissions)
-
-	// 检查是否已有权限
 	try {
-		const isGranted = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-		__f__('log','at utils/cameraPermission.uts:29','📷 [ensureCameraPermission] 当前权限状态:', isGranted ? '已授予' : '未授予')
-		
-		if (isGranted) {
-			__f__('log','at utils/cameraPermission.uts:32','✅ [ensureCameraPermission] 相机权限已授予')
+		if (isGranted(currentActivity)) {
 			callback('granted')
 			return
 		}
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:37','❌ [ensureCameraPermission] 检查权限失败:', error)
+		__f__('error','at utils/cameraPermission.uts:37','❌ [' + name + '] 检查权限失败:', error)
 		callback('unavailable')
 		return
 	}
 
-	// 请求权限
-	__f__('log','at utils/cameraPermission.uts:43','📷 [ensureCameraPermission] 开始请求相机权限...')
 	try {
 		UTSAndroid.requestSystemPermission(
-			activity,
+			currentActivity,
 			permissions,
 			(allRight: boolean, grantedPermissions: Array<string> | null) => {
-				__f__('log','at utils/cameraPermission.uts:49','📷 [ensureCameraPermission] 权限请求结果:', allRight ? '成功' : '失败')
-				__f__('log','at utils/cameraPermission.uts:50','📷 [ensureCameraPermission] 授予的权限:', grantedPermissions)
-				
-				if (allRight) {
-					__f__('log','at utils/cameraPermission.uts:53','✅ [ensureCameraPermission] 权限授予成功')
-					callback('granted')
-				} else {
-					// 再次检查是否真的被拒绝
-					try {
-						const isGrantedNow = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-						if (isGrantedNow) {
-							__f__('log','at utils/cameraPermission.uts:60','✅ [ensureCameraPermission] 权限实际已授予')
-							callback('granted')
-						} else {
-							__f__('log','at utils/cameraPermission.uts:63','❌ [ensureCameraPermission] 权限被拒绝')
-							callback('denied')
-						}
-					} catch (error) {
-						__f__('error','at utils/cameraPermission.uts:67','❌ [ensureCameraPermission] 再次检查权限失败:', error)
-						callback('denied')
-					}
+				__f__('log','at utils/cameraPermission.uts:47','[' + name + '] 权限请求结果:', allRight, grantedPermissions)
+				try {
+					callback(isGranted(currentActivity) ? 'granted' : 'denied')
+				} catch (error) {
+					__f__('error','at utils/cameraPermission.uts:51','❌ [' + name + '] 请求后检查权限失败:', error)
+					callback('unavailable')
 				}
 			},
 			(doNotAskAgain: boolean, deniedPermissions: Array<string> | null) => {
-				__f__('log','at utils/cameraPermission.uts:73','📷 [ensureCameraPermission] 权限被拒绝')
-				__f__('log','at utils/cameraPermission.uts:74','📷 [ensureCameraPermission] 是否不再询问:', doNotAskAgain)
-				__f__('log','at utils/cameraPermission.uts:75','📷 [ensureCameraPermission] 被拒绝的权限:', deniedPermissions)
-				
-				if (doNotAskAgain) {
-					__f__('log','at utils/cameraPermission.uts:78','⚠️ [ensureCameraPermission] 用户选择不再询问，需要去系统设置')
-					callback('settingsRequired')
-				} else {
-					__f__('log','at utils/cameraPermission.uts:81','❌ [ensureCameraPermission] 用户拒绝权限')
-					callback('denied')
-				}
+				__f__('warn','at utils/cameraPermission.uts:56','[' + name + '] 权限被拒绝:', deniedPermissions)
+				callback(doNotAskAgain ? 'settingsRequired' : 'denied')
 			}
 		)
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:87','❌ [ensureCameraPermission] 请求权限异常:', error)
+		__f__('error','at utils/cameraPermission.uts:61','❌ [' + name + '] 请求权限异常:', error)
 		callback('unavailable')
 	}
-	return
-
-
-
-
-
-
 }
 
-/**
- * 打开系统权限设置
- */
+export function ensureCameraPermission(callback: (status: CameraPermissionStatus) => void): void {
+	requestAndroidPermission(
+		[CAMERA_PERMISSION],
+		'ensureCameraPermission',
+		callback,
+		(activity: Activity): boolean => hasPermission(activity, [CAMERA_PERMISSION])
+	)
+}
+
+export function ensureLocationPermission(callback: (status: LocationPermissionStatus) => void): void {
+	requestAndroidPermission(
+		[COARSE_LOCATION_PERMISSION, FINE_LOCATION_PERMISSION],
+		'ensureLocationPermission',
+		callback,
+		(activity: Activity): boolean => {
+			return hasPermission(activity, [COARSE_LOCATION_PERMISSION]) ||
+				hasPermission(activity, [FINE_LOCATION_PERMISSION])
+		}
+	)
+}
+
 export function openCameraPermissionSettings(): void {
-	__f__('log','at utils/cameraPermission.uts:103','📷 [openCameraPermissionSettings] 打开系统权限设置')
-	
-
 	const activity = UTSAndroid.getUniActivity()
-	if (activity == null) {
-		__f__('error','at utils/cameraPermission.uts:108','❌ [openCameraPermissionSettings] 获取 Activity 失败')
-		return
-	}
-	
-	// 【修复】直接定义权限数组
-	const permission: string = 'android.permission.CAMERA'
-	const permissions: Array<string> = [permission]
-	
+	if (activity == null) return
 	try {
-		UTSAndroid.gotoSystemPermissionActivity(activity, permissions)
-		__f__('log','at utils/cameraPermission.uts:118','✅ [openCameraPermissionSettings] 已跳转到权限设置')
+		UTSAndroid.gotoSystemPermissionActivity(activity as Activity, [CAMERA_PERMISSION])
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:120','❌ [openCameraPermissionSettings] 打开权限设置失败:', error)
+		__f__('error','at utils/cameraPermission.uts:93','❌ [openCameraPermissionSettings] 打开权限设置失败:', error)
 	}
-
-	
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

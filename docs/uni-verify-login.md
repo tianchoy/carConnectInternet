@@ -1,0 +1,124 @@
+# Uni Verify 与短信登录接入说明
+
+## 平台行为
+
+| 平台 | 个人用户登录 | 兜底 |
+| --- | --- | --- |
+| 微信小程序 | 保持现有微信 `getPhoneNumber` + `/authLogin` | 保持现状 |
+| Android / iOS | `uni.getUniVerifyManager()` 标准授权页本机号码一键登录 | 手机号验证码登录 |
+
+企业账号密码登录继续使用既有 `/sys/login`，不受本次改动影响。
+
+## 原生配置前置条件
+
+`manifest.json` 已在 `app-android.distribute.modules`、`app-ios.distribute.modules` 中启用 `uni-verify`。在 HBuilderX / DCloud Uni Verify 控制台仍必须完成下列发布配置：
+
+1. 为应用 AppID `__UNI__662B0B4` 开通 Uni Verify。
+2. Android 配置正式包名、签名证书和控制台要求的运营商信息。
+3. iOS 配置正式 Bundle Identifier、证书/描述文件和控制台要求的信息。
+4. 使用包含 `uni-verify` 的 Android/iOS 原生包在真机上测试；热更新和模拟器不能替代运营商认证验证。
+5. 在隐私政策中告知：为本机号码认证，会向运营商请求认证并在服务端处理手机号；授权页须同时展示业务协议和运营商协议。
+
+当前实现采用官方标准授权页 `login()`，未使用 `customLogin()`，以避免自定义运营商授权页的协议展示合规风险。
+
+## 后端待实现接口
+
+> 以下接口目前是前端示例契约。`api/request.uts` 已标注“后端待实现的示例接口”。后端完成后可替换 URL 或按同样数据语义联调。
+
+### 1. Uni Verify 换号登录
+
+`POST /authLogin/uniVerify`
+
+请求：
+
+```json
+{
+  "openId": "Uni Verify 成功回调的 openId",
+  "accessToken": "Uni Verify 成功回调的 accessToken",
+  "platform": "android",
+  "clientVersion": "1.0.0"
+}
+```
+
+- `openId`、`accessToken` 由 `uni.getUniVerifyManager().login()` 成功回调直接透传；不得由客户端伪造手机号代替。
+- `platform` 仅为 `android` 或 `ios`，用于审计和服务端处理，不可作为身份凭证。
+- 客户端不会存储或打印完整 `accessToken`。
+
+成功响应（`data.token` 必填）：
+
+```json
+{
+  "code": 0,
+  "msg": "登录成功",
+  "data": {
+    "token": "业务登录token",
+    "refreshToken": "可选",
+    "expiresIn": 7200,
+    "userInfo": {
+      "id": "用户ID",
+      "mobile": "可选，建议脱敏"
+    }
+  }
+}
+```
+
+失败响应：
+
+```json
+{
+  "code": 40101,
+  "msg": "认证凭据无效或已过期",
+  "data": null
+}
+```
+
+服务端必须使用 Uni Verify 服务端能力通过 `openId` / `accessToken` 换取手机号，再按手机号查找个人用户；不存在时自动注册个人用户，校验账号状态后返回现有业务 token。
+
+### 2. 发送短信验证码
+
+`POST /authLogin/sms/send`
+
+```json
+{
+  "mobile": "13800138000",
+  "scene": "login"
+}
+```
+
+成功响应：
+
+```json
+{
+  "code": 0,
+  "msg": "发送成功",
+  "data": {
+    "cooldownSeconds": 60
+  }
+}
+```
+
+### 3. 短信验证码登录
+
+`POST /authLogin/sms/login`
+
+```json
+{
+  "mobile": "13800138000",
+  "code": "123456",
+  "platform": "ios"
+}
+```
+
+成功响应与 Uni Verify 登录成功响应一致，且必须返回 `data.token`。
+
+服务端应实现短信发送与校验频控、验证码过期和一次性使用、异常审计、HTTPS、认证凭据/手机号日志脱敏。首次验证成功但无对应个人用户时自动注册后登录。
+
+## 验收清单
+
+1. 微信小程序仍将 `{ code, encryptedData, iv }` 提交到 `/authLogin`。
+2. 企业账号密码仍将原字段提交到 `/sys/login`。
+3. Android / iOS 真机、受支持运营商 SIM 卡下，可打开标准授权页并在服务端换号后进入首页。
+4. 用户取消、无 SIM、运营商不支持、网络失败、后端拒绝时，页面不残留加载状态，且可使用短信登录。
+5. 短信号码格式错误不能发码；倒计时禁止重发；错误/过期验证码有提示；登录成功保存既有 `token` 并进入首页。
+
+官方 API 参考：[uni.getUniVerifyManager()](https://doc.dcloud.net.cn/uni-app-x/api/get-univerify-manager.html)。

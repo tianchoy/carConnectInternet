@@ -58,7 +58,9 @@
 				"<uses-permission android:name=\"android.permission.INTERNET\"/>"
 			],
 			"modules": {
+				"uni-verify": {},
 				"uni-barcode-scanning": {},
+				"uni-camera": {},
 				"uni-map": {
 					"tencent": {
 						"key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
@@ -86,7 +88,7 @@
 						"appkey_android": "您的高德地图Android Key"
 					},
 					"qqmap": {
-						"appkey_android": "您的腾讯地图Android Key"
+						"appkey_android": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
 					}
 				}
 			},
@@ -135,6 +137,7 @@
 				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
 			},
 			"modules": {
+				"uni-verify": {},
 				"uni-barcode-scanning": {},
 				"uni-map": {
 					"tencent": {

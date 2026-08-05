@@ -8,7 +8,7 @@
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
-    "compilerVersion": "5.22"
+    "compilerVersion": "5.23"
   },
   "app-android": {
     "distribute": {
@@ -21,7 +21,9 @@
         "<uses-permission android:name=\"android.permission.INTERNET\"/>"
       ],
       "modules": {
+        "uni-verify": {},
         "uni-barcode-scanning": {},
+        "uni-camera": {},
         "uni-map": {
           "tencent": {
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"

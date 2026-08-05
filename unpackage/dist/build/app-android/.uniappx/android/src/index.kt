@@ -1,5 +1,6 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI662B0B4
+import android.app.Activity
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -15,6 +16,7 @@ import kotlin.properties.Delegates
 import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.exit as uni_exit
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
+import io.dcloud.uniapp.extapi.getUniVerifyManager as uni_getUniVerifyManager
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
@@ -525,6 +527,9 @@ val trackPos = "/gps/trackPos?"
 val userinfo = "/sys/user/info"
 val addDeviceUrl = "/userDevice/add"
 val userDeviceList = "/userDevice/list"
+val uniVerifyLoginUrl = "/authLogin/uniVerify"
+val smsSendCodeUrl = "/authLogin/sms/send"
+val smsLoginUrl = "/authLogin/sms/login"
 val changePSW = "/sys/user/password"
 val userMsgList = "/usermessage/listForUser"
 val msgState = "/usermessage/detail/"
@@ -555,6 +560,29 @@ open class JsonDataResponse (
     open var msg: String,
     @JsonNotNull
     open var data: UTSJSONObject,
+) : UTSObject()
+open class UniVerifyLoginRequest (
+    @JsonNotNull
+    open var openId: String,
+    @JsonNotNull
+    open var accessToken: String,
+    @JsonNotNull
+    open var platform: String,
+    open var clientVersion: String? = null,
+) : UTSObject()
+open class SendSmsCodeRequest (
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var scene: String,
+) : UTSObject()
+open class SmsLoginRequest (
+    @JsonNotNull
+    open var mobile: String,
+    @JsonNotNull
+    open var code: String,
+    @JsonNotNull
+    open var platform: String,
 ) : UTSObject()
 open class DevicePositionResponse (
     @JsonNotNull
@@ -750,6 +778,24 @@ val delDevice = fun(imei: String): UTSPromise<BasicResponse> {
 val getUserDeviceList = fun(data: UTSJSONObject): UTSPromise<UserDeviceListResponse> {
     return post(userDeviceList, data).then(fun(raw: Any): UserDeviceListResponse {
         return userDevicePageResponse(raw)
+    }
+    )
+}
+val uniVerifyLogin = fun(data: UniVerifyLoginRequest): UTSPromise<JsonDataResponse> {
+    return post(uniVerifyLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val sendSmsLoginCode = fun(data: SendSmsCodeRequest): UTSPromise<JsonDataResponse> {
+    return post(smsSendCodeUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
+    }
+    )
+}
+val smsLogin = fun(data: SmsLoginRequest): UTSPromise<JsonDataResponse> {
+    return post(smsLoginUrl, data).then(fun(raw: Any): JsonDataResponse {
+        return jsonDataResponse(raw)
     }
     )
 }
@@ -1597,6 +1643,184 @@ val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsIFormIForm(instance)
 }
 )
+open class UniVerifyPreLoginResult (
+    @JsonNotNull
+    open var ok: Boolean = false,
+    @JsonNotNull
+    open var message: String,
+) : UTSObject()
+open class UniVerifyResult (
+    @JsonNotNull
+    open var ok: Boolean = false,
+    @JsonNotNull
+    open var cancelled: Boolean = false,
+    @JsonNotNull
+    open var message: String,
+    @JsonNotNull
+    open var token: String,
+) : UTSObject()
+@JvmField
+var manager: UniVerifyManager? = null
+var preLoginReady = false
+var requesting = false
+fun getPlatform(): String {
+    return "android"
+}
+fun getManager(): UniVerifyManager {
+    if (manager == null) {
+        manager = uni_getUniVerifyManager()
+    }
+    return manager!!
+}
+fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
+    val errCode = error.errCode
+    console.error("Uni Verify 授权失败:", errCode, error.errMsg)
+    if (errCode == 30001) {
+        return "已取消本机号码授权"
+    }
+    if (errCode == 30004 || errCode == 30005 || errCode == 30006) {
+        return "运营商认证失败，请检查 SIM 卡、移动网络后重试"
+    }
+    if (errCode == 30007) {
+        return "本机号码授权已过期，请重试"
+    }
+    if (errCode == 30008) {
+        return "正在进行本机号码授权，请稍候"
+    }
+    if (errCode == 40001 || errCode == 40002) {
+        return "网络异常，请检查移动网络后重试"
+    }
+    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录"
+}
+fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
+    val errCode = error.errCode
+    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + error.errMsg, "cause=" + error.cause)
+    if (errCode == 30005) {
+        return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用"
+    }
+    if (errCode == 1000 || errCode == 1001 || errCode == 1002) {
+        return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置"
+    }
+    if (errCode == 1004) {
+        return "一键登录服务已禁用，请检查 Uni Verify 服务状态"
+    }
+    if (errCode == 30001) {
+        return "本机号码预取已取消"
+    }
+    if (errCode == 30004) {
+        return "运营商预取号失败，请确认 SIM 卡、移动网络与运营商服务状态"
+    }
+    if (errCode == 40001 || errCode == 40002) {
+        return "网络异常，无法获取本机号码，请检查移动网络后重试"
+    }
+    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录"
+}
+fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
+    return UniVerifyPreLoginResult(ok = ok, message = message)
+}
+fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
+    return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
+        try {
+            val uniVerifyManager = getManager()
+            if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
+                preLoginReady = true
+                resolve(createPreLoginResult(true, ""))
+                return
+            }
+            uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
+                preLoginReady = true
+                resolve(createPreLoginResult(true, ""))
+            }
+            , fail = fun(error: UniVerifyManagerPreLoginFail){
+                preLoginReady = false
+                resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
+            }
+            ))
+        }
+         catch (error: Throwable) {
+            preLoginReady = false
+            console.error("Uni Verify 管理器初始化失败:", error)
+            resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
+        }
+    }
+    )
+}
+fun prefetchUniVerify(): Unit {
+    ensurePreLogin()
+}
+fun createResult(ok: Boolean, cancelled: Boolean, message: String, token: String): UniVerifyResult {
+    return UniVerifyResult(ok = ok, cancelled = cancelled, message = message, token = token)
+}
+fun closeLoginPage(uniVerifyManager: UniVerifyManager?): Unit {
+    if (uniVerifyManager != null) {
+        uniVerifyManager.close()
+    }
+}
+fun loginByUniVerify(clientVersion: String): UTSPromise<UniVerifyResult> {
+    return UTSPromise<UniVerifyResult>(fun(resolve, _reject){
+        if (requesting) {
+            resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""))
+            return
+        }
+        requesting = true
+        ensurePreLogin().then(fun(preLoginResult){
+            if (!preLoginResult.ok) {
+                requesting = false
+                resolve(createResult(false, false, preLoginResult.message, ""))
+                return
+            }
+            var uniVerifyManager: UniVerifyManager? = null
+            try {
+                uniVerifyManager = getManager()
+                uniVerifyManager.login(UniVerifyManagerLoginOptions(uniVerifyStyle = UniVerifyManagerLoginStyle(fullScreen = false, loginBtnText = "本机号码一键登录"), success = fun(result: UniVerifyManagerLoginSuccess){
+                    uniVerifyLogin(UniVerifyLoginRequest(openId = result.openId, accessToken = result.accessToken, platform = getPlatform(), clientVersion = clientVersion)).then(fun(response){
+                        val loginData = response.data
+                        val token = if (loginData != null) {
+                            loginData.getString("token", "")
+                        } else {
+                            ""
+                        }
+                        if (response.code == 0 && token != "") {
+                            resolve(createResult(true, false, "", token))
+                        } else {
+                            resolve(createResult(false, false, if (response.msg != "") {
+                                response.msg
+                            } else {
+                                "本机号码登录失败，请使用验证码登录"
+                            }
+                            , ""))
+                        }
+                    }
+                    ).`catch`(fun(){
+                        resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""))
+                    }
+                    ).`finally`(fun(){
+                        closeLoginPage(uniVerifyManager)
+                        requesting = false
+                    }
+                    )
+                }
+                , fail = fun(error: UniVerifyManagerLoginFail){
+                    preLoginReady = false
+                    resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""))
+                    closeLoginPage(uniVerifyManager)
+                    requesting = false
+                }
+                ))
+            }
+             catch (error: Throwable) {
+                resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""))
+                requesting = false
+            }
+        }
+        ).`catch`(fun(){
+            requesting = false
+            resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""))
+        }
+        )
+    }
+    )
+}
 open class FormData (
     @JsonNotNull
     open var username: String,
@@ -1853,102 +2077,80 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
 }
 )
 typealias CameraPermissionStatus = String
-fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
-    console.log("📷 [ensureCameraPermission] 开始检查相机权限")
+val CAMERA_PERMISSION = "android.permission.CAMERA"
+fun hasPermission(activity: Activity, permissions: UTSArray<String>): Boolean {
+    return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+}
+fun requestAndroidPermission(permissions: UTSArray<String>, name: String, callback: (status: CameraPermissionStatus) -> Unit, isGranted: (activity: Activity) -> Boolean): Unit {
     val activity = UTSAndroid.getUniActivity()
     if (activity == null) {
-        console.error("❌ [ensureCameraPermission] 获取 Activity 失败")
+        console.error("❌ [" + name + "] 获取 Activity 失败")
         callback("unavailable")
         return
     }
-    val permission: String = "android.permission.CAMERA"
-    val permissions = _uA(
-        permission
-    ) as UTSArray<String>
-    console.log("📷 [ensureCameraPermission] 权限:", permissions)
+    val currentActivity = activity as Activity
     try {
-        val isGranted = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-        console.log("📷 [ensureCameraPermission] 当前权限状态:", if (isTruthy(isGranted)) {
-            "已授予"
-        } else {
-            "未授予"
-        }
-        )
-        if (isTruthy(isGranted)) {
-            console.log("✅ [ensureCameraPermission] 相机权限已授予")
+        if (isGranted(currentActivity)) {
             callback("granted")
             return
         }
     }
      catch (error: Throwable) {
-        console.error("❌ [ensureCameraPermission] 检查权限失败:", error)
+        console.error("❌ [" + name + "] 检查权限失败:", error)
         callback("unavailable")
         return
     }
-    console.log("📷 [ensureCameraPermission] 开始请求相机权限...")
     try {
-        UTSAndroid.requestSystemPermission(activity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
-            console.log("📷 [ensureCameraPermission] 权限请求结果:", if (allRight) {
-                "成功"
-            } else {
-                "失败"
+        UTSAndroid.requestSystemPermission(currentActivity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
+            console.log("[" + name + "] 权限请求结果:", allRight, grantedPermissions)
+            try {
+                callback(if (isGranted(currentActivity)) {
+                    "granted"
+                } else {
+                    "denied"
+                }
+                )
             }
-            )
-            console.log("📷 [ensureCameraPermission] 授予的权限:", grantedPermissions)
-            if (allRight) {
-                console.log("✅ [ensureCameraPermission] 权限授予成功")
-                callback("granted")
-            } else {
-                try {
-                    val isGrantedNow = UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-                    if (isTruthy(isGrantedNow)) {
-                        console.log("✅ [ensureCameraPermission] 权限实际已授予")
-                        callback("granted")
-                    } else {
-                        console.log("❌ [ensureCameraPermission] 权限被拒绝")
-                        callback("denied")
-                    }
-                }
-                 catch (error: Throwable) {
-                    console.error("❌ [ensureCameraPermission] 再次检查权限失败:", error)
-                    callback("denied")
-                }
+             catch (error: Throwable) {
+                console.error("❌ [" + name + "] 请求后检查权限失败:", error)
+                callback("unavailable")
             }
         }
         , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
-            console.log("📷 [ensureCameraPermission] 权限被拒绝")
-            console.log("📷 [ensureCameraPermission] 是否不再询问:", doNotAskAgain)
-            console.log("📷 [ensureCameraPermission] 被拒绝的权限:", deniedPermissions)
-            if (doNotAskAgain) {
-                console.log("⚠️ [ensureCameraPermission] 用户选择不再询问，需要去系统设置")
-                callback("settingsRequired")
+            console.warn("[" + name + "] 权限被拒绝:", deniedPermissions)
+            callback(if (doNotAskAgain) {
+                "settingsRequired"
             } else {
-                console.log("❌ [ensureCameraPermission] 用户拒绝权限")
-                callback("denied")
+                "denied"
             }
+            )
         }
         )
     }
      catch (error: Throwable) {
-        console.error("❌ [ensureCameraPermission] 请求权限异常:", error)
+        console.error("❌ [" + name + "] 请求权限异常:", error)
         callback("unavailable")
     }
-    return
+}
+fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    requestAndroidPermission(_uA(
+        CAMERA_PERMISSION
+    ), "ensureCameraPermission", callback, fun(activity: Activity): Boolean {
+        return hasPermission(activity, _uA(
+            CAMERA_PERMISSION
+        ))
+    }
+    )
 }
 fun openCameraPermissionSettings(): Unit {
-    console.log("📷 [openCameraPermissionSettings] 打开系统权限设置")
     val activity = UTSAndroid.getUniActivity()
     if (activity == null) {
-        console.error("❌ [openCameraPermissionSettings] 获取 Activity 失败")
         return
     }
-    val permission: String = "android.permission.CAMERA"
-    val permissions = _uA(
-        permission
-    ) as UTSArray<String>
     try {
-        UTSAndroid.gotoSystemPermissionActivity(activity, permissions)
-        console.log("✅ [openCameraPermissionSettings] 已跳转到权限设置")
+        UTSAndroid.gotoSystemPermissionActivity(activity as Activity, _uA(
+            CAMERA_PERMISSION
+        ))
     }
      catch (error: Throwable) {
         console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error)
@@ -8421,7 +8623,7 @@ open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"
-    override var uniCompilerVersion: String = "5.22"
+    override var uniCompilerVersion: String = "5.23"
     constructor() : super() {}
 }
 fun definePageRoutes() {

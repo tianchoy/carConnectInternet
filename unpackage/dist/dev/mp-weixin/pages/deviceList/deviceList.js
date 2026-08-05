@@ -5,6 +5,7 @@ const api_request = require("../../api/request.js");
 const utils_coordTransform = require("../../utils/coordTransform.js");
 const utils_cars = require("../../utils/cars.js");
 const utils_device = require("../../utils/device.js");
+const utils_cameraPermission = require("../../utils/cameraPermission.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_tag_1 = common_vendor.resolveComponent("i-tag");
@@ -135,7 +136,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const res = yield api_request.getUserDeviceList(params);
             const list = res.code == 0 && res.data != null ? res.data.list : null;
             if (list == null || !Array.isArray(list)) {
-              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:147", "获取设备列表返回异常:", res);
+              common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:148", "获取设备列表返回异常:", res);
               originalDeviceList.value = [];
               markers.value = [];
               return Promise.resolve(null);
@@ -147,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           originalDeviceList.value = utils_coordTransform.CoordTransform.batchConvertCoordinates(deviceList, "tencent");
           updateMarkers(originalDeviceList.value);
         } catch (err) {
-          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:158", "获取设备列表失败:", err);
+          common_vendor.index.__f__("error", "at pages/deviceList/deviceList.uvue:159", "获取设备列表失败:", err);
           originalDeviceList.value = [];
           markers.value = [];
           utils_toast.showAppToast({ title: "获取设备列表失败", icon: "none" });
@@ -172,7 +173,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         yield loadUserDeviceList([], true);
       });
     };
-    const getLocation = () => {
+    const requestCurrentLocation = () => {
       common_vendor.index.getLocation(new common_vendor.UTSJSONObject({
         type: "wgs84",
         success: (res) => {
@@ -182,8 +183,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         },
         fail: (err) => {
           common_vendor.index.__f__("log", "at pages/deviceList/deviceList.uvue:192", "获取位置失败:", err);
+          utils_toast.showAppToast({ title: "无法获取当前位置，已显示设备位置", icon: "none" });
         }
       }));
+    };
+    const getLocation = () => {
+      utils_cameraPermission.ensureLocationPermission((status) => {
+        if (status == "granted") {
+          requestCurrentLocation();
+          return null;
+        }
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:205", "未获得定位权限:", status);
+        utils_toast.showAppToast({ title: "未获得定位权限，已显示设备位置", icon: "none" });
+      });
     };
     const changeState = (type) => {
       pickerStateTitle.value = type;
@@ -196,7 +208,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return device["deviceId"] == markerId;
       });
       if (selectedDevice == null) {
-        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:222", "未找到对应的设备信息", markerId);
+        common_vendor.index.__f__("warn", "at pages/deviceList/deviceList.uvue:235", "未找到对应的设备信息", markerId);
         return null;
       }
       const imeiValue = (_a = selectedDevice["imei"]) !== null && _a !== void 0 ? _a : "";
@@ -236,27 +248,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, showMap.value ? {
         k: common_vendor.o(($event) => {
           return changeState("全部");
-        }, "4c"),
+        }, "2f"),
         l: common_vendor.p({
           type: "primary",
           text: `全部 ${totalCount.value}`
         }),
         m: common_vendor.o(($event) => {
           return changeState("在线");
-        }, "c1"),
+        }, "8a"),
         n: common_vendor.p({
           type: "success",
           text: `在线 ${onlineCount.value}`
         }),
         o: common_vendor.o(($event) => {
           return changeState("离线");
-        }, "c7"),
+        }, "c2"),
         p: common_vendor.p({
           type: "danger",
           text: `离线 ${offlineCount.value}`
         })
       } : {}) : {
-        q: common_vendor.o(unbindDevice, "1d"),
+        q: common_vendor.o(unbindDevice, "5e"),
         r: common_vendor.p({
           lists: deviceListItems.value
         })

@@ -8123,9 +8123,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.22",
-    uniCompilerVersion: "5.22",
-    uniRuntimeVersion: "5.22",
+    uniCompileVersion: "5.23",
+    uniCompilerVersion: "5.23",
+    uniRuntimeVersion: "5.23",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -8155,8 +8155,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.22");
-      parameters.uniRuntimeVersionCode = parseFloat("5.22");
+      parameters.uniCompilerVersionCode = parseFloat("5.23");
+      parameters.uniRuntimeVersionCode = parseFloat("5.23");
     } catch (error) {
     }
   }
@@ -8292,9 +8292,9 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.22",
-      uniCompilerVersion: "5.22",
-      uniRuntimeVersion: "5.22"
+      uniCompileVersion: "5.23",
+      uniCompilerVersion: "5.23",
+      uniRuntimeVersion: "5.23"
     };
     try {
       if (typeof wx.getAccountInfoSync === "function") {
@@ -8304,8 +8304,8 @@ const getAppBaseInfo = {
     }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.22");
-        parameters.uniRuntimeVersionCode = parseFloat("5.22");
+        parameters.uniCompilerVersionCode = parseFloat("5.23");
+        parameters.uniRuntimeVersionCode = parseFloat("5.23");
       } catch (error) {
       }
     }
@@ -9144,9 +9144,9 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.252,169.254.71.85";
+  const hosts = "127.0.0.1,192.168.1.252";
   const port = "8090";
-  const id = "mp-weixin_FhShrq";
+  const id = "mp-weixin_LhPUHg";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {

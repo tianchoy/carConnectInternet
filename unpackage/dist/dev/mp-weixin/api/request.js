@@ -70,6 +70,75 @@ class JsonDataResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class UniVerifyLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          openId: { type: String, optional: false },
+          accessToken: { type: String, optional: false },
+          platform: { type: String, optional: false },
+          clientVersion: { type: String, optional: true }
+        };
+      },
+      name: "UniVerifyLoginRequest"
+    };
+  }
+  constructor(options, metadata = UniVerifyLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.openId = this.__props__.openId;
+    this.accessToken = this.__props__.accessToken;
+    this.platform = this.__props__.platform;
+    this.clientVersion = this.__props__.clientVersion;
+    delete this.__props__;
+  }
+}
+class SendSmsCodeRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          mobile: { type: String, optional: false },
+          scene: { type: String, optional: false }
+        };
+      },
+      name: "SendSmsCodeRequest"
+    };
+  }
+  constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.mobile = this.__props__.mobile;
+    this.scene = this.__props__.scene;
+    delete this.__props__;
+  }
+}
+class SmsLoginRequest extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          mobile: { type: String, optional: false },
+          code: { type: String, optional: false },
+          platform: { type: String, optional: false }
+        };
+      },
+      name: "SmsLoginRequest"
+    };
+  }
+  constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.mobile = this.__props__.mobile;
+    this.code = this.__props__.code;
+    this.platform = this.__props__.platform;
+    delete this.__props__;
+  }
+}
 class DevicePositionResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {

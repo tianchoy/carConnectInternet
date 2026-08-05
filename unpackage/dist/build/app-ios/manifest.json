@@ -8,7 +8,7 @@
   },
   "uni-app-x": {
     "styleIsolationVersion": "2",
-    "compilerVersion": "5.22"
+    "compilerVersion": "5.23"
   },
   "app-ios": {
     "distribute": {
@@ -16,6 +16,7 @@
         "NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
       },
       "modules": {
+        "uni-verify": {},
         "uni-barcode-scanning": {},
         "uni-map": {
           "tencent": {
@@ -25,10 +26,11 @@
         "uni-showLoading": {},
         "uni-dialogPage": {},
         "uni-event": {},
-        "uni-vibrate": {},
         "uni-storage": {},
+        "uni-vibrate": {},
         "uni-getSystemInfo": {},
         "uni-location": {},
+        "uni-getAppBaseInfo": {},
         "uni-network": {},
         "uni-openLocation": {},
         "uni-prompt": {},

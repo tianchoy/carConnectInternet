@@ -1,9 +1,9 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const api_request = require("../../api/request.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
-const api_request = require("../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");
@@ -122,6 +122,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const rememberPassword = common_vendor.ref(false);
     const formValid = common_vendor.ref(false);
     const loading = common_vendor.ref(false);
+    common_vendor.ref(false);
+    common_vendor.ref("");
+    common_vendor.ref("");
+    common_vendor.ref(0);
+    common_vendor.ref(false);
+    common_vendor.ref(false);
+    common_vendor.ref(false);
     const form = common_vendor.ref(new FormData({
       username: "",
       password: ""
@@ -144,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:133", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:176", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -181,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:176", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:219", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
@@ -193,6 +200,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return false;
       }
       return true;
+    };
+    const completeLogin = (token, savePassword) => {
+      if (token == "") {
+        utils_toast.showAppToast({ title: "登录失败，请重试", icon: "none" });
+        return null;
+      }
+      if (savePassword)
+        saveAccountPassword();
+      common_vendor.index.setStorageSync("token", token);
+      utils_toast.showAppToast({ title: "登录成功", icon: "success" });
+      setTimeout(() => {
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
+      }, 500);
     };
     const loginBt = () => {
       if (!docState.value) {
@@ -256,18 +276,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
             return Promise.resolve(null);
           }
-          common_vendor.index.setStorageSync("token", token);
-          utils_toast.showAppToast({
-            title: "登录成功",
-            icon: "success"
-          });
-          setTimeout(() => {
-            common_vendor.index.reLaunch({
-              url: "/pages/index/index"
-            });
-          }, 500);
+          completeLogin(token, false);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:279", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:435", "微信登录失败:", error);
           utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
@@ -287,41 +298,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:304", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:460", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:306", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:462", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:315", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:471", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:325", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:481", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:327", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:483", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
           const token = loginData != null ? loginData.getString("token", "") : "";
           if (token != "") {
-            saveAccountPassword();
-            common_vendor.index.setStorageSync("token", token);
-            utils_toast.showAppToast({
-              title: "登录成功",
-              icon: "success"
-            });
-            setTimeout(() => {
-              common_vendor.index.reLaunch({
-                url: "/pages/index/index"
-              });
-            }, 500);
+            completeLogin(token, true);
           } else {
             utils_toast.showAppToast({
               title: "登录失败，请重试",
@@ -329,7 +330,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:356", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:502", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -368,7 +369,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:452", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:601", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -443,22 +444,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : common_vendor.e({
         q: !docState.value
       }, !docState.value ? {
-        r: common_vendor.o(loginBt, "f1")
+        r: common_vendor.o(loginBt, "85")
       } : {}, {
         s: docState.value
       }, docState.value ? {
-        t: common_vendor.o(handleGetPhoneNumber, "41")
+        t: common_vendor.o(handleGetPhoneNumber, "7c")
       } : {}), {
-        v: common_vendor.o(isDocState, "73"),
+        v: common_vendor.o(isDocState, "68"),
         w: common_vendor.p({
           checked: docState.value,
           class: "data-v-27a30816"
         }),
-        x: common_vendor.o(gotoAgreement, "a9"),
-        y: common_vendor.o(gotoPrivacy, "11"),
-        z: common_vendor.o(gotoIndex, "e5"),
+        x: common_vendor.o(gotoAgreement, "02"),
+        y: common_vendor.o(gotoPrivacy, "17"),
+        z: common_vendor.o(gotoIndex, "d3"),
         A: common_vendor.t(pswLogin.value ? "个人用户登录" : "企业用户登录"),
-        B: common_vendor.o(isPswLogin, "be"),
+        B: common_vendor.o(isPswLogin, "e6"),
         C: `${_ctx.u_s_b_h}px`,
         D: `${_ctx.u_s_a_i_b}px`,
         E: common_vendor.p({
