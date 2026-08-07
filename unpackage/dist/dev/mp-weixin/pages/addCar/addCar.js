@@ -150,7 +150,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           cancelText: "取消",
           success: (res) => {
             if (res.confirm)
-              ;
+              utils_cameraPermission.openCameraPermissionSettings();
           }
         }));
         return null;

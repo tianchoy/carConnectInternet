@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>qqmap</string>
+		<string>iosamap</string>
+		<string>baidumap</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>需要使用您的摄像头扫描设备二维码</string>
 </dict>

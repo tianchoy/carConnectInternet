@@ -1,6 +1,10 @@
 import { showAppToast } from './toast.uts'
+import CoordTransform from './coordTransform.uts'
 
 import { openExternalMap } from '@/uni_modules/external-map-navigation'
+
+
+
 
 
 export type OpenLocationParams = {
@@ -56,6 +60,76 @@ function openAndroidExternalMap(params: OpenLocationParams): void {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function openBuiltInLocation(params: OpenLocationParams): void {
 	try {
 		uni.openLocation({
@@ -92,6 +166,11 @@ export function openLocation(params: OpenLocationParams): void {
 
 	openAndroidExternalMap(params)
 	return
+
+
+
+
+
 
 
 

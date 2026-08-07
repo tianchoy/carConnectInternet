@@ -23,7 +23,7 @@
 			<view class="fence-operations" v-if="selectedFence">
 				<view class="fence-header">
 					<text class="fence-name">{{ getSelectedFenceName() }}</text>
-					<i-icon size="22" name="/static/close.png" @click="selectedFence = null; showFenceModal?.$callMethod('close')"></i-icon>
+					<i-icon size="20" name="/static/close.png" @click="selectedFence = null; showFenceModal?.$callMethod('close')"></i-icon>
 				</view>
 				<view class="fence-actions">
 					<i-button size="small" @click="editSelectedFence">编辑</i-button>
@@ -1390,7 +1390,7 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		.fence-operations {
 			background-color: #fff;
-			padding: 20rpx 20rpx 50rpx 20rpx;
+			padding-bottom: 50rpx;
 
 			.fence-header {
 				display: flex;

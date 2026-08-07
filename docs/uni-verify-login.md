@@ -14,12 +14,20 @@
 `manifest.json` 已在 `app-android.distribute.modules`、`app-ios.distribute.modules` 中启用 `uni-verify`。在 HBuilderX / DCloud Uni Verify 控制台仍必须完成下列发布配置：
 
 1. 为应用 AppID `__UNI__662B0B4` 开通 Uni Verify。
-2. Android 配置正式包名、签名证书和控制台要求的运营商信息。
+2. Android 配置正式包名、**release 签名证书**和控制台要求的运营商信息；离线工程的 debug APK 通常使用另一份 debug 证书，不能用于验收一键登录。
 3. iOS 配置正式 Bundle Identifier、证书/描述文件和控制台要求的信息。
 4. 使用包含 `uni-verify` 的 Android/iOS 原生包在真机上测试；热更新和模拟器不能替代运营商认证验证。
 5. 在隐私政策中告知：为本机号码认证，会向运营商请求认证并在服务端处理手机号；授权页须同时展示业务协议和运营商协议。
 
 当前实现采用官方标准授权页 `login()`，未使用 `customLogin()`，以避免自定义运营商授权页的协议展示合规风险。
+
+## Android 离线构建排查
+
+Android 离线工程必须以最终 release APK/AAB 的证书指纹为准：用 `apksigner verify --print-certs` 或 `keytool` 获取 SHA-1，并与 Uniappx 控制台登记值逐字比对。包名、`DCLOUD_UNI_APPID`、`dcloud_appkey`、`GETUI_APPID`、`GY_APP_ID` 也必须与控制台配置一致。
+
+官方 Uni Login 错误码表将 `30004` 定义为“其他错误”，并建议查看 30004 专题排查或联系官方支持。因此客户端预取号返回 `30004` 时，不能将其直接归因为 SIM 卡、移动网络或 `READ_PHONE_STATE` 缺失；应同时记录 `errMsg`、`cause`、实际包名、最终 APK 签名及测试网络环境。应用代码不应在预取号前申请 `READ_PHONE_STATE`，除非后续 SDK 官方文档明确要求且完成合规评估。
+
+官方参考：[一键登录错误码](https://doc.dcloud.net.cn/uniCloud/uni-login/dev.html#错误码)。
 
 ## 后端待实现接口
 

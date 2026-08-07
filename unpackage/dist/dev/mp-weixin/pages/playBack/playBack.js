@@ -720,10 +720,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.t(getPlaybackClock(startTime.value)),
         m: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "3e"),
+        }, "df"),
         n: common_vendor.o(($event) => {
           return showPicker("start");
-        }, "48"),
+        }, "72"),
         o: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
@@ -733,25 +733,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.t(getPlaybackClock(endTime.value)),
         r: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "43"),
+        }, "5c"),
         s: common_vendor.o(($event) => {
           return showPicker("end");
-        }, "87"),
+        }, "02"),
         t: common_vendor.p({
           name: "/static/xiangxia.png",
           fontSize: "15",
           class: "date-arrow"
         }),
-        v: common_vendor.o(togglePlayback, "c1"),
+        v: common_vendor.o(togglePlayback, "3f"),
         w: common_vendor.p({
           type: "primary",
           size: "small",
           text: isPlaying.value ? "暂停" : "播放"
         }),
-        x: common_vendor.o(setPlaybackSpeedFromValue, "f0"),
+        x: common_vendor.o(setPlaybackSpeedFromValue, "ac"),
         y: common_vendor.o(($event) => {
           return playbackSpeed.value = $event;
-        }, "50"),
+        }, "7d"),
         z: common_vendor.p({
           min: 5,
           max: 50,
@@ -762,8 +762,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         B: common_vendor.t(currentTime.value),
         C: common_vendor.t(currentSpeed.value),
         D: common_vendor.t((totalDistance.value / 1e3).toFixed(1)),
-        E: common_vendor.o(onConfirm, "8d"),
-        F: common_vendor.o(onCancel, "dc"),
+        E: common_vendor.o(onConfirm, "85"),
+        F: common_vendor.o(onCancel, "9f"),
         G: common_vendor.p({
           ["confirm-btn"]: "确认",
           ["cancel-btn"]: "取消",
@@ -773,7 +773,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         H: common_vendor.o(($event) => {
           return showDateTimePicker.value = $event;
-        }, "ad"),
+        }, "40"),
         I: common_vendor.p({
           position: "bottom",
           closeable: false,

@@ -1,5 +1,6 @@
 import { ExternalMapNavigationParams } from "../uni_modules/external-map-navigation/utssdk/interface";
 import { showAppToast } from './toast.uts';
+import CoordTransform from './coordTransform.uts';
 import { openExternalMap } from '@/uni_modules/external-map-navigation';
 export type OpenLocationParams = {
     latitude: number;

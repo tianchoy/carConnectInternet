@@ -12,7 +12,8 @@
     "platforms": {
       "client": {
         "App": {
-          "app-android": "u"
+          "app-android": "u",
+          "app-ios": "u"
         }
       }
     }

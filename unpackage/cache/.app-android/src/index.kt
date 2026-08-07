@@ -195,6 +195,139 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
 fun showAppToast(options: ShowToastOptions): Unit {
     uni_showToast(options)
 }
+open class Coordinate (
+    @JsonNotNull
+    open var lat: Number,
+    @JsonNotNull
+    open var lng: Number,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("Coordinate", "utils/coordTransform.uts", 6, 13)
+    }
+}
+open class CoordTransform : IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("CoordTransform", "utils/coordTransform.uts", 10, 7)
+    }
+    companion object {
+        private val a: Number = 6378245.0
+        private val ee: Number = 0.00669342162296594323
+        private val pi: Number = 3.1415926535897932384626
+        fun wgs84ToTencent(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            val mgLat = wgLat + dLat
+            val mgLng = wgLon + dLng
+            return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
+        }
+        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
+        }
+        fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
+            if (!this.isInChina(tcLon, tcLat)) {
+                return Coordinate(lat = tcLat, lng = tcLon)
+            }
+            var wgsLat = tcLat
+            var wgsLng = tcLon
+            run {
+                var i: Number = 0
+                while(i < 5){
+                    val gcj02 = this.wgs84ToTencent(wgsLat, wgsLng)
+                    val deltaLat = tcLat - gcj02.lat
+                    val deltaLng = tcLon - gcj02.lng
+                    wgsLat += deltaLat
+                    wgsLng += deltaLng
+                    if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
+                        break
+                    }
+                    i++
+                }
+            }
+            return Coordinate(lat = parseFloat(wgsLat.toFixed(6)), lng = parseFloat(wgsLng.toFixed(6)))
+        }
+        fun batchConvertCoordinates(devices: UTSArray<UTSJSONObject>, targetSystem: String = "tencent"): UTSArray<UTSJSONObject> {
+            if (!UTSArray.isArray(devices)) {
+                return _uA()
+            }
+            return devices.map(fun(device): UTSJSONObject {
+                if (device == null) {
+                    return device
+                }
+                val item = device as UTSJSONObject
+                val latitude = item["latitude"]
+                val longitude = item["longitude"]
+                if (latitude == null || longitude == null) {
+                    return device
+                }
+                val lat = parseFloat(latitude.toString())
+                val lng = parseFloat(longitude.toString())
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn("设备经纬度无效", device, " at utils/coordTransform.uts:126")
+                    return device
+                }
+                var converted = Coordinate(lat = lat, lng = lng)
+                if (targetSystem === "tencent") {
+                    converted = this.wgs84ToTencent(lat, lng)
+                } else {
+                    converted = this.tencentToWgs84(lat, lng)
+                }
+                item["latitude"] = converted.lat
+                item["longitude"] = converted.lng
+                item["originalLatitude"] = lat
+                item["originalLongitude"] = lng
+                return item
+            }
+            )
+        }
+        fun convertCoordinate(lat: Number, lng: Number, fromSystem: String = "wgs84", toSystem: String = "tencent"): Coordinate {
+            if (fromSystem === "wgs84" && toSystem === "tencent") {
+                return this.wgs84ToTencent(lat, lng)
+            } else if (fromSystem === "tencent" && toSystem === "wgs84") {
+                return this.tencentToWgs84(lat, lng)
+            } else {
+                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem, " at utils/coordTransform.uts:161")
+                return Coordinate(lat = lat, lng = lng)
+            }
+        }
+        fun isInChina(lng: Number, lat: Number): Boolean {
+            return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271
+        }
+        private fun transformLat(x: Number, y: Number): Number {
+            var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
+            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
+            ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0
+            ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0
+            return ret
+        }
+        private fun transformLng(x: Number, y: Number): Number {
+            var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
+            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
+            ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0
+            ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 300.0 * Math.sin(x / 30.0 * Math.PI)) * 2.0 / 3.0
+            return ret
+        }
+    }
+}
 open class OpenLocationParams (
     @JsonNotNull
     open var latitude: Number,
@@ -204,7 +337,7 @@ open class OpenLocationParams (
     open var name: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("OpenLocationParams", "utils/openLocation.uts", 4, 13)
+        return UTSSourceMapPosition("OpenLocationParams", "utils/openLocation.uts", 5, 13)
     }
 }
 fun isValidCoordinate(latitude: Number, longitude: Number): Boolean {
@@ -1104,139 +1237,6 @@ val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
     }
     )
 }
-open class Coordinate (
-    @JsonNotNull
-    open var lat: Number,
-    @JsonNotNull
-    open var lng: Number,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Coordinate", "utils/coordTransform.uts", 6, 13)
-    }
-}
-open class CoordTransform : IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CoordTransform", "utils/coordTransform.uts", 10, 7)
-    }
-    companion object {
-        private val a: Number = 6378245.0
-        private val ee: Number = 0.00669342162296594323
-        private val pi: Number = 3.1415926535897932384626
-        fun wgs84ToTencent(wgLat: Number, wgLon: Number): Coordinate {
-            if (!this.isInChina(wgLon, wgLat)) {
-                return Coordinate(lat = wgLat, lng = wgLon)
-            }
-            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
-            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
-            var radLat = wgLat / 180.0 * this.pi
-            var magic = Math.sin(radLat)
-            magic = 1 - this.ee * magic * magic
-            var sqrtMagic = Math.sqrt(magic)
-            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
-            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
-            val mgLat = wgLat + dLat
-            val mgLng = wgLon + dLng
-            return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
-        }
-        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
-            if (!this.isInChina(wgLon, wgLat)) {
-                return Coordinate(lat = wgLat, lng = wgLon)
-            }
-            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
-            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
-            var radLat = wgLat / 180.0 * this.pi
-            var magic = Math.sin(radLat)
-            magic = 1 - this.ee * magic * magic
-            var sqrtMagic = Math.sqrt(magic)
-            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
-            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
-            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
-        }
-        fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
-            if (!this.isInChina(tcLon, tcLat)) {
-                return Coordinate(lat = tcLat, lng = tcLon)
-            }
-            var wgsLat = tcLat
-            var wgsLng = tcLon
-            run {
-                var i: Number = 0
-                while(i < 5){
-                    val gcj02 = this.wgs84ToTencent(wgsLat, wgsLng)
-                    val deltaLat = tcLat - gcj02.lat
-                    val deltaLng = tcLon - gcj02.lng
-                    wgsLat += deltaLat
-                    wgsLng += deltaLng
-                    if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
-                        break
-                    }
-                    i++
-                }
-            }
-            return Coordinate(lat = parseFloat(wgsLat.toFixed(6)), lng = parseFloat(wgsLng.toFixed(6)))
-        }
-        fun batchConvertCoordinates(devices: UTSArray<UTSJSONObject>, targetSystem: String = "tencent"): UTSArray<UTSJSONObject> {
-            if (!UTSArray.isArray(devices)) {
-                return _uA()
-            }
-            return devices.map(fun(device): UTSJSONObject {
-                if (device == null) {
-                    return device
-                }
-                val item = device as UTSJSONObject
-                val latitude = item["latitude"]
-                val longitude = item["longitude"]
-                if (latitude == null || longitude == null) {
-                    return device
-                }
-                val lat = parseFloat(latitude.toString())
-                val lng = parseFloat(longitude.toString())
-                if (isNaN(lat) || isNaN(lng)) {
-                    console.warn("设备经纬度无效", device, " at utils/coordTransform.uts:126")
-                    return device
-                }
-                var converted = Coordinate(lat = lat, lng = lng)
-                if (targetSystem === "tencent") {
-                    converted = this.wgs84ToTencent(lat, lng)
-                } else {
-                    converted = this.tencentToWgs84(lat, lng)
-                }
-                item["latitude"] = converted.lat
-                item["longitude"] = converted.lng
-                item["originalLatitude"] = lat
-                item["originalLongitude"] = lng
-                return item
-            }
-            )
-        }
-        fun convertCoordinate(lat: Number, lng: Number, fromSystem: String = "wgs84", toSystem: String = "tencent"): Coordinate {
-            if (fromSystem === "wgs84" && toSystem === "tencent") {
-                return this.wgs84ToTencent(lat, lng)
-            } else if (fromSystem === "tencent" && toSystem === "wgs84") {
-                return this.tencentToWgs84(lat, lng)
-            } else {
-                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem, " at utils/coordTransform.uts:161")
-                return Coordinate(lat = lat, lng = lng)
-            }
-        }
-        fun isInChina(lng: Number, lat: Number): Boolean {
-            return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271
-        }
-        private fun transformLat(x: Number, y: Number): Number {
-            var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
-            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-            ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0
-            ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0
-            return ret
-        }
-        private fun transformLng(x: Number, y: Number): Number {
-            var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
-            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-            ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0
-            ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 300.0 * Math.sin(x / 30.0 * Math.PI)) * 2.0 / 3.0
-            return ret
-        }
-    }
-}
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,
@@ -1870,6 +1870,7 @@ val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsIFormIForm(instance)
 }
 )
+val READ_PHONE_STATE_PERMISSION = "android.permission.READ_PHONE_STATE"
 open class UniVerifyPreLoginResult (
     @JsonNotNull
     open var ok: Boolean = false,
@@ -1877,7 +1878,7 @@ open class UniVerifyPreLoginResult (
     open var message: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 3, 13)
+        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 5, 13)
     }
 }
 open class UniVerifyResult (
@@ -1891,7 +1892,7 @@ open class UniVerifyResult (
     open var token: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 7, 13)
+        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 9, 13)
     }
 }
 @JvmField
@@ -1909,7 +1910,7 @@ fun getManager(): UniVerifyManager {
 }
 fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
     val errCode = error.errCode
-    console.error("Uni Verify 授权失败:", errCode, error.errMsg, " at services/auth/uni-verify.uts:38")
+    console.error("Uni Verify 授权失败:", errCode, error.errMsg, " at services/auth/uni-verify.uts:44")
     if (errCode == 30001) {
         return "已取消本机号码授权"
     }
@@ -1929,7 +1930,7 @@ fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
-    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + error.errMsg, "cause=" + error.cause, " at services/auth/uni-verify.uts:49")
+    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + error.errMsg, "cause=" + error.cause, " at services/auth/uni-verify.uts:55")
     if (errCode == 30005) {
         return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用"
     }
@@ -1953,30 +1954,94 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
 fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
     return UniVerifyPreLoginResult(ok = ok, message = message)
 }
-fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
+fun ensurePhoneStatePermission(): UTSPromise<UniVerifyPreLoginResult> {
     return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
+        val activity = UTSAndroid.getUniActivity()
+        if (activity == null) {
+            console.error("Uni Verify 无法获取 Android Activity，不能请求电话状态权限", " at services/auth/uni-verify.uts:74")
+            resolve(createPreLoginResult(false, "一键登录初始化失败，请重试"))
+            return
+        }
+        val currentActivity = activity as Activity
         try {
-            val uniVerifyManager = getManager()
-            if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
-                preLoginReady = true
+            if (isTruthy(UTSAndroid.checkSystemPermissionGranted(currentActivity, _uA(
+                READ_PHONE_STATE_PERMISSION
+            )))) {
                 resolve(createPreLoginResult(true, ""))
                 return
             }
-            uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
-                preLoginReady = true
-                resolve(createPreLoginResult(true, ""))
+            UTSAndroid.requestSystemPermission(currentActivity, _uA(
+                READ_PHONE_STATE_PERMISSION
+            ), fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
+                val granted = UTSAndroid.checkSystemPermissionGranted(currentActivity, _uA(
+                    READ_PHONE_STATE_PERMISSION
+                ))
+                console.log("Uni Verify 电话状态权限请求结果:", granted, " at services/auth/uni-verify.uts:91")
+                resolve(createPreLoginResult(granted, if (isTruthy(granted)) {
+                    ""
+                } else {
+                    "请允许读取电话状态权限后重试一键登录"
+                }
+                ))
             }
-            , fail = fun(error: UniVerifyManagerPreLoginFail){
-                preLoginReady = false
-                resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
+            , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
+                console.warn("Uni Verify 电话状态权限被拒绝:", doNotAskAgain, " at services/auth/uni-verify.uts:95")
+                resolve(createPreLoginResult(false, if (doNotAskAgain) {
+                    "电话状态权限已被永久拒绝，请在系统设置中允许后重试一键登录"
+                } else {
+                    "请允许读取电话状态权限后重试一键登录"
+                }
+                ))
             }
-            ))
+            )
         }
          catch (error: Throwable) {
-            preLoginReady = false
-            console.error("Uni Verify 管理器初始化失败:", error, " at services/auth/uni-verify.uts:84")
-            resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
+            console.error("Uni Verify 请求电话状态权限失败:", error, " at services/auth/uni-verify.uts:100")
+            resolve(createPreLoginResult(false, "一键登录权限初始化失败，请重试"))
         }
+    }
+    )
+}
+fun ensurePhoneStatePermissionBeforePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
+    return ensurePhoneStatePermission()
+}
+fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
+    return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
+        ensurePhoneStatePermissionBeforePreLogin().then(fun(permissionResult){
+            if (!permissionResult.ok) {
+                preLoginReady = false
+                resolve(permissionResult)
+                return
+            }
+            try {
+                val uniVerifyManager = getManager()
+                if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
+                    preLoginReady = true
+                    resolve(createPreLoginResult(true, ""))
+                    return
+                }
+                uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
+                    preLoginReady = true
+                    resolve(createPreLoginResult(true, ""))
+                }
+                , fail = fun(error: UniVerifyManagerPreLoginFail){
+                    preLoginReady = false
+                    resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
+                }
+                ))
+            }
+             catch (error: Throwable) {
+                preLoginReady = false
+                console.error("Uni Verify 管理器初始化失败:", error, " at services/auth/uni-verify.uts:142")
+                resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
+            }
+        }
+        ).`catch`(fun(error){
+            preLoginReady = false
+            console.error("Uni Verify 电话状态权限检查失败:", error, " at services/auth/uni-verify.uts:147")
+            resolve(createPreLoginResult(false, "一键登录权限初始化失败，请重试"))
+        }
+        )
     }
     )
 }

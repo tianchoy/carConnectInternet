@@ -68,6 +68,14 @@
 				},
 				"uni-location": {
 					"system": {}
+				},
+				"uni-push": {
+					"hms": {},
+					"oppo": {},
+					"vivo": {},
+					"xiaomi": {},
+					"meizu": {},
+					"honor": {}
 				}
 			}
 		}

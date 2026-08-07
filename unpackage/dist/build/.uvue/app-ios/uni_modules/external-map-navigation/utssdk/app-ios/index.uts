@@ -1,0 +1,132 @@
+import { URL } from 'Foundation';
+import { UIApplication } from 'UIKit';
+import { ExternalMapNavigationParams, ExternalMapNavigationResult } from '../interface.uts';
+const TENCENT_MAP_PROVIDER_ID = 'qqmap';
+const AMAP_PROVIDER_ID = 'iosamap';
+const BAIDU_MAP_PROVIDER_ID = 'baidumap';
+function result(code: string): ExternalMapNavigationResult {
+    return { code: code } as ExternalMapNavigationResult;
+}
+function isValidCoordinate(latitude: number, longitude: number): boolean {
+    return !isNaN(latitude) && !isNaN(longitude) &&
+        latitude >= -90 && latitude <= 90 &&
+        longitude >= -180 && longitude <= 180 &&
+        !(latitude == 0 && longitude == 0);
+}
+function createURL(value: string): URL | null {
+    try {
+        return new URL((string = value));
+    }
+    catch (error) {
+        console.error('创建地图链接失败:', error);
+        return null;
+    }
+}
+function canOpen(value: string): boolean {
+    const url = createURL(value);
+    return url != null && UIApplication.shared.canOpenURL(url!);
+}
+function openURL(value: string): boolean {
+    const url = createURL(value);
+    if (url == null || !UIApplication.shared.canOpenURL(url!)) {
+        return false;
+    }
+    try {
+        DispatchQueue.main.async((execute = (): void => {
+            UIApplication.shared.open(url!, (options = new Map()), (completionHandler = null));
+        }));
+        return true;
+    }
+    catch (error) {
+        console.error('打开 iOS 地图失败:', error);
+        return false;
+    }
+}
+function encodedValue(value: string): string {
+    const encoded = encodeURIComponent(value);
+    return encoded != null ? encoded as string : '';
+}
+function destinationName(params: ExternalMapNavigationParams): string {
+    return params.name != '' ? params.name : '车辆位置';
+}
+function canOpenProvider(providerId: string): boolean {
+    if (providerId == TENCENT_MAP_PROVIDER_ID)
+        return canOpen('qqmap://');
+    if (providerId == AMAP_PROVIDER_ID)
+        return canOpen('iosamap://');
+    if (providerId == BAIDU_MAP_PROVIDER_ID)
+        return canOpen('baidumap://');
+    return false;
+}
+export function getAvailableIOSMapProviderIds(): string[] {
+    const providerIds: string[] = [];
+    if (canOpenProvider(TENCENT_MAP_PROVIDER_ID))
+        providerIds.push(TENCENT_MAP_PROVIDER_ID);
+    if (canOpenProvider(AMAP_PROVIDER_ID))
+        providerIds.push(AMAP_PROVIDER_ID);
+    if (canOpenProvider(BAIDU_MAP_PROVIDER_ID))
+        providerIds.push(BAIDU_MAP_PROVIDER_ID);
+    return providerIds;
+}
+function buildTencentURL(params: ExternalMapNavigationParams): string {
+    const name = encodedValue(destinationName(params));
+    const origin = encodedValue('我的位置');
+    const latitude = params.latitude.toString() ?? '';
+    const longitude = params.longitude.toString() ?? '';
+    let url = 'qqmap://map/routeplan?type=drive&from=' + origin + '&fromcoord=CurrentLocation&to=' + name;
+    url += '&tocoord=' + latitude + ',' + longitude;
+    url += '&referer=FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD';
+    return url;
+}
+function buildAmapURL(params: ExternalMapNavigationParams): string {
+    const name = encodedValue(destinationName(params));
+    const sourceApplication = encodedValue('车载GPS');
+    const latitude = params.latitude.toString() ?? '';
+    const longitude = params.longitude.toString() ?? '';
+    let url = 'iosamap://navi?sourceApplication=' + sourceApplication + '&poiname=' + name;
+    url += '&lat=' + latitude + '&lon=' + longitude;
+    url += '&dev=0&style=0';
+    return url;
+}
+function buildBaiduURL(params: ExternalMapNavigationParams): string {
+    const name = encodedValue(destinationName(params));
+    const latitude = params.latitude.toString() ?? '';
+    const longitude = params.longitude.toString() ?? '';
+    let url = 'baidumap://map/direction?origin=我的位置&destination=name:' + name;
+    url += '|latlng:' + latitude + ',' + longitude;
+    url += '&mode=driving&coord_type=gcj02&src=ios.carConnectInternet.carConnectInternet';
+    return url;
+}
+function buildAppleURL(params: ExternalMapNavigationParams): string {
+    const latitude = (params.wgs84Latitude ?? params.latitude).toString() ?? '';
+    const longitude = (params.wgs84Longitude ?? params.longitude).toString() ?? '';
+    return 'https://maps.apple.com/?daddr=' + latitude + ',' + longitude + '&dirflg=d';
+}
+function openSelectedProvider(params: ExternalMapNavigationParams, providerId: string): ExternalMapNavigationResult {
+    if (providerId == TENCENT_MAP_PROVIDER_ID) {
+        return openURL(buildTencentURL(params)) ? result('opened') : result('launch_failed');
+    }
+    if (providerId == AMAP_PROVIDER_ID) {
+        return openURL(buildAmapURL(params)) ? result('opened') : result('launch_failed');
+    }
+    if (providerId == BAIDU_MAP_PROVIDER_ID) {
+        return openURL(buildBaiduURL(params)) ? result('opened') : result('launch_failed');
+    }
+    return result('invalid_provider');
+}
+export function openExternalMap(params: ExternalMapNavigationParams): ExternalMapNavigationResult {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+        return result('invalid_coordinate');
+    }
+    if (params.providerId != null && params.providerId != '') {
+        return openSelectedProvider(params, params.providerId as string);
+    }
+    const providerIds = getAvailableIOSMapProviderIds();
+    if (providerIds.length == 1) {
+        return openSelectedProvider(params, providerIds[0]);
+    }
+    if (providerIds.length > 1) {
+        return result('selection_required');
+    }
+    return openURL(buildAppleURL(params)) ? result('opened') : result('launch_failed');
+}

@@ -89,6 +89,132 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
 fun showAppToast(options: ShowToastOptions): Unit {
     uni_showToast(options)
 }
+open class Coordinate (
+    @JsonNotNull
+    open var lat: Number,
+    @JsonNotNull
+    open var lng: Number,
+) : UTSObject()
+open class CoordTransform {
+    companion object {
+        private val a: Number = 6378245.0
+        private val ee: Number = 0.00669342162296594323
+        private val pi: Number = 3.1415926535897932384626
+        fun wgs84ToTencent(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            val mgLat = wgLat + dLat
+            val mgLng = wgLon + dLng
+            return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
+        }
+        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
+            if (!this.isInChina(wgLon, wgLat)) {
+                return Coordinate(lat = wgLat, lng = wgLon)
+            }
+            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
+            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
+            var radLat = wgLat / 180.0 * this.pi
+            var magic = Math.sin(radLat)
+            magic = 1 - this.ee * magic * magic
+            var sqrtMagic = Math.sqrt(magic)
+            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
+            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
+            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
+        }
+        fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
+            if (!this.isInChina(tcLon, tcLat)) {
+                return Coordinate(lat = tcLat, lng = tcLon)
+            }
+            var wgsLat = tcLat
+            var wgsLng = tcLon
+            run {
+                var i: Number = 0
+                while(i < 5){
+                    val gcj02 = this.wgs84ToTencent(wgsLat, wgsLng)
+                    val deltaLat = tcLat - gcj02.lat
+                    val deltaLng = tcLon - gcj02.lng
+                    wgsLat += deltaLat
+                    wgsLng += deltaLng
+                    if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
+                        break
+                    }
+                    i++
+                }
+            }
+            return Coordinate(lat = parseFloat(wgsLat.toFixed(6)), lng = parseFloat(wgsLng.toFixed(6)))
+        }
+        fun batchConvertCoordinates(devices: UTSArray<UTSJSONObject>, targetSystem: String = "tencent"): UTSArray<UTSJSONObject> {
+            if (!UTSArray.isArray(devices)) {
+                return _uA()
+            }
+            return devices.map(fun(device): UTSJSONObject {
+                if (device == null) {
+                    return device
+                }
+                val item = device as UTSJSONObject
+                val latitude = item["latitude"]
+                val longitude = item["longitude"]
+                if (latitude == null || longitude == null) {
+                    return device
+                }
+                val lat = parseFloat(latitude.toString())
+                val lng = parseFloat(longitude.toString())
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn("设备经纬度无效", device)
+                    return device
+                }
+                var converted = Coordinate(lat = lat, lng = lng)
+                if (targetSystem === "tencent") {
+                    converted = this.wgs84ToTencent(lat, lng)
+                } else {
+                    converted = this.tencentToWgs84(lat, lng)
+                }
+                item["latitude"] = converted.lat
+                item["longitude"] = converted.lng
+                item["originalLatitude"] = lat
+                item["originalLongitude"] = lng
+                return item
+            }
+            )
+        }
+        fun convertCoordinate(lat: Number, lng: Number, fromSystem: String = "wgs84", toSystem: String = "tencent"): Coordinate {
+            if (fromSystem === "wgs84" && toSystem === "tencent") {
+                return this.wgs84ToTencent(lat, lng)
+            } else if (fromSystem === "tencent" && toSystem === "wgs84") {
+                return this.tencentToWgs84(lat, lng)
+            } else {
+                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem)
+                return Coordinate(lat = lat, lng = lng)
+            }
+        }
+        fun isInChina(lng: Number, lat: Number): Boolean {
+            return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271
+        }
+        private fun transformLat(x: Number, y: Number): Number {
+            var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
+            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
+            ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0
+            ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0
+            return ret
+        }
+        private fun transformLng(x: Number, y: Number): Number {
+            var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
+            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
+            ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0
+            ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 300.0 * Math.sin(x / 30.0 * Math.PI)) * 2.0 / 3.0
+            return ret
+        }
+    }
+}
 open class OpenLocationParams (
     @JsonNotNull
     open var latitude: Number,
@@ -904,132 +1030,6 @@ val sendCmd = fun(data: UTSJSONObject): UTSPromise<SendCmdResponse> {
     }
     )
 }
-open class Coordinate (
-    @JsonNotNull
-    open var lat: Number,
-    @JsonNotNull
-    open var lng: Number,
-) : UTSObject()
-open class CoordTransform {
-    companion object {
-        private val a: Number = 6378245.0
-        private val ee: Number = 0.00669342162296594323
-        private val pi: Number = 3.1415926535897932384626
-        fun wgs84ToTencent(wgLat: Number, wgLon: Number): Coordinate {
-            if (!this.isInChina(wgLon, wgLat)) {
-                return Coordinate(lat = wgLat, lng = wgLon)
-            }
-            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
-            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
-            var radLat = wgLat / 180.0 * this.pi
-            var magic = Math.sin(radLat)
-            magic = 1 - this.ee * magic * magic
-            var sqrtMagic = Math.sqrt(magic)
-            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
-            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
-            val mgLat = wgLat + dLat
-            val mgLng = wgLon + dLng
-            return Coordinate(lat = parseFloat(mgLat.toFixed(6)), lng = parseFloat(mgLng.toFixed(6)))
-        }
-        fun wgs84ToTencentPrecise(wgLat: Number, wgLon: Number): Coordinate {
-            if (!this.isInChina(wgLon, wgLat)) {
-                return Coordinate(lat = wgLat, lng = wgLon)
-            }
-            var dLat = this.transformLat(wgLon - 105.0, wgLat - 35.0)
-            var dLng = this.transformLng(wgLon - 105.0, wgLat - 35.0)
-            var radLat = wgLat / 180.0 * this.pi
-            var magic = Math.sin(radLat)
-            magic = 1 - this.ee * magic * magic
-            var sqrtMagic = Math.sqrt(magic)
-            dLat = (dLat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtMagic) * this.pi)
-            dLng = (dLng * 180.0) / (this.a / sqrtMagic * Math.cos(radLat) * this.pi)
-            return Coordinate(lat = wgLat + dLat, lng = wgLon + dLng)
-        }
-        fun tencentToWgs84(tcLat: Number, tcLon: Number): Coordinate {
-            if (!this.isInChina(tcLon, tcLat)) {
-                return Coordinate(lat = tcLat, lng = tcLon)
-            }
-            var wgsLat = tcLat
-            var wgsLng = tcLon
-            run {
-                var i: Number = 0
-                while(i < 5){
-                    val gcj02 = this.wgs84ToTencent(wgsLat, wgsLng)
-                    val deltaLat = tcLat - gcj02.lat
-                    val deltaLng = tcLon - gcj02.lng
-                    wgsLat += deltaLat
-                    wgsLng += deltaLng
-                    if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
-                        break
-                    }
-                    i++
-                }
-            }
-            return Coordinate(lat = parseFloat(wgsLat.toFixed(6)), lng = parseFloat(wgsLng.toFixed(6)))
-        }
-        fun batchConvertCoordinates(devices: UTSArray<UTSJSONObject>, targetSystem: String = "tencent"): UTSArray<UTSJSONObject> {
-            if (!UTSArray.isArray(devices)) {
-                return _uA()
-            }
-            return devices.map(fun(device): UTSJSONObject {
-                if (device == null) {
-                    return device
-                }
-                val item = device as UTSJSONObject
-                val latitude = item["latitude"]
-                val longitude = item["longitude"]
-                if (latitude == null || longitude == null) {
-                    return device
-                }
-                val lat = parseFloat(latitude.toString())
-                val lng = parseFloat(longitude.toString())
-                if (isNaN(lat) || isNaN(lng)) {
-                    console.warn("设备经纬度无效", device)
-                    return device
-                }
-                var converted = Coordinate(lat = lat, lng = lng)
-                if (targetSystem === "tencent") {
-                    converted = this.wgs84ToTencent(lat, lng)
-                } else {
-                    converted = this.tencentToWgs84(lat, lng)
-                }
-                item["latitude"] = converted.lat
-                item["longitude"] = converted.lng
-                item["originalLatitude"] = lat
-                item["originalLongitude"] = lng
-                return item
-            }
-            )
-        }
-        fun convertCoordinate(lat: Number, lng: Number, fromSystem: String = "wgs84", toSystem: String = "tencent"): Coordinate {
-            if (fromSystem === "wgs84" && toSystem === "tencent") {
-                return this.wgs84ToTencent(lat, lng)
-            } else if (fromSystem === "tencent" && toSystem === "wgs84") {
-                return this.tencentToWgs84(lat, lng)
-            } else {
-                console.warn("不支持的坐标系转换", fromSystem, "->", toSystem)
-                return Coordinate(lat = lat, lng = lng)
-            }
-        }
-        fun isInChina(lng: Number, lat: Number): Boolean {
-            return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271
-        }
-        private fun transformLat(x: Number, y: Number): Number {
-            var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
-            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-            ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0
-            ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0
-            return ret
-        }
-        private fun transformLng(x: Number, y: Number): Number {
-            var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
-            ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-            ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0
-            ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 300.0 * Math.sin(x / 30.0 * Math.PI)) * 2.0 / 3.0
-            return ret
-        }
-    }
-}
 open class TodayTimeRange (
     @JsonNotNull
     open var nowTime: Number,
@@ -1694,7 +1694,17 @@ fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
-    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + error.errMsg, "cause=" + error.cause)
+    val errMsg = if (error.errMsg != "") {
+        error.errMsg
+    } else {
+        ""
+    }
+    val cause = if (isTruthy(error.cause)) {
+        error.cause
+    } else {
+        ""
+    }
+    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg, "cause=" + (cause as Any))
     if (errCode == 30005) {
         return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用"
     }
@@ -1708,7 +1718,19 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
         return "本机号码预取已取消"
     }
     if (errCode == 30004) {
-        return "运营商预取号失败，请确认 SIM 卡、移动网络与运营商服务状态"
+        if (errMsg.indexOf("-20102") >= 0) {
+            return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK"
+        }
+        if (errMsg.indexOf("-20201") >= 0) {
+            return "未检测到可用 SIM 卡，请使用验证码登录"
+        }
+        if (errMsg.indexOf("-20202") >= 0) {
+            return "未开启蜂窝移动网络，请开启移动数据后重试"
+        }
+        if (errMsg.indexOf("-20203") >= 0) {
+            return "当前运营商暂不支持一键登录，请使用验证码登录"
+        }
+        return "本机号码预取失败，请稍后重试或使用验证码登录"
     }
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，无法获取本机号码，请检查移动网络后重试"

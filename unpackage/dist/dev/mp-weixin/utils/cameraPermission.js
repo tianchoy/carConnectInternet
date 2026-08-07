@@ -1,16 +1,11 @@
 "use strict";
-const CAMERA_PERMISSION = "android.permission.CAMERA";
-const COARSE_LOCATION_PERMISSION = "android.permission.ACCESS_COARSE_LOCATION";
-const FINE_LOCATION_PERMISSION = "android.permission.ACCESS_FINE_LOCATION";
-function requestAndroidPermission(permissions, name, callback, acceptGranted) {
+const common_vendor = require("../common/vendor.js");
+function ensureCameraPermission(callback) {
   callback("granted");
 }
-function ensureCameraPermission(callback) {
-  requestAndroidPermission([CAMERA_PERMISSION], "ensureCameraPermission", callback);
-}
-function ensureLocationPermission(callback) {
-  requestAndroidPermission([COARSE_LOCATION_PERMISSION, FINE_LOCATION_PERMISSION], "ensureLocationPermission", callback);
+function openCameraPermissionSettings() {
+  common_vendor.index.__f__("log", "at utils/cameraPermission.uts:108", "非 Android 平台无需打开相机权限设置");
 }
 exports.ensureCameraPermission = ensureCameraPermission;
-exports.ensureLocationPermission = ensureLocationPermission;
+exports.openCameraPermissionSettings = openCameraPermissionSettings;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/cameraPermission.js.map

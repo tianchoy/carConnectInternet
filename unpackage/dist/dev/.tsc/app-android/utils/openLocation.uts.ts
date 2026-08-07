@@ -1,6 +1,10 @@
 import { showAppToast } from './toast.uts'
+import CoordTransform from './coordTransform.uts'
 
 import { openExternalMap } from '@/uni_modules/external-map-navigation'
+
+
+
 
 
 export type OpenLocationParams = {
@@ -56,6 +60,76 @@ function openAndroidExternalMap(params: OpenLocationParams): void {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function openBuiltInLocation(params: OpenLocationParams): void {
 	try {
 		uni.openLocation({
@@ -64,10 +138,10 @@ function openBuiltInLocation(params: OpenLocationParams): void {
 			name: params.name != '' ? params.name : '当前位置',
 			scale: 18,
 			success: () => {
-				__f__('log','at utils/openLocation.uts:67','成功打开位置地图')
+				__f__('log','at utils/openLocation.uts:141','成功打开位置地图')
 			},
 			fail: (error) => {
-				__f__('error','at utils/openLocation.uts:70','打开位置地图失败:', error)
+				__f__('error','at utils/openLocation.uts:144','打开位置地图失败:', error)
 				showAppToast({
 					title: '打开位置地图失败，请稍后重试',
 					icon: 'none'
@@ -75,7 +149,7 @@ function openBuiltInLocation(params: OpenLocationParams): void {
 			}
 		})
 	} catch (error) {
-		__f__('error','at utils/openLocation.uts:78','打开位置地图异常:', error)
+		__f__('error','at utils/openLocation.uts:152','打开位置地图异常:', error)
 		showAppToast({
 			title: '打开位置地图失败，请稍后重试',
 			icon: 'none'
@@ -92,6 +166,11 @@ export function openLocation(params: OpenLocationParams): void {
 
 	openAndroidExternalMap(params)
 	return
+
+
+
+
+
 
 
 

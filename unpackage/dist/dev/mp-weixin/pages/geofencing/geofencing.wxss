@@ -57,7 +57,7 @@
 }
 .container .fence-operations[class] {
   background-color: #fff;
-  padding: 20rpx 20rpx 50rpx 20rpx;
+  padding-bottom: 50rpx;
 }
 .container .fence-operations .fence-header[class] {
   display: flex;

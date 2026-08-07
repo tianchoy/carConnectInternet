@@ -32,6 +32,14 @@
         "uni-location": {
           "system": {}
         },
+        "uni-push": {
+          "hms": {},
+          "oppo": {},
+          "vivo": {},
+          "xiaomi": {},
+          "meizu": {},
+          "honor": {}
+        },
         "uni-getSystemInfo": {},
         "uni-vibrate": {},
         "uni-prompt": {},

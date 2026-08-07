@@ -102,7 +102,7 @@ class MpPolylineData extends common_vendor.UTS.UTSType {
 const TRACKING_POLL_INTERVAL_MS = 1e3;
 const TRACKING_ANIMATION_DURATION_MS = 900;
 const MAX_POSITION_JUMP_DISTANCE = 500;
-const MARKER_UPDATE_INTERVAL = 120;
+const MARKER_UPDATE_INTERVAL = 30;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "vehicleTracking",
   setup(__props) {
@@ -585,7 +585,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: markers.value,
         f: polyline.value,
         g: mapScale.value,
-        h: common_vendor.o(handleCurrentTimeUpdate, "1e"),
+        h: common_vendor.o(handleCurrentTimeUpdate, "ad"),
         i: common_vendor.p({
           currentTime: currentTime.value,
           currentCar: currentCar.value,
@@ -594,7 +594,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           carStatus: connectionStatus.value,
           class: "sub-nav-overlay"
         }),
-        j: common_vendor.o(toggleTracking, "07"),
+        j: common_vendor.o(toggleTracking, "42"),
         k: isTracking.value ? "#e64340" : "#1296db",
         l: common_vendor.p({
           type: isTracking.value ? "danger" : "primary",

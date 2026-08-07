@@ -1,6 +1,10 @@
 import { showAppToast } from './toast.uts'
+import CoordTransform from './coordTransform.uts'
 // #ifdef APP-ANDROID
 import { openExternalMap } from '@/uni_modules/external-map-navigation'
+// #endif
+// #ifdef APP-IOS
+import { getAvailableIOSMapProviderIds, openExternalMap } from '@/uni_modules/external-map-navigation'
 // #endif
 
 export type OpenLocationParams = {
@@ -56,6 +60,76 @@ function openAndroidExternalMap(params: OpenLocationParams): void {
 }
 // #endif
 
+// #ifdef APP-IOS
+function openIOSExternalMap(params: OpenLocationParams, providerId?: string): void {
+	const wgs84 = CoordTransform.tencentToWgs84(params.latitude, params.longitude)
+	const navigationResult = openExternalMap({
+		latitude: params.latitude,
+		longitude: params.longitude,
+		name: params.name,
+		providerId: providerId,
+		wgs84Latitude: wgs84.lat,
+		wgs84Longitude: wgs84.lng
+	})
+	if (navigationResult.code == 'opened') return
+
+	if (navigationResult.code == 'invalid_coordinate') {
+		showInvalidLocationToast()
+		return
+	}
+
+	showOpenMapFailedToast()
+}
+
+function getIOSMapProviderName(providerId: string): string {
+	if (providerId == 'qqmap') return '腾讯地图'
+	if (providerId == 'iosamap') return '高德地图'
+	if (providerId == 'baidumap') return '百度地图'
+	return ''
+}
+
+function chooseIOSMapProvider(params: OpenLocationParams, availableProviderIds: string[]): void {
+	const itemList: string[] = []
+	const providerIds: string[] = []
+	availableProviderIds.forEach((providerId): void => {
+		const providerName = getIOSMapProviderName(providerId)
+		if (providerName == '') return
+		itemList.push(providerName)
+		providerIds.push(providerId)
+	})
+
+	if (providerIds.length == 0) {
+		openIOSExternalMap(params)
+		return
+	}
+
+	uni.showActionSheet({
+		title: '选择地图应用',
+		itemList: itemList,
+		success: (res: ShowActionSheetSuccess) => {
+			const tapIndex = res.tapIndex
+			if (tapIndex < 0 || tapIndex >= providerIds.length) return
+
+			const providerId = providerIds[tapIndex]
+			if (providerId != '') openIOSExternalMap(params, providerId)
+		}
+	})
+}
+
+function openIOSLocation(params: OpenLocationParams): void {
+	const providerIds = getAvailableIOSMapProviderIds()
+	if (providerIds.length > 1) {
+		chooseIOSMapProvider(params, providerIds)
+		return
+	}
+	if (providerIds.length == 1) {
+		openIOSExternalMap(params, providerIds[0])
+		return
+	}
+	openIOSExternalMap(params)
+}
+// #endif
+
 function openBuiltInLocation(params: OpenLocationParams): void {
 	try {
 		uni.openLocation({
@@ -91,6 +165,11 @@ export function openLocation(params: OpenLocationParams): void {
 
 	// #ifdef APP-ANDROID
 	openAndroidExternalMap(params)
+	return
+	// #endif
+
+	// #ifdef APP-IOS
+	openIOSLocation(params)
 	return
 	// #endif
 

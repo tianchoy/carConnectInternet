@@ -40,7 +40,9 @@ function getErrorMessage(error: UniVerifyManagerLoginFail): string {
 }
 function getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): string {
     const errCode = error.errCode;
-    console.error('Uni Verify 预取号失败:', 'platform=' + getPlatform(), 'errCode=' + errCode, 'errMsg=' + error.errMsg, 'cause=' + error.cause);
+    const errMsg = error.errMsg != "" ? error.errMsg : '';
+    const cause = isTruthy(error.cause) ? error.cause : '';
+    console.error('Uni Verify 预取号失败:', 'platform=' + getPlatform(), 'errCode=' + errCode, 'errMsg=' + errMsg, 'cause=' + (cause as any));
     if (errCode == 30005)
         return '本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用';
     if (errCode == 1000 || errCode == 1001 || errCode == 1002)
@@ -49,8 +51,17 @@ function getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): string {
         return '一键登录服务已禁用，请检查 Uni Verify 服务状态';
     if (errCode == 30001)
         return '本机号码预取已取消';
-    if (errCode == 30004)
-        return '运营商预取号失败，请确认 SIM 卡、移动网络与运营商服务状态';
+    if (errCode == 30004) {
+        if (errMsg.indexOf('-20102') >= 0)
+            return '一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK';
+        if (errMsg.indexOf('-20201') >= 0)
+            return '未检测到可用 SIM 卡，请使用验证码登录';
+        if (errMsg.indexOf('-20202') >= 0)
+            return '未开启蜂窝移动网络，请开启移动数据后重试';
+        if (errMsg.indexOf('-20203') >= 0)
+            return '当前运营商暂不支持一键登录，请使用验证码登录';
+        return '本机号码预取失败，请稍后重试或使用验证码登录';
+    }
     if (errCode == 40001 || errCode == 40002)
         return '网络异常，无法获取本机号码，请检查移动网络后重试';
     return '本机号码预取失败（错误码：' + errCode + '），请使用验证码登录';

@@ -25,6 +25,7 @@ open class ExternalMapNavigationParams (
     open var longitude: Number,
     @JsonNotNull
     open var name: String,
+    open var providerId: String? = null,
     open var wgs84Latitude: Number? = null,
     open var wgs84Longitude: Number? = null,
 ) : UTSObject()
