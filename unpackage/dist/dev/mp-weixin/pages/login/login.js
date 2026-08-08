@@ -151,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         form.value.password = account.getString("password", "");
         rememberPassword.value = form.value.username != "" || form.value.password != "";
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.uvue:176", "加载保存的账号密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
       }
     }
     const isPswLogin = () => {
@@ -188,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getSystemInfo = () => {
       const res = common_vendor.index.getSystemInfoSync();
       deviceModel.value = res.deviceModel;
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:219", "设备型号:", deviceModel.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
     };
     const validateForm = () => {
       if (form.value.username.length == 0) {
@@ -278,7 +278,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           completeLogin(token, false);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:435", "微信登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:437", "微信登录失败:", error);
           utils_toast.showAppToast({
             title: "微信登录失败",
             icon: "none"
@@ -298,25 +298,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return Promise.resolve(null);
         }
         try {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:460", "准备验证表单...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:462", "准备验证表单...");
           if (!validateForm())
             return Promise.resolve(null);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:462", "✅ 表单验证通过");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
           const newFormData = new common_vendor.UTSJSONObject({
             username: form.value.username,
             password: form.value.password,
             from: deviceModel.value,
             type: "USER"
           });
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:471", "📤 请求参数:", newFormData);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
           loading.value = true;
           common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
             title: "登录中...",
             mask: true
           }));
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:481", "🚀 开始调用 login 接口...");
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
           const res = yield api_request.login(newFormData);
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:483", "✅ 登录接口返回:", res);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
           loading.value = false;
           common_vendor.index.hideLoading();
           const loginData = res.data;
@@ -330,7 +330,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.uvue:502", "❌ 登录失败:", error);
+          common_vendor.index.__f__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
           loading.value = false;
           common_vendor.index.hideLoading();
           if (error && error.message) {
@@ -369,7 +369,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       getSystemInfo();
       loadSavedAccount();
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:601", "pswLogin 初始值:", pswLogin.value);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
     });
     return (_ctx, _cache) => {
       "raw js";

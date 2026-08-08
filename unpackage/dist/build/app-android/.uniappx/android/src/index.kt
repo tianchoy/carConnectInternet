@@ -1,6 +1,7 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI662B0B4
 import android.app.Activity
+import android.os.Build
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -13,22 +14,338 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import java.math.BigDecimal
 import kotlin.properties.Delegates
+import android.util.Log as AndroidLog
 import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.exit as uni_exit
+import io.dcloud.uniapp.extapi.getPushClientId as uni_getPushClientId
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getUniVerifyManager as uni_getUniVerifyManager
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
+import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.request as uni_request
 import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
+import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
+import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 val runBlock1 = run {
     __uniConfig.getAppStyles = fun(): Map<String, Map<String, Map<String, Any>>> {
         return GenApp.styles
+    }
+}
+val PUSH_CLIENT_ID_KEY = "push_client_id"
+val PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id"
+val PUSH_MESSAGE_STALE_KEY = "push_message_stale"
+val PUSH_SESSION_KEY = "push_session_key"
+var initialized = false
+var pushClientIdRequesting = false
+var pushClientIdRetryCount: Number = 0
+var pushClientIdRetryTimer: Number = 0
+var pushClientIdRequestTimeout: Number = 0
+val PUSH_CLIENT_ID_MAX_RETRY_COUNT: Number = 5
+val PUSH_CLIENT_ID_RETRY_DELAY: Number = 3000
+val PUSH_CLIENT_ID_REQUEST_TIMEOUT: Number = 18000
+fun pushDebug(message: String): Unit {
+    AndroidLog.e("UniPushDebug", message)
+    console.error("[UniPushDebug]", message)
+}
+fun clearPushClientIdTimers(): Unit {
+    if (pushClientIdRetryTimer > 0) {
+        clearTimeout(pushClientIdRetryTimer)
+        pushClientIdRetryTimer = 0
+    }
+    if (pushClientIdRequestTimeout > 0) {
+        clearTimeout(pushClientIdRequestTimeout)
+        pushClientIdRequestTimeout = 0
+    }
+}
+fun schedulePushClientIdRetry(reason: String): Unit {
+    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
+        pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason)
+        return
+    }
+    if (pushClientIdRetryTimer > 0) {
+        return
+    }
+    pushClientIdRetryCount += 1
+    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString(10) + "ms 后重试，第 " + pushClientIdRetryCount.toString(10) + " 次。原因: " + reason)
+    pushClientIdRetryTimer = setTimeout(fun(){
+        pushClientIdRetryTimer = 0
+        refreshPushClientId()
+    }
+    , PUSH_CLIENT_ID_RETRY_DELAY)
+}
+fun stringValue(value: Any): String {
+    if (value == null) {
+        return ""
+    }
+    return value.toString()
+}
+fun payloadValue(payload: Any, key: String): String {
+    if (payload == null) {
+        return ""
+    }
+    if (UTSAndroid.`typeof`(payload) == "string") {
+        try {
+            val parsedPayload = JSON.parse(payload as String)
+            if (parsedPayload == null) {
+                return ""
+            }
+            return payloadValue(parsedPayload, key)
+        }
+         catch (error: Throwable) {
+            return ""
+        }
+    }
+    try {
+        val kObject = payload as UTSJSONObject
+        return kObject.getString(key, "")
+    }
+     catch (error: Throwable) {
+        return ""
+    }
+}
+fun pushMessageId(message: Any): String {
+    var id = payloadValue(message, "messageId")
+    if (id == "") {
+        id = payloadValue(message, "message_id")
+    }
+    if (id == "") {
+        id = payloadValue(message, "id")
+    }
+    if (id == "") {
+        val data = payloadValue(message, "data")
+        if (data != "") {
+            id = payloadValue(data, "messageId")
+        }
+    }
+    return id
+}
+fun savePushEvent(event: Any): String {
+    val messageId = pushMessageId(event)
+    if (messageId != "") {
+        uni_setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId)
+    }
+    uni_setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
+    return messageId
+}
+fun isNotificationClick(event: Any): Boolean {
+    return payloadValue(event, "type").toLowerCase() == "click"
+}
+fun registerPushListener(): Unit {
+    if (initialized) {
+        return
+    }
+    initialized = true
+    try {
+        uni_onPushMessage(fun(event: Any){
+            console.log("收到 UniPush 消息")
+            savePushEvent(event)
+            if (isNotificationClick(event)) {
+                uni_switchTab(SwitchTabOptions(url = "/pages/message/message"))
+            }
+        }
+        )
+    }
+     catch (error: Throwable) {
+        console.error("注册 UniPush 监听失败:", error)
+    }
+}
+fun initPush(): Unit {
+    registerPushListener()
+    refreshPushClientId()
+}
+fun refreshPushClientId(): Unit {
+    if (pushClientIdRequesting) {
+        pushDebug("UniPush CID 正在获取，跳过重复请求")
+        return
+    }
+    pushClientIdRequesting = true
+    clearPushClientIdTimers()
+    try {
+        pushDebug("开始获取 UniPush CID")
+        pushClientIdRequestTimeout = setTimeout(fun(){
+            pushClientIdRequestTimeout = 0
+            if (!pushClientIdRequesting) {
+                return
+            }
+            pushClientIdRequesting = false
+            pushDebug("UniPush getPushClientId 回调超时")
+            schedulePushClientIdRetry("回调超时")
+        }
+        , PUSH_CLIENT_ID_REQUEST_TIMEOUT)
+        uni_getPushClientId(GetPushClientIdOptions(success = fun(result){
+            pushClientIdRequesting = false
+            if (pushClientIdRequestTimeout > 0) {
+                clearTimeout(pushClientIdRequestTimeout)
+                pushClientIdRequestTimeout = 0
+            }
+            val clientId = result.cid
+            pushDebug("UniPush getPushClientId success")
+            if (clientId == "") {
+                pushDebug("UniPush CID 为空")
+                schedulePushClientIdRetry("CID 为空")
+                return
+            }
+            val cachedClientId = getCachedPushClientId()
+            pushDebug("UniPush CID=" + clientId)
+            if (clientId != cachedClientId) {
+                pushDebug("UniPush CID 已更新")
+            }
+            pushClientIdRetryCount = 0
+            uni_setStorageSync(PUSH_CLIENT_ID_KEY, clientId)
+        }
+        , fail = fun(error: Any){
+            pushClientIdRequesting = false
+            if (pushClientIdRequestTimeout > 0) {
+                clearTimeout(pushClientIdRequestTimeout)
+                pushClientIdRequestTimeout = 0
+            }
+            pushDebug("UniPush getPushClientId failed: " + error.toString())
+            schedulePushClientIdRetry("调用失败")
+        }
+        ))
+    }
+     catch (error: Throwable) {
+        pushClientIdRequesting = false
+        if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout)
+            pushClientIdRequestTimeout = 0
+        }
+        pushDebug("调用 getPushClientId 异常: " + error.toString())
+        schedulePushClientIdRetry("调用异常")
+    }
+}
+fun markPushSessionAuthenticated(): Unit {
+    uni_setStorageSync(PUSH_SESSION_KEY, "authenticated")
+    refreshPushClientId()
+}
+fun clearPushSessionState(): Unit {
+    uni_removeStorageSync(PUSH_SESSION_KEY)
+    uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
+}
+fun consumePendingMessageId(): String {
+    val rawValue = uni_getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    val value = if (rawValue == null) {
+        ""
+    } else {
+        stringValue(rawValue)
+    }
+    uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    return value
+}
+fun consumePushStaleFlag(): Boolean {
+    val value = uni_getStorageSync(PUSH_MESSAGE_STALE_KEY)
+    uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
+    return value != null && value.toString() == "true"
+}
+fun getCachedPushClientId(): String {
+    val value = uni_getStorageSync(PUSH_CLIENT_ID_KEY)
+    return if (value == null) {
+        ""
+    } else {
+        value.toString()
+    }
+}
+typealias CameraPermissionStatus = String
+typealias NotificationPermissionStatus = CameraPermissionStatus
+val CAMERA_PERMISSION = "android.permission.CAMERA"
+val POST_NOTIFICATIONS_PERMISSION = "android.permission.POST_NOTIFICATIONS"
+fun hasPermission(activity: Activity, permissions: UTSArray<String>): Boolean {
+    return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+}
+fun requestAndroidPermission(permissions: UTSArray<String>, name: String, callback: (status: CameraPermissionStatus) -> Unit, isGranted: (activity: Activity) -> Boolean): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        console.error("❌ [" + name + "] 获取 Activity 失败")
+        callback("unavailable")
+        return
+    }
+    val currentActivity = activity as Activity
+    try {
+        if (isGranted(currentActivity)) {
+            callback("granted")
+            return
+        }
+    }
+     catch (error: Throwable) {
+        console.error("❌ [" + name + "] 检查权限失败:", error)
+        callback("unavailable")
+        return
+    }
+    try {
+        UTSAndroid.requestSystemPermission(currentActivity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
+            console.log("[" + name + "] 权限请求结果:", allRight, grantedPermissions)
+            try {
+                callback(if (isGranted(currentActivity)) {
+                    "granted"
+                } else {
+                    "denied"
+                }
+                )
+            }
+             catch (error: Throwable) {
+                console.error("❌ [" + name + "] 请求后检查权限失败:", error)
+                callback("unavailable")
+            }
+        }
+        , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
+            console.warn("[" + name + "] 权限被拒绝:", deniedPermissions)
+            callback(if (doNotAskAgain) {
+                "settingsRequired"
+            } else {
+                "denied"
+            }
+            )
+        }
+        )
+    }
+     catch (error: Throwable) {
+        console.error("❌ [" + name + "] 请求权限异常:", error)
+        callback("unavailable")
+    }
+}
+fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    requestAndroidPermission(_uA(
+        CAMERA_PERMISSION
+    ), "ensureCameraPermission", callback, fun(activity: Activity): Boolean {
+        return hasPermission(activity, _uA(
+            CAMERA_PERMISSION
+        ))
+    }
+    )
+}
+fun ensureNotificationPermission(callback: (status: NotificationPermissionStatus) -> Unit): Unit {
+    if (Build.VERSION.SDK_INT < 33) {
+        callback("granted")
+        return
+    }
+    requestAndroidPermission(_uA(
+        POST_NOTIFICATIONS_PERMISSION
+    ), "ensureNotificationPermission", callback, fun(activity: Activity): Boolean {
+        return hasPermission(activity, _uA(
+            POST_NOTIFICATIONS_PERMISSION
+        ))
+    }
+    )
+}
+fun openCameraPermissionSettings(): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        return
+    }
+    try {
+        UTSAndroid.gotoSystemPermissionActivity(activity as Activity, _uA(
+            CAMERA_PERMISSION
+        ))
+    }
+     catch (error: Throwable) {
+        console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error)
     }
 }
 var firstBackTime: Number = 0
@@ -38,10 +355,16 @@ open class GenApp : BaseApp {
         onLaunch(fun(_: OnLaunchOptions) {
             console.log("App onLaunch")
             checkForUpdates()
+            initPush()
+            ensureNotificationPermission(fun(status){
+                console.log("[NotificationPermission] " + status)
+            }
+            )
         }
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
             console.log("App Show")
+            refreshPushClientId()
         }
         , __ins)
         onAppHide(fun() {
@@ -497,6 +820,7 @@ val BASE_URL = "https://car.zdiot.cn:18443/api"
 fun handleTokenExpired(): Unit {
     console.log("检测到token过期，执行跳转登录页逻辑")
     uni_removeStorageSync("token")
+    clearPushSessionState()
     showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
     setTimeout(fun(){
         console.log("正在跳转到登录页...")
@@ -2098,86 +2422,6 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
     return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
 }
 )
-typealias CameraPermissionStatus = String
-val CAMERA_PERMISSION = "android.permission.CAMERA"
-fun hasPermission(activity: Activity, permissions: UTSArray<String>): Boolean {
-    return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-}
-fun requestAndroidPermission(permissions: UTSArray<String>, name: String, callback: (status: CameraPermissionStatus) -> Unit, isGranted: (activity: Activity) -> Boolean): Unit {
-    val activity = UTSAndroid.getUniActivity()
-    if (activity == null) {
-        console.error("❌ [" + name + "] 获取 Activity 失败")
-        callback("unavailable")
-        return
-    }
-    val currentActivity = activity as Activity
-    try {
-        if (isGranted(currentActivity)) {
-            callback("granted")
-            return
-        }
-    }
-     catch (error: Throwable) {
-        console.error("❌ [" + name + "] 检查权限失败:", error)
-        callback("unavailable")
-        return
-    }
-    try {
-        UTSAndroid.requestSystemPermission(currentActivity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
-            console.log("[" + name + "] 权限请求结果:", allRight, grantedPermissions)
-            try {
-                callback(if (isGranted(currentActivity)) {
-                    "granted"
-                } else {
-                    "denied"
-                }
-                )
-            }
-             catch (error: Throwable) {
-                console.error("❌ [" + name + "] 请求后检查权限失败:", error)
-                callback("unavailable")
-            }
-        }
-        , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
-            console.warn("[" + name + "] 权限被拒绝:", deniedPermissions)
-            callback(if (doNotAskAgain) {
-                "settingsRequired"
-            } else {
-                "denied"
-            }
-            )
-        }
-        )
-    }
-     catch (error: Throwable) {
-        console.error("❌ [" + name + "] 请求权限异常:", error)
-        callback("unavailable")
-    }
-}
-fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
-    requestAndroidPermission(_uA(
-        CAMERA_PERMISSION
-    ), "ensureCameraPermission", callback, fun(activity: Activity): Boolean {
-        return hasPermission(activity, _uA(
-            CAMERA_PERMISSION
-        ))
-    }
-    )
-}
-fun openCameraPermissionSettings(): Unit {
-    val activity = UTSAndroid.getUniActivity()
-    if (activity == null) {
-        return
-    }
-    try {
-        UTSAndroid.gotoSystemPermissionActivity(activity as Activity, _uA(
-            CAMERA_PERMISSION
-        ))
-    }
-     catch (error: Throwable) {
-        console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error)
-    }
-}
 val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)

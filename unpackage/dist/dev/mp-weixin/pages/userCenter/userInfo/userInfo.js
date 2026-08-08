@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const utils_toast = require("../../../utils/toast.js");
+const services_push = require("../../../services/push.js");
 const api_request = require("../../../api/request.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
@@ -62,9 +63,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             type: type != null ? type : 0,
             createTime: createTime != null ? createTime : ""
           };
-          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:82", "用户信息:", userInfo.value);
+          common_vendor.index.__f__("log", "at pages/userCenter/userInfo/userInfo.uvue:83", "用户信息:", userInfo.value);
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:84", "解析用户信息失败:", e);
+          common_vendor.index.__f__("error", "at pages/userCenter/userInfo/userInfo.uvue:85", "解析用户信息失败:", e);
         }
       }
     });
@@ -78,6 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_request.logout();
         if (res.code == 0) {
           common_vendor.index.removeStorageSync("token");
+          services_push.clearPushSessionState();
           common_vendor.index.reLaunch({
             url: "/pages/login/login"
           });

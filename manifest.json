@@ -55,7 +55,8 @@
 				"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
 				"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
 				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-				"<uses-permission android:name=\"android.permission.INTERNET\"/>"
+				"<uses-permission android:name=\"android.permission.INTERNET\"/>",
+				"<uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>"
 			],
 			"modules": {
 				"uni-verify": {},
@@ -89,7 +90,8 @@
 					"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-					"<uses-permission android:name=\"android.permission.INTERNET\"/>"
+					"<uses-permission android:name=\"android.permission.INTERNET\"/>",
+					"<uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>"
 				],
 				"maps": {
 					"amap": {
@@ -145,6 +147,7 @@
 				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
 			},
 			"modules": {
+				"uni-push": {},
 				"uni-verify": {},
 				"uni-barcode-scanning": {},
 				"uni-map": {

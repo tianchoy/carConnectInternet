@@ -68,6 +68,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                         val res = await(logout())
                         if (res.code == 0) {
                             uni_removeStorageSync("token")
+                            clearPushSessionState()
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
                         } else {
                             showAppToast(ShowToastOptions(title = "退出账户失败"))

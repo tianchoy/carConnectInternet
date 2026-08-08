@@ -1,3 +1,4 @@
+import { clearPushSessionState } from '../services/push.uts'
 import { showAppToast } from '../utils/toast.uts'
 // 定义类型
 type RequestOptions = {
@@ -36,10 +37,11 @@ const BASE_URL = 'https://car.zdiot.cn:18443/api'
 
 // 处理token过期的函数
 function handleTokenExpired(): void {
-    __f__('log','at api/http.uts:39','检测到token过期，执行跳转登录页逻辑')
+    __f__('log','at api/http.uts:40','检测到token过期，执行跳转登录页逻辑')
     
     // 清除本地token
     uni.removeStorageSync('token')
+    clearPushSessionState()
     
     // 显示提示
     showAppToast({
@@ -50,14 +52,14 @@ function handleTokenExpired(): void {
     
     // 使用定时器确保Toast显示完成后再跳转
     setTimeout(() => {
-        __f__('log','at api/http.uts:53','正在跳转到登录页...')
+        __f__('log','at api/http.uts:55','正在跳转到登录页...')
         uni.redirectTo({
             url: '/pages/login/login',
             success: () => {
-                __f__('log','at api/http.uts:57','跳转登录页成功')
+                __f__('log','at api/http.uts:59','跳转登录页成功')
             },
             fail: (err) => {
-                __f__('log','at api/http.uts:60','跳转登录页失败:', err)
+                __f__('log','at api/http.uts:62','跳转登录页失败:', err)
                 // 如果跳转失败，尝试使用 reLaunch
                 uni.reLaunch({
                     url: '/pages/login/login'
@@ -109,7 +111,7 @@ function errorHandler(error: HttpError, config: RequestOptions): void {
         uni.hideLoading()
     }
     
-    __f__('log','at api/http.uts:112','请求错误详情:', error)
+    __f__('log','at api/http.uts:114','请求错误详情:', error)
     
     // 处理错误状态码
     if (error.statusCode != 0) {

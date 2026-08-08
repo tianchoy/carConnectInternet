@@ -1,3 +1,4 @@
+import { clearPushSessionState } from '../services/push.uts';
 import { showAppToast } from '../utils/toast.uts';
 // 定义类型
 type RequestOptions = {
@@ -33,6 +34,7 @@ function handleTokenExpired(): void {
     console.log('检测到token过期，执行跳转登录页逻辑');
     // 清除本地token
     uni.removeStorageSync('token');
+    clearPushSessionState();
     // 显示提示
     showAppToast({
         title: '登录已过期，请重新登录',

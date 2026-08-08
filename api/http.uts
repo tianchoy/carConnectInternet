@@ -1,3 +1,4 @@
+import { clearPushSessionState } from '../services/push.uts'
 import { showAppToast } from '../utils/toast.uts'
 // 定义类型
 type RequestOptions = {
@@ -40,6 +41,7 @@ function handleTokenExpired(): void {
     
     // 清除本地token
     uni.removeStorageSync('token')
+    clearPushSessionState()
     
     // 显示提示
     showAppToast({

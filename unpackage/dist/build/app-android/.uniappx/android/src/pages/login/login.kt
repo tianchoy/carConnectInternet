@@ -119,6 +119,7 @@ open class GenPagesLoginLogin : BasePage {
                     saveAccountPassword()
                 }
                 uni_setStorageSync("token", token)
+                markPushSessionAuthenticated()
                 showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
                 setTimeout(fun(){
                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))

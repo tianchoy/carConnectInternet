@@ -16,6 +16,7 @@
         "NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
       },
       "modules": {
+        "uni-push": {},
         "uni-verify": {},
         "uni-barcode-scanning": {},
         "uni-map": {
@@ -23,12 +24,12 @@
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
           }
         },
+        "uni-showLoading": {},
         "uni-dialogPage": {},
         "uni-event": {},
-        "uni-showLoading": {},
         "uni-storage": {},
-        "uni-vibrate": {},
         "uni-location": {},
+        "uni-vibrate": {},
         "uni-getSystemInfo": {},
         "uni-getAppBaseInfo": {},
         "uni-network": {},

@@ -1,4 +1,7 @@
 
+	import { initPush, refreshPushClientId } from './services/push.uts'
+	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
+
 	let firstBackTime = 0
 	// 添加热更新相关变量
 	let updateManager: any = null
@@ -72,9 +75,16 @@
 		onLaunch: function () {
 			console.log('App onLaunch')
 			checkForUpdates()
+			initPush()
+
+			ensureNotificationPermission((status) => {
+				console.log('[NotificationPermission] ' + status)
+			})
+
 		},
 		onShow: function () {
 			console.log('App Show')
+			refreshPushClientId()
 		},
 		onHide: function () {
 			console.log('App Hide')

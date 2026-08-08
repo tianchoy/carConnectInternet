@@ -1,6 +1,7 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI662B0B4
 import android.app.Activity
+import android.os.Build
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -14,21 +15,26 @@ import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import java.math.BigDecimal
 import kotlin.properties.Delegates
+import android.util.Log as AndroidLog
 import uts.sdk.modules.externalMapNavigation.ExternalMapNavigationParams
 import io.dcloud.uniapp.extapi.connectSocket as uni_connectSocket
 import io.dcloud.uniapp.extapi.exit as uni_exit
 import io.dcloud.uniapp.extapi.getFileSystemManager as uni_getFileSystemManager
+import io.dcloud.uniapp.extapi.getPushClientId as uni_getPushClientId
 import io.dcloud.uniapp.extapi.getStorageSync as uni_getStorageSync
 import io.dcloud.uniapp.extapi.getUniVerifyManager as uni_getUniVerifyManager
 import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
+import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.redirectTo as uni_redirectTo
 import io.dcloud.uniapp.extapi.removeStorageSync as uni_removeStorageSync
 import io.dcloud.uniapp.extapi.request as uni_request
 import io.dcloud.uniapp.extapi.rpx2px as uni_rpx2px
+import io.dcloud.uniapp.extapi.setStorageSync as uni_setStorageSync
 import io.dcloud.uniapp.extapi.showModal as uni_showModal
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
+import io.dcloud.uniapp.extapi.switchTab as uni_switchTab
 val runBlock1 = run {
     __uniConfig.getAppStyles = fun(): Map<String, Map<String, Map<String, Any>>> {
         return GenApp.styles
@@ -115,7 +121,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.1.252"
     val port: String = "8090"
-    val id: String = "app-android_kOLlHh"
+    val id: String = "app-android_QEc7ku"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -137,25 +143,342 @@ fun initRuntimeSocketService(): UTSPromise<Boolean> {
 val runBlock2 = run {
     initRuntimeSocketService()
 }
+val PUSH_CLIENT_ID_KEY = "push_client_id"
+val PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id"
+val PUSH_MESSAGE_STALE_KEY = "push_message_stale"
+val PUSH_SESSION_KEY = "push_session_key"
+var initialized = false
+var pushClientIdRequesting = false
+var pushClientIdRetryCount: Number = 0
+var pushClientIdRetryTimer: Number = 0
+var pushClientIdRequestTimeout: Number = 0
+val PUSH_CLIENT_ID_MAX_RETRY_COUNT: Number = 5
+val PUSH_CLIENT_ID_RETRY_DELAY: Number = 3000
+val PUSH_CLIENT_ID_REQUEST_TIMEOUT: Number = 18000
+fun pushDebug(message: String): Unit {
+    AndroidLog.e("UniPushDebug", message)
+    console.error("[UniPushDebug]", message, " at services/push.uts:23")
+}
+fun clearPushClientIdTimers(): Unit {
+    if (pushClientIdRetryTimer > 0) {
+        clearTimeout(pushClientIdRetryTimer)
+        pushClientIdRetryTimer = 0
+    }
+    if (pushClientIdRequestTimeout > 0) {
+        clearTimeout(pushClientIdRequestTimeout)
+        pushClientIdRequestTimeout = 0
+    }
+}
+fun schedulePushClientIdRetry(reason: String): Unit {
+    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
+        pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason)
+        return
+    }
+    if (pushClientIdRetryTimer > 0) {
+        return
+    }
+    pushClientIdRetryCount += 1
+    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString(10) + "ms 后重试，第 " + pushClientIdRetryCount.toString(10) + " 次。原因: " + reason)
+    pushClientIdRetryTimer = setTimeout(fun(){
+        pushClientIdRetryTimer = 0
+        refreshPushClientId()
+    }
+    , PUSH_CLIENT_ID_RETRY_DELAY)
+}
+fun stringValue(value: Any): String {
+    if (value == null) {
+        return ""
+    }
+    return value.toString()
+}
+fun payloadValue(payload: Any, key: String): String {
+    if (payload == null) {
+        return ""
+    }
+    if (UTSAndroid.`typeof`(payload) == "string") {
+        try {
+            val parsedPayload = UTSAndroid.consoleDebugError(JSON.parse(payload as String), " at services/push.uts:52")
+            if (parsedPayload == null) {
+                return ""
+            }
+            return payloadValue(parsedPayload, key)
+        }
+         catch (error: Throwable) {
+            return ""
+        }
+    }
+    try {
+        val kObject = payload as UTSJSONObject
+        return kObject.getString(key, "")
+    }
+     catch (error: Throwable) {
+        return ""
+    }
+}
+fun pushMessageId(message: Any): String {
+    var id = payloadValue(message, "messageId")
+    if (id == "") {
+        id = payloadValue(message, "message_id")
+    }
+    if (id == "") {
+        id = payloadValue(message, "id")
+    }
+    if (id == "") {
+        val data = payloadValue(message, "data")
+        if (data != "") {
+            id = payloadValue(data, "messageId")
+        }
+    }
+    return id
+}
+fun savePushEvent(event: Any): String {
+    val messageId = pushMessageId(event)
+    if (messageId != "") {
+        uni_setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId)
+    }
+    uni_setStorageSync(PUSH_MESSAGE_STALE_KEY, true)
+    return messageId
+}
+fun isNotificationClick(event: Any): Boolean {
+    return payloadValue(event, "type").toLowerCase() == "click"
+}
+fun registerPushListener(): Unit {
+    if (initialized) {
+        return
+    }
+    initialized = true
+    try {
+        uni_onPushMessage(fun(event: Any){
+            console.log("收到 UniPush 消息", " at services/push.uts:103")
+            savePushEvent(event)
+            if (isNotificationClick(event)) {
+                uni_switchTab(SwitchTabOptions(url = "/pages/message/message"))
+            }
+        }
+        )
+    }
+     catch (error: Throwable) {
+        console.error("注册 UniPush 监听失败:", error, " at services/push.uts:110")
+    }
+}
+fun initPush(): Unit {
+    registerPushListener()
+    refreshPushClientId()
+}
+fun refreshPushClientId(): Unit {
+    if (pushClientIdRequesting) {
+        pushDebug("UniPush CID 正在获取，跳过重复请求")
+        return
+    }
+    pushClientIdRequesting = true
+    clearPushClientIdTimers()
+    try {
+        pushDebug("开始获取 UniPush CID")
+        pushClientIdRequestTimeout = setTimeout(fun(){
+            pushClientIdRequestTimeout = 0
+            if (!pushClientIdRequesting) {
+                return
+            }
+            pushClientIdRequesting = false
+            pushDebug("UniPush getPushClientId 回调超时")
+            schedulePushClientIdRetry("回调超时")
+        }
+        , PUSH_CLIENT_ID_REQUEST_TIMEOUT)
+        uni_getPushClientId(GetPushClientIdOptions(success = fun(result){
+            pushClientIdRequesting = false
+            if (pushClientIdRequestTimeout > 0) {
+                clearTimeout(pushClientIdRequestTimeout)
+                pushClientIdRequestTimeout = 0
+            }
+            val clientId = result.cid
+            pushDebug("UniPush getPushClientId success")
+            if (clientId == "") {
+                pushDebug("UniPush CID 为空")
+                schedulePushClientIdRetry("CID 为空")
+                return
+            }
+            val cachedClientId = getCachedPushClientId()
+            pushDebug("UniPush CID=" + clientId)
+            if (clientId != cachedClientId) {
+                pushDebug("UniPush CID 已更新")
+            }
+            pushClientIdRetryCount = 0
+            uni_setStorageSync(PUSH_CLIENT_ID_KEY, clientId)
+        }
+        , fail = fun(error: Any){
+            pushClientIdRequesting = false
+            if (pushClientIdRequestTimeout > 0) {
+                clearTimeout(pushClientIdRequestTimeout)
+                pushClientIdRequestTimeout = 0
+            }
+            pushDebug("UniPush getPushClientId failed: " + error.toString())
+            schedulePushClientIdRetry("调用失败")
+        }
+        ))
+    }
+     catch (error: Throwable) {
+        pushClientIdRequesting = false
+        if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout)
+            pushClientIdRequestTimeout = 0
+        }
+        pushDebug("调用 getPushClientId 异常: " + error.toString())
+        schedulePushClientIdRetry("调用异常")
+    }
+}
+fun markPushSessionAuthenticated(): Unit {
+    uni_setStorageSync(PUSH_SESSION_KEY, "authenticated")
+    refreshPushClientId()
+}
+fun clearPushSessionState(): Unit {
+    uni_removeStorageSync(PUSH_SESSION_KEY)
+    uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
+}
+fun consumePendingMessageId(): String {
+    val rawValue = uni_getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    val value = if (rawValue == null) {
+        ""
+    } else {
+        stringValue(rawValue)
+    }
+    uni_removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY)
+    return value
+}
+fun consumePushStaleFlag(): Boolean {
+    val value = uni_getStorageSync(PUSH_MESSAGE_STALE_KEY)
+    uni_removeStorageSync(PUSH_MESSAGE_STALE_KEY)
+    return value != null && value.toString() == "true"
+}
+fun getCachedPushClientId(): String {
+    val value = uni_getStorageSync(PUSH_CLIENT_ID_KEY)
+    return if (value == null) {
+        ""
+    } else {
+        value.toString()
+    }
+}
+typealias CameraPermissionStatus = String
+typealias NotificationPermissionStatus = CameraPermissionStatus
+val CAMERA_PERMISSION = "android.permission.CAMERA"
+val POST_NOTIFICATIONS_PERMISSION = "android.permission.POST_NOTIFICATIONS"
+fun hasPermission(activity: Activity, permissions: UTSArray<String>): Boolean {
+    return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
+}
+fun requestAndroidPermission(permissions: UTSArray<String>, name: String, callback: (status: CameraPermissionStatus) -> Unit, isGranted: (activity: Activity) -> Boolean): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        console.error("❌ [" + name + "] 获取 Activity 失败", " at utils/cameraPermission.uts:28")
+        callback("unavailable")
+        return
+    }
+    val currentActivity = activity as Activity
+    try {
+        if (isGranted(currentActivity)) {
+            callback("granted")
+            return
+        }
+    }
+     catch (error: Throwable) {
+        console.error("❌ [" + name + "] 检查权限失败:", error, " at utils/cameraPermission.uts:40")
+        callback("unavailable")
+        return
+    }
+    try {
+        UTSAndroid.requestSystemPermission(currentActivity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
+            console.log("[" + name + "] 权限请求结果:", allRight, grantedPermissions, " at utils/cameraPermission.uts:50")
+            try {
+                callback(if (isGranted(currentActivity)) {
+                    "granted"
+                } else {
+                    "denied"
+                }
+                )
+            }
+             catch (error: Throwable) {
+                console.error("❌ [" + name + "] 请求后检查权限失败:", error, " at utils/cameraPermission.uts:54")
+                callback("unavailable")
+            }
+        }
+        , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
+            console.warn("[" + name + "] 权限被拒绝:", deniedPermissions, " at utils/cameraPermission.uts:59")
+            callback(if (doNotAskAgain) {
+                "settingsRequired"
+            } else {
+                "denied"
+            }
+            )
+        }
+        )
+    }
+     catch (error: Throwable) {
+        console.error("❌ [" + name + "] 请求权限异常:", error, " at utils/cameraPermission.uts:64")
+        callback("unavailable")
+    }
+}
+fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
+    requestAndroidPermission(_uA(
+        CAMERA_PERMISSION
+    ), "ensureCameraPermission", callback, fun(activity: Activity): Boolean {
+        return hasPermission(activity, _uA(
+            CAMERA_PERMISSION
+        ))
+    }
+    )
+}
+fun ensureNotificationPermission(callback: (status: NotificationPermissionStatus) -> Unit): Unit {
+    if (Build.VERSION.SDK_INT < 33) {
+        callback("granted")
+        return
+    }
+    requestAndroidPermission(_uA(
+        POST_NOTIFICATIONS_PERMISSION
+    ), "ensureNotificationPermission", callback, fun(activity: Activity): Boolean {
+        return hasPermission(activity, _uA(
+            POST_NOTIFICATIONS_PERMISSION
+        ))
+    }
+    )
+}
+fun openCameraPermissionSettings(): Unit {
+    val activity = UTSAndroid.getUniActivity()
+    if (activity == null) {
+        return
+    }
+    try {
+        UTSAndroid.gotoSystemPermissionActivity(activity as Activity, _uA(
+            CAMERA_PERMISSION
+        ))
+    }
+     catch (error: Throwable) {
+        console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error, " at utils/cameraPermission.uts:110")
+    }
+}
 var firstBackTime: Number = 0
 fun checkForUpdates() {}
 open class GenApp : BaseApp {
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onLaunch(fun(_: OnLaunchOptions) {
-            console.log("App onLaunch", " at App.uvue:73")
+            console.log("App onLaunch", " at App.uvue:76")
             checkForUpdates()
+            initPush()
+            ensureNotificationPermission(fun(status){
+                console.log("[NotificationPermission] " + status, " at App.uvue:81")
+            }
+            )
         }
         , __ins)
         onAppShow(fun(_: OnShowOptions) {
-            console.log("App Show", " at App.uvue:77")
+            console.log("App Show", " at App.uvue:86")
+            refreshPushClientId()
         }
         , __ins)
         onAppHide(fun() {
-            console.log("App Hide", " at App.uvue:80")
+            console.log("App Hide", " at App.uvue:90")
         }
         , __ins)
         onLastPageBackPress(fun() {
-            console.log("App LastPageBackPress", " at App.uvue:84")
+            console.log("App LastPageBackPress", " at App.uvue:94")
             if (firstBackTime == 0) {
                 uni_showToast(ShowToastOptions(title = "再按一次退出应用", position = "bottom"))
                 firstBackTime = Date.now()
@@ -169,7 +492,7 @@ open class GenApp : BaseApp {
         }
         , __ins)
         onExit(fun() {
-            console.log("App Exit", " at App.uvue:101")
+            console.log("App Exit", " at App.uvue:111")
         }
         , __ins)
     }
@@ -614,7 +937,7 @@ open class RequestOptions__1 (
     open var showLoading: Boolean? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 3, 6)
+        return UTSSourceMapPosition("RequestOptions", "api/http.uts", 4, 6)
     }
 }
 open class HttpError (
@@ -625,21 +948,22 @@ open class HttpError (
     open var data: Any? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("HttpError", "api/http.uts", 15, 6)
+        return UTSSourceMapPosition("HttpError", "api/http.uts", 16, 6)
     }
 }
 val BASE_URL = "https://car.zdiot.cn:18443/api"
 fun handleTokenExpired(): Unit {
-    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:39")
+    console.log("检测到token过期，执行跳转登录页逻辑", " at api/http.uts:40")
     uni_removeStorageSync("token")
+    clearPushSessionState()
     showAppToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none", duration = 2000))
     setTimeout(fun(){
-        console.log("正在跳转到登录页...", " at api/http.uts:53")
+        console.log("正在跳转到登录页...", " at api/http.uts:55")
         uni_redirectTo(RedirectToOptions(url = "/pages/login/login", success = fun(_){
-            console.log("跳转登录页成功", " at api/http.uts:57")
+            console.log("跳转登录页成功", " at api/http.uts:59")
         }
         , fail = fun(err){
-            console.log("跳转登录页失败:", err, " at api/http.uts:60")
+            console.log("跳转登录页失败:", err, " at api/http.uts:62")
             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
         }
         ))
@@ -663,7 +987,7 @@ fun errorHandler(error: HttpError, config: RequestOptions__1): Unit {
     if (config.showLoading != false) {
         uni_hideLoading(null)
     }
-    console.log("请求错误详情:", error, " at api/http.uts:112")
+    console.log("请求错误详情:", error, " at api/http.uts:114")
     if (error.statusCode != 0) {
         when (error.statusCode) {
             401 -> 
@@ -1368,7 +1692,7 @@ open class Device (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 217, 6)
+        return UTSSourceMapPosition("Device", "pages/index/index.uvue", 218, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1552,7 +1876,7 @@ open class MapCenter (
     open var longitude: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 234, 6)
+        return UTSSourceMapPosition("MapCenter", "pages/index/index.uvue", 235, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return MapCenterReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1607,7 +1931,7 @@ open class DeviceStatus (
     open var signalStrength: Number,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 277, 6)
+        return UTSSourceMapPosition("DeviceStatus", "pages/index/index.uvue", 278, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceStatusReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1673,7 +1997,7 @@ open class DeviceDetailState (
     open var lastUpdateTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 283, 6)
+        return UTSSourceMapPosition("DeviceDetailState", "pages/index/index.uvue", 284, 6)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return DeviceDetailStateReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -1757,7 +2081,7 @@ open class SavedDevice (
     open var longitude: Number,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 376, 6)
+        return UTSSourceMapPosition("SavedDevice", "pages/index/index.uvue", 377, 6)
     }
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
@@ -1870,7 +2194,6 @@ val GenUniModulesIUiXComponentsIFormIFormClass = CreateVueComponent(GenUniModule
     return GenUniModulesIUiXComponentsIFormIForm(instance)
 }
 )
-val READ_PHONE_STATE_PERMISSION = "android.permission.READ_PHONE_STATE"
 open class UniVerifyPreLoginResult (
     @JsonNotNull
     open var ok: Boolean = false,
@@ -1878,7 +2201,7 @@ open class UniVerifyPreLoginResult (
     open var message: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 5, 13)
+        return UTSSourceMapPosition("UniVerifyPreLoginResult", "services/auth/uni-verify.uts", 3, 13)
     }
 }
 open class UniVerifyResult (
@@ -1892,7 +2215,7 @@ open class UniVerifyResult (
     open var token: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 9, 13)
+        return UTSSourceMapPosition("UniVerifyResult", "services/auth/uni-verify.uts", 7, 13)
     }
 }
 @JvmField
@@ -1910,7 +2233,7 @@ fun getManager(): UniVerifyManager {
 }
 fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
     val errCode = error.errCode
-    console.error("Uni Verify 授权失败:", errCode, error.errMsg, " at services/auth/uni-verify.uts:44")
+    console.error("Uni Verify 授权失败:", errCode, error.errMsg, " at services/auth/uni-verify.uts:38")
     if (errCode == 30001) {
         return "已取消本机号码授权"
     }
@@ -1930,7 +2253,17 @@ fun getErrorMessage(error: UniVerifyManagerLoginFail): String {
 }
 fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
     val errCode = error.errCode
-    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + error.errMsg, "cause=" + error.cause, " at services/auth/uni-verify.uts:55")
+    val errMsg = if (error.errMsg != "") {
+        error.errMsg
+    } else {
+        ""
+    }
+    val cause = if (isTruthy(error.cause)) {
+        error.cause
+    } else {
+        ""
+    }
+    console.error("Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg, "cause=" + (cause as Any), " at services/auth/uni-verify.uts:51")
     if (errCode == 30005) {
         return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用"
     }
@@ -1944,7 +2277,19 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
         return "本机号码预取已取消"
     }
     if (errCode == 30004) {
-        return "运营商预取号失败，请确认 SIM 卡、移动网络与运营商服务状态"
+        if (errMsg.indexOf("-20102") >= 0) {
+            return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK"
+        }
+        if (errMsg.indexOf("-20201") >= 0) {
+            return "未检测到可用 SIM 卡，请使用验证码登录"
+        }
+        if (errMsg.indexOf("-20202") >= 0) {
+            return "未开启蜂窝移动网络，请开启移动数据后重试"
+        }
+        if (errMsg.indexOf("-20203") >= 0) {
+            return "当前运营商暂不支持一键登录，请使用验证码登录"
+        }
+        return "本机号码预取失败，请稍后重试或使用验证码登录"
     }
     if (errCode == 40001 || errCode == 40002) {
         return "网络异常，无法获取本机号码，请检查移动网络后重试"
@@ -1954,94 +2299,30 @@ fun getPreLoginErrorMessage(error: UniVerifyManagerPreLoginFail): String {
 fun createPreLoginResult(ok: Boolean, message: String): UniVerifyPreLoginResult {
     return UniVerifyPreLoginResult(ok = ok, message = message)
 }
-fun ensurePhoneStatePermission(): UTSPromise<UniVerifyPreLoginResult> {
+fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
     return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
-        val activity = UTSAndroid.getUniActivity()
-        if (activity == null) {
-            console.error("Uni Verify 无法获取 Android Activity，不能请求电话状态权限", " at services/auth/uni-verify.uts:74")
-            resolve(createPreLoginResult(false, "一键登录初始化失败，请重试"))
-            return
-        }
-        val currentActivity = activity as Activity
         try {
-            if (isTruthy(UTSAndroid.checkSystemPermissionGranted(currentActivity, _uA(
-                READ_PHONE_STATE_PERMISSION
-            )))) {
+            val uniVerifyManager = getManager()
+            if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
+                preLoginReady = true
                 resolve(createPreLoginResult(true, ""))
                 return
             }
-            UTSAndroid.requestSystemPermission(currentActivity, _uA(
-                READ_PHONE_STATE_PERMISSION
-            ), fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
-                val granted = UTSAndroid.checkSystemPermissionGranted(currentActivity, _uA(
-                    READ_PHONE_STATE_PERMISSION
-                ))
-                console.log("Uni Verify 电话状态权限请求结果:", granted, " at services/auth/uni-verify.uts:91")
-                resolve(createPreLoginResult(granted, if (isTruthy(granted)) {
-                    ""
-                } else {
-                    "请允许读取电话状态权限后重试一键登录"
-                }
-                ))
+            uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
+                preLoginReady = true
+                resolve(createPreLoginResult(true, ""))
             }
-            , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
-                console.warn("Uni Verify 电话状态权限被拒绝:", doNotAskAgain, " at services/auth/uni-verify.uts:95")
-                resolve(createPreLoginResult(false, if (doNotAskAgain) {
-                    "电话状态权限已被永久拒绝，请在系统设置中允许后重试一键登录"
-                } else {
-                    "请允许读取电话状态权限后重试一键登录"
-                }
-                ))
+            , fail = fun(error: UniVerifyManagerPreLoginFail){
+                preLoginReady = false
+                resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
             }
-            )
+            ))
         }
          catch (error: Throwable) {
-            console.error("Uni Verify 请求电话状态权限失败:", error, " at services/auth/uni-verify.uts:100")
-            resolve(createPreLoginResult(false, "一键登录权限初始化失败，请重试"))
-        }
-    }
-    )
-}
-fun ensurePhoneStatePermissionBeforePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
-    return ensurePhoneStatePermission()
-}
-fun ensurePreLogin(): UTSPromise<UniVerifyPreLoginResult> {
-    return UTSPromise<UniVerifyPreLoginResult>(fun(resolve, _reject){
-        ensurePhoneStatePermissionBeforePreLogin().then(fun(permissionResult){
-            if (!permissionResult.ok) {
-                preLoginReady = false
-                resolve(permissionResult)
-                return
-            }
-            try {
-                val uniVerifyManager = getManager()
-                if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
-                    preLoginReady = true
-                    resolve(createPreLoginResult(true, ""))
-                    return
-                }
-                uniVerifyManager.preLogin(UniVerifyManagerPreLoginOptions(success = fun(_res){
-                    preLoginReady = true
-                    resolve(createPreLoginResult(true, ""))
-                }
-                , fail = fun(error: UniVerifyManagerPreLoginFail){
-                    preLoginReady = false
-                    resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)))
-                }
-                ))
-            }
-             catch (error: Throwable) {
-                preLoginReady = false
-                console.error("Uni Verify 管理器初始化失败:", error, " at services/auth/uni-verify.uts:142")
-                resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
-            }
-        }
-        ).`catch`(fun(error){
             preLoginReady = false
-            console.error("Uni Verify 电话状态权限检查失败:", error, " at services/auth/uni-verify.uts:147")
-            resolve(createPreLoginResult(false, "一键登录权限初始化失败，请重试"))
+            console.error("Uni Verify 管理器初始化失败:", error, " at services/auth/uni-verify.uts:92")
+            resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"))
         }
-        )
     }
     )
 }
@@ -2128,7 +2409,7 @@ open class FormData (
     open var password: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 142, 7)
+        return UTSSourceMapPosition("FormData", "pages/login/login.uvue", 143, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return FormDataReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
@@ -2180,7 +2461,7 @@ open class SavedAccount (
     open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 146, 7)
+        return UTSSourceMapPosition("SavedAccount", "pages/login/login.uvue", 147, 7)
     }
 }
 val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
@@ -2401,86 +2682,6 @@ val GenPagesCarInfoDetailCarInfoDetailClass = CreateVueComponent(GenPagesCarInfo
     return GenPagesCarInfoDetailCarInfoDetail(instance, renderer)
 }
 )
-typealias CameraPermissionStatus = String
-val CAMERA_PERMISSION = "android.permission.CAMERA"
-fun hasPermission(activity: Activity, permissions: UTSArray<String>): Boolean {
-    return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
-}
-fun requestAndroidPermission(permissions: UTSArray<String>, name: String, callback: (status: CameraPermissionStatus) -> Unit, isGranted: (activity: Activity) -> Boolean): Unit {
-    val activity = UTSAndroid.getUniActivity()
-    if (activity == null) {
-        console.error("❌ [" + name + "] 获取 Activity 失败", " at utils/cameraPermission.uts:25")
-        callback("unavailable")
-        return
-    }
-    val currentActivity = activity as Activity
-    try {
-        if (isGranted(currentActivity)) {
-            callback("granted")
-            return
-        }
-    }
-     catch (error: Throwable) {
-        console.error("❌ [" + name + "] 检查权限失败:", error, " at utils/cameraPermission.uts:37")
-        callback("unavailable")
-        return
-    }
-    try {
-        UTSAndroid.requestSystemPermission(currentActivity, permissions, fun(allRight: Boolean, grantedPermissions: UTSArray<String>?){
-            console.log("[" + name + "] 权限请求结果:", allRight, grantedPermissions, " at utils/cameraPermission.uts:47")
-            try {
-                callback(if (isGranted(currentActivity)) {
-                    "granted"
-                } else {
-                    "denied"
-                }
-                )
-            }
-             catch (error: Throwable) {
-                console.error("❌ [" + name + "] 请求后检查权限失败:", error, " at utils/cameraPermission.uts:51")
-                callback("unavailable")
-            }
-        }
-        , fun(doNotAskAgain: Boolean, deniedPermissions: UTSArray<String>?){
-            console.warn("[" + name + "] 权限被拒绝:", deniedPermissions, " at utils/cameraPermission.uts:56")
-            callback(if (doNotAskAgain) {
-                "settingsRequired"
-            } else {
-                "denied"
-            }
-            )
-        }
-        )
-    }
-     catch (error: Throwable) {
-        console.error("❌ [" + name + "] 请求权限异常:", error, " at utils/cameraPermission.uts:61")
-        callback("unavailable")
-    }
-}
-fun ensureCameraPermission(callback: (status: CameraPermissionStatus) -> Unit): Unit {
-    requestAndroidPermission(_uA(
-        CAMERA_PERMISSION
-    ), "ensureCameraPermission", callback, fun(activity: Activity): Boolean {
-        return hasPermission(activity, _uA(
-            CAMERA_PERMISSION
-        ))
-    }
-    )
-}
-fun openCameraPermissionSettings(): Unit {
-    val activity = UTSAndroid.getUniActivity()
-    if (activity == null) {
-        return
-    }
-    try {
-        UTSAndroid.gotoSystemPermissionActivity(activity as Activity, _uA(
-            CAMERA_PERMISSION
-        ))
-    }
-     catch (error: Throwable) {
-        console.error("❌ [openCameraPermissionSettings] 打开权限设置失败:", error, " at utils/cameraPermission.uts:93")
-    }
-}
 val GenUniModulesIUiXComponentsIPopupIPopupClass = CreateVueComponent(GenUniModulesIUiXComponentsIPopupIPopup::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesIUiXComponentsIPopupIPopup.name, inheritAttrs = GenUniModulesIUiXComponentsIPopupIPopup.inheritAttrs, inject = GenUniModulesIUiXComponentsIPopupIPopup.inject, props = GenUniModulesIUiXComponentsIPopupIPopup.props, propsNeedCastKeys = GenUniModulesIUiXComponentsIPopupIPopup.propsNeedCastKeys, emits = GenUniModulesIUiXComponentsIPopupIPopup.emits, components = GenUniModulesIUiXComponentsIPopupIPopup.components, styles = GenUniModulesIUiXComponentsIPopupIPopup.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesIUiXComponentsIPopupIPopup.setup(props as GenUniModulesIUiXComponentsIPopupIPopup, ctx)
@@ -8345,7 +8546,7 @@ open class UserInfo (
     open var createTime: String,
 ) : UTSReactiveObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UserInfo", "pages/userCenter/userInfo/userInfo.uvue", 55, 7)
+        return UTSSourceMapPosition("UserInfo", "pages/userCenter/userInfo/userInfo.uvue", 56, 7)
     }
     override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
         return UserInfoReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)

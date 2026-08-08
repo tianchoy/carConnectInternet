@@ -9,6 +9,7 @@ import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted } from 'vue'
+	import { markPushSessionAuthenticated } from '../../services/push.uts'
 	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
@@ -138,6 +139,7 @@ const docState = ref(false)
 		}
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
+		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({ url: '/pages/index/index' })

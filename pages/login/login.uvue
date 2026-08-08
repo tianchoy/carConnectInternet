@@ -120,6 +120,7 @@
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted } from 'vue'
+	import { markPushSessionAuthenticated } from '../../services/push.uts'
 	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 	// #ifdef APP-ANDROID || APP-IOS
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
@@ -241,6 +242,7 @@ import { showAppToast } from '../../utils/toast.uts'
 		}
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
+		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({ url: '/pages/index/index' })

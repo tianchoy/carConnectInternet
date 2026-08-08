@@ -27,7 +27,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
             onLoad(fun(options){
                 if (options["userInfo"] != null) {
                     try {
-                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:71") as String), " at pages/userCenter/userInfo/userInfo.uvue:71") as UTSJSONObject
+                        val parsedInfo = UTSAndroid.consoleDebugError(JSON.parse(UTSAndroid.consoleDebugError(decodeURIComponent(options["userInfo"] as String), " at pages/userCenter/userInfo/userInfo.uvue:72") as String), " at pages/userCenter/userInfo/userInfo.uvue:72") as UTSJSONObject
                         val userId = parsedInfo.getString("userId")
                         val mobile = parsedInfo.getString("mobile")
                         val type = parsedInfo.getNumber("type")
@@ -53,10 +53,10 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                             ""
                         }
                         )
-                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:82")
+                        console.log("用户信息:", userInfo.value, " at pages/userCenter/userInfo/userInfo.uvue:83")
                     }
                      catch (e: Throwable) {
-                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:84")
+                        console.error("解析用户信息失败:", e, " at pages/userCenter/userInfo/userInfo.uvue:85")
                     }
                 }
             }
@@ -69,6 +69,7 @@ open class GenPagesUserCenterUserInfoUserInfo : BasePage {
                         val res = await(logout())
                         if (res.code == 0) {
                             uni_removeStorageSync("token")
+                            clearPushSessionState()
                             uni_reLaunch(ReLaunchOptions(url = "/pages/login/login"))
                         } else {
                             showAppToast(ShowToastOptions(title = "退出账户失败"))

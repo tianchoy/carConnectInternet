@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const services_push = require("../services/push.js");
 const utils_toast = require("../utils/toast.js");
 class RequestOptions extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -120,22 +121,23 @@ class RequestFailure extends common_vendor.UTS.UTSType {
 }
 const BASE_URL = "https://car.zdiot.cn:18443/api";
 function handleTokenExpired() {
-  common_vendor.index.__f__("log", "at api/http.uts:39", "检测到token过期，执行跳转登录页逻辑");
+  common_vendor.index.__f__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
   common_vendor.index.removeStorageSync("token");
+  services_push.clearPushSessionState();
   utils_toast.showAppToast({
     title: "登录已过期，请重新登录",
     icon: "none",
     duration: 2e3
   });
   setTimeout(() => {
-    common_vendor.index.__f__("log", "at api/http.uts:53", "正在跳转到登录页...");
+    common_vendor.index.__f__("log", "at api/http.uts:55", "正在跳转到登录页...");
     common_vendor.index.redirectTo({
       url: "/pages/login/login",
       success: () => {
-        common_vendor.index.__f__("log", "at api/http.uts:57", "跳转登录页成功");
+        common_vendor.index.__f__("log", "at api/http.uts:59", "跳转登录页成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at api/http.uts:60", "跳转登录页失败:", err);
+        common_vendor.index.__f__("log", "at api/http.uts:62", "跳转登录页失败:", err);
         common_vendor.index.reLaunch({
           url: "/pages/login/login"
         });
@@ -160,7 +162,7 @@ function errorHandler(error, config) {
   if (config.showLoading != false) {
     common_vendor.index.hideLoading();
   }
-  common_vendor.index.__f__("log", "at api/http.uts:112", "请求错误详情:", error);
+  common_vendor.index.__f__("log", "at api/http.uts:114", "请求错误详情:", error);
   if (error.statusCode != 0) {
     switch (error.statusCode) {
       case 401:

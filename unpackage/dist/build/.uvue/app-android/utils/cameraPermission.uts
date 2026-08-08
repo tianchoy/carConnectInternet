@@ -1,10 +1,13 @@
 // utils/cameraPermission.uts
 export type CameraPermissionStatus = 'granted' | 'denied' | 'settingsRequired' | 'unavailable';
 export type LocationPermissionStatus = CameraPermissionStatus;
+export type NotificationPermissionStatus = CameraPermissionStatus;
 import Activity from 'android.app.Activity';
+import Build from 'android.os.Build';
 const CAMERA_PERMISSION = 'android.permission.CAMERA';
 const COARSE_LOCATION_PERMISSION = 'android.permission.ACCESS_COARSE_LOCATION';
 const FINE_LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+const POST_NOTIFICATIONS_PERMISSION = 'android.permission.POST_NOTIFICATIONS';
 function hasPermission(activity: Activity, permissions: Array<string>): boolean {
     return UTSAndroid.checkSystemPermissionGranted(activity, permissions);
 }
@@ -55,6 +58,13 @@ export function ensureLocationPermission(callback: (status: LocationPermissionSt
         return hasPermission(activity, [COARSE_LOCATION_PERMISSION]) ||
             hasPermission(activity, [FINE_LOCATION_PERMISSION]);
     });
+}
+export function ensureNotificationPermission(callback: (status: NotificationPermissionStatus) => void): void {
+    if (Build.VERSION.SDK_INT < 33) {
+        callback('granted');
+        return;
+    }
+    requestAndroidPermission([POST_NOTIFICATIONS_PERMISSION], 'ensureNotificationPermission', callback, (activity: Activity): boolean => hasPermission(activity, [POST_NOTIFICATIONS_PERMISSION]));
 }
 export function openCameraPermissionSettings(): void {
     const activity = UTSAndroid.getUniActivity();

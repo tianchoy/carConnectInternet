@@ -234,12 +234,67 @@ open class GenPagesMessageMessage : BasePage {
                 }
                 ).exec()
             }
+            fun gen_handleItemClick_fn(item: UTSJSONObject): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        modalContent.value = item
+                        modal.value = true
+                        if (item.getNumber("status", 0) == 1) {
+                            try {
+                                val messageId = item.getString("messageId", "")
+                                val res = await(setMsgState(messageId))
+                                if (res.code == 0 || res.msg == "success") {
+                                    val index = msgList.value.findIndex(fun(message: UTSJSONObject): Boolean {
+                                        return message.getString("messageId", "") == messageId
+                                    }
+                                    )
+                                    if (index != -1) {
+                                        msgList.value[index].set("status", 0)
+                                        msgList.value = msgList.value.slice()
+                                    }
+                                }
+                            }
+                             catch (error: Throwable) {
+                                console.error("更新状态失败:", error)
+                            }
+                        }
+                })
+            }
+            val handleItemClick = ::gen_handleItemClick_fn
+            fun gen_openPendingPushMessage_fn(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend w1@{
+                        if (isLoading.value) {
+                            setTimeout(fun(){
+                                gen_openPendingPushMessage_fn()
+                            }
+                            , 150)
+                            return@w1
+                        }
+                        val messageId = consumePendingMessageId()
+                        val shouldRefresh = consumePushStaleFlag()
+                        if (messageId == "" && !shouldRefresh) {
+                            return@w1
+                        }
+                        await(loadMsgList(true))
+                        if (messageId == "") {
+                            return@w1
+                        }
+                        val message = msgList.value.find(fun(item: UTSJSONObject): Boolean {
+                            return item.getString("messageId", "") == messageId
+                        }
+                        )
+                        if (message != null) {
+                            await(handleItemClick(message))
+                        }
+                })
+            }
+            val openPendingPushMessage = ::gen_openPendingPushMessage_fn
             onShow(fun(){
                 if (Login.value) {
                     console.log("页面显示 - 启动自动刷新")
                     isPageActive.value = true
                     measureMessageScrollViewport()
                     startNewMessageCheck()
+                    openPendingPushMessage()
                     checkNewMessages()
                 }
             }
@@ -268,6 +323,7 @@ open class GenPagesMessageMessage : BasePage {
                     console.log("页面激活 - 启动自动刷新")
                     isPageActive.value = true
                     startNewMessageCheck()
+                    openPendingPushMessage()
                     checkNewMessages()
                 }
             }
@@ -310,31 +366,6 @@ open class GenPagesMessageMessage : BasePage {
                 }
             }
             val onMessageScroll = fun(event: UniScrollEvent): Unit {}
-            val handleItemClick = fun(item: UTSJSONObject): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        modalContent.value = item
-                        modal.value = true
-                        if (item.getNumber("status", 0) == 1) {
-                            try {
-                                val messageId = item.getString("messageId", "")
-                                val res = await(setMsgState(messageId))
-                                if (res.code == 0 || res.msg == "success") {
-                                    val index = msgList.value.findIndex(fun(message: UTSJSONObject): Boolean {
-                                        return message.getString("messageId", "") == messageId
-                                    }
-                                    )
-                                    if (index != -1) {
-                                        msgList.value[index].set("status", 0)
-                                        msgList.value = msgList.value.slice()
-                                    }
-                                }
-                            }
-                             catch (error: Throwable) {
-                                console.error("更新状态失败:", error)
-                            }
-                        }
-                })
-            }
             val ReadIt = fun(){
                 modal.value = false
             }

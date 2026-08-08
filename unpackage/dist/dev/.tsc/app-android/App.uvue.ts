@@ -1,4 +1,7 @@
 
+	import { initPush, refreshPushClientId } from './services/push.uts'
+	import { ensureNotificationPermission } from './utils/cameraPermission.uts'
+
 	let firstBackTime = 0
 	// 添加热更新相关变量
 	let updateManager: any = null
@@ -70,18 +73,25 @@
 	
 	const __sfc__ = defineApp({
 		onLaunch: function () {
-			console.log('App onLaunch', " at App.uvue:73")
+			console.log('App onLaunch', " at App.uvue:76")
 			checkForUpdates()
+			initPush()
+
+			ensureNotificationPermission((status) => {
+				console.log('[NotificationPermission] ' + status, " at App.uvue:81")
+			})
+
 		},
 		onShow: function () {
-			console.log('App Show', " at App.uvue:77")
+			console.log('App Show', " at App.uvue:86")
+			refreshPushClientId()
 		},
 		onHide: function () {
-			console.log('App Hide', " at App.uvue:80")
+			console.log('App Hide', " at App.uvue:90")
 		},
 
 		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress', " at App.uvue:84")
+			console.log('App LastPageBackPress', " at App.uvue:94")
 			if (firstBackTime == 0) {
 				uni.showToast({
 					title: '再按一次退出应用',
@@ -98,7 +108,7 @@
 		},
 
 		onExit: function () {
-			console.log('App Exit', " at App.uvue:101")
+			console.log('App Exit', " at App.uvue:111")
 		}
 	})
 

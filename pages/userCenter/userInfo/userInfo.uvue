@@ -51,6 +51,7 @@
 
 <script setup lang="uts">
 import { showAppToast } from '../../../utils/toast.uts'
+	import { clearPushSessionState } from '../../../services/push.uts'
 	import {logout} from '../../../api/request.uts'
 	type UserInfo = {
 		id : string,
@@ -97,6 +98,7 @@ import { showAppToast } from '../../../utils/toast.uts'
 		const res = await logout()
 		if(res.code == 0){
 			uni.removeStorageSync('token')
+			clearPushSessionState()
 			uni.reLaunch({
 				url:'/pages/login/login'
 			})

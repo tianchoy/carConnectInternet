@@ -53,7 +53,7 @@ open class GenPagesLoginLogin : BasePage {
                         return
                     }
                     val account = if (UTSAndroid.`typeof`(rawAccount) == "string") {
-                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:171") as UTSJSONObject
+                        UTSAndroid.consoleDebugError(JSON.parse(rawAccount as String), " at pages/login/login.uvue:172") as UTSJSONObject
                     } else {
                         rawAccount as UTSJSONObject
                     }
@@ -62,7 +62,7 @@ open class GenPagesLoginLogin : BasePage {
                     rememberPassword.value = form.value.username != "" || form.value.password != ""
                 }
                  catch (error: Throwable) {
-                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:176")
+                    console.error("加载保存的账号密码失败:", error, " at pages/login/login.uvue:177")
                 }
             }
             val loadSavedAccount = ::gen_loadSavedAccount_fn
@@ -98,7 +98,7 @@ open class GenPagesLoginLogin : BasePage {
             val getSystemInfo = fun(): Unit {
                 val res = uni_getSystemInfoSync()
                 deviceModel.value = res.deviceModel
-                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:219")
+                console.log("设备型号:", deviceModel.value, " at pages/login/login.uvue:220")
             }
             val validateForm = fun(): Boolean {
                 if (form.value.username.length == 0) {
@@ -120,6 +120,7 @@ open class GenPagesLoginLogin : BasePage {
                     saveAccountPassword()
                 }
                 uni_setStorageSync("token", token)
+                markPushSessionAuthenticated()
                 showAppToast(ShowToastOptions(title = "登录成功", icon = "success"))
                 setTimeout(fun(){
                     uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
@@ -251,7 +252,7 @@ open class GenPagesLoginLogin : BasePage {
                                 }
                             }
                              catch (error: Throwable) {
-                                console.warn("获取应用版本失败，使用默认版本号:", error, " at pages/login/login.uvue:343")
+                                console.warn("获取应用版本失败，使用默认版本号:", error, " at pages/login/login.uvue:345")
                             }
                             val result = await(loginByUniVerify(clientVersion))
                             if (result.ok) {
@@ -275,18 +276,18 @@ open class GenPagesLoginLogin : BasePage {
                             return@w1
                         }
                         try {
-                            console.log("准备验证表单...", " at pages/login/login.uvue:460")
+                            console.log("准备验证表单...", " at pages/login/login.uvue:462")
                             if (!validateForm()) {
                                 return@w1
                             }
-                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:462")
-                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 465, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
-                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:471")
+                            console.log("✅ 表单验证通过", " at pages/login/login.uvue:464")
+                            val newFormData: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 467, 10), "username" to form.value.username, "password" to form.value.password, "from" to deviceModel.value, "type" to "USER")
+                            console.log("📤 请求参数:", newFormData, " at pages/login/login.uvue:473")
                             loading.value = true
                             uni_showLoading(ShowLoadingOptions(title = "登录中...", mask = true))
-                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:481")
+                            console.log("🚀 开始调用 login 接口...", " at pages/login/login.uvue:483")
                             val res = await(login(newFormData))
-                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:483")
+                            console.log("✅ 登录接口返回:", res, " at pages/login/login.uvue:485")
                             loading.value = false
                             uni_hideLoading(null)
                             val loginData = res.data
@@ -302,7 +303,7 @@ open class GenPagesLoginLogin : BasePage {
                             }
                         }
                          catch (error: Throwable) {
-                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:502")
+                            console.error("❌ 登录失败:", error, " at pages/login/login.uvue:504")
                             loading.value = false
                             uni_hideLoading(null)
                             if (isTruthy(error) && isTruthy(error.message)) {
@@ -328,7 +329,7 @@ open class GenPagesLoginLogin : BasePage {
                 getSystemInfo()
                 loadSavedAccount()
                 prefetchUniVerify()
-                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:601")
+                console.log("pswLogin 初始值:", pswLogin.value, " at pages/login/login.uvue:603")
             }
             )
             return fun(): Any? {

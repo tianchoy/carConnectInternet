@@ -42,10 +42,10 @@ function openBuiltInLocation(params) {
       name: params.name != "" ? params.name : "当前位置",
       scale: 18,
       success: () => {
-        common_vendor.index.__f__("log", "at utils/openLocation.uts:129", "成功打开位置地图");
+        common_vendor.index.__f__("log", "at utils/openLocation.uts:141", "成功打开位置地图");
       },
       fail: (error) => {
-        common_vendor.index.__f__("error", "at utils/openLocation.uts:132", "打开位置地图失败:", error);
+        common_vendor.index.__f__("error", "at utils/openLocation.uts:144", "打开位置地图失败:", error);
         utils_toast.showAppToast({
           title: "打开位置地图失败，请稍后重试",
           icon: "none"
@@ -53,7 +53,7 @@ function openBuiltInLocation(params) {
       }
     });
   } catch (error) {
-    common_vendor.index.__f__("error", "at utils/openLocation.uts:140", "打开位置地图异常:", error);
+    common_vendor.index.__f__("error", "at utils/openLocation.uts:152", "打开位置地图异常:", error);
     utils_toast.showAppToast({
       title: "打开位置地图失败，请稍后重试",
       icon: "none"

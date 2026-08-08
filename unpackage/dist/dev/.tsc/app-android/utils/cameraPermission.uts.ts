@@ -2,13 +2,16 @@
 
 export type CameraPermissionStatus = 'granted' | 'denied' | 'settingsRequired' | 'unavailable'
 export type LocationPermissionStatus = CameraPermissionStatus
+export type NotificationPermissionStatus = CameraPermissionStatus
 
 
 import Activity from 'android.app.Activity'
+import Build from 'android.os.Build'
 
 const CAMERA_PERMISSION = 'android.permission.CAMERA'
 const COARSE_LOCATION_PERMISSION = 'android.permission.ACCESS_COARSE_LOCATION'
 const FINE_LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION'
+const POST_NOTIFICATIONS_PERMISSION = 'android.permission.POST_NOTIFICATIONS'
 
 function hasPermission(activity: Activity, permissions: Array<string>): boolean {
 	return UTSAndroid.checkSystemPermissionGranted(activity, permissions)
@@ -22,7 +25,7 @@ function requestAndroidPermission(
 ): void {
 	const activity = UTSAndroid.getUniActivity()
 	if (activity == null) {
-		__f__('error','at utils/cameraPermission.uts:25','❌ [' + name + '] 获取 Activity 失败')
+		__f__('error','at utils/cameraPermission.uts:28','❌ [' + name + '] 获取 Activity 失败')
 		callback('unavailable')
 		return
 	}
@@ -34,7 +37,7 @@ function requestAndroidPermission(
 			return
 		}
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:37','❌ [' + name + '] 检查权限失败:', error)
+		__f__('error','at utils/cameraPermission.uts:40','❌ [' + name + '] 检查权限失败:', error)
 		callback('unavailable')
 		return
 	}
@@ -44,21 +47,21 @@ function requestAndroidPermission(
 			currentActivity,
 			permissions,
 			(allRight: boolean, grantedPermissions: Array<string> | null) => {
-				__f__('log','at utils/cameraPermission.uts:47','[' + name + '] 权限请求结果:', allRight, grantedPermissions)
+				__f__('log','at utils/cameraPermission.uts:50','[' + name + '] 权限请求结果:', allRight, grantedPermissions)
 				try {
 					callback(isGranted(currentActivity) ? 'granted' : 'denied')
 				} catch (error) {
-					__f__('error','at utils/cameraPermission.uts:51','❌ [' + name + '] 请求后检查权限失败:', error)
+					__f__('error','at utils/cameraPermission.uts:54','❌ [' + name + '] 请求后检查权限失败:', error)
 					callback('unavailable')
 				}
 			},
 			(doNotAskAgain: boolean, deniedPermissions: Array<string> | null) => {
-				__f__('warn','at utils/cameraPermission.uts:56','[' + name + '] 权限被拒绝:', deniedPermissions)
+				__f__('warn','at utils/cameraPermission.uts:59','[' + name + '] 权限被拒绝:', deniedPermissions)
 				callback(doNotAskAgain ? 'settingsRequired' : 'denied')
 			}
 		)
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:61','❌ [' + name + '] 请求权限异常:', error)
+		__f__('error','at utils/cameraPermission.uts:64','❌ [' + name + '] 请求权限异常:', error)
 		callback('unavailable')
 	}
 }
@@ -84,15 +87,33 @@ export function ensureLocationPermission(callback: (status: LocationPermissionSt
 	)
 }
 
+export function ensureNotificationPermission(callback: (status: NotificationPermissionStatus) => void): void {
+	if (Build.VERSION.SDK_INT < 33) {
+		callback('granted')
+		return
+	}
+
+	requestAndroidPermission(
+		[POST_NOTIFICATIONS_PERMISSION],
+		'ensureNotificationPermission',
+		callback,
+		(activity: Activity): boolean => hasPermission(activity, [POST_NOTIFICATIONS_PERMISSION])
+	)
+}
+
 export function openCameraPermissionSettings(): void {
 	const activity = UTSAndroid.getUniActivity()
 	if (activity == null) return
 	try {
 		UTSAndroid.gotoSystemPermissionActivity(activity as Activity, [CAMERA_PERMISSION])
 	} catch (error) {
-		__f__('error','at utils/cameraPermission.uts:93','❌ [openCameraPermissionSettings] 打开权限设置失败:', error)
+		__f__('error','at utils/cameraPermission.uts:110','❌ [openCameraPermissionSettings] 打开权限设置失败:', error)
 	}
 }
+
+
+
+
 
 
 

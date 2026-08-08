@@ -16,6 +16,7 @@ import { showAppToast } from '../../utils/toast.uts'
 import { openLocation } from '../../utils/openLocation.uts'
 import { showAppModal, type AppModalSuccess } from '../../utils/modal.uts'
 import { ref, reactive, computed, nextTick } from 'vue';
+import { clearPushSessionState } from '../../services/push.uts'
 import { getCustomDeviceList, getUserDeviceList, getDeviceDetail, getDevicePos,getTrackPos,delDevice,logout } from '../../api/request.uts'
 import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
@@ -456,6 +457,7 @@ const loadTrackPos = async (data: UTSJSONObject) : Promise<void> => {
                 duration: 2000
             })
             uni.removeStorageSync('token')
+            clearPushSessionState()
             uni.reLaunch({
                 url: '/pages/index/index'
             })
@@ -991,6 +993,7 @@ const handleExit = () => {
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
                     uni.removeStorageSync('token')
+                    clearPushSessionState()
                     uni.reLaunch({
                         url:'/pages/login/login'
                     })

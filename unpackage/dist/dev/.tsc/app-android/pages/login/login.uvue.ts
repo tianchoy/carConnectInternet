@@ -9,16 +9,17 @@ import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import { showAppToast } from '../../utils/toast.uts'
 	import { showAppModal } from '../../utils/modal.uts'
 	import { ref, onMounted } from 'vue'
+	import { markPushSessionAuthenticated } from '../../services/push.uts'
 	import { login, PostWechatlogin, sendSmsLoginCode, smsLogin } from '../../api/request.uts'
 
 	import { loginByUniVerify, prefetchUniVerify } from '../../services/auth/uni-verify.uts'
 
 
-	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 142, 7>;
+	type FormData = { __$originalPosition?: UTSSourceMapPosition<"FormData", "pages/login/login.uvue", 143, 7>;
 		username: string
 		password: string
 	}
-	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 146, 7>;
+	type SavedAccount = { __$originalPosition?: UTSSourceMapPosition<"SavedAccount", "pages/login/login.uvue", 147, 7>;
 		username: string
 		password: string
 	}
@@ -65,12 +66,12 @@ const docState = ref(false)
 		try {
 			const rawAccount = uni.getStorageSync('savedEnterpriseAccount')
 			if (rawAccount == null || rawAccount == '') return
-			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:171") as UTSJSONObject : rawAccount as UTSJSONObject
+			const account = typeof rawAccount == 'string' ? UTSAndroid.consoleDebugError(JSON.parse(rawAccount), " at pages/login/login.uvue:172") as UTSJSONObject : rawAccount as UTSJSONObject
 			form.value.username = account.getString('username', '')
 			form.value.password = account.getString('password', '')
 			rememberPassword.value = form.value.username != '' || form.value.password != ''
 		} catch (error) {
-			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:176")
+			console.error('加载保存的账号密码失败:', error, " at pages/login/login.uvue:177")
 		}
 	}
 
@@ -113,7 +114,7 @@ const docState = ref(false)
 	const getSystemInfo = () : void => {
 		const res = uni.getSystemInfoSync()
 		deviceModel.value = res.deviceModel
-		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:219")
+		console.log('设备型号:', deviceModel.value, " at pages/login/login.uvue:220")
 	}
 
 	// ===== 表单验证 =====
@@ -138,6 +139,7 @@ const docState = ref(false)
 		}
 		if (savePassword) saveAccountPassword()
 		uni.setStorageSync('token', token)
+		markPushSessionAuthenticated()
 		showAppToast({ title: '登录成功', icon: 'success' })
 		setTimeout(() => {
 			uni.reLaunch({ url: '/pages/index/index' })
@@ -237,7 +239,7 @@ const docState = ref(false)
 				const appVersion = uni.getAppBaseInfo().appVersion ?? ''
 				if (appVersion != '') clientVersion = appVersion
 			} catch (error) {
-				console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:343")
+				console.warn('获取应用版本失败，使用默认版本号:', error, " at pages/login/login.uvue:345")
 			}
 			const result = await loginByUniVerify(clientVersion)
 			if (result.ok) {
@@ -354,18 +356,18 @@ const docState = ref(false)
 
 		try {
 			// 表单验证
-			console.log('准备验证表单...', " at pages/login/login.uvue:460")
+			console.log('准备验证表单...', " at pages/login/login.uvue:462")
 			if (!validateForm()) return
-			console.log('✅ 表单验证通过', " at pages/login/login.uvue:462")
+			console.log('✅ 表单验证通过', " at pages/login/login.uvue:464")
 
 			// 构建请求参数
-			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 465, 10),
+			const newFormData = {__$originalPosition: new UTSSourceMapPosition("newFormData", "pages/login/login.uvue", 467, 10),
 				username: form.value.username,
 				password: form.value.password,
 				from: deviceModel.value,
 				type: "USER"
 			}
-			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:471")
+			console.log('📤 请求参数:', newFormData, " at pages/login/login.uvue:473")
 
 			// 显示加载状态
 			loading.value = true
@@ -375,9 +377,9 @@ const docState = ref(false)
 			})
 
 			// 调用登录接口
-			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:481")
+			console.log('🚀 开始调用 login 接口...', " at pages/login/login.uvue:483")
 			const res = await login(newFormData)
-			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:483")
+			console.log('✅ 登录接口返回:', res, " at pages/login/login.uvue:485")
 
 			// 隐藏加载状态
 			loading.value = false
@@ -396,7 +398,7 @@ const docState = ref(false)
 			}
 
 		} catch (error: any) {
-			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:502")
+			console.error('❌ 登录失败:', error, " at pages/login/login.uvue:504")
 			loading.value = false
 			uni.hideLoading()
 
@@ -495,7 +497,7 @@ const docState = ref(false)
 
 		prefetchUniVerify()
 
-		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:601")
+		console.log('pswLogin 初始值:', pswLogin.value, " at pages/login/login.uvue:603")
 	})
 
 

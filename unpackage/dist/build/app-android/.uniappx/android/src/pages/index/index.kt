@@ -355,6 +355,7 @@ open class GenPagesIndexIndex : BasePage {
                             if (res.code == 401) {
                                 showAppToast(ShowToastOptions(title = "登录过期，请重新登录", icon = "none", duration = 2000))
                                 uni_removeStorageSync("token")
+                                clearPushSessionState()
                                 uni_reLaunch(ReLaunchOptions(url = "/pages/index/index"))
                                 return@w1
                             }

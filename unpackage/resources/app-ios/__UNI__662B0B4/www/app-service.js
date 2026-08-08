@@ -1783,6 +1783,196 @@
       }
     }));
   }
+  const PUSH_CLIENT_ID_KEY = "push_client_id";
+  const PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id";
+  const PUSH_MESSAGE_STALE_KEY = "push_message_stale";
+  const PUSH_SESSION_KEY = "push_session_key";
+  let initialized = false;
+  let pushClientIdRequesting = false;
+  let pushClientIdRetryCount = 0;
+  let pushClientIdRetryTimer = 0;
+  let pushClientIdRequestTimeout = 0;
+  const PUSH_CLIENT_ID_MAX_RETRY_COUNT = 5;
+  const PUSH_CLIENT_ID_RETRY_DELAY = 3e3;
+  const PUSH_CLIENT_ID_REQUEST_TIMEOUT = 18e3;
+  function pushDebug(message) {
+    uni.__log__("error", "at services/push.uts:23", "[UniPushDebug]", message);
+  }
+  function clearPushClientIdTimers() {
+    if (pushClientIdRetryTimer > 0) {
+      clearTimeout(pushClientIdRetryTimer);
+      pushClientIdRetryTimer = 0;
+    }
+    if (pushClientIdRequestTimeout > 0) {
+      clearTimeout(pushClientIdRequestTimeout);
+      pushClientIdRequestTimeout = 0;
+    }
+  }
+  function schedulePushClientIdRetry(reason) {
+    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
+      pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason);
+      return null;
+    }
+    if (pushClientIdRetryTimer > 0)
+      return null;
+    pushClientIdRetryCount += 1;
+    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString() + "ms 后重试，第 " + pushClientIdRetryCount.toString() + " 次。原因: " + reason);
+    pushClientIdRetryTimer = setTimeout(() => {
+      pushClientIdRetryTimer = 0;
+      refreshPushClientId();
+    }, PUSH_CLIENT_ID_RETRY_DELAY);
+  }
+  function stringValue(value = null) {
+    if (value == null)
+      return "";
+    return value.toString();
+  }
+  function payloadValue(payload = null, key) {
+    if (payload == null)
+      return "";
+    if (typeof payload == "string") {
+      try {
+        const parsedPayload = UTS.JSON.parse(payload);
+        if (parsedPayload == null)
+          return "";
+        return payloadValue(parsedPayload, key);
+      } catch (error) {
+        return "";
+      }
+    }
+    try {
+      const object = payload;
+      return object.getString(key, "");
+    } catch (error) {
+      return "";
+    }
+  }
+  function pushMessageId(message = null) {
+    let id = payloadValue(message, "messageId");
+    if (id == "")
+      id = payloadValue(message, "message_id");
+    if (id == "")
+      id = payloadValue(message, "id");
+    if (id == "") {
+      const data = payloadValue(message, "data");
+      if (data != "")
+        id = payloadValue(data, "messageId");
+    }
+    return id;
+  }
+  function savePushEvent(event = null) {
+    const messageId = pushMessageId(event);
+    if (messageId != "")
+      uni.setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId);
+    uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
+    return messageId;
+  }
+  function isNotificationClick(event = null) {
+    return payloadValue(event, "type").toLowerCase() == "click";
+  }
+  function registerPushListener() {
+    if (initialized)
+      return null;
+    initialized = true;
+    try {
+      uni.onPushMessage((event = null) => {
+        uni.__log__("log", "at services/push.uts:103", "收到 UniPush 消息");
+        savePushEvent(event);
+        if (isNotificationClick(event)) {
+          uni.switchTab({ url: "/pages/message/message" });
+        }
+      });
+    } catch (error) {
+      uni.__log__("error", "at services/push.uts:110", "注册 UniPush 监听失败:", error);
+    }
+  }
+  function initPush() {
+    registerPushListener();
+    refreshPushClientId();
+  }
+  function refreshPushClientId() {
+    if (pushClientIdRequesting) {
+      pushDebug("UniPush CID 正在获取，跳过重复请求");
+      return null;
+    }
+    pushClientIdRequesting = true;
+    clearPushClientIdTimers();
+    try {
+      pushDebug("开始获取 UniPush CID");
+      pushClientIdRequestTimeout = setTimeout(() => {
+        pushClientIdRequestTimeout = 0;
+        if (!pushClientIdRequesting)
+          return null;
+        pushClientIdRequesting = false;
+        pushDebug("UniPush getPushClientId 回调超时");
+        schedulePushClientIdRetry("回调超时");
+      }, PUSH_CLIENT_ID_REQUEST_TIMEOUT);
+      uni.getPushClientId(new UTSJSONObject({
+        success: (result) => {
+          pushClientIdRequesting = false;
+          if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout);
+            pushClientIdRequestTimeout = 0;
+          }
+          const clientId = result.cid;
+          pushDebug("UniPush getPushClientId success");
+          if (clientId == "") {
+            pushDebug("UniPush CID 为空");
+            schedulePushClientIdRetry("CID 为空");
+            return null;
+          }
+          const cachedClientId = getCachedPushClientId();
+          pushDebug("UniPush CID=" + clientId);
+          if (clientId != cachedClientId) {
+            pushDebug("UniPush CID 已更新");
+          }
+          pushClientIdRetryCount = 0;
+          uni.setStorageSync(PUSH_CLIENT_ID_KEY, clientId);
+        },
+        fail: (error = null) => {
+          pushClientIdRequesting = false;
+          if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout);
+            pushClientIdRequestTimeout = 0;
+          }
+          pushDebug("UniPush getPushClientId failed: " + error.toString());
+          schedulePushClientIdRetry("调用失败");
+        }
+      }));
+    } catch (error) {
+      pushClientIdRequesting = false;
+      if (pushClientIdRequestTimeout > 0) {
+        clearTimeout(pushClientIdRequestTimeout);
+        pushClientIdRequestTimeout = 0;
+      }
+      pushDebug("调用 getPushClientId 异常: " + error.toString());
+      schedulePushClientIdRetry("调用异常");
+    }
+  }
+  function markPushSessionAuthenticated() {
+    uni.setStorageSync(PUSH_SESSION_KEY, "authenticated");
+    refreshPushClientId();
+  }
+  function clearPushSessionState() {
+    uni.removeStorageSync(PUSH_SESSION_KEY);
+    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
+  }
+  function consumePendingMessageId() {
+    const rawValue = uni.getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    const value = rawValue == null ? "" : stringValue(rawValue);
+    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    return value;
+  }
+  function consumePushStaleFlag() {
+    const value = uni.getStorageSync(PUSH_MESSAGE_STALE_KEY);
+    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
+    return value != null && value.toString() == "true";
+  }
+  function getCachedPushClientId() {
+    const value = uni.getStorageSync(PUSH_CLIENT_ID_KEY);
+    return value == null ? "" : value.toString();
+  }
   class RequestOptions extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -1897,22 +2087,23 @@
   }
   const BASE_URL = "https://car.zdiot.cn:18443/api";
   function handleTokenExpired() {
-    uni.__log__("log", "at api/http.uts:39", "检测到token过期，执行跳转登录页逻辑");
+    uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");
+    clearPushSessionState();
     showAppToast({
       title: "登录已过期，请重新登录",
       icon: "none",
       duration: 2e3
     });
     setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:53", "正在跳转到登录页...");
+      uni.__log__("log", "at api/http.uts:55", "正在跳转到登录页...");
       uni.redirectTo({
         url: "/pages/login/login",
         success: () => {
-          uni.__log__("log", "at api/http.uts:57", "跳转登录页成功");
+          uni.__log__("log", "at api/http.uts:59", "跳转登录页成功");
         },
         fail: (err) => {
-          uni.__log__("log", "at api/http.uts:60", "跳转登录页失败:", err);
+          uni.__log__("log", "at api/http.uts:62", "跳转登录页失败:", err);
           uni.reLaunch({
             url: "/pages/login/login"
           });
@@ -1937,7 +2128,7 @@
     if (config.showLoading != false) {
       uni.hideLoading();
     }
-    uni.__log__("log", "at api/http.uts:112", "请求错误详情:", error);
+    uni.__log__("log", "at api/http.uts:114", "请求错误详情:", error);
     if (error.statusCode != 0) {
       switch (error.statusCode) {
         case 401:
@@ -3075,9 +3266,9 @@
             longitude: device.longitude
           });
           uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:370", "保存选中设备成功:", deviceInfo);
+          uni.__log__("log", "at pages/index/index.uvue:371", "保存选中设备成功:", deviceInfo);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:372", "保存选中设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:373", "保存选中设备失败:", error);
         }
       };
       const decodeSavedDevice = (raw = null) => {
@@ -3121,23 +3312,23 @@
             return null;
           return decodeSavedDevice(rawDevice);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:430", "获取保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:431", "获取保存设备失败:", error);
         }
         return null;
       };
       const clearSavedSelectedDevice = () => {
         try {
           uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:439", "清除保存设备成功");
+          uni.__log__("log", "at pages/index/index.uvue:440", "清除保存设备成功");
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:441", "清除保存设备失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:442", "清除保存设备失败:", error);
         }
       };
       const saveSelectedDeviceIndex = (index) => {
         try {
           uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:450", "保存选中设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:451", "保存选中设备索引失败:", error);
         }
       };
       const getSavedSelectedDeviceIndex = () => {
@@ -3148,7 +3339,7 @@
             return isNaN(index) || index < 0 ? null : index;
           }
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:463", "获取保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:464", "获取保存设备索引失败:", error);
         }
         return null;
       };
@@ -3156,7 +3347,7 @@
         try {
           uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
         } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:473", "清除保存设备索引失败:", error);
+          uni.__log__("error", "at pages/index/index.uvue:474", "清除保存设备索引失败:", error);
         }
       };
       const handlePicker = () => {
@@ -3232,7 +3423,7 @@
               }
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:576", "加载设备详情失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:577", "加载设备详情失败", error);
           }
         });
       };
@@ -3290,13 +3481,14 @@
                 duration: 2e3
               });
               uni.removeStorageSync("token");
+              clearPushSessionState();
               uni.reLaunch({
                 url: "/pages/index/index"
               });
               return Promise.resolve(null);
             }
             if (res.code != 0) {
-              uni.__log__("error", "at pages/index/index.uvue:649", "加载轨迹失败:", res.msg);
+              uni.__log__("error", "at pages/index/index.uvue:651", "加载轨迹失败:", res.msg);
               clearTripData();
               return Promise.resolve(null);
             }
@@ -3304,7 +3496,7 @@
           } catch (error) {
             if (requestId != trackRequestId)
               return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:657", "加载轨迹失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:659", "加载轨迹失败", error);
             clearTripData();
           }
         });
@@ -3322,7 +3514,7 @@
             const res = yield getDevicePos(data);
             const positions = res.data;
             if (res.code != 0 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:675", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              uni.__log__("warn", "at pages/index/index.uvue:677", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
               positionState.value = "empty";
               return false;
             }
@@ -3332,7 +3524,7 @@
             const lng = position.getNumber("longitude", 0);
             const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
             if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:690", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              uni.__log__("error", "at pages/index/index.uvue:692", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
               positionState.value = "invalid";
               showAppToast({
                 title: "定位数据异常",
@@ -3347,10 +3539,10 @@
             yield delay(100);
             const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
             markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:715", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            uni.__log__("log", "at pages/index/index.uvue:717", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
             return true;
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:718", "加载设备位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:720", "加载设备位置失败", error);
             positionState.value = "failed";
             showAppToast({
               title: "定位失败，请重试",
@@ -3362,7 +3554,7 @@
       };
       const loadDeviceData = (device) => {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:730", "开始加载设备数据:", device);
+          uni.__log__("log", "at pages/index/index.uvue:732", "开始加载设备数据:", device);
           try {
             yield loadDeviceDetail(device.deviceId);
             yield loadDevicePos(new UTSJSONObject({
@@ -3375,7 +3567,7 @@
               icon: "none"
             });
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:743", "切换车辆失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:745", "切换车辆失败", error);
             showAppToast({
               title: "切换失败，请重试",
               icon: "none"
@@ -3390,16 +3582,16 @@
         const indexs = e.getArray("indexs");
         let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
         if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:765", "无法解析选中的索引，使用当前设备");
+          uni.__log__("warn", "at pages/index/index.uvue:767", "无法解析选中的索引，使用当前设备");
           const currentIndex = deviceList.value.findIndex((device) => {
             return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
           });
           if (currentIndex != -1) {
             selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:771", "使用当前设备索引:", selectedIndex);
+            uni.__log__("log", "at pages/index/index.uvue:773", "使用当前设备索引:", selectedIndex);
           } else {
             selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:774", "使用默认索引: 0");
+            uni.__log__("log", "at pages/index/index.uvue:776", "使用默认索引: 0");
           }
         }
         const selectedDevice = deviceList.value[selectedIndex];
@@ -3411,7 +3603,7 @@
           return null;
         }
         if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:789", "选择的设备与当前设备相同，不重复加载");
+          uni.__log__("log", "at pages/index/index.uvue:791", "选择的设备与当前设备相同，不重复加载");
           return null;
         }
         const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
@@ -3492,7 +3684,7 @@
                 selectedIdx = 0;
                 saveSelectedDevice(selectedDevice);
                 saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:892", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+                uni.__log__("log", "at pages/index/index.uvue:894", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
               }
               if (selectedDevice != null) {
                 const device = selectedDevice;
@@ -3525,7 +3717,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:930", "加载车辆列表失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:932", "加载车辆列表失败", error);
             showAppToast({
               title: "加载失败，请下拉重试",
               icon: "none"
@@ -3552,7 +3744,7 @@
           try {
             yield loadDeviceList();
           } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:959", "刷新位置失败", error);
+            uni.__log__("error", "at pages/index/index.uvue:961", "刷新位置失败", error);
             showAppToast({
               title: "刷新失败",
               icon: "none"
@@ -3583,12 +3775,12 @@
           url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:991", "跳转轨迹详情失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:993", "跳转轨迹详情失败:", err);
           }
         });
       };
       const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:998", "toDeviceList");
+        uni.__log__("log", "at pages/index/index.uvue:1000", "toDeviceList");
         if (!isLogin())
           return null;
         uni.navigateTo({
@@ -3616,7 +3808,7 @@
           url: "/pages/addCar/addCar",
           fail: (err) => {
             if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1026", "跳转添加设备失败:", err);
+              uni.__log__("error", "at pages/index/index.uvue:1028", "跳转添加设备失败:", err);
           }
         });
       };
@@ -3664,7 +3856,7 @@
           iccid = iccid.substring(0, iccid.length - 1);
         }
         needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1114", "iccid", iccid);
+        uni.__log__("log", "at pages/index/index.uvue:1116", "iccid", iccid);
         needRefresh.value = false;
         showAppToast({
           title: "请在微信小程序中完成充值",
@@ -4542,7 +4734,7 @@
       const isPageActive = vue.ref(false);
       function stopNewMessageCheck() {
         if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:108", "停止定时消息检查");
+          uni.__log__("log", "at pages/message/message.uvue:109", "停止定时消息检查");
           clearInterval(checkTimer);
           checkTimer = 0;
         }
@@ -4586,7 +4778,7 @@
             }
             return latestMessages.length;
           } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:153", "检查新消息失败:", error);
+            uni.__log__("error", "at pages/message/message.uvue:154", "检查新消息失败:", error);
             return 0;
           } finally {
             isLoading.value = false;
@@ -4609,10 +4801,10 @@
         if (checkTimer > 0) {
           stopNewMessageCheck();
         }
-        uni.__log__("log", "at pages/message/message.uvue:177", "启动定时消息检查");
+        uni.__log__("log", "at pages/message/message.uvue:178", "启动定时消息检查");
         checkTimer = setInterval(() => {
           if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:181", "定时检查新消息...");
+            uni.__log__("log", "at pages/message/message.uvue:182", "定时检查新消息...");
             checkNewMessages();
           }
         }, 1e4);
@@ -4664,7 +4856,7 @@
             }
           } catch (error) {
             loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:229", "请求异常:", error);
+            uni.__log__("error", "at pages/message/message.uvue:230", "请求异常:", error);
           } finally {
             isLoading.value = false;
           }
@@ -4672,11 +4864,11 @@
       }
       function loadNewMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:237", "加载新消息");
+          uni.__log__("log", "at pages/message/message.uvue:238", "加载新消息");
           yield prependLatestMessages();
           hasNewMessages.value = false;
           newMessageCount.value = 0;
-          uni.__log__("log", "at pages/message/message.uvue:241", "新消息加载完成");
+          uni.__log__("log", "at pages/message/message.uvue:242", "新消息加载完成");
         });
       }
       vue.onLoad(() => {
@@ -4700,50 +4892,97 @@
           }
         }).exec();
       };
+      function handleItemClick(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+          modalContent.value = item;
+          modal.value = true;
+          if (item.getNumber("status", 0) == 1) {
+            try {
+              const messageId = item.getString("messageId", "");
+              const res = yield setMsgState(messageId);
+              if (res.code == 0 || res.msg == "success") {
+                const index = msgList.value.findIndex((message) => {
+                  return message.getString("messageId", "") == messageId;
+                });
+                if (index != -1) {
+                  msgList.value[index].set("status", 0);
+                  msgList.value = [...msgList.value];
+                }
+              }
+            } catch (error) {
+              uni.__log__("error", "at pages/message/message.uvue:289", "更新状态失败:", error);
+            }
+          }
+        });
+      }
+      function openPendingPushMessage() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value) {
+            setTimeout(() => {
+              void openPendingPushMessage();
+            }, 150);
+            return Promise.resolve(null);
+          }
+          const messageId = consumePendingMessageId();
+          const shouldRefresh = consumePushStaleFlag();
+          if (messageId == "" && !shouldRefresh)
+            return Promise.resolve(null);
+          yield loadMsgList(true);
+          if (messageId == "")
+            return Promise.resolve(null);
+          const message = UTS.arrayFind(msgList.value, (item) => {
+            return item.getString("messageId", "") == messageId;
+          });
+          if (message != null)
+            yield handleItemClick(message);
+        });
+      }
       vue.onShow(() => {
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:276", "页面显示 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:313", "页面显示 - 启动自动刷新");
           isPageActive.value = true;
           measureMessageScrollViewport();
           startNewMessageCheck();
+          void openPendingPushMessage();
           checkNewMessages();
         }
       });
       vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:287", "页面隐藏 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:325", "页面隐藏 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:289", "页面隐藏 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:327", "页面隐藏 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:297", "页面卸载 - 清理资源");
+        uni.__log__("log", "at pages/message/message.uvue:335", "页面卸载 - 清理资源");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:299", "页面卸载 - 清理资源");
+          uni.__log__("log", "at pages/message/message.uvue:337", "页面卸载 - 清理资源");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:306", "页面激活 - 启动自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:344", "页面激活 - 启动自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:308", "页面激活 - 启动自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:346", "页面激活 - 启动自动刷新");
           isPageActive.value = true;
           startNewMessageCheck();
+          void openPendingPushMessage();
           checkNewMessages();
         }
       });
       vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:317", "页面停用 - 停止自动刷新");
+        uni.__log__("log", "at pages/message/message.uvue:356", "页面停用 - 停止自动刷新");
         if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:319", "页面停用 - 停止自动刷新");
+          uni.__log__("log", "at pages/message/message.uvue:358", "页面停用 - 停止自动刷新");
           isPageActive.value = false;
           stopNewMessageCheck();
         }
       });
       const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:327", "下拉刷新触发");
+        uni.__log__("log", "at pages/message/message.uvue:366", "下拉刷新触发");
         refresherTriggered.value = true;
         loadMsgList(true).then(() => {
           refresherTriggered.value = false;
@@ -4780,29 +5019,6 @@
         } else if (!isNearBottom) {
           isNearMessageListBottom.value = false;
         }
-      };
-      const handleItemClick = (item) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          modalContent.value = item;
-          modal.value = true;
-          if (item.getNumber("status", 0) == 1) {
-            try {
-              const messageId = item.getString("messageId", "");
-              const res = yield setMsgState(messageId);
-              if (res.code == 0 || res.msg == "success") {
-                const index = msgList.value.findIndex((message) => {
-                  return message.getString("messageId", "") == messageId;
-                });
-                if (index != -1) {
-                  msgList.value[index].set("status", 0);
-                  msgList.value = [...msgList.value];
-                }
-              }
-            } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:389", "更新状态失败:", error);
-            }
-          }
-        });
       };
       const ReadIt = () => {
         modal.value = false;
@@ -7203,7 +7419,7 @@
           form.value.password = account.getString("password", "");
           rememberPassword.value = form.value.username != "" || form.value.password != "";
         } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:176", "加载保存的账号密码失败:", error);
+          uni.__log__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
         }
       }
       const isPswLogin = () => {
@@ -7240,7 +7456,7 @@
       const getSystemInfo = () => {
         const res = uni.getSystemInfoSync();
         deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:219", "设备型号:", deviceModel.value);
+        uni.__log__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
       };
       const validateForm = () => {
         if (form.value.username.length == 0) {
@@ -7261,6 +7477,7 @@
         if (savePassword)
           saveAccountPassword();
         uni.setStorageSync("token", token);
+        markPushSessionAuthenticated();
         showAppToast({ title: "登录成功", icon: "success" });
         setTimeout(() => {
           uni.reLaunch({ url: "/pages/index/index" });
@@ -7357,7 +7574,7 @@
               if (appVersion != "")
                 clientVersion = appVersion;
             } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:343", "获取应用版本失败，使用默认版本号:", error);
+              uni.__log__("warn", "at pages/login/login.uvue:345", "获取应用版本失败，使用默认版本号:", error);
             }
             const result = yield loginByUniVerify(clientVersion);
             if (result.ok) {
@@ -7383,25 +7600,25 @@
             return Promise.resolve(null);
           }
           try {
-            uni.__log__("log", "at pages/login/login.uvue:460", "准备验证表单...");
+            uni.__log__("log", "at pages/login/login.uvue:462", "准备验证表单...");
             if (!validateForm())
               return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:462", "✅ 表单验证通过");
+            uni.__log__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
             const newFormData = new UTSJSONObject({
               username: form.value.username,
               password: form.value.password,
               from: deviceModel.value,
               type: "USER"
             });
-            uni.__log__("log", "at pages/login/login.uvue:471", "📤 请求参数:", newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
             loading.value = true;
             uni.showLoading(new UTSJSONObject({
               title: "登录中...",
               mask: true
             }));
-            uni.__log__("log", "at pages/login/login.uvue:481", "🚀 开始调用 login 接口...");
+            uni.__log__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
             const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:483", "✅ 登录接口返回:", res);
+            uni.__log__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
             loading.value = false;
             uni.hideLoading();
             const loginData = res.data;
@@ -7415,7 +7632,7 @@
               });
             }
           } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:502", "❌ 登录失败:", error);
+            uni.__log__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
             loading.value = false;
             uni.hideLoading();
             if (error && error.message) {
@@ -7455,7 +7672,7 @@
         getSystemInfo();
         loadSavedAccount();
         prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:601", "pswLogin 初始值:", pswLogin.value);
+        uni.__log__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
       });
       return (_ctx = null, _cache = null) => {
         const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
@@ -8998,7 +9215,7 @@
     callback("granted");
   }
   function openCameraPermissionSettings() {
-    uni.__log__("log", "at utils/cameraPermission.uts:108", "非 Android 平台无需打开相机权限设置");
+    uni.__log__("log", "at utils/cameraPermission.uts:129", "非 Android 平台无需打开相机权限设置");
   }
   const _sfc_main$s = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
     show: { type: Boolean, default: false },
@@ -17261,9 +17478,9 @@
               type: type != null ? type : 0,
               createTime: createTime != null ? createTime : ""
             };
-            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:82", "用户信息:", userInfo.value);
+            uni.__log__("log", "at pages/userCenter/userInfo/userInfo.uvue:83", "用户信息:", userInfo.value);
           } catch (e) {
-            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:84", "解析用户信息失败:", e);
+            uni.__log__("error", "at pages/userCenter/userInfo/userInfo.uvue:85", "解析用户信息失败:", e);
           }
         }
       });
@@ -17277,6 +17494,7 @@
           const res = yield logout();
           if (res.code == 0) {
             uni.removeStorageSync("token");
+            clearPushSessionState();
             uni.reLaunch({
               url: "/pages/login/login"
             });
@@ -21203,16 +21421,18 @@
   __definePage("pages/deviceList/deviceList", PagesDeviceListDeviceList);
   const _sfc_main = vue.defineComponent({
     onLaunch: function() {
-      uni.__log__("log", "at App.uvue:73", "App onLaunch");
+      uni.__log__("log", "at App.uvue:76", "App onLaunch");
+      initPush();
     },
     onShow: function() {
-      uni.__log__("log", "at App.uvue:77", "App Show");
+      uni.__log__("log", "at App.uvue:86", "App Show");
+      refreshPushClientId();
     },
     onHide: function() {
-      uni.__log__("log", "at App.uvue:80", "App Hide");
+      uni.__log__("log", "at App.uvue:90", "App Hide");
     },
     onExit: function() {
-      uni.__log__("log", "at App.uvue:101", "App Exit");
+      uni.__log__("log", "at App.uvue:111", "App Exit");
     }
   });
   const _style_0 = { "uni-row": { "": { "flexDirection": "row" } }, "uni-column": { "": { "flexDirection": "column" } } };
