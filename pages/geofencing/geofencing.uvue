@@ -1579,6 +1579,8 @@ import { showAppToast } from '../../utils/toast.uts'
 
 		.device-dialog {
 			height: 800rpx;
+			display: flex;
+			flex-direction: column;
 			background-color: #fff;
 
 			.dialog-header {
@@ -1609,7 +1611,8 @@ import { showAppToast } from '../../utils/toast.uts'
 			}
 
 			.device-list {
-				height: 100%;
+				flex: 1;
+				min-height: 0;
 				padding: 20rpx 20rpx 75rpx 20rpx;
 				box-sizing: border-box;
 
