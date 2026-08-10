@@ -66,7 +66,7 @@
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
   };
-  const _sfc_main$M = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
+  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-icon" }, { __name: "i-icon", props: {
     name: {
       type: String,
       default: "home-3-fill"
@@ -396,7 +396,7 @@
       ], 6);
     };
   } }));
-  const _style_0$K = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
+  const _style_0$J = { "i-icon": { "": { "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "i-icon--badge": { "": { "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34 } }, "i-icon--mini": { "": { "width": 26, "height": 26, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26 } }, "i-icon--large": { "": { "width": 44, "height": 44, "borderTopLeftRadius": 44, "borderTopRightRadius": 44, "borderBottomRightRadius": 44, "borderBottomLeftRadius": 44 } }, "i-icon--primary": { "": { "backgroundColor": "#2979ff" } }, "i-icon--success": { "": { "backgroundColor": "#19be6b" } }, "i-icon--warning": { "": { "backgroundColor": "#ff9900" } }, "i-icon--danger": { "": { "backgroundColor": "#fa3534" } }, "i-icon--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "i-icon__text": { "": { "color": "#303133", "fontSize": 16, "lineHeight": 1 } }, "i-icon__text--badge": { "": { "color": "#ffffff", "fontWeight": 700 } }, "i-icon__text--primary": { "": { "color": "#2979ff" } }, "i-icon__text--success": { "": { "color": "#19be6b" } }, "i-icon__text--warning": { "": { "color": "#ff9900" } }, "i-icon__text--danger": { "": { "color": "#fa3534" } }, "i-icon__image": { "": { "width": 16, "height": 16 } }, "@FONT-FACE": [{ "fontFamily": "remixicon", "src": 'url("/uni_modules/i-ui-x/static/remixicon.woff2") format("woff2"),\n    url("https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.ttf")\n      format("truetype")' }] };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -404,11 +404,11 @@
     }
     return target;
   };
-  const __easycom_2$5 = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["styles", [_style_0$K]]]);
+  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
   function resolveEasycom(component, easycom) {
     return typeof component === "string" ? easycom : component;
   }
-  const _sfc_main$L = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
+  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-line-progress" }, { __name: "i-line-progress", props: {
     percent: { type: Number, default: 45 },
     title: { type: String, default: "" },
     activeColor: { type: String, default: "#19be6b" },
@@ -454,9818 +454,8 @@
       ]);
     };
   } }));
-  const _style_0$J = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
-  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["styles", [_style_0$J]]]);
-  let PickerItem$1 = class PickerItem2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            text: { type: String, optional: false },
-            value: { type: "Any", optional: false },
-            disabled: { type: Boolean, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = PickerItem2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.text = this.__props__.text;
-      this.value = this.__props__.value;
-      this.disabled = this.__props__.disabled;
-      delete this.__props__;
-    }
-  };
-  const _sfc_main$K = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-picker" }, { __name: "i-picker", props: {
-    modelValue: {
-      type: [String, Number, Array],
-      default: ""
-    },
-    show: {
-      type: Boolean,
-      default: false
-    },
-    showToolbar: {
-      type: Boolean,
-      default: true
-    },
-    title: {
-      type: String,
-      default: ""
-    },
-    columns: {
-      type: Array,
-      default: () => {
-        return [];
-      }
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    itemHeight: {
-      type: Number,
-      default: 44
-    },
-    cancelText: {
-      type: String,
-      default: "取消"
-    },
-    confirmText: {
-      type: String,
-      default: "确认"
-    },
-    cancelColor: {
-      type: String,
-      default: "#909193"
-    },
-    confirmColor: {
-      type: String,
-      default: "#3c9cff"
-    },
-    visibleItemCount: {
-      type: Number,
-      default: 5
-    },
-    closeOnMask: { type: Boolean, default: true },
-    defaultIndex: {
-      type: [Number, Array],
-      default: 0
-    },
-    immediateChange: {
-      type: Boolean,
-      default: false
-    },
-    round: {
-      type: [String, Number],
-      default: 16
-    },
-    showInput: {
-      type: Boolean,
-      default: true
-    },
-    showDefaultValue: {
-      type: Boolean,
-      default: true
-    },
-    options: {
-      type: Array,
-      default: () => {
-        return ["Apple", "Orange", "Banana"];
-      }
-    },
-    value: {
-      type: [String, Number],
-      default: ""
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  }, emits: [
-    "open",
-    "close",
-    "cancel",
-    "change",
-    "confirm",
-    "clear",
-    "update:value",
-    "update:modelValue",
-    "update:show"
-  ], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function isArray(value = null) {
-      return Array.isArray(value);
-    }
-    function normalizeItem(item = null) {
-      const data = item;
-      if (data != null) {
-        const rawValue = data["value"];
-        const rawText = data["text"];
-        const text = rawText != null ? rawText.toString() : rawValue != null ? rawValue.toString() : "";
-        const value = rawValue != null ? rawValue : text;
-        return new PickerItem$1({
-          text,
-          value,
-          disabled: data["disabled"] == true
-        });
-      }
-      return new PickerItem$1({
-        text: item.toString(),
-        value: item,
-        disabled: false
-      });
-    }
-    function normalizeColumn(list) {
-      const result = new Array();
-      for (let i = 0; i < list.length; i++)
-        result.push(normalizeItem(list[i]));
-      return result;
-    }
-    const opened = vue.ref(props.show);
-    const currentIndexs = vue.ref([]);
-    const normalizedColumns = vue.computed(() => {
-      const source = props.columns.length > 0 ? props.columns : props.options;
-      if (source.length == 0)
-        return new Array();
-      const first = source[0];
-      if (isArray(first)) {
-        const result = new Array();
-        for (let i = 0; i < source.length; i++)
-          result.push(normalizeColumn(source[i]));
-        return result;
-      }
-      return [normalizeColumn(source)];
-    });
-    function selectedIndexAt(columnIndex) {
-      if (currentIndexs.value.length <= columnIndex)
-        return 0;
-      return currentIndexs.value[columnIndex];
-    }
-    function selectedItems() {
-      const result = new Array();
-      const columns = normalizedColumns.value;
-      for (let i = 0; i < columns.length; i++) {
-        const column = columns[i];
-        const index = selectedIndexAt(i);
-        if (index >= 0 && index < column.length)
-          result.push(column[index]);
-      }
-      return result;
-    }
-    function columnAt(index) {
-      if (index < 0 || index >= normalizedColumns.value.length)
-        return new Array();
-      return normalizedColumns.value[index];
-    }
-    function visibleCountNumber() {
-      const count = props.visibleItemCount;
-      if (count <= 0)
-        return 5;
-      return count;
-    }
-    function itemHeightNumber() {
-      const height = props.itemHeight;
-      if (height <= 0)
-        return 44;
-      return height;
-    }
-    function formatSize(value) {
-      return value.toString() + "px";
-    }
-    const displayText = vue.computed(() => {
-      const items = selectedItems();
-      if (items.length == 0)
-        return "请选择";
-      const texts = new Array();
-      for (let i = 0; i < items.length; i++)
-        texts.push(items[i].text);
-      return texts.join(" / ");
-    });
-    const displayTextClass = vue.computed(() => {
-      return selectedItems().length == 0 ? "i-picker__input-text i-picker__input-text--placeholder" : "i-picker__input-text";
-    });
-    const columnCount = vue.computed(() => {
-      return normalizedColumns.value.length;
-    });
-    const column0 = vue.computed(() => {
-      return columnAt(0);
-    });
-    const column1 = vue.computed(() => {
-      return columnAt(1);
-    });
-    const column2 = vue.computed(() => {
-      return columnAt(2);
-    });
-    const column3 = vue.computed(() => {
-      return columnAt(3);
-    });
-    const column4 = vue.computed(() => {
-      return columnAt(4);
-    });
-    const column5 = vue.computed(() => {
-      return columnAt(5);
-    });
-    const columnsStyle = vue.computed(() => {
-      const height = itemHeightNumber() * visibleCountNumber();
-      return "width:100%;height:" + height.toString() + "px;";
-    });
-    const indicatorStyle = vue.computed(() => {
-      return "height:" + formatSize(props.itemHeight) + ";background-color:transparent;border-top:1px solid #eef0f4;border-bottom:1px solid #eef0f4;";
-    });
-    const itemStyle = vue.computed(() => {
-      return "height:" + formatSize(props.itemHeight) + ";";
-    });
-    const panelStyle = vue.computed(() => {
-      const radius = formatSize(props.round);
-      return "border-radius:" + radius + " " + radius + " 0 0;";
-    });
-    function hasModelValue() {
-      if (isArray(props.modelValue)) {
-        const modelValues = props.modelValue;
-        return modelValues.length > 0;
-      }
-      return props.modelValue.length > 0;
-    }
-    function activeModelValue() {
-      if (hasModelValue())
-        return props.modelValue;
-      const value = props.value;
-      if (value.length > 0)
-        return value;
-      return null;
-    }
-    function columnTargetValue(value = null, columnIndex) {
-      if (value == null)
-        return null;
-      if (isArray(value)) {
-        const values = value;
-        return values.length > columnIndex ? values[columnIndex] : null;
-      }
-      return columnIndex == 0 ? value : null;
-    }
-    function defaultIndexAt(columnIndex) {
-      if (isArray(props.defaultIndex)) {
-        const defaultIndexes = props.defaultIndex;
-        if (defaultIndexes.length > columnIndex)
-          return defaultIndexes[columnIndex];
-        return 0;
-      }
-      return columnIndex == 0 ? props.defaultIndex : 0;
-    }
-    function findValueIndex(column, value = null) {
-      for (let i = 0; i < column.length; i++) {
-        const itemValue = column[i].value;
-        if (itemValue == value)
-          return i;
-      }
-      return -1;
-    }
-    function hasTargetValue(value = null) {
-      if (value == null)
-        return false;
-      if (isArray(value))
-        return true;
-      return value.length > 0;
-    }
-    function syncIndexs() {
-      const columns = normalizedColumns.value;
-      const result = new Array();
-      const value = activeModelValue();
-      for (let i = 0; i < columns.length; i++) {
-        const column = columns[i];
-        const targetValue = columnTargetValue(value, i);
-        let index = -1;
-        if (hasTargetValue(targetValue)) {
-          index = findValueIndex(column, targetValue);
-        }
-        if (index < 0 && (props.showDefaultValue || !hasModelValue())) {
-          index = defaultIndexAt(i);
-        }
-        if (index < 0)
-          index = 0;
-        if (index >= column.length)
-          index = column.length - 1;
-        result.push(index);
-      }
-      currentIndexs.value = result;
-    }
-    syncIndexs();
-    function selectedValue() {
-      const items = selectedItems();
-      if (items.length == 0)
-        return "";
-      if (items.length == 1)
-        return items[0].value;
-      const values = new Array();
-      for (let i = 0; i < items.length; i++)
-        values.push(items[i].value);
-      return values;
-    }
-    function pickerValuePayload() {
-      const items = selectedItems();
-      if (items.length == 1)
-        return items[0];
-      return items;
-    }
-    function buildChangeEvent(columnIndex, index) {
-      return new UTSJSONObject({
-        index,
-        indexs: currentIndexs.value,
-        columnIndex,
-        value: pickerValuePayload(),
-        values: selectedItems()
-      });
-    }
-    function buildConfirmEvent() {
-      return new UTSJSONObject({
-        indexs: currentIndexs.value,
-        value: pickerValuePayload(),
-        values: selectedItems()
-      });
-    }
-    function emitSelectedValue() {
-      const value = selectedValue();
-      emit("update:modelValue", value);
-      emit("update:value", isArray(value) ? "" : value);
-    }
-    function open() {
-      if (opened.value)
-        return null;
-      syncIndexs();
-      opened.value = true;
-      emit("open");
-      emit("update:show", true);
-    }
-    function openByTrigger() {
-      if (props.disabled)
-        return null;
-      open();
-    }
-    function close() {
-      if (!opened.value)
-        return null;
-      opened.value = false;
-      emit("close");
-      emit("update:show", false);
-    }
-    function cancel() {
-      emit("cancel", buildChangeEvent(0, selectedIndexAt(0)));
-      close();
-    }
-    function confirm() {
-      const event = buildConfirmEvent();
-      emit("confirm", event);
-      emitSelectedValue();
-      close();
-    }
-    function clear() {
-      currentIndexs.value = [];
-      emit("clear");
-      emit("change", buildChangeEvent(0, -1));
-      emit("update:value", "");
-      emit("update:modelValue", "");
-    }
-    function handleOverlayClick() {
-      if (!props.closeOnMask)
-        return null;
-      close();
-    }
-    function handlePickerChange(event) {
-      if (props.disabled || props.loading)
-        return null;
-      const values = event.detail.value;
-      const nextIndexs = new Array();
-      let changedColumnIndex = 0;
-      for (let i = 0; i < normalizedColumns.value.length; i++) {
-        const column = normalizedColumns.value[i];
-        const oldIndex = selectedIndexAt(i);
-        let nextIndex = 0;
-        if (values.length > i)
-          nextIndex = values[i];
-        if (nextIndex < 0)
-          nextIndex = 0;
-        if (nextIndex >= column.length)
-          nextIndex = column.length - 1;
-        if (column.length > 0 && column[nextIndex].disabled)
-          nextIndex = oldIndex;
-        if (oldIndex != nextIndex)
-          changedColumnIndex = i;
-        nextIndexs.push(nextIndex);
-      }
-      currentIndexs.value = nextIndexs;
-      const eventValue = buildChangeEvent(changedColumnIndex, selectedIndexAt(changedColumnIndex));
-      emit("change", eventValue);
-      if (props.immediateChange)
-        emitSelectedValue();
-    }
-    function itemClass(item, columnIndex, itemIndex) {
-      const classes = new Array();
-      classes.push("i-picker__item");
-      if (selectedIndexAt(columnIndex) == itemIndex)
-        classes.push("i-picker__item--active");
-      if (item.disabled)
-        classes.push("i-picker__item--disabled");
-      return classes.join(" ");
-    }
-    function itemTextClass(item, columnIndex, itemIndex) {
-      return selectedIndexAt(columnIndex) == itemIndex ? "i-picker__item-text i-picker__item-text--active" : "i-picker__item-text";
-    }
-    function itemTextStyle(item, columnIndex, itemIndex) {
-      let style = "line-height:" + formatSize(props.itemHeight) + ";color:#606266;";
-      if (selectedIndexAt(columnIndex) == itemIndex) {
-        style = style + "color:#111827;";
-      }
-      return style;
-    }
-    __expose({
-      open,
-      close,
-      clear,
-      getIndexs() {
-        return currentIndexs.value;
-      },
-      getValues() {
-        return selectedItems();
-      },
-      getColumns() {
-        return normalizedColumns.value;
-      },
-      getColumnValues(columnIndex) {
-        if (columnIndex < 0 || columnIndex >= normalizedColumns.value.length)
-          return [];
-        return normalizedColumns.value[columnIndex];
-      },
-      setColumnValues(columnIndex, values) {
-        emit("change", {
-          index: selectedIndexAt(columnIndex),
-          indexs: currentIndexs.value,
-          columnIndex,
-          value: values,
-          values
-        });
-      }
-    });
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "i-picker" }), [
-        __props.showInput ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: "i-picker__trigger",
-          onClick: openByTrigger
-        }), [
-          vue.renderSlot(_ctx.$slots, "trigger", new UTSJSONObject({}), () => {
-            return [
-              vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({}), () => {
-                return [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "i-picker__input" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(displayTextClass.value)
-                    }), vue.toDisplayString(displayText.value), 3),
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "i-picker__arrow" }), "›")
-                  ])
-                ];
-              })
-            ];
-          })
-        ])) : vue.createCommentVNode("", true),
-        opened.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 1,
-          class: "i-picker__mask",
-          onClick: handleOverlayClick
-        }), [
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "i-picker__panel",
-            style: vue.normalizeStyle(panelStyle.value),
-            onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
-            }, ["stop"]))
-          }), [
-            __props.showToolbar ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "i-picker__toolbar"
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({
-                class: "i-picker__cancel",
-                style: vue.normalizeStyle("color:" + __props.cancelColor + ";"),
-                onClick: cancel
-              }), vue.toDisplayString(__props.cancelText), 5),
-              vue.createElementVNode("text", new UTSJSONObject({ class: "i-picker__title" }), vue.toDisplayString(__props.title), 1),
-              vue.createElementVNode("text", new UTSJSONObject({
-                class: "i-picker__confirm",
-                style: vue.normalizeStyle("color:" + __props.confirmColor + ";"),
-                onClick: confirm
-              }), vue.toDisplayString(__props.confirmText), 5)
-            ])) : vue.createCommentVNode("", true),
-            __props.loading ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 1,
-              class: "i-picker__loading"
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "i-picker__loading-text" }), "加载中...")
-            ])) : vue.createCommentVNode("", true),
-            vue.createElementVNode("picker-view", new UTSJSONObject({
-              class: "i-picker__columns",
-              style: vue.normalizeStyle(columnsStyle.value),
-              value: currentIndexs.value,
-              "indicator-style": indicatorStyle.value,
-              onChange: handlePickerChange
-            }), [
-              columnCount.value > 0 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 0,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column0.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 0, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 0, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 0, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true),
-              columnCount.value > 1 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 1,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column1.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 1, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 1, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 1, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true),
-              columnCount.value > 2 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 2,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column2.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 2, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 2, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 2, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true),
-              columnCount.value > 3 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 3,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column3.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 3, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 3, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 3, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true),
-              columnCount.value > 4 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 4,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column4.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 4, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 4, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 4, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true),
-              columnCount.value > 5 ? (vue.openBlock(), vue.createElementBlock("picker-view-column", new UTSJSONObject({
-                key: 5,
-                class: "i-picker__column"
-              }), [
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(column5.value, (item, itemIndex) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: item.value,
-                    class: vue.normalizeClass(itemClass(item, 5, itemIndex)),
-                    style: vue.normalizeStyle(itemStyle.value)
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(itemTextClass(item, 5, itemIndex)),
-                      style: vue.normalizeStyle(itemTextStyle(item, 5, itemIndex))
-                    }), vue.toDisplayString(item.text), 7)
-                  ], 6);
-                }), 128))
-              ])) : vue.createCommentVNode("", true)
-            ], 44, ["value", "indicator-style"])
-          ], 4)
-        ])) : vue.createCommentVNode("", true)
-      ]);
-    };
-  } }));
-  const _style_0$I = { "i-picker": { "": { "width": "100%" } }, "i-picker__trigger": { "": { "width": "100%" } }, "i-picker__input": { "": { "height": 44, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff", "flexDirection": "row", "alignItems": "center" } }, "i-picker__input-text": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#303133", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__input-text--placeholder": { "": { "color": "#909193" } }, "i-picker__arrow": { "": { "width": 20, "color": "#909193", "fontSize": 20, "lineHeight": "24px", "textAlign": "right", "transform": "rotate(90deg)" } }, "i-picker__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "zIndex": 150, "backgroundColor": "rgba(0,0,0,0.42)", "justifyContent": "flex-end" } }, "i-picker__panel": { "": { "overflow": "hidden", "backgroundColor": "#ffffff" } }, "i-picker__toolbar": { "": { "height": 48, "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-picker__cancel": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px" } }, "i-picker__confirm": { "": { "width": 64, "fontSize": 14, "lineHeight": "22px", "textAlign": "right" } }, "i-picker__title": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "color": "#111827", "fontSize": 16, "fontWeight": 700, "lineHeight": "24px", "textAlign": "center" } }, "i-picker__loading": { "": { "position": "absolute", "left": 0, "right": 0, "top": 48, "bottom": 0, "zIndex": 2, "backgroundColor": "rgba(255,255,255,0.78)", "alignItems": "center", "justifyContent": "center" } }, "i-picker__loading-text": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px" } }, "i-picker__columns": { "": { "width": "100%" } }, "i-picker__column": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%" } }, "i-picker__item": { "": { "width": "100%", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8, "alignItems": "center", "justifyContent": "center" } }, "i-picker__item--active": { "": { "backgroundColor": "rgba(0,0,0,0)" } }, "i-picker__item--disabled": { "": { "opacity": 0.42 } }, "i-picker__item-text": { "": { "color": "#303133", "fontSize": 15, "lineHeight": "22px", "textAlign": "center" } }, "i-picker__item-text--active": { "": { "color": "#111827", "fontWeight": 700 } } };
-  const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
-  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
-    zIndex: { type: [String, Number], default: 10090 },
-    loading: { type: Boolean, default: false },
-    title: { type: String, default: "" },
-    icon: { type: String, default: "" },
-    type: { type: String, default: "default" },
-    mask: { type: Boolean, default: false },
-    position: { type: String, default: "center" },
-    duration: { type: [String, Number], default: 2e3 },
-    fill: { type: Boolean, default: false },
-    customStyle: { type: [String, Object], default: "" }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
-    const props = __props;
-    const visible = vue.ref(false);
-    const timer = vue.ref(0);
-    const currentZIndex = vue.ref(props.zIndex);
-    const currentLoading = vue.ref(props.loading);
-    const currentTitle = vue.ref(props.title);
-    const currentIcon = vue.ref(props.icon);
-    const currentType = vue.ref(props.type);
-    const currentMask = vue.ref(props.mask);
-    const currentPosition = vue.ref(props.position);
-    const currentDuration = vue.ref(props.duration);
-    const currentFill = vue.ref(props.fill);
-    const currentCustomStyle = vue.ref(props.customStyle);
-    const loadingAngle = vue.ref(0);
-    let loadingTimer = 0;
-    const toastClass = vue.computed(() => {
-      return "i-toast i-toast--" + normalizePosition(currentPosition.value);
-    });
-    const toastStyle = vue.computed(() => {
-      let style = "z-index:" + String(currentZIndex.value) + ";";
-      style += "background-color:" + resolveBgColor() + ";";
-      if (typeof currentCustomStyle.value == "string")
-        style += currentCustomStyle.value;
-      return style;
-    });
-    const iconClass = vue.computed(() => {
-      if (currentFill.value)
-        return "i-toast__icon i-toast__icon--fill";
-      return "i-toast__icon";
-    });
-    const displayIcon = vue.computed(() => {
-      if (currentIcon.value.length > 0 && !isImagePath(currentIcon.value)) {
-        return currentIcon.value;
-      }
-      if (currentType.value == "success")
-        return "✓";
-      if (currentType.value == "error")
-        return "×";
-      if (currentType.value == "warning")
-        return "!";
-      if (currentType.value == "primary")
-        return "i";
-      return "";
-    });
-    const isImageIcon = vue.computed(() => {
-      return currentIcon.value.length > 0 && isImagePath(currentIcon.value);
-    });
-    const loadingStyle = vue.computed(() => {
-      return "transform:rotate(" + String(loadingAngle.value) + "deg);";
-    });
-    vue.onUnmounted(() => {
-      clearTimeout(timer.value);
-      stopLoadingAnimation();
-    });
-    function open(options = null) {
-      applyOptions(options, "");
-      showToast();
-    }
-    function close() {
-      clearTimeout(timer.value);
-      stopLoadingAnimation();
-      visible.value = false;
-    }
-    function primary(options = null) {
-      applyOptions(options, "primary");
-      showToast();
-    }
-    function success(options = null) {
-      applyOptions(options, "success");
-      showToast();
-    }
-    function error(options = null) {
-      applyOptions(options, "error");
-      showToast();
-    }
-    function warning(options = null) {
-      applyOptions(options, "warning");
-      showToast();
-    }
-    function showLoading(options = null) {
-      applyOptions(options, "default");
-      currentLoading.value = true;
-      if (currentTitle.value.length == 0)
-        currentTitle.value = "加载中";
-      showToast();
-    }
-    function showToast() {
-      clearTimeout(timer.value);
-      visible.value = true;
-      if (currentLoading.value) {
-        startLoadingAnimation();
-      } else {
-        stopLoadingAnimation();
-      }
-      const duration = Number(currentDuration.value);
-      if (duration > 0) {
-        timer.value = setTimeout(() => {
-          close();
-        }, duration);
-      }
-    }
-    function applyOptions(options = null, forcedType = null) {
-      currentZIndex.value = props.zIndex;
-      currentLoading.value = props.loading;
-      currentTitle.value = props.title;
-      currentIcon.value = props.icon;
-      currentType.value = forcedType.length > 0 ? forcedType : props.type;
-      currentMask.value = props.mask;
-      currentPosition.value = props.position;
-      currentDuration.value = props.duration;
-      currentFill.value = props.fill;
-      currentCustomStyle.value = props.customStyle;
-      if (options == null)
-        return null;
-      if (typeof options == "string") {
-        currentTitle.value = options;
-        return null;
-      }
-      if (typeof options == "object") {
-        setValue(options, "zIndex");
-        setValue(options, "loading");
-        setValue(options, "title");
-        setValue(options, "icon");
-        setValue(options, "type");
-        setValue(options, "mask");
-        setValue(options, "position");
-        setValue(options, "duration");
-        setValue(options, "fill");
-        setValue(options, "customStyle");
-      }
-    }
-    function setValue(options = null, keyName = null) {
-      const value = options[keyName];
-      if (value == null)
-        return null;
-      if (keyName == "zIndex")
-        currentZIndex.value = value;
-      if (keyName == "loading")
-        currentLoading.value = value == true;
-      if (keyName == "title")
-        currentTitle.value = String(value);
-      if (keyName == "icon")
-        currentIcon.value = String(value);
-      if (keyName == "type")
-        currentType.value = String(value);
-      if (keyName == "mask")
-        currentMask.value = value == true;
-      if (keyName == "position")
-        currentPosition.value = String(value);
-      if (keyName == "duration")
-        currentDuration.value = value;
-      if (keyName == "fill")
-        currentFill.value = value == true;
-      if (keyName == "customStyle")
-        currentCustomStyle.value = value;
-    }
-    function startLoadingAnimation() {
-      if (loadingTimer > 0)
-        return null;
-      loadingTimer = setInterval(() => {
-        let angle = (loadingAngle.value + 24) % 360;
-        if (angle < 0)
-          angle = angle + 360;
-        loadingAngle.value = angle;
-      }, 50);
-    }
-    function stopLoadingAnimation() {
-      if (loadingTimer > 0) {
-        clearInterval(loadingTimer);
-        loadingTimer = 0;
-      }
-      loadingAngle.value = 0;
-    }
-    function normalizePosition(value = null) {
-      if (value == "top" || value == "bottom")
-        return value;
-      return "center";
-    }
-    function resolveBgColor() {
-      if (currentType.value == "primary")
-        return "#2979ff";
-      if (currentType.value == "success")
-        return "#19be6b";
-      if (currentType.value == "warning")
-        return "#ff9900";
-      if (currentType.value == "error")
-        return "#fa3534";
-      return "rgba(0, 0, 0, 0.78)";
-    }
-    function isImagePath(value = null) {
-      const text = String(value);
-      return text.indexOf("/") >= 0 || text.indexOf("http") == 0;
-    }
-    __expose({
-      open,
-      close,
-      primary,
-      success,
-      error,
-      warning,
-      showLoading
-    });
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-        visible.value && currentMask.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: "i-toast__mask",
-          style: vue.normalizeStyle("z-index:" + String(Number(currentZIndex.value) - 1))
-        }), null, 4)) : vue.createCommentVNode("", true),
-        visible.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 1,
-          class: vue.normalizeClass(toastClass.value),
-          style: vue.normalizeStyle(toastStyle.value)
-        }), [
-          currentLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 0,
-            class: "i-toast__loading",
-            style: vue.normalizeStyle(loadingStyle.value)
-          }), null, 4)) : isImageIcon.value ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
-            key: 1,
-            class: "i-toast__image",
-            src: currentIcon.value,
-            mode: "aspectFit"
-          }), null, 8, ["src"])) : displayIcon.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 2,
-            class: vue.normalizeClass(iconClass.value)
-          }), [
-            vue.createElementVNode("text", new UTSJSONObject({ class: "i-toast__icon-text" }), vue.toDisplayString(displayIcon.value), 1)
-          ], 2)) : vue.createCommentVNode("", true),
-          vue.createElementVNode("text", new UTSJSONObject({ class: "i-toast__text" }), vue.toDisplayString(currentTitle.value), 1)
-        ], 6)) : vue.createCommentVNode("", true)
-      ], 64);
-    };
-  } }));
-  const _style_0$H = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
-  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
-  const iosToastHandlers = [];
-  const pendingIosToasts = [];
-  const maxPendingToastCount = 10;
-  function dispatchIosToast(options) {
-    const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null;
-    return handler != null && handler(options);
-  }
-  function flushPendingIosToasts() {
-    while (pendingIosToasts.length > 0) {
-      const options = pendingIosToasts[0];
-      if (!dispatchIosToast(options))
-        return null;
-      pendingIosToasts.splice(0, 1);
-    }
-  }
-  function registerIosToastHandler(handler) {
-    const index = iosToastHandlers.indexOf(handler);
-    if (index == -1)
-      iosToastHandlers.push(handler);
-    flushPendingIosToasts();
-  }
-  function unregisterIosToastHandler(handler) {
-    const index = iosToastHandlers.indexOf(handler);
-    if (index >= 0)
-      iosToastHandlers.splice(index, 1);
-  }
-  function showAppToast(options) {
-    if (!dispatchIosToast(options)) {
-      if (pendingIosToasts.length >= maxPendingToastCount)
-        pendingIosToasts.splice(0, 1);
-      pendingIosToasts.push(options);
-    }
-  }
-  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
-    const toastRef = vue.ref(null);
-    const handleToast = (options) => {
-      var _a, _b, _c;
-      const toast = toastRef.value;
-      if (toast == null)
-        return false;
-      const toastOptions = new UTSJSONObject({
-        title: options.title,
-        duration: (_a = options.duration) !== null && _a !== void 0 ? _a : 2e3,
-        position: (_b = options.position) !== null && _b !== void 0 ? _b : "center",
-        mask: (_c = options.mask) !== null && _c !== void 0 ? _c : false
-      });
-      if (options.icon == "success") {
-        toast.success(toastOptions);
-      } else if (options.icon == "error") {
-        toast.error(toastOptions);
-      } else {
-        toast.open(toastOptions);
-      }
-      return true;
-    };
-    vue.onMounted(() => {
-      vue.nextTick(() => {
-        registerIosToastHandler(handleToast);
-      });
-    });
-    vue.onUnmounted(() => {
-      unregisterIosToastHandler(handleToast);
-    });
-    return (_ctx = null, _cache = null) => {
-      const _component_i_toast = resolveEasycom(vue.resolveDynamicComponent("i-toast"), __easycom_0$6);
-      return vue.openBlock(), vue.createBlock(_component_i_toast, new UTSJSONObject({
-        ref_key: "toastRef",
-        ref: toastRef
-      }), null, 512);
-    };
-  } }));
-  const _imports_1$2 = "/static/addNew.png";
-  const _imports_2$2 = "/static/banner.png";
-  const _imports_3$1 = "/static/pos.png";
-  const _imports_4 = "/static/car.png";
-  const _imports_5 = "/static/dzwl.png";
-  const _imports_6 = "/static/msg.png";
-  const _imports_7 = "/static/pay.png";
-  const _imports_8 = "/static/online.png";
-  const _imports_9 = "/static/del.png";
-  class Coordinate extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            lat: { type: Number, optional: false },
-            lng: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.lat = this.__props__.lat;
-      this.lng = this.__props__.lng;
-      delete this.__props__;
-    }
-  }
-  class CoordTransform {
-    /**
-     * WGS84转腾讯地图坐标系（GCJ02）
-     * @param wgLat WGS84纬度
-     * @param wgLon WGS84经度
-     * @returns 腾讯地图坐标系 { lat: number, lng: number }
-     */
-    static wgs84ToTencent(wgLat, wgLon) {
-      if (!this.isInChina(wgLon, wgLat)) {
-        return new Coordinate({ lat: wgLat, lng: wgLon });
-      }
-      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
-      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
-      let radLat = wgLat / 180 * this.pi;
-      let magic = Math.sin(radLat);
-      magic = 1 - this.ee * magic * magic;
-      let sqrtMagic = Math.sqrt(magic);
-      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
-      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
-      const mgLat = wgLat + dLat;
-      const mgLng = wgLon + dLng;
-      return new Coordinate({
-        lat: parseFloat(mgLat.toFixed(6)),
-        lng: parseFloat(mgLng.toFixed(6))
-      });
-    }
-    /**
-     * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
-     */
-    static wgs84ToTencentPrecise(wgLat, wgLon) {
-      if (!this.isInChina(wgLon, wgLat)) {
-        return new Coordinate({ lat: wgLat, lng: wgLon });
-      }
-      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
-      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
-      let radLat = wgLat / 180 * this.pi;
-      let magic = Math.sin(radLat);
-      magic = 1 - this.ee * magic * magic;
-      let sqrtMagic = Math.sqrt(magic);
-      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
-      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
-      return new Coordinate({ lat: wgLat + dLat, lng: wgLon + dLng });
-    }
-    /**
-     * 腾讯地图坐标系转WGS84（使用高精度算法）
-     * @param tcLat 腾讯地图纬度
-     * @param tcLon 腾讯地图经度
-     * @returns WGS84坐标系 { lat: number, lng: number }
-     */
-    static tencentToWgs84(tcLat, tcLon) {
-      if (!this.isInChina(tcLon, tcLat)) {
-        return new Coordinate({ lat: tcLat, lng: tcLon });
-      }
-      let wgsLat = tcLat;
-      let wgsLng = tcLon;
-      for (let i = 0; i < 5; i++) {
-        const gcj02 = this.wgs84ToTencent(wgsLat, wgsLng);
-        const deltaLat = tcLat - gcj02.lat;
-        const deltaLng = tcLon - gcj02.lng;
-        wgsLat += deltaLat;
-        wgsLng += deltaLng;
-        if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
-          break;
-        }
-      }
-      return new Coordinate({
-        lat: parseFloat(wgsLat.toFixed(6)),
-        lng: parseFloat(wgsLng.toFixed(6))
-      });
-    }
-    /**
-     * 批量转换坐标（内部使用高精度转换）
-     * @param devices 设备数组
-     * @param targetSystem 目标坐标系 'tencent' | 'wgs84'
-     * @returns 转换后的设备数组
-     */
-    static batchConvertCoordinates(devices, targetSystem = "tencent") {
-      if (!Array.isArray(devices))
-        return [];
-      return devices.map((device) => {
-        if (device == null)
-          return device;
-        const item = device;
-        const latitude = item["latitude"];
-        const longitude = item["longitude"];
-        if (latitude == null || longitude == null) {
-          return device;
-        }
-        const lat = parseFloat(latitude.toString());
-        const lng = parseFloat(longitude.toString());
-        if (isNaN(lat) || isNaN(lng)) {
-          uni.__log__("warn", "at utils/coordTransform.uts:126", "设备经纬度无效", device);
-          return device;
-        }
-        let converted = new Coordinate({ lat, lng });
-        if (targetSystem === "tencent") {
-          converted = this.wgs84ToTencent(lat, lng);
-        } else {
-          converted = this.tencentToWgs84(lat, lng);
-        }
-        item["latitude"] = converted.lat;
-        item["longitude"] = converted.lng;
-        item["originalLatitude"] = lat;
-        item["originalLongitude"] = lng;
-        return item;
-      });
-    }
-    /**
-     * 转换单个坐标点（内部使用高精度转换）
-     * @param lat 纬度
-     * @param lng 经度
-     * @param fromSystem 原坐标系 'wgs84' | 'tencent'
-     * @param toSystem 目标坐标系 'tencent' | 'wgs84'
-     * @returns 转换后的坐标 { lat: number, lng: number }
-     */
-    static convertCoordinate(lat, lng, fromSystem = "wgs84", toSystem = "tencent") {
-      if (fromSystem === "wgs84" && toSystem === "tencent") {
-        return this.wgs84ToTencent(lat, lng);
-      } else if (fromSystem === "tencent" && toSystem === "wgs84") {
-        return this.tencentToWgs84(lat, lng);
-      } else {
-        uni.__log__("warn", "at utils/coordTransform.uts:161", "不支持的坐标系转换", fromSystem, "->", toSystem);
-        return new Coordinate({ lat, lng });
-      }
-    }
-    /**
-     * 检查坐标是否在中国境内
-     * @param lat 纬度
-     * @param lng 经度
-     * @returns 是否在中国境内
-     */
-    static isInChina(lng, lat) {
-      return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271;
-    }
-    // 私有方法：纬度转换
-    static transformLat(x, y) {
-      let ret = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
-      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
-      ret += (20 * Math.sin(y * Math.PI) + 40 * Math.sin(y / 3 * Math.PI)) * 2 / 3;
-      ret += (160 * Math.sin(y / 12 * Math.PI) + 320 * Math.sin(y * Math.PI / 30)) * 2 / 3;
-      return ret;
-    }
-    // 私有方法：经度转换
-    static transformLng(x, y) {
-      let ret = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
-      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
-      ret += (20 * Math.sin(x * Math.PI) + 40 * Math.sin(x / 3 * Math.PI)) * 2 / 3;
-      ret += (150 * Math.sin(x / 12 * Math.PI) + 300 * Math.sin(x / 30 * Math.PI)) * 2 / 3;
-      return ret;
-    }
-  }
-  CoordTransform.a = 6378245;
-  CoordTransform.ee = 0.006693421622965943;
-  CoordTransform.pi = 3.141592653589793;
-  const { registerUTSInterface, initUTSProxyClass, initUTSElementProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
-  const name = "externalMapNavigation";
-  const moduleName = "外部地图导航";
-  const moduleType = "";
-  const errMsg = "";
-  const is_uni_modules = true;
-  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
-  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
-  const getAvailableIOSMapProviderIds = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getAvailableIOSMapProviderIdsByJs", keepAlive: false, params: [], return: "" });
-  const openExternalMap = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "openExternalMapByJs", keepAlive: false, params: [{ "name": "params", "type": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject" }], return: "" });
-  class OpenLocationParams extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false },
-            name: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = OpenLocationParams.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      this.name = this.__props__.name;
-      delete this.__props__;
-    }
-  }
-  function isValidCoordinate(latitude, longitude) {
-    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
-  }
-  function showInvalidLocationToast() {
-    showAppToast({
-      title: "暂无有效车辆位置",
-      icon: "none"
-    });
-  }
-  function showOpenMapFailedToast() {
-    showAppToast({
-      title: "无法打开地图，请稍后重试",
-      icon: "none"
-    });
-  }
-  function openIOSExternalMap(params, providerId = null) {
-    const wgs84 = CoordTransform.tencentToWgs84(params.latitude, params.longitude);
-    const navigationResult = openExternalMap(new UTSJSONObject({
-      latitude: params.latitude,
-      longitude: params.longitude,
-      name: params.name,
-      providerId,
-      wgs84Latitude: wgs84.lat,
-      wgs84Longitude: wgs84.lng
-    }));
-    if (navigationResult.code == "opened")
-      return null;
-    if (navigationResult.code == "invalid_coordinate") {
-      showInvalidLocationToast();
-      return null;
-    }
-    showOpenMapFailedToast();
-  }
-  function getIOSMapProviderName(providerId) {
-    if (providerId == "qqmap")
-      return "腾讯地图";
-    if (providerId == "iosamap")
-      return "高德地图";
-    if (providerId == "baidumap")
-      return "百度地图";
-    return "";
-  }
-  function chooseIOSMapProvider(params, availableProviderIds) {
-    const itemList = [];
-    const providerIds = [];
-    availableProviderIds.forEach((providerId) => {
-      const providerName = getIOSMapProviderName(providerId);
-      if (providerName == "")
-        return null;
-      itemList.push(providerName);
-      providerIds.push(providerId);
-    });
-    if (providerIds.length == 0) {
-      openIOSExternalMap(params);
-      return null;
-    }
-    uni.showActionSheet({
-      title: "选择地图应用",
-      itemList,
-      success: (res) => {
-        const tapIndex = res.tapIndex;
-        if (tapIndex < 0 || tapIndex >= providerIds.length)
-          return null;
-        const providerId = providerIds[tapIndex];
-        if (providerId != "")
-          openIOSExternalMap(params, providerId);
-      }
-    });
-  }
-  function openIOSLocation(params) {
-    const providerIds = getAvailableIOSMapProviderIds();
-    if (providerIds.length > 1) {
-      chooseIOSMapProvider(params, providerIds);
-      return null;
-    }
-    if (providerIds.length == 1) {
-      openIOSExternalMap(params, providerIds[0]);
-      return null;
-    }
-    openIOSExternalMap(params);
-  }
-  function openLocation(params) {
-    if (!isValidCoordinate(params.latitude, params.longitude)) {
-      showInvalidLocationToast();
-      return null;
-    }
-    openIOSLocation(params);
-    return null;
-  }
-  class AppModalSuccess {
-    constructor() {
-      this.confirm = false;
-      this.cancel = false;
-    }
-  }
-  class AppModalOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            title: { type: String, optional: true },
-            content: { type: String, optional: true },
-            showCancel: { type: Boolean, optional: true },
-            confirmText: { type: String, optional: true },
-            cancelText: { type: String, optional: true },
-            success: { type: "Unknown", optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = AppModalOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.title = this.__props__.title;
-      this.content = this.__props__.content;
-      this.showCancel = this.__props__.showCancel;
-      this.confirmText = this.__props__.confirmText;
-      this.cancelText = this.__props__.cancelText;
-      this.success = this.__props__.success;
-      delete this.__props__;
-    }
-  }
-  const modalHandlers = [];
-  function showAppModal(options) {
-    var _a, _b, _c;
-    const handler = modalHandlers.length > 0 ? modalHandlers[modalHandlers.length - 1] : null;
-    if (handler != null) {
-      handler(options);
-      return null;
-    }
-    uni.showModal(new UTSJSONObject({
-      title: (_a = options.title) !== null && _a !== void 0 ? _a : "",
-      content: (_b = options.content) !== null && _b !== void 0 ? _b : "",
-      showCancel: (_c = options.showCancel) !== null && _c !== void 0 ? _c : true,
-      confirmText: options.confirmText,
-      cancelText: options.cancelText,
-      success: (res) => {
-        const result = new AppModalSuccess();
-        result.confirm = res.confirm;
-        result.cancel = res.cancel;
-        if (options.success != null)
-          options.success(result);
-      }
-    }));
-  }
-  const PUSH_CLIENT_ID_KEY = "push_client_id";
-  const PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id";
-  const PUSH_MESSAGE_STALE_KEY = "push_message_stale";
-  const PUSH_SESSION_KEY = "push_session_key";
-  let initialized = false;
-  let pushClientIdRequesting = false;
-  let pushClientIdRetryCount = 0;
-  let pushClientIdRetryTimer = 0;
-  let pushClientIdRequestTimeout = 0;
-  const PUSH_CLIENT_ID_MAX_RETRY_COUNT = 5;
-  const PUSH_CLIENT_ID_RETRY_DELAY = 3e3;
-  const PUSH_CLIENT_ID_REQUEST_TIMEOUT = 18e3;
-  function pushDebug(message) {
-    uni.__log__("error", "at services/push.uts:23", "[UniPushDebug]", message);
-  }
-  function clearPushClientIdTimers() {
-    if (pushClientIdRetryTimer > 0) {
-      clearTimeout(pushClientIdRetryTimer);
-      pushClientIdRetryTimer = 0;
-    }
-    if (pushClientIdRequestTimeout > 0) {
-      clearTimeout(pushClientIdRequestTimeout);
-      pushClientIdRequestTimeout = 0;
-    }
-  }
-  function schedulePushClientIdRetry(reason) {
-    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
-      pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason);
-      return null;
-    }
-    if (pushClientIdRetryTimer > 0)
-      return null;
-    pushClientIdRetryCount += 1;
-    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString() + "ms 后重试，第 " + pushClientIdRetryCount.toString() + " 次。原因: " + reason);
-    pushClientIdRetryTimer = setTimeout(() => {
-      pushClientIdRetryTimer = 0;
-      refreshPushClientId();
-    }, PUSH_CLIENT_ID_RETRY_DELAY);
-  }
-  function stringValue(value = null) {
-    if (value == null)
-      return "";
-    return value.toString();
-  }
-  function payloadValue(payload = null, key) {
-    if (payload == null)
-      return "";
-    if (typeof payload == "string") {
-      try {
-        const parsedPayload = UTS.JSON.parse(payload);
-        if (parsedPayload == null)
-          return "";
-        return payloadValue(parsedPayload, key);
-      } catch (error) {
-        return "";
-      }
-    }
-    try {
-      const object = payload;
-      return object.getString(key, "");
-    } catch (error) {
-      return "";
-    }
-  }
-  function pushMessageId(message = null) {
-    let id = payloadValue(message, "messageId");
-    if (id == "")
-      id = payloadValue(message, "message_id");
-    if (id == "")
-      id = payloadValue(message, "id");
-    if (id == "") {
-      const data = payloadValue(message, "data");
-      if (data != "")
-        id = payloadValue(data, "messageId");
-    }
-    return id;
-  }
-  function savePushEvent(event = null) {
-    const messageId = pushMessageId(event);
-    if (messageId != "")
-      uni.setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId);
-    uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
-    return messageId;
-  }
-  function isNotificationClick(event = null) {
-    return payloadValue(event, "type").toLowerCase() == "click";
-  }
-  function registerPushListener() {
-    if (initialized)
-      return null;
-    initialized = true;
-    try {
-      uni.onPushMessage((event = null) => {
-        uni.__log__("log", "at services/push.uts:103", "收到 UniPush 消息");
-        savePushEvent(event);
-        if (isNotificationClick(event)) {
-          uni.switchTab({ url: "/pages/message/message" });
-        }
-      });
-    } catch (error) {
-      uni.__log__("error", "at services/push.uts:110", "注册 UniPush 监听失败:", error);
-    }
-  }
-  function initPush() {
-    registerPushListener();
-    refreshPushClientId();
-  }
-  function refreshPushClientId() {
-    if (pushClientIdRequesting) {
-      pushDebug("UniPush CID 正在获取，跳过重复请求");
-      return null;
-    }
-    pushClientIdRequesting = true;
-    clearPushClientIdTimers();
-    try {
-      pushDebug("开始获取 UniPush CID");
-      pushClientIdRequestTimeout = setTimeout(() => {
-        pushClientIdRequestTimeout = 0;
-        if (!pushClientIdRequesting)
-          return null;
-        pushClientIdRequesting = false;
-        pushDebug("UniPush getPushClientId 回调超时");
-        schedulePushClientIdRetry("回调超时");
-      }, PUSH_CLIENT_ID_REQUEST_TIMEOUT);
-      uni.getPushClientId(new UTSJSONObject({
-        success: (result) => {
-          pushClientIdRequesting = false;
-          if (pushClientIdRequestTimeout > 0) {
-            clearTimeout(pushClientIdRequestTimeout);
-            pushClientIdRequestTimeout = 0;
-          }
-          const clientId = result.cid;
-          pushDebug("UniPush getPushClientId success");
-          if (clientId == "") {
-            pushDebug("UniPush CID 为空");
-            schedulePushClientIdRetry("CID 为空");
-            return null;
-          }
-          const cachedClientId = getCachedPushClientId();
-          pushDebug("UniPush CID=" + clientId);
-          if (clientId != cachedClientId) {
-            pushDebug("UniPush CID 已更新");
-          }
-          pushClientIdRetryCount = 0;
-          uni.setStorageSync(PUSH_CLIENT_ID_KEY, clientId);
-        },
-        fail: (error = null) => {
-          pushClientIdRequesting = false;
-          if (pushClientIdRequestTimeout > 0) {
-            clearTimeout(pushClientIdRequestTimeout);
-            pushClientIdRequestTimeout = 0;
-          }
-          pushDebug("UniPush getPushClientId failed: " + error.toString());
-          schedulePushClientIdRetry("调用失败");
-        }
-      }));
-    } catch (error) {
-      pushClientIdRequesting = false;
-      if (pushClientIdRequestTimeout > 0) {
-        clearTimeout(pushClientIdRequestTimeout);
-        pushClientIdRequestTimeout = 0;
-      }
-      pushDebug("调用 getPushClientId 异常: " + error.toString());
-      schedulePushClientIdRetry("调用异常");
-    }
-  }
-  function markPushSessionAuthenticated() {
-    uni.setStorageSync(PUSH_SESSION_KEY, "authenticated");
-    refreshPushClientId();
-  }
-  function clearPushSessionState() {
-    uni.removeStorageSync(PUSH_SESSION_KEY);
-    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
-  }
-  function consumePendingMessageId() {
-    const rawValue = uni.getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    const value = rawValue == null ? "" : stringValue(rawValue);
-    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    return value;
-  }
-  function consumePushStaleFlag() {
-    const value = uni.getStorageSync(PUSH_MESSAGE_STALE_KEY);
-    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
-    return value != null && value.toString() == "true";
-  }
-  function getCachedPushClientId() {
-    const value = uni.getStorageSync(PUSH_CLIENT_ID_KEY);
-    return value == null ? "" : value.toString();
-  }
-  class RequestOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            url: { type: String, optional: true },
-            method: { type: "Unknown", optional: true },
-            data: { type: "Any", optional: true },
-            header: { type: "Unknown", optional: true },
-            showLoading: { type: Boolean, optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = RequestOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.url = this.__props__.url;
-      this.method = this.__props__.method;
-      this.data = this.__props__.data;
-      this.header = this.__props__.header;
-      this.showLoading = this.__props__.showLoading;
-      delete this.__props__;
-    }
-  }
-  class HttpResponse extends UTS.UTSType {
-    static get$UTSMetadata$(T) {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            message: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = HttpResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.message = this.__props__.message;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class HttpError extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            statusCode: { type: Number, optional: false },
-            message: { type: String, optional: false },
-            data: { type: "Any", optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = HttpError.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.statusCode = this.__props__.statusCode;
-      this.message = this.__props__.message;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class RequestResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            statusCode: { type: Number, optional: false },
-            data: { type: "Any", optional: false },
-            errMsg: { type: String, optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = RequestResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.statusCode = this.__props__.statusCode;
-      this.data = this.__props__.data;
-      this.errMsg = this.__props__.errMsg;
-      delete this.__props__;
-    }
-  }
-  class RequestFailure extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            errMsg: { type: String, optional: true },
-            data: { type: "Any", optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = RequestFailure.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.errMsg = this.__props__.errMsg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  const BASE_URL = "https://car.zdiot.cn:18443/api";
-  function handleTokenExpired() {
-    uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
-    uni.removeStorageSync("token");
-    clearPushSessionState();
-    showAppToast({
-      title: "登录已过期，请重新登录",
-      icon: "none",
-      duration: 2e3
-    });
-    setTimeout(() => {
-      uni.__log__("log", "at api/http.uts:55", "正在跳转到登录页...");
-      uni.redirectTo({
-        url: "/pages/login/login",
-        success: () => {
-          uni.__log__("log", "at api/http.uts:59", "跳转登录页成功");
-        },
-        fail: (err) => {
-          uni.__log__("log", "at api/http.uts:62", "跳转登录页失败:", err);
-          uni.reLaunch({
-            url: "/pages/login/login"
-          });
-        }
-      });
-    }, 500);
-  }
-  function requestInterceptor(config) {
-    const token = uni.getStorageSync("token");
-    if (token != null && token.toString().length > 0) {
-      if (config.header == null) {
-        config.header = new UTSJSONObject();
-      }
-      config.header.set("token", token.toString());
-    }
-    return config;
-  }
-  function responseInterceptor(response, config) {
-    return response.data;
-  }
-  function errorHandler(error, config) {
-    if (config.showLoading != false) {
-      uni.hideLoading();
-    }
-    uni.__log__("log", "at api/http.uts:114", "请求错误详情:", error);
-    if (error.statusCode != 0) {
-      switch (error.statusCode) {
-        case 401:
-          handleTokenExpired();
-          break;
-        case 403:
-          showAppToast({
-            title: "没有权限访问",
-            icon: "none"
-          });
-          break;
-        case 404:
-          showAppToast({
-            title: "请求资源不存在",
-            icon: "none"
-          });
-          break;
-        case 500:
-          showAppToast({
-            title: "服务器错误",
-            icon: "none"
-          });
-          break;
-        default:
-          showAppToast({
-            title: error.message != null ? error.message : "请求错误: ".concat(error.statusCode),
-            icon: "none"
-          });
-      }
-    } else {
-      showAppToast({
-        title: "网络错误，请检查网络连接",
-        icon: "none"
-      });
-    }
-  }
-  function request(options) {
-    const requestUrl = options.url != null ? options.url : "";
-    const config = new UTSJSONObject(
-      {
-        url: requestUrl,
-        method: options.method != null ? options.method : "GET",
-        data: options.data != null ? options.data : new UTSJSONObject({}),
-        header: options.header != null ? options.header : new UTSJSONObject(),
-        showLoading: options.showLoading != false
-      }
-      // 处理完整URL
-    );
-    if (!config.url.startsWith("http")) {
-      config.url = BASE_URL + config.url;
-    }
-    const processedConfig = requestInterceptor(config);
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: processedConfig.url,
-        method: processedConfig.method,
-        data: processedConfig.data,
-        header: processedConfig.header,
-        success: (res) => {
-          const statusCode = res.statusCode;
-          if (statusCode == 200) {
-            const data = responseInterceptor(res);
-            resolve(data);
-          } else {
-            const httpError = new HttpError({
-              statusCode,
-              message: "请求失败: ".concat(statusCode),
-              data: res.data
-            });
-            errorHandler(httpError, processedConfig);
-            reject(httpError);
-          }
-        },
-        fail: (error) => {
-          const httpError = new HttpError({
-            statusCode: 0,
-            message: error.errMsg != null ? error.errMsg : "网络请求失败",
-            data: error
-          });
-          errorHandler(httpError, processedConfig);
-          reject(httpError);
-        }
-      });
-    });
-  }
-  function get(url, data = new UTSJSONObject({}), options = new RequestOptions({
-    url: null,
-    method: null,
-    data: null,
-    header: null,
-    showLoading: null
-  })) {
-    return request(new UTSJSONObject({
-      url,
-      method: "GET",
-      data,
-      header: options.header,
-      showLoading: options.showLoading
-    }));
-  }
-  function post(url, data = new UTSJSONObject({}), options = new RequestOptions({
-    url: null,
-    method: null,
-    data: null,
-    header: null,
-    showLoading: null
-  })) {
-    return request(new UTSJSONObject({
-      url,
-      method: "POST",
-      data,
-      header: options.header,
-      showLoading: options.showLoading
-    }));
-  }
-  function put(url, data = new UTSJSONObject({}), options = new RequestOptions({
-    url: null,
-    method: null,
-    data: null,
-    header: null,
-    showLoading: null
-  })) {
-    return request(new UTSJSONObject({
-      url,
-      method: "PUT",
-      data,
-      header: options.header,
-      showLoading: options.showLoading
-    }));
-  }
-  function remove(url, data = new UTSJSONObject({}), options = new RequestOptions({
-    url: null,
-    method: null,
-    data: null,
-    header: null,
-    showLoading: null
-  })) {
-    return request(new UTSJSONObject({
-      url,
-      method: "DELETE",
-      data,
-      header: options.header,
-      showLoading: options.showLoading
-    }));
-  }
-  function asJSONObject(value = null) {
-    if (value == null) {
-      return new UTSJSONObject();
-    }
-    return value;
-  }
-  function getResponseCode(response) {
-    return response.getNumber("code", -1);
-  }
-  function getResponseMessage(response) {
-    const msg = response.getString("msg", "");
-    return msg != "" ? msg : response.getString("message", "");
-  }
-  function getResponseDataObject(response) {
-    const data = response.getJSON("data");
-    return data != null ? data : new UTSJSONObject();
-  }
-  function getResponseDataArray(response) {
-    const data = response.getArray("data");
-    return data != null ? data : [];
-  }
-  const loginUrl = "/sys/login";
-  const devicePos = "/gps/lastPosition?deptId=";
-  const trackPos = "/gps/trackPos?";
-  const userinfo = "/sys/user/info";
-  const addDeviceUrl = "/userDevice/add";
-  const userDeviceList = "/userDevice/list";
-  const uniVerifyLoginUrl = "/authLogin/uniVerify";
-  const smsSendCodeUrl = "/authLogin/sms/send";
-  const smsLoginUrl = "/authLogin/sms/login";
-  const changePSW = "/sys/user/password";
-  const userMsgList = "/usermessage/listForUser";
-  const msgState = "/usermessage/detail/";
-  const updateDevice = "/device/update";
-  const deviceDetail = "/device/info/";
-  const logoutUrl = "/sys/logout";
-  const sendcmd = "/command/sendCmd";
-  const getGeofence = "/geofence";
-  const deleteGeo = "/geofence/";
-  const unbindDeviceList = "/device/unbindGeofenceList";
-  const bindDeviceList = "/device/bindGeofenceList";
-  const bindGeofence = "/geofence/bind";
-  const unbindGeofence = "/geofence/unbind";
-  const deleteDevice = "/userDevice/del";
-  const cmdActionUrl = "/command/cmdAction";
-  const cmdByMidUrl = "/command/cmdByMid";
-  const cmdSendUrl = "/command/sendCmd";
-  class BasicResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = BasicResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      delete this.__props__;
-    }
-  }
-  class JsonDataResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = JsonDataResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class UniVerifyLoginRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            openId: { type: String, optional: false },
-            accessToken: { type: String, optional: false },
-            platform: { type: String, optional: false },
-            clientVersion: { type: String, optional: true }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UniVerifyLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.openId = this.__props__.openId;
-      this.accessToken = this.__props__.accessToken;
-      this.platform = this.__props__.platform;
-      this.clientVersion = this.__props__.clientVersion;
-      delete this.__props__;
-    }
-  }
-  class SendSmsCodeRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            mobile: { type: String, optional: false },
-            scene: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
-      this.scene = this.__props__.scene;
-      delete this.__props__;
-    }
-  }
-  class SmsLoginRequest extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            mobile: { type: String, optional: false },
-            code: { type: String, optional: false },
-            platform: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.mobile = this.__props__.mobile;
-      this.code = this.__props__.code;
-      this.platform = this.__props__.platform;
-      delete this.__props__;
-    }
-  }
-  class DevicePositionResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            message: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DevicePositionResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.message = this.__props__.message;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class TrackPosResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = TrackPosResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class UserInfoResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UserInfoResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  let UserDeviceListData$1 = class UserDeviceListData2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            list: { type: "Unknown", optional: false },
-            totalPage: { type: Number, optional: false },
-            totalCount: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UserDeviceListData2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.list = this.__props__.list;
-      this.totalPage = this.__props__.totalPage;
-      this.totalCount = this.__props__.totalCount;
-      delete this.__props__;
-    }
-  };
-  class UserDeviceListResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: UserDeviceListData$1, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UserDeviceListResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class DeviceDetailResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DeviceDetailResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class GeofenceResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = GeofenceResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class DevicePageData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            list: { type: "Unknown", optional: false },
-            totalPage: { type: Number, optional: false },
-            totalCount: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DevicePageData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.list = this.__props__.list;
-      this.totalPage = this.__props__.totalPage;
-      this.totalCount = this.__props__.totalCount;
-      delete this.__props__;
-    }
-  }
-  class DevicePageResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: DevicePageData, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DevicePageResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class CommandListResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = CommandListResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class SendCmdResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SendCmdResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  class ChangePasswordResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = ChangePasswordResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      delete this.__props__;
-    }
-  }
-  let MessageResponse$1 = class MessageResponse2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: UserDeviceListData$1, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MessageResponse2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  };
-  function basicResponse(raw = null) {
-    const response = asJSONObject(raw);
-    return new BasicResponse({ code: getResponseCode(response), msg: getResponseMessage(response) });
-  }
-  function jsonDataResponse(raw = null) {
-    const response = asJSONObject(raw);
-    return new JsonDataResponse({
-      code: getResponseCode(response),
-      msg: getResponseMessage(response),
-      data: getResponseDataObject(response)
-    });
-  }
-  function devicePageResponse(raw = null) {
-    const response = asJSONObject(raw);
-    const data = getResponseDataObject(response);
-    const list = data.getArray("list");
-    return new DevicePageResponse({
-      code: getResponseCode(response),
-      msg: getResponseMessage(response),
-      data: new DevicePageData({
-        list: list != null ? list : [],
-        totalPage: data.getNumber("totalPage", 0),
-        totalCount: data.getNumber("totalCount", 0)
-      })
-    });
-  }
-  function userDevicePageResponse(raw = null) {
-    const page = devicePageResponse(raw);
-    return new UserDeviceListResponse({
-      code: page.code,
-      msg: page.msg,
-      data: new UserDeviceListData$1({
-        list: page.data.list,
-        totalPage: page.data.totalPage,
-        totalCount: page.data.totalCount
-      })
-    });
-  }
-  function messagePageResponse(raw = null) {
-    const page = devicePageResponse(raw);
-    return new MessageResponse$1({
-      code: page.code,
-      msg: page.msg,
-      data: new UserDeviceListData$1({
-        list: page.data.list,
-        totalPage: page.data.totalPage,
-        totalCount: page.data.totalCount
-      })
-    });
-  }
-  function userInfoResponse(raw = null) {
-    const response = jsonDataResponse(raw);
-    return new UserInfoResponse({ code: response.code, msg: response.msg, data: response.data });
-  }
-  function deviceDetailResponse(raw = null) {
-    const response = jsonDataResponse(raw);
-    return new DeviceDetailResponse({ code: response.code, msg: response.msg, data: response.data });
-  }
-  function changePasswordResponse(raw = null) {
-    const response = basicResponse(raw);
-    return new ChangePasswordResponse({ code: response.code, msg: response.msg });
-  }
-  const login = (data) => {
-    return post(loginUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const logout = () => {
-    return post(logoutUrl).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const sendCommand = (data) => {
-    return post(sendcmd, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const getDevicePos = (data) => {
-    return get(devicePos, data).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new DevicePositionResponse({
-        code: getResponseCode(response),
-        message: getResponseMessage(response),
-        data: getResponseDataArray(response)
-      });
-    });
-  };
-  const getTrackPos = (data) => {
-    return get(trackPos, data).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new TrackPosResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataObject(response) });
-    });
-  };
-  const getUserInfo = () => {
-    return get(userinfo).then((raw = null) => {
-      return userInfoResponse(raw);
-    });
-  };
-  const addDevice = (data) => {
-    return post(addDeviceUrl, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const delDevice = (imei) => {
-    return post(deleteDevice, new UTSJSONObject({ imei })).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const getUserDeviceList = (data) => {
-    return post(userDeviceList, data).then((raw = null) => {
-      return userDevicePageResponse(raw);
-    });
-  };
-  const uniVerifyLogin = (data) => {
-    return post(uniVerifyLoginUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const sendSmsLoginCode = (data) => {
-    return post(smsSendCodeUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const smsLogin = (data) => {
-    return post(smsLoginUrl, data).then((raw = null) => {
-      return jsonDataResponse(raw);
-    });
-  };
-  const changePassWord = (data) => {
-    return put(changePSW, data).then((raw = null) => {
-      return changePasswordResponse(raw);
-    });
-  };
-  const getUserMsgList = (data = null) => {
-    return (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw = null) => {
-      return messagePageResponse(raw);
-    });
-  };
-  const setMsgState = (msgId) => {
-    return get("".concat(msgState).concat(msgId)).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const editDeviceInfo = (data) => {
-    return put(updateDevice, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const getDeviceDetail = (deviceId) => {
-    return get("".concat(deviceDetail).concat(deviceId)).then((raw = null) => {
-      return deviceDetailResponse(raw);
-    });
-  };
-  const getGeofenceList = () => {
-    return get(getGeofence).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new GeofenceResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
-    });
-  };
-  const addGeofence = (data) => {
-    return post(getGeofence, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const updateGeofence = (data) => {
-    return put(getGeofence, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const deleteGeofence = (id) => {
-    return remove("".concat(deleteGeo).concat(id)).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const getUnboundDevices = (params) => {
-    return get(unbindDeviceList, params).then((raw = null) => {
-      return devicePageResponse(raw);
-    });
-  };
-  const getBoundDevices = (params) => {
-    return get(bindDeviceList, params).then((raw = null) => {
-      return devicePageResponse(raw);
-    });
-  };
-  const bindDevices = (data) => {
-    return post(bindGeofence, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const unbindDevices = (data) => {
-    return remove(unbindGeofence, data).then((raw = null) => {
-      return basicResponse(raw);
-    });
-  };
-  const getCmdAction = () => {
-    return get(cmdActionUrl).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
-    });
-  };
-  const getCmdByMid = (data) => {
-    return get(cmdByMidUrl, data).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
-    });
-  };
-  const sendCmd = (data) => {
-    return post(cmdSendUrl, data).then((raw = null) => {
-      const response = asJSONObject(raw);
-      return new SendCmdResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString("data", "") });
-    });
-  };
-  class TodayTimeRange extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            nowTime: { type: Number, optional: false },
-            todayZero: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = TodayTimeRange.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.nowTime = this.__props__.nowTime;
-      this.todayZero = this.__props__.todayZero;
-      delete this.__props__;
-    }
-  }
-  function getTodayZeroTime() {
-    const now = /* @__PURE__ */ new Date();
-    const nowTime = now.getTime();
-    const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
-    return new TodayTimeRange({
-      nowTime,
-      todayZero
-    });
-  }
-  function pad(value) {
-    return value.toString().padStart(2, "0");
-  }
-  function formatTimes(timestamp) {
-    const d = new Date(timestamp);
-    return "".concat(d.getFullYear(), "-").concat(pad(d.getMonth() + 1), "-").concat(pad(d.getDate()), " ").concat(pad(d.getHours()), ":").concat(pad(d.getMinutes()), ":").concat(pad(d.getSeconds()));
-  }
-  function parseLocalDateTime(timestamp) {
-    var _a, _b, _c, _d, _e, _f;
-    const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
-    if (match == null)
-      return null;
-    const year = parseInt((_a = match[1]) !== null && _a !== void 0 ? _a : "0");
-    const month = parseInt((_b = match[2]) !== null && _b !== void 0 ? _b : "0");
-    const day = parseInt((_c = match[3]) !== null && _c !== void 0 ? _c : "0");
-    const hour = match[4] == null ? 0 : parseInt((_d = match[4]) !== null && _d !== void 0 ? _d : "0");
-    const minute = match[5] == null ? 0 : parseInt((_e = match[5]) !== null && _e !== void 0 ? _e : "0");
-    const second = match[6] == null ? 0 : parseInt((_f = match[6]) !== null && _f !== void 0 ? _f : "0");
-    const date = new Date(year, month - 1, day, hour, minute, second);
-    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
-      return null;
-    }
-    return date.getTime();
-  }
-  function normalizeLocalDateTime(timestamp) {
-    const milliseconds = parseLocalDateTime(timestamp);
-    return milliseconds == null ? timestamp : formatTimes(milliseconds);
-  }
-  function formatLocalTime(timestamp) {
-    const milliseconds = parseLocalDateTime(timestamp);
-    if (milliseconds == null)
-      return "";
-    const date = new Date(milliseconds);
-    return "".concat(pad(date.getHours()), ":").concat(pad(date.getMinutes()), ":").concat(pad(date.getSeconds()));
-  }
-  function getDeviceIcon(connectionStatus, carType) {
-    const basePath = connectionStatus == "online" ? "/static/cars/online/" : "/static/cars/offline/";
-    const validTypes = ["car", "bus", "bike", "moto", "diandong", "huoche", "sanlun", "tuola", "suv", "baby", "tank", "zhuangjia", "wajue", "plan", "walk", "muma", "hangmu", "junjian", "tuiche", "train"];
-    let iconPath = basePath + "default.png";
-    if (validTypes.includes(carType)) {
-      iconPath = basePath + carType + ".png";
-    }
-    return iconPath;
-  }
-  class Device extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            deviceName: { type: String, optional: false },
-            value: { type: String, optional: false },
-            imei: { type: String, optional: false },
-            deptId: { type: String, optional: false },
-            deviceId: { type: String, optional: false },
-            iccid: { type: String, optional: false },
-            simMerchant: { type: String, optional: false },
-            connectionStatus: { type: String, optional: false },
-            carType: { type: String, optional: false },
-            plateNo: { type: String, optional: false },
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = Device.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.deviceName = this.__props__.deviceName;
-      this.value = this.__props__.value;
-      this.imei = this.__props__.imei;
-      this.deptId = this.__props__.deptId;
-      this.deviceId = this.__props__.deviceId;
-      this.iccid = this.__props__.iccid;
-      this.simMerchant = this.__props__.simMerchant;
-      this.connectionStatus = this.__props__.connectionStatus;
-      this.carType = this.__props__.carType;
-      this.plateNo = this.__props__.plateNo;
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  }
-  let MapCenter$1 = class MapCenter2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MapCenter2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  };
-  class UserDeviceListData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            list: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UserDeviceListData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.list = this.__props__.list;
-      delete this.__props__;
-    }
-  }
-  class DeviceStatus extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            batteryPercent: { type: Number, optional: false },
-            voltage: { type: Number, optional: false },
-            signalStrength: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DeviceStatus.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.batteryPercent = this.__props__.batteryPercent;
-      this.voltage = this.__props__.voltage;
-      this.signalStrength = this.__props__.signalStrength;
-      delete this.__props__;
-    }
-  }
-  class DeviceDetailState extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            deviceStatus: { type: DeviceStatus, optional: false },
-            connectionStatus: { type: String, optional: false },
-            lastUpdateTime: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = DeviceDetailState.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.deviceStatus = this.__props__.deviceStatus;
-      this.connectionStatus = this.__props__.connectionStatus;
-      this.lastUpdateTime = this.__props__.lastUpdateTime;
-      delete this.__props__;
-    }
-  }
-  const SELECTED_DEVICE_STORAGE_KEY = "selected_device_info";
-  const SELECTED_DEVICE_INDEX_STORAGE_KEY = "selected_device_index";
-  class SavedDevice extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            deviceName: { type: String, optional: false },
-            imei: { type: String, optional: false },
-            deptId: { type: String, optional: false },
-            deviceId: { type: String, optional: false },
-            iccid: { type: String, optional: false },
-            simMerchant: { type: String, optional: false },
-            connectionStatus: { type: String, optional: false },
-            carType: { type: String, optional: false },
-            plateNo: { type: String, optional: false },
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SavedDevice.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.deviceName = this.__props__.deviceName;
-      this.imei = this.__props__.imei;
-      this.deptId = this.__props__.deptId;
-      this.deviceId = this.__props__.deviceId;
-      this.iccid = this.__props__.iccid;
-      this.simMerchant = this.__props__.simMerchant;
-      this.connectionStatus = this.__props__.connectionStatus;
-      this.carType = this.__props__.carType;
-      this.plateNo = this.__props__.plateNo;
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  }
-  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
-    __name: "index",
-    setup(__props) {
-      const center = vue.reactive(new MapCenter$1({
-        latitude: 39.90469,
-        longitude: 116.40717
-      }));
-      const userDeviceList2 = vue.ref([]);
-      const positionState = vue.ref("loading");
-      const positionMessage = vue.computed(() => {
-        if (positionState.value == "loading")
-          return "正在获取车辆位置";
-        if (positionState.value == "empty")
-          return "暂无车辆定位数据";
-        if (positionState.value == "invalid")
-          return "定位数据异常";
-        if (positionState.value == "failed")
-          return "位置获取失败，请检查网络后重试";
-        return "";
-      });
-      const mapScale = vue.ref(12);
-      const statusBarHeight = vue.ref(20);
-      vue.ref(null);
-      vue.ref(44);
-      const deviceList = vue.ref([]);
-      const showPicker = vue.ref(false);
-      const pickerDefaultIndex = vue.ref([0]);
-      const pickerKey = vue.ref(0);
-      const currentCarImei = vue.ref("");
-      const currentCarDeptId = vue.ref("");
-      const currentCarDeviceId = vue.ref("");
-      const currentCarIccId = vue.ref("");
-      const currentCarName = vue.ref("");
-      const currentCarSimMerchant = vue.ref("");
-      const currentCarConnectionStatus = vue.ref("");
-      const currentCarCarType = vue.ref("");
-      const currentCarPlateNo = vue.ref("");
-      const deviceDetail2 = vue.ref(new DeviceDetailState({
-        deviceStatus: new DeviceStatus({
-          batteryPercent: 0,
-          voltage: 0,
-          signalStrength: 0
-        }),
-        connectionStatus: "offline",
-        lastUpdateTime: ""
-      }));
-      const markers = vue.ref([]);
-      const lastUpdateTime = vue.ref("--:--:--");
-      const safeDeviceDetail = vue.computed(() => {
-        const detail = deviceDetail2.value;
-        return new DeviceDetailState({
-          deviceStatus: new DeviceStatus({
-            batteryPercent: detail.deviceStatus.batteryPercent,
-            voltage: detail.deviceStatus.voltage,
-            signalStrength: detail.deviceStatus.signalStrength
-          }),
-          connectionStatus: detail.connectionStatus,
-          lastUpdateTime: detail.lastUpdateTime
-        });
-      });
-      const pickerColumns = vue.computed(() => {
-        return [deviceList.value.map((device) => {
-          const displayName = device.deviceName || device.name || device.imei || "未命名设备";
-          const statusText = device.connectionStatus == "online" ? "在线" : "离线";
-          return new UTSJSONObject({
-            text: "".concat(displayName, " (").concat(statusText, ")"),
-            value: device.imei || device.deviceId,
-            disabled: false
-          });
-        })];
-      });
-      const closePicker = () => {
-        showPicker.value = false;
-      };
-      const initDimensions = () => {
-        const systemInfo = uni.getSystemInfoSync();
-        statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
-      };
-      const delay = (ms) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, ms);
-        });
-      };
-      const saveSelectedDevice = (device) => {
-        try {
-          const deviceInfo = new UTSJSONObject({
-            name: device.deviceName || device.name || device.imei,
-            deviceName: device.deviceName || device.name || device.imei,
-            imei: device.imei || device.value,
-            deptId: device.deptId,
-            deviceId: device.deviceId,
-            iccid: device.iccid,
-            simMerchant: device.simMerchant,
-            connectionStatus: device.connectionStatus,
-            carType: device.carType,
-            plateNo: device.plateNo,
-            latitude: device.latitude,
-            longitude: device.longitude
-          });
-          uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
-          uni.__log__("log", "at pages/index/index.uvue:371", "保存选中设备成功:", deviceInfo);
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:373", "保存选中设备失败:", error);
-        }
-      };
-      const decodeSavedDevice = (raw = null) => {
-        if (raw == null || raw == "")
-          return null;
-        let data = null;
-        if (typeof raw == "string") {
-          try {
-            data = UTS.JSON.parse(raw);
-          } catch (error) {
-            return null;
-          }
-        } else {
-          data = raw;
-        }
-        if (data == null)
-          return null;
-        const imei = data.getString("imei", "");
-        if (imei == "")
-          return null;
-        const device = new SavedDevice({
-          name: data.getString("name", imei),
-          deviceName: data.getString("deviceName", data.getString("name", imei)),
-          imei,
-          deptId: data.getString("deptId", ""),
-          deviceId: data.getString("deviceId", ""),
-          iccid: data.getString("iccid", ""),
-          simMerchant: data.getString("simMerchant", ""),
-          connectionStatus: data.getString("connectionStatus", ""),
-          carType: data.getString("carType", ""),
-          plateNo: data.getString("plateNo", ""),
-          latitude: data.getNumber("latitude", 0),
-          longitude: data.getNumber("longitude", 0)
-        });
-        return device;
-      };
-      const getSavedSelectedDevice = () => {
-        try {
-          const rawDevice = uni.getStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          if (rawDevice == null)
-            return null;
-          return decodeSavedDevice(rawDevice);
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:431", "获取保存设备失败:", error);
-        }
-        return null;
-      };
-      const clearSavedSelectedDevice = () => {
-        try {
-          uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
-          uni.__log__("log", "at pages/index/index.uvue:440", "清除保存设备成功");
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:442", "清除保存设备失败:", error);
-        }
-      };
-      const saveSelectedDeviceIndex = (index) => {
-        try {
-          uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:451", "保存选中设备索引失败:", error);
-        }
-      };
-      const getSavedSelectedDeviceIndex = () => {
-        try {
-          const savedIndex = uni.getStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
-          if (savedIndex != null && savedIndex.toString() != "") {
-            const index = parseInt(savedIndex.toString());
-            return isNaN(index) || index < 0 ? null : index;
-          }
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:464", "获取保存设备索引失败:", error);
-        }
-        return null;
-      };
-      const clearSavedSelectedDeviceIndex = () => {
-        try {
-          uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
-        } catch (error) {
-          uni.__log__("error", "at pages/index/index.uvue:474", "清除保存设备索引失败:", error);
-        }
-      };
-      const handlePicker = () => {
-        if (deviceList.value.length == 0) {
-          showAppToast({
-            title: "暂无车辆数据",
-            icon: "none"
-          });
-          return null;
-        }
-        pickerKey.value++;
-        const savedIndex = getSavedSelectedDeviceIndex();
-        if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-          pickerDefaultIndex.value = [savedIndex];
-        } else {
-          const currentIndex = deviceList.value.findIndex((device) => {
-            return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
-          });
-          if (currentIndex != -1) {
-            pickerDefaultIndex.value = [currentIndex];
-          } else {
-            pickerDefaultIndex.value = [0];
-          }
-        }
-        vue.nextTick(() => {
-          showPicker.value = true;
-        });
-      };
-      const createMarker = (id, lat, lng, type, title = null) => {
-        const isOnline = currentCarConnectionStatus.value == "online";
-        const callout = new UTSJSONObject({
-          content: title || "爱车位置",
-          color: isOnline ? "#ffffff" : "#999999",
-          borderRadius: 6,
-          bgColor: isOnline ? "#07C160" : "#CCCCCC",
-          padding: 4,
-          fontSize: 12,
-          display: "ALWAYS"
-        });
-        return {
-          id,
-          latitude: lat,
-          longitude: lng,
-          iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
-          width: 30,
-          height: 30,
-          anchor: { x: 0.5, y: 0.5 },
-          callout
-        };
-      };
-      const loadDeviceDetail = (deviceId) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          var _a, _b, _c;
-          try {
-            const res = yield getDeviceDetail(deviceId);
-            const detail = res.data;
-            if (detail != null) {
-              const deviceStatus = detail.getJSON("deviceStatus");
-              deviceDetail2.value = {
-                deviceStatus: {
-                  batteryPercent: (_a = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("batteryPercent", 0)) !== null && _a !== void 0 ? _a : 0,
-                  voltage: (_b = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("voltage", 0)) !== null && _b !== void 0 ? _b : 0,
-                  signalStrength: (_c = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("signalStrength", 0)) !== null && _c !== void 0 ? _c : 0
-                },
-                connectionStatus: detail.getString("connectionStatus", "offline"),
-                lastUpdateTime: detail.getString("lastUpdateTime", "")
-              };
-              const updateTime = detail.getString("lastUpdateTime", "");
-              if (updateTime) {
-                const formattedTime = formatLocalTime(updateTime);
-                if (formattedTime != "")
-                  lastUpdateTime.value = formattedTime;
-              }
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:577", "加载设备详情失败", error);
-          }
-        });
-      };
-      vue.ref(new UTSJSONObject({}));
-      const tripData = vue.ref([]);
-      const totalMileage = vue.ref(0);
-      const averageSpeed = vue.ref(0);
-      let trackRequestId = 0;
-      const clearTripData = () => {
-        tripData.value = [];
-        totalMileage.value = 0;
-        averageSpeed.value = 0;
-      };
-      const processTripData = (data) => {
-        const trips = data.getArray("trips");
-        if (trips != null && trips.length > 0) {
-          tripData.value = trips;
-          let totalDistance = 0;
-          let totalDuration = 0;
-          let totalAvgSpeed = 0;
-          trips.forEach((trip) => {
-            totalDistance += trip.getNumber("distance", 0);
-            totalDuration += trip.getNumber("duration", 0);
-            totalAvgSpeed += trip.getNumber("averageSpeed", 0);
-          });
-          totalMileage.value = totalDistance;
-          averageSpeed.value = totalAvgSpeed / trips.length;
-        } else {
-          clearTripData();
-        }
-      };
-      const createTrackRequestData = (imei) => {
-        const timeRange = getTodayZeroTime();
-        return new UTSJSONObject({
-          imei,
-          startTime: formatTimes(timeRange.todayZero),
-          endTime: formatTimes(timeRange.nowTime),
-          minParkTime: 120,
-          withStop: false,
-          withPos: false,
-          withTrip: true
-        });
-      };
-      const loadTrackPos = (data) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          const requestId = ++trackRequestId;
-          try {
-            const res = yield getTrackPos(data);
-            if (requestId != trackRequestId)
-              return Promise.resolve(null);
-            if (res.code == 401) {
-              showAppToast({
-                title: "登录过期，请重新登录",
-                icon: "none",
-                duration: 2e3
-              });
-              uni.removeStorageSync("token");
-              clearPushSessionState();
-              uni.reLaunch({
-                url: "/pages/index/index"
-              });
-              return Promise.resolve(null);
-            }
-            if (res.code != 0) {
-              uni.__log__("error", "at pages/index/index.uvue:651", "加载轨迹失败:", res.msg);
-              clearTripData();
-              return Promise.resolve(null);
-            }
-            processTripData(res.data);
-          } catch (error) {
-            if (requestId != trackRequestId)
-              return Promise.resolve(null);
-            uni.__log__("error", "at pages/index/index.uvue:659", "加载轨迹失败", error);
-            clearTripData();
-          }
-        });
-      };
-      const devicePosInfo = vue.ref(null);
-      const devicePositionUpdateTime = vue.computed(() => {
-        const position = devicePosInfo.value;
-        return position != null ? position.getString("positionUpdateTime", "暂无位置") : "暂无位置";
-      });
-      const loadDevicePos = (data) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          positionState.value = "loading";
-          markers.value = [];
-          try {
-            const res = yield getDevicePos(data);
-            const positions = res.data;
-            if (res.code != 0 || positions == null || positions.length == 0) {
-              uni.__log__("warn", "at pages/index/index.uvue:677", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
-              positionState.value = "empty";
-              return false;
-            }
-            const position = positions[0];
-            devicePosInfo.value = position;
-            const lat = position.getNumber("latitude", 0);
-            const lng = position.getNumber("longitude", 0);
-            const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
-            if (!isValidCoordinate2) {
-              uni.__log__("error", "at pages/index/index.uvue:692", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
-              positionState.value = "invalid";
-              showAppToast({
-                title: "定位数据异常",
-                icon: "none"
-              });
-              return false;
-            }
-            const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
-            center.latitude = convertedCoord.lat;
-            center.longitude = convertedCoord.lng;
-            positionState.value = "available";
-            yield delay(100);
-            const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
-            markers.value = [nextMarker];
-            uni.__log__("log", "at pages/index/index.uvue:717", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
-            return true;
-          } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:720", "加载设备位置失败", error);
-            positionState.value = "failed";
-            showAppToast({
-              title: "定位失败，请重试",
-              icon: "none"
-            });
-            return false;
-          }
-        });
-      };
-      const loadDeviceData = (device) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/index/index.uvue:732", "开始加载设备数据:", device);
-          try {
-            yield loadDeviceDetail(device.deviceId);
-            yield loadDevicePos(new UTSJSONObject({
-              deviceId: device.deviceId,
-              deviceids: device.imei || device.value
-            }));
-            yield loadTrackPos(createTrackRequestData(device.imei || device.value));
-            showAppToast({
-              title: "切换成功",
-              icon: "none"
-            });
-          } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:745", "切换车辆失败", error);
-            showAppToast({
-              title: "切换失败，请重试",
-              icon: "none"
-            });
-          } finally {
-            uni.hideLoading();
-          }
-        });
-      };
-      const handleConfirm = (e) => {
-        showPicker.value = false;
-        const indexs = e.getArray("indexs");
-        let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1;
-        if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-          uni.__log__("warn", "at pages/index/index.uvue:767", "无法解析选中的索引，使用当前设备");
-          const currentIndex = deviceList.value.findIndex((device) => {
-            return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value;
-          });
-          if (currentIndex != -1) {
-            selectedIndex = currentIndex;
-            uni.__log__("log", "at pages/index/index.uvue:773", "使用当前设备索引:", selectedIndex);
-          } else {
-            selectedIndex = 0;
-            uni.__log__("log", "at pages/index/index.uvue:776", "使用默认索引: 0");
-          }
-        }
-        const selectedDevice = deviceList.value[selectedIndex];
-        if (!selectedDevice) {
-          showAppToast({
-            title: "选择设备失败",
-            icon: "none"
-          });
-          return null;
-        }
-        if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
-          uni.__log__("log", "at pages/index/index.uvue:791", "选择的设备与当前设备相同，不重复加载");
-          return null;
-        }
-        const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
-        currentCarName.value = deviceName;
-        currentCarImei.value = selectedDevice.imei || selectedDevice.value;
-        currentCarDeptId.value = selectedDevice.deptId;
-        currentCarDeviceId.value = selectedDevice.deviceId;
-        currentCarIccId.value = selectedDevice.iccid;
-        currentCarSimMerchant.value = selectedDevice.simMerchant;
-        currentCarConnectionStatus.value = selectedDevice.connectionStatus;
-        currentCarCarType.value = selectedDevice.carType;
-        currentCarPlateNo.value = selectedDevice.plateNo;
-        center.latitude = selectedDevice.latitude;
-        center.longitude = selectedDevice.longitude;
-        if (selectedIndex != -1) {
-          saveSelectedDeviceIndex(selectedIndex);
-          pickerDefaultIndex.value = [selectedIndex];
-        }
-        saveSelectedDevice(selectedDevice);
-        uni.showLoading(new UTSJSONObject({
-          title: "加载车辆数据...",
-          mask: true
-        }));
-        loadDeviceData(selectedDevice);
-      };
-      const loadDeviceList = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          try {
-            const res = yield getUserDeviceList(new UTSJSONObject({
-              pageSize: 1e3
-            }));
-            const code = res.code;
-            const data = res.data;
-            const list = data.list;
-            if (code == 0 && list != null && list.length > 0) {
-              userDeviceList2.value = list;
-              deviceList.value = list.map((item) => {
-                const imei = item.getString("imei", "");
-                const rawDeviceName = item.getString("deviceName", "");
-                const deviceName = rawDeviceName != "" ? rawDeviceName : imei != "" ? imei : "未命名设备";
-                return new Device({
-                  name: deviceName,
-                  deviceName,
-                  value: imei,
-                  imei,
-                  deptId: item.getString("companyId", ""),
-                  deviceId: item.getString("deviceId", ""),
-                  iccid: item.getString("iccid", ""),
-                  simMerchant: item.getString("simMerchant", ""),
-                  connectionStatus: item.getString("connectionStatus", ""),
-                  carType: item.getString("carType", ""),
-                  plateNo: item.getString("plateNo", ""),
-                  latitude: item.getNumber("latitude", 0),
-                  longitude: item.getNumber("longitude", 0)
-                });
-              });
-              const savedDevice = getSavedSelectedDevice();
-              const savedIndex = getSavedSelectedDeviceIndex();
-              let selectedDevice = null;
-              let selectedIdx = -1;
-              if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-                selectedDevice = deviceList.value[savedIndex];
-                selectedIdx = savedIndex;
-              }
-              if (selectedDevice == null && savedDevice != null && savedDevice.imei != "") {
-                selectedDevice = UTS.arrayFind(deviceList.value, (device) => {
-                  return device.imei == savedDevice.imei || device.value == savedDevice.imei;
-                });
-                if (selectedDevice) {
-                  selectedIdx = deviceList.value.indexOf(selectedDevice);
-                } else {
-                  clearSavedSelectedDevice();
-                  clearSavedSelectedDeviceIndex();
-                }
-              }
-              if (!selectedDevice && deviceList.value.length > 0) {
-                selectedDevice = deviceList.value[0];
-                selectedIdx = 0;
-                saveSelectedDevice(selectedDevice);
-                saveSelectedDeviceIndex(0);
-                uni.__log__("log", "at pages/index/index.uvue:894", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
-              }
-              if (selectedDevice != null) {
-                const device = selectedDevice;
-                const deviceName = device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : "未命名设备";
-                currentCarName.value = deviceName;
-                currentCarImei.value = device.imei != "" ? device.imei : device.value;
-                currentCarDeptId.value = device.deptId;
-                currentCarDeviceId.value = device.deviceId;
-                currentCarIccId.value = device.iccid;
-                currentCarSimMerchant.value = device.simMerchant;
-                currentCarConnectionStatus.value = device.connectionStatus;
-                currentCarCarType.value = device.carType;
-                currentCarPlateNo.value = device.plateNo;
-                center.latitude = device.latitude;
-                center.longitude = device.longitude;
-                if (selectedIdx != -1) {
-                  pickerDefaultIndex.value = [selectedIdx];
-                }
-                yield loadDeviceDetail(device.deviceId);
-                yield loadDevicePos(new UTSJSONObject({
-                  deviceId: device.deviceId,
-                  deviceids: device.imei != "" ? device.imei : device.value
-                }));
-                yield loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
-              }
-            } else {
-              showAppToast({
-                title: "暂无车辆数据",
-                icon: "none"
-              });
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:932", "加载车辆列表失败", error);
-            showAppToast({
-              title: "加载失败，请下拉重试",
-              icon: "none"
-            });
-          }
-        });
-      };
-      const totalTrips = vue.computed(() => {
-        return tripData.value.length;
-      });
-      const refreshLocation = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!currentCarDeviceId.value) {
-            showAppToast({
-              title: "请先选择车辆",
-              icon: "none"
-            });
-            return Promise.resolve(null);
-          }
-          uni.showLoading(new UTSJSONObject({
-            title: "刷新位置中...",
-            mask: true
-          }));
-          try {
-            yield loadDeviceList();
-          } catch (error) {
-            uni.__log__("error", "at pages/index/index.uvue:961", "刷新位置失败", error);
-            showAppToast({
-              title: "刷新失败",
-              icon: "none"
-            });
-          } finally {
-            uni.hideLoading();
-          }
-        });
-      };
-      function checkToken() {
-        const token = uni.getStorageSync("token");
-        return token != null && token.toString() != "";
-      }
-      function isLogin() {
-        if (!checkToken()) {
-          showAppToast({
-            title: "请先登录",
-            icon: "none"
-          });
-          return false;
-        }
-        return true;
-      }
-      const toRecordDetail = () => {
-        if (!isLogin())
-          return null;
-        uni.navigateTo({
-          url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
-          fail: (err) => {
-            if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:993", "跳转轨迹详情失败:", err);
-          }
-        });
-      };
-      const toDeviceList = () => {
-        uni.__log__("log", "at pages/index/index.uvue:1000", "toDeviceList");
-        if (!isLogin())
-          return null;
-        uni.navigateTo({
-          url: "/pages/deviceList/deviceList"
-        });
-      };
-      const toDeviceDetail = (e = null) => {
-        if (!isLogin())
-          return null;
-        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
-          showAppToast({
-            title: "请先选择车辆",
-            icon: "none"
-          });
-          return null;
-        }
-        uni.navigateTo({
-          url: "/pages/carInfoDetail/carInfoDetail?imei=".concat(currentCarImei.value, "&deptId=").concat(currentCarDeptId.value, "&deviceId=").concat(currentCarDeviceId.value)
-        });
-      };
-      const toAdd = () => {
-        if (!isLogin())
-          return null;
-        uni.navigateTo({
-          url: "/pages/addCar/addCar",
-          fail: (err) => {
-            if (err.errMsg.indexOf("locked") < 0)
-              uni.__log__("error", "at pages/index/index.uvue:1028", "跳转添加设备失败:", err);
-          }
-        });
-      };
-      const toMsgCenter = () => {
-        if (!isLogin())
-          return null;
-        uni.switchTab({
-          url: "/pages/message/message"
-        });
-      };
-      const toFindCar = () => {
-        if (!isLogin())
-          return null;
-        if (positionState.value != "available") {
-          showAppToast({
-            title: positionMessage.value || "暂无有效车辆位置",
-            icon: "none"
-          });
-          return null;
-        }
-        openLocation(new OpenLocationParams({
-          latitude: center.latitude,
-          longitude: center.longitude,
-          name: currentCarName.value
-        }));
-      };
-      const toFence = () => {
-        if (!isLogin())
-          return null;
-        uni.navigateTo({
-          url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
-        });
-      };
-      const contactCustomerService = () => {
-        showAppToast({
-          title: "请在微信小程序中联系客服",
-          icon: "none"
-        });
-      };
-      const needRefresh = vue.ref(false);
-      const toPay = (iccid, simMerchant) => {
-        if (!isLogin())
-          return null;
-        if (simMerchant.toLowerCase() == "zddx") {
-          iccid = iccid.substring(0, iccid.length - 1);
-        }
-        needRefresh.value = true;
-        uni.__log__("log", "at pages/index/index.uvue:1116", "iccid", iccid);
-        needRefresh.value = false;
-        showAppToast({
-          title: "请在微信小程序中完成充值",
-          icon: "none",
-          duration: 2e3,
-          mask: true
-        });
-      };
-      const gotoLogin = () => {
-        uni.navigateTo({
-          url: "/pages/login/login"
-        });
-      };
-      function unbindCurrentDevice() {
-        return __awaiter(this, void 0, void 0, function* () {
-          const result = yield delDevice(currentCarImei.value);
-          if (result.code == 0) {
-            showAppToast({
-              title: "解绑成功",
-              icon: "none"
-            });
-            clearSavedSelectedDevice();
-            clearSavedSelectedDeviceIndex();
-          } else {
-            showAppToast({
-              title: "解绑失败",
-              icon: "error"
-            });
-          }
-          yield loadDeviceList();
-        });
-      }
-      const unbindDevice = () => {
-        if (!isLogin())
-          return null;
-        showAppModal(new UTSJSONObject({
-          title: "解绑车辆",
-          content: "确定解绑当前车辆吗？",
-          success: (res) => {
-            if (res.confirm) {
-              void unbindCurrentDevice();
-            }
-          }
-        }));
-      };
-      vue.onShow(() => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (checkToken()) {
-            const needRefresh_1 = uni.getStorageSync("needRefreshHome");
-            if (needRefresh_1) {
-              yield loadDeviceList();
-              uni.removeStorageSync("needRefreshHome");
-            }
-          }
-        });
-      });
-      const handleReload = () => {
-        if (!isLogin())
-          return null;
-        loadDeviceList();
-      };
-      vue.onLoad(() => {
-        uni.hideTabBar();
-        initDimensions();
-        if (checkToken()) {
-          loadDeviceList();
-        }
-      });
-      return (_ctx = null, _cache = null) => {
-        var _a;
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
-        const _component_map = vue.resolveComponent("map");
-        const _component_i_picker = resolveEasycom(vue.resolveDynamicComponent("i-picker"), __easycom_2$4);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("scroll-view", new UTSJSONObject({
-            class: "container",
-            "scroll-y": "true",
-            "show-scrollbar": false
-          }), [
-            vue.createElementVNode("view", new UTSJSONObject({ class: "page-bg" }), [
-              vue.createElementVNode("view", new UTSJSONObject({
-                class: "top",
-                style: vue.normalizeStyle({ paddingTop: statusBarHeight.value + 10 + "px" })
-              }), [
-                vue.createElementVNode("view", new UTSJSONObject({ class: "device-car" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "current-car" }), [
-                    checkToken() ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
-                      currentCarName.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                        key: 0,
-                        class: "car-id",
-                        onClick: handlePicker
-                      }), vue.toDisplayString((_a = currentCarName.value) !== null && _a !== void 0 ? _a : "加载中…"), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                        key: 1,
-                        class: "car-id"
-                      }), "暂无设备"))
-                    ])) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                      key: 1,
-                      class: "login",
-                      onClick: gotoLogin
-                    }), "点击登录!")),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      name: "/static/right-bottom.png",
-                      fontSize: "7"
-                    }))
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "nav-tools" }), [
-                    vue.createCommentVNode("", true),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      name: "/static/reload.png",
-                      fontSize: "18",
-                      onClick: handleReload
-                    })),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      class: "nav-tool-spacing",
-                      name: "/static/maps.png",
-                      fontSize: "20",
-                      onClick: toDeviceList
-                    })),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "nav-tool-spacing nav-tool-add",
-                      onClick: toAdd
-                    }), [
-                      vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_1$2,
-                        mode: "aspectFit",
-                        class: "nav-tool-add-image"
-                      }))
-                    ])
-                  ])
-                ]),
-                safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 0,
-                  class: "device-info"
-                }), [
-                  safeDeviceDetail.value.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createBlock(_component_i_line_progress, new UTSJSONObject({
-                    key: 0,
-                    percent: safeDeviceDetail.value.deviceStatus.batteryPercent
-                  }), null, 8, ["percent"])) : vue.createCommentVNode("", true),
-                  safeDeviceDetail.value.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 1,
-                    class: "info"
-                  }), "电量: " + vue.toDisplayString(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)) : vue.createCommentVNode("", true),
-                  safeDeviceDetail.value.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 2,
-                    class: "info"
-                  }), "电压: " + vue.toDisplayString(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)) : vue.createCommentVNode("", true)
-                ])) : vue.createCommentVNode("", true),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
-                  vue.createElementVNode("image", new UTSJSONObject({
-                    src: _imports_2$2,
-                    mode: "aspectFit",
-                    class: "banner-image"
-                  }))
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "car-state" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "设备状态"),
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: vue.normalizeClass(["state-value", new UTSJSONObject({ "online": safeDeviceDetail.value.connectionStatus == "online" })])
-                    }), vue.toDisplayString(safeDeviceDetail.value.connectionStatus == "online" ? "在线" : "离线"), 3)
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "最后定位"),
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-value" }), vue.toDisplayString(devicePositionUpdateTime.value), 1)
-                  ])
-                ])
-              ], 4),
-              vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
-                vue.createElementVNode("view", new UTSJSONObject({ class: "map-box" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "map-header" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "map-title" }), "车辆定位"),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "map-refresh-wrap",
-                      onClick: refreshLocation
-                    }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-refresh" }), "刷新位置")
-                    ])
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
-                    vue.createVNode(_component_map, new UTSJSONObject({
-                      id: "myMap",
-                      latitude: center.latitude,
-                      longitude: center.longitude,
-                      scale: mapScale.value,
-                      style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
-                      "show-location": true,
-                      "enable-traffic": true,
-                      "enable-overlooking": true,
-                      "enable-building": true,
-                      "enable-3D": false,
-                      markers: markers.value
-                    }), null, 8, ["latitude", "longitude", "scale", "markers"]),
-                    positionState.value != "available" ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                      key: 0,
-                      class: "map-status"
-                    }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-status-text" }), vue.toDisplayString(positionMessage.value), 1),
-                      positionState.value != "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                        key: 0,
-                        class: "map-status-retry",
-                        onClick: refreshLocation
-                      }), "重新获取")) : vue.createCommentVNode("", true)
-                    ])) : vue.createCommentVNode("", true)
-                  ])
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "mile-record" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "record-header" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "record-title" }), "轨迹记录"),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "record-desc-wrap",
-                      onClick: toRecordDetail
-                    }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "record-desc" }), "更多轨迹")
-                    ])
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "ring-container" }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "ring-item" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-bg green" }), [
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-left" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--track" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-right" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-right" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-left" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ])
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-text" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "unit" }), "条"),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "num" }), vue.toDisplayString(totalTrips.value), 1),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "label" }), "今日轨迹")
-                      ])
-                    ]),
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "ring-item" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-bg orange" }), [
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-left" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--track" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-right" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-right" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ]),
-                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-left" }), [
-                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
-                        ])
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-text" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "unit" }), "km"),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "num" }), vue.toDisplayString((totalMileage.value / 1e3).toFixed(2)), 1),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "label" }), "今日里程")
-                      ])
-                    ])
-                  ])
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "device-list" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "device-item",
-                    onClick: toDeviceDetail
-                  }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-device" }), [
-                        vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_3$1,
-                          mode: "aspectFill",
-                          class: "icon-image"
-                        }))
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "设备详情"),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "查看设备更多详情")
-                      ])
-                    ]),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      name: "/static/arrow-right.png",
-                      fontSize: "15"
-                    }))
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "device-item",
-                    onClick: toFindCar
-                  }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-car" }), [
-                        vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_4,
-                          mode: "aspectFill",
-                          class: "icon-image"
-                        }))
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "一键寻车"),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "点击立即寻找车辆位置")
-                      ])
-                    ]),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      name: "/static/arrow-right.png",
-                      fontSize: "15"
-                    }))
-                  ]),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "device-item",
-                    onClick: toFence
-                  }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-fence" }), [
-                        vue.createElementVNode("image", new UTSJSONObject({
-                          src: _imports_5,
-                          mode: "aspectFill",
-                          class: "icon-image"
-                        }))
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "电子围栏"),
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "点击去设置或者查看电子围栏")
-                      ])
-                    ]),
-                    vue.createVNode(_component_i_icon, new UTSJSONObject({
-                      name: "/static/arrow-right.png",
-                      fontSize: "15"
-                    }))
-                  ])
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "service" }), [
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "service-header" }), "服务中心"),
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "service-content" }), [
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "service-item",
-                      onClick: toMsgCenter
-                    }), [
-                      vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_6,
-                        mode: "aspectFit",
-                        class: "icon-image"
-                      })),
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "警报消息")
-                    ]),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "service-item",
-                      onClick: _cache[0] || (_cache[0] = ($event = null) => {
-                        return toPay(currentCarIccId.value, currentCarSimMerchant.value);
-                      })
-                    }), [
-                      vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_7,
-                        mode: "aspectFit",
-                        class: "icon-image"
-                      })),
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "一键续费")
-                    ]),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "service-item",
-                      onClick: contactCustomerService
-                    }), [
-                      vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_8,
-                        mode: "aspectFit",
-                        class: "icon-image"
-                      })),
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "在线客服")
-                    ]),
-                    vue.createElementVNode("view", new UTSJSONObject({
-                      class: "service-item",
-                      onClick: unbindDevice
-                    }), [
-                      vue.createElementVNode("image", new UTSJSONObject({
-                        src: _imports_9,
-                        mode: "aspectFit",
-                        class: "icon-image"
-                      })),
-                      vue.createElementVNode("text", new UTSJSONObject({
-                        class: "item-title",
-                        style: new UTSJSONObject({ "color": "#d81e06" })
-                      }), "删除设备")
-                    ])
-                  ])
-                ])
-              ])
-            ]),
-            showPicker.value ? (vue.openBlock(), vue.createBlock(_component_i_picker, new UTSJSONObject({
-              key: pickerKey.value,
-              show: showPicker.value,
-              columns: pickerColumns.value,
-              defaultIndex: pickerDefaultIndex.value,
-              visibleItemCount: 5,
-              onConfirm: handleConfirm,
-              onCancel: closePicker,
-              onClose: closePicker
-            }), null, 8, ["show", "columns", "defaultIndex"])) : vue.createCommentVNode("", true)
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$G = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "36rpx", "height": "36rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["styles", [_style_0$G]]]);
-  const _imports_0$3 = "/static/back.png";
-  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
-    __name: "custom-navBar",
-    props: {
-      title: String,
-      showBack: { type: Boolean, default: true },
-      backText: { type: String, default: "" },
-      showCapsule: { type: Boolean, default: true },
-      backgroundColor: { type: String, default: "#f1f1f1" },
-      textColor: { type: String, default: "#000000" },
-      isIcon: { type: Boolean, default: true },
-      Icon: { type: String, default: "plus-circle" },
-      rightText: { type: String, default: "" },
-      isShowStyle: { type: Boolean, default: false },
-      iconColor: { type: String, default: "#606266" }
-    },
-    emits: ["back", "capsuleClick"],
-    setup(__props, _a) {
-      var __emit = _a.emit;
-      const emit = __emit;
-      const statusBarHeight = vue.ref(20);
-      const navBarHeight = vue.ref(44);
-      vue.ref(new UTSJSONObject({
-        top: 4,
-        right: 10,
-        width: 87,
-        height: 32
-      }));
-      const initDimensions = () => {
-        const systemInfo = uni.getSystemInfoSync();
-        statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
-      };
-      const handleCapsuleClick = () => {
-        emit("capsuleClick", "menu");
-      };
-      const handleBack = () => {
-        const pages = getCurrentPages();
-        if (pages.length > 1) {
-          uni.navigateBack();
-        } else {
-          uni.switchTab({ url: "/pages/index/index" });
-        }
-        emit("back");
-      };
-      vue.onMounted(initDimensions);
-      return (_ctx = null, _cache = null) => {
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("view", new UTSJSONObject({
-            style: vue.normalizeStyle(__props.isShowStyle ? { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1", position: "fixed", width: "100%", letf: 0, top: 0, "z-index": "100" } : { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1" })
-          }), null, 4),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: "navbar",
-            style: vue.normalizeStyle(__props.isShowStyle ? {
-              height: vue.unref(navBarHeight) + "px",
-              background: __props.backgroundColor,
-              position: "fixed",
-              width: "100%",
-              letf: "0",
-              top: vue.unref(statusBarHeight) + "px",
-              "z-index": "100"
-            } : {
-              height: vue.unref(navBarHeight) + "px",
-              background: __props.backgroundColor
-            })
-          }), [
-            vue.createElementVNode("view", new UTSJSONObject({ class: "back-btn" }), [
-              __props.showBack ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
-                key: 0,
-                src: _imports_0$3,
-                mode: "aspectFit",
-                class: "icon",
-                onClick: handleBack
-              }))) : vue.createCommentVNode("", true)
-            ]),
-            vue.createElementVNode("text", new UTSJSONObject({
-              class: "title",
-              style: vue.normalizeStyle({ color: __props.textColor, "line-height": vue.unref(navBarHeight) + "px" })
-            }), [
-              vue.renderSlot(_ctx.$slots, "title", new UTSJSONObject({}), () => {
-                return [
-                  vue.createTextVNode(vue.toDisplayString(__props.title), 1)
-                ];
-              })
-            ], 4),
-            vue.createElementVNode("view", new UTSJSONObject({
-              class: "capsule",
-              style: new UTSJSONObject({
-                right: "10rpx"
-              })
-            }), [
-              vue.createElementVNode("view", new UTSJSONObject({ class: "capsule-item" }), [
-                __props.showCapsule ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 0,
-                  onClick: handleCapsuleClick
-                }), [
-                  __props.isIcon ? (vue.openBlock(), vue.createBlock(_component_i_icon, new UTSJSONObject({
-                    key: 0,
-                    name: __props.Icon,
-                    fontSize: "20"
-                  }), null, 8, ["name"])) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 1 }), vue.toDisplayString(__props.rightText), 1))
-                ])) : vue.createCommentVNode("", true)
-              ])
-            ])
-          ], 4)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$F = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
-  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$F]]]);
-  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
-    show: { type: Boolean, default: false },
-    title: { type: String, default: "" },
-    content: { type: String, default: "" },
-    confirmText: { type: String, default: "确认" },
-    cancelText: { type: String, default: "取消" },
-    showConfirmButton: { type: Boolean, default: true },
-    showCancelButton: { type: Boolean, default: false },
-    confirmColor: { type: String, default: "#2979ff" },
-    cancelColor: { type: String, default: "#606266" },
-    duration: { type: Number, default: 200 },
-    buttonReverse: { type: Boolean, default: false },
-    zoom: { type: Boolean, default: true },
-    zIndex: { type: Number, default: 10075 },
-    asyncClose: { type: Boolean, default: false },
-    closeable: { type: Boolean, default: false },
-    closeOnMask: { type: Boolean, default: false },
-    negativeTop: { type: String, default: "0px" },
-    width: { type: String, default: "320px" },
-    confirmButtonShape: { type: String, default: "100px" },
-    round: { type: String, default: "6px" },
-    buttonModel: { type: String, default: "text" },
-    buttonRadius: { type: String, default: "100px" },
-    confirmBgColor: { type: String, default: "" },
-    cancelBgColor: { type: String, default: "" },
-    customStyle: { type: String, default: "" }
-  }, emits: ["confirm", "cancel", "close", "update:show"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function formatMs(value) {
-      return value.toString() + "ms";
-    }
-    function formatSize(value) {
-      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-        return value;
-      }
-      return value + "px";
-    }
-    function stringifyStyle(value) {
-      if (value.length == 0)
-        return "";
-      return value.endsWith(";") ? value : value + ";";
-    }
-    function animationDuration() {
-      return props.duration;
-    }
-    const opened = vue.ref(props.show);
-    const active = vue.ref(props.show);
-    const loading = vue.ref(false);
-    let closeTimer = 0;
-    const maskStyle = vue.computed(() => {
-      return "z-index:" + props.zIndex.toString() + ";opacity:" + (props.show || active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
-    });
-    const visibleMaskStyle = vue.computed(() => {
-      if (props.show && !opened.value) {
-        return "z-index:" + props.zIndex.toString() + ";opacity:1;transition-duration:" + formatMs(props.duration) + ";";
-      }
-      return maskStyle.value;
-    });
-    const modalClass = vue.computed(() => {
-      const classes = ["i-modal"];
-      return classes.join(" ");
-    });
-    const modalStyle = vue.computed(() => {
-      let style = "width:" + formatSize(props.width) + ";";
-      style = style + "border-radius:" + formatSize(props.round) + ";";
-      style = style + "transition-duration:" + formatMs(props.duration) + ";";
-      const top = formatSize(props.negativeTop);
-      const scaleValue = props.zoom ? props.show || active.value ? "1" : "0.86" : "1";
-      const translateValue = top != "0px" ? "-" + top : "0px";
-      style = style + "opacity:" + (props.show || active.value ? "1" : "0") + ";";
-      style = style + "transform:translateY(" + translateValue + ") scale(" + scaleValue + ");";
-      style = style + stringifyStyle(props.customStyle);
-      return style;
-    });
-    const visibleModalStyle = vue.computed(() => {
-      return modalStyle.value;
-    });
-    const confirmButtonClass = vue.computed(() => {
-      const classes = ["i-modal__button", "i-modal__button--confirm"];
-      if (props.buttonModel == "button")
-        classes.push("i-modal__button--model-button");
-      if (props.confirmButtonShape == "square")
-        classes.push("i-modal__button--square");
-      return classes.join(" ");
-    });
-    const cancelButtonClass = vue.computed(() => {
-      const classes = ["i-modal__button", "i-modal__button--cancel"];
-      if (props.buttonModel == "button")
-        classes.push("i-modal__button--model-button");
-      return classes.join(" ");
-    });
-    const confirmTextStyle = vue.computed(() => {
-      return "color:" + props.confirmColor + ";";
-    });
-    const cancelTextStyle = vue.computed(() => {
-      return "color:" + props.cancelColor + ";";
-    });
-    const confirmButtonStyle = vue.computed(() => {
-      if (props.buttonModel != "button")
-        return "";
-      let style = "border-radius:" + formatSize(props.buttonRadius) + ";";
-      if (props.confirmBgColor.length > 0)
-        style = style + "background-color:" + props.confirmBgColor + ";";
-      return style;
-    });
-    const cancelButtonStyle = vue.computed(() => {
-      if (props.buttonModel != "button")
-        return "";
-      let style = "border-radius:" + formatSize(props.buttonRadius) + ";";
-      if (props.cancelBgColor.length > 0)
-        style = style + "background-color:" + props.cancelBgColor + ";";
-      return style;
-    });
-    function clearCloseTimer() {
-      if (closeTimer > 0) {
-        clearTimeout(closeTimer);
-        closeTimer = 0;
-      }
-    }
-    function openPanel() {
-      clearCloseTimer();
-      opened.value = true;
-      setTimeout(() => {
-        active.value = true;
-      }, 20);
-    }
-    function closePanel(shouldEmitUpdate) {
-      clearCloseTimer();
-      active.value = false;
-      loading.value = false;
-      closeTimer = setTimeout(() => {
-        opened.value = false;
-        closeTimer = 0;
-        if (shouldEmitUpdate)
-          emit("update:show", false);
-      }, animationDuration());
-    }
-    function open() {
-      openPanel();
-      emit("update:show", true);
-    }
-    function close() {
-      closePanel(true);
-    }
-    function confirm() {
-      if (loading.value)
-        return null;
-      emit("confirm");
-      if (props.asyncClose) {
-        loading.value = true;
-        return null;
-      }
-      close();
-    }
-    function cancel() {
-      emit("cancel");
-      closePanel(true);
-    }
-    function closeByIcon() {
-      emit("close");
-      closePanel(true);
-    }
-    function handleOverlayClick() {
-      if (!props.closeOnMask)
-        return null;
-      emit("close");
-      closePanel(true);
-    }
-    __expose({
-      open,
-      close
-    });
-    return (_ctx = null, _cache = null) => {
-      return __props.show || opened.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        key: 0,
-        class: "i-modal__mask",
-        style: vue.normalizeStyle(visibleMaskStyle.value),
-        onClick: handleOverlayClick
-      }), [
-        vue.createElementVNode("view", new UTSJSONObject({
-          class: vue.normalizeClass(modalClass.value),
-          style: vue.normalizeStyle(visibleModalStyle.value),
-          onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }), [
-          __props.closeable ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 0,
-            class: "i-modal__close",
-            onClick: closeByIcon
-          }), [
-            vue.createElementVNode("text", new UTSJSONObject({ class: "i-modal__close-text" }), "×")
-          ])) : vue.createCommentVNode("", true),
-          __props.title.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 1,
-            class: "i-modal__title"
-          }), vue.toDisplayString(__props.title), 1)) : vue.createCommentVNode("", true),
-          vue.createElementVNode("view", new UTSJSONObject({ class: "i-modal__content-wrap" }), [
-            vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({}), () => {
-              return [
-                vue.createElementVNode("text", new UTSJSONObject({ class: "i-modal__content" }), vue.toDisplayString(__props.content), 1)
-              ];
-            })
-          ]),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: vue.normalizeClass(["i-modal__footer", __props.buttonModel == "button" ? "i-modal__footer--button" : ""])
-          }), [
-            __props.buttonReverse ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "i-modal__footer-inner"
-            }), [
-              vue.renderSlot(_ctx.$slots, "confirmButton", new UTSJSONObject({}), () => {
-                return [
-                  __props.showConfirmButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 0,
-                    class: vue.normalizeClass(confirmButtonClass.value),
-                    style: vue.normalizeStyle(confirmButtonStyle.value),
-                    onClick: confirm
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "i-modal__confirm-text",
-                      style: vue.normalizeStyle(confirmTextStyle.value)
-                    }), vue.toDisplayString(loading.value ? "..." : __props.confirmText), 5)
-                  ], 6)) : vue.createCommentVNode("", true)
-                ];
-              }),
-              __props.showCancelButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                key: 0,
-                class: vue.normalizeClass(cancelButtonClass.value),
-                style: vue.normalizeStyle(cancelButtonStyle.value),
-                onClick: cancel
-              }), [
-                vue.createElementVNode("text", new UTSJSONObject({
-                  class: "i-modal__cancel-text",
-                  style: vue.normalizeStyle(cancelTextStyle.value)
-                }), vue.toDisplayString(__props.cancelText), 5)
-              ], 6)) : vue.createCommentVNode("", true)
-            ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 1,
-              class: "i-modal__footer-inner"
-            }), [
-              __props.showCancelButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                key: 0,
-                class: vue.normalizeClass(cancelButtonClass.value),
-                style: vue.normalizeStyle(cancelButtonStyle.value),
-                onClick: cancel
-              }), [
-                vue.createElementVNode("text", new UTSJSONObject({
-                  class: "i-modal__cancel-text",
-                  style: vue.normalizeStyle(cancelTextStyle.value)
-                }), vue.toDisplayString(__props.cancelText), 5)
-              ], 6)) : vue.createCommentVNode("", true),
-              vue.renderSlot(_ctx.$slots, "confirmButton", new UTSJSONObject({}), () => {
-                return [
-                  __props.showConfirmButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 0,
-                    class: vue.normalizeClass(confirmButtonClass.value),
-                    style: vue.normalizeStyle(confirmButtonStyle.value),
-                    onClick: confirm
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "i-modal__confirm-text",
-                      style: vue.normalizeStyle(confirmTextStyle.value)
-                    }), vue.toDisplayString(loading.value ? "..." : __props.confirmText), 5)
-                  ], 6)) : vue.createCommentVNode("", true)
-                ];
-              })
-            ]))
-          ], 2)
-        ], 6)
-      ], 4)) : vue.createCommentVNode("", true);
-    };
-  } }));
-  const _style_0$E = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$E]]]);
-  class ModalInstance extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            open: { type: "Unknown", optional: false },
-            close: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = ModalInstance.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.open = this.__props__.open;
-      this.close = this.__props__.close;
-      delete this.__props__;
-    }
-  }
-  class MessageData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            list: { type: "Unknown", optional: false },
-            total: { type: Number, optional: false },
-            totalPage: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MessageData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.list = this.__props__.list;
-      this.total = this.__props__.total;
-      this.totalPage = this.__props__.totalPage;
-      delete this.__props__;
-    }
-  }
-  class MessageResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: MessageData, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MessageResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent({
-    __name: "message",
-    setup(__props) {
-      const modal = vue.ref(false);
-      const modalContent = vue.ref(new UTSJSONObject({}));
-      const refresherTriggered = vue.ref(false);
-      const msgList = vue.ref([]);
-      const currPage = vue.ref(1);
-      const pageSize = vue.ref(10);
-      const totalPage = vue.ref(1);
-      const loadStatus = vue.ref("loadmore");
-      const isLoading = vue.ref(false);
-      const hasNewMessages = vue.ref(false);
-      const newMessageCount = vue.ref(0);
-      const lastUpdateTime = vue.ref((/* @__PURE__ */ new Date()).getTime());
-      const Login = vue.ref(false);
-      const messageScrollViewportHeight = vue.ref(0);
-      const isNearMessageListBottom = vue.ref(false);
-      let checkTimer = 0;
-      const isPageActive = vue.ref(false);
-      function stopNewMessageCheck() {
-        if (checkTimer > 0) {
-          uni.__log__("log", "at pages/message/message.uvue:109", "停止定时消息检查");
-          clearInterval(checkTimer);
-          checkTimer = 0;
-        }
-      }
-      function vibrateAlert() {
-        for (let i = 0; i < 3; i++) {
-          uni.vibrateLong(new UTSJSONObject({}));
-        }
-      }
-      function prependLatestMessages() {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value)
-            return 0;
-          isLoading.value = true;
-          try {
-            const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
-            if (res.code != 0 || res.data.list == null)
-              return 0;
-            const existingIds = /* @__PURE__ */ new Set();
-            msgList.value.forEach((message) => {
-              const messageId = message.getString("messageId", "");
-              if (messageId != "")
-                existingIds.add(messageId);
-            });
-            const latestMessages = [];
-            res.data.list.forEach((message) => {
-              const messageId = message.getString("messageId", "");
-              if (messageId != "" && !existingIds.has(messageId)) {
-                existingIds.add(messageId);
-                latestMessages.push(message);
-              }
-            });
-            if (latestMessages.length > 0) {
-              msgList.value = [...latestMessages, ...msgList.value];
-              const newestCreateTime = latestMessages[0].getString("createTime", "");
-              if (newestCreateTime != "") {
-                const newestTime = parseLocalDateTime(newestCreateTime);
-                if (newestTime != null)
-                  lastUpdateTime.value = newestTime;
-              }
-            }
-            return latestMessages.length;
-          } catch (error) {
-            uni.__log__("error", "at pages/message/message.uvue:154", "检查新消息失败:", error);
-            return 0;
-          } finally {
-            isLoading.value = false;
-          }
-        });
-      }
-      function checkNewMessages() {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!isPageActive.value || isLoading.value)
-            return Promise.resolve(null);
-          const insertedCount = yield prependLatestMessages();
-          if (insertedCount > 0) {
-            hasNewMessages.value = true;
-            newMessageCount.value += insertedCount;
-            vibrateAlert();
-          }
-        });
-      }
-      function startNewMessageCheck() {
-        if (checkTimer > 0) {
-          stopNewMessageCheck();
-        }
-        uni.__log__("log", "at pages/message/message.uvue:178", "启动定时消息检查");
-        checkTimer = setInterval(() => {
-          if (isPageActive.value) {
-            uni.__log__("log", "at pages/message/message.uvue:182", "定时检查新消息...");
-            checkNewMessages();
-          }
-        }, 1e4);
-      }
-      function loadMsgList(isInit = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value)
-            return Promise.resolve(null);
-          if (isInit) {
-            currPage.value = 1;
-            msgList.value = [];
-            loadStatus.value = "loadmore";
-            isNearMessageListBottom.value = false;
-          }
-          isLoading.value = true;
-          try {
-            if (!isInit)
-              loadStatus.value = "loading";
-            const res = yield getUserMsgList(new UTSJSONObject({
-              page: currPage.value,
-              pageSize: pageSize.value
-            }));
-            if (res.code != 0) {
-              loadStatus.value = "loadmore";
-              return Promise.resolve(null);
-            }
-            const data = res.data;
-            const totalPages = data.totalPage > 0 ? data.totalPage : 1;
-            totalPage.value = totalPages;
-            const newData = data.list;
-            if (isInit) {
-              msgList.value = newData;
-              if (newData.length > 0)
-                lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
-            } else {
-              newData.forEach((item) => {
-                const messageId = item.getString("messageId", "");
-                const exists = msgList.value.some((existing) => {
-                  return existing.getString("messageId", "") == messageId;
-                });
-                if (!exists)
-                  msgList.value.push(item);
-              });
-            }
-            loadStatus.value = currPage.value >= totalPage.value ? "nomore" : "loadmore";
-            if (isInit) {
-              hasNewMessages.value = false;
-              newMessageCount.value = 0;
-            }
-          } catch (error) {
-            loadStatus.value = "loadmore";
-            uni.__log__("error", "at pages/message/message.uvue:230", "请求异常:", error);
-          } finally {
-            isLoading.value = false;
-          }
-        });
-      }
-      function loadNewMessages() {
-        return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/message/message.uvue:238", "加载新消息");
-          yield prependLatestMessages();
-          hasNewMessages.value = false;
-          newMessageCount.value = 0;
-          uni.__log__("log", "at pages/message/message.uvue:242", "新消息加载完成");
-        });
-      }
-      vue.onLoad(() => {
-        const token = uni.getStorageSync("token");
-        if (token) {
-          Login.value = true;
-          loadMsgList(true);
-        } else {
-          Login.value = false;
-        }
-      });
-      const measureMessageScrollViewport = () => {
-        uni.createSelectorQuery().select("#message-scroll-container").boundingClientRect((rect = null) => {
-          var _a;
-          if (rect == null)
-            return null;
-          const nodeInfo = rect;
-          const height = (_a = nodeInfo.height) !== null && _a !== void 0 ? _a : 0;
-          if (height > 0) {
-            messageScrollViewportHeight.value = height;
-          }
-        }).exec();
-      };
-      function handleItemClick(item) {
-        return __awaiter(this, void 0, void 0, function* () {
-          modalContent.value = item;
-          modal.value = true;
-          if (item.getNumber("status", 0) == 1) {
-            try {
-              const messageId = item.getString("messageId", "");
-              const res = yield setMsgState(messageId);
-              if (res.code == 0 || res.msg == "success") {
-                const index = msgList.value.findIndex((message) => {
-                  return message.getString("messageId", "") == messageId;
-                });
-                if (index != -1) {
-                  msgList.value[index].set("status", 0);
-                  msgList.value = [...msgList.value];
-                }
-              }
-            } catch (error) {
-              uni.__log__("error", "at pages/message/message.uvue:289", "更新状态失败:", error);
-            }
-          }
-        });
-      }
-      function openPendingPushMessage() {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value) {
-            setTimeout(() => {
-              void openPendingPushMessage();
-            }, 150);
-            return Promise.resolve(null);
-          }
-          const messageId = consumePendingMessageId();
-          const shouldRefresh = consumePushStaleFlag();
-          if (messageId == "" && !shouldRefresh)
-            return Promise.resolve(null);
-          yield loadMsgList(true);
-          if (messageId == "")
-            return Promise.resolve(null);
-          const message = UTS.arrayFind(msgList.value, (item) => {
-            return item.getString("messageId", "") == messageId;
-          });
-          if (message != null)
-            yield handleItemClick(message);
-        });
-      }
-      vue.onShow(() => {
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:313", "页面显示 - 启动自动刷新");
-          isPageActive.value = true;
-          measureMessageScrollViewport();
-          startNewMessageCheck();
-          void openPendingPushMessage();
-          checkNewMessages();
-        }
-      });
-      vue.onHide(() => {
-        uni.__log__("log", "at pages/message/message.uvue:325", "页面隐藏 - 停止自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:327", "页面隐藏 - 停止自动刷新");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
-      });
-      vue.onUnload(() => {
-        uni.__log__("log", "at pages/message/message.uvue:335", "页面卸载 - 清理资源");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:337", "页面卸载 - 清理资源");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
-      });
-      vue.onActivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:344", "页面激活 - 启动自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:346", "页面激活 - 启动自动刷新");
-          isPageActive.value = true;
-          startNewMessageCheck();
-          void openPendingPushMessage();
-          checkNewMessages();
-        }
-      });
-      vue.onDeactivated(() => {
-        uni.__log__("log", "at pages/message/message.uvue:356", "页面停用 - 停止自动刷新");
-        if (Login.value) {
-          uni.__log__("log", "at pages/message/message.uvue:358", "页面停用 - 停止自动刷新");
-          isPageActive.value = false;
-          stopNewMessageCheck();
-        }
-      });
-      const onRefresherRefresh = () => {
-        uni.__log__("log", "at pages/message/message.uvue:366", "下拉刷新触发");
-        refresherTriggered.value = true;
-        loadMsgList(true).then(() => {
-          refresherTriggered.value = false;
-        }).catch(() => {
-          refresherTriggered.value = false;
-        });
-      };
-      const loadMore = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
-            if (currPage.value >= totalPage.value) {
-              loadStatus.value = "nomore";
-            }
-            return Promise.resolve(null);
-          }
-          currPage.value++;
-          yield loadMsgList();
-        });
-      };
-      const onScrollToLower = () => {
-        if (loadStatus.value == "loadmore" && !isLoading.value) {
-          loadMore();
-        }
-      };
-      const onMessageScroll = (event) => {
-        const viewportHeight = messageScrollViewportHeight.value;
-        if (viewportHeight <= 0)
-          return null;
-        const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight;
-        const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100;
-        if (isNearBottom && !isNearMessageListBottom.value) {
-          isNearMessageListBottom.value = true;
-          loadMore();
-        } else if (!isNearBottom) {
-          isNearMessageListBottom.value = false;
-        }
-      };
-      const ReadIt = () => {
-        modal.value = false;
-      };
-      const getMessageId = (item, index) => {
-        const messageId = item.getString("messageId", "");
-        return messageId != "" ? messageId : index.toString();
-      };
-      const getMessageCreateTime = (item) => {
-        return item.getString("createTime", "");
-      };
-      const getMessageContent = (item) => {
-        return item.getString("content", "");
-      };
-      const isMessageUnread = (item) => {
-        return item.getNumber("status", 0) == 1;
-      };
-      const getMessageTypeText = (type) => {
-        switch (type) {
-          case 1:
-            return "警告";
-          case 2:
-            return "事件";
-          default:
-            return "通知";
-        }
-      };
-      const getMessageTitle = (item) => {
-        return getMessageTypeText(item.getNumber("messageType", 0)) + " - " + getMessageCreateTime(item);
-      };
-      const formatTime = (timeString) => {
-        if (!timeString)
-          return "";
-        try {
-          const milliseconds = parseLocalDateTime(timeString);
-          if (milliseconds == null)
-            return timeString;
-          const date = new Date(milliseconds);
-          const now = /* @__PURE__ */ new Date();
-          const diff = now.getTime() - date.getTime();
-          const minutes = Math.floor(diff / 6e4);
-          const hours = Math.floor(diff / 36e5);
-          const days = Math.floor(diff / 864e5);
-          if (minutes < 1)
-            return "刚刚";
-          if (minutes < 60)
-            return "".concat(minutes, "分钟前");
-          if (hours < 24)
-            return "".concat(hours, "小时前");
-          if (days < 7)
-            return "".concat(days, "天前");
-          return "".concat(date.getMonth() + 1, "-").concat(date.getDate());
-        } catch (error) {
-          return timeString;
-        }
-      };
-      return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createVNode(_component_custom_navBar, new UTSJSONObject({
-            title: "消息中心",
-            "show-back": true,
-            backgroundColor: "#fff",
-            textColor: "#333",
-            showCapsule: false,
-            isShowStyle: true
-          })),
-          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
-            vue.createElementVNode("scroll-view", new UTSJSONObject({
-              "scroll-y": "true",
-              "show-scrollbar": false,
-              class: "scroll-container",
-              id: "message-scroll-container",
-              "refresher-enabled": "",
-              "refresher-triggered": refresherTriggered.value,
-              "lower-threshold": 100,
-              onRefresherrefresh: onRefresherRefresh,
-              onScrolltolower: onScrollToLower,
-              onScroll: onMessageScroll
-            }), [
-              vue.createElementVNode("view", new UTSJSONObject({ class: "list-box" }), [
-                msgList.value.length == 0 && !isLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 0,
-                  class: "empty-state"
-                }), [
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "empty-state-text" }), "暂无消息")
-                ])) : vue.createCommentVNode("", true),
-                hasNewMessages.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 1,
-                  class: "new-message-tip",
-                  onClick: loadNewMessages
-                }), [
-                  vue.createElementVNode("text", null, "有 " + vue.toDisplayString(newMessageCount.value) + " 条新消息，点击查看", 1)
-                ])) : vue.createCommentVNode("", true),
-                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(msgList.value, (item, index) => {
-                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: getMessageId(item, index),
-                    class: "message-item",
-                    onClick: ($event = null) => {
-                      return handleItemClick(item);
-                    }
-                  }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "message-header" }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "message-title" }), vue.toDisplayString(getMessageTitle(item)), 1),
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "time-text" }), vue.toDisplayString(formatTime(getMessageCreateTime(item))), 1)
-                    ]),
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "message-content-row" }), [
-                      vue.createElementVNode("text", new UTSJSONObject({ class: "message-content" }), vue.toDisplayString(getMessageContent(item)), 1),
-                      isMessageUnread(item) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                        key: 0,
-                        class: "unread-box"
-                      }), [
-                        vue.createElementVNode("text", new UTSJSONObject({ class: "unread-badge" }), "未读")
-                      ])) : vue.createCommentVNode("", true)
-                    ])
-                  ], 8, ["onClick"]);
-                }), 128)),
-                Login.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 2,
-                  class: "load-more"
-                }), [
-                  loadStatus.value == "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                    key: 0,
-                    class: "tips-text"
-                  }), "上拉加载更多")) : loadStatus.value == "nomore" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                    key: 1,
-                    class: "tips-text"
-                  }), "没有更多了")) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                    key: 2,
-                    class: "tips-text"
-                  }), "加载中..."))
-                ])) : vue.createCommentVNode("", true)
-              ])
-            ], 40, ["refresher-triggered"]),
-            vue.createVNode(_component_i_modal, new UTSJSONObject({
-              show: modal.value,
-              title: getMessageTypeText(modalContent.value.getNumber("messageType", 0)),
-              content: modalContent.value.getString("content", ""),
-              onConfirm: ReadIt
-            }), null, 8, ["show", "title", "content"])
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$D = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
-  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["styles", [_style_0$D]]]);
-  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
-    label: {
-      type: String,
-      default: ""
-    },
-    count: {
-      type: Number,
-      default: 0
-    },
-    value: {
-      type: [String, Number],
-      default: ""
-    },
-    type: {
-      type: String,
-      default: "danger"
-    },
-    dot: {
-      type: Boolean,
-      default: true
-    },
-    maxCount: {
-      type: Number,
-      default: 99
-    },
-    max: {
-      type: Number,
-      default: 99
-    },
-    position: {
-      type: String,
-      default: "right"
-    },
-    offset: {
-      type: Array,
-      default() {
-        return [0, 0];
-      }
-    },
-    fontSize: {
-      type: [String, Number],
-      default: "9"
-    },
-    showZero: {
-      type: Boolean,
-      default: false
-    },
-    hidden: {
-      type: Boolean,
-      default: false
-    },
-    bgColor: {
-      type: String,
-      default: "error"
-    },
-    fontColor: {
-      type: String,
-      default: "white"
-    },
-    color: {
-      type: String,
-      default: ""
-    }
-  }, emits: ["click"], setup(__props, _a) {
-    var __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function hasNumberValue() {
-      if (props.value != null && props.value.toString().length > 0)
-        return true;
-      return props.count > 0 || props.showZero;
-    }
-    function effectiveCount() {
-      if (props.value != null && props.value.toString().length > 0) {
-        if (typeof props.value == "number")
-          return props.value;
-        return parseFloat(props.value);
-      }
-      return props.count;
-    }
-    function getMaxCount() {
-      if (props.maxCount != 99)
-        return props.maxCount;
-      return props.max;
-    }
-    function effectiveBgColor() {
-      if (props.bgColor.length > 0)
-        return props.bgColor;
-      return props.type;
-    }
-    function effectiveFontColor() {
-      if (props.color.length > 0)
-        return props.color;
-      return props.fontColor;
-    }
-    function normalizeTheme(value) {
-      const text = value;
-      if (text == "danger")
-        return "error";
-      if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info")
-        return text;
-      return "custom";
-    }
-    function parseColor(value) {
-      const text = value;
-      if (text == "white")
-        return "#ffffff";
-      if (text == "black")
-        return "#000000";
-      if (text == "danger" || text == "error")
-        return "#f56c6c";
-      if (text == "primary")
-        return "#3c9cff";
-      if (text == "success")
-        return "#5ac725";
-      if (text == "warning")
-        return "#f9ae3d";
-      if (text == "info")
-        return "#909399";
-      return text;
-    }
-    function normalizePosition(value) {
-      const text = value;
-      if (text == "rightTop")
-        return "right";
-      if (text == "leftTop")
-        return "left";
-      if (text == "rightBottom")
-        return "bottomRight";
-      if (text == "leftBottom")
-        return "bottomLeft";
-      if (text == "left" || text == "right" || text == "bottomLeft" || text == "bottomRight" || text == "top" || text == "bottom")
-        return text;
-      return "right";
-    }
-    function getOffset(index) {
-      const offset = props.offset;
-      if (offset == null || offset.length <= index)
-        return 0;
-      const value = offset[index];
-      if (typeof value == "number")
-        return value;
-      if (typeof value == "string")
-        return parseFloat(value);
-      return 0;
-    }
-    function positionStyle() {
-      const x = getOffset(0);
-      const y = getOffset(1);
-      const position = normalizePosition(props.position);
-      const edge = 0;
-      if (position == "left")
-        return "left:" + (edge + x) + "px;top:" + (edge + y) + "px;";
-      if (position == "bottomLeft")
-        return "left:" + (edge + x) + "px;bottom:" + (edge - y) + "px;";
-      if (position == "bottomRight")
-        return "right:" + (edge - x) + "px;bottom:" + (edge - y) + "px;";
-      if (position == "top")
-        return "left:50%;top:" + (edge + y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
-      if (position == "bottom")
-        return "left:50%;bottom:" + (edge - y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
-      return "right:" + (edge - x) + "px;top:" + (edge + y) + "px;";
-    }
-    function formatSize(value) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
-        return text;
-      return text + "px";
-    }
-    vue.computed(() => {
-      return props.bgColor;
-    });
-    const showBadge = vue.computed(() => {
-      if (props.hidden)
-        return false;
-      if (props.label.length > 0)
-        return true;
-      if (hasNumberValue()) {
-        if (effectiveCount() == 0 && !props.showZero)
-          return props.dot;
-        return true;
-      }
-      return props.dot;
-    });
-    const displayValue = vue.computed(() => {
-      if (props.label.length > 0)
-        return props.label;
-      const value = effectiveCount();
-      const max = getMaxCount();
-      if (value > max)
-        return max + "+";
-      return value.toString();
-    });
-    const dot = vue.computed(() => {
-      if (props.label.length > 0)
-        return false;
-      if (hasNumberValue()) {
-        if (effectiveCount() == 0 && !props.showZero)
-          return props.dot;
-        return false;
-      }
-      return props.dot;
-    });
-    const rootClass = vue.computed(() => {
-      const classes = ["i-badge"];
-      const position = normalizePosition(props.position);
-      classes.push("i-badge--" + position);
-      if (dot.value)
-        classes.push("i-badge--dot");
-      if (position == "left" || position == "bottomLeft")
-        classes.push("i-badge--left-space");
-      if (dot.value && (position == "left" || position == "bottomLeft")) {
-        classes.push("i-badge--dot-left-space");
-      }
-      if (dot.value && (position == "bottomLeft" || position == "bottomRight" || position == "bottom")) {
-        classes.push("i-badge--dot-bottom");
-      }
-      if (dot.value && position == "top")
-        classes.push("i-badge--dot-top");
-      return classes.join(" ");
-    });
-    const badgeClass = vue.computed(() => {
-      const classes = ["i-badge__mark", "i-badge__mark--" + normalizeTheme(effectiveBgColor())];
-      if (dot.value)
-        classes.push("i-badge__mark--dot");
-      classes.push("i-badge__mark--" + normalizePosition(props.position));
-      return classes.join(" ");
-    });
-    const badgeStyle = vue.computed(() => {
-      let style = positionStyle();
-      const bgColor = parseColor(effectiveBgColor());
-      if (bgColor.length > 0)
-        style = style + "background-color:" + bgColor + ";";
-      return style;
-    });
-    const badgeTextStyle = vue.computed(() => {
-      return "color:" + parseColor(effectiveFontColor()) + ";font-size:" + formatSize(props.fontSize) + ";";
-    });
-    function handleClick() {
-      emit("click", new UTSJSONObject({
-        label: props.label,
-        count: effectiveCount(),
-        value: displayValue.value,
-        dot: dot.value,
-        position: props.position
-      }));
-    }
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: vue.normalizeClass(rootClass.value)
-      }), [
-        vue.renderSlot(_ctx.$slots, "default"),
-        showBadge.value && dot.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: vue.normalizeClass(badgeClass.value),
-          style: vue.normalizeStyle(badgeStyle.value),
-          onClick: handleClick
-        }), null, 6)) : showBadge.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 1,
-          class: vue.normalizeClass(badgeClass.value),
-          style: vue.normalizeStyle(badgeStyle.value),
-          onClick: handleClick
-        }), [
-          vue.createElementVNode("text", new UTSJSONObject({
-            class: "i-badge__text",
-            style: vue.normalizeStyle(badgeTextStyle.value)
-          }), vue.toDisplayString(displayValue.value), 5)
-        ], 6)) : vue.createCommentVNode("", true)
-      ], 2);
-    };
-  } }));
-  const _style_0$C = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
-  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
-  const buttonWidth = 120;
-  const buttonHeight = 200;
-  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent({
-    __name: "userCenter",
-    setup(__props) {
-      const userInfo = vue.ref(new UTSJSONObject({
-        avatar: "/static/avatar.png",
-        nickname: ""
-      }));
-      const carsnumber = vue.ref(0);
-      const Login = vue.ref(false);
-      const version = vue.ref("");
-      const moveX = vue.ref(0);
-      const moveY = vue.ref(0);
-      const windowWidth = vue.ref(0);
-      const windowHeight = vue.ref(0);
-      const loadData = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          const params = new UTSJSONObject({});
-          const res = yield getUserInfo();
-          userInfo.value = {
-            avatar: res.data.getString("avatar", "/static/avatar.png"),
-            nickname: res.data.getString("nickname", "")
-          };
-          const resCars = yield getUserDeviceList(params);
-          carsnumber.value = resCars.data.totalCount;
-        });
-      };
-      vue.onShow(() => {
-        const systemInfo = uni.getSystemInfoSync();
-        windowWidth.value = systemInfo.windowWidth;
-        windowHeight.value = systemInfo.windowHeight;
-        moveX.value = windowWidth.value - buttonWidth - 20;
-        moveY.value = windowHeight.value - buttonHeight - 20;
-        const token = uni.getStorageSync("token");
-        if (token) {
-          Login.value = true;
-          loadData();
-        } else {
-          Login.value = false;
-        }
-      });
-      const contactCustomerService = () => {
-        showAppToast({
-          title: "请在微信小程序中联系人工客服",
-          icon: "none"
-        });
-      };
-      const onMoveChange = (e) => {
-        const detail = e.getJSON("detail");
-        const x = detail != null ? detail.getNumber("x", 0) : 0;
-        const y = detail != null ? detail.getNumber("y", 0) : 0;
-        const maxX = windowWidth.value - buttonWidth;
-        const maxY = windowHeight.value - buttonHeight;
-        if (x < 0 || x > maxX || y < 0 || y > maxY) {
-          moveX.value = Math.max(0, Math.min(maxX, x));
-          moveY.value = Math.max(0, Math.min(maxY, y));
-        }
-      };
-      const userInfoDetail = () => {
-        if (Login.value) {
-          uni.navigateTo({
-            url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
-          });
-        } else {
-          uni.navigateTo({
-            url: "/pages/login/login"
-          });
-        }
-      };
-      const carList = () => {
-        if (Login.value) {
-          uni.navigateTo({
-            url: "/pages/userCenter/carList/carList"
-          });
-        } else {
-          showAppToast({
-            title: "请先登录",
-            icon: "none"
-          });
-        }
-      };
-      const platformRenewal = () => {
-        if (Login.value) {
-          uni.navigateTo({
-            url: "/pages/userCenter/payDeviceList/payDeviceList"
-          });
-        } else {
-          showAppToast({
-            title: "请先登录",
-            icon: "none"
-          });
-        }
-      };
-      return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$3);
-        const _component_movable_view = vue.resolveComponent("movable-view");
-        const _component_movable_area = vue.resolveComponent("movable-area");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
-            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
-              title: "个人中心",
-              "show-back": false,
-              backgroundColor: "#fff",
-              textColor: "#333",
-              showCapsule: false
-            })),
-            vue.createElementVNode("view", new UTSJSONObject({
-              class: "user-info-box",
-              onClick: userInfoDetail
-            }), [
-              vue.createElementVNode("view", new UTSJSONObject({ class: "userinfo" }), [
-                vue.createElementVNode("view", null, [
-                  vue.createVNode(_component_i_icon, new UTSJSONObject({
-                    name: "/static/avatar.png",
-                    fontSize: "40"
-                  }))
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "user-info" }), [
-                  vue.unref(Login) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 0 }), vue.toDisplayString(vue.unref(userInfo).mobile), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 1 }), "点击登录"))
-                ])
-              ]),
-              vue.createVNode(_component_i_icon, new UTSJSONObject({
-                name: "/static/arrow-right.png",
-                fontSize: "15"
-              }))
-            ]),
-            vue.unref(Login) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
-              vue.createElementVNode("view", new UTSJSONObject({
-                class: "list",
-                onClick: carList
-              }), [
-                vue.createElementVNode("view", new UTSJSONObject({ class: "left" }), [
-                  vue.createElementVNode("text", null, "我的车辆"),
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "badge" }), [
-                    vue.createVNode(_component_i_badge, new UTSJSONObject({
-                      type: "danger",
-                      maxCount: "99",
-                      count: vue.unref(carsnumber)
-                    }), null, 8, ["count"])
-                  ])
-                ]),
-                vue.createVNode(_component_i_icon, new UTSJSONObject({
-                  name: "/static/arrow-right.png",
-                  fontSize: "15"
-                }))
-              ]),
-              vue.createElementVNode("view", new UTSJSONObject({
-                class: "list",
-                onClick: platformRenewal
-              }), "平台续费")
-            ])) : vue.createCommentVNode("", true),
-            vue.unref(version) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 1,
-              class: "version"
-            }), "当前版本：" + vue.toDisplayString(vue.unref(version)), 1)) : vue.createCommentVNode("", true),
-            vue.createVNode(_component_movable_area, new UTSJSONObject({ class: "movable-area" }), {
-              default: vue.withCtx(() => {
-                return [
-                  vue.createVNode(_component_movable_view, new UTSJSONObject({
-                    class: "movable-view",
-                    direction: "all",
-                    x: vue.unref(moveX),
-                    y: vue.unref(moveY),
-                    onChange: onMoveChange
-                  }), {
-                    default: vue.withCtx(() => {
-                      return [
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "contact-button-movable",
-                          onClick: contactCustomerService
-                        }), [
-                          vue.createVNode(_component_i_icon, new UTSJSONObject({
-                            name: "/static/server-man.png",
-                            fontSize: "20"
-                          })),
-                          vue.createElementVNode("text", new UTSJSONObject({ class: "contact-text" }), "人工客服"),
-                          vue.createElementVNode("text", new UTSJSONObject({ class: "contact-text" }), "08:00-24:00")
-                        ])
-                      ];
-                    }),
-                    _: 1
-                  }, 8, ["x", "y"])
-                ];
-              }),
-              _: 1
-            })
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$B = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
-  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
-  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    value: {
-      type: String,
-      default: ""
-    },
-    type: {
-      type: String,
-      default: "text"
-    },
-    height: {
-      type: String,
-      default: "40px"
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    disabledColor: {
-      type: String,
-      default: "#f5f7fa"
-    },
-    clearable: {
-      type: Boolean,
-      default: false
-    },
-    password: {
-      type: Boolean,
-      default: false
-    },
-    showPasswordToggle: {
-      type: Boolean,
-      default: true
-    },
-    maxlength: {
-      type: Number,
-      default: -1
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    placeholderClass: {
-      type: String,
-      default: "input-placeholder"
-    },
-    placeholderStyle: {
-      type: String,
-      default: ""
-    },
-    showWordLimit: {
-      type: Boolean,
-      default: false
-    },
-    confirmType: {
-      type: String,
-      default: "done"
-    },
-    confirmHold: {
-      type: Boolean,
-      default: false
-    },
-    focus: {
-      type: Boolean,
-      default: false
-    },
-    cursor: {
-      type: Number,
-      default: -1
-    },
-    cursorSpacing: {
-      type: Number,
-      default: 30
-    },
-    selectionStart: {
-      type: Number,
-      default: -1
-    },
-    selectionEnd: {
-      type: Number,
-      default: -1
-    },
-    adjustPosition: {
-      type: Boolean,
-      default: true
-    },
-    inputAlign: {
-      type: String,
-      default: "left"
-    },
-    fontSize: {
-      type: String,
-      default: "15px"
-    },
-    color: {
-      type: String,
-      default: "#303133"
-    },
-    prefiicon: {
-      type: String,
-      default: ""
-    },
-    prefiiconStyle: {
-      type: String,
-      default: ""
-    },
-    suffiicon: {
-      type: String,
-      default: ""
-    },
-    suffiiconStyle: {
-      type: String,
-      default: ""
-    },
-    border: {
-      type: String,
-      default: "surround"
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    shape: {
-      type: String,
-      default: "square"
-    },
-    customStyle: {
-      type: String,
-      default: ""
-    },
-    round: {
-      type: String,
-      default: "4px"
-    },
-    borderColor: {
-      type: String,
-      default: "#e5e5e5"
-    },
-    bgColor: {
-      type: String,
-      default: "#ffffff"
-    },
-    inputmode: {
-      type: String,
-      default: "text"
-    },
-    prefix: {
-      type: String,
-      default: ""
-    }
-  }, emits: [
-    "update:modelValue",
-    "update:value",
-    "input",
-    "change",
-    "focus",
-    "blur",
-    "confirm",
-    "keyboardheightchange",
-    "clear"
-  ], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function initialValue() {
-      const modelValue = props.modelValue;
-      if (modelValue.length > 0)
-        return modelValue;
-      return props.value;
-    }
-    function formatSize(value) {
-      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
-        return value;
-      }
-      return value + "px";
-    }
-    const inputBgColor = vue.computed(() => {
-      return props.bgColor;
-    });
-    const current = vue.ref(initialValue());
-    vue.watch(() => {
-      return props.modelValue;
-    }, () => {
-      current.value = props.modelValue;
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      if (props.modelValue.length == 0)
-        current.value = props.value;
-    });
-    const focused = vue.ref(false);
-    const passwordVisible = vue.ref(props.password);
-    const wrapClass = vue.computed(() => {
-      const classes = ["i-input"];
-      if (props.disabled)
-        classes.push("i-input--disabled");
-      if (focused.value && !props.disabled)
-        classes.push("i-input--focus");
-      if (props.shape == "circle")
-        classes.push("i-input--circle");
-      return classes.join(" ");
-    });
-    const wrapStyle = vue.computed(() => {
-      let style = "min-height:" + formatSize(props.height) + ";background-color:" + (props.disabled ? props.disabledColor : inputBgColor.value) + ";border-radius:" + (props.shape == "circle" ? formatSize(props.height) : props.round) + ";";
-      if (props.border == "surround") {
-        style += "border-width:1px;border-style:solid;border-color:" + props.borderColor + ";";
-      }
-      if (props.border == "bottom") {
-        style += "border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:" + props.borderColor + ";";
-      }
-      return style + props.customStyle;
-    });
-    const fieldStyle = vue.computed(() => {
-      return "height:" + formatSize(props.height) + ";color:" + props.color + ";font-size:" + formatSize(props.fontSize) + ";text-align:" + props.inputAlign + ";";
-    });
-    const placeholderStyleText = vue.computed(() => {
-      if (props.placeholderStyle.length > 0)
-        return props.placeholderStyle;
-      return "color:#c0c4cc;";
-    });
-    function emitValue(value) {
-      emit("update:modelValue", value);
-      emit("update:value", value);
-      emit("input", value);
-      emit("change", value);
-    }
-    function handleInput(event) {
-      const nextValue = event.detail.value;
-      if (props.readonly) {
-        current.value = initialValue();
-        return null;
-      }
-      current.value = nextValue;
-      emitValue(nextValue);
-    }
-    function handleFocus(event) {
-      focused.value = true;
-      emit("focus", event);
-    }
-    function handleBlur(event) {
-      focused.value = false;
-      emit("blur", event);
-    }
-    function handleConfirm(event) {
-      emit("confirm", event.detail.value);
-    }
-    function handleKeyboardHeightChange(event) {
-      emit("keyboardheightchange", event);
-    }
-    function clear() {
-      current.value = "";
-      emitValue("");
-      emit("clear");
-    }
-    function togglePassword() {
-      passwordVisible.value = !passwordVisible.value;
-    }
-    __expose({
-      setFormatter() {
-      }
-    });
-    return (_ctx = null, _cache = null) => {
-      const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: vue.normalizeClass(wrapClass.value),
-        style: vue.normalizeStyle(wrapStyle.value)
-      }), [
-        vue.renderSlot(_ctx.$slots, "prefix", new UTSJSONObject({}), () => {
-          return [
-            __props.prefiicon.length > 0 || __props.prefix.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-              key: 0,
-              class: "i-input__prefix",
-              style: vue.normalizeStyle(__props.prefiiconStyle)
-            }), vue.toDisplayString(__props.prefix.length > 0 ? __props.prefix : __props.prefiicon), 5)) : vue.createCommentVNode("", true)
-          ];
-        }),
-        vue.createElementVNode("input", new UTSJSONObject({
-          class: "i-input__field",
-          style: vue.normalizeStyle(fieldStyle.value),
-          type: __props.type,
-          value: current.value,
-          placeholder: __props.placeholder,
-          "placeholder-class": __props.placeholderClass,
-          "placeholder-style": placeholderStyleText.value,
-          password: passwordVisible.value,
-          disabled: __props.disabled,
-          maxlength: __props.maxlength,
-          "confirm-type": __props.confirmType,
-          "confirm-hold": __props.confirmHold,
-          inputmode: __props.inputmode,
-          focus: __props.focus,
-          cursor: __props.cursor,
-          "cursor-spacing": __props.cursorSpacing,
-          "selection-start": __props.selectionStart,
-          "selection-end": __props.selectionEnd,
-          "adjust-position": __props.adjustPosition,
-          onInput: handleInput,
-          onFocus: handleFocus,
-          onBlur: handleBlur,
-          onConfirm: handleConfirm,
-          onKeyboardheightchange: handleKeyboardHeightChange
-        }), null, 44, ["type", "value", "placeholder", "placeholder-class", "placeholder-style", "password", "disabled", "maxlength", "confirm-type", "confirm-hold", "inputmode", "focus", "cursor", "cursor-spacing", "selection-start", "selection-end", "adjust-position"]),
-        __props.showWordLimit ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-          key: 0,
-          class: "i-input__count"
-        }), vue.toDisplayString(current.value.length) + "/" + vue.toDisplayString(__props.maxlength), 1)) : vue.createCommentVNode("", true),
-        __props.clearable && current.value.length > 0 && !__props.disabled && !__props.readonly ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-          key: 1,
-          class: "i-input__clear",
-          onClick: clear
-        }), " × ")) : vue.createCommentVNode("", true),
-        __props.password && __props.showPasswordToggle ? (vue.openBlock(), vue.createBlock(_component_i_icon, new UTSJSONObject({
-          key: 2,
-          class: "i-input__eye",
-          onClick: togglePassword,
-          name: passwordVisible.value ? "../../../../static/eye-close.png" : "../../../../static/eye-open.png",
-          size: "24"
-        }), null, 8, ["name"])) : vue.createCommentVNode("", true),
-        vue.renderSlot(_ctx.$slots, "suffix", new UTSJSONObject({}), () => {
-          return [
-            __props.suffiicon.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-              key: 0,
-              class: "i-input__suffix",
-              style: vue.normalizeStyle(__props.suffiiconStyle)
-            }), vue.toDisplayString(__props.suffiicon), 5)) : vue.createCommentVNode("", true)
-          ];
-        })
-      ], 6);
-    };
-  } }));
-  const _style_0$A = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
-  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
-  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
-    name: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    hint: {
-      type: String,
-      default: ""
-    },
-    error: {
-      type: String,
-      default: ""
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    scrollId: {
-      type: String,
-      default: ""
-    },
-    scrollIdPrefix: {
-      type: String,
-      default: "i-form-item-"
-    },
-    labelWidth: {
-      type: [String, Number],
-      default: "100px"
-    },
-    labelDirection: {
-      type: String,
-      default: "vertical"
-    },
-    labelFontColor: {
-      type: String,
-      default: "#303133"
-    },
-    labelFontSize: {
-      type: [String, Number],
-      default: "14px"
-    },
-    showLabel: {
-      type: Boolean,
-      default: true
-    },
-    errorAlign: {
-      type: String,
-      default: "left"
-    }
-  }, emits: [], setup(__props, _a) {
-    _a.emit;
-    const props = __props;
-    function formatSize(value) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
-    }
-    function normalizeIdName(name2) {
-      let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
-        const isNumber2 = char >= "0" && char <= "9";
-        const isUpper = char >= "A" && char <= "Z";
-        const isLower = char >= "a" && char <= "z";
-        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
-          result = result + char;
-        } else {
-          result = result + "-";
-        }
-      }
-      return result;
-    }
-    const itemId = vue.computed(() => {
-      if (props.scrollId.length > 0)
-        return props.scrollId;
-      if (props.name.length == 0)
-        return "";
-      return props.scrollIdPrefix + normalizeIdName(props.name);
-    });
-    const itemClass = vue.computed(() => {
-      const classes = ["i-form-item"];
-      if (props.labelDirection == "horizontal")
-        classes.push("i-form-item--horizontal");
-      return classes.join(" ");
-    });
-    const headerClass = vue.computed(() => {
-      const classes = ["i-form-item__header"];
-      if (props.labelDirection == "horizontal")
-        classes.push("i-form-item__header--horizontal");
-      return classes.join(" ");
-    });
-    const contentClass = vue.computed(() => {
-      const classes = ["i-form-item__content"];
-      if (props.labelDirection == "horizontal")
-        classes.push("i-form-item__content--horizontal");
-      return classes.join(" ");
-    });
-    const headerStyle = vue.computed(() => {
-      if (props.labelDirection != "horizontal")
-        return "";
-      return "width:" + formatSize(props.labelWidth) + ";";
-    });
-    const labelStyle = vue.computed(() => {
-      return "color:" + props.labelFontColor + ";font-size:" + formatSize(props.labelFontSize) + ";";
-    });
-    const footerStyle = vue.computed(() => {
-      return "text-align:" + props.errorAlign + ";";
-    });
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        id: itemId.value,
-        class: vue.normalizeClass(itemClass.value)
-      }), [
-        __props.showLabel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: vue.normalizeClass(headerClass.value),
-          style: vue.normalizeStyle(headerStyle.value)
-        }), [
-          __props.required ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 0,
-            class: "i-form-item__required"
-          }), "*")) : vue.createCommentVNode("", true),
-          vue.createElementVNode("text", new UTSJSONObject({
-            class: "i-form-item__label",
-            style: vue.normalizeStyle(labelStyle.value)
-          }), vue.toDisplayString(__props.label), 5)
-        ], 6)) : vue.createCommentVNode("", true),
-        vue.createElementVNode("view", new UTSJSONObject({ class: "i-form-item__body" }), [
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: vue.normalizeClass(contentClass.value)
-          }), [
-            vue.renderSlot(_ctx.$slots, "default")
-          ], 2),
-          __props.error.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 0,
-            class: "i-form-item__error",
-            style: vue.normalizeStyle(footerStyle.value)
-          }), vue.toDisplayString(__props.error), 5)) : __props.hint.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 1,
-            class: "i-form-item__hint",
-            style: vue.normalizeStyle(footerStyle.value)
-          }), vue.toDisplayString(__props.hint), 5)) : vue.createCommentVNode("", true)
-        ])
-      ], 10, ["id"]);
-    };
-  } }));
-  const _style_0$z = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
-  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
-  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
-    name: {
-      type: [String, Number],
-      default: ""
-    },
-    modelValue: {
-      type: [Array, Boolean, String, Number],
-      default: false
-    },
-    value: {
-      type: [Array, Boolean, String, Number],
-      default: false
-    },
-    checked: {
-      type: Boolean,
-      default: false
-    },
-    shape: {
-      type: String,
-      default: "square"
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    activeColor: {
-      type: String,
-      default: "#2979ff"
-    },
-    inactiveColor: {
-      type: String,
-      default: "#dcdfe6"
-    },
-    size: {
-      type: [String, Number],
-      default: 20
-    },
-    placement: {
-      type: String,
-      default: "row"
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    labelSize: {
-      type: [String, Number],
-      default: 14
-    },
-    labelColor: {
-      type: String,
-      default: "#303133"
-    },
-    labelDisabled: {
-      type: Boolean,
-      default: false
-    },
-    iconColor: {
-      type: String,
-      default: "#ffffff"
-    },
-    iconSize: {
-      type: [String, Number],
-      default: 14
-    },
-    iconPlacement: {
-      type: String,
-      default: "left"
-    },
-    borderBottom: {
-      type: Boolean,
-      default: false
-    },
-    activeLabelColor: {
-      type: String,
-      default: ""
-    },
-    plain: {
-      type: Boolean,
-      default: true
-    }
-  }, emits: ["change", "update:modelValue", "update:value", "update:checked"], setup(__props, _a) {
-    var __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function formatSize(value) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
-    }
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      return "";
-    }
-    function isChecked() {
-      if (props.checked)
-        return true;
-      const modelValue = props.modelValue;
-      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
-      if (Array.isArray(value)) {
-        const names2 = value;
-        for (let i = 0; i < names2.length; i++) {
-          if (valueText(names2[i]) == valueText(props.name))
-            return true;
-        }
-        return false;
-      }
-      if (typeof value == "boolean")
-        return value;
-      return valueText(value) == valueText(props.name);
-    }
-    const internalChecked = vue.ref(isChecked());
-    const checked = vue.computed(() => {
-      return internalChecked.value;
-    });
-    const wrapClass = vue.computed(() => {
-      const classes = ["i-checkbox"];
-      if (props.placement == "column")
-        classes.push("i-checkbox--column");
-      if (props.iconPlacement == "right")
-        classes.push("i-checkbox--right");
-      if (props.shape == "button")
-        classes.push("i-checkbox--button");
-      if (props.plain && props.shape == "button")
-        classes.push("i-checkbox--plain");
-      if (checked.value)
-        classes.push("i-checkbox--checked");
-      if (props.shape == "button" && checked.value)
-        classes.push("i-checkbox--button-checked");
-      if (props.shape == "button" && props.plain && checked.value) {
-        classes.push("i-checkbox--button-plain-checked");
-      }
-      if (props.disabled)
-        classes.push("i-checkbox--disabled");
-      if (props.borderBottom)
-        classes.push("i-checkbox--border");
-      return classes.join(" ");
-    });
-    const labelClass = vue.computed(() => {
-      const classes = ["i-checkbox__label"];
-      if (props.shape == "button")
-        classes.push("i-checkbox__label--button");
-      return classes.join(" ");
-    });
-    const boxStyle = vue.computed(() => {
-      return "width:" + formatSize(props.size) + ";height:" + formatSize(props.size) + ";border-radius:" + (props.shape == "circle" ? formatSize(props.size) : "4px") + ";border-color:" + (checked.value ? props.activeColor : props.inactiveColor) + ";background-color:" + (checked.value && props.shape != "check" ? props.activeColor : "transparent") + ";";
-    });
-    const markStyle = vue.computed(() => {
-      return "color:" + props.iconColor + ";font-size:" + formatSize(props.iconSize) + ";";
-    });
-    const labelStyle = vue.computed(() => {
-      let color = props.labelColor;
-      if (checked.value && props.activeLabelColor.length > 0)
-        color = props.activeLabelColor;
-      return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";";
-    });
-    vue.watch(() => {
-      return props.modelValue;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    vue.watch(() => {
-      return props.value;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    vue.watch(() => {
-      return props.checked;
-    }, () => {
-      internalChecked.value = isChecked();
-    });
-    function buildValue(nextChecked, previousChecked) {
-      const modelValue = props.modelValue;
-      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
-      if (Array.isArray(value)) {
-        const list = value;
-        const nextList = list.slice(0);
-        const exists = previousChecked;
-        if (nextChecked && !exists)
-          nextList.push(props.name);
-        if (!nextChecked && exists) {
-          const filtered = [];
-          for (let i = 0; i < nextList.length; i++) {
-            if (valueText(nextList[i]) != valueText(props.name))
-              filtered.push(nextList[i]);
-          }
-          return filtered;
-        }
-        return nextList;
-      }
-      return nextChecked;
-    }
-    function updateChecked(nextChecked) {
-      const previousChecked = checked.value;
-      internalChecked.value = nextChecked;
-      const nextValue = buildValue(nextChecked, previousChecked);
-      emit("update:checked", nextChecked);
-      emit("update:modelValue", nextValue);
-      emit("update:value", nextValue);
-      emit("change", nextValue);
-    }
-    function toggle() {
-      if (props.disabled)
-        return null;
-      updateChecked(!checked.value);
-    }
-    function toggleByLabel() {
-      if (props.labelDisabled)
-        return null;
-      toggle();
-    }
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: vue.normalizeClass(wrapClass.value),
-        onClick: toggle
-      }), [
-        vue.renderSlot(_ctx.$slots, "icon", new UTSJSONObject({ checked: checked.value }), () => {
-          return [
-            __props.shape != "button" ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "i-checkbox__box",
-              style: vue.normalizeStyle(boxStyle.value)
-            }), [
-              checked.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                key: 0,
-                class: "i-checkbox__mark",
-                style: vue.normalizeStyle(markStyle.value)
-              }), "✓", 4)) : vue.createCommentVNode("", true)
-            ], 4)) : vue.createCommentVNode("", true)
-          ];
-        }),
-        vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ checked: checked.value }), () => {
-          return [
-            vue.createElementVNode("text", new UTSJSONObject({
-              class: vue.normalizeClass(labelClass.value),
-              style: vue.normalizeStyle(labelStyle.value),
-              onClick: vue.withModifiers(toggleByLabel, ["stop"])
-            }), vue.toDisplayString(__props.label), 7)
-          ];
-        })
-      ], 2);
-    };
-  } }));
-  const _style_0$y = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
-  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
-  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
-    hairline: {
-      type: Boolean,
-      default: true
-    },
-    type: {
-      type: String,
-      default: "default"
-    },
-    size: {
-      type: String,
-      default: "normal"
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    shape: {
-      type: String,
-      default: "square"
-    },
-    plain: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    round: {
-      type: [String, Number],
-      default: "4px"
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    loadingMode: {
-      type: String,
-      default: "spinner"
-    },
-    loadingSize: {
-      type: [String, Number],
-      default: 15
-    },
-    openType: {
-      type: String,
-      default: ""
-    },
-    formType: {
-      type: String,
-      default: ""
-    },
-    appParameter: {
-      type: String,
-      default: ""
-    },
-    hoverStopPropagation: {
-      type: Boolean,
-      default: true
-    },
-    lang: {
-      type: String,
-      default: "en"
-    },
-    sessionFrom: {
-      type: String,
-      default: ""
-    },
-    sendMessageTitle: {
-      type: String,
-      default: ""
-    },
-    sendMessagePath: {
-      type: String,
-      default: ""
-    },
-    sendMessageImg: {
-      type: String,
-      default: ""
-    },
-    showMessageCard: {
-      type: Boolean,
-      default: false
-    },
-    dataName: {
-      type: String,
-      default: ""
-    },
-    throttleTime: {
-      type: [String, Number],
-      default: 0
-    },
-    hoverStartTime: {
-      type: [String, Number],
-      default: 0
-    },
-    hoverStayTime: {
-      type: [String, Number],
-      default: 200
-    },
-    hoverClass: {
-      type: String,
-      default: "i-button--hover"
-    },
-    text: {
-      type: [String, Number],
-      default: ""
-    },
-    icon: {
-      type: String,
-      default: ""
-    },
-    iconColor: {
-      type: String,
-      default: ""
-    },
-    iconPosition: {
-      type: String,
-      default: "left"
-    },
-    color: {
-      type: String,
-      default: ""
-    },
-    customStyle: {
-      type: String,
-      default: ""
-    }
-  }, emits: [
-    "click",
-    "getphonenumber",
-    "getuserinfo",
-    "error",
-    "opensetting",
-    "launchapp",
-    "agreeprivacyauthorization"
-  ], setup(__props, _a) {
-    var __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    const lastClickTime = vue.ref(0);
-    const loadingAngle = vue.ref(0);
-    let loadingTimer = 0;
-    function formatSize(value) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
-        return text;
-      return text + "px";
-    }
-    const normalizedType = vue.computed(() => {
-      if (props.type == "danger")
-        return "error";
-      return props.type;
-    });
-    const contentText = vue.computed(() => {
-      if (props.text == null)
-        return "";
-      return props.text.toString();
-    });
-    const computedHoverClass = vue.computed(() => {
-      if (props.disabled || props.loading)
-        return "none";
-      return props.hoverClass;
-    });
-    function normalizeNumber(value) {
-      if (typeof value == "number")
-        return value;
-      return Number.from(parseFloat(value));
-    }
-    const hoverStartTimeValue = vue.computed(() => {
-      return normalizeNumber(props.hoverStartTime);
-    });
-    const hoverStayTimeValue = vue.computed(() => {
-      return normalizeNumber(props.hoverStayTime);
-    });
-    const useNativeButton = vue.computed(() => {
-      return props.openType.length > 0 || props.formType.length > 0;
-    });
-    const buttonClass = vue.computed(() => {
-      const classes = ["i-button", "i-button--" + normalizedType.value, "i-button--" + props.size];
-      if (props.block)
-        classes.push("i-button--block");
-      if (props.plain)
-        classes.push("i-button--plain");
-      if (props.plain)
-        classes.push("i-button--plain-" + normalizedType.value);
-      if (props.hairline && props.plain)
-        classes.push("i-button--hairline");
-      if (props.shape == "circle")
-        classes.push("i-button--circle");
-      if (props.disabled)
-        classes.push("i-button--disabled");
-      if (props.loading)
-        classes.push("i-button--loading");
-      return classes.join(" ");
-    });
-    const textClass = vue.computed(() => {
-      const classes = ["i-button__text"];
-      if (props.size == "small" || props.size == "mini")
-        classes.push("i-button__text--small");
-      if (normalizedType.value == "default")
-        classes.push("i-button__text--default");
-      if (props.plain)
-        classes.push("i-button__text--plain-" + normalizedType.value);
-      if (props.color.length > 0 && props.plain)
-        classes.push("i-button__text--custom");
-      if (props.disabled)
-        classes.push("i-button__text--disabled");
-      if (props.loading)
-        classes.push("i-button__text--loading");
-      return classes.join(" ");
-    });
-    const iconClass = vue.computed(() => {
-      const classes = ["i-button__icon"];
-      if (props.iconPosition == "right")
-        classes.push("i-button__icon--right");
-      return classes.join(" ");
-    });
-    const loadingClass = vue.computed(() => {
-      const classes = ["i-button__loading"];
-      if (props.loadingMode == "circle")
-        classes.push("i-button__loading--circle");
-      if (normalizedType.value == "default" || props.plain)
-        classes.push("i-button__loading--muted");
-      if (props.plain)
-        classes.push("i-button__loading--plain-" + normalizedType.value);
-      return classes.join(" ");
-    });
-    const buttonStyle = vue.computed(() => {
-      let style = "";
-      if (props.shape != "circle")
-        style = style + "border-radius:" + formatSize(props.round) + ";";
-      if (props.color.length > 0) {
-        if (props.plain) {
-          style = style + "background-color:transparent;border-color:" + props.color + ";";
-        } else {
-          style = style + "background:" + props.color + ";border-color:transparent;";
-        }
-      }
-      if (props.customStyle.length > 0)
-        style = style + props.customStyle;
-      return style;
-    });
-    const textStyle = vue.computed(() => {
-      if (props.color.length > 0 && props.plain)
-        return "color:" + props.color + ";";
-      return "";
-    });
-    const iconStyle = vue.computed(() => {
-      if (props.iconColor.length > 0)
-        return "color:" + props.iconColor + ";";
-      if (props.color.length > 0 && props.plain)
-        return "color:" + props.color + ";";
-      return "";
-    });
-    const loadingStyle = vue.computed(() => {
-      const size = formatSize(props.loadingSize);
-      return "width:" + size + ";height:" + size + ";transform:rotate(" + loadingAngle.value.toString() + "deg);";
-    });
-    function startLoading() {
-      if (loadingTimer > 0)
-        return null;
-      loadingTimer = setInterval(() => {
-        let angle = (loadingAngle.value + 24) % 360;
-        if (angle < 0)
-          angle = angle + 360;
-        loadingAngle.value = angle;
-      }, 50);
-    }
-    function stopLoading() {
-      if (loadingTimer > 0) {
-        clearInterval(loadingTimer);
-        loadingTimer = 0;
-      }
-      loadingAngle.value = 0;
-    }
-    vue.watch(() => {
-      return props.loading;
-    }, (nextValue) => {
-      if (nextValue) {
-        startLoading();
-      } else {
-        stopLoading();
-      }
-    });
-    vue.onMounted(() => {
-      if (props.loading)
-        startLoading();
-    });
-    vue.onUnmounted(() => {
-      stopLoading();
-    });
-    function canClick() {
-      if (props.disabled || props.loading)
-        return false;
-      const wait = normalizeNumber(props.throttleTime);
-      if (wait <= 0 || isNaN(wait))
-        return true;
-      const now = Date.now();
-      if (now - lastClickTime.value < wait)
-        return false;
-      lastClickTime.value = now;
-      return true;
-    }
-    function handleClick(event = null) {
-      if (!canClick())
-        return null;
-      emit("click", event);
-    }
-    function handleGetPhoneNumber(event = null) {
-      emit("getphonenumber", event);
-    }
-    function handleGetUserInfo(event = null) {
-      emit("getuserinfo", event);
-    }
-    function handleError(event = null) {
-      emit("error", event);
-    }
-    function handleOpenSetting(event = null) {
-      emit("opensetting", event);
-    }
-    function handleLaunchApp(event = null) {
-      emit("launchapp", event);
-    }
-    function handleAgreePrivacyAuthorization(event = null) {
-      emit("agreeprivacyauthorization", event);
-    }
-    return (_ctx = null, _cache = null) => {
-      return useNativeButton.value ? (vue.openBlock(), vue.createElementBlock("button", new UTSJSONObject({
-        key: 0,
-        class: vue.normalizeClass(buttonClass.value),
-        style: vue.normalizeStyle(buttonStyle.value),
-        disabled: __props.disabled || __props.loading,
-        "form-type": __props.formType,
-        "open-type": __props.openType,
-        "app-parameter": __props.appParameter,
-        "hover-class": computedHoverClass.value,
-        "hover-stop-propagation": __props.hoverStopPropagation,
-        "hover-start-time": hoverStartTimeValue.value,
-        "hover-stay-time": hoverStayTimeValue.value,
-        lang: __props.lang,
-        "session-from": __props.sessionFrom,
-        "send-message-title": __props.sendMessageTitle,
-        "send-message-path": __props.sendMessagePath,
-        "send-message-img": __props.sendMessageImg,
-        "show-message-card": __props.showMessageCard,
-        "data-name": __props.dataName,
-        onClick: handleClick,
-        onGetphonenumber: handleGetPhoneNumber,
-        onGetuserinfo: handleGetUserInfo,
-        onError: handleError,
-        onOpensetting: handleOpenSetting,
-        onLaunchapp: handleLaunchApp,
-        onAgreeprivacyauthorization: handleAgreePrivacyAuthorization
-      }), [
-        vue.createElementVNode("view", new UTSJSONObject({ class: "i-button__inner" }), [
-          __props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 0,
-            class: vue.normalizeClass(loadingClass.value),
-            style: vue.normalizeStyle(loadingStyle.value)
-          }), null, 6)) : vue.createCommentVNode("", true),
-          __props.icon.length > 0 && __props.iconPosition == "left" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 1,
-            class: vue.normalizeClass(iconClass.value),
-            style: vue.normalizeStyle(iconStyle.value)
-          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true),
-          contentText.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 2,
-            class: vue.normalizeClass(textClass.value),
-            style: vue.normalizeStyle(textStyle.value)
-          }), vue.toDisplayString(contentText.value), 7)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 3,
-            class: vue.normalizeClass(textClass.value),
-            style: vue.normalizeStyle(textStyle.value)
-          }), [
-            vue.renderSlot(_ctx.$slots, "default")
-          ], 6)),
-          __props.icon.length > 0 && __props.iconPosition == "right" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 4,
-            class: vue.normalizeClass(iconClass.value),
-            style: vue.normalizeStyle(iconStyle.value)
-          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true)
-        ])
-      ], 46, ["disabled", "form-type", "open-type", "app-parameter", "hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "data-name"])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        key: 1,
-        class: vue.normalizeClass(buttonClass.value),
-        style: vue.normalizeStyle(buttonStyle.value),
-        "hover-class": computedHoverClass.value,
-        "hover-stop-propagation": __props.hoverStopPropagation,
-        "hover-start-time": hoverStartTimeValue.value,
-        "hover-stay-time": hoverStayTimeValue.value,
-        "data-name": __props.dataName,
-        onClick: handleClick
-      }), [
-        vue.createElementVNode("view", new UTSJSONObject({ class: "i-button__inner" }), [
-          __props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 0,
-            class: vue.normalizeClass(loadingClass.value),
-            style: vue.normalizeStyle(loadingStyle.value)
-          }), null, 6)) : vue.createCommentVNode("", true),
-          __props.icon.length > 0 && __props.iconPosition == "left" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 1,
-            class: vue.normalizeClass(iconClass.value),
-            style: vue.normalizeStyle(iconStyle.value)
-          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true),
-          contentText.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 2,
-            class: vue.normalizeClass(textClass.value),
-            style: vue.normalizeStyle(textStyle.value)
-          }), vue.toDisplayString(contentText.value), 7)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 3,
-            class: vue.normalizeClass(textClass.value),
-            style: vue.normalizeStyle(textStyle.value)
-          }), [
-            vue.renderSlot(_ctx.$slots, "default")
-          ], 6)),
-          __props.icon.length > 0 && __props.iconPosition == "right" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-            key: 4,
-            class: vue.normalizeClass(iconClass.value),
-            style: vue.normalizeStyle(iconStyle.value)
-          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true)
-        ])
-      ], 14, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]));
-    };
-  } }));
-  const _style_0$x = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
-  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
-  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
-    modelValue: {
-      type: Object,
-      default() {
-        return new UTSJSONObject({});
-      }
-    },
-    fields: {
-      type: Array,
-      default() {
-        return [];
-      }
-    },
-    rules: {
-      type: Array,
-      default() {
-        return [];
-      }
-    },
-    showActions: {
-      type: Boolean,
-      default: false
-    },
-    submitText: {
-      type: String,
-      default: "提交"
-    },
-    resetText: {
-      type: String,
-      default: "重置"
-    },
-    labelDirection: {
-      type: String,
-      default: "horizontal"
-    },
-    errorAlign: {
-      type: String,
-      default: "left"
-    },
-    errorAutoPage: {
-      type: Boolean,
-      default: true
-    },
-    scrollOffsetTop: {
-      type: [String, Number],
-      default: 12
-    },
-    scrollDuration: {
-      type: [String, Number],
-      default: 300
-    },
-    scrollIdPrefix: {
-      type: String,
-      default: "i-form-item-"
-    },
-    watchValidStatus: {
-      type: Boolean,
-      default: false
-    },
-    modelValid: {
-      type: Boolean,
-      default: false
-    }
-  }, emits: [
-    "submit",
-    "reset",
-    "validate",
-    "scroll-to-error",
-    "update:modelValid",
-    "update:valid"
-  ], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    const valid = vue.ref(true);
-    const message = vue.ref("");
-    const errors = vue.ref([]);
-    const formClass = vue.computed(() => {
-      const classes = ["i-form"];
-      if (props.labelDirection == "vertical")
-        classes.push("i-form--vertical");
-      return classes.join(" ");
-    });
-    const messageClass = vue.computed(() => {
-      return valid.value ? "i-form__message i-form__message--success" : "i-form__message i-form__message--error";
-    });
-    const messageStyle = vue.computed(() => {
-      return "text-align:" + props.errorAlign + ";";
-    });
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      if (Array.isArray(value)) {
-        const list = value;
-        return list.join(",");
-      }
-      if (value != null && typeof value == "object")
-        return "[object Object]";
-      return "";
-    }
-    function activeFields() {
-      const fields = props.fields;
-      if (fields != null && fields.length > 0)
-        return fields;
-      const rules = props.rules;
-      if (rules != null)
-        return rules;
-      return [];
-    }
-    function fieldValue(item) {
-      const configuredValue = item["value"];
-      if (configuredValue != null)
-        return configuredValue;
-      const name2 = item.getString("name", "");
-      if (name2.length == 0)
-        return "";
-      const values = props.modelValue;
-      if (values != null) {
-        const modelValue = values[name2];
-        if (modelValue != null)
-          return modelValue;
-      }
-      return "";
-    }
-    function fieldLabel(item) {
-      const label = item.getString("label", item.getString("name", ""));
-      return label.length > 0 ? label : "字段";
-    }
-    function fieldRequired(item) {
-      return item.getBoolean("required", false);
-    }
-    function fieldMessage(item) {
-      const customMessage = item.getString("message", "");
-      if (customMessage.length > 0)
-        return customMessage;
-      return fieldLabel(item) + "不能为空";
-    }
-    function checkField(item, selectedKeys) {
-      const name2 = item.getString("name", "");
-      if (selectedKeys.length > 0 && selectedKeys.indexOf(name2) < 0)
-        return "";
-      const value = fieldValue(item);
-      if (fieldRequired(item) && valueText(value).length == 0) {
-        return fieldMessage(item);
-      }
-      return "";
-    }
-    function collectValues() {
-      const values = new UTSJSONObject({});
-      const list = activeFields();
-      for (let i = 0; i < list.length; i++) {
-        const item = list[i];
-        const name2 = item.getString("name", "");
-        if (name2.length > 0)
-          values[name2] = fieldValue(item);
-      }
-      return values;
-    }
-    function numberValue(value) {
-      if (typeof value == "number")
-        return value;
-      return Number.from(parseFloat(value));
-    }
-    function normalizeIdName(name2) {
-      let result = "";
-      for (let i = 0; i < name2.length; i++) {
-        const char = name2.charAt(i);
-        const isNumber2 = char >= "0" && char <= "9";
-        const isUpper = char >= "A" && char <= "Z";
-        const isLower = char >= "a" && char <= "z";
-        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
-          result = result + char;
-        } else {
-          result = result + "-";
-        }
-      }
-      return result;
-    }
-    function scrollTargetId(name2) {
-      return props.scrollIdPrefix + normalizeIdName(name2);
-    }
-    function scrollToFirstError(nextErrors) {
-      if (!props.errorAutoPage || nextErrors.length == 0)
-        return null;
-      const field = nextErrors[0].getString("field", "");
-      if (field.length == 0)
-        return null;
-      const targetId = scrollTargetId(field);
-      const selector = "#" + targetId;
-      const offsetTop = numberValue(props.scrollOffsetTop);
-      const duration = numberValue(props.scrollDuration);
-      emit("scroll-to-error", new UTSJSONObject({
-        field,
-        targetId,
-        selector,
-        offsetTop,
-        duration
-      }));
-      vue.nextTick(() => {
-        uni.pageScrollTo(new UTSJSONObject({
-          selector,
-          offsetTop,
-          duration
-        }));
-      });
-    }
-    function validateFields(selectedKeys, silent) {
-      const list = activeFields();
-      const nextErrors = [];
-      for (let i = 0; i < list.length; i++) {
-        const item = list[i];
-        const errorMessage = checkField(item, selectedKeys);
-        if (errorMessage.length > 0) {
-          nextErrors.push(new UTSJSONObject({
-            field: item.getString("name", ""),
-            message: errorMessage
-          }));
-        }
-      }
-      errors.value = nextErrors;
-      valid.value = nextErrors.length == 0;
-      if (!silent) {
-        if (valid.value) {
-          message.value = "校验通过";
-        } else {
-          const firstError = nextErrors[0];
-          message.value = firstError.getString("message", "");
-        }
-        emit("validate", new UTSJSONObject({
-          valid: valid.value,
-          message: message.value,
-          errors: nextErrors,
-          values: collectValues()
-        }));
-        if (!valid.value)
-          scrollToFirstError(nextErrors);
-      }
-      emit("update:modelValid", valid.value);
-      emit("update:valid", valid.value);
-      return valid.value;
-    }
-    function validate() {
-      return validateFields([], false);
-    }
-    function validFields(keys) {
-      return validateFields(keys, false);
-    }
-    function checkAsyncVaildStatus() {
-      return validateFields([], true);
-    }
-    function clearValid() {
-      valid.value = true;
-      message.value = "";
-      errors.value = [];
-      emit("update:modelValid", true);
-      emit("update:valid", true);
-    }
-    function submit() {
-      const isValid = validate();
-      const result = new UTSJSONObject({
-        valid: isValid,
-        values: collectValues(),
-        errors: errors.value,
-        message: message.value
-      });
-      emit("submit", result);
-    }
-    function reset() {
-      clearValid();
-      emit("reset", new UTSJSONObject({
-        values: collectValues()
-      }));
-    }
-    vue.watch(() => {
-      return [props.fields, props.rules, props.modelValue, props.watchValidStatus];
-    }, () => {
-      if (props.watchValidStatus)
-        validateFields([], true);
-    }, { deep: true });
-    __expose({
-      valid: validFields,
-      validate,
-      clearValid,
-      checkAsyncVaildStatus,
-      submit,
-      reset
-    });
-    return (_ctx = null, _cache = null) => {
-      const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: vue.normalizeClass(formClass.value)
-      }), [
-        vue.renderSlot(_ctx.$slots, "default"),
-        message.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-          key: 0,
-          class: vue.normalizeClass(messageClass.value),
-          style: vue.normalizeStyle(messageStyle.value)
-        }), vue.toDisplayString(message.value), 7)) : vue.createCommentVNode("", true),
-        __props.showActions ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 1,
-          class: "i-form__actions"
-        }), [
-          vue.createVNode(_component_i_button, new UTSJSONObject({
-            size: "small",
-            plain: "",
-            onClick: reset
-          }), {
-            default: vue.withCtx(() => {
-              return [
-                vue.createTextVNode(vue.toDisplayString(__props.resetText), 1)
-              ];
-            }),
-            _: 1
-          }),
-          vue.createVNode(_component_i_button, new UTSJSONObject({
-            size: "small",
-            type: "primary",
-            onClick: submit
-          }), {
-            default: vue.withCtx(() => {
-              return [
-                vue.createTextVNode(vue.toDisplayString(__props.submitText), 1)
-              ];
-            }),
-            _: 1
-          })
-        ])) : vue.createCommentVNode("", true)
-      ], 2);
-    };
-  } }));
-  const _style_0$w = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
-  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
-  const _imports_0$2 = "/static/car_location.png";
-  class UniVerifyPreLoginResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ok: { type: Boolean, optional: false },
-            message: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UniVerifyPreLoginResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ok = this.__props__.ok;
-      this.message = this.__props__.message;
-      delete this.__props__;
-    }
-  }
-  class UniVerifyResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            ok: { type: Boolean, optional: false },
-            cancelled: { type: Boolean, optional: false },
-            message: { type: String, optional: false },
-            token: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = UniVerifyResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.ok = this.__props__.ok;
-      this.cancelled = this.__props__.cancelled;
-      this.message = this.__props__.message;
-      this.token = this.__props__.token;
-      delete this.__props__;
-    }
-  }
-  let manager = null;
-  let preLoginReady = false;
-  let requesting = false;
-  function getPlatform() {
-    return "ios";
-  }
-  function getManager() {
-    if (manager == null) {
-      manager = uni.getUniVerifyManager();
-    }
-    return manager;
-  }
-  function getErrorMessage(error) {
-    const errCode = error.errCode;
-    uni.__log__("error", "at services/auth/uni-verify.uts:38", "Uni Verify 授权失败:", errCode, error.errMsg);
-    if (errCode == 30001)
-      return "已取消本机号码授权";
-    if (errCode == 30004 || errCode == 30005 || errCode == 30006)
-      return "运营商认证失败，请检查 SIM 卡、移动网络后重试";
-    if (errCode == 30007)
-      return "本机号码授权已过期，请重试";
-    if (errCode == 30008)
-      return "正在进行本机号码授权，请稍候";
-    if (errCode == 40001 || errCode == 40002)
-      return "网络异常，请检查移动网络后重试";
-    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录";
-  }
-  function getPreLoginErrorMessage(error) {
-    const errCode = error.errCode;
-    const errMsg2 = error.errMsg || "";
-    const cause = error.cause || "";
-    uni.__log__("error", "at services/auth/uni-verify.uts:51", "Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg2, "cause=" + cause);
-    if (errCode == 30005)
-      return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用";
-    if (errCode == 1e3 || errCode == 1001 || errCode == 1002)
-      return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置";
-    if (errCode == 1004)
-      return "一键登录服务已禁用，请检查 Uni Verify 服务状态";
-    if (errCode == 30001)
-      return "本机号码预取已取消";
-    if (errCode == 30004) {
-      if (errMsg2.indexOf("-20102") >= 0)
-        return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK";
-      if (errMsg2.indexOf("-20201") >= 0)
-        return "未检测到可用 SIM 卡，请使用验证码登录";
-      if (errMsg2.indexOf("-20202") >= 0)
-        return "未开启蜂窝移动网络，请开启移动数据后重试";
-      if (errMsg2.indexOf("-20203") >= 0)
-        return "当前运营商暂不支持一键登录，请使用验证码登录";
-      return "本机号码预取失败，请稍后重试或使用验证码登录";
-    }
-    if (errCode == 40001 || errCode == 40002)
-      return "网络异常，无法获取本机号码，请检查移动网络后重试";
-    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录";
-  }
-  function createPreLoginResult(ok, message) {
-    return new UniVerifyPreLoginResult({ ok, message });
-  }
-  function ensurePreLogin() {
-    return new Promise((resolve) => {
-      try {
-        const uniVerifyManager = getManager();
-        if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
-          preLoginReady = true;
-          resolve(createPreLoginResult(true, ""));
-          return null;
-        }
-        uniVerifyManager.preLogin(new UTSJSONObject({
-          success: () => {
-            preLoginReady = true;
-            resolve(createPreLoginResult(true, ""));
-          },
-          fail: (error) => {
-            preLoginReady = false;
-            resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)));
-          }
-        }));
-      } catch (error) {
-        preLoginReady = false;
-        uni.__log__("error", "at services/auth/uni-verify.uts:92", "Uni Verify 管理器初始化失败:", error);
-        resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"));
-      }
-    });
-  }
-  function prefetchUniVerify() {
-    ensurePreLogin();
-  }
-  function createResult(ok, cancelled, message, token) {
-    return new UniVerifyResult({ ok, cancelled, message, token });
-  }
-  function closeLoginPage(uniVerifyManager = null) {
-    if (uniVerifyManager != null)
-      uniVerifyManager.close();
-  }
-  function loginByUniVerify(clientVersion) {
-    return new Promise((resolve) => {
-      if (requesting) {
-        resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""));
-        return null;
-      }
-      requesting = true;
-      ensurePreLogin().then((preLoginResult) => {
-        if (!preLoginResult.ok) {
-          requesting = false;
-          resolve(createResult(false, false, preLoginResult.message, ""));
-          return null;
-        }
-        let uniVerifyManager = null;
-        try {
-          uniVerifyManager = getManager();
-          uniVerifyManager.login(new UTSJSONObject({
-            uniVerifyStyle: new UTSJSONObject({
-              fullScreen: false,
-              loginBtnText: "本机号码一键登录"
-            }),
-            success: (result) => {
-              uniVerifyLogin(new UniVerifyLoginRequest({
-                openId: result.openId,
-                accessToken: result.accessToken,
-                platform: getPlatform(),
-                clientVersion
-              })).then((response) => {
-                const loginData = response.data;
-                const token = loginData != null ? loginData.getString("token", "") : "";
-                if (response.code == 0 && token != "") {
-                  resolve(createResult(true, false, "", token));
-                } else {
-                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请使用验证码登录", ""));
-                }
-              }).catch(() => {
-                resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""));
-              }).finally(() => {
-                closeLoginPage(uniVerifyManager);
-                requesting = false;
-              });
-            },
-            fail: (error) => {
-              preLoginReady = false;
-              resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""));
-              closeLoginPage(uniVerifyManager);
-              requesting = false;
-            }
-          }));
-        } catch (error) {
-          resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""));
-          requesting = false;
-        }
-      }).catch(() => {
-        requesting = false;
-        resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""));
-      });
-    });
-  }
-  class FormData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            username: { type: String, optional: false },
-            password: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = FormData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.username = this.__props__.username;
-      this.password = this.__props__.password;
-      delete this.__props__;
-    }
-  }
-  class SavedAccount extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            username: { type: String, optional: false },
-            password: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SavedAccount.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.username = this.__props__.username;
-      this.password = this.__props__.password;
-      delete this.__props__;
-    }
-  }
-  const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
-  const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
-  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
-    __name: "login",
-    setup(__props) {
-      const docState = vue.ref(false);
-      const pswLogin = vue.ref(false);
-      const rememberPassword = vue.ref(false);
-      const formValid = vue.ref(false);
-      const loading = vue.ref(false);
-      const smsLoginMode = vue.ref(false);
-      const smsMobile = vue.ref("");
-      const smsCode = vue.ref("");
-      const smsCooldown = vue.ref(0);
-      const smsSending = vue.ref(false);
-      const smsSubmitting = vue.ref(false);
-      const nativeLoginLoading = vue.ref(false);
-      const form = vue.ref(new FormData({
-        username: "",
-        password: ""
-      }));
-      const deviceModel = vue.ref("");
-      const pswrules = [
-        new UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
-        new UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
-      ];
-      const updateFormValid = (valid) => {
-        formValid.value = valid;
-      };
-      function loadSavedAccount() {
-        try {
-          const rawAccount = uni.getStorageSync("savedEnterpriseAccount");
-          if (rawAccount == null || rawAccount == "")
-            return null;
-          const account = typeof rawAccount == "string" ? UTS.JSON.parse(rawAccount) : rawAccount;
-          form.value.username = account.getString("username", "");
-          form.value.password = account.getString("password", "");
-          rememberPassword.value = form.value.username != "" || form.value.password != "";
-        } catch (error) {
-          uni.__log__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
-        }
-      }
-      const isPswLogin = () => {
-        pswLogin.value = !pswLogin.value;
-        if (pswLogin.value) {
-          setTimeout(() => {
-            loadSavedAccount();
-          }, 100);
-        }
-      };
-      const toggleRememberPassword = () => {
-        rememberPassword.value = !rememberPassword.value;
-        if (!rememberPassword.value) {
-          uni.removeStorageSync("savedEnterpriseAccount");
-        }
-      };
-      const saveAccountPassword = () => {
-        if (rememberPassword.value && form.value.username != "" && form.value.password != "") {
-          const accountInfo = new SavedAccount({
-            username: form.value.username,
-            password: form.value.password
-          });
-          uni.setStorageSync("savedEnterpriseAccount", UTS.JSON.stringify(accountInfo));
-        } else if (!rememberPassword.value) {
-          uni.removeStorageSync("savedEnterpriseAccount");
-        }
-      };
-      const filterNonLatin = (value) => {
-        form.value.password = value.replace(/[^\x00-\x7F]/g, "");
-      };
-      const isDocState = () => {
-        docState.value = !docState.value;
-      };
-      const getSystemInfo = () => {
-        const res = uni.getSystemInfoSync();
-        deviceModel.value = res.deviceModel;
-        uni.__log__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
-      };
-      const validateForm = () => {
-        if (form.value.username.length == 0) {
-          showAppToast({ title: "请输入账号", icon: "none" });
-          return false;
-        }
-        if (form.value.password.length == 0) {
-          showAppToast({ title: "请输入密码", icon: "none" });
-          return false;
-        }
-        return true;
-      };
-      const completeLogin = (token, savePassword) => {
-        if (token == "") {
-          showAppToast({ title: "登录失败，请重试", icon: "none" });
-          return null;
-        }
-        if (savePassword)
-          saveAccountPassword();
-        uni.setStorageSync("token", token);
-        markPushSessionAuthenticated();
-        showAppToast({ title: "登录成功", icon: "success" });
-        setTimeout(() => {
-          uni.reLaunch({ url: "/pages/index/index" });
-        }, 500);
-      };
-      const ensureAgreementAccepted = () => {
-        if (docState.value)
-          return true;
-        showAppToast({ title: "请先阅读并同意用户协议", icon: "error" });
-        return false;
-      };
-      const openSmsLogin = () => {
-        smsLoginMode.value = true;
-      };
-      const closeSmsLogin = () => {
-        smsLoginMode.value = false;
-        smsCode.value = "";
-      };
-      const isValidMobile = () => {
-        if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
-          showAppToast({ title: "请输入正确的手机号", icon: "none" });
-          return false;
-        }
-        return true;
-      };
-      const startSmsCooldown = (seconds) => {
-        smsCooldown.value = seconds > 0 ? seconds : 60;
-        setInterval(() => {
-          smsCooldown.value -= 1;
-          if (smsCooldown.value <= 0)
-            smsCooldown.value = 0;
-        }, 1e3);
-      };
-      const sendSmsCode = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (smsCooldown.value > 0 || smsSending.value)
-            return Promise.resolve(null);
-          if (!ensureAgreementAccepted() || !isValidMobile())
-            return Promise.resolve(null);
-          try {
-            smsSending.value = true;
-            const response = yield sendSmsLoginCode(new SendSmsCodeRequest({ mobile: smsMobile.value, scene: "login" }));
-            if (response.code != 0) {
-              showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
-              return Promise.resolve(null);
-            }
-            const cooldownSeconds = response.data != null ? response.data.getNumber("cooldownSeconds", 60) : 60;
-            startSmsCooldown(cooldownSeconds);
-            showAppToast({ title: "验证码已发送", icon: "success" });
-          } catch (error) {
-            showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
-          } finally {
-            smsSending.value = false;
-          }
-        });
-      };
-      const getAppPlatform = () => {
-        return "ios";
-      };
-      const submitSmsLogin = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == "" || smsSubmitting.value) {
-            if (smsCode.value == "")
-              showAppToast({ title: "请输入验证码", icon: "none" });
-            return Promise.resolve(null);
-          }
-          try {
-            smsSubmitting.value = true;
-            const response = yield smsLogin(new SmsLoginRequest({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() }));
-            const token = response.data != null ? response.data.getString("token", "") : "";
-            if (response.code == 0 && token != "") {
-              smsCode.value = "";
-              completeLogin(token, false);
-            } else {
-              showAppToast({ title: response.msg || "验证码登录失败", icon: "none" });
-            }
-          } catch (error) {
-            showAppToast({ title: "验证码登录失败，请检查网络", icon: "none" });
-          } finally {
-            smsSubmitting.value = false;
-          }
-        });
-      };
-      const startUniVerifyLogin = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          var _a;
-          if (!ensureAgreementAccepted() || nativeLoginLoading.value)
-            return Promise.resolve(null);
-          try {
-            nativeLoginLoading.value = true;
-            let clientVersion = "1.0.0";
-            try {
-              const appVersion = (_a = uni.getAppBaseInfo().appVersion) !== null && _a !== void 0 ? _a : "";
-              if (appVersion != "")
-                clientVersion = appVersion;
-            } catch (error) {
-              uni.__log__("warn", "at pages/login/login.uvue:345", "获取应用版本失败，使用默认版本号:", error);
-            }
-            const result = yield loginByUniVerify(clientVersion);
-            if (result.ok) {
-              completeLogin(result.token, false);
-              return Promise.resolve(null);
-            }
-            if (!result.cancelled) {
-              showAppToast({ title: result.message + "，可使用验证码登录", icon: "none" });
-              openSmsLogin();
-            }
-          } finally {
-            nativeLoginLoading.value = false;
-          }
-        });
-      };
-      const submit = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!docState.value) {
-            showAppToast({
-              title: "请先阅读并同意用户协议",
-              icon: "error"
-            });
-            return Promise.resolve(null);
-          }
-          try {
-            uni.__log__("log", "at pages/login/login.uvue:462", "准备验证表单...");
-            if (!validateForm())
-              return Promise.resolve(null);
-            uni.__log__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
-            const newFormData = new UTSJSONObject({
-              username: form.value.username,
-              password: form.value.password,
-              from: deviceModel.value,
-              type: "USER"
-            });
-            uni.__log__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
-            loading.value = true;
-            uni.showLoading(new UTSJSONObject({
-              title: "登录中...",
-              mask: true
-            }));
-            uni.__log__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
-            const res = yield login(newFormData);
-            uni.__log__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
-            loading.value = false;
-            uni.hideLoading();
-            const loginData = res.data;
-            const token = loginData != null ? loginData.getString("token", "") : "";
-            if (token != "") {
-              completeLogin(token, true);
-            } else {
-              showAppToast({
-                title: "登录失败，请重试",
-                icon: "error"
-              });
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
-            loading.value = false;
-            uni.hideLoading();
-            if (error && error.message) {
-              showAppToast({
-                icon: "error",
-                title: "登录失败，请检查账号、密码或网络"
-              });
-            } else {
-              showAppToast({
-                icon: "error",
-                title: "登录失败，请检查网络后重试"
-              });
-            }
-          }
-        });
-      };
-      const gotoIndex = () => {
-        uni.reLaunch({
-          url: "/pages/index/index"
-        });
-      };
-      const gotoAgreement = () => {
-        showAppModal(new UTSJSONObject({
-          title: "用户协议",
-          content: userAgreement,
-          showCancel: false
-        }));
-      };
-      const gotoPrivacy = () => {
-        showAppModal(new UTSJSONObject({
-          title: "隐私政策",
-          content: privacyPolicy,
-          showCancel: false
-        }));
-      };
-      vue.onMounted(() => {
-        getSystemInfo();
-        loadSavedAccount();
-        prefetchUniVerify();
-        uni.__log__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
-      });
-      return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
-        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
-        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$2);
-        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
-            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
-              title: "登陆",
-              "show-back": false,
-              backgroundColor: "#fff",
-              textColor: "#333",
-              showCapsule: false
-            })),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
-              vue.createElementVNode("image", new UTSJSONObject({
-                src: _imports_0$2,
-                class: "banner-image",
-                mode: "aspectFill"
-              })),
-              vue.createElementVNode("text", new UTSJSONObject({ class: "title" }), "车联网")
-            ]),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
-              pswLogin.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
-                vue.createVNode(_component_i_form, new UTSJSONObject({
-                  modelValue: form.value,
-                  rules: pswrules,
-                  labelDirection: "horizontal",
-                  watchValidStatus: "",
-                  "onUpdate:modelValid": updateFormValid
-                }), {
-                  default: vue.withCtx(() => {
-                    return [
-                      vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                        name: "username",
-                        label: "",
-                        required: "",
-                        labelDirection: "horizontal",
-                        labelWidth: "0"
-                      }), {
-                        default: vue.withCtx(() => {
-                          return [
-                            vue.createVNode(_component_i_input, new UTSJSONObject({
-                              modelValue: form.value.username,
-                              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
-                                return form.value.username = $event;
-                              }),
-                              placeholder: "请输入账号",
-                              clearable: "",
-                              prefixIcon: "account-fill"
-                            }), null, 8, ["modelValue"])
-                          ];
-                        }),
-                        _: 1
-                      }),
-                      vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                        name: "password",
-                        label: "",
-                        required: "",
-                        labelDirection: "horizontal",
-                        labelWidth: "0"
-                      }), {
-                        default: vue.withCtx(() => {
-                          return [
-                            vue.createVNode(_component_i_input, new UTSJSONObject({
-                              modelValue: form.value.password,
-                              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
-                                return form.value.password = $event;
-                              }),
-                              onInput: filterNonLatin,
-                              placeholder: "请输入密码",
-                              password: true
-                            }), null, 8, ["modelValue"])
-                          ];
-                        }),
-                        _: 1
-                      }),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "remember-password" }), [
-                        vue.createVNode(_component_i_checkbox, new UTSJSONObject({
-                          checked: rememberPassword.value,
-                          onChange: toggleRememberPassword,
-                          label: "记住密码"
-                        }), null, 8, ["checked"])
-                      ]),
-                      vue.createVNode(_component_i_button, new UTSJSONObject({
-                        type: "primary",
-                        onClick: submit,
-                        loading: loading.value
-                      }), {
-                        default: vue.withCtx(() => {
-                          return [
-                            vue.createTextVNode("提交")
-                          ];
-                        }),
-                        _: 1
-                      }, 8, ["loading"])
-                    ];
-                  }),
-                  _: 1
-                }, 8, ["modelValue"])
-              ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
-                !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
-                  vue.createVNode(_component_i_button, new UTSJSONObject({
-                    type: "primary",
-                    onClick: startUniVerifyLogin,
-                    loading: nativeLoginLoading.value
-                  }), {
-                    default: vue.withCtx(() => {
-                      return [
-                        vue.createTextVNode("本机号码一键登录")
-                      ];
-                    }),
-                    _: 1
-                  }, 8, ["loading"]),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "phone-login-switch",
-                    onClick: openSmsLogin
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "验证码登录")
-                  ])
-                ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
-                  vue.createVNode(_component_i_form, null, {
-                    default: vue.withCtx(() => {
-                      return [
-                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                          class: "sms-mobile-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createVNode(_component_i_input, new UTSJSONObject({
-                                modelValue: smsMobile.value,
-                                "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
-                                  return smsMobile.value = $event;
-                                }),
-                                placeholder: "请输入手机号",
-                                type: "number",
-                                clearable: ""
-                              }), null, 8, ["modelValue"])
-                            ];
-                          }),
-                          _: 1
-                        }),
-                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                          class: "sms-code-item",
-                          label: "",
-                          labelDirection: "horizontal",
-                          labelWidth: "0"
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createVNode(_component_i_input, new UTSJSONObject({
-                                class: "sms-code-input",
-                                modelValue: smsCode.value,
-                                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event = null) => {
-                                  return smsCode.value = $event;
-                                }),
-                                placeholder: "请输入验证码",
-                                type: "number",
-                                clearable: ""
-                              }), {
-                                suffix: vue.withCtx(() => {
-                                  return [
-                                    vue.createElementVNode("view", new UTSJSONObject({
-                                      class: vue.normalizeClass(["sms-send-button", new UTSJSONObject({ "sms-send-button-disabled": smsCooldown.value > 0 || smsSending.value })]),
-                                      onClick: sendSmsCode
-                                    }), [
-                                      vue.createElementVNode("text", new UTSJSONObject({ class: "sms-send-button-text" }), vue.toDisplayString(smsCooldown.value > 0 ? smsCooldown.value + "秒后重试" : "获取验证码"), 1)
-                                    ], 2)
-                                  ];
-                                }),
-                                _: 1
-                              }, 8, ["modelValue"])
-                            ];
-                          }),
-                          _: 1
-                        }),
-                        vue.createVNode(_component_i_button, new UTSJSONObject({
-                          type: "primary",
-                          onClick: submitSmsLogin,
-                          loading: smsSubmitting.value
-                        }), {
-                          default: vue.withCtx(() => {
-                            return [
-                              vue.createTextVNode("手机号验证码登录")
-                            ];
-                          }),
-                          _: 1
-                        }, 8, ["loading"])
-                      ];
-                    }),
-                    _: 1
-                  }),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: "phone-login-switch",
-                    onClick: closeSmsLogin
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "一键登录")
-                  ])
-                ]))
-              ])),
-              vue.createElementVNode("view", new UTSJSONObject({ class: "documents" }), [
-                vue.createVNode(_component_i_checkbox, new UTSJSONObject({
-                  checked: docState.value,
-                  onChange: isDocState
-                }), null, 8, ["checked"]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "doc-info-box" }), [
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "已阅读并同意"),
-                  vue.createElementVNode("text", new UTSJSONObject({
-                    class: "doc-link",
-                    onClick: gotoAgreement
-                  }), "《用户协议》"),
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "和"),
-                  vue.createElementVNode("text", new UTSJSONObject({
-                    class: "doc-link",
-                    onClick: gotoPrivacy
-                  }), "《隐私政策》")
-                ])
-              ])
-            ]),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "other-way" }), [
-              vue.createElementVNode("view", new UTSJSONObject({
-                class: "noLogin",
-                onClick: gotoIndex
-              }), "暂不登录"),
-              vue.createElementVNode("view", new UTSJSONObject({
-                class: "BLogin",
-                onClick: isPswLogin
-              }), vue.toDisplayString(pswLogin.value ? "个人用户登录" : "企业用户登录"), 1)
-            ])
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$v = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "phone-way": { ".container .phone-login-switch ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
-  class PickerItem extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            label: { type: String, optional: false },
-            value: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = PickerItem.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.label = this.__props__.label;
-      this.value = this.__props__.value;
-      delete this.__props__;
-    }
-  }
-  class PickerConfirmEvent extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            value: { type: "Unknown", optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = PickerConfirmEvent.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.value = this.__props__.value;
-      delete this.__props__;
-    }
-  }
-  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent({
-    __name: "sub-navBar",
-    props: {
-      showTime: {
-        type: Boolean,
-        default: true
-      },
-      showPickerTime: {
-        type: Boolean,
-        default: true
-      },
-      showCar: {
-        type: Boolean,
-        default: false
-      },
-      showPicker: {
-        type: Boolean,
-        default: true
-      },
-      currentTime: {
-        type: String,
-        default: ""
-      },
-      currentCar: {
-        type: String,
-        default: ""
-      },
-      carStatus: {
-        type: String,
-        default: "在线"
-      },
-      times: {
-        type: Array,
-        default: () => {
-          return [[]];
-        }
-        // 默认值调整为二维数组
-      },
-      cars: {
-        type: Array,
-        default: () => {
-          return [[]];
-        }
-        // 默认值调整为二维数组
-      }
-    },
-    emits: ["update:currentTime", "update:currentCar"],
-    setup(__props, _a) {
-      _a.emit;
-      const props = __props;
-      const columns = vue.ref([]);
-      vue.ref(null);
-      const currentPickerType = vue.ref("");
-      const handleTime = () => {
-        columns.value = props.times;
-        currentPickerType.value = "time";
-      };
-      const handleCar = () => {
-        columns.value = props.cars;
-        currentPickerType.value = "car";
-      };
-      return (_ctx = null, _cache = null) => {
-        return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "tools-box" }), [
-          __props.showTime ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 0,
-            class: "second",
-            onClick: _cache[0] || (_cache[0] = ($event = null) => {
-              return __props.showPickerTime ? handleTime : null;
-            })
-          }), [
-            vue.createElementVNode("view", new UTSJSONObject({ class: "times" }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "refresh" }), vue.toDisplayString(__props.currentTime), 1),
-              !__props.showPickerTime ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                key: 0,
-                class: "refresh"
-              }), "刷新一次位置")) : vue.createCommentVNode("", true)
-            ])
-          ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 1,
-            class: "slot"
-          }))),
-          vue.createElementVNode("view", new UTSJSONObject({ class: "car-box" }), [
-            __props.showCar ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "selectCar",
-              onClick: _cache[1] || (_cache[1] = ($event = null) => {
-                return __props.showPicker ? handleCar : null;
-              })
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "plateNo" }), vue.toDisplayString(__props.currentCar), 1)
-            ])) : vue.createCommentVNode("", true),
-            vue.createElementVNode("view", new UTSJSONObject({
-              class: vue.normalizeClass(["car-state", __props.carStatus == "online" ? "success" : "error"])
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({ class: "state" }), vue.toDisplayString(__props.carStatus == "online" ? "在线" : "离线"), 1)
-            ], 2)
-          ])
-        ]);
-      };
-    }
-  });
-  const _style_0$u = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
-  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
-  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
-    items: {
-      type: Array,
-      default() {
-        return ["首页", "分类", "购物车", "我的", "优惠券", "设置"];
-      }
-    },
-    col: {
-      type: Number,
-      default: 3
-    },
-    itemHeight: {
-      type: [String, Number],
-      default: "70"
-    },
-    itemBgColor: {
-      type: String,
-      default: "#ffffff"
-    },
-    bgColor: {
-      type: String,
-      default: "transparent"
-    },
-    width: {
-      type: String,
-      default: "auto"
-    },
-    iconColor: {
-      type: String,
-      default: "#333333"
-    },
-    textColor: {
-      type: String,
-      default: "#888888"
-    },
-    fontSize: {
-      type: [String, Number],
-      default: "13"
-    },
-    iconSize: {
-      type: [String, Number],
-      default: "25"
-    },
-    imageSize: {
-      type: [String, Number],
-      default: "40"
-    },
-    showBorder: {
-      type: Boolean,
-      default: true
-    },
-    borderColor: {
-      type: String,
-      default: "#f5f5f5"
-    },
-    round: {
-      type: [String, Number],
-      default: "0"
-    },
-    isLink: {
-      type: Boolean,
-      default: true
-    }
-  }, emits: ["select", "change", "click", "loadmore"], setup(__props, _a) {
-    var __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    function valueText(value = null) {
-      if (typeof value == "string")
-        return value;
-      if (typeof value == "number" || typeof value == "boolean")
-        return value.toString();
-      return "";
-    }
-    function formatSize(value) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto") {
-        return text;
-      }
-      return text + "px";
-    }
-    function itemValue(item = null, keyName) {
-      if (item == null || typeof item != "object")
-        return "";
-      const values = item;
-      const value = values[keyName];
-      if (value == null)
-        return "";
-      return valueText(value);
-    }
-    function getItemText(item = null) {
-      const text = itemValue(item, "text");
-      if (text.length > 0)
-        return text;
-      return valueText(item);
-    }
-    function getItemIcon(item = null) {
-      return itemValue(item, "icon");
-    }
-    function getItemImage(item = null) {
-      return itemValue(item, "image");
-    }
-    function getItemName(item = null) {
-      return itemValue(item, "name");
-    }
-    function getItemBgColor(item = null) {
-      const color = itemValue(item, "bgColor");
-      if (color.length > 0)
-        return color;
-      return props.itemBgColor;
-    }
-    function getItemIconColor(item = null) {
-      const color = itemValue(item, "iconColor");
-      if (color.length > 0)
-        return color;
-      return props.iconColor;
-    }
-    function getItemTextColor(item = null) {
-      const color = itemValue(item, "textColor");
-      if (color.length > 0)
-        return color;
-      return props.textColor;
-    }
-    function getItemUrl(item = null) {
-      return itemValue(item, "url");
-    }
-    const bgColor = vue.computed(() => {
-      return props.bgColor;
-    });
-    const gridItems = vue.computed(() => {
-      const items = props.items;
-      if (items == null)
-        return [];
-      return items;
-    });
-    const selected = vue.ref(-1);
-    const gridStyle = vue.computed(() => {
-      return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
-    });
-    function getColumns() {
-      if (props.col <= 1)
-        return 1;
-      if (props.col >= 6)
-        return 6;
-      return props.col;
-    }
-    function getRows() {
-      const columns = getColumns();
-      const items = props.items;
-      if (items == null)
-        return 0;
-      return Math.ceil(items.length / columns);
-    }
-    function getItemWidth() {
-      const columns = getColumns();
-      if (columns == 1)
-        return "100%";
-      if (columns == 2)
-        return "50%";
-      if (columns == 3)
-        return "33.3333%";
-      if (columns == 4)
-        return "25%";
-      if (columns == 5)
-        return "20%";
-      return "16.6667%";
-    }
-    function getItemStyle(index, item = null) {
-      const columns = getColumns();
-      const row = Math.floor(index / columns);
-      const colIndex = index % columns;
-      let style = "width:" + getItemWidth() + ";height:" + formatSize(props.itemHeight) + ";background-color:" + getItemBgColor(item) + ";";
-      if (props.showBorder) {
-        if (colIndex < columns - 1) {
-          style = style + "border-right-width:1px;border-right-style:solid;border-right-color:" + props.borderColor + ";";
-        }
-        if (row < getRows() - 1) {
-          style = style + "border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:" + props.borderColor + ";";
-        }
-      }
-      return style;
-    }
-    function getIconStyle(item = null) {
-      return "color:" + getItemIconColor(item) + ";font-size:" + formatSize(props.iconSize) + ";line-height:" + formatSize(props.iconSize) + ";";
-    }
-    function getImageStyle(item = null) {
-      const size = formatSize(props.imageSize);
-      return "width:" + size + ";height:" + size + ";";
-    }
-    function getTextStyle(item = null) {
-      return "color:" + getItemTextColor(item) + ";font-size:" + formatSize(props.fontSize) + ";";
-    }
-    function buildPayload(item = null, index) {
-      return new UTSJSONObject({
-        index,
-        name: getItemName(item),
-        text: getItemText(item),
-        icon: getItemIcon(item),
-        image: getItemImage(item),
-        url: getItemUrl(item)
-      });
-    }
-    function select(item = null, index) {
-      selected.value = index;
-      const payload = buildPayload(item, index);
-      emit("select", payload);
-      emit("change", payload);
-      emit("click", payload);
-    }
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-        class: "i-grid",
-        style: vue.normalizeStyle(gridStyle.value)
-      }), [
-        (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(gridItems.value, (item = null, index) => {
-          return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: index.toString() + "-" + getItemText(item),
-            class: vue.normalizeClass(selected.value == index ? "i-grid__item i-grid__item--active" : "i-grid__item"),
-            style: vue.normalizeStyle(getItemStyle(index, item)),
-            "hover-class": __props.isLink ? "i-grid__item--hover" : "none",
-            onClick: ($event = null) => {
-              return select(item, index);
-            }
-          }), [
-            getItemImage(item).length > 0 ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
-              key: 0,
-              class: "i-grid__image",
-              src: getItemImage(item),
-              style: vue.normalizeStyle(getImageStyle(item)),
-              mode: "aspectFit"
-            }), null, 12, ["src"])) : getItemIcon(item).length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-              key: 1,
-              class: "i-grid__icon",
-              style: vue.normalizeStyle(getIconStyle(item))
-            }), vue.toDisplayString(getItemIcon(item)), 5)) : vue.createCommentVNode("", true),
-            vue.createElementVNode("text", new UTSJSONObject({
-              class: "i-grid__text",
-              style: vue.normalizeStyle(getTextStyle(item))
-            }), vue.toDisplayString(getItemText(item)), 5)
-          ], 14, ["hover-class", "onClick"]);
-        }), 128))
-      ], 4);
-    };
-  } }));
-  const _style_0$t = { "i-grid": { "": { "flexDirection": "row", "flexWrap": "wrap", "overflow": "hidden" } }, "i-grid__item": { "": { "boxSizing": "border-box", "overflow": "hidden", "alignItems": "center", "justifyContent": "center" } }, "i-grid__item--hover": { "": { "backgroundColor": "#f3f4f6" } }, "i-grid__item--active": { "": { "backgroundColor": "#ecf5ff" } }, "i-grid__image": { "": { "marginBottom": 8 } }, "i-grid__icon": { "": { "marginBottom": 8, "textAlign": "center", "lines": 1 } }, "i-grid__text": { "": { "lineHeight": "18px", "textAlign": "center", "lines": 1 } } };
-  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
-  const _imports_0$1 = "/static/sate.png";
-  const _imports_1$1 = "/static/v.png";
-  const _imports_2$1 = "/static/pow.png";
-  const DEFAULT_TK = "1e3374be3d63de65d44dbfdc7b311afb";
-  class AddressResult extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            formatted_address: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = AddressResult.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.formatted_address = this.__props__.formatted_address;
-      delete this.__props__;
-    }
-  }
-  class AddressResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            result: { type: AddressResult, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = AddressResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.result = this.__props__.result;
-      delete this.__props__;
-    }
-  }
-  function getAddress(latitude, longitude, tk = DEFAULT_TK) {
-    return new Promise((resolve, reject) => {
-      const postStr = UTS.JSON.stringify(new UTSJSONObject({
-        lon: longitude,
-        lat: latitude,
-        ver: 1
-      }));
-      uni.request({
-        url: "https://api.tianditu.gov.cn/geocoder?postStr=".concat(encodeURIComponent(postStr), "&type=geocode&tk=").concat(tk),
-        method: "GET",
-        header: new UTSJSONObject({
-          "User-Agent": "Mozilla/5.0"
-        }),
-        success: (res) => {
-          if (res.statusCode != 200 || res.data == null) {
-            reject(new Error("获取地址信息失败，状态码：".concat(res.statusCode)));
-            return null;
-          }
-          const response = res.data;
-          const result = response.getJSON("result");
-          if (result == null) {
-            reject(new Error("获取地址信息失败：".concat(response.getString("msg", "响应缺少结果"))));
-            return null;
-          }
-          const formattedAddress = result.getString("formatted_address", "");
-          if (formattedAddress == "") {
-            reject(new Error("获取地址信息失败：响应缺少地址"));
-            return null;
-          }
-          resolve({ result: new AddressResult({ formatted_address: formattedAddress }) });
-        },
-        fail: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-  class MapCenter extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            latitude: { type: Number, optional: false },
-            longitude: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = MapCenter.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.latitude = this.__props__.latitude;
-      this.longitude = this.__props__.longitude;
-      delete this.__props__;
-    }
-  }
-  class SignalDetail extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            experience: { type: String, optional: false },
-            quality: { type: String, optional: false },
-            color: { type: String, optional: false },
-            level: { type: Number, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = SignalDetail.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.experience = this.__props__.experience;
-      this.quality = this.__props__.quality;
-      this.color = this.__props__.color;
-      this.level = this.__props__.level;
-      delete this.__props__;
-    }
-  }
-  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
-    __name: "carInfoDetail",
-    setup(__props) {
-      const deptId = vue.ref("");
-      const imei = vue.ref("");
-      const deviceId = vue.ref("");
-      const center = vue.reactive(new MapCenter({
-        latitude: 39.90469,
-        longitude: 116.40717
-      }));
-      const mapScale = vue.ref(15);
-      const isMapReady = vue.ref(false);
-      const datainfo = vue.ref(new UTSJSONObject({}));
-      const address = vue.ref("");
-      const currentTime = vue.ref("5s");
-      const onCurrentTimeChange = (value) => {
-        currentTime.value = value;
-      };
-      const times = vue.ref([
-        [
-          new UTSJSONObject({ label: "5s", value: "5" }),
-          new UTSJSONObject({ label: "10s", value: "10" }),
-          new UTSJSONObject({ label: "20s", value: "20" }),
-          new UTSJSONObject({ label: "30s", value: "30" }),
-          new UTSJSONObject({ label: "停止刷新", value: "0" })
-        ]
-      ]);
-      const refreshTimer = vue.ref(null);
-      const isRefreshing = vue.ref(false);
-      const popupRef = vue.ref(false);
-      const psw = vue.ref("");
-      const currentOperation = vue.ref(0);
-      const modalTitle = vue.ref("验证密码");
-      const userType = vue.ref("");
-      const filterNonLatin = (value) => {
-        psw.value = value.replace(/[^\x00-\x7F]/g, "");
-      };
-      const markers = vue.ref([]);
-      vue.ref(false);
-      vue.ref(new UTSJSONObject({
-        deviceName: "",
-        carNumber: "",
-        deviceSerial: "",
-        locationType: "",
-        lngLat: "",
-        updateTime: "",
-        locationTime: "",
-        speed: "",
-        totalMileage: "",
-        address: ""
-      }));
-      const currentCarInfo = vue.ref(new UTSJSONObject({}));
-      const signalRssi = vue.ref(null);
-      const signalSat = vue.ref(null);
-      const carVoltage = vue.computed(() => {
-        return currentCarInfo.value["voltage"];
-      });
-      const batteryPercent = vue.computed(() => {
-        return datainfo.value["batteryPercent"];
-      });
-      const getBatteryColor = (batteryPercent2 = null) => {
-        if (batteryPercent2 == null || batteryPercent2 == "")
-          return "#c9c9c9";
-        const batteryValue = parseFloat(batteryPercent2.toString());
-        if (batteryValue >= 70) {
-          return "#07C160";
-        } else if (batteryValue >= 30) {
-          return "#FF9C19";
-        } else if (batteryValue >= 10) {
-          return "#FF6B00";
-        } else {
-          return "#FF0000";
-        }
-      };
-      function getSignalDetail(rssi = null) {
-        if (rssi == null || rssi == "") {
-          return new SignalDetail({
-            experience: "无信号",
-            quality: "无服务",
-            color: "#999",
-            level: 0
-          });
-        }
-        const signalValue = parseFloat(rssi.toString());
-        if (isNaN(signalValue)) {
-          return new SignalDetail({
-            experience: "信号数据无效",
-            quality: "无服务",
-            color: "#999",
-            level: 0
-          });
-        }
-        if (signalValue >= 26) {
-          return new SignalDetail({
-            experience: "极好",
-            quality: "极强",
-            color: "#07C160",
-            level: 5
-          });
-        } else if (signalValue >= 20) {
-          return new SignalDetail({
-            experience: "良好",
-            quality: "强",
-            color: "#52c41a",
-            level: 4
-          });
-        } else if (signalValue >= 15) {
-          return new SignalDetail({
-            experience: "一般",
-            quality: "一般",
-            color: "#faad14",
-            level: 3
-          });
-        } else if (signalValue >= 10) {
-          return new SignalDetail({
-            experience: "差",
-            quality: "较弱",
-            color: "#fa8c16",
-            level: 2
-          });
-        } else if (signalValue >= 1) {
-          return new SignalDetail({
-            experience: "非常差",
-            quality: "微弱",
-            color: "#f5222d",
-            level: 1
-          });
-        } else {
-          return new SignalDetail({
-            experience: "无信号",
-            quality: "无服务",
-            color: "#999",
-            level: 0
-          });
-        }
-      }
-      const getMobileSignalBarClass = (barIndex, rssi = null) => {
-        if (rssi == null || rssi == "") {
-          return "bar-off";
-        }
-        const signalValue = parseFloat(rssi.toString());
-        if (isNaN(signalValue))
-          return "bar-off";
-        const signalDetail = getSignalDetail(signalValue);
-        const level = signalDetail.level;
-        return barIndex < level ? "bar-active" : "bar-off";
-      };
-      const createMarker = (id, lat, lng, type, title = null) => {
-        const connectionStatus = datainfo.value["connectionStatus"];
-        const carType = currentCarInfo.value["carType"];
-        const marker = {
-          id,
-          latitude: lat,
-          longitude: lng,
-          width: 25,
-          height: 25,
-          iconPath: getDeviceIcon(connectionStatus !== null && connectionStatus !== void 0 ? connectionStatus : "", carType !== null && carType !== void 0 ? carType : ""),
-          callout: new UTSJSONObject({
-            content: title || "爱车位置",
-            color: connectionStatus == "online" ? "#fff" : "#666",
-            borderRadius: 10,
-            bgColor: connectionStatus == "online" ? "#07C160" : "#ccc",
-            padding: 5,
-            display: "ALWAYS"
-          })
-        };
-        return marker;
-      };
-      const delay = (ms) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, ms);
-        });
-      };
-      const loadData = (data, retryCount) => {
-        return __awaiter(this, void 0, void 0, function* () {
-          signalRssi.value = null;
-          signalSat.value = null;
-          let retry = retryCount;
-          const tryLoad = (attempt) => {
-            return __awaiter(this, void 0, void 0, function* () {
-              var e_1, _a;
-              try {
-                const res = yield getDevicePos(data);
-                if (!res || !res.data || res.data.length == 0) {
-                  throw new Error("返回数据为空");
-                }
-                let foundDevice = false;
-                try {
-                  for (var _b = __values(res.data), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var item = _c.value;
-                    const itemImei = item.getString("imei", "");
-                    if (itemImei != null && itemImei == imei.value) {
-                      foundDevice = true;
-                      datainfo.value = item;
-                      const attribute = item["attribute"];
-                      signalRssi.value = attribute != null ? attribute["rssi"] : null;
-                      signalSat.value = attribute != null ? attribute["sat"] : null;
-                      const latitude = item.getNumber("latitude", 0);
-                      const longitude = item.getNumber("longitude", 0);
-                      if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:360", "位置信息缺失", item);
-                        showAppToast({
-                          title: "位置信息缺失",
-                          icon: "none"
-                        });
-                        return false;
-                      }
-                      const lat = parseFloat(latitude.toString());
-                      const lng = parseFloat(longitude.toString());
-                      if (isNaN(lat) || isNaN(lng)) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:373", "经纬度格式错误", latitude, longitude);
-                        return false;
-                      }
-                      let convertedLat = lat;
-                      let convertedLng = lng;
-                      try {
-                        const coord = CoordTransform.wgs84ToTencent(lat, lng);
-                        convertedLat = coord.lat;
-                        convertedLng = coord.lng;
-                      } catch (transformError) {
-                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:385", "坐标转换失败:", transformError);
-                      }
-                      center.latitude = convertedLat;
-                      center.longitude = convertedLng;
-                      yield delay(50);
-                      const deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value["deviceName"]);
-                      markers.value = [];
-                      yield delay(50);
-                      markers.value = [deviceMarker];
-                      isMapReady.value = true;
-                      const connectionStatus = item["connectionStatus"];
-                      if (connectionStatus != "online" && refreshTimer.value !== null) {
-                        const timer = refreshTimer.value;
-                        if (timer !== null) {
-                          clearInterval(timer);
-                        }
-                        refreshTimer.value = null;
-                        isRefreshing.value = false;
-                        showAppToast({
-                          title: "设备已离线，停止自动刷新",
-                          icon: "none"
-                        });
-                      }
-                      if (signalRssi.value != null) {
-                        const signalExp = getSignalDetail(signalRssi.value).experience;
-                        if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
-                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:428", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
-                        }
-                      }
-                    }
-                  }
-                } catch (e_1_1) {
-                  e_1 = { error: e_1_1 };
-                } finally {
-                  try {
-                    if (_c && !_c.done && (_a = _b.return))
-                      _a.call(_b);
-                  } finally {
-                    if (e_1)
-                      throw e_1.error;
-                  }
-                }
-                if (!foundDevice) {
-                  throw new Error("未找到对应的设备数据");
-                }
-                return true;
-              } catch (error) {
-                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:442", "第".concat(attempt, "次加载设备数据失败:"), error);
-                if (attempt < retry) {
-                  const delayMs = Math.pow(2, attempt) * 1e3;
-                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:448", "等待".concat(delayMs / 1e3, "秒后重试..."));
-                  yield delay(delayMs);
-                  return false;
-                } else {
-                  showAppToast({
-                    title: "数据加载失败，请稍后重试",
-                    icon: "none",
-                    duration: 2e3
-                  });
-                  if (datainfo.value.connectionStatus == "online" && refreshTimer.value !== null) {
-                    const timer = refreshTimer.value;
-                    if (timer !== null) {
-                      clearInterval(timer);
-                    }
-                    refreshTimer.value = null;
-                    isRefreshing.value = false;
-                    showAppToast({
-                      title: "数据加载失败，停止自动刷新",
-                      icon: "none"
-                    });
-                  }
-                  return false;
-                }
-              }
-            });
-          };
-          return tryLoad(1);
-        });
-      };
-      const setupAutoRefresh = (intervalValue) => {
-        if (refreshTimer.value !== null) {
-          const timer = refreshTimer.value;
-          if (timer !== null) {
-            clearInterval(timer);
-          }
-          refreshTimer.value = null;
-          isRefreshing.value = false;
-        }
-        if (intervalValue == "0") {
-          isRefreshing.value = false;
-          return null;
-        }
-        if (datainfo.value.connectionStatus != "online") {
-          isRefreshing.value = false;
-          return null;
-        }
-        const intervalSeconds = parseInt(intervalValue);
-        if (intervalSeconds > 0) {
-          isRefreshing.value = true;
-          const intervalMs = intervalSeconds * 1e3;
-          loadData(new UTSJSONObject({
-            deptId: deptId.value,
-            deviceids: imei.value
-          }), 3);
-          refreshTimer.value = setInterval(() => {
-            loadData(new UTSJSONObject({
-              deptId: deptId.value,
-              deviceids: imei.value
-            }), 3);
-          }, intervalMs);
-        }
-      };
-      vue.watch(currentTime, (newVal) => {
-        setupAutoRefresh(newVal);
-      });
-      const stopAutoRefresh = () => {
-        if (refreshTimer.value !== null) {
-          const timer = refreshTimer.value;
-          if (timer !== null) {
-            clearInterval(timer);
-          }
-          refreshTimer.value = null;
-          isRefreshing.value = false;
-        }
-      };
-      const baseList = vue.computed(() => {
-        const list = [new UTSJSONObject({
-          image: "/static/gjhf.png",
-          text: "轨迹回放"
-        }), new UTSJSONObject({
-          image: "/static/clgz.png",
-          text: "车辆跟踪"
-        }), new UTSJSONObject({
-          image: "/static/lcjl.png",
-          text: "里程记录"
-        }), new UTSJSONObject({
-          image: "/static/tcjl.png",
-          text: "停车记录"
-        }), new UTSJSONObject({
-          image: "/static/dzwl.png",
-          text: "电子围栏"
-        }), new UTSJSONObject({
-          image: "/static/navto.png",
-          text: "一键寻车"
-        }), new UTSJSONObject({
-          image: "/static/power.png",
-          text: "恢复油电"
-        }), new UTSJSONObject({
-          image: "/static/offpower.png",
-          text: "断开油电"
-        })];
-        const productId = currentCarInfo.value.productId;
-        if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
-          list.push(new UTSJSONObject({
-            image: "/static/cmd.png",
-            text: "发送指令"
-          }));
-        }
-        return list;
-      });
-      function executeOperation(operationType) {
-        return __awaiter(this, void 0, void 0, function* () {
-          let predictCmdId = 0;
-          let type = 0;
-          if (operationType == 1) {
-            predictCmdId = 2;
-            type = 2;
-          } else if (operationType == 2) {
-            predictCmdId = 1;
-            type = 1;
-          } else {
-            showAppToast({
-              title: "操作类型错误",
-              icon: "none"
-            });
-            return Promise.resolve(null);
-          }
-          try {
-            uni.showLoading(new UTSJSONObject({
-              title: "执行中...",
-              mask: true
-            }));
-            const res = yield sendCommand(new UTSJSONObject({
-              imei: imei.value,
-              password: userType.value == "1" ? psw.value : "",
-              params: ["1111"],
-              predictCmdId,
-              type
-            }));
-            uni.hideLoading();
-            if (res.code == 0) {
-              showAppToast({
-                title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
-                icon: "success"
-              });
-              psw.value = "";
-            } else {
-              showAppToast({
-                title: res.msg.length > 0 ? res.msg : "操作失败",
-                icon: "none"
-              });
-            }
-          } catch (error) {
-            uni.hideLoading();
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:688", "操作失败:", error);
-            showAppToast({
-              title: "操作失败，请重试",
-              icon: "none"
-            });
-          }
-        });
-      }
-      const confirm = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (userType.value == "1" && psw.value == "") {
-            showAppToast({
-              title: "请输入密码",
-              icon: "none"
-            });
-            return Promise.resolve(null);
-          }
-          executeOperation(currentOperation.value);
-        });
-      };
-      const carDetail = () => {
-        stopAutoRefresh();
-        uni.navigateTo({
-          url: "/pages/userCenter/carDetail/carDetail?deviceId=" + deviceId.value
-        });
-      };
-      const refreshAdress = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          try {
-            const addr = yield getAddress(center.latitude, center.longitude);
-            address.value = addr.result.formatted_address;
-          } catch (error) {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:724", "获取地址信息失败:", error);
-          }
-        });
-      };
-      function navTo() {
-        let locationName = address.value;
-        if (locationName == "") {
-          locationName = currentCarInfo.value.getString("deviceName", "当前位置");
-        }
-        openLocation(new OpenLocationParams({
-          latitude: center.latitude,
-          longitude: center.longitude,
-          name: locationName
-        }));
-      }
-      const handleGridClick = (event = null) => {
-        const name2 = event;
-        const itemTo = name2.text;
-        if (itemTo == "轨迹回放") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&lat=" + datainfo.value.latitude + "&lng=" + datainfo.value.longitude
-          });
-        }
-        if (itemTo == "车辆跟踪") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
-          });
-        }
-        if (itemTo == "里程记录") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
-          });
-        }
-        if (itemTo == "停车记录") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/stopRecord/stopRecord?imei=" + imei.value + "&deptId=" + deptId.value
-          });
-        }
-        if (itemTo == "恢复油电") {
-          if (userType.value == "1") {
-            psw.value = "";
-            currentOperation.value = 1;
-            modalTitle.value = "验证密码";
-            popupRef.value = true;
-          } else {
-            executeOperation(1);
-          }
-        }
-        if (itemTo == "断开油电") {
-          if (userType.value == "1") {
-            psw.value = "";
-            currentOperation.value = 2;
-            modalTitle.value = "验证密码";
-            popupRef.value = true;
-          } else {
-            executeOperation(2);
-          }
-        }
-        if (itemTo == "电子围栏") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value.deviceName
-          });
-        }
-        if (itemTo == "一键寻车") {
-          navTo();
-        }
-        if (itemTo == "发送指令") {
-          stopAutoRefresh();
-          uni.navigateTo({
-            url: "/pages/cmd/cmd?imei=" + imei.value
-          });
-        }
-      };
-      const loadDeviceDetail = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (deviceId.value !== null) {
-            const res = yield getDeviceDetail(deviceId.value);
-            currentCarInfo.value = res.data;
-          } else {
-            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:817", "设备id获取失败");
-          }
-        });
-      };
-      vue.onLoad((option) => {
-        deptId.value = option.deptId;
-        imei.value = option.imei;
-        deviceId.value = option.deviceId;
-        const storedUserType = uni.getStorageSync("userType");
-        userType.value = storedUserType !== null && storedUserType !== void 0 ? storedUserType : "";
-        loadDeviceDetail().then(() => {
-          const data = new UTSJSONObject({
-            deptId: deptId.value,
-            deviceids: imei.value
-          });
-          uni.showLoading(new UTSJSONObject({ title: "加载中..." }));
-          loadData(data, 3).then((success) => {
-            uni.hideLoading();
-            if (success && datainfo.value.connectionStatus == "online") {
-              setupAutoRefresh(currentTime.value);
-            }
-          });
-        });
-      });
-      vue.onShow(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:851", "页面显示，检查自动刷新状态");
-        if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
-          setupAutoRefresh(currentTime.value);
-        }
-      });
-      vue.onHide(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:860", "页面隐藏时停止自动刷新");
-        stopAutoRefresh();
-      });
-      vue.onUnmounted(() => {
-        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面卸载时停止自动刷新");
-        stopAutoRefresh();
-      });
-      return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_map = vue.resolveComponent("map");
-        const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
-        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
-        const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
-            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
-              title: "详情",
-              "show-back": true,
-              backgroundColor: "#fff",
-              textColor: "#333",
-              showCapsule: false
-            })),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
-              vue.unref(isMapReady) ? (vue.openBlock(), vue.createBlock(_component_map, new UTSJSONObject({
-                key: 0,
-                id: "myMap",
-                latitude: vue.unref(center).latitude,
-                longitude: vue.unref(center).longitude,
-                markers: vue.unref(markers),
-                scale: vue.unref(mapScale),
-                style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
-                "show-location": false,
-                "enable-traffic": true,
-                "enable-overlooking": true,
-                "enable-building": true,
-                "enable-3D": true
-              }), null, 8, ["latitude", "longitude", "markers", "scale"])) : vue.createCommentVNode("", true),
-              vue.createVNode(_component_sub_navBar, new UTSJSONObject({
-                class: "sub-nav-overlay",
-                currentTime: vue.unref(currentTime),
-                showTime: true,
-                showPickerTime: false,
-                "onUpdate:currentTime": onCurrentTimeChange,
-                currentCar: vue.unref(currentCarInfo).deviceName,
-                times: vue.unref(times),
-                carStatus: vue.unref(datainfo).connectionStatus,
-                showPicker: false,
-                showCar: true
-              }), null, 8, ["currentTime", "currentCar", "times", "carStatus"])
-            ]),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "tools-panel" }), [
-              vue.createElementVNode("view", new UTSJSONObject({ class: "imei-box" }), [
-                vue.createElementVNode("view", new UTSJSONObject({
-                  class: "imei-info",
-                  onClick: carDetail
-                }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "imeis" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "imei-text" }), "ID: " + vue.toDisplayString(vue.unref(imei)), 1),
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "pos-time" }))
-                  ]),
-                  vue.createVNode(_component_i_icon, new UTSJSONObject({
-                    name: "/static/arrow-right.png",
-                    fontSize: "16"
-                  }))
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "pos-date" }), [
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "time-item" }), "定位时间: " + vue.toDisplayString(vue.unref(datainfo).positionUpdateTime), 1),
-                  vue.createElementVNode("text", new UTSJSONObject({ class: "time-item" }), "通信时间: " + vue.toDisplayString(vue.unref(datainfo).signalUpdateTime), 1)
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "pos-adress" }), [
-                  vue.createElementVNode("view", new UTSJSONObject({ class: "address-row" }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "address-label",
-                      style: new UTSJSONObject({ "margin-right": "10rpx", "font-size": "22rpx" })
-                    }), "当前位置:"),
-                    vue.unref(address) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                      key: 0,
-                      class: "address-text"
-                    }), vue.toDisplayString(vue.unref(address)), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                      key: 1,
-                      class: "address-text"
-                    }), vue.toDisplayString(vue.unref(center).latitude) + " , " + vue.toDisplayString(vue.unref(center).longitude), 1)),
-                    !vue.unref(address) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
-                      key: 2,
-                      style: new UTSJSONObject({ "color": "#007AFF", "margin-left": "20rpx", "font-weight": "bold", "font-size": "22rpx" }),
-                      onClick: refreshAdress
-                    }), "中文地址")) : vue.createCommentVNode("", true)
-                  ])
-                ]),
-                vue.createElementVNode("view", new UTSJSONObject({ class: "signal-container" }), [
-                  vue.unref(signalRssi) != null ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 0,
-                    class: "signal-item"
-                  }), [
-                    vue.createElementVNode("view", new UTSJSONObject({ class: "mobile-signal" }), [
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "signal-bars-horizontal" }), [
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "signal-bar-h signal-bar-h-1",
-                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(0, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
-                        }), null, 4),
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "signal-bar-h signal-bar-h-2",
-                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(1, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
-                        }), null, 4),
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "signal-bar-h signal-bar-h-3",
-                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(2, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
-                        }), null, 4),
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "signal-bar-h signal-bar-h-4",
-                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(3, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
-                        }), null, 4),
-                        vue.createElementVNode("view", new UTSJSONObject({
-                          class: "signal-bar-h signal-bar-h-5",
-                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(4, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
-                        }), null, 4)
-                      ]),
-                      vue.createElementVNode("view", new UTSJSONObject({ class: "signal-info-h" }), [
-                        vue.createElementVNode("text", new UTSJSONObject({
-                          class: "experience",
-                          style: vue.normalizeStyle({ color: getSignalDetail(vue.unref(signalRssi)).color })
-                        }), vue.toDisplayString(getSignalDetail(vue.unref(signalRssi)).experience), 5),
-                        vue.createElementVNode("text", new UTSJSONObject({
-                          class: "signal-value",
-                          style: vue.normalizeStyle({ color: getSignalDetail(vue.unref(signalRssi)).color })
-                        }), "CSQ " + vue.toDisplayString(vue.unref(signalRssi)), 5)
-                      ])
-                    ])
-                  ])) : vue.createCommentVNode("", true),
-                  vue.unref(signalSat) != null ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 1,
-                    class: "satellite-item-h"
-                  }), [
-                    vue.createElementVNode("image", new UTSJSONObject({
-                      class: "satellite-icon",
-                      src: _imports_0$1
-                    })),
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "satellite-text" }), vue.toDisplayString(vue.unref(signalSat)), 1)
-                  ])) : vue.createCommentVNode("", true),
-                  vue.unref(carVoltage) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 2,
-                    class: "power"
-                  }), [
-                    vue.createElementVNode("image", new UTSJSONObject({
-                      class: "power-icon",
-                      src: _imports_1$1
-                    })),
-                    vue.createElementVNode("text", null, vue.toDisplayString(vue.unref(carVoltage)) + "V", 1)
-                  ])) : vue.createCommentVNode("", true),
-                  vue.unref(batteryPercent) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 3,
-                    class: "battery",
-                    style: vue.normalizeStyle({ color: getBatteryColor(vue.unref(batteryPercent)) })
-                  }), [
-                    vue.createElementVNode("image", new UTSJSONObject({
-                      class: "battery-icon",
-                      src: _imports_2$1,
-                      alt: ""
-                    })),
-                    vue.createElementVNode("text", null, vue.toDisplayString(vue.unref(batteryPercent)) + "%", 1)
-                  ], 4)) : vue.createCommentVNode("", true)
-                ])
-              ]),
-              vue.createVNode(_component_i_grid, new UTSJSONObject({
-                items: vue.unref(baseList),
-                col: 5,
-                itemHeight: "88",
-                round: "8",
-                imageSize: 30,
-                iconColor: "#3c9cff",
-                textColor: "#606266",
-                showBorder: true,
-                onClick: _cache[0] || (_cache[0] = ($event = null) => {
-                  return handleGridClick($event);
-                })
-              }), null, 8, ["items"])
-            ]),
-            vue.createElementVNode("view", null, [
-              vue.createVNode(_component_i_modal, new UTSJSONObject({
-                show: vue.unref(popupRef),
-                title: vue.unref(modalTitle),
-                onConfirm: confirm
-              }), {
-                default: vue.withCtx(() => {
-                  return [
-                    vue.createElementVNode("view", null, [
-                      vue.createVNode(_component_i_input, new UTSJSONObject({
-                        modelValue: vue.unref(psw),
-                        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
-                          return vue.isRef(psw) ? psw.value = $event : null;
-                        }),
-                        onInput: filterNonLatin,
-                        placeholder: "请输入密码",
-                        clearable: "",
-                        password: true
-                      }), null, 8, ["modelValue"])
-                    ])
-                  ];
-                }),
-                _: 1
-              }, 8, ["show", "title"])
-            ])
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$s = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
-  function ensureCameraPermission(callback) {
-    callback("granted");
-  }
-  function openCameraPermissionSettings() {
-    uni.__log__("log", "at utils/cameraPermission.uts:129", "非 Android 平台无需打开相机权限设置");
-  }
-  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
-    show: { type: Boolean, default: false },
-    overlay: { type: Boolean, default: true },
-    mode: { type: String, default: "bottom" },
-    position: { type: String, default: "" },
-    title: { type: String, default: "" },
-    showTitle: { type: Boolean, default: true },
-    showClose: { type: Boolean, default: false },
-    showFooter: { type: Boolean, default: false },
-    showCancel: { type: Boolean, default: true },
-    cancelText: { type: String, default: "" },
-    confirmText: { type: String, default: "" },
-    titleStyle: { type: [String, Object], default: "" },
-    duration: { type: [String, Number], default: 300 },
-    closeable: { type: Boolean, default: false },
-    overlayStyle: { type: [String, Object], default: "" },
-    overlayOpacity: { type: [String, Number], default: 0.5 },
-    closeOnMask: { type: Boolean, default: true },
-    overlayClick: { type: Boolean, default: true },
-    overflayBgColor: { type: String, default: "" },
-    zIndex: { type: [String, Number], default: 10075 },
-    safeBottom: { type: Boolean, default: true },
-    safeTop: { type: Boolean, default: false },
-    closeIcon: { type: String, default: "close" },
-    closeIconColor: { type: String, default: "#909399" },
-    closeIconSize: { type: [String, Number], default: 18 },
-    closeIconPos: { type: String, default: "top-right" },
-    margin: { type: [String, Number], default: 0 },
-    navbarHeight: { type: Number, default: 0 },
-    round: { type: [String, Number], default: 16 },
-    zoom: { type: Boolean, default: true },
-    bgColor: { type: String, default: "#ffffff" },
-    size: { type: [String, Number], default: "" },
-    maxHeight: { type: [String, Number], default: "" },
-    width: { type: [String, Number], default: "" },
-    height: { type: [String, Number], default: "" },
-    customStyle: { type: [String, Object], default: "" },
-    customWrapStyle: { type: [String, Object], default: "" },
-    customFooterStyle: { type: [String, Object], default: "" },
-    contentMargin: { type: [String, Number], default: 16 },
-    widthCoverCenter: { type: Boolean, default: false },
-    offsetTop: { type: [String, Number], default: "0" },
-    offsetBottom: { type: [String, Number], default: "0" },
-    lazy: { type: Boolean, default: false },
-    disabledScroll: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false },
-    disabledConfirm: { type: Boolean, default: false },
-    btnColor: { type: String, default: "" },
-    swipeClose: { type: Boolean, default: false },
-    swipeHandle: { type: Boolean, default: true },
-    contentDraggable: { type: Boolean, default: true },
-    swipeCloseThreshold: { type: [String, Number], default: 50 }
-  }, emits: [
-    "click",
-    "open",
-    "close",
-    "beforeOpen",
-    "beforeClose",
-    "cancel",
-    "confirm",
-    "update:show"
-  ], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    const props = __props;
-    const emit = __emit;
-    const bgColor = vue.computed(() => {
-      return props.bgColor;
-    });
-    const opened = vue.ref(props.show);
-    const active = vue.ref(props.show);
-    const contentReady = vue.ref(!props.lazy || props.show);
-    const startX = vue.ref(0);
-    const startY = vue.ref(0);
-    const offsetX = vue.ref(0);
-    const offsetY = vue.ref(0);
-    const touching = vue.ref(false);
-    let closeTimer = 0;
-    let lazyTimer = 0;
-    const drawerPosition = vue.computed(() => {
-      if (props.position.length > 0)
-        return props.position;
-      return props.mode;
-    });
-    const normalizedMode = vue.computed(() => {
-      if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center") {
-        return drawerPosition.value;
-      }
-      return "bottom";
-    });
-    function shouldCoverCenter() {
-      return props.widthCoverCenter && (normalizedMode.value == "top" || normalizedMode.value == "bottom") && props.width.toString().length > 0;
-    }
-    function stringifyStyle(value = null) {
-      if (value == null)
-        return "";
-      const text = value.toString();
-      if (text == "[object Object]")
-        return "";
-      if (text.length == 0)
-        return "";
-      return text.endsWith(";") ? text : text + ";";
-    }
-    function formatMs(value = null) {
-      const text = value.toString();
-      if (text.indexOf("ms") >= 0 || text.indexOf("s") >= 0)
-        return text;
-      return text + "ms";
-    }
-    function formatSize(value = null) {
-      const text = value.toString();
-      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
-        return text;
-      }
-      return text + "px";
-    }
-    const rootStyle = vue.computed(() => {
-      return "z-index:" + props.zIndex.toString() + ";";
-    });
-    const panelClass = vue.computed(() => {
-      const classes = ["i-popup__panel"];
-      classes.push("i-popup__panel--" + normalizedMode.value);
-      if (shouldCoverCenter())
-        classes.push("i-popup__panel--cover-center");
-      return classes.join(" ");
-    });
-    const overlayComputedStyle = vue.computed(() => {
-      let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
-      if (props.overflayBgColor.length > 0)
-        bgColor2 = props.overflayBgColor;
-      let style = "background-color:" + bgColor2 + ";";
-      style = style + "opacity:" + (active.value ? "1" : "0") + ";";
-      style = style + "transition-duration:" + formatMs(props.duration) + ";";
-      style = style + stringifyStyle(props.overlayStyle);
-      return style;
-    });
-    const titleStyleText = vue.computed(() => {
-      return stringifyStyle(props.titleStyle);
-    });
-    function marginStyle() {
-      const margin = formatSize(props.margin);
-      if (margin == "0px")
-        return "";
-      return "margin:" + margin + ";";
-    }
-    function sizeStyle() {
-      let style = "";
-      const size = props.size.toString();
-      if (normalizedMode.value == "left" || normalizedMode.value == "right") {
-        if (props.width.toString().length > 0) {
-          style = style + "width:" + formatSize(props.width) + ";";
-        } else if (size.length > 0) {
-          style = style + "width:" + formatSize(size) + ";";
-        }
-      } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
-        if (props.width.toString().length == 0 && !shouldCoverCenter()) {
-          style = style + "width:100%;";
-        }
-        if (props.height.toString().length > 0) {
-          style = style + "height:" + formatSize(props.height) + ";";
-        } else if (size.length > 0) {
-          style = style + "height:" + formatSize(size) + ";";
-        }
-        if (props.width.toString().length > 0)
-          style = style + "width:" + formatSize(props.width) + ";";
-      } else {
-        if (props.width.toString().length > 0)
-          style = style + "width:" + formatSize(props.width) + ";";
-        if (props.height.toString().length > 0)
-          style = style + "height:" + formatSize(props.height) + ";";
-      }
-      if (normalizedMode.value == "top") {
-        if (props.navbarHeight > 0)
-          style = style + "top:" + props.navbarHeight.toString() + "px;";
-        if (props.offsetTop.toString().length > 0)
-          style = style + "top:" + formatSize(props.offsetTop) + ";";
-      }
-      if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
-        style = style + "bottom:" + formatSize(props.offsetBottom) + ";";
-      }
-      return style;
-    }
-    function roundStyle() {
-      const round = formatSize(props.round);
-      if (normalizedMode.value == "top")
-        return "border-radius:0 0 " + round + " " + round + ";";
-      if (normalizedMode.value == "bottom")
-        return "border-radius:" + round + " " + round + " 0 0;";
-      if (normalizedMode.value == "left")
-        return "border-radius:0 " + round + " " + round + " 0;";
-      if (normalizedMode.value == "right")
-        return "border-radius:" + round + " 0 0 " + round + ";";
-      if (normalizedMode.value == "center")
-        return "border-radius:" + round + ";";
-      return "";
-    }
-    function safeAreaStyle() {
-      let style = "";
-      if (props.safeTop && normalizedMode.value == "top") {
-        style = style + "padding-top:env(safe-area-inset-top);";
-      }
-      if (props.safeBottom && normalizedMode.value == "bottom") {
-        style = style + "padding-bottom:env(safe-area-inset-bottom);";
-      }
-      return style;
-    }
-    function transformStyle() {
-      const x = offsetX.value.toString();
-      const y = offsetY.value.toString();
-      if (normalizedMode.value == "center") {
-        const scale = props.zoom ? active.value ? "1" : "0.88" : "1";
-        return "opacity:" + (active.value ? "1" : "0") + ";transform:translate(-50%,-50%) translate(" + x + "px," + y + "px) scale(" + scale + ");";
-      }
-      if (normalizedMode.value == "bottom") {
-        const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
-        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "100%") + ");";
-      }
-      if (normalizedMode.value == "top") {
-        const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
-        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "-100%") + ");";
-      }
-      if (normalizedMode.value == "left")
-        return "transform:translateX(" + (active.value ? x + "px" : "-100%") + ");";
-      if (normalizedMode.value == "right")
-        return "transform:translateX(" + (active.value ? x + "px" : "100%") + ");";
-      return "";
-    }
-    const panelStyle = vue.computed(() => {
-      let style = "background-color:" + bgColor.value + ";";
-      style = style + "transition-duration:" + formatMs(props.duration) + ";";
-      style = style + marginStyle();
-      style = style + sizeStyle();
-      style = style + roundStyle();
-      style = style + safeAreaStyle();
-      style = style + transformStyle();
-      style = style + stringifyStyle(props.customStyle);
-      style = style + stringifyStyle(props.customWrapStyle);
-      return style;
-    });
-    const bodyStyle = vue.computed(() => {
-      let style = "padding:" + formatSize(props.contentMargin) + ";";
-      if (props.maxHeight.toString().length > 0)
-        style = style + "max-height:" + formatSize(props.maxHeight) + ";";
-      return style;
-    });
-    const footerStyle = vue.computed(() => {
-      return stringifyStyle(props.customFooterStyle);
-    });
-    const confirmTextStyle = vue.computed(() => {
-      const color = props.btnColor.length > 0 ? props.btnColor : "#1989fa";
-      return "color:" + color + ";";
-    });
-    const confirmTextValue = vue.computed(() => {
-      return props.confirmText.length > 0 ? props.confirmText : "确定";
-    });
-    const cancelTextValue = vue.computed(() => {
-      return props.cancelText.length > 0 ? props.cancelText : "取消";
-    });
-    const contentVisible = vue.computed(() => {
-      return !props.lazy || contentReady.value;
-    });
-    const closeClass = vue.computed(() => {
-      const classes = ["i-popup__close"];
-      let position = "top-right";
-      if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
-        position = props.closeIconPos;
-      }
-      classes.push("i-popup__close--" + position);
-      return classes.join(" ");
-    });
-    const closeStyle = vue.computed(() => {
-      return "color:" + props.closeIconColor + ";font-size:" + formatSize(props.closeIconSize) + ";";
-    });
-    const closeIconText = vue.computed(() => {
-      if (props.closeIcon == "close")
-        return "×";
-      return props.closeIcon;
-    });
-    const clearTimers = () => {
-      if (closeTimer > 0) {
-        clearTimeout(closeTimer);
-        closeTimer = 0;
-      }
-      if (lazyTimer > 0) {
-        clearTimeout(lazyTimer);
-        lazyTimer = 0;
-      }
-    };
-    const resetOffset = () => {
-      offsetX.value = 0;
-      offsetY.value = 0;
-      touching.value = false;
-    };
-    const animationDuration = () => {
-      const text = props.duration.toString();
-      if (text.indexOf("ms") >= 0)
-        return parseFloat(text.replace("ms", ""));
-      if (text.indexOf("s") >= 0)
-        return parseFloat(text.replace("s", "")) * 1e3;
-      const duration = parseFloat(text);
-      if (isNaN(duration))
-        return 300;
-      return duration;
-    };
-    const openPanel = (shouldEmitUpdate) => {
-      if (props.disabled)
-        return null;
-      if (opened.value && active.value)
-        return null;
-      clearTimers();
-      emit("beforeOpen");
-      opened.value = true;
-      resetOffset();
-      if (!props.lazy)
-        contentReady.value = true;
-      setTimeout(() => {
-        active.value = true;
-        if (props.lazy) {
-          lazyTimer = setTimeout(() => {
-            contentReady.value = true;
-            lazyTimer = 0;
-          }, animationDuration());
-        }
-        emit("open");
-        if (shouldEmitUpdate)
-          emit("update:show", true);
-      }, 20);
-    };
-    const closePanel = (shouldEmitUpdate) => {
-      if (!opened.value && !active.value)
-        return null;
-      clearTimers();
-      emit("beforeClose");
-      active.value = false;
-      if (props.lazy)
-        contentReady.value = false;
-      resetOffset();
-      closeTimer = setTimeout(() => {
-        opened.value = false;
-        closeTimer = 0;
-        emit("close");
-        if (shouldEmitUpdate)
-          emit("update:show", false);
-      }, animationDuration());
-    };
-    vue.watch(() => {
-      return props.show;
-    }, (nextValue) => {
-      if (nextValue) {
-        openPanel(false);
-      } else {
-        closePanel(false);
-      }
-    });
-    function open() {
-      openPanel(true);
-    }
-    function close() {
-      closePanel(true);
-    }
-    function handleOverlayClick() {
-      emit("click");
-      if (!props.overlayClick || !props.closeOnMask)
-        return null;
-      close();
-    }
-    function cancel() {
-      emit("cancel");
-      close();
-    }
-    function confirm() {
-      if (props.disabledConfirm)
-        return null;
-      emit("confirm");
-      close();
-    }
-    const readTouchX = (event) => {
-      let point = null;
-      if (event.touches.length > 0) {
-        point = event.touches[0];
-      } else if (event.changedTouches.length > 0) {
-        point = event.changedTouches[0];
-      }
-      if (point == null)
-        return 0;
-      return point.clientX;
-    };
-    const readTouchY = (event) => {
-      let point = null;
-      if (event.touches.length > 0) {
-        point = event.touches[0];
-      } else if (event.changedTouches.length > 0) {
-        point = event.changedTouches[0];
-      }
-      if (point == null)
-        return 0;
-      return point.clientY;
-    };
-    const handleTouchStart = (event) => {
-      if (!props.swipeClose)
-        return null;
-      touching.value = true;
-      startX.value = readTouchX(event);
-      startY.value = readTouchY(event);
-    };
-    function handleHandleTouchStart(event) {
-      handleTouchStart(event);
-    }
-    function handleTouchMove(event) {
-      if (!props.swipeClose || !touching.value)
-        return null;
-      const currentX = readTouchX(event);
-      const currentY = readTouchY(event);
-      const deltaX = currentX - startX.value;
-      const deltaY = currentY - startY.value;
-      if (normalizedMode.value == "bottom" && deltaY > 0)
-        offsetY.value = deltaY;
-      if (normalizedMode.value == "top" && deltaY < 0)
-        offsetY.value = deltaY;
-      if (normalizedMode.value == "left" && deltaX < 0)
-        offsetX.value = deltaX;
-      if (normalizedMode.value == "right" && deltaX > 0)
-        offsetX.value = deltaX;
-      if (normalizedMode.value == "center" && deltaY > 0)
-        offsetY.value = deltaY;
-    }
-    function handleTouchEnd() {
-      if (!touching.value)
-        return null;
-      touching.value = false;
-      const threshold = parseFloat(props.swipeCloseThreshold.toString());
-      if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
-        close();
-        return null;
-      }
-      resetOffset();
-    }
-    __expose({
-      open,
-      close
-    });
-    return (_ctx = null, _cache = null) => {
-      return vue.openBlock(), vue.createElementBlock("view", null, [
-        vue.createElementVNode("view", new UTSJSONObject({
-          class: "i-popup__trigger",
-          onClick: open
-        }), [
-          vue.renderSlot(_ctx.$slots, "trigger")
-        ]),
-        opened.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: "i-popup",
-          style: vue.normalizeStyle(rootStyle.value)
-        }), [
-          __props.overlay ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 0,
-            class: "i-popup__overlay",
-            style: vue.normalizeStyle(overlayComputedStyle.value),
-            onClick: handleOverlayClick
-          }), null, 4)) : vue.createCommentVNode("", true),
-          vue.createElementVNode("view", new UTSJSONObject({
-            class: vue.normalizeClass(panelClass.value),
-            style: vue.normalizeStyle(panelStyle.value),
-            onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
-            }, ["stop"]))
-          }), [
-            vue.renderSlot(_ctx.$slots, "bg"),
-            __props.swipeClose && __props.swipeHandle ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "i-popup__swipe-handle",
-              onTouchstart: vue.withModifiers(handleHandleTouchStart, ["stop"]),
-              onTouchmove: vue.withModifiers(handleTouchMove, ["stop", "prevent"]),
-              onTouchend: vue.withModifiers(handleTouchEnd, ["stop"]),
-              onTouchcancel: vue.withModifiers(handleTouchEnd, ["stop"])
-            }), [
-              vue.createElementVNode("view", new UTSJSONObject({ class: "i-popup__swipe-bar" }))
-            ], 32)) : vue.createCommentVNode("", true),
-            normalizedMode.value == "bottom" ? vue.renderSlot(_ctx.$slots, "contentTop", new UTSJSONObject({ key: 1 })) : vue.createCommentVNode("", true),
-            vue.renderSlot(_ctx.$slots, "header", new UTSJSONObject({}), () => {
-              return [
-                __props.showTitle && __props.title.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 0,
-                  class: "i-popup__header"
-                }), [
-                  vue.renderSlot(_ctx.$slots, "title", new UTSJSONObject({}), () => {
-                    return [
-                      vue.createElementVNode("text", new UTSJSONObject({
-                        class: "i-popup__title",
-                        style: vue.normalizeStyle(titleStyleText.value)
-                      }), vue.toDisplayString(__props.title), 5)
-                    ];
-                  })
-                ])) : vue.createCommentVNode("", true)
-              ];
-            }),
-            __props.showClose ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 2,
-              class: vue.normalizeClass(closeClass.value),
-              onClick: close
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({
-                class: "i-popup__close-text",
-                style: vue.normalizeStyle(closeStyle.value)
-              }), vue.toDisplayString(closeIconText.value), 5)
-            ], 2)) : vue.createCommentVNode("", true),
-            __props.disabledScroll ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 3,
-              class: "i-popup__body",
-              style: vue.normalizeStyle(bodyStyle.value)
-            }), [
-              contentVisible.value ? vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ key: 0 })) : vue.createCommentVNode("", true)
-            ], 4)) : (vue.openBlock(), vue.createElementBlock("scroll-view", new UTSJSONObject({
-              key: 4,
-              "scroll-y": "",
-              class: "i-popup__body i-popup__body--scroll",
-              style: vue.normalizeStyle(bodyStyle.value)
-            }), [
-              contentVisible.value ? vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ key: 0 })) : vue.createCommentVNode("", true)
-            ], 4)),
-            vue.renderSlot(_ctx.$slots, "footer", new UTSJSONObject({}), () => {
-              return [
-                __props.showFooter ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                  key: 0,
-                  class: "i-popup__footer",
-                  style: vue.normalizeStyle(footerStyle.value)
-                }), [
-                  __props.showCancel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-                    key: 0,
-                    class: "i-popup__footer-button i-popup__footer-button--cancel",
-                    onClick: cancel
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({ class: "i-popup__footer-cancel" }), vue.toDisplayString(cancelTextValue.value), 1)
-                  ])) : vue.createCommentVNode("", true),
-                  vue.createElementVNode("view", new UTSJSONObject({
-                    class: vue.normalizeClass(__props.disabledConfirm ? "i-popup__footer-button i-popup__footer-button--confirm i-popup__footer-button--disabled" : "i-popup__footer-button i-popup__footer-button--confirm"),
-                    onClick: confirm
-                  }), [
-                    vue.createElementVNode("text", new UTSJSONObject({
-                      class: "i-popup__footer-confirm",
-                      style: vue.normalizeStyle(confirmTextStyle.value)
-                    }), vue.toDisplayString(confirmTextValue.value), 5)
-                  ], 2)
-                ], 4)) : vue.createCommentVNode("", true)
-              ];
-            }),
-            __props.closeable && !__props.showClose ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 5,
-              class: vue.normalizeClass(closeClass.value),
-              onClick: close
-            }), [
-              vue.createElementVNode("text", new UTSJSONObject({
-                class: "i-popup__close-text",
-                style: vue.normalizeStyle(closeStyle.value)
-              }), vue.toDisplayString(closeIconText.value), 5)
-            ], 2)) : vue.createCommentVNode("", true)
-          ], 6)
-        ], 4)) : vue.createCommentVNode("", true)
-      ]);
-    };
-  } }));
-  const _style_0$r = { "i-popup__trigger": { "": { "flexDirection": "column" } }, "i-popup": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0 } }, "i-popup__overlay": { "": { "position": "absolute", "left": 0, "right": 0, "top": 0, "bottom": 0, "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-popup__panel": { "": { "position": "absolute", "overflow": "hidden", "flexDirection": "column", "boxShadow": "0 12px 34px rgba(15, 23, 42, 0.18)", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-popup__panel--bottom": { "": { "left": 0, "right": 0, "bottom": 0, "minHeight": 160 } }, "i-popup__panel--top": { "": { "left": 0, "right": 0, "top": 0, "minHeight": 160 } }, "i-popup__panel--left": { "": { "left": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--right": { "": { "right": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--center": { "": { "left": "50%", "top": "50%", "width": 300 } }, "i-popup__panel--cover-center": { "": { "left": "50%", "right": "auto", "width": "100%", "transformOrigin": "center center" } }, "i-popup__swipe-handle": { "": { "height": 24, "alignItems": "center", "justifyContent": "center" } }, "i-popup__swipe-bar": { "": { "width": 38, "height": 4, "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99, "backgroundColor": "#d9dee8" } }, "i-popup__header": { "": { "minHeight": 54, "paddingTop": 0, "paddingRight": 52, "paddingBottom": 0, "paddingLeft": 18, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#f2f3f5", "alignItems": "center", "justifyContent": "center" } }, "i-popup__title": { "": { "color": "#303133", "fontSize": 16, "fontWeight": 600, "lineHeight": "24px" } }, "i-popup__close": { "": { "position": "absolute", "zIndex": 2, "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34, "backgroundColor": "rgba(245,247,250,0.92)", "alignItems": "center", "justifyContent": "center" } }, "i-popup__close--top-right": { "": { "right": 12, "top": 10 } }, "i-popup__close--top-left": { "": { "left": 12, "top": 10 } }, "i-popup__close--bottom-left": { "": { "left": 12, "bottom": 10 } }, "i-popup__close--bottom-right": { "": { "right": 12, "bottom": 10 } }, "i-popup__close-text": { "": { "color": "#606266", "fontSize": 22, "lineHeight": "34px", "textAlign": "center" } }, "i-popup__body": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__body--scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__footer": { "": { "minHeight": 58, "paddingTop": 10, "paddingRight": 14, "paddingBottom": 10, "paddingLeft": 14, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5", "backgroundColor": "#ffffff", "flexDirection": "row" } }, "i-popup__footer-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 40, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "alignItems": "center", "justifyContent": "center" } }, "i-popup__footer-button--cancel": { "": { "marginRight": 8, "backgroundColor": "#f5f7fb" } }, "i-popup__footer-button--confirm": { "": { "backgroundColor": "#eef6ff" } }, "i-popup__footer-button--disabled": { "": { "opacity": 0.45 } }, "i-popup__footer-cancel": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px", "color": "#606266" } }, "i-popup__footer-confirm": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-popup__overlay": { "property": "opacity", "timingFunction": "ease" }, "i-popup__panel": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
-  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
-  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
-    __name: "car-icons",
-    props: {
-      show: { type: Boolean, default: false },
-      title: { default: "请选择图标", type: String },
-      col: { default: 4, type: Number },
-      iconSize: { default: 40, type: Number },
-      safeAreaInsetBottom: { type: Boolean, default: true }
-    },
-    emits: ["select", "update:show"],
-    setup(__props, _a) {
-      var __emit = _a.emit;
-      const props = __props;
-      const emit = __emit;
-      const iconList = [
-        new UTSJSONObject({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
-        new UTSJSONObject({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
-        new UTSJSONObject({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
-        new UTSJSONObject({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
-        new UTSJSONObject({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
-        new UTSJSONObject({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
-        new UTSJSONObject({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
-        new UTSJSONObject({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
-        new UTSJSONObject({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
-        new UTSJSONObject({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
-        new UTSJSONObject({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
-        new UTSJSONObject({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
-        new UTSJSONObject({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
-        new UTSJSONObject({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
-        new UTSJSONObject({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
-        new UTSJSONObject({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
-        new UTSJSONObject({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
-        new UTSJSONObject({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
-        new UTSJSONObject({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
-        new UTSJSONObject({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
-      ];
-      vue.computed(() => {
-        const cols = props.col > 0 ? props.col : 4;
-        return 100 / cols + "%";
-      });
-      const close = () => {
-        emit("update:show", false);
-      };
-      const handleSelect = (item = null) => {
-        const selected = item;
-        uni.__log__("log", "at components/car-icons/car-icons.uvue:93", "选择的图标:", selected);
-        emit("select", selected);
-        close();
-      };
-      const handlePopupClick = () => {
-        uni.__log__("log", "at components/car-icons/car-icons.uvue:100", "Popup clicked");
-      };
-      return (_ctx = null, _cache = null) => {
-        const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$4);
-        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
-        return vue.openBlock(), vue.createBlock(_component_i_popup, new UTSJSONObject({
-          show: props.show,
-          title: _ctx.title,
-          mode: "bottom",
-          safeBottom: _ctx.safeAreaInsetBottom,
-          showClose: "",
-          onClose: close,
-          onClick: handlePopupClick
-        }), new UTSJSONObject({
-          default: vue.withCtx(() => {
-            return [
-              vue.createElementVNode("scroll-view", new UTSJSONObject({
-                class: "icon-selector",
-                "scroll-y": ""
-              }), [
-                vue.createVNode(_component_i_grid, new UTSJSONObject({
-                  items: iconList,
-                  col: 4,
-                  itemHeight: "88",
-                  round: "8",
-                  imageSize: 30,
-                  iconColor: "#3c9cff",
-                  textColor: "#606266",
-                  showBorder: true,
-                  onClick: _cache[0] || (_cache[0] = ($event = null) => {
-                    return handleSelect($event);
-                  })
-                }))
-              ])
-            ];
-          }),
-          _: 1
-        }), 8, ["show", "title", "safeBottom"]);
-      };
-    }
-  });
-  const _style_0$q = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
-  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["styles", [_style_0$q]]]);
-  class CarFormData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            deviceName: { type: String, optional: false },
-            imei: { type: String, optional: false },
-            deviceType: { type: String, optional: false },
-            deviceTypeValue: { type: String, optional: false },
-            plateNo: { type: String, optional: false },
-            carType: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = CarFormData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.deviceName = this.__props__.deviceName;
-      this.imei = this.__props__.imei;
-      this.deviceType = this.__props__.deviceType;
-      this.deviceTypeValue = this.__props__.deviceTypeValue;
-      this.plateNo = this.__props__.plateNo;
-      this.carType = this.__props__.carType;
-      delete this.__props__;
-    }
-  }
-  class ScanResultData extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            result: { type: String, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = ScanResultData.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.result = this.__props__.result;
-      delete this.__props__;
-    }
-  }
-  class AddDeviceResponse extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            code: { type: Number, optional: false },
-            msg: { type: String, optional: false },
-            data: { type: CarFormData, optional: false }
-          };
-        }
-      };
-    }
-    constructor(options, metadata = AddDeviceResponse.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.code = this.__props__.code;
-      this.msg = this.__props__.msg;
-      this.data = this.__props__.data;
-      delete this.__props__;
-    }
-  }
-  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent({
-    __name: "addCar",
-    setup(__props) {
-      const isRequestingCameraPermission = vue.ref(false);
-      const isNavigatingToScanner = vue.ref(false);
-      const carIconSelectorVisible = vue.ref(false);
-      const loading = vue.ref(false);
-      const formValid = vue.ref(false);
-      const carInfo = vue.ref(new CarFormData({
-        deviceName: "",
-        imei: "",
-        deviceType: "",
-        deviceTypeValue: "",
-        plateNo: "",
-        carType: ""
-      }));
-      vue.ref([]);
-      const rules = [
-        new UTSJSONObject({ name: "imei", required: true, message: "请输入设备ID" }),
-        new UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
-      ];
-      const handleModelValid = (value = null) => {
-        formValid.value = !!value;
-      };
-      const openScanPage = () => {
-        if (isNavigatingToScanner.value)
-          return null;
-        isNavigatingToScanner.value = true;
-        uni.__log__("log", "at pages/addCar/addCar.uvue:117", "打开扫码页");
-        uni.navigateTo({
-          url: "/pages/scancode/scancode?source=addCar",
-          fail: (error) => {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:121", "打开扫码页失败:", error);
-            showAppToast({ title: "无法打开扫码页，请重试", icon: "none" });
-          },
-          complete: () => {
-            isNavigatingToScanner.value = false;
-          }
-        });
-      };
-      const handleCameraPermission = (status) => {
-        isRequestingCameraPermission.value = false;
-        if (status == "granted") {
-          openScanPage();
-          return null;
-        }
-        if (status == "settingsRequired") {
-          showAppModal(new UTSJSONObject({
-            title: "需要相机权限",
-            content: "请在系统设置中开启相机权限后再扫码",
-            confirmText: "去设置",
-            cancelText: "取消",
-            success: (res) => {
-              if (res.confirm)
-                openCameraPermissionSettings();
-            }
-          }));
-          return null;
-        }
-        showAppToast({ title: "未获得相机权限，无法扫码", icon: "none" });
-      };
-      const scanCode = () => {
-        if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
-          return null;
-        isRequestingCameraPermission.value = true;
-        ensureCameraPermission(handleCameraPermission);
-      };
-      const handleScanResult = (data) => {
-        uni.__log__("log", "at pages/addCar/addCar.uvue:159", "接收到扫码结果:", data.result);
-        if (data.result.length == 15) {
-          carInfo.value.imei = "0" + data.result.slice(4, 15);
-          return null;
-        }
-        if (data.result.length == 11) {
-          carInfo.value.imei = "0" + data.result;
-          return null;
-        }
-        showAppToast({
-          title: "扫码结果长度不是标准设备ID，请确认后提交",
-          icon: "none"
-        });
-      };
-      const updateCarIconSelectorVisible = (visible) => {
-        carIconSelectorVisible.value = visible;
-      };
-      const selectIcon = (item) => {
-        const name2 = item.getString("name", "");
-        const text = item.getString("text", "");
-        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name2);
-        carInfo.value.deviceType = name2;
-        carInfo.value.deviceTypeValue = text;
-        carIconSelectorVisible.value = false;
-      };
-      const deviceTypeSelectFun = () => {
-        carIconSelectorVisible.value = true;
-      };
-      const refreshDeviceList = () => {
-        uni.$emit("refreshDeviceList");
-      };
-      const validateForm = () => {
-        if (carInfo.value.imei.length == 0) {
-          showAppToast({
-            title: "请输入设备ID",
-            icon: "none"
-          });
-          return false;
-        }
-        if (carInfo.value.deviceType.length == 0) {
-          showAppToast({
-            title: "请选择设备图标",
-            icon: "none"
-          });
-          return false;
-        }
-        return true;
-      };
-      const submit = () => {
-        return __awaiter(this, void 0, void 0, function* () {
-          uni.__log__("log", "at pages/addCar/addCar.uvue:219", "=== 开始提交设备 ===");
-          try {
-            if (!validateForm())
-              return Promise.resolve(null);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:224", "✅ 表单验证通过");
-            loading.value = true;
-            uni.showLoading(new UTSJSONObject({
-              title: "添加中...",
-              mask: true
-            }));
-            const submitData = new UTSJSONObject({
-              deviceName: carInfo.value.deviceName,
-              imei: carInfo.value.imei,
-              carType: carInfo.value.deviceType,
-              plateNo: carInfo.value.plateNo
-            });
-            uni.__log__("log", "at pages/addCar/addCar.uvue:239", "📤 提交数据:", submitData);
-            const res = yield addDevice(submitData);
-            uni.__log__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
-            uni.hideLoading();
-            loading.value = false;
-            if (res.code == 0) {
-              showAppToast({
-                title: "添加成功",
-                icon: "success"
-              });
-              uni.setStorageSync("needRefreshHome", true);
-              refreshDeviceList();
-              setTimeout(() => {
-                uni.navigateBack();
-              }, 1500);
-            } else {
-              showAppToast({
-                title: res.msg || "添加失败",
-                icon: "none",
-                duration: 2e3
-              });
-            }
-          } catch (error) {
-            uni.__log__("error", "at pages/addCar/addCar.uvue:269", "❌ 添加设备失败:", error);
-            uni.hideLoading();
-            loading.value = false;
-            showAppToast({
-              title: "添加设备失败",
-              icon: "none"
-            });
-          }
-        });
-      };
-      vue.onLoad(() => {
-      });
-      vue.onShow(() => {
-        isNavigatingToScanner.value = false;
-        const rawResult = uni.getStorageSync("scanCodeResult");
-        const result = rawResult != null ? rawResult.toString() : "";
-        if (result.length > 0) {
-          uni.removeStorageSync("scanCodeResult");
-          handleScanResult(new ScanResultData({ result }));
-        }
-      });
-      vue.onUnload(() => {
-      });
-      return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
-        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
-        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
-            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
-              title: "添加设备",
-              "show-back": true,
-              backgroundColor: "#fff",
-              textColor: "#333",
-              showCapsule: false
-            })),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
-              vue.createVNode(_component_i_form, new UTSJSONObject({
-                labelPosition: "left",
-                modelValue: carInfo.value,
-                rules,
-                labelDirection: "horizontal",
-                watchValidStatus: "",
-                "onUpdate:modelValid": handleModelValid
-              }), {
-                default: vue.withCtx(() => {
-                  return [
-                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                      label: "设备名称",
-                      name: "deviceName",
-                      labelDirection: "horizontal"
-                    }), {
-                      default: vue.withCtx(() => {
-                        return [
-                          vue.createVNode(_component_i_input, new UTSJSONObject({
-                            border: "none",
-                            modelValue: carInfo.value.deviceName,
-                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
-                              return carInfo.value.deviceName = $event;
-                            }),
-                            placeholder: "请输入设备名称"
-                          }), null, 8, ["modelValue"])
-                        ];
-                      }),
-                      _: 1
-                    }),
-                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                      label: "*设备ID",
-                      name: "imei",
-                      labelDirection: "horizontal"
-                    }), {
-                      default: vue.withCtx(() => {
-                        return [
-                          vue.createVNode(_component_i_input, new UTSJSONObject({
-                            border: "none",
-                            modelValue: carInfo.value.imei,
-                            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
-                              return carInfo.value.imei = $event;
-                            }),
-                            placeholder: "请输入设备ID(必填)"
-                          }), {
-                            suffix: vue.withCtx(() => {
-                              return [
-                                vue.createVNode(_component_i_icon, new UTSJSONObject({
-                                  name: "/static/sancode.png",
-                                  fontSize: "24",
-                                  onClick: scanCode
-                                }))
-                              ];
-                            }),
-                            _: 1
-                          }, 8, ["modelValue"])
-                        ];
-                      }),
-                      _: 1
-                    }),
-                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                      label: "车标",
-                      name: "deviceType",
-                      labelDirection: "horizontal"
-                    }), {
-                      default: vue.withCtx(() => {
-                        return [
-                          vue.createElementVNode("view", new UTSJSONObject({
-                            class: "car-type-selector",
-                            onClick: deviceTypeSelectFun
-                          }), [
-                            vue.createElementVNode("text", new UTSJSONObject({
-                              class: vue.normalizeClass(["clickable", new UTSJSONObject({ "placeholder": !carInfo.value.deviceTypeValue })])
-                            }), vue.toDisplayString(carInfo.value.deviceTypeValue || "请选择设备图标(必选)"), 3)
-                          ])
-                        ];
-                      }),
-                      _: 1
-                    }),
-                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
-                      label: "车牌号",
-                      name: "plateNo",
-                      labelDirection: "horizontal"
-                    }), {
-                      default: vue.withCtx(() => {
-                        return [
-                          vue.createVNode(_component_i_input, new UTSJSONObject({
-                            border: "none",
-                            modelValue: carInfo.value.plateNo,
-                            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
-                              return carInfo.value.plateNo = $event;
-                            }),
-                            placeholder: "请输入车牌号"
-                          }), null, 8, ["modelValue"])
-                        ];
-                      }),
-                      _: 1
-                    }),
-                    vue.createVNode(vue.unref(carIcons), new UTSJSONObject({
-                      show: carIconSelectorVisible.value,
-                      "onUpdate:show": updateCarIconSelectorVisible,
-                      onSelect: selectIcon
-                    }), null, 8, ["show"])
-                  ];
-                }),
-                _: 1
-              }, 8, ["modelValue"])
-            ]),
-            vue.createElementVNode("view", new UTSJSONObject({ class: "btn" }), [
-              vue.createVNode(_component_i_button, new UTSJSONObject({
-                type: "primary",
-                onClick: submit,
-                loading: loading.value
-              }), {
-                default: vue.withCtx(() => {
-                  return [
-                    vue.createTextVNode("提交")
-                  ];
-                }),
-                _: 1
-              }, 8, ["loading"])
-            ])
-          ]),
-          vue.createVNode(_component_app_toast)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$p = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "clickable": { ".container ": { "marginTop": 10, "color": "#999999", "fontSize": "28rpx" } }, "btn": { ".container ": { "marginTop": "50rpx", "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx" } }, "plate-input": { ".container ": { "width": "100%" } }, "input-wrapper": { ".container .plate-input ": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000" } }, "car-input-container": { ".container ": { "display": "flex", "flexDirection": "row" } }, "car-number-input": { ".container ": { "width": "60%", "textAlign": "right" } }, "plate-close": { ".container .car-number-container ": { "height": 40, "display": "flex", "textAlign": "right", "backgroundColor": "#FFFFFF", "flexDirection": "row", "justifyContent": "flex-end", "alignItems": "center" } }, "car-input-item": { ".container .car-input-container .car-input-box ": { "position": "relative", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#E2E2E2", "borderRightColor": "#E2E2E2", "borderBottomColor": "#E2E2E2", "borderLeftColor": "#E2E2E2", "height": 40, "lineHeight": "40px", "textAlign": "center", "fontSize": 17 } }, "new-item-img": { ".container .car-input-container .car-input-box .car-input-item ": { "position": "absolute", "top": -2, "left": "50%", "marginLeft": -15, "height": 13, "width": 30, "zIndex": 9 } }, "i-form-item": { ".container ": { "paddingTop": "5rpx", "paddingRight": "10rpx", "paddingBottom": "5rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#99999924" } } };
-  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["styles", [_style_0$p]]]);
+  const _style_0$I = { "i-card": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "i-title": { "": { "color": "#303133", "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-muted": { "": { "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-row": { "": { "flexDirection": "row", "alignItems": "center", "flexWrap": "wrap" } }, "i-btn": { "": { "minHeight": 34, "marginTop": 10, "marginRight": 8, "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "backgroundColor": "#ecf5ff", "alignItems": "center", "justifyContent": "center" } }, "i-btn--plain": { "": { "backgroundColor": "#f5f7fa" } }, "i-btn--danger": { "": { "backgroundColor": "#fef0f0" } }, "i-btn-text": { "": { "color": "#2979ff", "fontSize": 13, "lineHeight": "18px" } }, "i-danger": { "": { "color": "#f56c6c" } }, "i-head": { "": { "justifyContent": "space-between" } }, "i-track": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "marginRight": 5, "overflow": "hidden" } }, "i-fill": { "": { "height": "100%", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } } };
+  const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["styles", [_style_0$I]]]);
   function isString$1(str) {
     return typeof str == "string";
   }
@@ -10443,7 +633,7 @@
       this.isInitialized = false;
     }
   }
-  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$J = /* @__PURE__ */ vue.defineComponent({
     __name: "l-picker-item",
     props: {
       options: { default: [], type: Array },
@@ -10667,8 +857,8 @@
       };
     }
   });
-  const _style_0$o = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
-  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["styles", [_style_0$o]]]);
+  const _style_0$H = { "l-picker-item__group": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-picker-item__group-item": { "": { "height": "var(--l-picker-item-height, 50px)", "lineHeight": "var(--l-picker-item-height, 50px)", "textAlign": "center", "transitionDuration": "100ms", "transitionProperty": "fontWeight,color", "transitionTimingFunction": "linear", "fontWeight": 400, "color": "var(--l-picker-item-color, #000000E0)", "fontSize": "var(--l-picker-item-font-size, 16px)", "whiteSpace": "nowrap" } }, "l-picker-item__group-item--active": { "": { "color": "var(--l-picker-item-active-color, #000000E0)", "fontWeight": "var(--l-picker-item-active-font-weight, 700)" } }, "l-picker-item__wrapper": { "": { "width": "100%" } }, "@TRANSITION": { "l-picker-item__group-item": { "duration": "100ms", "property": "fontWeight,color", "timingFunction": "linear" } } };
+  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["styles", [_style_0$H]]]);
   function arrayEqual(arr1, arr2) {
     return arr1.length == arr2.length && arr1.every((val, i) => {
       return val == arr2[i];
@@ -12521,7 +2711,7 @@
     });
     return state;
   }
-  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
     __name: "l-picker",
     props: {
       cancelBtn: { type: String },
@@ -12732,7 +2922,7 @@
       vue.provide("limePickerManageChildInList", manageChildInList);
       return (_ctx = null, _cache = null) => {
         var _a2, _b2, _c2, _d2;
-        const _component_l_picker_item = resolveEasycom(vue.resolveDynamicComponent("l-picker-item"), __easycom_0$3);
+        const _component_l_picker_item = resolveEasycom(vue.resolveDynamicComponent("l-picker-item"), __easycom_0$6);
         return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
           class: "l-picker",
           style: vue.normalizeStyle([vue.unref(styles)]),
@@ -12800,8 +2990,9645 @@
       };
     }
   });
-  const _style_0$n = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
-  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["styles", [_style_0$n]]]);
+  const _style_0$G = { "l-picker": { "": { "position": "relative", "backgroundColor": "var(--l-picker-bg-color, #fff)", "borderTopLeftRadius": "var(--l-picker-border-radius, 12px)", "borderTopRightRadius": "var(--l-picker-border-radius, 12px)" } }, "l-picker__toolbar": { "": { "display": "flex", "alignItems": "center", "justifyContent": "space-between", "height": "var(--l-picker-toolbar-height, 58px)", "flexDirection": "row", "position": "relative" } }, "l-picker__title": { "": { "position": "absolute", "left": "50%", "top": "50%", "transform": "translateX(-50%) translateY(-50%)", "textAlign": "center", "overflow": "hidden", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "color": "var(--l-picker-title-color, #000000E0)", "lineHeight": "var(--l-picker-title-line-height, 26px)", "fontWeight": "var(--l-picker-title-font-weight, 700)", "fontSize": "var(--l-picker-title-font-size, 18px)" } }, "l-picker__cancel": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginRight": "auto", "color": "var(--l-picker-cancel-color, #000000A6)" } }, "l-picker__confirm": { "": { "whiteSpace": "nowrap", "fontSize": "var(--l-picker-button-font-size, 16px)", "lineHeight": "var(--l-picker-toolbar-height, 58px)", "height": "100%", "paddingTop": 0, "paddingRight": 16, "paddingBottom": 0, "paddingLeft": 16, "marginLeft": "auto", "color": "var(--l-picker-confirm-color, #3283ff)" } }, "l-picker__main": { "": { "position": "relative", "display": "flex", "height": "var(--l-picker-group-height, 200px)", "flexDirection": "row", "zIndex": 2, "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "l-picker__empty": { "": { "pointerEvents": "none", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "zIndex": 3 } }, "l-picker__loading": { "": { "zIndex": 3, "backgroundColor": "var(--l-picker-loading-mask-color, rgba(255, 255, 255, 0.9))", "justifyContent": "center", "alignItems": "center", "display": "flex", "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0 } }, "l-picker__indicator": { "": { "position": "absolute", "backgroundColor": "var(--l-picker-indicator-bg-color, #0000000A)", "top": "50%", "left": "var(--l-picker-indicator-margin, 10px)", "right": "var(--l-picker-indicator-margin, 10px)", "height": "var(--l-picker-item-height, 50px)", "transform": "translateY(-50%)", "zIndex": -1, "borderTopLeftRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderTopRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomRightRadius": "var(--l-picker-indicator-border-radius, 6px)", "borderBottomLeftRadius": "var(--l-picker-indicator-border-radius, 6px)" } } };
+  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["styles", [_style_0$G]]]);
+  function raf(fn = null) {
+    if (typeof fn == "UniAnimationFrameCallback") {
+      return requestAnimationFrame(fn);
+    } else {
+      return requestAnimationFrame(fn);
+    }
+  }
+  function useTransition(options) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    const state = vue.ref(false);
+    const display = vue.ref(false);
+    const inited = vue.ref(false);
+    const classes = vue.ref("");
+    const name2 = vue.ref((_a = options.defaultName) !== null && _a !== void 0 ? _a : "fade");
+    const enterClass = (_b = options.enterClass) !== null && _b !== void 0 ? _b : "";
+    const enterActiveClass = (_c = options.enterActiveClass) !== null && _c !== void 0 ? _c : "";
+    const enterToClass = (_d = options.enterToClass) !== null && _d !== void 0 ? _d : "";
+    const leaveActiveClass = (_e = options.leaveActiveClass) !== null && _e !== void 0 ? _e : "";
+    const leaveToClass = (_f = options.leaveToClass) !== null && _f !== void 0 ? _f : "";
+    const leaveClass = (_g = options.leaveClass) !== null && _g !== void 0 ? _g : "";
+    const appear = (_h = options.appear) !== null && _h !== void 0 ? _h : false;
+    const duration = (_j = options.duration) !== null && _j !== void 0 ? _j : 300;
+    let status = "";
+    let isTransitionEnd = false;
+    let isTransitioning = false;
+    let timeoutId = -1;
+    let finishTimeoutId = -1;
+    const emitEvent = (event) => {
+      var _a2;
+      (_a2 = options.emits) === null || _a2 === void 0 ? void 0 : _a2.call(options, event);
+    };
+    const finished = () => {
+      var _a2;
+      if (isTransitionEnd)
+        return;
+      isTransitionEnd = true;
+      clearTimeout(finishTimeoutId);
+      if ((_a2 = options.removeClasses) !== null && _a2 !== void 0 ? _a2 : false) {
+        classes.value = "";
+      }
+      emitEvent("after-".concat(status));
+      if (display.value && !state.value) {
+        display.value = false;
+      }
+    };
+    const sleep = () => {
+      return new Promise((resolve) => {
+        vue.nextTick(() => {
+          raf(() => {
+            var _a2, _b2, _c2, _d2;
+            if (((_a2 = options.element) === null || _a2 === void 0 ? void 0 : _a2.value) != null) {
+              (_d2 = (_c2 = (_b2 = options.element) === null || _b2 === void 0 ? void 0 : _b2.value) === null || _c2 === void 0 ? void 0 : _c2.getBoundingClientRectAsync()) === null || _d2 === void 0 ? void 0 : _d2.then((res) => {
+                resolve();
+              });
+            } else {
+              resolve();
+            }
+          });
+        });
+      });
+    };
+    const getClassNames = (name3) => {
+      return /* @__PURE__ */ new Map([
+        ["enter", "l-".concat(name3, "-enter l-").concat(name3, "-enter-active ").concat(enterClass, " ").concat(enterActiveClass)],
+        ["enter-to", "l-".concat(name3, "-enter-to l-").concat(name3, "-enter-active ").concat(enterToClass, " ").concat(enterActiveClass)],
+        ["leave", "l-".concat(name3, "-leave l-").concat(name3, "-leave-active ").concat(leaveClass, " ").concat(leaveActiveClass)],
+        ["leave-to", "l-".concat(name3, "-leave-to l-").concat(name3, "-leave-active ").concat(leaveToClass, " ").concat(leaveActiveClass)]
+      ]);
+    };
+    const transitionQueue = vue.ref([]);
+    const performTransition = (newStatus, eventName) => {
+      return __awaiter(this, void 0, void 0, function* () {
+        var _a2;
+        if (status == newStatus)
+          return;
+        transitionQueue.value.push(newStatus);
+        if (isTransitioning)
+          return;
+        isTransitioning = true;
+        isTransitionEnd = true;
+        while (transitionQueue.value.length > 0) {
+          const currentStatus = transitionQueue.value.shift();
+          status = currentStatus;
+          emitEvent("before-".concat(eventName));
+          yield sleep();
+          yield sleep();
+          yield sleep();
+          yield sleep();
+          yield sleep();
+          if (status != currentStatus)
+            continue;
+          const classNames = getClassNames(name2.value);
+          inited.value = true;
+          display.value = true;
+          classes.value = classNames.get(eventName);
+          emitEvent(eventName);
+          const executeAfterTick = (_a2 = options.onNextTick) === null || _a2 === void 0 ? void 0 : _a2.call(options, eventName);
+          if (executeAfterTick != null) {
+            yield executeAfterTick;
+          }
+          yield sleep();
+          if (status != currentStatus)
+            continue;
+          classes.value = classNames.get("".concat(eventName, "-to"));
+          if (status == "leave") {
+            setTimeout(() => {
+              finished();
+            }, duration);
+          }
+        }
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          if (transitionQueue.value.length == 0 && status == newStatus) {
+            isTransitionEnd = false;
+          }
+        }, duration * 0.8);
+        isTransitioning = false;
+      });
+    };
+    const enter = () => {
+      performTransition("enter", "enter");
+    };
+    const leave = () => {
+      performTransition("leave", "leave");
+    };
+    let init = false;
+    let lastState = null;
+    vue.watchEffect(() => {
+      if (options.visible == null)
+        return;
+      state.value = options.visible();
+      if (lastState == state.value)
+        return;
+      lastState = state.value;
+      if (!appear && !init) {
+        init = true;
+        return;
+      }
+      if (state.value) {
+        enter();
+      } else {
+        leave();
+      }
+    });
+    vue.watchEffect(() => {
+      if (options.name == null)
+        return;
+      name2.value = options.name();
+    });
+    const toggle = (v) => {
+      state.value = v;
+      if (v) {
+        enter();
+      } else {
+        leave();
+      }
+    };
+    return {
+      state,
+      inited,
+      display,
+      classes,
+      name: name2,
+      finished,
+      toggle
+    };
+  }
+  const _sfc_main$H = /* @__PURE__ */ vue.defineComponent({
+    __name: "l-overlay",
+    props: {
+      ariaLabel: { default: "关闭", type: String },
+      ariaRole: { default: "button", type: String },
+      lClass: { type: String },
+      bgColor: { type: String },
+      lStyle: { type: null },
+      duration: { default: 300, type: Number },
+      preventScrollThrough: { type: Boolean, default: true },
+      visible: { type: Boolean, default: false },
+      zIndex: { default: 998, type: Number }
+    },
+    emits: ["click", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"],
+    setup(__props, _a) {
+      var __emit = _a.emit;
+      const props = __props;
+      const emit = __emit;
+      const _b = useTransition({
+        defaultName: "fade",
+        appear: props.visible,
+        emits: (name2) => {
+          emit(name2);
+        },
+        visible: () => {
+          return props.visible;
+        },
+        duration: props.duration
+      }), inited = _b.inited, display = _b.display, classes = _b.classes, finished = _b.finished;
+      const styles = vue.computed(() => {
+        const style = /* @__PURE__ */ new Map();
+        if (props.bgColor != null) {
+          style.set("background-color", props.bgColor);
+        }
+        if (props.zIndex > 0) {
+          style.set("z-index", props.zIndex);
+        }
+        return style;
+      });
+      const noop = () => {
+      };
+      const onClick = (event) => {
+        emit("click", !props.visible);
+      };
+      const overlayRef = vue.ref(null);
+      vue.watchEffect(() => {
+        var _a2, _b2, _c;
+        (_a2 = overlayRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "".concat(props.duration, "ms"));
+        if (!display.value) {
+          (_b2 = overlayRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("display", "none");
+        } else {
+          (_c = overlayRef.value) === null || _c === void 0 ? null : _c.style.setProperty("display", "flex");
+        }
+      });
+      return (_ctx = null, _cache = null) => {
+        return vue.unref(inited) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 0,
+          class: vue.normalizeClass(["l-overlay", [_ctx.lClass, vue.unref(classes)]]),
+          ref_key: "overlayRef",
+          ref: overlayRef,
+          style: vue.normalizeStyle([vue.unref(styles), _ctx.lStyle]),
+          onClick: vue.withModifiers(onClick, ["stop"]),
+          onTouchmove: vue.withModifiers(noop, ["stop"]),
+          onTransitionend: _cache[0] || (_cache[0] = (...args) => {
+            return vue.unref(finished) && vue.unref(finished)(...args);
+          }),
+          "aria-role": _ctx.ariaRole,
+          "aria-label": _ctx.ariaLabel
+        }), [
+          vue.renderSlot(_ctx.$slots, "default")
+        ], 46, ["aria-role", "aria-label"])) : vue.createCommentVNode("", true);
+      };
+    }
+  });
+  const _style_0$F = { "l-overlay": { "": { "position": "fixed", "top": 0, "left": 0, "width": "100%", "bottom": 0, "backgroundColor": "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))", "transitionProperty": "opacity", "transitionTimingFunction": "ease", "zIndex": "var(--l-overlay-z-index, 998)", "opacity": 1, "transitionDuration": "300ms" } }, "l-fade-enter": { "": { "opacity": 0 } }, "l-fade-leave-to": { "": { "opacity": 0 } }, "@TRANSITION": { "l-overlay": { "property": "opacity", "timingFunction": "ease", "duration": "300ms" } } };
+  const __easycom_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["styles", [_style_0$F]]]);
+  function isDef(value) {
+    return value != null;
+  }
+  function addUnit(value) {
+    if (!isDef(value)) {
+      return null;
+    }
+    value = "".concat(value);
+    return isNumeric$1(value) ? "".concat(value, "px") : value;
+  }
+  function convertRadius(radius) {
+    var _a;
+    if (Array.isArray(radius)) {
+      const values = radius.map((item) => {
+        return addUnit(item);
+      });
+      if (values.length == 1) {
+        return [values[0], values[0], values[0], values[0]];
+      }
+      if (values.length == 2) {
+        return [values[0], values[1], values[0], values[1]];
+      }
+      if (values.length == 3) {
+        return [values[0], values[1], values[2], values[1]];
+      }
+      if (values.length == 4) {
+        return [values[0], values[1], values[2], values[3]];
+      }
+      return ["0", "0", "0", "0"];
+    }
+    const value = (_a = addUnit(radius)) !== null && _a !== void 0 ? _a : "0";
+    return [value, value, value, value];
+  }
+  const _sfc_main$G = /* @__PURE__ */ vue.defineComponent({
+    __name: "l-popup",
+    props: /* @__PURE__ */ vue.mergeModels(new UTSJSONObject({
+      closeable: { type: Boolean, default: false },
+      closeOnClickOverlay: { type: Boolean, default: true },
+      destroyOnClose: { type: Boolean, default: false },
+      overlayStyle: { type: null },
+      position: { default: "center", type: String },
+      preventScrollThrough: { type: Boolean, default: true },
+      overlay: { type: Boolean, default: true },
+      transitionName: { type: String },
+      visible: { type: Boolean },
+      zIndex: { default: 999, type: Number },
+      duration: { default: 300, type: Number },
+      bgColor: { type: String },
+      closeIcon: { default: "close", type: String },
+      iconColor: { type: String },
+      lStyle: { type: null },
+      safeAreaInsetBottom: { type: Boolean, default: true },
+      safeAreaInsetTop: { type: Boolean, default: false },
+      radius: { type: [String, Number, Array] }
+    }), new UTSJSONObject({
+      "modelValue": { type: Boolean },
+      "modelModifiers": {}
+    })),
+    emits: /* @__PURE__ */ vue.mergeModels(["change", "click-overlay", "click-close", "open", "opened", "close", "closed", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"], ["update:modelValue"]),
+    setup(__props, _a) {
+      var _b;
+      var __emit = _a.emit;
+      const emit = __emit;
+      const props = __props;
+      const modelValue = vue.useModel(__props, "modelValue");
+      const innerValue = vue.computed({
+        set(value) {
+          modelValue.value = value;
+          emit("change", value);
+        },
+        get() {
+          return props.visible || modelValue.value;
+        }
+      });
+      const status = vue.ref("before-enter");
+      const _c = useTransition({
+        defaultName: (_b = props.transitionName) !== null && _b !== void 0 ? _b : "popup-fade",
+        appear: innerValue.value,
+        emits: (name2) => {
+          status.value = name2;
+          if (name2 == "before-enter") {
+            emit("open");
+          } else if (name2 == "after-enter") {
+            emit("opened");
+          } else if (name2 == "before-leave") {
+            emit("close");
+          } else if (name2 == "after-leave") {
+            emit("closed");
+          }
+          emit(name2);
+        },
+        visible: () => {
+          return innerValue.value;
+        },
+        duration: props.duration
+      }), inited = _c.inited, display = _c.display, classes = _c.classes, finished = _c.finished;
+      const overlayZIndex = vue.computed(() => {
+        return props.zIndex > 0 ? props.zIndex - 1 : 998;
+      });
+      const rootClass = vue.computed(() => {
+        const safe = props.safeAreaInsetTop && props.position == "top" ? "l-popup--safe-top" : props.safeAreaInsetBottom && props.position == "bottom" ? "l-popup--safe-bottom" : "";
+        return "l-popup--".concat(props.position, " ").concat(safe, " ").concat(classes.value);
+      });
+      uni.getWindowInfo().safeAreaInsets;
+      const styles = vue.computed(() => {
+        const style = /* @__PURE__ */ new Map();
+        style.set("transition-duration", (["after-leave", "before-enter"].includes(status.value) ? 0 : props.duration) + "ms");
+        if (props.bgColor != null) {
+          style.set("background", props.bgColor);
+        }
+        if (props.zIndex > 0) {
+          style.set("z-index", props.zIndex);
+        }
+        if (props.radius != null) {
+          const values = convertRadius(props.radius);
+          style.set("border-top-left-radius", values[0]);
+          style.set("border-top-right-radius", values[1]);
+          style.set("border-bottom-right-radius", values[2]);
+          style.set("border-bottom-left-radius", values[3]);
+        }
+        return style;
+      });
+      const handleOverlayClick = () => {
+        if (props.closeOnClickOverlay) {
+          innerValue.value = false;
+          emit("click-overlay");
+        }
+      };
+      const handleClose = () => {
+        innerValue.value = false;
+        emit("click-close");
+      };
+      const popupRef = vue.ref(null);
+      vue.watchEffect(() => {
+        var _a2, _b2, _c2, _d;
+        if (!display.value) {
+          (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("pointer-events", "none");
+          (_b2 = popupRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("z-index", -1e4);
+        } else {
+          (_c2 = popupRef.value) === null || _c2 === void 0 ? null : _c2.style.setProperty("pointer-events", "auto");
+          (_d = popupRef.value) === null || _d === void 0 ? null : _d.style.setProperty("z-index", props.zIndex);
+        }
+      });
+      return (_ctx = null, _cache = null) => {
+        const _component_l_overlay = resolveEasycom(vue.resolveDynamicComponent("l-overlay"), __easycom_0$4);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          (_ctx.destroyOnClose ? vue.unref(display) && _ctx.overlay : _ctx.overlay) ? (vue.openBlock(), vue.createBlock(_component_l_overlay, new UTSJSONObject({
+            key: 0,
+            visible: vue.unref(innerValue),
+            zIndex: vue.unref(overlayZIndex),
+            appear: true,
+            preventScrollThrough: _ctx.preventScrollThrough,
+            "l-style": _ctx.overlayStyle,
+            onClick: handleOverlayClick
+          }), null, 8, ["visible", "zIndex", "preventScrollThrough", "l-style"])) : vue.createCommentVNode("", true),
+          (_ctx.destroyOnClose ? vue.unref(display) : vue.unref(inited)) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 1,
+            class: vue.normalizeClass(["l-popup", vue.unref(rootClass)]),
+            ref_key: "popupRef",
+            ref: popupRef,
+            style: vue.normalizeStyle([vue.unref(styles), _ctx.lStyle]),
+            onTransitionend: _cache[0] || (_cache[0] = (...args) => {
+              return vue.unref(finished) && vue.unref(finished)(...args);
+            })
+          }), [
+            vue.renderSlot(_ctx.$slots, "default"),
+            _ctx.closeable ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "l-popup__close",
+              onClick: handleClose
+            }), [
+              vue.renderSlot(_ctx.$slots, "close-btn", new UTSJSONObject({}), () => {
+                return [
+                  vue.createVNode(_component_i_icon, new UTSJSONObject({
+                    name: "close",
+                    fontSize: "20",
+                    size: "27px",
+                    color: _ctx.iconColor
+                  }), null, 8, ["color"])
+                ];
+              })
+            ])) : vue.createCommentVNode("", true)
+          ], 38)) : vue.createCommentVNode("", true)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$E = { "l-popup": { "": { "position": "fixed", "transitionDuration": "300ms", "transitionProperty": "transform,opacity", "transitionTimingFunction": "ease", "backgroundColor": "var(--l-popup-bg-color, #fff)", "overflow": "visible", "opacity": 1 }, ".l-popup-fade-enter": { "opacity": 0 }, ".l-popup-fade-leave-to": { "opacity": 0 }, ".l-popup-fade-enter.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-leave-to.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-enter.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-leave-to.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-enter.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-leave-to.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-enter.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-leave-to.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-enter.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-popup-fade-leave-to.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-enter.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-leave-to.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 } }, "l-popup__close": { "": { "position": "absolute", "top": 0, "right": 0, "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "l-popup__close-icon": { "": { "color": "var(--l-popup-close-icon-color, #000000A6)" } }, "l-popup--top": { "": { "top": 0, "left": 0, "right": 0, "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--bottom": { "": { "bottom": 0, "left": 0, "right": 0, "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--safe-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "l-popup--safe-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "l-popup--left": { "": { "top": 0, "left": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--right": { "": { "top": 0, "right": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--center": { "": { "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "transformOrigin": "50% 50%", "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)" } }, "@TRANSITION": { "l-popup": { "duration": "300ms", "property": "transform,opacity", "timingFunction": "ease" } } };
+  const __easycom_3$2 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["styles", [_style_0$E]]]);
+  const _sfc_main$F = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-toast" }, { __name: "i-toast", props: {
+    zIndex: { type: [String, Number], default: 10090 },
+    loading: { type: Boolean, default: false },
+    title: { type: String, default: "" },
+    icon: { type: String, default: "" },
+    type: { type: String, default: "default" },
+    mask: { type: Boolean, default: false },
+    position: { type: String, default: "center" },
+    duration: { type: [String, Number], default: 2e3 },
+    fill: { type: Boolean, default: false },
+    customStyle: { type: [String, Object], default: "" }
+  }, setup(__props, _a) {
+    var __expose = _a.expose;
+    const props = __props;
+    const visible = vue.ref(false);
+    const timer = vue.ref(0);
+    const currentZIndex = vue.ref(props.zIndex);
+    const currentLoading = vue.ref(props.loading);
+    const currentTitle = vue.ref(props.title);
+    const currentIcon = vue.ref(props.icon);
+    const currentType = vue.ref(props.type);
+    const currentMask = vue.ref(props.mask);
+    const currentPosition = vue.ref(props.position);
+    const currentDuration = vue.ref(props.duration);
+    const currentFill = vue.ref(props.fill);
+    const currentCustomStyle = vue.ref(props.customStyle);
+    const loadingAngle = vue.ref(0);
+    let loadingTimer = 0;
+    const toastClass = vue.computed(() => {
+      return "i-toast i-toast--" + normalizePosition(currentPosition.value);
+    });
+    const toastStyle = vue.computed(() => {
+      let style = "z-index:" + String(currentZIndex.value) + ";";
+      style += "background-color:" + resolveBgColor() + ";";
+      if (typeof currentCustomStyle.value == "string")
+        style += currentCustomStyle.value;
+      return style;
+    });
+    const iconClass = vue.computed(() => {
+      if (currentFill.value)
+        return "i-toast__icon i-toast__icon--fill";
+      return "i-toast__icon";
+    });
+    const displayIcon = vue.computed(() => {
+      if (currentIcon.value.length > 0 && !isImagePath(currentIcon.value)) {
+        return currentIcon.value;
+      }
+      if (currentType.value == "success")
+        return "✓";
+      if (currentType.value == "error")
+        return "×";
+      if (currentType.value == "warning")
+        return "!";
+      if (currentType.value == "primary")
+        return "i";
+      return "";
+    });
+    const isImageIcon = vue.computed(() => {
+      return currentIcon.value.length > 0 && isImagePath(currentIcon.value);
+    });
+    const loadingStyle = vue.computed(() => {
+      return "transform:rotate(" + String(loadingAngle.value) + "deg);";
+    });
+    vue.onUnmounted(() => {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+    });
+    function open(options = null) {
+      applyOptions(options, "");
+      showToast();
+    }
+    function close() {
+      clearTimeout(timer.value);
+      stopLoadingAnimation();
+      visible.value = false;
+    }
+    function primary(options = null) {
+      applyOptions(options, "primary");
+      showToast();
+    }
+    function success(options = null) {
+      applyOptions(options, "success");
+      showToast();
+    }
+    function error(options = null) {
+      applyOptions(options, "error");
+      showToast();
+    }
+    function warning(options = null) {
+      applyOptions(options, "warning");
+      showToast();
+    }
+    function showLoading(options = null) {
+      applyOptions(options, "default");
+      currentLoading.value = true;
+      if (currentTitle.value.length == 0)
+        currentTitle.value = "加载中";
+      showToast();
+    }
+    function showToast() {
+      clearTimeout(timer.value);
+      visible.value = true;
+      if (currentLoading.value) {
+        startLoadingAnimation();
+      } else {
+        stopLoadingAnimation();
+      }
+      const duration = Number(currentDuration.value);
+      if (duration > 0) {
+        timer.value = setTimeout(() => {
+          close();
+        }, duration);
+      }
+    }
+    function applyOptions(options = null, forcedType = null) {
+      currentZIndex.value = props.zIndex;
+      currentLoading.value = props.loading;
+      currentTitle.value = props.title;
+      currentIcon.value = props.icon;
+      currentType.value = forcedType.length > 0 ? forcedType : props.type;
+      currentMask.value = props.mask;
+      currentPosition.value = props.position;
+      currentDuration.value = props.duration;
+      currentFill.value = props.fill;
+      currentCustomStyle.value = props.customStyle;
+      if (options == null)
+        return null;
+      if (typeof options == "string") {
+        currentTitle.value = options;
+        return null;
+      }
+      if (typeof options == "object") {
+        setValue(options, "zIndex");
+        setValue(options, "loading");
+        setValue(options, "title");
+        setValue(options, "icon");
+        setValue(options, "type");
+        setValue(options, "mask");
+        setValue(options, "position");
+        setValue(options, "duration");
+        setValue(options, "fill");
+        setValue(options, "customStyle");
+      }
+    }
+    function setValue(options = null, keyName = null) {
+      const value = options[keyName];
+      if (value == null)
+        return null;
+      if (keyName == "zIndex")
+        currentZIndex.value = value;
+      if (keyName == "loading")
+        currentLoading.value = value == true;
+      if (keyName == "title")
+        currentTitle.value = String(value);
+      if (keyName == "icon")
+        currentIcon.value = String(value);
+      if (keyName == "type")
+        currentType.value = String(value);
+      if (keyName == "mask")
+        currentMask.value = value == true;
+      if (keyName == "position")
+        currentPosition.value = String(value);
+      if (keyName == "duration")
+        currentDuration.value = value;
+      if (keyName == "fill")
+        currentFill.value = value == true;
+      if (keyName == "customStyle")
+        currentCustomStyle.value = value;
+    }
+    function startLoadingAnimation() {
+      if (loadingTimer > 0)
+        return null;
+      loadingTimer = setInterval(() => {
+        let angle = (loadingAngle.value + 24) % 360;
+        if (angle < 0)
+          angle = angle + 360;
+        loadingAngle.value = angle;
+      }, 50);
+    }
+    function stopLoadingAnimation() {
+      if (loadingTimer > 0) {
+        clearInterval(loadingTimer);
+        loadingTimer = 0;
+      }
+      loadingAngle.value = 0;
+    }
+    function normalizePosition(value = null) {
+      if (value == "top" || value == "bottom")
+        return value;
+      return "center";
+    }
+    function resolveBgColor() {
+      if (currentType.value == "primary")
+        return "#2979ff";
+      if (currentType.value == "success")
+        return "#19be6b";
+      if (currentType.value == "warning")
+        return "#ff9900";
+      if (currentType.value == "error")
+        return "#fa3534";
+      return "rgba(0, 0, 0, 0.78)";
+    }
+    function isImagePath(value = null) {
+      const text = String(value);
+      return text.indexOf("/") >= 0 || text.indexOf("http") == 0;
+    }
+    __expose({
+      open,
+      close,
+      primary,
+      success,
+      error,
+      warning,
+      showLoading
+    });
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+        visible.value && currentMask.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 0,
+          class: "i-toast__mask",
+          style: vue.normalizeStyle("z-index:" + String(Number(currentZIndex.value) - 1))
+        }), null, 4)) : vue.createCommentVNode("", true),
+        visible.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 1,
+          class: vue.normalizeClass(toastClass.value),
+          style: vue.normalizeStyle(toastStyle.value)
+        }), [
+          currentLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 0,
+            class: "i-toast__loading",
+            style: vue.normalizeStyle(loadingStyle.value)
+          }), null, 4)) : isImageIcon.value ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
+            key: 1,
+            class: "i-toast__image",
+            src: currentIcon.value,
+            mode: "aspectFit"
+          }), null, 8, ["src"])) : displayIcon.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 2,
+            class: vue.normalizeClass(iconClass.value)
+          }), [
+            vue.createElementVNode("text", new UTSJSONObject({ class: "i-toast__icon-text" }), vue.toDisplayString(displayIcon.value), 1)
+          ], 2)) : vue.createCommentVNode("", true),
+          vue.createElementVNode("text", new UTSJSONObject({ class: "i-toast__text" }), vue.toDisplayString(currentTitle.value), 1)
+        ], 6)) : vue.createCommentVNode("", true)
+      ], 64);
+    };
+  } }));
+  const _style_0$D = { "i-toast__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0)" } }, "i-toast": { "": { "position": "fixed", "alignSelf": "center", "paddingTop": 10, "paddingRight": 16, "paddingBottom": 10, "paddingLeft": 16, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-toast--top": { "": { "top": 0 } }, "i-toast--center": { "": { "top": "45%" } }, "i-toast--bottom": { "": { "bottom": 0 } }, "i-toast__text": { "": { "color": "#ffffff", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-toast__icon": { "": { "width": 24, "height": 24, "marginRight": 8, "alignItems": "center", "justifyContent": "center" } }, "i-toast__icon--fill": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12, "backgroundColor": "rgba(255,255,255,0.2)" } }, "i-toast__icon-text": { "": { "color": "#ffffff", "fontSize": 18, "fontWeight": 700, "lineHeight": "24px" } }, "i-toast__image": { "": { "width": 24, "height": 24, "marginRight": 8 } }, "i-toast__loading": { "": { "width": 28, "height": 28, "marginRight": 8, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.38)", "borderBottomColor": "rgba(255,255,255,0.38)", "borderLeftColor": "rgba(255,255,255,0.38)" } } };
+  const __easycom_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["styles", [_style_0$D]]]);
+  const iosToastHandlers = [];
+  const pendingIosToasts = [];
+  const maxPendingToastCount = 10;
+  function dispatchIosToast(options) {
+    const handler = iosToastHandlers.length > 0 ? iosToastHandlers[iosToastHandlers.length - 1] : null;
+    return handler != null && handler(options);
+  }
+  function flushPendingIosToasts() {
+    while (pendingIosToasts.length > 0) {
+      const options = pendingIosToasts[0];
+      if (!dispatchIosToast(options))
+        return null;
+      pendingIosToasts.splice(0, 1);
+    }
+  }
+  function registerIosToastHandler(handler) {
+    const index = iosToastHandlers.indexOf(handler);
+    if (index == -1)
+      iosToastHandlers.push(handler);
+    flushPendingIosToasts();
+  }
+  function unregisterIosToastHandler(handler) {
+    const index = iosToastHandlers.indexOf(handler);
+    if (index >= 0)
+      iosToastHandlers.splice(index, 1);
+  }
+  function showAppToast(options) {
+    if (!dispatchIosToast(options)) {
+      if (pendingIosToasts.length >= maxPendingToastCount)
+        pendingIosToasts.splice(0, 1);
+      pendingIosToasts.push(options);
+    }
+  }
+  const _sfc_main$E = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "app-toast" }, { __name: "app-toast", setup(__props) {
+    const toastRef = vue.ref(null);
+    const handleToast = (options) => {
+      var _a, _b, _c;
+      const toast = toastRef.value;
+      if (toast == null)
+        return false;
+      const toastOptions = new UTSJSONObject({
+        title: options.title,
+        duration: (_a = options.duration) !== null && _a !== void 0 ? _a : 2e3,
+        position: (_b = options.position) !== null && _b !== void 0 ? _b : "center",
+        mask: (_c = options.mask) !== null && _c !== void 0 ? _c : false
+      });
+      if (options.icon == "success") {
+        toast.success(toastOptions);
+      } else if (options.icon == "error") {
+        toast.error(toastOptions);
+      } else {
+        toast.open(toastOptions);
+      }
+      return true;
+    };
+    vue.onMounted(() => {
+      vue.nextTick(() => {
+        registerIosToastHandler(handleToast);
+      });
+    });
+    vue.onUnmounted(() => {
+      unregisterIosToastHandler(handleToast);
+    });
+    return (_ctx = null, _cache = null) => {
+      const _component_i_toast = resolveEasycom(vue.resolveDynamicComponent("i-toast"), __easycom_0$3);
+      return vue.openBlock(), vue.createBlock(_component_i_toast, new UTSJSONObject({
+        ref_key: "toastRef",
+        ref: toastRef
+      }), null, 512);
+    };
+  } }));
+  const _imports_1$2 = "/static/addNew.png";
+  const _imports_2$2 = "/static/banner.png";
+  const _imports_3$1 = "/static/pos.png";
+  const _imports_4 = "/static/car.png";
+  const _imports_5 = "/static/dzwl.png";
+  const _imports_6 = "/static/msg.png";
+  const _imports_7 = "/static/pay.png";
+  const _imports_8 = "/static/online.png";
+  const _imports_9 = "/static/del.png";
+  class Coordinate extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            lat: { type: Number, optional: false },
+            lng: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = Coordinate.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.lat = this.__props__.lat;
+      this.lng = this.__props__.lng;
+      delete this.__props__;
+    }
+  }
+  class CoordTransform {
+    /**
+     * WGS84转腾讯地图坐标系（GCJ02）
+     * @param wgLat WGS84纬度
+     * @param wgLon WGS84经度
+     * @returns 腾讯地图坐标系 { lat: number, lng: number }
+     */
+    static wgs84ToTencent(wgLat, wgLon) {
+      if (!this.isInChina(wgLon, wgLat)) {
+        return new Coordinate({ lat: wgLat, lng: wgLon });
+      }
+      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
+      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
+      let radLat = wgLat / 180 * this.pi;
+      let magic = Math.sin(radLat);
+      magic = 1 - this.ee * magic * magic;
+      let sqrtMagic = Math.sqrt(magic);
+      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
+      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+      const mgLat = wgLat + dLat;
+      const mgLng = wgLon + dLng;
+      return new Coordinate({
+        lat: parseFloat(mgLat.toFixed(6)),
+        lng: parseFloat(mgLng.toFixed(6))
+      });
+    }
+    /**
+     * 仅供实时地图跟踪使用：保留原始计算精度，避免小位移被六位小数截断。
+     */
+    static wgs84ToTencentPrecise(wgLat, wgLon) {
+      if (!this.isInChina(wgLon, wgLat)) {
+        return new Coordinate({ lat: wgLat, lng: wgLon });
+      }
+      let dLat = this.transformLat(wgLon - 105, wgLat - 35);
+      let dLng = this.transformLng(wgLon - 105, wgLat - 35);
+      let radLat = wgLat / 180 * this.pi;
+      let magic = Math.sin(radLat);
+      magic = 1 - this.ee * magic * magic;
+      let sqrtMagic = Math.sqrt(magic);
+      dLat = dLat * 180 / (this.a * (1 - this.ee) / (magic * sqrtMagic) * this.pi);
+      dLng = dLng * 180 / (this.a / sqrtMagic * Math.cos(radLat) * this.pi);
+      return new Coordinate({ lat: wgLat + dLat, lng: wgLon + dLng });
+    }
+    /**
+     * 腾讯地图坐标系转WGS84（使用高精度算法）
+     * @param tcLat 腾讯地图纬度
+     * @param tcLon 腾讯地图经度
+     * @returns WGS84坐标系 { lat: number, lng: number }
+     */
+    static tencentToWgs84(tcLat, tcLon) {
+      if (!this.isInChina(tcLon, tcLat)) {
+        return new Coordinate({ lat: tcLat, lng: tcLon });
+      }
+      let wgsLat = tcLat;
+      let wgsLng = tcLon;
+      for (let i = 0; i < 5; i++) {
+        const gcj02 = this.wgs84ToTencent(wgsLat, wgsLng);
+        const deltaLat = tcLat - gcj02.lat;
+        const deltaLng = tcLon - gcj02.lng;
+        wgsLat += deltaLat;
+        wgsLng += deltaLng;
+        if (Math.abs(deltaLat) < 1e-7 && Math.abs(deltaLng) < 1e-7) {
+          break;
+        }
+      }
+      return new Coordinate({
+        lat: parseFloat(wgsLat.toFixed(6)),
+        lng: parseFloat(wgsLng.toFixed(6))
+      });
+    }
+    /**
+     * 批量转换坐标（内部使用高精度转换）
+     * @param devices 设备数组
+     * @param targetSystem 目标坐标系 'tencent' | 'wgs84'
+     * @returns 转换后的设备数组
+     */
+    static batchConvertCoordinates(devices, targetSystem = "tencent") {
+      if (!Array.isArray(devices))
+        return [];
+      return devices.map((device) => {
+        if (device == null)
+          return device;
+        const item = device;
+        const latitude = item["latitude"];
+        const longitude = item["longitude"];
+        if (latitude == null || longitude == null) {
+          return device;
+        }
+        const lat = parseFloat(latitude.toString());
+        const lng = parseFloat(longitude.toString());
+        if (isNaN(lat) || isNaN(lng)) {
+          uni.__log__("warn", "at utils/coordTransform.uts:126", "设备经纬度无效", device);
+          return device;
+        }
+        let converted = new Coordinate({ lat, lng });
+        if (targetSystem === "tencent") {
+          converted = this.wgs84ToTencent(lat, lng);
+        } else {
+          converted = this.tencentToWgs84(lat, lng);
+        }
+        item["latitude"] = converted.lat;
+        item["longitude"] = converted.lng;
+        item["originalLatitude"] = lat;
+        item["originalLongitude"] = lng;
+        return item;
+      });
+    }
+    /**
+     * 转换单个坐标点（内部使用高精度转换）
+     * @param lat 纬度
+     * @param lng 经度
+     * @param fromSystem 原坐标系 'wgs84' | 'tencent'
+     * @param toSystem 目标坐标系 'tencent' | 'wgs84'
+     * @returns 转换后的坐标 { lat: number, lng: number }
+     */
+    static convertCoordinate(lat, lng, fromSystem = "wgs84", toSystem = "tencent") {
+      if (fromSystem === "wgs84" && toSystem === "tencent") {
+        return this.wgs84ToTencent(lat, lng);
+      } else if (fromSystem === "tencent" && toSystem === "wgs84") {
+        return this.tencentToWgs84(lat, lng);
+      } else {
+        uni.__log__("warn", "at utils/coordTransform.uts:161", "不支持的坐标系转换", fromSystem, "->", toSystem);
+        return new Coordinate({ lat, lng });
+      }
+    }
+    /**
+     * 检查坐标是否在中国境内
+     * @param lat 纬度
+     * @param lng 经度
+     * @returns 是否在中国境内
+     */
+    static isInChina(lng, lat) {
+      return lng >= 72.004 && lng <= 137.8347 && lat >= 0.8293 && lat <= 55.8271;
+    }
+    // 私有方法：纬度转换
+    static transformLat(x, y) {
+      let ret = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
+      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
+      ret += (20 * Math.sin(y * Math.PI) + 40 * Math.sin(y / 3 * Math.PI)) * 2 / 3;
+      ret += (160 * Math.sin(y / 12 * Math.PI) + 320 * Math.sin(y * Math.PI / 30)) * 2 / 3;
+      return ret;
+    }
+    // 私有方法：经度转换
+    static transformLng(x, y) {
+      let ret = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
+      ret += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3;
+      ret += (20 * Math.sin(x * Math.PI) + 40 * Math.sin(x / 3 * Math.PI)) * 2 / 3;
+      ret += (150 * Math.sin(x / 12 * Math.PI) + 300 * Math.sin(x / 30 * Math.PI)) * 2 / 3;
+      return ret;
+    }
+  }
+  CoordTransform.a = 6378245;
+  CoordTransform.ee = 0.006693421622965943;
+  CoordTransform.pi = 3.141592653589793;
+  const { registerUTSInterface, initUTSProxyClass, initUTSElementProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
+  const name = "externalMapNavigation";
+  const moduleName = "外部地图导航";
+  const moduleType = "";
+  const errMsg = "";
+  const is_uni_modules = true;
+  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
+  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
+  const getAvailableIOSMapProviderIds = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getAvailableIOSMapProviderIdsByJs", keepAlive: false, params: [], return: "" });
+  const openExternalMap = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "openExternalMapByJs", keepAlive: false, params: [{ "name": "params", "type": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject" }], return: "" });
+  class OpenLocationParams extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false },
+            name: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = OpenLocationParams.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      this.name = this.__props__.name;
+      delete this.__props__;
+    }
+  }
+  function isValidCoordinate(latitude, longitude) {
+    return !isNaN(latitude) && !isNaN(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 && !(latitude == 0 && longitude == 0);
+  }
+  function showInvalidLocationToast() {
+    showAppToast({
+      title: "暂无有效车辆位置",
+      icon: "none"
+    });
+  }
+  function showOpenMapFailedToast() {
+    showAppToast({
+      title: "无法打开地图，请稍后重试",
+      icon: "none"
+    });
+  }
+  function openIOSExternalMap(params, providerId = null) {
+    const wgs84 = CoordTransform.tencentToWgs84(params.latitude, params.longitude);
+    const navigationResult = openExternalMap(new UTSJSONObject({
+      latitude: params.latitude,
+      longitude: params.longitude,
+      name: params.name,
+      providerId,
+      wgs84Latitude: wgs84.lat,
+      wgs84Longitude: wgs84.lng
+    }));
+    if (navigationResult.code == "opened")
+      return null;
+    if (navigationResult.code == "invalid_coordinate") {
+      showInvalidLocationToast();
+      return null;
+    }
+    showOpenMapFailedToast();
+  }
+  function getIOSMapProviderName(providerId) {
+    if (providerId == "qqmap")
+      return "腾讯地图";
+    if (providerId == "iosamap")
+      return "高德地图";
+    if (providerId == "baidumap")
+      return "百度地图";
+    return "";
+  }
+  function chooseIOSMapProvider(params, availableProviderIds) {
+    const itemList = [];
+    const providerIds = [];
+    availableProviderIds.forEach((providerId) => {
+      const providerName = getIOSMapProviderName(providerId);
+      if (providerName == "")
+        return null;
+      itemList.push(providerName);
+      providerIds.push(providerId);
+    });
+    if (providerIds.length == 0) {
+      openIOSExternalMap(params);
+      return null;
+    }
+    uni.showActionSheet({
+      title: "选择地图应用",
+      itemList,
+      success: (res) => {
+        const tapIndex = res.tapIndex;
+        if (tapIndex < 0 || tapIndex >= providerIds.length)
+          return null;
+        const providerId = providerIds[tapIndex];
+        if (providerId != "")
+          openIOSExternalMap(params, providerId);
+      }
+    });
+  }
+  function openIOSLocation(params) {
+    const providerIds = getAvailableIOSMapProviderIds();
+    if (providerIds.length > 1) {
+      chooseIOSMapProvider(params, providerIds);
+      return null;
+    }
+    if (providerIds.length == 1) {
+      openIOSExternalMap(params, providerIds[0]);
+      return null;
+    }
+    openIOSExternalMap(params);
+  }
+  function openLocation(params) {
+    if (!isValidCoordinate(params.latitude, params.longitude)) {
+      showInvalidLocationToast();
+      return null;
+    }
+    openIOSLocation(params);
+    return null;
+  }
+  class AppModalSuccess {
+    constructor() {
+      this.confirm = false;
+      this.cancel = false;
+    }
+  }
+  class AppModalOptions extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            title: { type: String, optional: true },
+            content: { type: String, optional: true },
+            showCancel: { type: Boolean, optional: true },
+            confirmText: { type: String, optional: true },
+            cancelText: { type: String, optional: true },
+            success: { type: "Unknown", optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = AppModalOptions.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.title = this.__props__.title;
+      this.content = this.__props__.content;
+      this.showCancel = this.__props__.showCancel;
+      this.confirmText = this.__props__.confirmText;
+      this.cancelText = this.__props__.cancelText;
+      this.success = this.__props__.success;
+      delete this.__props__;
+    }
+  }
+  const modalHandlers = [];
+  function showAppModal(options) {
+    var _a, _b, _c;
+    const handler = modalHandlers.length > 0 ? modalHandlers[modalHandlers.length - 1] : null;
+    if (handler != null) {
+      handler(options);
+      return null;
+    }
+    uni.showModal(new UTSJSONObject({
+      title: (_a = options.title) !== null && _a !== void 0 ? _a : "",
+      content: (_b = options.content) !== null && _b !== void 0 ? _b : "",
+      showCancel: (_c = options.showCancel) !== null && _c !== void 0 ? _c : true,
+      confirmText: options.confirmText,
+      cancelText: options.cancelText,
+      success: (res) => {
+        const result = new AppModalSuccess();
+        result.confirm = res.confirm;
+        result.cancel = res.cancel;
+        if (options.success != null)
+          options.success(result);
+      }
+    }));
+  }
+  const PUSH_CLIENT_ID_KEY = "push_client_id";
+  const PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id";
+  const PUSH_MESSAGE_STALE_KEY = "push_message_stale";
+  const PUSH_SESSION_KEY = "push_session_key";
+  let initialized = false;
+  let pushClientIdRequesting = false;
+  let pushClientIdRetryCount = 0;
+  let pushClientIdRetryTimer = 0;
+  let pushClientIdRequestTimeout = 0;
+  const PUSH_CLIENT_ID_MAX_RETRY_COUNT = 5;
+  const PUSH_CLIENT_ID_RETRY_DELAY = 3e3;
+  const PUSH_CLIENT_ID_REQUEST_TIMEOUT = 18e3;
+  function pushDebug(message) {
+    uni.__log__("error", "at services/push.uts:23", "[UniPushDebug]", message);
+  }
+  function clearPushClientIdTimers() {
+    if (pushClientIdRetryTimer > 0) {
+      clearTimeout(pushClientIdRetryTimer);
+      pushClientIdRetryTimer = 0;
+    }
+    if (pushClientIdRequestTimeout > 0) {
+      clearTimeout(pushClientIdRequestTimeout);
+      pushClientIdRequestTimeout = 0;
+    }
+  }
+  function schedulePushClientIdRetry(reason) {
+    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
+      pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason);
+      return null;
+    }
+    if (pushClientIdRetryTimer > 0)
+      return null;
+    pushClientIdRetryCount += 1;
+    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString() + "ms 后重试，第 " + pushClientIdRetryCount.toString() + " 次。原因: " + reason);
+    pushClientIdRetryTimer = setTimeout(() => {
+      pushClientIdRetryTimer = 0;
+      refreshPushClientId();
+    }, PUSH_CLIENT_ID_RETRY_DELAY);
+  }
+  function stringValue(value = null) {
+    if (value == null)
+      return "";
+    return value.toString();
+  }
+  function payloadValue(payload = null, key) {
+    if (payload == null)
+      return "";
+    if (typeof payload == "string") {
+      try {
+        const parsedPayload = UTS.JSON.parse(payload);
+        if (parsedPayload == null)
+          return "";
+        return payloadValue(parsedPayload, key);
+      } catch (error) {
+        return "";
+      }
+    }
+    try {
+      const object = payload;
+      return object.getString(key, "");
+    } catch (error) {
+      return "";
+    }
+  }
+  function pushMessageId(message = null) {
+    let id = payloadValue(message, "messageId");
+    if (id == "")
+      id = payloadValue(message, "message_id");
+    if (id == "")
+      id = payloadValue(message, "id");
+    if (id == "") {
+      const data = payloadValue(message, "data");
+      if (data != "")
+        id = payloadValue(data, "messageId");
+    }
+    return id;
+  }
+  function savePushEvent(event = null) {
+    const messageId = pushMessageId(event);
+    if (messageId != "")
+      uni.setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId);
+    uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
+    return messageId;
+  }
+  function isNotificationClick(event = null) {
+    return payloadValue(event, "type").toLowerCase() == "click";
+  }
+  function registerPushListener() {
+    if (initialized)
+      return null;
+    initialized = true;
+    try {
+      uni.onPushMessage((event = null) => {
+        uni.__log__("log", "at services/push.uts:103", "收到 UniPush 消息");
+        savePushEvent(event);
+        if (isNotificationClick(event)) {
+          uni.switchTab({ url: "/pages/message/message" });
+        }
+      });
+    } catch (error) {
+      uni.__log__("error", "at services/push.uts:110", "注册 UniPush 监听失败:", error);
+    }
+  }
+  function initPush() {
+    registerPushListener();
+    refreshPushClientId();
+  }
+  function refreshPushClientId() {
+    if (pushClientIdRequesting) {
+      pushDebug("UniPush CID 正在获取，跳过重复请求");
+      return null;
+    }
+    pushClientIdRequesting = true;
+    clearPushClientIdTimers();
+    try {
+      pushDebug("开始获取 UniPush CID");
+      pushClientIdRequestTimeout = setTimeout(() => {
+        pushClientIdRequestTimeout = 0;
+        if (!pushClientIdRequesting)
+          return null;
+        pushClientIdRequesting = false;
+        pushDebug("UniPush getPushClientId 回调超时");
+        schedulePushClientIdRetry("回调超时");
+      }, PUSH_CLIENT_ID_REQUEST_TIMEOUT);
+      uni.getPushClientId(new UTSJSONObject({
+        success: (result) => {
+          pushClientIdRequesting = false;
+          if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout);
+            pushClientIdRequestTimeout = 0;
+          }
+          const clientId = result.cid;
+          pushDebug("UniPush getPushClientId success");
+          if (clientId == "") {
+            pushDebug("UniPush CID 为空");
+            schedulePushClientIdRetry("CID 为空");
+            return null;
+          }
+          const cachedClientId = getCachedPushClientId();
+          pushDebug("UniPush CID=" + clientId);
+          if (clientId != cachedClientId) {
+            pushDebug("UniPush CID 已更新");
+          }
+          pushClientIdRetryCount = 0;
+          uni.setStorageSync(PUSH_CLIENT_ID_KEY, clientId);
+        },
+        fail: (error = null) => {
+          pushClientIdRequesting = false;
+          if (pushClientIdRequestTimeout > 0) {
+            clearTimeout(pushClientIdRequestTimeout);
+            pushClientIdRequestTimeout = 0;
+          }
+          pushDebug("UniPush getPushClientId failed: " + error.toString());
+          schedulePushClientIdRetry("调用失败");
+        }
+      }));
+    } catch (error) {
+      pushClientIdRequesting = false;
+      if (pushClientIdRequestTimeout > 0) {
+        clearTimeout(pushClientIdRequestTimeout);
+        pushClientIdRequestTimeout = 0;
+      }
+      pushDebug("调用 getPushClientId 异常: " + error.toString());
+      schedulePushClientIdRetry("调用异常");
+    }
+  }
+  function markPushSessionAuthenticated() {
+    uni.setStorageSync(PUSH_SESSION_KEY, "authenticated");
+    refreshPushClientId();
+  }
+  function clearPushSessionState() {
+    uni.removeStorageSync(PUSH_SESSION_KEY);
+    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
+  }
+  function consumePendingMessageId() {
+    const rawValue = uni.getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    const value = rawValue == null ? "" : stringValue(rawValue);
+    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
+    return value;
+  }
+  function consumePushStaleFlag() {
+    const value = uni.getStorageSync(PUSH_MESSAGE_STALE_KEY);
+    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
+    return value != null && value.toString() == "true";
+  }
+  function getCachedPushClientId() {
+    const value = uni.getStorageSync(PUSH_CLIENT_ID_KEY);
+    return value == null ? "" : value.toString();
+  }
+  class RequestOptions extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            url: { type: String, optional: true },
+            method: { type: "Unknown", optional: true },
+            data: { type: "Any", optional: true },
+            header: { type: "Unknown", optional: true },
+            showLoading: { type: Boolean, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = RequestOptions.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.url = this.__props__.url;
+      this.method = this.__props__.method;
+      this.data = this.__props__.data;
+      this.header = this.__props__.header;
+      this.showLoading = this.__props__.showLoading;
+      delete this.__props__;
+    }
+  }
+  class HttpResponse extends UTS.UTSType {
+    static get$UTSMetadata$(T) {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            message: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = HttpResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.message = this.__props__.message;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class HttpError extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            statusCode: { type: Number, optional: false },
+            message: { type: String, optional: false },
+            data: { type: "Any", optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = HttpError.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.statusCode = this.__props__.statusCode;
+      this.message = this.__props__.message;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class RequestResult extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            statusCode: { type: Number, optional: false },
+            data: { type: "Any", optional: false },
+            errMsg: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = RequestResult.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.statusCode = this.__props__.statusCode;
+      this.data = this.__props__.data;
+      this.errMsg = this.__props__.errMsg;
+      delete this.__props__;
+    }
+  }
+  class RequestFailure extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            errMsg: { type: String, optional: true },
+            data: { type: "Any", optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = RequestFailure.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.errMsg = this.__props__.errMsg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  const BASE_URL = "https://car.zdiot.cn:18443/api";
+  function handleTokenExpired() {
+    uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
+    uni.removeStorageSync("token");
+    clearPushSessionState();
+    showAppToast({
+      title: "登录已过期，请重新登录",
+      icon: "none",
+      duration: 2e3
+    });
+    setTimeout(() => {
+      uni.__log__("log", "at api/http.uts:55", "正在跳转到登录页...");
+      uni.redirectTo({
+        url: "/pages/login/login",
+        success: () => {
+          uni.__log__("log", "at api/http.uts:59", "跳转登录页成功");
+        },
+        fail: (err) => {
+          uni.__log__("log", "at api/http.uts:62", "跳转登录页失败:", err);
+          uni.reLaunch({
+            url: "/pages/login/login"
+          });
+        }
+      });
+    }, 500);
+  }
+  function requestInterceptor(config) {
+    const token = uni.getStorageSync("token");
+    if (token != null && token.toString().length > 0) {
+      if (config.header == null) {
+        config.header = new UTSJSONObject();
+      }
+      config.header.set("token", token.toString());
+    }
+    return config;
+  }
+  function responseInterceptor(response, config) {
+    return response.data;
+  }
+  function errorHandler(error, config) {
+    if (config.showLoading != false) {
+      uni.hideLoading();
+    }
+    uni.__log__("log", "at api/http.uts:114", "请求错误详情:", error);
+    if (error.statusCode != 0) {
+      switch (error.statusCode) {
+        case 401:
+          handleTokenExpired();
+          break;
+        case 403:
+          showAppToast({
+            title: "没有权限访问",
+            icon: "none"
+          });
+          break;
+        case 404:
+          showAppToast({
+            title: "请求资源不存在",
+            icon: "none"
+          });
+          break;
+        case 500:
+          showAppToast({
+            title: "服务器错误",
+            icon: "none"
+          });
+          break;
+        default:
+          showAppToast({
+            title: error.message != null ? error.message : "请求错误: ".concat(error.statusCode),
+            icon: "none"
+          });
+      }
+    } else {
+      showAppToast({
+        title: "网络错误，请检查网络连接",
+        icon: "none"
+      });
+    }
+  }
+  function request(options) {
+    const requestUrl = options.url != null ? options.url : "";
+    const config = new UTSJSONObject(
+      {
+        url: requestUrl,
+        method: options.method != null ? options.method : "GET",
+        data: options.data != null ? options.data : new UTSJSONObject({}),
+        header: options.header != null ? options.header : new UTSJSONObject(),
+        showLoading: options.showLoading != false
+      }
+      // 处理完整URL
+    );
+    if (!config.url.startsWith("http")) {
+      config.url = BASE_URL + config.url;
+    }
+    const processedConfig = requestInterceptor(config);
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: processedConfig.url,
+        method: processedConfig.method,
+        data: processedConfig.data,
+        header: processedConfig.header,
+        success: (res) => {
+          const statusCode = res.statusCode;
+          if (statusCode == 200) {
+            const data = responseInterceptor(res);
+            resolve(data);
+          } else {
+            const httpError = new HttpError({
+              statusCode,
+              message: "请求失败: ".concat(statusCode),
+              data: res.data
+            });
+            errorHandler(httpError, processedConfig);
+            reject(httpError);
+          }
+        },
+        fail: (error) => {
+          const httpError = new HttpError({
+            statusCode: 0,
+            message: error.errMsg != null ? error.errMsg : "网络请求失败",
+            data: error
+          });
+          errorHandler(httpError, processedConfig);
+          reject(httpError);
+        }
+      });
+    });
+  }
+  function get(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "GET",
+      data,
+      header: options.header,
+      showLoading: options.showLoading
+    }));
+  }
+  function post(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "POST",
+      data,
+      header: options.header,
+      showLoading: options.showLoading
+    }));
+  }
+  function put(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "PUT",
+      data,
+      header: options.header,
+      showLoading: options.showLoading
+    }));
+  }
+  function remove(url, data = new UTSJSONObject({}), options = new RequestOptions({
+    url: null,
+    method: null,
+    data: null,
+    header: null,
+    showLoading: null
+  })) {
+    return request(new UTSJSONObject({
+      url,
+      method: "DELETE",
+      data,
+      header: options.header,
+      showLoading: options.showLoading
+    }));
+  }
+  function asJSONObject(value = null) {
+    if (value == null) {
+      return new UTSJSONObject();
+    }
+    return value;
+  }
+  function getResponseCode(response) {
+    return response.getNumber("code", -1);
+  }
+  function getResponseMessage(response) {
+    const msg = response.getString("msg", "");
+    return msg != "" ? msg : response.getString("message", "");
+  }
+  function getResponseDataObject(response) {
+    const data = response.getJSON("data");
+    return data != null ? data : new UTSJSONObject();
+  }
+  function getResponseDataArray(response) {
+    const data = response.getArray("data");
+    return data != null ? data : [];
+  }
+  const loginUrl = "/sys/login";
+  const devicePos = "/gps/lastPosition?deptId=";
+  const trackPos = "/gps/trackPos?";
+  const userinfo = "/sys/user/info";
+  const addDeviceUrl = "/userDevice/add";
+  const userDeviceList = "/userDevice/list";
+  const uniVerifyLoginUrl = "/authLogin/uniVerify";
+  const smsSendCodeUrl = "/authLogin/sms/send";
+  const smsLoginUrl = "/authLogin/sms/login";
+  const changePSW = "/sys/user/password";
+  const userMsgList = "/usermessage/listForUser";
+  const msgState = "/usermessage/detail/";
+  const updateDevice = "/device/update";
+  const deviceDetail = "/device/info/";
+  const logoutUrl = "/sys/logout";
+  const sendcmd = "/command/sendCmd";
+  const getGeofence = "/geofence";
+  const deleteGeo = "/geofence/";
+  const unbindDeviceList = "/device/unbindGeofenceList";
+  const bindDeviceList = "/device/bindGeofenceList";
+  const bindGeofence = "/geofence/bind";
+  const unbindGeofence = "/geofence/unbind";
+  const deleteDevice = "/userDevice/del";
+  const cmdActionUrl = "/command/cmdAction";
+  const cmdByMidUrl = "/command/cmdByMid";
+  const cmdSendUrl = "/command/sendCmd";
+  class BasicResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = BasicResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      delete this.__props__;
+    }
+  }
+  class JsonDataResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = JsonDataResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class UniVerifyLoginRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            openId: { type: String, optional: false },
+            accessToken: { type: String, optional: false },
+            platform: { type: String, optional: false },
+            clientVersion: { type: String, optional: true }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UniVerifyLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.openId = this.__props__.openId;
+      this.accessToken = this.__props__.accessToken;
+      this.platform = this.__props__.platform;
+      this.clientVersion = this.__props__.clientVersion;
+      delete this.__props__;
+    }
+  }
+  class SendSmsCodeRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            mobile: { type: String, optional: false },
+            scene: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SendSmsCodeRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.mobile = this.__props__.mobile;
+      this.scene = this.__props__.scene;
+      delete this.__props__;
+    }
+  }
+  class SmsLoginRequest extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            mobile: { type: String, optional: false },
+            code: { type: String, optional: false },
+            platform: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SmsLoginRequest.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.mobile = this.__props__.mobile;
+      this.code = this.__props__.code;
+      this.platform = this.__props__.platform;
+      delete this.__props__;
+    }
+  }
+  class DevicePositionResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            message: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DevicePositionResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.message = this.__props__.message;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class TrackPosResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = TrackPosResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class UserInfoResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UserInfoResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  let UserDeviceListData$1 = class UserDeviceListData2 extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            list: { type: "Unknown", optional: false },
+            totalPage: { type: Number, optional: false },
+            totalCount: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UserDeviceListData2.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.list = this.__props__.list;
+      this.totalPage = this.__props__.totalPage;
+      this.totalCount = this.__props__.totalCount;
+      delete this.__props__;
+    }
+  };
+  class UserDeviceListResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: UserDeviceListData$1, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UserDeviceListResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class DeviceDetailResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DeviceDetailResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class GeofenceResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = GeofenceResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class DevicePageData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            list: { type: "Unknown", optional: false },
+            totalPage: { type: Number, optional: false },
+            totalCount: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DevicePageData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.list = this.__props__.list;
+      this.totalPage = this.__props__.totalPage;
+      this.totalCount = this.__props__.totalCount;
+      delete this.__props__;
+    }
+  }
+  class DevicePageResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: DevicePageData, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DevicePageResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class CommandListResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = CommandListResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class SendCmdResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SendCmdResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  class ChangePasswordResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = ChangePasswordResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      delete this.__props__;
+    }
+  }
+  let MessageResponse$1 = class MessageResponse2 extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: UserDeviceListData$1, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MessageResponse2.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  };
+  function basicResponse(raw = null) {
+    const response = asJSONObject(raw);
+    return new BasicResponse({ code: getResponseCode(response), msg: getResponseMessage(response) });
+  }
+  function jsonDataResponse(raw = null) {
+    const response = asJSONObject(raw);
+    return new JsonDataResponse({
+      code: getResponseCode(response),
+      msg: getResponseMessage(response),
+      data: getResponseDataObject(response)
+    });
+  }
+  function devicePageResponse(raw = null) {
+    const response = asJSONObject(raw);
+    const data = getResponseDataObject(response);
+    const list = data.getArray("list");
+    return new DevicePageResponse({
+      code: getResponseCode(response),
+      msg: getResponseMessage(response),
+      data: new DevicePageData({
+        list: list != null ? list : [],
+        totalPage: data.getNumber("totalPage", 0),
+        totalCount: data.getNumber("totalCount", 0)
+      })
+    });
+  }
+  function userDevicePageResponse(raw = null) {
+    const page = devicePageResponse(raw);
+    return new UserDeviceListResponse({
+      code: page.code,
+      msg: page.msg,
+      data: new UserDeviceListData$1({
+        list: page.data.list,
+        totalPage: page.data.totalPage,
+        totalCount: page.data.totalCount
+      })
+    });
+  }
+  function messagePageResponse(raw = null) {
+    const page = devicePageResponse(raw);
+    return new MessageResponse$1({
+      code: page.code,
+      msg: page.msg,
+      data: new UserDeviceListData$1({
+        list: page.data.list,
+        totalPage: page.data.totalPage,
+        totalCount: page.data.totalCount
+      })
+    });
+  }
+  function userInfoResponse(raw = null) {
+    const response = jsonDataResponse(raw);
+    return new UserInfoResponse({ code: response.code, msg: response.msg, data: response.data });
+  }
+  function deviceDetailResponse(raw = null) {
+    const response = jsonDataResponse(raw);
+    return new DeviceDetailResponse({ code: response.code, msg: response.msg, data: response.data });
+  }
+  function changePasswordResponse(raw = null) {
+    const response = basicResponse(raw);
+    return new ChangePasswordResponse({ code: response.code, msg: response.msg });
+  }
+  const login = (data) => {
+    return post(loginUrl, data).then((raw = null) => {
+      return jsonDataResponse(raw);
+    });
+  };
+  const logout = () => {
+    return post(logoutUrl).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const sendCommand = (data) => {
+    return post(sendcmd, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const getDevicePos = (data) => {
+    return get(devicePos, data).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new DevicePositionResponse({
+        code: getResponseCode(response),
+        message: getResponseMessage(response),
+        data: getResponseDataArray(response)
+      });
+    });
+  };
+  const getTrackPos = (data) => {
+    return get(trackPos, data).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new TrackPosResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataObject(response) });
+    });
+  };
+  const getUserInfo = () => {
+    return get(userinfo).then((raw = null) => {
+      return userInfoResponse(raw);
+    });
+  };
+  const addDevice = (data) => {
+    return post(addDeviceUrl, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const delDevice = (imei) => {
+    return post(deleteDevice, new UTSJSONObject({ imei })).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const getUserDeviceList = (data) => {
+    return post(userDeviceList, data).then((raw = null) => {
+      return userDevicePageResponse(raw);
+    });
+  };
+  const uniVerifyLogin = (data) => {
+    return post(uniVerifyLoginUrl, data).then((raw = null) => {
+      return jsonDataResponse(raw);
+    });
+  };
+  const sendSmsLoginCode = (data) => {
+    return post(smsSendCodeUrl, data).then((raw = null) => {
+      return jsonDataResponse(raw);
+    });
+  };
+  const smsLogin = (data) => {
+    return post(smsLoginUrl, data).then((raw = null) => {
+      return jsonDataResponse(raw);
+    });
+  };
+  const changePassWord = (data) => {
+    return put(changePSW, data).then((raw = null) => {
+      return changePasswordResponse(raw);
+    });
+  };
+  const getUserMsgList = (data = null) => {
+    return (data != null ? get(userMsgList, data) : get(userMsgList)).then((raw = null) => {
+      return messagePageResponse(raw);
+    });
+  };
+  const setMsgState = (msgId) => {
+    return get("".concat(msgState).concat(msgId)).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const editDeviceInfo = (data) => {
+    return put(updateDevice, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const getDeviceDetail = (deviceId) => {
+    return get("".concat(deviceDetail).concat(deviceId)).then((raw = null) => {
+      return deviceDetailResponse(raw);
+    });
+  };
+  const getGeofenceList = () => {
+    return get(getGeofence).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new GeofenceResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
+    });
+  };
+  const addGeofence = (data) => {
+    return post(getGeofence, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const updateGeofence = (data) => {
+    return put(getGeofence, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const deleteGeofence = (id) => {
+    return remove("".concat(deleteGeo).concat(id)).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const getUnboundDevices = (params) => {
+    return get(unbindDeviceList, params).then((raw = null) => {
+      return devicePageResponse(raw);
+    });
+  };
+  const getBoundDevices = (params) => {
+    return get(bindDeviceList, params).then((raw = null) => {
+      return devicePageResponse(raw);
+    });
+  };
+  const bindDevices = (data) => {
+    return post(bindGeofence, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const unbindDevices = (data) => {
+    return remove(unbindGeofence, data).then((raw = null) => {
+      return basicResponse(raw);
+    });
+  };
+  const getCmdAction = () => {
+    return get(cmdActionUrl).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
+    });
+  };
+  const getCmdByMid = (data) => {
+    return get(cmdByMidUrl, data).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new CommandListResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: getResponseDataArray(response) });
+    });
+  };
+  const sendCmd = (data) => {
+    return post(cmdSendUrl, data).then((raw = null) => {
+      const response = asJSONObject(raw);
+      return new SendCmdResponse({ code: getResponseCode(response), msg: getResponseMessage(response), data: response.getString("data", "") });
+    });
+  };
+  class TodayTimeRange extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            nowTime: { type: Number, optional: false },
+            todayZero: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = TodayTimeRange.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.nowTime = this.__props__.nowTime;
+      this.todayZero = this.__props__.todayZero;
+      delete this.__props__;
+    }
+  }
+  function getTodayZeroTime() {
+    const now = /* @__PURE__ */ new Date();
+    const nowTime = now.getTime();
+    const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+    return new TodayTimeRange({
+      nowTime,
+      todayZero
+    });
+  }
+  function pad(value) {
+    return value.toString().padStart(2, "0");
+  }
+  function formatTimes(timestamp) {
+    const d = new Date(timestamp);
+    return "".concat(d.getFullYear(), "-").concat(pad(d.getMonth() + 1), "-").concat(pad(d.getDate()), " ").concat(pad(d.getHours()), ":").concat(pad(d.getMinutes()), ":").concat(pad(d.getSeconds()));
+  }
+  function parseLocalDateTime(timestamp) {
+    var _a, _b, _c, _d, _e, _f;
+    const match = timestamp.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (match == null)
+      return null;
+    const year = parseInt((_a = match[1]) !== null && _a !== void 0 ? _a : "0");
+    const month = parseInt((_b = match[2]) !== null && _b !== void 0 ? _b : "0");
+    const day = parseInt((_c = match[3]) !== null && _c !== void 0 ? _c : "0");
+    const hour = match[4] == null ? 0 : parseInt((_d = match[4]) !== null && _d !== void 0 ? _d : "0");
+    const minute = match[5] == null ? 0 : parseInt((_e = match[5]) !== null && _e !== void 0 ? _e : "0");
+    const second = match[6] == null ? 0 : parseInt((_f = match[6]) !== null && _f !== void 0 ? _f : "0");
+    const date = new Date(year, month - 1, day, hour, minute, second);
+    if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day || date.getHours() != hour || date.getMinutes() != minute || date.getSeconds() != second) {
+      return null;
+    }
+    return date.getTime();
+  }
+  function normalizeLocalDateTime(timestamp) {
+    const milliseconds = parseLocalDateTime(timestamp);
+    return milliseconds == null ? timestamp : formatTimes(milliseconds);
+  }
+  function formatLocalTime(timestamp) {
+    const milliseconds = parseLocalDateTime(timestamp);
+    if (milliseconds == null)
+      return "";
+    const date = new Date(milliseconds);
+    return "".concat(pad(date.getHours()), ":").concat(pad(date.getMinutes()), ":").concat(pad(date.getSeconds()));
+  }
+  function getDeviceIcon(connectionStatus, carType) {
+    const basePath = connectionStatus == "online" ? "/static/cars/online/" : "/static/cars/offline/";
+    const validTypes = ["car", "bus", "bike", "moto", "diandong", "huoche", "sanlun", "tuola", "suv", "baby", "tank", "zhuangjia", "wajue", "plan", "walk", "muma", "hangmu", "junjian", "tuiche", "train"];
+    let iconPath = basePath + "default.png";
+    if (validTypes.includes(carType)) {
+      iconPath = basePath + carType + ".png";
+    }
+    return iconPath;
+  }
+  class Device extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            deviceName: { type: String, optional: false },
+            value: { type: String, optional: false },
+            imei: { type: String, optional: false },
+            deptId: { type: String, optional: false },
+            deviceId: { type: String, optional: false },
+            iccid: { type: String, optional: false },
+            simMerchant: { type: String, optional: false },
+            connectionStatus: { type: String, optional: false },
+            carType: { type: String, optional: false },
+            plateNo: { type: String, optional: false },
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = Device.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.deviceName = this.__props__.deviceName;
+      this.value = this.__props__.value;
+      this.imei = this.__props__.imei;
+      this.deptId = this.__props__.deptId;
+      this.deviceId = this.__props__.deviceId;
+      this.iccid = this.__props__.iccid;
+      this.simMerchant = this.__props__.simMerchant;
+      this.connectionStatus = this.__props__.connectionStatus;
+      this.carType = this.__props__.carType;
+      this.plateNo = this.__props__.plateNo;
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      delete this.__props__;
+    }
+  }
+  let MapCenter$1 = class MapCenter2 extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MapCenter2.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      delete this.__props__;
+    }
+  };
+  class UserDeviceListData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            list: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UserDeviceListData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.list = this.__props__.list;
+      delete this.__props__;
+    }
+  }
+  class DeviceStatus extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            batteryPercent: { type: Number, optional: false },
+            voltage: { type: Number, optional: false },
+            signalStrength: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DeviceStatus.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.batteryPercent = this.__props__.batteryPercent;
+      this.voltage = this.__props__.voltage;
+      this.signalStrength = this.__props__.signalStrength;
+      delete this.__props__;
+    }
+  }
+  class DeviceDetailState extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            deviceStatus: { type: DeviceStatus, optional: false },
+            connectionStatus: { type: String, optional: false },
+            lastUpdateTime: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = DeviceDetailState.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.deviceStatus = this.__props__.deviceStatus;
+      this.connectionStatus = this.__props__.connectionStatus;
+      this.lastUpdateTime = this.__props__.lastUpdateTime;
+      delete this.__props__;
+    }
+  }
+  const SELECTED_DEVICE_STORAGE_KEY = "selected_device_info";
+  const SELECTED_DEVICE_INDEX_STORAGE_KEY = "selected_device_index";
+  class SavedDevice extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            deviceName: { type: String, optional: false },
+            imei: { type: String, optional: false },
+            deptId: { type: String, optional: false },
+            deviceId: { type: String, optional: false },
+            iccid: { type: String, optional: false },
+            simMerchant: { type: String, optional: false },
+            connectionStatus: { type: String, optional: false },
+            carType: { type: String, optional: false },
+            plateNo: { type: String, optional: false },
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SavedDevice.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.deviceName = this.__props__.deviceName;
+      this.imei = this.__props__.imei;
+      this.deptId = this.__props__.deptId;
+      this.deviceId = this.__props__.deviceId;
+      this.iccid = this.__props__.iccid;
+      this.simMerchant = this.__props__.simMerchant;
+      this.connectionStatus = this.__props__.connectionStatus;
+      this.carType = this.__props__.carType;
+      this.plateNo = this.__props__.plateNo;
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$D = /* @__PURE__ */ vue.defineComponent({
+    __name: "index",
+    setup(__props) {
+      const center = vue.reactive(new MapCenter$1({
+        latitude: 39.90469,
+        longitude: 116.40717
+      }));
+      const userDeviceList2 = vue.ref([]);
+      const positionState = vue.ref("loading");
+      const positionMessage = vue.computed(() => {
+        if (positionState.value == "loading")
+          return "正在获取车辆位置";
+        if (positionState.value == "empty")
+          return "暂无车辆定位数据";
+        if (positionState.value == "invalid")
+          return "定位数据异常";
+        if (positionState.value == "failed")
+          return "位置获取失败，请检查网络后重试";
+        return "";
+      });
+      const mapScale = vue.ref(12);
+      const isMapReady = vue.ref(false);
+      const statusBarHeight = vue.ref(20);
+      vue.ref(null);
+      vue.ref(44);
+      const deviceList = vue.ref([]);
+      const showPicker = vue.ref(false);
+      const pickerValues = vue.ref([]);
+      const currentCarImei = vue.ref("");
+      const currentCarDeptId = vue.ref("");
+      const currentCarDeviceId = vue.ref("");
+      const currentCarIccId = vue.ref("");
+      const currentCarName = vue.ref("");
+      const currentCarSimMerchant = vue.ref("");
+      const currentCarConnectionStatus = vue.ref("");
+      const currentCarCarType = vue.ref("");
+      const currentCarPlateNo = vue.ref("");
+      const deviceDetail2 = vue.ref(new DeviceDetailState({
+        deviceStatus: new DeviceStatus({
+          batteryPercent: 0,
+          voltage: 0,
+          signalStrength: 0
+        }),
+        connectionStatus: "offline",
+        lastUpdateTime: ""
+      }));
+      const markers = vue.ref([]);
+      const lastUpdateTime = vue.ref("--:--:--");
+      const safeDeviceDetail = vue.computed(() => {
+        const detail = deviceDetail2.value;
+        return new DeviceDetailState({
+          deviceStatus: new DeviceStatus({
+            batteryPercent: detail.deviceStatus.batteryPercent,
+            voltage: detail.deviceStatus.voltage,
+            signalStrength: detail.deviceStatus.signalStrength
+          }),
+          connectionStatus: detail.connectionStatus,
+          lastUpdateTime: detail.lastUpdateTime
+        });
+      });
+      const pickerColumns = vue.computed(() => {
+        return [deviceList.value.map((device) => {
+          const displayName = device.deviceName || device.name || device.imei || "未命名设备";
+          const statusText = device.connectionStatus == "online" ? "在线" : "离线";
+          return {
+            id: null,
+            label: "".concat(displayName, " (").concat(statusText, ")"),
+            value: device.imei || device.deviceId,
+            disabled: false,
+            children: null
+          };
+        })];
+      });
+      const closePicker = () => {
+        showPicker.value = false;
+      };
+      const initDimensions = () => {
+        const systemInfo = uni.getSystemInfoSync();
+        statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
+      };
+      const delay = (ms) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, ms);
+        });
+      };
+      const saveSelectedDevice = (device) => {
+        try {
+          const deviceInfo = new UTSJSONObject({
+            name: device.deviceName || device.name || device.imei,
+            deviceName: device.deviceName || device.name || device.imei,
+            imei: device.imei || device.value,
+            deptId: device.deptId,
+            deviceId: device.deviceId,
+            iccid: device.iccid,
+            simMerchant: device.simMerchant,
+            connectionStatus: device.connectionStatus,
+            carType: device.carType,
+            plateNo: device.plateNo,
+            latitude: device.latitude,
+            longitude: device.longitude
+          });
+          uni.setStorageSync(SELECTED_DEVICE_STORAGE_KEY, UTS.JSON.stringify(deviceInfo));
+          uni.__log__("log", "at pages/index/index.uvue:379", "保存选中设备成功:", deviceInfo);
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:381", "保存选中设备失败:", error);
+        }
+      };
+      const decodeSavedDevice = (raw = null) => {
+        if (raw == null || raw == "")
+          return null;
+        let data = null;
+        if (typeof raw == "string") {
+          try {
+            data = UTS.JSON.parse(raw);
+          } catch (error) {
+            return null;
+          }
+        } else {
+          data = raw;
+        }
+        if (data == null)
+          return null;
+        const imei = data.getString("imei", "");
+        const deviceId = data.getString("deviceId", "");
+        if (imei == "" && deviceId == "")
+          return null;
+        const identity = imei != "" ? imei : deviceId;
+        const device = new SavedDevice({
+          name: data.getString("name", identity),
+          deviceName: data.getString("deviceName", data.getString("name", identity)),
+          imei,
+          deptId: data.getString("deptId", ""),
+          deviceId,
+          iccid: data.getString("iccid", ""),
+          simMerchant: data.getString("simMerchant", ""),
+          connectionStatus: data.getString("connectionStatus", ""),
+          carType: data.getString("carType", ""),
+          plateNo: data.getString("plateNo", ""),
+          latitude: data.getNumber("latitude", 0),
+          longitude: data.getNumber("longitude", 0)
+        });
+        return device;
+      };
+      const getSavedSelectedDevice = () => {
+        try {
+          const rawDevice = uni.getStorageSync(SELECTED_DEVICE_STORAGE_KEY);
+          if (rawDevice == null)
+            return null;
+          return decodeSavedDevice(rawDevice);
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:441", "获取保存设备失败:", error);
+        }
+        return null;
+      };
+      const clearSavedSelectedDevice = () => {
+        try {
+          uni.removeStorageSync(SELECTED_DEVICE_STORAGE_KEY);
+          uni.__log__("log", "at pages/index/index.uvue:450", "清除保存设备成功");
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:452", "清除保存设备失败:", error);
+        }
+      };
+      const saveSelectedDeviceIndex = (index) => {
+        try {
+          uni.setStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY, index);
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:461", "保存选中设备索引失败:", error);
+        }
+      };
+      const getSavedSelectedDeviceIndex = () => {
+        try {
+          const savedIndex = uni.getStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
+          if (savedIndex != null && savedIndex.toString() != "") {
+            const index = parseInt(savedIndex.toString());
+            return isNaN(index) || index < 0 ? null : index;
+          }
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:474", "获取保存设备索引失败:", error);
+        }
+        return null;
+      };
+      const clearSavedSelectedDeviceIndex = () => {
+        try {
+          uni.removeStorageSync(SELECTED_DEVICE_INDEX_STORAGE_KEY);
+        } catch (error) {
+          uni.__log__("error", "at pages/index/index.uvue:484", "清除保存设备索引失败:", error);
+        }
+      };
+      const findDeviceIndex = (imei, deviceId) => {
+        if (imei != "") {
+          const imeiIndex = deviceList.value.findIndex((device) => {
+            return device.imei == imei || device.value == imei;
+          });
+          if (imeiIndex != -1)
+            return imeiIndex;
+        }
+        if (deviceId != "") {
+          return deviceList.value.findIndex((device) => {
+            return device.deviceId == deviceId;
+          });
+        }
+        return -1;
+      };
+      const handlePicker = () => {
+        if (deviceList.value.length == 0) {
+          showAppToast({
+            title: "暂无车辆数据",
+            icon: "none"
+          });
+          return null;
+        }
+        const currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+        const savedDevice = getSavedSelectedDevice();
+        const savedDeviceIndex = savedDevice != null ? findDeviceIndex(savedDevice.imei, savedDevice.deviceId) : -1;
+        const savedIndex = getSavedSelectedDeviceIndex();
+        let selectedIndex = currentIndex;
+        if (selectedIndex == -1)
+          selectedIndex = savedDeviceIndex;
+        if (selectedIndex == -1 && savedIndex != null && savedIndex < deviceList.value.length) {
+          selectedIndex = savedIndex;
+        }
+        if (selectedIndex == -1)
+          selectedIndex = 0;
+        const selectedDevice = deviceList.value[selectedIndex];
+        if (selectedDevice == null)
+          return null;
+        pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
+        showPicker.value = true;
+      };
+      const createMarker = (id, lat, lng, type, title = null) => {
+        const isOnline = currentCarConnectionStatus.value == "online";
+        const callout = new UTSJSONObject({
+          content: title || "爱车位置",
+          color: isOnline ? "#ffffff" : "#999999",
+          borderRadius: 6,
+          bgColor: isOnline ? "#07C160" : "#CCCCCC",
+          padding: 4,
+          fontSize: 12,
+          display: "ALWAYS"
+        });
+        return {
+          id,
+          latitude: lat,
+          longitude: lng,
+          iconPath: getDeviceIcon(currentCarConnectionStatus.value, currentCarCarType.value),
+          width: 30,
+          height: 30,
+          anchor: { x: 0.5, y: 0.5 },
+          callout
+        };
+      };
+      const loadDeviceDetail = (deviceId) => {
+        return __awaiter(this, void 0, void 0, function* () {
+          var _a, _b, _c;
+          try {
+            const res = yield getDeviceDetail(deviceId);
+            const detail = res.data;
+            if (detail != null) {
+              const deviceStatus = detail.getJSON("deviceStatus");
+              deviceDetail2.value = {
+                deviceStatus: {
+                  batteryPercent: (_a = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("batteryPercent", 0)) !== null && _a !== void 0 ? _a : 0,
+                  voltage: (_b = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("voltage", 0)) !== null && _b !== void 0 ? _b : 0,
+                  signalStrength: (_c = deviceStatus === null || deviceStatus === void 0 ? null : deviceStatus.getNumber("signalStrength", 0)) !== null && _c !== void 0 ? _c : 0
+                },
+                connectionStatus: detail.getString("connectionStatus", "offline"),
+                lastUpdateTime: detail.getString("lastUpdateTime", "")
+              };
+              const updateTime = detail.getString("lastUpdateTime", "");
+              if (updateTime) {
+                const formattedTime = formatLocalTime(updateTime);
+                if (formattedTime != "")
+                  lastUpdateTime.value = formattedTime;
+              }
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/index/index.uvue:597", "加载设备详情失败", error);
+          }
+        });
+      };
+      vue.ref(new UTSJSONObject({}));
+      const tripData = vue.ref([]);
+      const totalMileage = vue.ref(0);
+      const averageSpeed = vue.ref(0);
+      let trackRequestId = 0;
+      const clearTripData = () => {
+        tripData.value = [];
+        totalMileage.value = 0;
+        averageSpeed.value = 0;
+      };
+      const processTripData = (data) => {
+        const trips = data.getArray("trips");
+        if (trips != null && trips.length > 0) {
+          tripData.value = trips;
+          let totalDistance = 0;
+          let totalDuration = 0;
+          let totalAvgSpeed = 0;
+          trips.forEach((trip) => {
+            totalDistance += trip.getNumber("distance", 0);
+            totalDuration += trip.getNumber("duration", 0);
+            totalAvgSpeed += trip.getNumber("averageSpeed", 0);
+          });
+          totalMileage.value = totalDistance;
+          averageSpeed.value = totalAvgSpeed / trips.length;
+        } else {
+          clearTripData();
+        }
+      };
+      const createTrackRequestData = (imei) => {
+        const timeRange = getTodayZeroTime();
+        return new UTSJSONObject({
+          imei,
+          startTime: formatTimes(timeRange.todayZero),
+          endTime: formatTimes(timeRange.nowTime),
+          minParkTime: 120,
+          withStop: false,
+          withPos: false,
+          withTrip: true
+        });
+      };
+      const loadTrackPos = (data) => {
+        return __awaiter(this, void 0, void 0, function* () {
+          const requestId = ++trackRequestId;
+          try {
+            const res = yield getTrackPos(data);
+            if (requestId != trackRequestId)
+              return Promise.resolve(null);
+            if (res.code == 401) {
+              showAppToast({
+                title: "登录过期，请重新登录",
+                icon: "none",
+                duration: 2e3
+              });
+              uni.removeStorageSync("token");
+              clearPushSessionState();
+              uni.reLaunch({
+                url: "/pages/index/index"
+              });
+              return Promise.resolve(null);
+            }
+            if (res.code != 0) {
+              uni.__log__("error", "at pages/index/index.uvue:671", "加载轨迹失败:", res.msg);
+              clearTripData();
+              return Promise.resolve(null);
+            }
+            processTripData(res.data);
+          } catch (error) {
+            if (requestId != trackRequestId)
+              return Promise.resolve(null);
+            uni.__log__("error", "at pages/index/index.uvue:679", "加载轨迹失败", error);
+            clearTripData();
+          }
+        });
+      };
+      const devicePosInfo = vue.ref(null);
+      const devicePositionUpdateTime = vue.computed(() => {
+        const position = devicePosInfo.value;
+        return position != null ? position.getString("positionUpdateTime", "暂无位置") : "暂无位置";
+      });
+      const loadDevicePos = (data) => {
+        return __awaiter(this, void 0, void 0, function* () {
+          positionState.value = "loading";
+          markers.value = [];
+          try {
+            const res = yield getDevicePos(data);
+            const positions = res.data;
+            if (res.code != 0 || positions == null || positions.length == 0) {
+              uni.__log__("warn", "at pages/index/index.uvue:697", "获取设备位置失败:", data.getString("deviceId", ""), res.code);
+              positionState.value = "empty";
+              return false;
+            }
+            const position = positions[0];
+            devicePosInfo.value = position;
+            const lat = position.getNumber("latitude", 0);
+            const lng = position.getNumber("longitude", 0);
+            const isValidCoordinate2 = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat == 0 && lng == 0);
+            if (!isValidCoordinate2) {
+              uni.__log__("error", "at pages/index/index.uvue:712", "经纬度格式错误", position.getString("latitude", ""), position.getString("longitude", ""));
+              positionState.value = "invalid";
+              showAppToast({
+                title: "定位数据异常",
+                icon: "none"
+              });
+              return false;
+            }
+            const convertedCoord = CoordTransform.wgs84ToTencent(lat, lng);
+            center.latitude = convertedCoord.lat;
+            center.longitude = convertedCoord.lng;
+            positionState.value = "available";
+            yield delay(100);
+            const nextMarker = createMarker(1, convertedCoord.lat, convertedCoord.lng, "device", currentCarName.value);
+            markers.value = [nextMarker];
+            uni.__log__("log", "at pages/index/index.uvue:737", "标记点更新完成:", data.getString("deviceId", ""), convertedCoord.lat, convertedCoord.lng);
+            return true;
+          } catch (error) {
+            uni.__log__("error", "at pages/index/index.uvue:740", "加载设备位置失败", error);
+            positionState.value = "failed";
+            showAppToast({
+              title: "定位失败，请重试",
+              icon: "none"
+            });
+            return false;
+          }
+        });
+      };
+      const loadDeviceData = (device) => {
+        return __awaiter(this, void 0, void 0, function* () {
+          uni.__log__("log", "at pages/index/index.uvue:752", "开始加载设备数据:", device);
+          try {
+            yield loadDeviceDetail(device.deviceId);
+            yield loadDevicePos(new UTSJSONObject({
+              deviceId: device.deviceId,
+              deviceids: device.imei || device.value
+            }));
+            yield loadTrackPos(createTrackRequestData(device.imei || device.value));
+            showAppToast({
+              title: "切换成功",
+              icon: "none"
+            });
+          } catch (error) {
+            uni.__log__("error", "at pages/index/index.uvue:765", "切换车辆失败", error);
+            showAppToast({
+              title: "切换失败，请重试",
+              icon: "none"
+            });
+          } finally {
+            uni.hideLoading();
+          }
+        });
+      };
+      const handlePickerConfirm = (e) => {
+        showPicker.value = false;
+        const selectedValue = e.values.length > 0 ? e.values[0].toString() : "";
+        let selectedIndex = -1;
+        if (selectedValue != "") {
+          selectedIndex = deviceList.value.findIndex((device) => {
+            return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue;
+          });
+        }
+        if (selectedIndex < 0 && e.indexs.length > 0) {
+          const eventIndex = e.indexs[0];
+          if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
+            selectedIndex = eventIndex;
+          }
+        }
+        if (selectedIndex < 0) {
+          selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value);
+        }
+        if (selectedIndex < 0 && deviceList.value.length > 0) {
+          selectedIndex = 0;
+        }
+        const selectedDevice = selectedIndex >= 0 ? deviceList.value[selectedIndex] : null;
+        if (selectedDevice == null) {
+          showAppToast({
+            title: "选择设备失败",
+            icon: "none"
+          });
+          return null;
+        }
+        if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
+          uni.__log__("log", "at pages/index/index.uvue:811", "选择的设备与当前设备相同，不重复加载");
+          return null;
+        }
+        const deviceName = selectedDevice.deviceName || selectedDevice.name || "未命名设备";
+        currentCarName.value = deviceName;
+        currentCarImei.value = selectedDevice.imei || selectedDevice.value;
+        currentCarDeptId.value = selectedDevice.deptId;
+        currentCarDeviceId.value = selectedDevice.deviceId;
+        currentCarIccId.value = selectedDevice.iccid;
+        currentCarSimMerchant.value = selectedDevice.simMerchant;
+        currentCarConnectionStatus.value = selectedDevice.connectionStatus;
+        currentCarCarType.value = selectedDevice.carType;
+        currentCarPlateNo.value = selectedDevice.plateNo;
+        center.latitude = selectedDevice.latitude;
+        center.longitude = selectedDevice.longitude;
+        saveSelectedDeviceIndex(selectedIndex);
+        pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId];
+        saveSelectedDevice(selectedDevice);
+        uni.showLoading(new UTSJSONObject({
+          title: "加载车辆数据...",
+          mask: true
+        }));
+        loadDeviceData(selectedDevice);
+      };
+      const loadDeviceList = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          try {
+            const res = yield getUserDeviceList(new UTSJSONObject({
+              pageSize: 1e3
+            }));
+            const code = res.code;
+            const data = res.data;
+            const list = data.list;
+            if (code == 0 && list != null && list.length > 0) {
+              userDeviceList2.value = list;
+              deviceList.value = list.map((item) => {
+                const imei = item.getString("imei", "");
+                const rawDeviceName = item.getString("deviceName", "");
+                const deviceName = rawDeviceName != "" ? rawDeviceName : imei != "" ? imei : "未命名设备";
+                return new Device({
+                  name: deviceName,
+                  deviceName,
+                  value: imei,
+                  imei,
+                  deptId: item.getString("companyId", ""),
+                  deviceId: item.getString("deviceId", ""),
+                  iccid: item.getString("iccid", ""),
+                  simMerchant: item.getString("simMerchant", ""),
+                  connectionStatus: item.getString("connectionStatus", ""),
+                  carType: item.getString("carType", ""),
+                  plateNo: item.getString("plateNo", ""),
+                  latitude: item.getNumber("latitude", 0),
+                  longitude: item.getNumber("longitude", 0)
+                });
+              });
+              const savedDevice = getSavedSelectedDevice();
+              const savedIndex = getSavedSelectedDeviceIndex();
+              let selectedDevice = null;
+              let selectedIdx = -1;
+              if (savedDevice != null) {
+                selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId);
+                if (selectedIdx != -1) {
+                  selectedDevice = deviceList.value[selectedIdx];
+                  saveSelectedDeviceIndex(selectedIdx);
+                } else {
+                  clearSavedSelectedDevice();
+                  clearSavedSelectedDeviceIndex();
+                }
+              }
+              if (selectedDevice == null && savedIndex != null && savedIndex < deviceList.value.length) {
+                selectedDevice = deviceList.value[savedIndex];
+                selectedIdx = savedIndex;
+              }
+              if (!selectedDevice && deviceList.value.length > 0) {
+                selectedDevice = deviceList.value[0];
+                selectedIdx = 0;
+                saveSelectedDevice(selectedDevice);
+                saveSelectedDeviceIndex(0);
+                uni.__log__("log", "at pages/index/index.uvue:904", "使用第一个设备作为默认:", selectedDevice === null || selectedDevice === void 0 ? null : selectedDevice.deviceName);
+              }
+              if (selectedDevice != null) {
+                const device = selectedDevice;
+                const deviceName = device.deviceName != "" ? device.deviceName : device.name != "" ? device.name : "未命名设备";
+                currentCarName.value = deviceName;
+                currentCarImei.value = device.imei != "" ? device.imei : device.value;
+                currentCarDeptId.value = device.deptId;
+                currentCarDeviceId.value = device.deviceId;
+                currentCarIccId.value = device.iccid;
+                currentCarSimMerchant.value = device.simMerchant;
+                currentCarConnectionStatus.value = device.connectionStatus;
+                currentCarCarType.value = device.carType;
+                currentCarPlateNo.value = device.plateNo;
+                center.latitude = device.latitude;
+                center.longitude = device.longitude;
+                pickerValues.value = [device.imei != "" ? device.imei : device.deviceId];
+                yield loadDeviceDetail(device.deviceId);
+                yield loadDevicePos(new UTSJSONObject({
+                  deviceId: device.deviceId,
+                  deviceids: device.imei != "" ? device.imei : device.value
+                }));
+                yield loadTrackPos(createTrackRequestData(device.imei != "" ? device.imei : device.value));
+              }
+            } else {
+              showAppToast({
+                title: "暂无车辆数据",
+                icon: "none"
+              });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/index/index.uvue:939", "加载车辆列表失败", error);
+            showAppToast({
+              title: "加载失败，请下拉重试",
+              icon: "none"
+            });
+          }
+        });
+      };
+      const totalTrips = vue.computed(() => {
+        return tripData.value.length;
+      });
+      const refreshLocation = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!currentCarDeviceId.value) {
+            showAppToast({
+              title: "请先选择车辆",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          uni.showLoading(new UTSJSONObject({
+            title: "刷新位置中...",
+            mask: true
+          }));
+          try {
+            yield loadDeviceList();
+          } catch (error) {
+            uni.__log__("error", "at pages/index/index.uvue:968", "刷新位置失败", error);
+            showAppToast({
+              title: "刷新失败",
+              icon: "none"
+            });
+          } finally {
+            uni.hideLoading();
+          }
+        });
+      };
+      function checkToken() {
+        const token = uni.getStorageSync("token");
+        return token != null && token.toString() != "";
+      }
+      function isLogin() {
+        if (!checkToken()) {
+          showAppToast({
+            title: "请先登录",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
+      }
+      const toRecordDetail = () => {
+        if (!isLogin())
+          return null;
+        uni.navigateTo({
+          url: "/pages/playBack/playBack?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarPlateNo.value + "&carType=" + currentCarCarType.value + "&lat=" + center.latitude + "&lng=" + center.longitude,
+          fail: (err) => {
+            if (err.errMsg.indexOf("locked") < 0)
+              uni.__log__("error", "at pages/index/index.uvue:1000", "跳转轨迹详情失败:", err);
+          }
+        });
+      };
+      const toDeviceList = () => {
+        uni.__log__("log", "at pages/index/index.uvue:1007", "toDeviceList");
+        if (!isLogin())
+          return null;
+        uni.navigateTo({
+          url: "/pages/deviceList/deviceList"
+        });
+      };
+      const toDeviceDetail = (e = null) => {
+        if (!isLogin())
+          return null;
+        if (!currentCarImei.value || !currentCarDeptId.value || !currentCarDeviceId.value) {
+          showAppToast({
+            title: "请先选择车辆",
+            icon: "none"
+          });
+          return null;
+        }
+        uni.navigateTo({
+          url: "/pages/carInfoDetail/carInfoDetail?imei=".concat(currentCarImei.value, "&deptId=").concat(currentCarDeptId.value, "&deviceId=").concat(currentCarDeviceId.value)
+        });
+      };
+      const toAdd = () => {
+        if (!isLogin())
+          return null;
+        uni.navigateTo({
+          url: "/pages/addCar/addCar",
+          fail: (err) => {
+            if (err.errMsg.indexOf("locked") < 0)
+              uni.__log__("error", "at pages/index/index.uvue:1035", "跳转添加设备失败:", err);
+          }
+        });
+      };
+      const toMsgCenter = () => {
+        if (!isLogin())
+          return null;
+        uni.switchTab({
+          url: "/pages/message/message"
+        });
+      };
+      const toFindCar = () => {
+        if (!isLogin())
+          return null;
+        if (positionState.value != "available") {
+          showAppToast({
+            title: positionMessage.value || "暂无有效车辆位置",
+            icon: "none"
+          });
+          return null;
+        }
+        openLocation(new OpenLocationParams({
+          latitude: center.latitude,
+          longitude: center.longitude,
+          name: currentCarName.value
+        }));
+      };
+      const toFence = () => {
+        if (!isLogin())
+          return null;
+        uni.navigateTo({
+          url: "/pages/geofencing/geofencing?imei=" + currentCarImei.value + "&connectionStatus=" + currentCarConnectionStatus.value + "&plateNo=" + currentCarName.value + "&carType=" + currentCarCarType.value + "&deptId=" + currentCarDeptId.value + "&deviceName=" + currentCarName.value
+        });
+      };
+      const contactCustomerService = () => {
+        showAppToast({
+          title: "请在微信小程序中联系客服",
+          icon: "none"
+        });
+      };
+      const needRefresh = vue.ref(false);
+      const toPay = (iccid, simMerchant) => {
+        if (!isLogin())
+          return null;
+        if (simMerchant.toLowerCase() == "zddx") {
+          iccid = iccid.substring(0, iccid.length - 1);
+        }
+        needRefresh.value = true;
+        uni.__log__("log", "at pages/index/index.uvue:1123", "iccid", iccid);
+        needRefresh.value = false;
+        showAppToast({
+          title: "请在微信小程序中完成充值",
+          icon: "none",
+          duration: 2e3,
+          mask: true
+        });
+      };
+      const gotoLogin = () => {
+        isMapReady.value = false;
+        vue.nextTick(() => {
+          uni.navigateTo({
+            url: "/pages/login/login"
+          });
+        });
+      };
+      function unbindCurrentDevice() {
+        return __awaiter(this, void 0, void 0, function* () {
+          const result = yield delDevice(currentCarImei.value);
+          if (result.code == 0) {
+            showAppToast({
+              title: "解绑成功",
+              icon: "none"
+            });
+            clearSavedSelectedDevice();
+            clearSavedSelectedDeviceIndex();
+          } else {
+            showAppToast({
+              title: "解绑失败",
+              icon: "error"
+            });
+          }
+          yield loadDeviceList();
+        });
+      }
+      const unbindDevice = () => {
+        if (!isLogin())
+          return null;
+        showAppModal(new UTSJSONObject({
+          title: "解绑车辆",
+          content: "确定解绑当前车辆吗？",
+          success: (res) => {
+            if (res.confirm) {
+              void unbindCurrentDevice();
+            }
+          }
+        }));
+      };
+      vue.onShow(() => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (checkToken()) {
+            const needRefresh_1 = uni.getStorageSync("needRefreshHome");
+            if (needRefresh_1) {
+              yield loadDeviceList();
+              uni.removeStorageSync("needRefreshHome");
+            }
+          }
+        });
+      });
+      const handleReload = () => {
+        if (!isLogin())
+          return null;
+        loadDeviceList();
+      };
+      vue.onLoad(() => {
+        uni.hideTabBar();
+        initDimensions();
+        if (checkToken()) {
+          isMapReady.value = true;
+          loadDeviceList();
+        }
+      });
+      return (_ctx = null, _cache = null) => {
+        var _a;
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_i_line_progress = resolveEasycom(vue.resolveDynamicComponent("i-line-progress"), __easycom_1$4);
+        const _component_map = vue.resolveComponent("map");
+        const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$5);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("scroll-view", new UTSJSONObject({
+            class: "container",
+            "scroll-y": "true",
+            "show-scrollbar": false
+          }), [
+            vue.createElementVNode("view", new UTSJSONObject({ class: "page-bg" }), [
+              vue.createElementVNode("view", new UTSJSONObject({
+                class: "top",
+                style: vue.normalizeStyle({ paddingTop: statusBarHeight.value + 10 + "px" })
+              }), [
+                vue.createElementVNode("view", new UTSJSONObject({ class: "device-car" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "current-car" }), [
+                    checkToken() ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
+                      currentCarName.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                        key: 0,
+                        class: "car-id",
+                        onClick: handlePicker
+                      }), vue.toDisplayString((_a = currentCarName.value) !== null && _a !== void 0 ? _a : "加载中…"), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                        key: 1,
+                        class: "car-id"
+                      }), "暂无设备"))
+                    ])) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                      key: 1,
+                      class: "login",
+                      onClick: gotoLogin
+                    }), "点击登录!")),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      name: "/static/right-bottom.png",
+                      fontSize: "7"
+                    }))
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "nav-tools" }), [
+                    vue.createCommentVNode("", true),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      name: "/static/reload.png",
+                      fontSize: "18",
+                      onClick: handleReload
+                    })),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      class: "nav-tool-spacing",
+                      name: "/static/maps.png",
+                      fontSize: "20",
+                      onClick: toDeviceList
+                    })),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "nav-tool-spacing nav-tool-add",
+                      onClick: toAdd
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_1$2,
+                        mode: "aspectFit",
+                        class: "nav-tool-add-image"
+                      }))
+                    ])
+                  ])
+                ]),
+                safeDeviceDetail.value.deviceStatus.batteryPercent && safeDeviceDetail.value.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 0,
+                  class: "device-info"
+                }), [
+                  safeDeviceDetail.value.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createBlock(_component_i_line_progress, new UTSJSONObject({
+                    key: 0,
+                    percent: safeDeviceDetail.value.deviceStatus.batteryPercent
+                  }), null, 8, ["percent"])) : vue.createCommentVNode("", true),
+                  safeDeviceDetail.value.deviceStatus.batteryPercent ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 1,
+                    class: "info"
+                  }), "电量: " + vue.toDisplayString(safeDeviceDetail.value.deviceStatus.batteryPercent) + "%", 1)) : vue.createCommentVNode("", true),
+                  safeDeviceDetail.value.deviceStatus.voltage ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 2,
+                    class: "info"
+                  }), "电压: " + vue.toDisplayString(safeDeviceDetail.value.deviceStatus.voltage) + "V", 1)) : vue.createCommentVNode("", true)
+                ])) : vue.createCommentVNode("", true),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
+                  vue.createElementVNode("image", new UTSJSONObject({
+                    src: _imports_2$2,
+                    mode: "aspectFit",
+                    class: "banner-image"
+                  }))
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "car-state" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "设备状态"),
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: vue.normalizeClass(["state-value", new UTSJSONObject({ "online": safeDeviceDetail.value.connectionStatus == "online" })])
+                    }), vue.toDisplayString(safeDeviceDetail.value.connectionStatus == "online" ? "在线" : "离线"), 3)
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "state-item" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-label" }), "最后定位"),
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "state-value" }), vue.toDisplayString(devicePositionUpdateTime.value), 1)
+                  ])
+                ])
+              ], 4),
+              vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
+                vue.createElementVNode("view", new UTSJSONObject({ class: "map-box" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "map-header" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "map-title" }), "车辆定位"),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "map-refresh-wrap",
+                      onClick: refreshLocation
+                    }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-refresh" }), "刷新位置")
+                    ])
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
+                    isMapReady.value ? (vue.openBlock(), vue.createBlock(_component_map, new UTSJSONObject({
+                      key: 0,
+                      id: "myMap",
+                      latitude: center.latitude,
+                      longitude: center.longitude,
+                      scale: mapScale.value,
+                      style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
+                      "show-location": true,
+                      "enable-traffic": true,
+                      "enable-overlooking": true,
+                      "enable-building": true,
+                      "enable-3D": false,
+                      markers: markers.value
+                    }), null, 8, ["latitude", "longitude", "scale", "markers"])) : vue.createCommentVNode("", true),
+                    positionState.value != "available" ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                      key: 1,
+                      class: "map-status"
+                    }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "map-status-text" }), vue.toDisplayString(positionMessage.value), 1),
+                      positionState.value != "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                        key: 0,
+                        class: "map-status-retry",
+                        onClick: refreshLocation
+                      }), "重新获取")) : vue.createCommentVNode("", true)
+                    ])) : vue.createCommentVNode("", true)
+                  ])
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "mile-record" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "record-header" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "record-title" }), "轨迹记录"),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "record-desc-wrap",
+                      onClick: toRecordDetail
+                    }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "record-desc" }), "更多轨迹")
+                    ])
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "ring-container" }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "ring-item" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-bg green" }), [
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-left" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--track" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-right" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-right" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-left" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ])
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-text" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "unit" }), "条"),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "num" }), vue.toDisplayString(totalTrips.value), 1),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "label" }), "今日轨迹")
+                      ])
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "ring-item" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-bg orange" }), [
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-left" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--track" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--top-right" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-right" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ]),
+                        vue.createElementVNode("view", new UTSJSONObject({ class: "ring-quarter ring-quarter--bottom-left" }), [
+                          vue.createElementVNode("view", new UTSJSONObject({ class: "ring-stroke ring-stroke--active" }))
+                        ])
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "ring-text" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "unit" }), "km"),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "num" }), vue.toDisplayString((totalMileage.value / 1e3).toFixed(2)), 1),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "label" }), "今日里程")
+                      ])
+                    ])
+                  ])
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "device-list" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: "device-item",
+                    onClick: toDeviceDetail
+                  }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-device" }), [
+                        vue.createElementVNode("image", new UTSJSONObject({
+                          src: _imports_3$1,
+                          mode: "aspectFill",
+                          class: "icon-image"
+                        }))
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "设备详情"),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "查看设备更多详情")
+                      ])
+                    ]),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      name: "/static/arrow-right.png",
+                      fontSize: "15"
+                    }))
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: "device-item",
+                    onClick: toFindCar
+                  }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-car" }), [
+                        vue.createElementVNode("image", new UTSJSONObject({
+                          src: _imports_4,
+                          mode: "aspectFill",
+                          class: "icon-image"
+                        }))
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "一键寻车"),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "点击立即寻找车辆位置")
+                      ])
+                    ]),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      name: "/static/arrow-right.png",
+                      fontSize: "15"
+                    }))
+                  ]),
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: "device-item",
+                    onClick: toFence
+                  }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "item-label" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "icon icon-fence" }), [
+                        vue.createElementVNode("image", new UTSJSONObject({
+                          src: _imports_5,
+                          mode: "aspectFill",
+                          class: "icon-image"
+                        }))
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "item-info" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "电子围栏"),
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "item-desc" }), "点击去设置或者查看电子围栏")
+                      ])
+                    ]),
+                    vue.createVNode(_component_i_icon, new UTSJSONObject({
+                      name: "/static/arrow-right.png",
+                      fontSize: "15"
+                    }))
+                  ])
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "service" }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "service-header" }), "服务中心"),
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "service-content" }), [
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "service-item",
+                      onClick: toMsgCenter
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_6,
+                        mode: "aspectFit",
+                        class: "icon-image"
+                      })),
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "警报消息")
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "service-item",
+                      onClick: _cache[0] || (_cache[0] = ($event = null) => {
+                        return toPay(currentCarIccId.value, currentCarSimMerchant.value);
+                      })
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_7,
+                        mode: "aspectFit",
+                        class: "icon-image"
+                      })),
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "一键续费")
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "service-item",
+                      onClick: contactCustomerService
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_8,
+                        mode: "aspectFit",
+                        class: "icon-image"
+                      })),
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "item-title" }), "在线客服")
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({
+                      class: "service-item",
+                      onClick: unbindDevice
+                    }), [
+                      vue.createElementVNode("image", new UTSJSONObject({
+                        src: _imports_9,
+                        mode: "aspectFit",
+                        class: "icon-image"
+                      })),
+                      vue.createElementVNode("text", new UTSJSONObject({
+                        class: "item-title",
+                        style: new UTSJSONObject({ "color": "#d81e06" })
+                      }), "删除设备")
+                    ])
+                  ])
+                ])
+              ])
+            ]),
+            vue.createVNode(_component_l_popup, new UTSJSONObject({
+              modelValue: showPicker.value,
+              "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
+                return showPicker.value = $event;
+              }),
+              position: "bottom",
+              closeable: false,
+              "safe-area-inset-bottom": true
+            }), {
+              default: vue.withCtx(() => {
+                return [
+                  vue.createVNode(_component_l_picker, new UTSJSONObject({
+                    modelValue: pickerValues.value,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                      return pickerValues.value = $event;
+                    }),
+                    "cancel-btn": "取消",
+                    "confirm-btn": "确认",
+                    columns: pickerColumns.value,
+                    onCancel: closePicker,
+                    onConfirm: handlePickerConfirm
+                  }), null, 8, ["modelValue", "columns"])
+                ];
+              }),
+              _: 1
+            }, 8, ["modelValue"])
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$C = { "container": { "": { "height": "100%", "backgroundColor": "#E6F9E6", "backgroundImage": "linear-gradient(to right, #E6F9E6, #E0F0FF)" } }, "page-bg": { ".container ": { "paddingTop": 0, "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx" } }, "loading-container": { ".container .page-bg ": { "position": "fixed", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "display": "flex", "flexDirection": "column", "alignItems": "center", "zIndex": 999 } }, "loading-text": { ".container .page-bg .loading-container ": { "marginTop": "20rpx", "fontSize": "28rpx", "color": "#666666" } }, "device-car": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "current-car": { ".container .page-bg .top .device-car ": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "flex-end" } }, "car-id": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "position": "relative" } }, "login": { ".container .page-bg .top .device-car .current-car ": { "fontSize": "36rpx", "fontWeight": "bold", "color": "#000000", "textAlign": "center", "paddingRight": "10rpx" } }, "nav-tools": { ".container .page-bg .top .device-car ": { "display": "flex", "flexShrink": 0, "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "nav-tool-spacing": { ".container .page-bg .top .device-car .nav-tools ": { "flexShrink": 0, "marginLeft": "30rpx" } }, "nav-tool-add": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "width": "36rpx", "height": "36rpx", "alignItems": "center", "justifyContent": "center" } }, "nav-tool-add-image": { ".container .page-bg .top .device-car .nav-tools ": { "width": "36rpx", "height": "36rpx" } }, "exit": { ".container .page-bg .top .device-car .nav-tools ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(0,0,0,0.05)", "transitionProperty": "all", "transitionDuration": "0.2s", "transitionTimingFunction": "ease", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%" } }, "exit-icon": { ".container .page-bg .top .device-car .nav-tools .exit ": { "width": "40rpx", "height": "40rpx" } }, "device-info": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "column", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx", "width": "50%" } }, "info": { ".container .page-bg .top .device-info .info+": { "marginTop": "16rpx" }, ".container .page-bg .top .device-info ": { "fontSize": "26rpx", "color": "#333333" } }, "banner-image": { ".container .page-bg .top ": { "width": "100%", "height": "300rpx" } }, "car-state": { ".container .page-bg .top ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0, "borderTopLeftRadius": "16rpx", "borderTopRightRadius": "16rpx", "borderBottomRightRadius": "16rpx", "borderBottomLeftRadius": "16rpx" } }, "state-item": { ".container .page-bg .top .car-state .state-item+": { "marginLeft": "20rpx" }, ".container .page-bg .top .car-state ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "alignItems": "center", "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "30rpx", "borderTopRightRadius": "30rpx", "borderBottomRightRadius": "30rpx", "borderBottomLeftRadius": "30rpx" } }, "state-label": { ".container .page-bg .top .car-state .state-item ": { "fontSize": "24rpx", "color": "#999999" } }, "state-value": { ".container .page-bg .top .car-state .state-item ": { "marginTop": "12rpx", "fontSize": "25rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .top .car-state .state-item .online": { "color": "#07C160" } }, "map-box": { ".container .page-bg .content ": { "width": "100%", "height": "400rpx", "marginTop": "10rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0, "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "map-header": { ".container .page-bg .content .map-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "map-title": { ".container .page-bg .content .map-box .map-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "map-refresh-wrap": { ".container .page-bg .content .map-box .map-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "map-refresh": { ".container .page-bg .content .map-box .map-header .map-refresh-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "map-container": { ".container .page-bg .content .map-box ": { "position": "relative", "height": "300rpx" } }, "map-status": { ".container .page-bg .content .map-box .map-container ": { "position": "absolute", "left": "24rpx", "right": "24rpx", "bottom": "24rpx", "paddingTop": "16rpx", "paddingRight": "20rpx", "paddingBottom": "16rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "12rpx", "borderTopRightRadius": "12rpx", "borderBottomRightRadius": "12rpx", "borderBottomLeftRadius": "12rpx", "backgroundColor": "rgba(0,0,0,0.68)", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "map-status-text": { ".container .page-bg .content .map-box .map-container .map-status ": { "color": "#ffffff", "fontSize": "24rpx" } }, "map-status-retry": { ".container .page-bg .content .map-box .map-container .map-status ": { "flexShrink": 0, "marginLeft": "20rpx", "color": "#8de39b", "fontSize": "24rpx" } }, "mile-record": { ".container .page-bg .content ": { "width": "100%", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "display": "flex", "flexDirection": "column", "overflow": "hidden", "boxShadow": "0 4rpx 20rpx rgba(0, 0, 0, 0.08)" } }, "record-header": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0" } }, "record-title": { ".container .page-bg .content .mile-record .record-header ": { "flexShrink": 0, "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333" } }, "record-desc-wrap": { ".container .page-bg .content .mile-record .record-header ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "8rpx", "paddingRight": "16rpx", "paddingBottom": "8rpx", "paddingLeft": "16rpx", "backgroundImage": "none", "backgroundColor": "#f0f9f0", "borderTopLeftRadius": "8rpx", "borderTopRightRadius": "8rpx", "borderBottomRightRadius": "8rpx", "borderBottomLeftRadius": "8rpx" } }, "record-desc": { ".container .page-bg .content .mile-record .record-header .record-desc-wrap ": { "fontSize": "26rpx", "lineHeight": "42rpx", "color": "#07C160", "whiteSpace": "nowrap" } }, "ring-container": { ".container .page-bg .content .mile-record ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "paddingTop": "30rpx", "paddingRight": "20rpx", "paddingBottom": "30rpx", "paddingLeft": "20rpx", "backgroundColor": "#edf7ff", "borderTopLeftRadius": "24rpx", "borderTopRightRadius": "24rpx", "borderBottomRightRadius": "24rpx", "borderBottomLeftRadius": "24rpx", "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx" } }, "ring-item": { ".container .page-bg .content .mile-record ": { "position": "relative", "width": "250rpx", "height": "250rpx", "display": "flex", "alignItems": "center", "justifyContent": "center" } }, "ring-bg": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "zIndex": 2 } }, "ring-quarter": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "125rpx", "height": "125rpx", "overflow": "hidden" } }, "ring-quarter--top-left": { ".container .page-bg .content .mile-record ": { "top": 0, "left": 0 } }, "ring-quarter--top-right": { ".container .page-bg .content .mile-record ": { "top": 0, "right": 0 } }, "ring-quarter--bottom-right": { ".container .page-bg .content .mile-record ": { "right": 0, "bottom": 0 } }, "ring-quarter--bottom-left": { ".container .page-bg .content .mile-record ": { "bottom": 0, "left": 0 } }, "ring-stroke": { ".container .page-bg .content .mile-record ": { "position": "absolute", "width": "250rpx", "height": "250rpx", "boxSizing": "border-box", "borderTopWidth": "16rpx", "borderRightWidth": "16rpx", "borderBottomWidth": "16rpx", "borderLeftWidth": "16rpx", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 }, ".container .page-bg .content .mile-record .ring-quarter--top-left ": { "top": 0, "left": 0 }, ".container .page-bg .content .mile-record .ring-quarter--top-right ": { "top": 0, "right": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-right ": { "right": 0, "bottom": 0 }, ".container .page-bg .content .mile-record .ring-quarter--bottom-left ": { "bottom": 0, "left": 0 } }, "ring-stroke--track": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#dceaf3", "borderRightColor": "#dceaf3", "borderBottomColor": "#dceaf3", "borderLeftColor": "#dceaf3", "borderTopWidth": "5rpx", "borderRightWidth": "5rpx", "borderBottomWidth": "5rpx", "borderLeftWidth": "5rpx" } }, "ring-stroke--active": { ".container .page-bg .content .mile-record ": { "borderTopColor": "#4cd964", "borderRightColor": "#4cd964", "borderBottomColor": "#4cd964", "borderLeftColor": "#4cd964" }, ".container .page-bg .content .mile-record .ring-bg.orange ": { "borderTopColor": "#ff9500", "borderRightColor": "#ff9500", "borderBottomColor": "#ff9500", "borderLeftColor": "#ff9500" } }, "ring-text": { ".container .page-bg .content .mile-record ": { "position": "relative", "zIndex": 10 } }, "num": { ".container .page-bg .content .mile-record ": { "fontSize": "45rpx", "fontWeight": "bold", "color": "#333333", "textAlign": "center" } }, "unit": { ".container .page-bg .content .mile-record ": { "fontSize": "20rpx", "color": "#666666", "textAlign": "right" } }, "label": { ".container .page-bg .content .mile-record ": { "fontSize": "25rpx", "color": "#666666", "marginTop": "12rpx", "textAlign": "center" } }, "device-list": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "marginTop": "40rpx", "marginRight": 0, "marginBottom": "40rpx", "marginLeft": 0 } }, "device-item": { ".container .page-bg .content .device-list .device-item+": { "marginTop": "30rpx" }, ".container .page-bg .content .device-list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "item-label": { ".container .page-bg .content .device-list .device-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "icon": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "80rpx", "height": "80rpx", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "paddingTop": "18rpx", "paddingRight": "18rpx", "paddingBottom": "18rpx", "paddingLeft": "18rpx" }, ".container .page-bg .content .device-list .device-item .item-label .icon-device": { "backgroundColor": "#f0f9f0" }, ".container .page-bg .content .device-list .device-item .item-label .icon-car": { "backgroundColor": "#f3f8fb" }, ".container .page-bg .content .device-list .device-item .item-label .icon-fence": { "backgroundColor": "#f1f7f4" } }, "icon-image": { ".container .page-bg .content .device-list .device-item .item-label ": { "width": "45rpx", "height": "45rpx" }, ".container .page-bg .content .service .service-content .service-item ": { "width": "60rpx", "height": "60rpx" } }, "item-info": { ".container .page-bg .content .device-list .device-item .item-label ": { "marginLeft": "20rpx" } }, "item-title": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "fontSize": "28rpx", "fontWeight": "bold", "color": "#333333" }, ".container .page-bg .content .service .service-content .service-item ": { "marginTop": "10rpx", "fontSize": "25rpx", "color": "#222222" } }, "item-desc": { ".container .page-bg .content .device-list .device-item .item-label .item-info ": { "color": "#cccccc", "fontSize": "24rpx", "marginTop": "10rpx" } }, "service": { ".container .page-bg .content ": { "display": "flex", "flexDirection": "column", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff", "marginBottom": "30rpx" } }, "service-header": { ".container .page-bg .content .service ": { "fontSize": "32rpx", "fontWeight": "bold", "color": "#333333", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#f0f0f0", "marginBottom": "30rpx" } }, "service-content": { ".container .page-bg .content .service ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "service-item": { ".container .page-bg .content .service .service-content ": { "display": "flex", "flexDirection": "column", "alignItems": "center" } }, "@TRANSITION": { "exit": { "property": "all", "duration": "0.2s", "timingFunction": "ease" } } };
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["styles", [_style_0$C]]]);
+  const _imports_0$3 = "/static/back.png";
+  const _sfc_main$C = /* @__PURE__ */ vue.defineComponent({
+    __name: "custom-navBar",
+    props: {
+      title: String,
+      showBack: { type: Boolean, default: true },
+      backText: { type: String, default: "" },
+      showCapsule: { type: Boolean, default: true },
+      backgroundColor: { type: String, default: "#f1f1f1" },
+      textColor: { type: String, default: "#000000" },
+      isIcon: { type: Boolean, default: true },
+      Icon: { type: String, default: "plus-circle" },
+      rightText: { type: String, default: "" },
+      isShowStyle: { type: Boolean, default: false },
+      iconColor: { type: String, default: "#606266" }
+    },
+    emits: ["back", "capsuleClick"],
+    setup(__props, _a) {
+      var __emit = _a.emit;
+      const emit = __emit;
+      const statusBarHeight = vue.ref(20);
+      const navBarHeight = vue.ref(44);
+      vue.ref(new UTSJSONObject({
+        top: 4,
+        right: 10,
+        width: 87,
+        height: 32
+      }));
+      const initDimensions = () => {
+        const systemInfo = uni.getSystemInfoSync();
+        statusBarHeight.value = systemInfo.statusBarHeight != null ? systemInfo.statusBarHeight : 20;
+      };
+      const handleCapsuleClick = () => {
+        emit("capsuleClick", "menu");
+      };
+      const handleBack = () => {
+        const pages = getCurrentPages();
+        if (pages.length > 1) {
+          uni.navigateBack();
+        } else {
+          uni.switchTab({ url: "/pages/index/index" });
+        }
+        emit("back");
+      };
+      vue.onMounted(initDimensions);
+      return (_ctx = null, _cache = null) => {
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({
+            style: vue.normalizeStyle(__props.isShowStyle ? { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1", position: "fixed", width: "100%", letf: 0, top: 0, "z-index": "100" } : { height: vue.unref(statusBarHeight) + "px", "background-color": "#f1f1f1" })
+          }), null, 4),
+          vue.createElementVNode("view", new UTSJSONObject({
+            class: "navbar",
+            style: vue.normalizeStyle(__props.isShowStyle ? {
+              height: vue.unref(navBarHeight) + "px",
+              background: __props.backgroundColor,
+              position: "fixed",
+              width: "100%",
+              letf: "0",
+              top: vue.unref(statusBarHeight) + "px",
+              "z-index": "100"
+            } : {
+              height: vue.unref(navBarHeight) + "px",
+              background: __props.backgroundColor
+            })
+          }), [
+            vue.createElementVNode("view", new UTSJSONObject({ class: "back-btn" }), [
+              __props.showBack ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
+                key: 0,
+                src: _imports_0$3,
+                mode: "aspectFit",
+                class: "icon",
+                onClick: handleBack
+              }))) : vue.createCommentVNode("", true)
+            ]),
+            vue.createElementVNode("text", new UTSJSONObject({
+              class: "title",
+              style: vue.normalizeStyle({ color: __props.textColor, "line-height": vue.unref(navBarHeight) + "px" })
+            }), [
+              vue.renderSlot(_ctx.$slots, "title", new UTSJSONObject({}), () => {
+                return [
+                  vue.createTextVNode(vue.toDisplayString(__props.title), 1)
+                ];
+              })
+            ], 4),
+            vue.createElementVNode("view", new UTSJSONObject({
+              class: "capsule",
+              style: new UTSJSONObject({
+                right: "10rpx"
+              })
+            }), [
+              vue.createElementVNode("view", new UTSJSONObject({ class: "capsule-item" }), [
+                __props.showCapsule ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 0,
+                  onClick: handleCapsuleClick
+                }), [
+                  __props.isIcon ? (vue.openBlock(), vue.createBlock(_component_i_icon, new UTSJSONObject({
+                    key: 0,
+                    name: __props.Icon,
+                    fontSize: "20"
+                  }), null, 8, ["name"])) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 1 }), vue.toDisplayString(__props.rightText), 1))
+                ])) : vue.createCommentVNode("", true)
+              ])
+            ])
+          ], 4)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$B = { "navbar": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "back-btn": { "": { "display": "flex", "alignItems": "center", "width": "70rpx", "height": "40rpx", "zIndex": 10, "justifyContent": "center" } }, "title": { "": { "textAlign": "center", "fontWeight": "bold", "fontSize": "36rpx" } }, "capsule-item": { "": { "width": 40, "height": "100%", "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "icon": { "": { "width": "40rpx", "height": "40rpx" } }, "menu-icon": { "": { "width": "60rpx", "height": "60rpx" } } };
+  const __easycom_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["styles", [_style_0$B]]]);
+  const _sfc_main$B = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-modal" }, { __name: "i-modal", props: {
+    show: { type: Boolean, default: false },
+    title: { type: String, default: "" },
+    content: { type: String, default: "" },
+    confirmText: { type: String, default: "确认" },
+    cancelText: { type: String, default: "取消" },
+    showConfirmButton: { type: Boolean, default: true },
+    showCancelButton: { type: Boolean, default: false },
+    confirmColor: { type: String, default: "#2979ff" },
+    cancelColor: { type: String, default: "#606266" },
+    duration: { type: Number, default: 200 },
+    buttonReverse: { type: Boolean, default: false },
+    zoom: { type: Boolean, default: true },
+    zIndex: { type: Number, default: 10075 },
+    asyncClose: { type: Boolean, default: false },
+    closeable: { type: Boolean, default: false },
+    closeOnMask: { type: Boolean, default: false },
+    negativeTop: { type: String, default: "0px" },
+    width: { type: String, default: "320px" },
+    confirmButtonShape: { type: String, default: "100px" },
+    round: { type: String, default: "6px" },
+    buttonModel: { type: String, default: "text" },
+    buttonRadius: { type: String, default: "100px" },
+    confirmBgColor: { type: String, default: "" },
+    cancelBgColor: { type: String, default: "" },
+    customStyle: { type: String, default: "" }
+  }, emits: ["confirm", "cancel", "close", "update:show"], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function formatMs(value) {
+      return value.toString() + "ms";
+    }
+    function formatSize(value) {
+      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
+        return value;
+      }
+      return value + "px";
+    }
+    function stringifyStyle(value) {
+      if (value.length == 0)
+        return "";
+      return value.endsWith(";") ? value : value + ";";
+    }
+    function animationDuration() {
+      return props.duration;
+    }
+    const opened = vue.ref(props.show);
+    const active = vue.ref(props.show);
+    const loading = vue.ref(false);
+    let closeTimer = 0;
+    const maskStyle = vue.computed(() => {
+      return "z-index:" + props.zIndex.toString() + ";opacity:" + (props.show || active.value ? "1" : "0") + ";transition-duration:" + formatMs(props.duration) + ";";
+    });
+    const visibleMaskStyle = vue.computed(() => {
+      if (props.show && !opened.value) {
+        return "z-index:" + props.zIndex.toString() + ";opacity:1;transition-duration:" + formatMs(props.duration) + ";";
+      }
+      return maskStyle.value;
+    });
+    const modalClass = vue.computed(() => {
+      const classes = ["i-modal"];
+      return classes.join(" ");
+    });
+    const modalStyle = vue.computed(() => {
+      let style = "width:" + formatSize(props.width) + ";";
+      style = style + "border-radius:" + formatSize(props.round) + ";";
+      style = style + "transition-duration:" + formatMs(props.duration) + ";";
+      const top = formatSize(props.negativeTop);
+      const scaleValue = props.zoom ? props.show || active.value ? "1" : "0.86" : "1";
+      const translateValue = top != "0px" ? "-" + top : "0px";
+      style = style + "opacity:" + (props.show || active.value ? "1" : "0") + ";";
+      style = style + "transform:translateY(" + translateValue + ") scale(" + scaleValue + ");";
+      style = style + stringifyStyle(props.customStyle);
+      return style;
+    });
+    const visibleModalStyle = vue.computed(() => {
+      return modalStyle.value;
+    });
+    const confirmButtonClass = vue.computed(() => {
+      const classes = ["i-modal__button", "i-modal__button--confirm"];
+      if (props.buttonModel == "button")
+        classes.push("i-modal__button--model-button");
+      if (props.confirmButtonShape == "square")
+        classes.push("i-modal__button--square");
+      return classes.join(" ");
+    });
+    const cancelButtonClass = vue.computed(() => {
+      const classes = ["i-modal__button", "i-modal__button--cancel"];
+      if (props.buttonModel == "button")
+        classes.push("i-modal__button--model-button");
+      return classes.join(" ");
+    });
+    const confirmTextStyle = vue.computed(() => {
+      return "color:" + props.confirmColor + ";";
+    });
+    const cancelTextStyle = vue.computed(() => {
+      return "color:" + props.cancelColor + ";";
+    });
+    const confirmButtonStyle = vue.computed(() => {
+      if (props.buttonModel != "button")
+        return "";
+      let style = "border-radius:" + formatSize(props.buttonRadius) + ";";
+      if (props.confirmBgColor.length > 0)
+        style = style + "background-color:" + props.confirmBgColor + ";";
+      return style;
+    });
+    const cancelButtonStyle = vue.computed(() => {
+      if (props.buttonModel != "button")
+        return "";
+      let style = "border-radius:" + formatSize(props.buttonRadius) + ";";
+      if (props.cancelBgColor.length > 0)
+        style = style + "background-color:" + props.cancelBgColor + ";";
+      return style;
+    });
+    function clearCloseTimer() {
+      if (closeTimer > 0) {
+        clearTimeout(closeTimer);
+        closeTimer = 0;
+      }
+    }
+    function openPanel() {
+      clearCloseTimer();
+      opened.value = true;
+      setTimeout(() => {
+        active.value = true;
+      }, 20);
+    }
+    function closePanel(shouldEmitUpdate) {
+      clearCloseTimer();
+      active.value = false;
+      loading.value = false;
+      closeTimer = setTimeout(() => {
+        opened.value = false;
+        closeTimer = 0;
+        if (shouldEmitUpdate)
+          emit("update:show", false);
+      }, animationDuration());
+    }
+    function open() {
+      openPanel();
+      emit("update:show", true);
+    }
+    function close() {
+      closePanel(true);
+    }
+    function confirm() {
+      if (loading.value)
+        return null;
+      emit("confirm");
+      if (props.asyncClose) {
+        loading.value = true;
+        return null;
+      }
+      close();
+    }
+    function cancel() {
+      emit("cancel");
+      closePanel(true);
+    }
+    function closeByIcon() {
+      emit("close");
+      closePanel(true);
+    }
+    function handleOverlayClick() {
+      if (!props.closeOnMask)
+        return null;
+      emit("close");
+      closePanel(true);
+    }
+    __expose({
+      open,
+      close
+    });
+    return (_ctx = null, _cache = null) => {
+      return __props.show || opened.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        key: 0,
+        class: "i-modal__mask",
+        style: vue.normalizeStyle(visibleMaskStyle.value),
+        onClick: handleOverlayClick
+      }), [
+        vue.createElementVNode("view", new UTSJSONObject({
+          class: vue.normalizeClass(modalClass.value),
+          style: vue.normalizeStyle(visibleModalStyle.value),
+          onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }), [
+          __props.closeable ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 0,
+            class: "i-modal__close",
+            onClick: closeByIcon
+          }), [
+            vue.createElementVNode("text", new UTSJSONObject({ class: "i-modal__close-text" }), "×")
+          ])) : vue.createCommentVNode("", true),
+          __props.title.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 1,
+            class: "i-modal__title"
+          }), vue.toDisplayString(__props.title), 1)) : vue.createCommentVNode("", true),
+          vue.createElementVNode("view", new UTSJSONObject({ class: "i-modal__content-wrap" }), [
+            vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({}), () => {
+              return [
+                vue.createElementVNode("text", new UTSJSONObject({ class: "i-modal__content" }), vue.toDisplayString(__props.content), 1)
+              ];
+            })
+          ]),
+          vue.createElementVNode("view", new UTSJSONObject({
+            class: vue.normalizeClass(["i-modal__footer", __props.buttonModel == "button" ? "i-modal__footer--button" : ""])
+          }), [
+            __props.buttonReverse ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "i-modal__footer-inner"
+            }), [
+              vue.renderSlot(_ctx.$slots, "confirmButton", new UTSJSONObject({}), () => {
+                return [
+                  __props.showConfirmButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 0,
+                    class: vue.normalizeClass(confirmButtonClass.value),
+                    style: vue.normalizeStyle(confirmButtonStyle.value),
+                    onClick: confirm
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "i-modal__confirm-text",
+                      style: vue.normalizeStyle(confirmTextStyle.value)
+                    }), vue.toDisplayString(loading.value ? "..." : __props.confirmText), 5)
+                  ], 6)) : vue.createCommentVNode("", true)
+                ];
+              }),
+              __props.showCancelButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                key: 0,
+                class: vue.normalizeClass(cancelButtonClass.value),
+                style: vue.normalizeStyle(cancelButtonStyle.value),
+                onClick: cancel
+              }), [
+                vue.createElementVNode("text", new UTSJSONObject({
+                  class: "i-modal__cancel-text",
+                  style: vue.normalizeStyle(cancelTextStyle.value)
+                }), vue.toDisplayString(__props.cancelText), 5)
+              ], 6)) : vue.createCommentVNode("", true)
+            ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 1,
+              class: "i-modal__footer-inner"
+            }), [
+              __props.showCancelButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                key: 0,
+                class: vue.normalizeClass(cancelButtonClass.value),
+                style: vue.normalizeStyle(cancelButtonStyle.value),
+                onClick: cancel
+              }), [
+                vue.createElementVNode("text", new UTSJSONObject({
+                  class: "i-modal__cancel-text",
+                  style: vue.normalizeStyle(cancelTextStyle.value)
+                }), vue.toDisplayString(__props.cancelText), 5)
+              ], 6)) : vue.createCommentVNode("", true),
+              vue.renderSlot(_ctx.$slots, "confirmButton", new UTSJSONObject({}), () => {
+                return [
+                  __props.showConfirmButton ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 0,
+                    class: vue.normalizeClass(confirmButtonClass.value),
+                    style: vue.normalizeStyle(confirmButtonStyle.value),
+                    onClick: confirm
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "i-modal__confirm-text",
+                      style: vue.normalizeStyle(confirmTextStyle.value)
+                    }), vue.toDisplayString(loading.value ? "..." : __props.confirmText), 5)
+                  ], 6)) : vue.createCommentVNode("", true)
+                ];
+              })
+            ]))
+          ], 2)
+        ], 6)
+      ], 4)) : vue.createCommentVNode("", true);
+    };
+  } }));
+  const _style_0$A = { "i-modal__mask": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0, "backgroundColor": "rgba(0,0,0,0.5)", "alignItems": "center", "justifyContent": "center", "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-modal": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-modal__close": { "": { "position": "absolute", "right": 8, "top": 8, "zIndex": 2, "width": 34, "height": 34, "alignItems": "center", "justifyContent": "center" } }, "i-modal__close-text": { "": { "color": "#909399", "fontSize": 22, "lineHeight": "30px" } }, "i-modal__title": { "": { "paddingTop": 22, "paddingRight": 22, "paddingBottom": 8, "paddingLeft": 22, "color": "#303133", "fontSize": 17, "fontWeight": 600, "lineHeight": "24px", "textAlign": "center" } }, "i-modal__content-wrap": { "": { "minHeight": 52, "paddingTop": 8, "paddingRight": 22, "paddingBottom": 22, "paddingLeft": 22, "alignItems": "center", "justifyContent": "center" } }, "i-modal__content": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "textAlign": "center" } }, "i-modal__footer": { "": { "minHeight": 48, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f3f4f6" } }, "i-modal__footer--button": { "": { "paddingTop": 10, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14, "borderTopWidth": 0 } }, "i-modal__footer-inner": { "": { "flexDirection": "row" } }, "i-modal__button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 48, "alignItems": "center", "justifyContent": "center" } }, "i-modal__button--cancel": { "": { "borderRightWidth": 1, "borderRightStyle": "solid", "borderRightColor": "#f3f4f6" } }, "i-modal__button--model-button": { "": { "height": 40, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "borderRightWidth": 0, "backgroundColor": "#f5f7fb" } }, "i-modal__button--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-modal__confirm-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "i-modal__cancel-text": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-modal__mask": { "property": "opacity", "timingFunction": "ease" }, "i-modal": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
+  const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["styles", [_style_0$A]]]);
+  class ModalInstance extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            open: { type: "Unknown", optional: false },
+            close: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = ModalInstance.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.open = this.__props__.open;
+      this.close = this.__props__.close;
+      delete this.__props__;
+    }
+  }
+  class MessageData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            list: { type: "Unknown", optional: false },
+            total: { type: Number, optional: false },
+            totalPage: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MessageData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.list = this.__props__.list;
+      this.total = this.__props__.total;
+      this.totalPage = this.__props__.totalPage;
+      delete this.__props__;
+    }
+  }
+  class MessageResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: MessageData, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MessageResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$A = /* @__PURE__ */ vue.defineComponent({
+    __name: "message",
+    setup(__props) {
+      const modal = vue.ref(false);
+      const modalContent = vue.ref(new UTSJSONObject({}));
+      const refresherTriggered = vue.ref(false);
+      const msgList = vue.ref([]);
+      const currPage = vue.ref(1);
+      const pageSize = vue.ref(10);
+      const totalPage = vue.ref(1);
+      const loadStatus = vue.ref("loadmore");
+      const isLoading = vue.ref(false);
+      const hasNewMessages = vue.ref(false);
+      const newMessageCount = vue.ref(0);
+      const lastUpdateTime = vue.ref((/* @__PURE__ */ new Date()).getTime());
+      const Login = vue.ref(false);
+      const messageScrollViewportHeight = vue.ref(0);
+      const isNearMessageListBottom = vue.ref(false);
+      let checkTimer = 0;
+      const isPageActive = vue.ref(false);
+      function stopNewMessageCheck() {
+        if (checkTimer > 0) {
+          uni.__log__("log", "at pages/message/message.uvue:109", "停止定时消息检查");
+          clearInterval(checkTimer);
+          checkTimer = 0;
+        }
+      }
+      function vibrateAlert() {
+        for (let i = 0; i < 3; i++) {
+          uni.vibrateLong(new UTSJSONObject({}));
+        }
+      }
+      function prependLatestMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value)
+            return 0;
+          isLoading.value = true;
+          try {
+            const res = yield getUserMsgList(new UTSJSONObject({ page: 1, pageSize: 50 }));
+            if (res.code != 0 || res.data.list == null)
+              return 0;
+            const existingIds = /* @__PURE__ */ new Set();
+            msgList.value.forEach((message) => {
+              const messageId = message.getString("messageId", "");
+              if (messageId != "")
+                existingIds.add(messageId);
+            });
+            const latestMessages = [];
+            res.data.list.forEach((message) => {
+              const messageId = message.getString("messageId", "");
+              if (messageId != "" && !existingIds.has(messageId)) {
+                existingIds.add(messageId);
+                latestMessages.push(message);
+              }
+            });
+            if (latestMessages.length > 0) {
+              msgList.value = [...latestMessages, ...msgList.value];
+              const newestCreateTime = latestMessages[0].getString("createTime", "");
+              if (newestCreateTime != "") {
+                const newestTime = parseLocalDateTime(newestCreateTime);
+                if (newestTime != null)
+                  lastUpdateTime.value = newestTime;
+              }
+            }
+            return latestMessages.length;
+          } catch (error) {
+            uni.__log__("error", "at pages/message/message.uvue:154", "检查新消息失败:", error);
+            return 0;
+          } finally {
+            isLoading.value = false;
+          }
+        });
+      }
+      function checkNewMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!isPageActive.value || isLoading.value)
+            return Promise.resolve(null);
+          const insertedCount = yield prependLatestMessages();
+          if (insertedCount > 0) {
+            hasNewMessages.value = true;
+            newMessageCount.value += insertedCount;
+            vibrateAlert();
+          }
+        });
+      }
+      function startNewMessageCheck() {
+        if (checkTimer > 0) {
+          stopNewMessageCheck();
+        }
+        uni.__log__("log", "at pages/message/message.uvue:178", "启动定时消息检查");
+        checkTimer = setInterval(() => {
+          if (isPageActive.value) {
+            uni.__log__("log", "at pages/message/message.uvue:182", "定时检查新消息...");
+            checkNewMessages();
+          }
+        }, 1e4);
+      }
+      function loadMsgList(isInit = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value)
+            return Promise.resolve(null);
+          if (isInit) {
+            currPage.value = 1;
+            msgList.value = [];
+            loadStatus.value = "loadmore";
+            isNearMessageListBottom.value = false;
+          }
+          isLoading.value = true;
+          try {
+            if (!isInit)
+              loadStatus.value = "loading";
+            const res = yield getUserMsgList(new UTSJSONObject({
+              page: currPage.value,
+              pageSize: pageSize.value
+            }));
+            if (res.code != 0) {
+              loadStatus.value = "loadmore";
+              return Promise.resolve(null);
+            }
+            const data = res.data;
+            const totalPages = data.totalPage > 0 ? data.totalPage : 1;
+            totalPage.value = totalPages;
+            const newData = data.list;
+            if (isInit) {
+              msgList.value = newData;
+              if (newData.length > 0)
+                lastUpdateTime.value = (/* @__PURE__ */ new Date()).getTime();
+            } else {
+              newData.forEach((item) => {
+                const messageId = item.getString("messageId", "");
+                const exists = msgList.value.some((existing) => {
+                  return existing.getString("messageId", "") == messageId;
+                });
+                if (!exists)
+                  msgList.value.push(item);
+              });
+            }
+            loadStatus.value = currPage.value >= totalPage.value ? "nomore" : "loadmore";
+            if (isInit) {
+              hasNewMessages.value = false;
+              newMessageCount.value = 0;
+            }
+          } catch (error) {
+            loadStatus.value = "loadmore";
+            uni.__log__("error", "at pages/message/message.uvue:230", "请求异常:", error);
+          } finally {
+            isLoading.value = false;
+          }
+        });
+      }
+      function loadNewMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+          uni.__log__("log", "at pages/message/message.uvue:238", "加载新消息");
+          yield prependLatestMessages();
+          hasNewMessages.value = false;
+          newMessageCount.value = 0;
+          uni.__log__("log", "at pages/message/message.uvue:242", "新消息加载完成");
+        });
+      }
+      vue.onLoad(() => {
+        const token = uni.getStorageSync("token");
+        if (token) {
+          Login.value = true;
+          loadMsgList(true);
+        } else {
+          Login.value = false;
+        }
+      });
+      const measureMessageScrollViewport = () => {
+        uni.createSelectorQuery().select("#message-scroll-container").boundingClientRect((rect = null) => {
+          var _a;
+          if (rect == null)
+            return null;
+          const nodeInfo = rect;
+          const height = (_a = nodeInfo.height) !== null && _a !== void 0 ? _a : 0;
+          if (height > 0) {
+            messageScrollViewportHeight.value = height;
+          }
+        }).exec();
+      };
+      function handleItemClick(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+          modalContent.value = item;
+          modal.value = true;
+          if (item.getNumber("status", 0) == 1) {
+            try {
+              const messageId = item.getString("messageId", "");
+              const res = yield setMsgState(messageId);
+              if (res.code == 0 || res.msg == "success") {
+                const index = msgList.value.findIndex((message) => {
+                  return message.getString("messageId", "") == messageId;
+                });
+                if (index != -1) {
+                  msgList.value[index].set("status", 0);
+                  msgList.value = [...msgList.value];
+                }
+              }
+            } catch (error) {
+              uni.__log__("error", "at pages/message/message.uvue:289", "更新状态失败:", error);
+            }
+          }
+        });
+      }
+      function openPendingPushMessage() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value) {
+            setTimeout(() => {
+              void openPendingPushMessage();
+            }, 150);
+            return Promise.resolve(null);
+          }
+          const messageId = consumePendingMessageId();
+          const shouldRefresh = consumePushStaleFlag();
+          if (messageId == "" && !shouldRefresh)
+            return Promise.resolve(null);
+          yield loadMsgList(true);
+          if (messageId == "")
+            return Promise.resolve(null);
+          const message = UTS.arrayFind(msgList.value, (item) => {
+            return item.getString("messageId", "") == messageId;
+          });
+          if (message != null)
+            yield handleItemClick(message);
+        });
+      }
+      vue.onShow(() => {
+        if (Login.value) {
+          uni.__log__("log", "at pages/message/message.uvue:313", "页面显示 - 启动自动刷新");
+          isPageActive.value = true;
+          measureMessageScrollViewport();
+          startNewMessageCheck();
+          void openPendingPushMessage();
+          checkNewMessages();
+        }
+      });
+      vue.onHide(() => {
+        uni.__log__("log", "at pages/message/message.uvue:325", "页面隐藏 - 停止自动刷新");
+        if (Login.value) {
+          uni.__log__("log", "at pages/message/message.uvue:327", "页面隐藏 - 停止自动刷新");
+          isPageActive.value = false;
+          stopNewMessageCheck();
+        }
+      });
+      vue.onUnload(() => {
+        uni.__log__("log", "at pages/message/message.uvue:335", "页面卸载 - 清理资源");
+        if (Login.value) {
+          uni.__log__("log", "at pages/message/message.uvue:337", "页面卸载 - 清理资源");
+          isPageActive.value = false;
+          stopNewMessageCheck();
+        }
+      });
+      vue.onActivated(() => {
+        uni.__log__("log", "at pages/message/message.uvue:344", "页面激活 - 启动自动刷新");
+        if (Login.value) {
+          uni.__log__("log", "at pages/message/message.uvue:346", "页面激活 - 启动自动刷新");
+          isPageActive.value = true;
+          startNewMessageCheck();
+          void openPendingPushMessage();
+          checkNewMessages();
+        }
+      });
+      vue.onDeactivated(() => {
+        uni.__log__("log", "at pages/message/message.uvue:356", "页面停用 - 停止自动刷新");
+        if (Login.value) {
+          uni.__log__("log", "at pages/message/message.uvue:358", "页面停用 - 停止自动刷新");
+          isPageActive.value = false;
+          stopNewMessageCheck();
+        }
+      });
+      const onRefresherRefresh = () => {
+        uni.__log__("log", "at pages/message/message.uvue:366", "下拉刷新触发");
+        refresherTriggered.value = true;
+        loadMsgList(true).then(() => {
+          refresherTriggered.value = false;
+        }).catch(() => {
+          refresherTriggered.value = false;
+        });
+      };
+      const loadMore = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (isLoading.value || loadStatus.value != "loadmore" || currPage.value >= totalPage.value) {
+            if (currPage.value >= totalPage.value) {
+              loadStatus.value = "nomore";
+            }
+            return Promise.resolve(null);
+          }
+          currPage.value++;
+          yield loadMsgList();
+        });
+      };
+      const onScrollToLower = () => {
+        if (loadStatus.value == "loadmore" && !isLoading.value) {
+          loadMore();
+        }
+      };
+      const onMessageScroll = (event) => {
+        const viewportHeight = messageScrollViewportHeight.value;
+        if (viewportHeight <= 0)
+          return null;
+        const remainingDistance = event.detail.scrollHeight - event.detail.scrollTop - viewportHeight;
+        const isNearBottom = event.detail.deltaY > 0 && remainingDistance <= 100;
+        if (isNearBottom && !isNearMessageListBottom.value) {
+          isNearMessageListBottom.value = true;
+          loadMore();
+        } else if (!isNearBottom) {
+          isNearMessageListBottom.value = false;
+        }
+      };
+      const ReadIt = () => {
+        modal.value = false;
+      };
+      const getMessageId = (item, index) => {
+        const messageId = item.getString("messageId", "");
+        return messageId != "" ? messageId : index.toString();
+      };
+      const getMessageCreateTime = (item) => {
+        return item.getString("createTime", "");
+      };
+      const getMessageContent = (item) => {
+        return item.getString("content", "");
+      };
+      const isMessageUnread = (item) => {
+        return item.getNumber("status", 0) == 1;
+      };
+      const getMessageTypeText = (type) => {
+        switch (type) {
+          case 1:
+            return "警告";
+          case 2:
+            return "事件";
+          default:
+            return "通知";
+        }
+      };
+      const getMessageTitle = (item) => {
+        return getMessageTypeText(item.getNumber("messageType", 0)) + " - " + getMessageCreateTime(item);
+      };
+      const formatTime = (timeString) => {
+        if (!timeString)
+          return "";
+        try {
+          const milliseconds = parseLocalDateTime(timeString);
+          if (milliseconds == null)
+            return timeString;
+          const date = new Date(milliseconds);
+          const now = /* @__PURE__ */ new Date();
+          const diff = now.getTime() - date.getTime();
+          const minutes = Math.floor(diff / 6e4);
+          const hours = Math.floor(diff / 36e5);
+          const days = Math.floor(diff / 864e5);
+          if (minutes < 1)
+            return "刚刚";
+          if (minutes < 60)
+            return "".concat(minutes, "分钟前");
+          if (hours < 24)
+            return "".concat(hours, "小时前");
+          if (days < 7)
+            return "".concat(days, "天前");
+          return "".concat(date.getMonth() + 1, "-").concat(date.getDate());
+        } catch (error) {
+          return timeString;
+        }
+      };
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+            title: "消息中心",
+            "show-back": true,
+            backgroundColor: "#fff",
+            textColor: "#333",
+            showCapsule: false,
+            isShowStyle: true
+          })),
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createElementVNode("scroll-view", new UTSJSONObject({
+              "scroll-y": "true",
+              "show-scrollbar": false,
+              class: "scroll-container",
+              id: "message-scroll-container",
+              "refresher-enabled": "",
+              "refresher-triggered": refresherTriggered.value,
+              "lower-threshold": 100,
+              onRefresherrefresh: onRefresherRefresh,
+              onScrolltolower: onScrollToLower,
+              onScroll: onMessageScroll
+            }), [
+              vue.createElementVNode("view", new UTSJSONObject({ class: "list-box" }), [
+                msgList.value.length == 0 && !isLoading.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 0,
+                  class: "empty-state"
+                }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "empty-state-text" }), "暂无消息")
+                ])) : vue.createCommentVNode("", true),
+                hasNewMessages.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 1,
+                  class: "new-message-tip",
+                  onClick: loadNewMessages
+                }), [
+                  vue.createElementVNode("text", null, "有 " + vue.toDisplayString(newMessageCount.value) + " 条新消息，点击查看", 1)
+                ])) : vue.createCommentVNode("", true),
+                (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(msgList.value, (item, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: getMessageId(item, index),
+                    class: "message-item",
+                    onClick: ($event = null) => {
+                      return handleItemClick(item);
+                    }
+                  }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "message-header" }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "message-title" }), vue.toDisplayString(getMessageTitle(item)), 1),
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "time-text" }), vue.toDisplayString(formatTime(getMessageCreateTime(item))), 1)
+                    ]),
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "message-content-row" }), [
+                      vue.createElementVNode("text", new UTSJSONObject({ class: "message-content" }), vue.toDisplayString(getMessageContent(item)), 1),
+                      isMessageUnread(item) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                        key: 0,
+                        class: "unread-box"
+                      }), [
+                        vue.createElementVNode("text", new UTSJSONObject({ class: "unread-badge" }), "未读")
+                      ])) : vue.createCommentVNode("", true)
+                    ])
+                  ], 8, ["onClick"]);
+                }), 128)),
+                Login.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 2,
+                  class: "load-more"
+                }), [
+                  loadStatus.value == "loading" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                    key: 0,
+                    class: "tips-text"
+                  }), "上拉加载更多")) : loadStatus.value == "nomore" ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                    key: 1,
+                    class: "tips-text"
+                  }), "没有更多了")) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                    key: 2,
+                    class: "tips-text"
+                  }), "加载中..."))
+                ])) : vue.createCommentVNode("", true)
+              ])
+            ], 40, ["refresher-triggered"]),
+            vue.createVNode(_component_i_modal, new UTSJSONObject({
+              show: modal.value,
+              title: getMessageTypeText(modalContent.value.getNumber("messageType", 0)),
+              content: modalContent.value.getString("content", ""),
+              onConfirm: ReadIt
+            }), null, 8, ["show", "title", "content"])
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$z = { "container": { "": { "width": "100%", "position": "fixed", "top": "170rpx", "bottom": 0, "backgroundColor": "#f5f5f5" } }, "scroll-container": { ".container ": { "height": "100%", "width": "100%" } }, "list-box": { ".container ": { "width": "100%", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "position": "relative" } }, "message-item": { ".container .list-box ": { "marginBottom": "20rpx", "paddingTop": "24rpx", "paddingRight": "24rpx", "paddingBottom": "24rpx", "paddingLeft": "24rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "backgroundColor": "#ffffff" } }, "message-header": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "message-content-row": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between", "marginTop": "16rpx" } }, "message-title": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "30rpx", "color": "#333333", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "message-content": { ".container .list-box ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": "26rpx", "color": "#666666", "whiteSpace": "nowrap", "textOverflow": "ellipsis", "overflow": "hidden" } }, "unread-box": { ".container .list-box ": { "display": "flex", "flexShrink": 0, "alignItems": "center", "justifyContent": "center", "paddingTop": "4rpx", "paddingRight": "12rpx", "paddingBottom": "4rpx", "paddingLeft": "12rpx", "backgroundColor": "#f56c6c", "marginLeft": "16rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "unread-badge": { ".container .list-box .unread-box ": { "color": "#ffffff", "fontSize": "22rpx" } }, "empty-state": { ".container .list-box ": { "display": "flex", "justifyContent": "center", "paddingTop": "50rpx", "paddingRight": 0, "paddingBottom": "50rpx", "paddingLeft": 0 } }, "empty-state-text": { ".container .list-box .empty-state ": { "color": "#999999", "fontSize": "28rpx" } }, "new-message-tip": { ".container .list-box ": { "backgroundImage": "linear-gradient(135deg, #2979ff, #07c160)", "backgroundColor": "rgba(0,0,0,0)", "color": "#FFFFFF", "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx", "textAlign": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "marginBottom": "20rpx", "fontSize": "26rpx" } }, "load-more": { ".container .list-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "paddingTop": "30rpx", "paddingRight": 0, "paddingBottom": "30rpx", "paddingLeft": 0 } }, "tips-text": { ".container .list-box .load-more ": { "color": "#999999", "fontSize": "26rpx", "textAlign": "center" } } };
+  const PagesMessageMessage = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["styles", [_style_0$z]]]);
+  const _sfc_main$z = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-badge" }, { __name: "i-badge", props: {
+    label: {
+      type: String,
+      default: ""
+    },
+    count: {
+      type: Number,
+      default: 0
+    },
+    value: {
+      type: [String, Number],
+      default: ""
+    },
+    type: {
+      type: String,
+      default: "danger"
+    },
+    dot: {
+      type: Boolean,
+      default: true
+    },
+    maxCount: {
+      type: Number,
+      default: 99
+    },
+    max: {
+      type: Number,
+      default: 99
+    },
+    position: {
+      type: String,
+      default: "right"
+    },
+    offset: {
+      type: Array,
+      default() {
+        return [0, 0];
+      }
+    },
+    fontSize: {
+      type: [String, Number],
+      default: "9"
+    },
+    showZero: {
+      type: Boolean,
+      default: false
+    },
+    hidden: {
+      type: Boolean,
+      default: false
+    },
+    bgColor: {
+      type: String,
+      default: "error"
+    },
+    fontColor: {
+      type: String,
+      default: "white"
+    },
+    color: {
+      type: String,
+      default: ""
+    }
+  }, emits: ["click"], setup(__props, _a) {
+    var __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function hasNumberValue() {
+      if (props.value != null && props.value.toString().length > 0)
+        return true;
+      return props.count > 0 || props.showZero;
+    }
+    function effectiveCount() {
+      if (props.value != null && props.value.toString().length > 0) {
+        if (typeof props.value == "number")
+          return props.value;
+        return parseFloat(props.value);
+      }
+      return props.count;
+    }
+    function getMaxCount() {
+      if (props.maxCount != 99)
+        return props.maxCount;
+      return props.max;
+    }
+    function effectiveBgColor() {
+      if (props.bgColor.length > 0)
+        return props.bgColor;
+      return props.type;
+    }
+    function effectiveFontColor() {
+      if (props.color.length > 0)
+        return props.color;
+      return props.fontColor;
+    }
+    function normalizeTheme(value) {
+      const text = value;
+      if (text == "danger")
+        return "error";
+      if (text == "error" || text == "primary" || text == "success" || text == "warning" || text == "info")
+        return text;
+      return "custom";
+    }
+    function parseColor(value) {
+      const text = value;
+      if (text == "white")
+        return "#ffffff";
+      if (text == "black")
+        return "#000000";
+      if (text == "danger" || text == "error")
+        return "#f56c6c";
+      if (text == "primary")
+        return "#3c9cff";
+      if (text == "success")
+        return "#5ac725";
+      if (text == "warning")
+        return "#f9ae3d";
+      if (text == "info")
+        return "#909399";
+      return text;
+    }
+    function normalizePosition(value) {
+      const text = value;
+      if (text == "rightTop")
+        return "right";
+      if (text == "leftTop")
+        return "left";
+      if (text == "rightBottom")
+        return "bottomRight";
+      if (text == "leftBottom")
+        return "bottomLeft";
+      if (text == "left" || text == "right" || text == "bottomLeft" || text == "bottomRight" || text == "top" || text == "bottom")
+        return text;
+      return "right";
+    }
+    function getOffset(index) {
+      const offset = props.offset;
+      if (offset == null || offset.length <= index)
+        return 0;
+      const value = offset[index];
+      if (typeof value == "number")
+        return value;
+      if (typeof value == "string")
+        return parseFloat(value);
+      return 0;
+    }
+    function positionStyle() {
+      const x = getOffset(0);
+      const y = getOffset(1);
+      const position = normalizePosition(props.position);
+      const edge = 0;
+      if (position == "left")
+        return "left:" + (edge + x) + "px;top:" + (edge + y) + "px;";
+      if (position == "bottomLeft")
+        return "left:" + (edge + x) + "px;bottom:" + (edge - y) + "px;";
+      if (position == "bottomRight")
+        return "right:" + (edge - x) + "px;bottom:" + (edge - y) + "px;";
+      if (position == "top")
+        return "left:50%;top:" + (edge + y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
+      if (position == "bottom")
+        return "left:50%;bottom:" + (edge - y) + "px;transform:translateX(-50%);margin-left:" + x + "px;";
+      return "right:" + (edge - x) + "px;top:" + (edge + y) + "px;";
+    }
+    function formatSize(value) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+        return text;
+      return text + "px";
+    }
+    vue.computed(() => {
+      return props.bgColor;
+    });
+    const showBadge = vue.computed(() => {
+      if (props.hidden)
+        return false;
+      if (props.label.length > 0)
+        return true;
+      if (hasNumberValue()) {
+        if (effectiveCount() == 0 && !props.showZero)
+          return props.dot;
+        return true;
+      }
+      return props.dot;
+    });
+    const displayValue = vue.computed(() => {
+      if (props.label.length > 0)
+        return props.label;
+      const value = effectiveCount();
+      const max = getMaxCount();
+      if (value > max)
+        return max + "+";
+      return value.toString();
+    });
+    const dot = vue.computed(() => {
+      if (props.label.length > 0)
+        return false;
+      if (hasNumberValue()) {
+        if (effectiveCount() == 0 && !props.showZero)
+          return props.dot;
+        return false;
+      }
+      return props.dot;
+    });
+    const rootClass = vue.computed(() => {
+      const classes = ["i-badge"];
+      const position = normalizePosition(props.position);
+      classes.push("i-badge--" + position);
+      if (dot.value)
+        classes.push("i-badge--dot");
+      if (position == "left" || position == "bottomLeft")
+        classes.push("i-badge--left-space");
+      if (dot.value && (position == "left" || position == "bottomLeft")) {
+        classes.push("i-badge--dot-left-space");
+      }
+      if (dot.value && (position == "bottomLeft" || position == "bottomRight" || position == "bottom")) {
+        classes.push("i-badge--dot-bottom");
+      }
+      if (dot.value && position == "top")
+        classes.push("i-badge--dot-top");
+      return classes.join(" ");
+    });
+    const badgeClass = vue.computed(() => {
+      const classes = ["i-badge__mark", "i-badge__mark--" + normalizeTheme(effectiveBgColor())];
+      if (dot.value)
+        classes.push("i-badge__mark--dot");
+      classes.push("i-badge__mark--" + normalizePosition(props.position));
+      return classes.join(" ");
+    });
+    const badgeStyle = vue.computed(() => {
+      let style = positionStyle();
+      const bgColor = parseColor(effectiveBgColor());
+      if (bgColor.length > 0)
+        style = style + "background-color:" + bgColor + ";";
+      return style;
+    });
+    const badgeTextStyle = vue.computed(() => {
+      return "color:" + parseColor(effectiveFontColor()) + ";font-size:" + formatSize(props.fontSize) + ";";
+    });
+    function handleClick() {
+      emit("click", new UTSJSONObject({
+        label: props.label,
+        count: effectiveCount(),
+        value: displayValue.value,
+        dot: dot.value,
+        position: props.position
+      }));
+    }
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        class: vue.normalizeClass(rootClass.value)
+      }), [
+        vue.renderSlot(_ctx.$slots, "default"),
+        showBadge.value && dot.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 0,
+          class: vue.normalizeClass(badgeClass.value),
+          style: vue.normalizeStyle(badgeStyle.value),
+          onClick: handleClick
+        }), null, 6)) : showBadge.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 1,
+          class: vue.normalizeClass(badgeClass.value),
+          style: vue.normalizeStyle(badgeStyle.value),
+          onClick: handleClick
+        }), [
+          vue.createElementVNode("text", new UTSJSONObject({
+            class: "i-badge__text",
+            style: vue.normalizeStyle(badgeTextStyle.value)
+          }), vue.toDisplayString(displayValue.value), 5)
+        ], 6)) : vue.createCommentVNode("", true)
+      ], 2);
+    };
+  } }));
+  const _style_0$y = { "i-badge": { "": { "position": "relative", "alignSelf": "flex-start", "paddingTop": 10, "paddingRight": 12, "overflow": "visible" } }, "i-badge--left-space": { "": { "paddingLeft": 12, "paddingRight": 0 } }, "i-badge--dot": { "": { "paddingTop": 4, "paddingRight": 4 } }, "i-badge--dot-left-space": { "": { "paddingLeft": 4, "paddingRight": 0 } }, "i-badge--bottomLeft": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottomRight": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--bottom": { "": { "paddingTop": 0, "paddingBottom": 10 } }, "i-badge--dot-bottom": { "": { "paddingBottom": 4 } }, "i-badge--top": { "": { "paddingRight": 0 } }, "i-badge--dot-top": { "": { "paddingRight": 0 } }, "i-badge__mark": { "": { "position": "absolute", "zIndex": 2, "minWidth": 20, "height": 20, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10, "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "overflow": "visible" } }, "i-badge__mark--dot": { "": { "width": 8, "minWidth": 8, "height": 8, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "i-badge__mark--danger": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--error": { "": { "backgroundColor": "#f56c6c" } }, "i-badge__mark--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-badge__mark--success": { "": { "backgroundColor": "#5ac725" } }, "i-badge__mark--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-badge__mark--info": { "": { "backgroundColor": "#909399" } }, "i-badge__text": { "": { "color": "#ffffff", "lineHeight": "20px", "whiteSpace": "nowrap" } } };
+  const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["styles", [_style_0$y]]]);
+  const buttonWidth = 120;
+  const buttonHeight = 200;
+  const _sfc_main$y = /* @__PURE__ */ vue.defineComponent({
+    __name: "userCenter",
+    setup(__props) {
+      const userInfo = vue.ref(new UTSJSONObject({
+        avatar: "/static/avatar.png",
+        nickname: ""
+      }));
+      const carsnumber = vue.ref(0);
+      const Login = vue.ref(false);
+      const version = vue.ref("");
+      const moveX = vue.ref(0);
+      const moveY = vue.ref(0);
+      const windowWidth = vue.ref(0);
+      const windowHeight = vue.ref(0);
+      const loadData = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          const params = new UTSJSONObject({});
+          const res = yield getUserInfo();
+          userInfo.value = {
+            avatar: res.data.getString("avatar", "/static/avatar.png"),
+            nickname: res.data.getString("nickname", "")
+          };
+          const resCars = yield getUserDeviceList(params);
+          carsnumber.value = resCars.data.totalCount;
+        });
+      };
+      vue.onShow(() => {
+        const systemInfo = uni.getSystemInfoSync();
+        windowWidth.value = systemInfo.windowWidth;
+        windowHeight.value = systemInfo.windowHeight;
+        moveX.value = windowWidth.value - buttonWidth - 20;
+        moveY.value = windowHeight.value - buttonHeight - 20;
+        const token = uni.getStorageSync("token");
+        if (token) {
+          Login.value = true;
+          loadData();
+        } else {
+          Login.value = false;
+        }
+      });
+      const contactCustomerService = () => {
+        showAppToast({
+          title: "请在微信小程序中联系人工客服",
+          icon: "none"
+        });
+      };
+      const onMoveChange = (e) => {
+        const detail = e.getJSON("detail");
+        const x = detail != null ? detail.getNumber("x", 0) : 0;
+        const y = detail != null ? detail.getNumber("y", 0) : 0;
+        const maxX = windowWidth.value - buttonWidth;
+        const maxY = windowHeight.value - buttonHeight;
+        if (x < 0 || x > maxX || y < 0 || y > maxY) {
+          moveX.value = Math.max(0, Math.min(maxX, x));
+          moveY.value = Math.max(0, Math.min(maxY, y));
+        }
+      };
+      const userInfoDetail = () => {
+        if (Login.value) {
+          uni.navigateTo({
+            url: "/pages/userCenter/userInfo/userInfo?userInfo=" + encodeURIComponent(UTS.JSON.stringify(userInfo.value))
+          });
+        } else {
+          uni.navigateTo({
+            url: "/pages/login/login"
+          });
+        }
+      };
+      const carList = () => {
+        if (Login.value) {
+          uni.navigateTo({
+            url: "/pages/userCenter/carList/carList"
+          });
+        } else {
+          showAppToast({
+            title: "请先登录",
+            icon: "none"
+          });
+        }
+      };
+      const platformRenewal = () => {
+        if (Login.value) {
+          uni.navigateTo({
+            url: "/pages/userCenter/payDeviceList/payDeviceList"
+          });
+        } else {
+          showAppToast({
+            title: "请先登录",
+            icon: "none"
+          });
+        }
+      };
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_i_badge = resolveEasycom(vue.resolveDynamicComponent("i-badge"), __easycom_2$3);
+        const _component_movable_view = vue.resolveComponent("movable-view");
+        const _component_movable_area = vue.resolveComponent("movable-area");
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "个人中心",
+              "show-back": false,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({
+              class: "user-info-box",
+              onClick: userInfoDetail
+            }), [
+              vue.createElementVNode("view", new UTSJSONObject({ class: "userinfo" }), [
+                vue.createElementVNode("view", null, [
+                  vue.createVNode(_component_i_icon, new UTSJSONObject({
+                    name: "/static/avatar.png",
+                    fontSize: "40"
+                  }))
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "user-info" }), [
+                  vue.unref(Login) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 0 }), vue.toDisplayString(vue.unref(userInfo).mobile), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({ key: 1 }), "点击登录"))
+                ])
+              ]),
+              vue.createVNode(_component_i_icon, new UTSJSONObject({
+                name: "/static/arrow-right.png",
+                fontSize: "15"
+              }))
+            ]),
+            vue.unref(Login) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
+              vue.createElementVNode("view", new UTSJSONObject({
+                class: "list",
+                onClick: carList
+              }), [
+                vue.createElementVNode("view", new UTSJSONObject({ class: "left" }), [
+                  vue.createElementVNode("text", null, "我的车辆"),
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "badge" }), [
+                    vue.createVNode(_component_i_badge, new UTSJSONObject({
+                      type: "danger",
+                      maxCount: "99",
+                      count: vue.unref(carsnumber)
+                    }), null, 8, ["count"])
+                  ])
+                ]),
+                vue.createVNode(_component_i_icon, new UTSJSONObject({
+                  name: "/static/arrow-right.png",
+                  fontSize: "15"
+                }))
+              ]),
+              vue.createElementVNode("view", new UTSJSONObject({
+                class: "list",
+                onClick: platformRenewal
+              }), "平台续费")
+            ])) : vue.createCommentVNode("", true),
+            vue.unref(version) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 1,
+              class: "version"
+            }), "当前版本：" + vue.toDisplayString(vue.unref(version)), 1)) : vue.createCommentVNode("", true),
+            vue.createVNode(_component_movable_area, new UTSJSONObject({ class: "movable-area" }), {
+              default: vue.withCtx(() => {
+                return [
+                  vue.createVNode(_component_movable_view, new UTSJSONObject({
+                    class: "movable-view",
+                    direction: "all",
+                    x: vue.unref(moveX),
+                    y: vue.unref(moveY),
+                    onChange: onMoveChange
+                  }), {
+                    default: vue.withCtx(() => {
+                      return [
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "contact-button-movable",
+                          onClick: contactCustomerService
+                        }), [
+                          vue.createVNode(_component_i_icon, new UTSJSONObject({
+                            name: "/static/server-man.png",
+                            fontSize: "20"
+                          })),
+                          vue.createElementVNode("text", new UTSJSONObject({ class: "contact-text" }), "人工客服"),
+                          vue.createElementVNode("text", new UTSJSONObject({ class: "contact-text" }), "08:00-24:00")
+                        ])
+                      ];
+                    }),
+                    _: 1
+                  }, 8, ["x", "y"])
+                ];
+              }),
+              _: 1
+            })
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$x = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#ffffff", "position": "relative" } }, "user-info-box": { ".container ": { "width": "100%", "paddingTop": "40rpx", "paddingRight": "60rpx", "paddingBottom": "40rpx", "paddingLeft": "60rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "userinfo": { ".container .user-info-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "user-info": { ".container .user-info-box ": { "marginLeft": "20rpx", "textAlign": "center", "fontSize": "30rpx", "color": "#333333" } }, "list": { ".container ": { "backgroundColor": "#f5f5f5", "paddingTop": "30rpx", "paddingRight": "30rpx", "paddingBottom": "30rpx", "paddingLeft": "30rpx", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx", "marginTop": "15rpx", "marginRight": "15rpx", "marginBottom": "15rpx", "marginLeft": "15rpx", "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "fontSize": "25rpx" } }, "left": { ".container .list ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "badge": { ".container .list .left ": { "marginLeft": "20rpx" } }, "version": { ".container ": { "position": "fixed", "bottom": "50rpx", "left": "20rpx", "right": "20rpx", "textAlign": "center", "fontSize": "25rpx", "color": "#c3c2c2ff", "marginTop": "20rpx", "marginRight": "40rpx", "marginBottom": 0, "marginLeft": "40rpx" } }, "movable-area": { ".container ": { "position": "fixed", "top": 0, "left": 0, "right": 0, "bottom": 0, "width": "100%", "height": "100%", "pointerEvents": "none", "zIndex": 999 } } };
+  const PagesUserCenterUserCenter = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["styles", [_style_0$x]]]);
+  const _sfc_main$x = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-input" }, { __name: "i-input", props: {
+    modelValue: {
+      type: String,
+      default: ""
+    },
+    value: {
+      type: String,
+      default: ""
+    },
+    type: {
+      type: String,
+      default: "text"
+    },
+    height: {
+      type: String,
+      default: "40px"
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    disabledColor: {
+      type: String,
+      default: "#f5f7fa"
+    },
+    clearable: {
+      type: Boolean,
+      default: false
+    },
+    password: {
+      type: Boolean,
+      default: false
+    },
+    showPasswordToggle: {
+      type: Boolean,
+      default: true
+    },
+    maxlength: {
+      type: Number,
+      default: -1
+    },
+    placeholder: {
+      type: String,
+      default: ""
+    },
+    placeholderClass: {
+      type: String,
+      default: "input-placeholder"
+    },
+    placeholderStyle: {
+      type: String,
+      default: ""
+    },
+    showWordLimit: {
+      type: Boolean,
+      default: false
+    },
+    confirmType: {
+      type: String,
+      default: "done"
+    },
+    confirmHold: {
+      type: Boolean,
+      default: false
+    },
+    focus: {
+      type: Boolean,
+      default: false
+    },
+    cursor: {
+      type: Number,
+      default: -1
+    },
+    cursorSpacing: {
+      type: Number,
+      default: 30
+    },
+    selectionStart: {
+      type: Number,
+      default: -1
+    },
+    selectionEnd: {
+      type: Number,
+      default: -1
+    },
+    adjustPosition: {
+      type: Boolean,
+      default: true
+    },
+    inputAlign: {
+      type: String,
+      default: "left"
+    },
+    fontSize: {
+      type: String,
+      default: "15px"
+    },
+    color: {
+      type: String,
+      default: "#303133"
+    },
+    prefiicon: {
+      type: String,
+      default: ""
+    },
+    prefiiconStyle: {
+      type: String,
+      default: ""
+    },
+    suffiicon: {
+      type: String,
+      default: ""
+    },
+    suffiiconStyle: {
+      type: String,
+      default: ""
+    },
+    border: {
+      type: String,
+      default: "surround"
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    shape: {
+      type: String,
+      default: "square"
+    },
+    customStyle: {
+      type: String,
+      default: ""
+    },
+    round: {
+      type: String,
+      default: "4px"
+    },
+    borderColor: {
+      type: String,
+      default: "#e5e5e5"
+    },
+    bgColor: {
+      type: String,
+      default: "#ffffff"
+    },
+    inputmode: {
+      type: String,
+      default: "text"
+    },
+    prefix: {
+      type: String,
+      default: ""
+    }
+  }, emits: [
+    "update:modelValue",
+    "update:value",
+    "input",
+    "change",
+    "focus",
+    "blur",
+    "confirm",
+    "keyboardheightchange",
+    "clear"
+  ], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function initialValue() {
+      const modelValue = props.modelValue;
+      if (modelValue.length > 0)
+        return modelValue;
+      return props.value;
+    }
+    function formatSize(value) {
+      if (value.indexOf("px") >= 0 || value.indexOf("rpx") >= 0 || value.indexOf("%") >= 0) {
+        return value;
+      }
+      return value + "px";
+    }
+    const inputBgColor = vue.computed(() => {
+      return props.bgColor;
+    });
+    const current = vue.ref(initialValue());
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      current.value = props.modelValue;
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      if (props.modelValue.length == 0)
+        current.value = props.value;
+    });
+    const focused = vue.ref(false);
+    const passwordVisible = vue.ref(props.password);
+    const wrapClass = vue.computed(() => {
+      const classes = ["i-input"];
+      if (props.disabled)
+        classes.push("i-input--disabled");
+      if (focused.value && !props.disabled)
+        classes.push("i-input--focus");
+      if (props.shape == "circle")
+        classes.push("i-input--circle");
+      return classes.join(" ");
+    });
+    const wrapStyle = vue.computed(() => {
+      let style = "min-height:" + formatSize(props.height) + ";background-color:" + (props.disabled ? props.disabledColor : inputBgColor.value) + ";border-radius:" + (props.shape == "circle" ? formatSize(props.height) : props.round) + ";";
+      if (props.border == "surround") {
+        style += "border-width:1px;border-style:solid;border-color:" + props.borderColor + ";";
+      }
+      if (props.border == "bottom") {
+        style += "border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:" + props.borderColor + ";";
+      }
+      return style + props.customStyle;
+    });
+    const fieldStyle = vue.computed(() => {
+      return "height:" + formatSize(props.height) + ";color:" + props.color + ";font-size:" + formatSize(props.fontSize) + ";text-align:" + props.inputAlign + ";";
+    });
+    const placeholderStyleText = vue.computed(() => {
+      if (props.placeholderStyle.length > 0)
+        return props.placeholderStyle;
+      return "color:#c0c4cc;";
+    });
+    function emitValue(value) {
+      emit("update:modelValue", value);
+      emit("update:value", value);
+      emit("input", value);
+      emit("change", value);
+    }
+    function handleInput(event) {
+      const nextValue = event.detail.value;
+      if (props.readonly) {
+        current.value = initialValue();
+        return null;
+      }
+      current.value = nextValue;
+      emitValue(nextValue);
+    }
+    function handleFocus(event) {
+      focused.value = true;
+      emit("focus", event);
+    }
+    function handleBlur(event) {
+      focused.value = false;
+      emit("blur", event);
+    }
+    function handleConfirm(event) {
+      emit("confirm", event.detail.value);
+    }
+    function handleKeyboardHeightChange(event) {
+      emit("keyboardheightchange", event);
+    }
+    function clear() {
+      current.value = "";
+      emitValue("");
+      emit("clear");
+    }
+    function togglePassword() {
+      passwordVisible.value = !passwordVisible.value;
+    }
+    __expose({
+      setFormatter() {
+      }
+    });
+    return (_ctx = null, _cache = null) => {
+      const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        class: vue.normalizeClass(wrapClass.value),
+        style: vue.normalizeStyle(wrapStyle.value)
+      }), [
+        vue.renderSlot(_ctx.$slots, "prefix", new UTSJSONObject({}), () => {
+          return [
+            __props.prefiicon.length > 0 || __props.prefix.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+              key: 0,
+              class: "i-input__prefix",
+              style: vue.normalizeStyle(__props.prefiiconStyle)
+            }), vue.toDisplayString(__props.prefix.length > 0 ? __props.prefix : __props.prefiicon), 5)) : vue.createCommentVNode("", true)
+          ];
+        }),
+        vue.createElementVNode("input", new UTSJSONObject({
+          class: "i-input__field",
+          style: vue.normalizeStyle(fieldStyle.value),
+          type: __props.type,
+          value: current.value,
+          placeholder: __props.placeholder,
+          "placeholder-class": __props.placeholderClass,
+          "placeholder-style": placeholderStyleText.value,
+          password: passwordVisible.value,
+          disabled: __props.disabled,
+          maxlength: __props.maxlength,
+          "confirm-type": __props.confirmType,
+          "confirm-hold": __props.confirmHold,
+          inputmode: __props.inputmode,
+          focus: __props.focus,
+          cursor: __props.cursor,
+          "cursor-spacing": __props.cursorSpacing,
+          "selection-start": __props.selectionStart,
+          "selection-end": __props.selectionEnd,
+          "adjust-position": __props.adjustPosition,
+          onInput: handleInput,
+          onFocus: handleFocus,
+          onBlur: handleBlur,
+          onConfirm: handleConfirm,
+          onKeyboardheightchange: handleKeyboardHeightChange
+        }), null, 44, ["type", "value", "placeholder", "placeholder-class", "placeholder-style", "password", "disabled", "maxlength", "confirm-type", "confirm-hold", "inputmode", "focus", "cursor", "cursor-spacing", "selection-start", "selection-end", "adjust-position"]),
+        __props.showWordLimit ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+          key: 0,
+          class: "i-input__count"
+        }), vue.toDisplayString(current.value.length) + "/" + vue.toDisplayString(__props.maxlength), 1)) : vue.createCommentVNode("", true),
+        __props.clearable && current.value.length > 0 && !__props.disabled && !__props.readonly ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+          key: 1,
+          class: "i-input__clear",
+          onClick: clear
+        }), " × ")) : vue.createCommentVNode("", true),
+        __props.password && __props.showPasswordToggle ? (vue.openBlock(), vue.createBlock(_component_i_icon, new UTSJSONObject({
+          key: 2,
+          class: "i-input__eye",
+          onClick: togglePassword,
+          name: passwordVisible.value ? "../../../../static/eye-close.png" : "../../../../static/eye-open.png",
+          size: "24"
+        }), null, 8, ["name"])) : vue.createCommentVNode("", true),
+        vue.renderSlot(_ctx.$slots, "suffix", new UTSJSONObject({}), () => {
+          return [
+            __props.suffiicon.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+              key: 0,
+              class: "i-input__suffix",
+              style: vue.normalizeStyle(__props.suffiiconStyle)
+            }), vue.toDisplayString(__props.suffiicon), 5)) : vue.createCommentVNode("", true)
+          ];
+        })
+      ], 6);
+    };
+  } }));
+  const _style_0$w = { "i-input": { "": { "paddingTop": 0, "paddingRight": 12, "paddingBottom": 0, "paddingLeft": 12, "flexDirection": "row", "alignItems": "center" } }, "i-input--disabled": { "": { "opacity": 0.76 } }, "i-input--focus": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff" } }, "i-input__prefix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginRight": 8 } }, "i-input__suffix": { "": { "color": "#606266", "fontSize": 14, "lineHeight": "22px", "marginLeft": 8 } }, "i-input__clear": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__eye": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 16, "lineHeight": "22px" } }, "i-input__count": { "": { "marginLeft": 8, "color": "#c0c4cc", "fontSize": 12, "lineHeight": "18px" } }, "i-input__field": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "minWidth": 0 } } };
+  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["styles", [_style_0$w]]]);
+  const _sfc_main$w = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form-item" }, { __name: "i-form-item", props: {
+    name: {
+      type: String,
+      default: ""
+    },
+    label: {
+      type: String,
+      default: ""
+    },
+    hint: {
+      type: String,
+      default: ""
+    },
+    error: {
+      type: String,
+      default: ""
+    },
+    required: {
+      type: Boolean,
+      default: false
+    },
+    scrollId: {
+      type: String,
+      default: ""
+    },
+    scrollIdPrefix: {
+      type: String,
+      default: "i-form-item-"
+    },
+    labelWidth: {
+      type: [String, Number],
+      default: "100px"
+    },
+    labelDirection: {
+      type: String,
+      default: "vertical"
+    },
+    labelFontColor: {
+      type: String,
+      default: "#303133"
+    },
+    labelFontSize: {
+      type: [String, Number],
+      default: "14px"
+    },
+    showLabel: {
+      type: Boolean,
+      default: true
+    },
+    errorAlign: {
+      type: String,
+      default: "left"
+    }
+  }, emits: [], setup(__props, _a) {
+    _a.emit;
+    const props = __props;
+    function formatSize(value) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
+      }
+      return text + "px";
+    }
+    function normalizeIdName(name2) {
+      let result = "";
+      for (let i = 0; i < name2.length; i++) {
+        const char = name2.charAt(i);
+        const isNumber2 = char >= "0" && char <= "9";
+        const isUpper = char >= "A" && char <= "Z";
+        const isLower = char >= "a" && char <= "z";
+        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
+          result = result + char;
+        } else {
+          result = result + "-";
+        }
+      }
+      return result;
+    }
+    const itemId = vue.computed(() => {
+      if (props.scrollId.length > 0)
+        return props.scrollId;
+      if (props.name.length == 0)
+        return "";
+      return props.scrollIdPrefix + normalizeIdName(props.name);
+    });
+    const itemClass = vue.computed(() => {
+      const classes = ["i-form-item"];
+      if (props.labelDirection == "horizontal")
+        classes.push("i-form-item--horizontal");
+      return classes.join(" ");
+    });
+    const headerClass = vue.computed(() => {
+      const classes = ["i-form-item__header"];
+      if (props.labelDirection == "horizontal")
+        classes.push("i-form-item__header--horizontal");
+      return classes.join(" ");
+    });
+    const contentClass = vue.computed(() => {
+      const classes = ["i-form-item__content"];
+      if (props.labelDirection == "horizontal")
+        classes.push("i-form-item__content--horizontal");
+      return classes.join(" ");
+    });
+    const headerStyle = vue.computed(() => {
+      if (props.labelDirection != "horizontal")
+        return "";
+      return "width:" + formatSize(props.labelWidth) + ";";
+    });
+    const labelStyle = vue.computed(() => {
+      return "color:" + props.labelFontColor + ";font-size:" + formatSize(props.labelFontSize) + ";";
+    });
+    const footerStyle = vue.computed(() => {
+      return "text-align:" + props.errorAlign + ";";
+    });
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        id: itemId.value,
+        class: vue.normalizeClass(itemClass.value)
+      }), [
+        __props.showLabel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 0,
+          class: vue.normalizeClass(headerClass.value),
+          style: vue.normalizeStyle(headerStyle.value)
+        }), [
+          __props.required ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: "i-form-item__required"
+          }), "*")) : vue.createCommentVNode("", true),
+          vue.createElementVNode("text", new UTSJSONObject({
+            class: "i-form-item__label",
+            style: vue.normalizeStyle(labelStyle.value)
+          }), vue.toDisplayString(__props.label), 5)
+        ], 6)) : vue.createCommentVNode("", true),
+        vue.createElementVNode("view", new UTSJSONObject({ class: "i-form-item__body" }), [
+          vue.createElementVNode("view", new UTSJSONObject({
+            class: vue.normalizeClass(contentClass.value)
+          }), [
+            vue.renderSlot(_ctx.$slots, "default")
+          ], 2),
+          __props.error.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: "i-form-item__error",
+            style: vue.normalizeStyle(footerStyle.value)
+          }), vue.toDisplayString(__props.error), 5)) : __props.hint.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 1,
+            class: "i-form-item__hint",
+            style: vue.normalizeStyle(footerStyle.value)
+          }), vue.toDisplayString(__props.hint), 5)) : vue.createCommentVNode("", true)
+        ])
+      ], 10, ["id"]);
+    };
+  } }));
+  const _style_0$v = { "i-form-item": { "": { "paddingTop": 12, "paddingRight": 14, "paddingBottom": 12, "paddingLeft": 14, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#ffffff" } }, "i-form-item--horizontal": { "": { "flexDirection": "row", "alignItems": "flex-start" } }, "i-form-item__header": { "": { "flexDirection": "row", "alignItems": "center" } }, "i-form-item__header--horizontal": { "": { "minHeight": 40 } }, "i-form-item__required": { "": { "marginRight": 4, "color": "#fa3534", "fontSize": 14, "lineHeight": "22px" } }, "i-form-item__label": { "": { "color": "#303133", "fontSize": 14, "fontWeight": 600, "lineHeight": "22px" } }, "i-form-item__content": { "": { "marginTop": 8 } }, "i-form-item__content--horizontal": { "": { "marginTop": 0 } }, "i-form-item__body": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-form-item__hint": { "": { "marginTop": 6, "color": "#909399", "fontSize": 12, "lineHeight": "18px" } }, "i-form-item__error": { "": { "marginTop": 6, "color": "#fa3534", "fontSize": 12, "lineHeight": "18px" } } };
+  const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["styles", [_style_0$v]]]);
+  const _sfc_main$v = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-checkbox" }, { __name: "i-checkbox", props: {
+    name: {
+      type: [String, Number],
+      default: ""
+    },
+    modelValue: {
+      type: [Array, Boolean, String, Number],
+      default: false
+    },
+    value: {
+      type: [Array, Boolean, String, Number],
+      default: false
+    },
+    checked: {
+      type: Boolean,
+      default: false
+    },
+    shape: {
+      type: String,
+      default: "square"
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    activeColor: {
+      type: String,
+      default: "#2979ff"
+    },
+    inactiveColor: {
+      type: String,
+      default: "#dcdfe6"
+    },
+    size: {
+      type: [String, Number],
+      default: 20
+    },
+    placement: {
+      type: String,
+      default: "row"
+    },
+    label: {
+      type: String,
+      default: ""
+    },
+    labelSize: {
+      type: [String, Number],
+      default: 14
+    },
+    labelColor: {
+      type: String,
+      default: "#303133"
+    },
+    labelDisabled: {
+      type: Boolean,
+      default: false
+    },
+    iconColor: {
+      type: String,
+      default: "#ffffff"
+    },
+    iconSize: {
+      type: [String, Number],
+      default: 14
+    },
+    iconPlacement: {
+      type: String,
+      default: "left"
+    },
+    borderBottom: {
+      type: Boolean,
+      default: false
+    },
+    activeLabelColor: {
+      type: String,
+      default: ""
+    },
+    plain: {
+      type: Boolean,
+      default: true
+    }
+  }, emits: ["change", "update:modelValue", "update:value", "update:checked"], setup(__props, _a) {
+    var __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function formatSize(value) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
+      }
+      return text + "px";
+    }
+    function valueText(value = null) {
+      if (typeof value == "string")
+        return value;
+      if (typeof value == "number" || typeof value == "boolean")
+        return value.toString();
+      return "";
+    }
+    function isChecked() {
+      if (props.checked)
+        return true;
+      const modelValue = props.modelValue;
+      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+      if (Array.isArray(value)) {
+        const names2 = value;
+        for (let i = 0; i < names2.length; i++) {
+          if (valueText(names2[i]) == valueText(props.name))
+            return true;
+        }
+        return false;
+      }
+      if (typeof value == "boolean")
+        return value;
+      return valueText(value) == valueText(props.name);
+    }
+    const internalChecked = vue.ref(isChecked());
+    const checked = vue.computed(() => {
+      return internalChecked.value;
+    });
+    const wrapClass = vue.computed(() => {
+      const classes = ["i-checkbox"];
+      if (props.placement == "column")
+        classes.push("i-checkbox--column");
+      if (props.iconPlacement == "right")
+        classes.push("i-checkbox--right");
+      if (props.shape == "button")
+        classes.push("i-checkbox--button");
+      if (props.plain && props.shape == "button")
+        classes.push("i-checkbox--plain");
+      if (checked.value)
+        classes.push("i-checkbox--checked");
+      if (props.shape == "button" && checked.value)
+        classes.push("i-checkbox--button-checked");
+      if (props.shape == "button" && props.plain && checked.value) {
+        classes.push("i-checkbox--button-plain-checked");
+      }
+      if (props.disabled)
+        classes.push("i-checkbox--disabled");
+      if (props.borderBottom)
+        classes.push("i-checkbox--border");
+      return classes.join(" ");
+    });
+    const labelClass = vue.computed(() => {
+      const classes = ["i-checkbox__label"];
+      if (props.shape == "button")
+        classes.push("i-checkbox__label--button");
+      return classes.join(" ");
+    });
+    const boxStyle = vue.computed(() => {
+      return "width:" + formatSize(props.size) + ";height:" + formatSize(props.size) + ";border-radius:" + (props.shape == "circle" ? formatSize(props.size) : "4px") + ";border-color:" + (checked.value ? props.activeColor : props.inactiveColor) + ";background-color:" + (checked.value && props.shape != "check" ? props.activeColor : "transparent") + ";";
+    });
+    const markStyle = vue.computed(() => {
+      return "color:" + props.iconColor + ";font-size:" + formatSize(props.iconSize) + ";";
+    });
+    const labelStyle = vue.computed(() => {
+      let color = props.labelColor;
+      if (checked.value && props.activeLabelColor.length > 0)
+        color = props.activeLabelColor;
+      return "color:" + color + ";font-size:" + formatSize(props.labelSize) + ";";
+    });
+    vue.watch(() => {
+      return props.modelValue;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    vue.watch(() => {
+      return props.value;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    vue.watch(() => {
+      return props.checked;
+    }, () => {
+      internalChecked.value = isChecked();
+    });
+    function buildValue(nextChecked, previousChecked) {
+      const modelValue = props.modelValue;
+      const value = valueText(modelValue).length > 0 ? modelValue : props.value;
+      if (Array.isArray(value)) {
+        const list = value;
+        const nextList = list.slice(0);
+        const exists = previousChecked;
+        if (nextChecked && !exists)
+          nextList.push(props.name);
+        if (!nextChecked && exists) {
+          const filtered = [];
+          for (let i = 0; i < nextList.length; i++) {
+            if (valueText(nextList[i]) != valueText(props.name))
+              filtered.push(nextList[i]);
+          }
+          return filtered;
+        }
+        return nextList;
+      }
+      return nextChecked;
+    }
+    function updateChecked(nextChecked) {
+      const previousChecked = checked.value;
+      internalChecked.value = nextChecked;
+      const nextValue = buildValue(nextChecked, previousChecked);
+      emit("update:checked", nextChecked);
+      emit("update:modelValue", nextValue);
+      emit("update:value", nextValue);
+      emit("change", nextValue);
+    }
+    function toggle() {
+      if (props.disabled)
+        return null;
+      updateChecked(!checked.value);
+    }
+    function toggleByLabel() {
+      if (props.labelDisabled)
+        return null;
+      toggle();
+    }
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        class: vue.normalizeClass(wrapClass.value),
+        onClick: toggle
+      }), [
+        vue.renderSlot(_ctx.$slots, "icon", new UTSJSONObject({ checked: checked.value }), () => {
+          return [
+            __props.shape != "button" ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "i-checkbox__box",
+              style: vue.normalizeStyle(boxStyle.value)
+            }), [
+              checked.value ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                key: 0,
+                class: "i-checkbox__mark",
+                style: vue.normalizeStyle(markStyle.value)
+              }), "✓", 4)) : vue.createCommentVNode("", true)
+            ], 4)) : vue.createCommentVNode("", true)
+          ];
+        }),
+        vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ checked: checked.value }), () => {
+          return [
+            vue.createElementVNode("text", new UTSJSONObject({
+              class: vue.normalizeClass(labelClass.value),
+              style: vue.normalizeStyle(labelStyle.value),
+              onClick: vue.withModifiers(toggleByLabel, ["stop"])
+            }), vue.toDisplayString(__props.label), 7)
+          ];
+        })
+      ], 2);
+    };
+  } }));
+  const _style_0$u = { "i-checkbox": { "": { "minHeight": 32, "flexDirection": "row", "alignItems": "center" } }, "i-checkbox--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "i-checkbox--button": { "": { "minWidth": 64, "minHeight": 34, "paddingTop": 7, "paddingRight": 12, "paddingBottom": 7, "paddingLeft": 12, "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dcdfe6", "borderRightColor": "#dcdfe6", "borderBottomColor": "#dcdfe6", "borderLeftColor": "#dcdfe6", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox--button-checked": { "": { "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff", "backgroundColor": "#ecf5ff" } }, "i-checkbox--button-plain-checked": { "": { "backgroundColor": "#ffffff" } }, "i-checkbox--disabled": { "": { "opacity": 0.5 } }, "i-checkbox--border": { "": { "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#eef0f4" } }, "i-checkbox__box": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "alignItems": "center", "justifyContent": "center" } }, "i-checkbox__mark": { "": { "lineHeight": "18px" } }, "i-checkbox__label": { "": { "marginLeft": 8, "lineHeight": "22px" } }, "i-checkbox__label--button": { "": { "marginLeft": 0, "textAlign": "center" } } };
+  const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["styles", [_style_0$u]]]);
+  const _sfc_main$u = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-button" }, { __name: "i-button", props: {
+    hairline: {
+      type: Boolean,
+      default: true
+    },
+    type: {
+      type: String,
+      default: "default"
+    },
+    size: {
+      type: String,
+      default: "normal"
+    },
+    block: {
+      type: Boolean,
+      default: false
+    },
+    shape: {
+      type: String,
+      default: "square"
+    },
+    plain: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    round: {
+      type: [String, Number],
+      default: "4px"
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    loadingMode: {
+      type: String,
+      default: "spinner"
+    },
+    loadingSize: {
+      type: [String, Number],
+      default: 15
+    },
+    openType: {
+      type: String,
+      default: ""
+    },
+    formType: {
+      type: String,
+      default: ""
+    },
+    appParameter: {
+      type: String,
+      default: ""
+    },
+    hoverStopPropagation: {
+      type: Boolean,
+      default: true
+    },
+    lang: {
+      type: String,
+      default: "en"
+    },
+    sessionFrom: {
+      type: String,
+      default: ""
+    },
+    sendMessageTitle: {
+      type: String,
+      default: ""
+    },
+    sendMessagePath: {
+      type: String,
+      default: ""
+    },
+    sendMessageImg: {
+      type: String,
+      default: ""
+    },
+    showMessageCard: {
+      type: Boolean,
+      default: false
+    },
+    dataName: {
+      type: String,
+      default: ""
+    },
+    throttleTime: {
+      type: [String, Number],
+      default: 0
+    },
+    hoverStartTime: {
+      type: [String, Number],
+      default: 0
+    },
+    hoverStayTime: {
+      type: [String, Number],
+      default: 200
+    },
+    hoverClass: {
+      type: String,
+      default: "i-button--hover"
+    },
+    text: {
+      type: [String, Number],
+      default: ""
+    },
+    icon: {
+      type: String,
+      default: ""
+    },
+    iconColor: {
+      type: String,
+      default: ""
+    },
+    iconPosition: {
+      type: String,
+      default: "left"
+    },
+    color: {
+      type: String,
+      default: ""
+    },
+    customStyle: {
+      type: String,
+      default: ""
+    }
+  }, emits: [
+    "click",
+    "getphonenumber",
+    "getuserinfo",
+    "error",
+    "opensetting",
+    "launchapp",
+    "agreeprivacyauthorization"
+  ], setup(__props, _a) {
+    var __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const lastClickTime = vue.ref(0);
+    const loadingAngle = vue.ref(0);
+    let loadingTimer = 0;
+    function formatSize(value) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0)
+        return text;
+      return text + "px";
+    }
+    const normalizedType = vue.computed(() => {
+      if (props.type == "danger")
+        return "error";
+      return props.type;
+    });
+    const contentText = vue.computed(() => {
+      if (props.text == null)
+        return "";
+      return props.text.toString();
+    });
+    const computedHoverClass = vue.computed(() => {
+      if (props.disabled || props.loading)
+        return "none";
+      return props.hoverClass;
+    });
+    function normalizeNumber(value) {
+      if (typeof value == "number")
+        return value;
+      return Number.from(parseFloat(value));
+    }
+    const hoverStartTimeValue = vue.computed(() => {
+      return normalizeNumber(props.hoverStartTime);
+    });
+    const hoverStayTimeValue = vue.computed(() => {
+      return normalizeNumber(props.hoverStayTime);
+    });
+    const useNativeButton = vue.computed(() => {
+      return props.openType.length > 0 || props.formType.length > 0;
+    });
+    const buttonClass = vue.computed(() => {
+      const classes = ["i-button", "i-button--" + normalizedType.value, "i-button--" + props.size];
+      if (props.block)
+        classes.push("i-button--block");
+      if (props.plain)
+        classes.push("i-button--plain");
+      if (props.plain)
+        classes.push("i-button--plain-" + normalizedType.value);
+      if (props.hairline && props.plain)
+        classes.push("i-button--hairline");
+      if (props.shape == "circle")
+        classes.push("i-button--circle");
+      if (props.disabled)
+        classes.push("i-button--disabled");
+      if (props.loading)
+        classes.push("i-button--loading");
+      return classes.join(" ");
+    });
+    const textClass = vue.computed(() => {
+      const classes = ["i-button__text"];
+      if (props.size == "small" || props.size == "mini")
+        classes.push("i-button__text--small");
+      if (normalizedType.value == "default")
+        classes.push("i-button__text--default");
+      if (props.plain)
+        classes.push("i-button__text--plain-" + normalizedType.value);
+      if (props.color.length > 0 && props.plain)
+        classes.push("i-button__text--custom");
+      if (props.disabled)
+        classes.push("i-button__text--disabled");
+      if (props.loading)
+        classes.push("i-button__text--loading");
+      return classes.join(" ");
+    });
+    const iconClass = vue.computed(() => {
+      const classes = ["i-button__icon"];
+      if (props.iconPosition == "right")
+        classes.push("i-button__icon--right");
+      return classes.join(" ");
+    });
+    const loadingClass = vue.computed(() => {
+      const classes = ["i-button__loading"];
+      if (props.loadingMode == "circle")
+        classes.push("i-button__loading--circle");
+      if (normalizedType.value == "default" || props.plain)
+        classes.push("i-button__loading--muted");
+      if (props.plain)
+        classes.push("i-button__loading--plain-" + normalizedType.value);
+      return classes.join(" ");
+    });
+    const buttonStyle = vue.computed(() => {
+      let style = "";
+      if (props.shape != "circle")
+        style = style + "border-radius:" + formatSize(props.round) + ";";
+      if (props.color.length > 0) {
+        if (props.plain) {
+          style = style + "background-color:transparent;border-color:" + props.color + ";";
+        } else {
+          style = style + "background:" + props.color + ";border-color:transparent;";
+        }
+      }
+      if (props.customStyle.length > 0)
+        style = style + props.customStyle;
+      return style;
+    });
+    const textStyle = vue.computed(() => {
+      if (props.color.length > 0 && props.plain)
+        return "color:" + props.color + ";";
+      return "";
+    });
+    const iconStyle = vue.computed(() => {
+      if (props.iconColor.length > 0)
+        return "color:" + props.iconColor + ";";
+      if (props.color.length > 0 && props.plain)
+        return "color:" + props.color + ";";
+      return "";
+    });
+    const loadingStyle = vue.computed(() => {
+      const size = formatSize(props.loadingSize);
+      return "width:" + size + ";height:" + size + ";transform:rotate(" + loadingAngle.value.toString() + "deg);";
+    });
+    function startLoading() {
+      if (loadingTimer > 0)
+        return null;
+      loadingTimer = setInterval(() => {
+        let angle = (loadingAngle.value + 24) % 360;
+        if (angle < 0)
+          angle = angle + 360;
+        loadingAngle.value = angle;
+      }, 50);
+    }
+    function stopLoading() {
+      if (loadingTimer > 0) {
+        clearInterval(loadingTimer);
+        loadingTimer = 0;
+      }
+      loadingAngle.value = 0;
+    }
+    vue.watch(() => {
+      return props.loading;
+    }, (nextValue) => {
+      if (nextValue) {
+        startLoading();
+      } else {
+        stopLoading();
+      }
+    });
+    vue.onMounted(() => {
+      if (props.loading)
+        startLoading();
+    });
+    vue.onUnmounted(() => {
+      stopLoading();
+    });
+    function canClick() {
+      if (props.disabled || props.loading)
+        return false;
+      const wait = normalizeNumber(props.throttleTime);
+      if (wait <= 0 || isNaN(wait))
+        return true;
+      const now = Date.now();
+      if (now - lastClickTime.value < wait)
+        return false;
+      lastClickTime.value = now;
+      return true;
+    }
+    function handleClick(event = null) {
+      if (!canClick())
+        return null;
+      emit("click", event);
+    }
+    function handleGetPhoneNumber(event = null) {
+      emit("getphonenumber", event);
+    }
+    function handleGetUserInfo(event = null) {
+      emit("getuserinfo", event);
+    }
+    function handleError(event = null) {
+      emit("error", event);
+    }
+    function handleOpenSetting(event = null) {
+      emit("opensetting", event);
+    }
+    function handleLaunchApp(event = null) {
+      emit("launchapp", event);
+    }
+    function handleAgreePrivacyAuthorization(event = null) {
+      emit("agreeprivacyauthorization", event);
+    }
+    return (_ctx = null, _cache = null) => {
+      return useNativeButton.value ? (vue.openBlock(), vue.createElementBlock("button", new UTSJSONObject({
+        key: 0,
+        class: vue.normalizeClass(buttonClass.value),
+        style: vue.normalizeStyle(buttonStyle.value),
+        disabled: __props.disabled || __props.loading,
+        "form-type": __props.formType,
+        "open-type": __props.openType,
+        "app-parameter": __props.appParameter,
+        "hover-class": computedHoverClass.value,
+        "hover-stop-propagation": __props.hoverStopPropagation,
+        "hover-start-time": hoverStartTimeValue.value,
+        "hover-stay-time": hoverStayTimeValue.value,
+        lang: __props.lang,
+        "session-from": __props.sessionFrom,
+        "send-message-title": __props.sendMessageTitle,
+        "send-message-path": __props.sendMessagePath,
+        "send-message-img": __props.sendMessageImg,
+        "show-message-card": __props.showMessageCard,
+        "data-name": __props.dataName,
+        onClick: handleClick,
+        onGetphonenumber: handleGetPhoneNumber,
+        onGetuserinfo: handleGetUserInfo,
+        onError: handleError,
+        onOpensetting: handleOpenSetting,
+        onLaunchapp: handleLaunchApp,
+        onAgreeprivacyauthorization: handleAgreePrivacyAuthorization
+      }), [
+        vue.createElementVNode("view", new UTSJSONObject({ class: "i-button__inner" }), [
+          __props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: vue.normalizeClass(loadingClass.value),
+            style: vue.normalizeStyle(loadingStyle.value)
+          }), null, 6)) : vue.createCommentVNode("", true),
+          __props.icon.length > 0 && __props.iconPosition == "left" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 1,
+            class: vue.normalizeClass(iconClass.value),
+            style: vue.normalizeStyle(iconStyle.value)
+          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true),
+          contentText.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 2,
+            class: vue.normalizeClass(textClass.value),
+            style: vue.normalizeStyle(textStyle.value)
+          }), vue.toDisplayString(contentText.value), 7)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 3,
+            class: vue.normalizeClass(textClass.value),
+            style: vue.normalizeStyle(textStyle.value)
+          }), [
+            vue.renderSlot(_ctx.$slots, "default")
+          ], 6)),
+          __props.icon.length > 0 && __props.iconPosition == "right" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 4,
+            class: vue.normalizeClass(iconClass.value),
+            style: vue.normalizeStyle(iconStyle.value)
+          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true)
+        ])
+      ], 46, ["disabled", "form-type", "open-type", "app-parameter", "hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "data-name"])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        key: 1,
+        class: vue.normalizeClass(buttonClass.value),
+        style: vue.normalizeStyle(buttonStyle.value),
+        "hover-class": computedHoverClass.value,
+        "hover-stop-propagation": __props.hoverStopPropagation,
+        "hover-start-time": hoverStartTimeValue.value,
+        "hover-stay-time": hoverStayTimeValue.value,
+        "data-name": __props.dataName,
+        onClick: handleClick
+      }), [
+        vue.createElementVNode("view", new UTSJSONObject({ class: "i-button__inner" }), [
+          __props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 0,
+            class: vue.normalizeClass(loadingClass.value),
+            style: vue.normalizeStyle(loadingStyle.value)
+          }), null, 6)) : vue.createCommentVNode("", true),
+          __props.icon.length > 0 && __props.iconPosition == "left" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 1,
+            class: vue.normalizeClass(iconClass.value),
+            style: vue.normalizeStyle(iconStyle.value)
+          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true),
+          contentText.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 2,
+            class: vue.normalizeClass(textClass.value),
+            style: vue.normalizeStyle(textStyle.value)
+          }), vue.toDisplayString(contentText.value), 7)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 3,
+            class: vue.normalizeClass(textClass.value),
+            style: vue.normalizeStyle(textStyle.value)
+          }), [
+            vue.renderSlot(_ctx.$slots, "default")
+          ], 6)),
+          __props.icon.length > 0 && __props.iconPosition == "right" && !__props.loading ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+            key: 4,
+            class: vue.normalizeClass(iconClass.value),
+            style: vue.normalizeStyle(iconStyle.value)
+          }), vue.toDisplayString(__props.icon), 7)) : vue.createCommentVNode("", true)
+        ])
+      ], 14, ["hover-class", "hover-stop-propagation", "hover-start-time", "hover-stay-time", "data-name"]));
+    };
+  } }));
+  const _style_0$t = { "i-button": { "": { "display": "flex", "height": 44, "minWidth": 86, "paddingTop": 0, "paddingRight": 18, "paddingBottom": 0, "paddingLeft": 18, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "backgroundColor": "#f4f4f5", "alignItems": "center", "justifyContent": "center", "flexDirection": "row", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "overflow": "hidden" } }, "i-button__inner": { "": { "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "i-button--block": { "": { "width": "100%" } }, "i-button--large": { "": { "height": 50, "minWidth": 108, "paddingTop": 0, "paddingRight": 22, "paddingBottom": 0, "paddingLeft": 22 } }, "i-button--normal": { "": { "height": 44 } }, "i-button--small": { "": { "height": 36, "minWidth": 72, "paddingTop": 0, "paddingRight": 14, "paddingBottom": 0, "paddingLeft": 14 } }, "i-button--mini": { "": { "height": 30, "minWidth": 58, "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "i-button--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button--primary": { "": { "backgroundColor": "#3c9cff" } }, "i-button--success": { "": { "backgroundColor": "#5ac725" } }, "i-button--warning": { "": { "backgroundColor": "#f9ae3d" } }, "i-button--error": { "": { "backgroundColor": "#f56c6c" } }, "i-button--info": { "": { "backgroundColor": "#909399" } }, "i-button--default": { "": { "backgroundColor": "#f4f4f5", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain": { "": { "backgroundColor": "#ffffff", "borderTopColor": "#dadbde", "borderRightColor": "#dadbde", "borderBottomColor": "#dadbde", "borderLeftColor": "#dadbde" } }, "i-button--plain-primary": { "": { "borderTopColor": "#3c9cff", "borderRightColor": "#3c9cff", "borderBottomColor": "#3c9cff", "borderLeftColor": "#3c9cff", "backgroundColor": "#ffffff" } }, "i-button--plain-success": { "": { "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725", "backgroundColor": "#ffffff" } }, "i-button--plain-warning": { "": { "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d", "backgroundColor": "#ffffff" } }, "i-button--plain-error": { "": { "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c", "backgroundColor": "#ffffff" } }, "i-button--plain-info": { "": { "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399", "backgroundColor": "#ffffff" } }, "i-button--hairline": { "": { "borderTopWidth": 0.5, "borderRightWidth": 0.5, "borderBottomWidth": 0.5, "borderLeftWidth": 0.5 } }, "i-button--disabled": { "": { "opacity": 0.6 } }, "i-button--loading": { "": { "opacity": 0.9 } }, "i-button--hover": { "": { "opacity": 0.86 } }, "i-button__text": { "": { "color": "#ffffff", "fontSize": 15, "fontWeight": 500, "lineHeight": "22px" } }, "i-button__text--small": { "": { "fontSize": 13, "lineHeight": "20px" } }, "i-button__text--default": { "": { "color": "#303133" } }, "i-button__text--plain-primary": { "": { "color": "#3c9cff" } }, "i-button__text--plain-success": { "": { "color": "#5ac725" } }, "i-button__text--plain-warning": { "": { "color": "#f9ae3d" } }, "i-button__text--plain-error": { "": { "color": "#f56c6c" } }, "i-button__text--plain-info": { "": { "color": "#909399" } }, "i-button__text--plain-default": { "": { "color": "#303133" } }, "i-button__text--disabled": { "": { "opacity": 0.9 } }, "i-button__icon": { "": { "marginRight": 6, "color": "#ffffff", "fontSize": 15, "lineHeight": "22px" } }, "i-button__icon--right": { "": { "marginRight": 0, "marginLeft": 6 } }, "i-button__loading": { "": { "marginRight": 6, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#ffffff", "borderRightColor": "rgba(255,255,255,0.45)", "borderBottomColor": "rgba(255,255,255,0.45)", "borderLeftColor": "rgba(255,255,255,0.45)", "boxSizing": "border-box" } }, "i-button__loading--circle": { "": { "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999 } }, "i-button__text--loading": { "": { "opacity": 0.96 } }, "i-button__loading--muted": { "": { "borderTopColor": "#606266", "borderRightColor": "rgba(48,49,51,0.18)", "borderBottomColor": "rgba(48,49,51,0.18)", "borderLeftColor": "rgba(48,49,51,0.18)" } }, "i-button__loading--plain-primary": { "": { "borderTopColor": "#3c9cff" } }, "i-button__loading--plain-success": { "": { "borderTopColor": "#5ac725" } }, "i-button__loading--plain-warning": { "": { "borderTopColor": "#f9ae3d" } }, "i-button__loading--plain-error": { "": { "borderTopColor": "#f56c6c" } }, "i-button__loading--plain-info": { "": { "borderTopColor": "#909399" } } };
+  const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["styles", [_style_0$t]]]);
+  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-form" }, { __name: "i-form", props: {
+    modelValue: {
+      type: Object,
+      default() {
+        return new UTSJSONObject({});
+      }
+    },
+    fields: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    rules: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    showActions: {
+      type: Boolean,
+      default: false
+    },
+    submitText: {
+      type: String,
+      default: "提交"
+    },
+    resetText: {
+      type: String,
+      default: "重置"
+    },
+    labelDirection: {
+      type: String,
+      default: "horizontal"
+    },
+    errorAlign: {
+      type: String,
+      default: "left"
+    },
+    errorAutoPage: {
+      type: Boolean,
+      default: true
+    },
+    scrollOffsetTop: {
+      type: [String, Number],
+      default: 12
+    },
+    scrollDuration: {
+      type: [String, Number],
+      default: 300
+    },
+    scrollIdPrefix: {
+      type: String,
+      default: "i-form-item-"
+    },
+    watchValidStatus: {
+      type: Boolean,
+      default: false
+    },
+    modelValid: {
+      type: Boolean,
+      default: false
+    }
+  }, emits: [
+    "submit",
+    "reset",
+    "validate",
+    "scroll-to-error",
+    "update:modelValid",
+    "update:valid"
+  ], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const valid = vue.ref(true);
+    const message = vue.ref("");
+    const errors = vue.ref([]);
+    const formClass = vue.computed(() => {
+      const classes = ["i-form"];
+      if (props.labelDirection == "vertical")
+        classes.push("i-form--vertical");
+      return classes.join(" ");
+    });
+    const messageClass = vue.computed(() => {
+      return valid.value ? "i-form__message i-form__message--success" : "i-form__message i-form__message--error";
+    });
+    const messageStyle = vue.computed(() => {
+      return "text-align:" + props.errorAlign + ";";
+    });
+    function valueText(value = null) {
+      if (typeof value == "string")
+        return value;
+      if (typeof value == "number" || typeof value == "boolean")
+        return value.toString();
+      if (Array.isArray(value)) {
+        const list = value;
+        return list.join(",");
+      }
+      if (value != null && typeof value == "object")
+        return "[object Object]";
+      return "";
+    }
+    function activeFields() {
+      const fields = props.fields;
+      if (fields != null && fields.length > 0)
+        return fields;
+      const rules = props.rules;
+      if (rules != null)
+        return rules;
+      return [];
+    }
+    function fieldValue(item) {
+      const configuredValue = item["value"];
+      if (configuredValue != null)
+        return configuredValue;
+      const name2 = item.getString("name", "");
+      if (name2.length == 0)
+        return "";
+      const values = props.modelValue;
+      if (values != null) {
+        const modelValue = values[name2];
+        if (modelValue != null)
+          return modelValue;
+      }
+      return "";
+    }
+    function fieldLabel(item) {
+      const label = item.getString("label", item.getString("name", ""));
+      return label.length > 0 ? label : "字段";
+    }
+    function fieldRequired(item) {
+      return item.getBoolean("required", false);
+    }
+    function fieldMessage(item) {
+      const customMessage = item.getString("message", "");
+      if (customMessage.length > 0)
+        return customMessage;
+      return fieldLabel(item) + "不能为空";
+    }
+    function checkField(item, selectedKeys) {
+      const name2 = item.getString("name", "");
+      if (selectedKeys.length > 0 && selectedKeys.indexOf(name2) < 0)
+        return "";
+      const value = fieldValue(item);
+      if (fieldRequired(item) && valueText(value).length == 0) {
+        return fieldMessage(item);
+      }
+      return "";
+    }
+    function collectValues() {
+      const values = new UTSJSONObject({});
+      const list = activeFields();
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        const name2 = item.getString("name", "");
+        if (name2.length > 0)
+          values[name2] = fieldValue(item);
+      }
+      return values;
+    }
+    function numberValue(value) {
+      if (typeof value == "number")
+        return value;
+      return Number.from(parseFloat(value));
+    }
+    function normalizeIdName(name2) {
+      let result = "";
+      for (let i = 0; i < name2.length; i++) {
+        const char = name2.charAt(i);
+        const isNumber2 = char >= "0" && char <= "9";
+        const isUpper = char >= "A" && char <= "Z";
+        const isLower = char >= "a" && char <= "z";
+        if (isNumber2 || isUpper || isLower || char == "-" || char == "_") {
+          result = result + char;
+        } else {
+          result = result + "-";
+        }
+      }
+      return result;
+    }
+    function scrollTargetId(name2) {
+      return props.scrollIdPrefix + normalizeIdName(name2);
+    }
+    function scrollToFirstError(nextErrors) {
+      if (!props.errorAutoPage || nextErrors.length == 0)
+        return null;
+      const field = nextErrors[0].getString("field", "");
+      if (field.length == 0)
+        return null;
+      const targetId = scrollTargetId(field);
+      const selector = "#" + targetId;
+      const offsetTop = numberValue(props.scrollOffsetTop);
+      const duration = numberValue(props.scrollDuration);
+      emit("scroll-to-error", new UTSJSONObject({
+        field,
+        targetId,
+        selector,
+        offsetTop,
+        duration
+      }));
+      vue.nextTick(() => {
+        uni.pageScrollTo(new UTSJSONObject({
+          selector,
+          offsetTop,
+          duration
+        }));
+      });
+    }
+    function validateFields(selectedKeys, silent) {
+      const list = activeFields();
+      const nextErrors = [];
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        const errorMessage = checkField(item, selectedKeys);
+        if (errorMessage.length > 0) {
+          nextErrors.push(new UTSJSONObject({
+            field: item.getString("name", ""),
+            message: errorMessage
+          }));
+        }
+      }
+      errors.value = nextErrors;
+      valid.value = nextErrors.length == 0;
+      if (!silent) {
+        if (valid.value) {
+          message.value = "校验通过";
+        } else {
+          const firstError = nextErrors[0];
+          message.value = firstError.getString("message", "");
+        }
+        emit("validate", new UTSJSONObject({
+          valid: valid.value,
+          message: message.value,
+          errors: nextErrors,
+          values: collectValues()
+        }));
+        if (!valid.value)
+          scrollToFirstError(nextErrors);
+      }
+      emit("update:modelValid", valid.value);
+      emit("update:valid", valid.value);
+      return valid.value;
+    }
+    function validate() {
+      return validateFields([], false);
+    }
+    function validFields(keys) {
+      return validateFields(keys, false);
+    }
+    function checkAsyncVaildStatus() {
+      return validateFields([], true);
+    }
+    function clearValid() {
+      valid.value = true;
+      message.value = "";
+      errors.value = [];
+      emit("update:modelValid", true);
+      emit("update:valid", true);
+    }
+    function submit() {
+      const isValid = validate();
+      const result = new UTSJSONObject({
+        valid: isValid,
+        values: collectValues(),
+        errors: errors.value,
+        message: message.value
+      });
+      emit("submit", result);
+    }
+    function reset() {
+      clearValid();
+      emit("reset", new UTSJSONObject({
+        values: collectValues()
+      }));
+    }
+    vue.watch(() => {
+      return [props.fields, props.rules, props.modelValue, props.watchValidStatus];
+    }, () => {
+      if (props.watchValidStatus)
+        validateFields([], true);
+    }, { deep: true });
+    __expose({
+      valid: validFields,
+      validate,
+      clearValid,
+      checkAsyncVaildStatus,
+      submit,
+      reset
+    });
+    return (_ctx = null, _cache = null) => {
+      const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        class: vue.normalizeClass(formClass.value)
+      }), [
+        vue.renderSlot(_ctx.$slots, "default"),
+        message.value.length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+          key: 0,
+          class: vue.normalizeClass(messageClass.value),
+          style: vue.normalizeStyle(messageStyle.value)
+        }), vue.toDisplayString(message.value), 7)) : vue.createCommentVNode("", true),
+        __props.showActions ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 1,
+          class: "i-form__actions"
+        }), [
+          vue.createVNode(_component_i_button, new UTSJSONObject({
+            size: "small",
+            plain: "",
+            onClick: reset
+          }), {
+            default: vue.withCtx(() => {
+              return [
+                vue.createTextVNode(vue.toDisplayString(__props.resetText), 1)
+              ];
+            }),
+            _: 1
+          }),
+          vue.createVNode(_component_i_button, new UTSJSONObject({
+            size: "small",
+            type: "primary",
+            onClick: submit
+          }), {
+            default: vue.withCtx(() => {
+              return [
+                vue.createTextVNode(vue.toDisplayString(__props.submitText), 1)
+              ];
+            }),
+            _: 1
+          })
+        ])) : vue.createCommentVNode("", true)
+      ], 2);
+    };
+  } }));
+  const _style_0$s = { "i-form": { "": { "paddingTop": 4, "paddingRight": 0, "paddingBottom": 4, "paddingLeft": 0 } }, "i-form__message": { "": { "marginTop": 10, "fontSize": 13, "lineHeight": "20px" } }, "i-form__message--success": { "": { "color": "#19be6b" } }, "i-form__message--error": { "": { "color": "#fa3534" } }, "i-form__actions": { "": { "marginTop": 12, "flexDirection": "row", "justifyContent": "flex-end" } } };
+  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["styles", [_style_0$s]]]);
+  const _imports_0$2 = "/static/car_location.png";
+  class UniVerifyPreLoginResult extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            ok: { type: Boolean, optional: false },
+            message: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UniVerifyPreLoginResult.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.ok = this.__props__.ok;
+      this.message = this.__props__.message;
+      delete this.__props__;
+    }
+  }
+  class UniVerifyResult extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            ok: { type: Boolean, optional: false },
+            cancelled: { type: Boolean, optional: false },
+            message: { type: String, optional: false },
+            token: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = UniVerifyResult.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.ok = this.__props__.ok;
+      this.cancelled = this.__props__.cancelled;
+      this.message = this.__props__.message;
+      this.token = this.__props__.token;
+      delete this.__props__;
+    }
+  }
+  let manager = null;
+  let preLoginReady = false;
+  let requesting = false;
+  function getPlatform() {
+    return "ios";
+  }
+  function getManager() {
+    if (manager == null) {
+      manager = uni.getUniVerifyManager();
+    }
+    return manager;
+  }
+  function getErrorMessage(error) {
+    const errCode = error.errCode;
+    uni.__log__("error", "at services/auth/uni-verify.uts:38", "Uni Verify 授权失败:", errCode, error.errMsg);
+    if (errCode == 30001)
+      return "已取消本机号码授权";
+    if (errCode == 30004 || errCode == 30005 || errCode == 30006)
+      return "运营商认证失败，请检查 SIM 卡、移动网络后重试";
+    if (errCode == 30007)
+      return "本机号码授权已过期，请重试";
+    if (errCode == 30008)
+      return "正在进行本机号码授权，请稍候";
+    if (errCode == 40001 || errCode == 40002)
+      return "网络异常，请检查移动网络后重试";
+    return "本机号码授权失败（错误码：" + errCode + "），请使用验证码登录";
+  }
+  function getPreLoginErrorMessage(error) {
+    const errCode = error.errCode;
+    const errMsg2 = error.errMsg || "";
+    const cause = error.cause || "";
+    uni.__log__("error", "at services/auth/uni-verify.uts:51", "Uni Verify 预取号失败:", "platform=" + getPlatform(), "errCode=" + errCode, "errMsg=" + errMsg2, "cause=" + cause);
+    if (errCode == 30005)
+      return "本机号码预取失败，请检查本地包签名与 Uni Verify 配置，或确认 SIM 卡和移动数据可用";
+    if (errCode == 1e3 || errCode == 1001 || errCode == 1002)
+      return "一键登录服务未正确配置，请检查应用签名与 Uni Verify 控制台配置";
+    if (errCode == 1004)
+      return "一键登录服务已禁用，请检查 Uni Verify 服务状态";
+    if (errCode == 30001)
+      return "本机号码预取已取消";
+    if (errCode == 30004) {
+      if (errMsg2.indexOf("-20102") >= 0)
+        return "一键登录应用签名或控制台配置不匹配，请安装使用正式签名构建的 APK";
+      if (errMsg2.indexOf("-20201") >= 0)
+        return "未检测到可用 SIM 卡，请使用验证码登录";
+      if (errMsg2.indexOf("-20202") >= 0)
+        return "未开启蜂窝移动网络，请开启移动数据后重试";
+      if (errMsg2.indexOf("-20203") >= 0)
+        return "当前运营商暂不支持一键登录，请使用验证码登录";
+      return "本机号码预取失败，请稍后重试或使用验证码登录";
+    }
+    if (errCode == 40001 || errCode == 40002)
+      return "网络异常，无法获取本机号码，请检查移动网络后重试";
+    return "本机号码预取失败（错误码：" + errCode + "），请使用验证码登录";
+  }
+  function createPreLoginResult(ok, message) {
+    return new UniVerifyPreLoginResult({ ok, message });
+  }
+  function ensurePreLogin() {
+    return new Promise((resolve) => {
+      try {
+        const uniVerifyManager = getManager();
+        if (preLoginReady || uniVerifyManager.isPreLoginValid()) {
+          preLoginReady = true;
+          resolve(createPreLoginResult(true, ""));
+          return null;
+        }
+        uniVerifyManager.preLogin(new UTSJSONObject({
+          success: () => {
+            preLoginReady = true;
+            resolve(createPreLoginResult(true, ""));
+          },
+          fail: (error) => {
+            preLoginReady = false;
+            resolve(createPreLoginResult(false, getPreLoginErrorMessage(error)));
+          }
+        }));
+      } catch (error) {
+        preLoginReady = false;
+        uni.__log__("error", "at services/auth/uni-verify.uts:92", "Uni Verify 管理器初始化失败:", error);
+        resolve(createPreLoginResult(false, "一键登录初始化失败，请确认 uni-verify 模块、应用签名与控制台配置"));
+      }
+    });
+  }
+  function prefetchUniVerify() {
+    ensurePreLogin();
+  }
+  function createResult(ok, cancelled, message, token) {
+    return new UniVerifyResult({ ok, cancelled, message, token });
+  }
+  function closeLoginPage(uniVerifyManager = null) {
+    if (uniVerifyManager != null)
+      uniVerifyManager.close();
+  }
+  function loginByUniVerify(clientVersion) {
+    return new Promise((resolve) => {
+      if (requesting) {
+        resolve(createResult(false, false, "正在进行本机号码授权，请稍候", ""));
+        return null;
+      }
+      requesting = true;
+      ensurePreLogin().then((preLoginResult) => {
+        if (!preLoginResult.ok) {
+          requesting = false;
+          resolve(createResult(false, false, preLoginResult.message, ""));
+          return null;
+        }
+        let uniVerifyManager = null;
+        try {
+          uniVerifyManager = getManager();
+          uniVerifyManager.login(new UTSJSONObject({
+            uniVerifyStyle: new UTSJSONObject({
+              fullScreen: false,
+              loginBtnText: "本机号码一键登录"
+            }),
+            success: (result) => {
+              uniVerifyLogin(new UniVerifyLoginRequest({
+                openId: result.openId,
+                accessToken: result.accessToken,
+                platform: getPlatform(),
+                clientVersion
+              })).then((response) => {
+                const loginData = response.data;
+                const token = loginData != null ? loginData.getString("token", "") : "";
+                if (response.code == 0 && token != "") {
+                  resolve(createResult(true, false, "", token));
+                } else {
+                  resolve(createResult(false, false, response.msg || "本机号码登录失败，请使用验证码登录", ""));
+                }
+              }).catch(() => {
+                resolve(createResult(false, false, "登录服务连接失败，请使用验证码登录", ""));
+              }).finally(() => {
+                closeLoginPage(uniVerifyManager);
+                requesting = false;
+              });
+            },
+            fail: (error) => {
+              preLoginReady = false;
+              resolve(createResult(false, error.errCode == 30001, getErrorMessage(error), ""));
+              closeLoginPage(uniVerifyManager);
+              requesting = false;
+            }
+          }));
+        } catch (error) {
+          resolve(createResult(false, false, "当前设备不支持本机号码一键登录，请使用验证码登录", ""));
+          requesting = false;
+        }
+      }).catch(() => {
+        requesting = false;
+        resolve(createResult(false, false, "一键登录预取号异常，请检查 SIM 卡、移动网络及服务配置", ""));
+      });
+    });
+  }
+  class FormData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = FormData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      delete this.__props__;
+    }
+  }
+  class SavedAccount extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            username: { type: String, optional: false },
+            password: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SavedAccount.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.username = this.__props__.username;
+      this.password = this.__props__.password;
+      delete this.__props__;
+    }
+  }
+  const userAgreement = "\n欢迎使用车联网平台！\n\n一、服务条款的确认和接纳\n本协议是您与车联网平台之间关于使用平台服务的协议。您使用平台服务即表示您已阅读并同意本协议的全部条款。\n\n二、服务内容\n1. 车联网平台提供车辆管理、远程控制、数据分析等服务。\n2. 平台保留随时变更、中断或终止部分或全部网络服务的权利。\n\n三、用户账号\n用户应对其账号的全部行为负责，不得将账号转让或出借给他人使用。\n\n四、用户隐私保护\n保护用户隐私是平台的一项基本政策，详情请参阅《隐私政策》。\n\n五、免责声明\n1. 平台不保证服务一定能满足用户的要求，也不保证服务不会中断。\n2. 对于因不可抗力造成的服务中断，平台不承担责任。\n\n六、法律适用\n本协议的订立、执行和解释及争议的解决均适用中华人民共和国法律。\n\n如有任何疑问，请联系我们。";
+  const privacyPolicy = "\n车联网平台非常重视您的隐私保护！\n\n一、信息收集\n1. 我们可能收集的信息包括：手机号码、车辆信息、位置信息、设备信息等。\n2. 我们会在您注册、使用服务时收集必要的信息。\n\n二、信息使用\n1. 我们使用收集的信息来提供、维护和改进服务。\n2. 我们不会向第三方出售或分享您的个人信息。\n\n三、信息保护\n1. 我们采用行业标准的安全措施保护您的信息。\n2. 我们会定期评估安全措施的有效性。\n\n四、未成年人保护\n我们重视未成年人的隐私保护，如您是未成年人，请在监护人指导下使用服务。\n\n五、政策更新\n我们可能会更新隐私政策，更新后的政策将在平台公布。\n\n如有任何隐私问题，请联系我们。";
+  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
+    __name: "login",
+    setup(__props) {
+      const docState = vue.ref(false);
+      const pswLogin = vue.ref(false);
+      const rememberPassword = vue.ref(false);
+      const formValid = vue.ref(false);
+      const loading = vue.ref(false);
+      const smsLoginMode = vue.ref(false);
+      const smsMobile = vue.ref("");
+      const smsCode = vue.ref("");
+      const smsCooldown = vue.ref(0);
+      const smsSending = vue.ref(false);
+      const smsSubmitting = vue.ref(false);
+      const nativeLoginLoading = vue.ref(false);
+      const form = vue.ref(new FormData({
+        username: "",
+        password: ""
+      }));
+      const deviceModel = vue.ref("");
+      const pswrules = [
+        new UTSJSONObject({ name: "username", required: true, message: "请输入账号" }),
+        new UTSJSONObject({ name: "password", required: true, message: "请输入密码" })
+      ];
+      const updateFormValid = (valid) => {
+        formValid.value = valid;
+      };
+      function loadSavedAccount() {
+        try {
+          const rawAccount = uni.getStorageSync("savedEnterpriseAccount");
+          if (rawAccount == null || rawAccount == "")
+            return null;
+          const account = typeof rawAccount == "string" ? UTS.JSON.parse(rawAccount) : rawAccount;
+          form.value.username = account.getString("username", "");
+          form.value.password = account.getString("password", "");
+          rememberPassword.value = form.value.username != "" || form.value.password != "";
+        } catch (error) {
+          uni.__log__("error", "at pages/login/login.uvue:177", "加载保存的账号密码失败:", error);
+        }
+      }
+      const isPswLogin = () => {
+        pswLogin.value = !pswLogin.value;
+        if (pswLogin.value) {
+          setTimeout(() => {
+            loadSavedAccount();
+          }, 100);
+        }
+      };
+      const toggleRememberPassword = () => {
+        rememberPassword.value = !rememberPassword.value;
+        if (!rememberPassword.value) {
+          uni.removeStorageSync("savedEnterpriseAccount");
+        }
+      };
+      const saveAccountPassword = () => {
+        if (rememberPassword.value && form.value.username != "" && form.value.password != "") {
+          const accountInfo = new SavedAccount({
+            username: form.value.username,
+            password: form.value.password
+          });
+          uni.setStorageSync("savedEnterpriseAccount", UTS.JSON.stringify(accountInfo));
+        } else if (!rememberPassword.value) {
+          uni.removeStorageSync("savedEnterpriseAccount");
+        }
+      };
+      const filterNonLatin = (value) => {
+        form.value.password = value.replace(/[^\x00-\x7F]/g, "");
+      };
+      const isDocState = () => {
+        docState.value = !docState.value;
+      };
+      const getSystemInfo = () => {
+        const res = uni.getSystemInfoSync();
+        deviceModel.value = res.deviceModel;
+        uni.__log__("log", "at pages/login/login.uvue:220", "设备型号:", deviceModel.value);
+      };
+      const validateForm = () => {
+        if (form.value.username.length == 0) {
+          showAppToast({ title: "请输入账号", icon: "none" });
+          return false;
+        }
+        if (form.value.password.length == 0) {
+          showAppToast({ title: "请输入密码", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const completeLogin = (token, savePassword) => {
+        if (token == "") {
+          showAppToast({ title: "登录失败，请重试", icon: "none" });
+          return null;
+        }
+        if (savePassword)
+          saveAccountPassword();
+        uni.setStorageSync("token", token);
+        markPushSessionAuthenticated();
+        showAppToast({ title: "登录成功", icon: "success" });
+        setTimeout(() => {
+          uni.reLaunch({ url: "/pages/index/index" });
+        }, 500);
+      };
+      const ensureAgreementAccepted = () => {
+        if (docState.value)
+          return true;
+        showAppToast({ title: "请先阅读并同意用户协议", icon: "error" });
+        return false;
+      };
+      const openSmsLogin = () => {
+        smsLoginMode.value = true;
+      };
+      const closeSmsLogin = () => {
+        smsLoginMode.value = false;
+        smsCode.value = "";
+      };
+      const isValidMobile = () => {
+        if (!/^1[3-9]\\d{9}$/.test(smsMobile.value)) {
+          showAppToast({ title: "请输入正确的手机号", icon: "none" });
+          return false;
+        }
+        return true;
+      };
+      const startSmsCooldown = (seconds) => {
+        smsCooldown.value = seconds > 0 ? seconds : 60;
+        setInterval(() => {
+          smsCooldown.value -= 1;
+          if (smsCooldown.value <= 0)
+            smsCooldown.value = 0;
+        }, 1e3);
+      };
+      const sendSmsCode = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (smsCooldown.value > 0 || smsSending.value)
+            return Promise.resolve(null);
+          if (!ensureAgreementAccepted() || !isValidMobile())
+            return Promise.resolve(null);
+          try {
+            smsSending.value = true;
+            const response = yield sendSmsLoginCode(new SendSmsCodeRequest({ mobile: smsMobile.value, scene: "login" }));
+            if (response.code != 0) {
+              showAppToast({ title: response.msg || "验证码发送失败", icon: "none" });
+              return Promise.resolve(null);
+            }
+            const cooldownSeconds = response.data != null ? response.data.getNumber("cooldownSeconds", 60) : 60;
+            startSmsCooldown(cooldownSeconds);
+            showAppToast({ title: "验证码已发送", icon: "success" });
+          } catch (error) {
+            showAppToast({ title: "验证码发送失败，请检查网络", icon: "none" });
+          } finally {
+            smsSending.value = false;
+          }
+        });
+      };
+      const getAppPlatform = () => {
+        return "ios";
+      };
+      const submitSmsLogin = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!ensureAgreementAccepted() || !isValidMobile() || smsCode.value == "" || smsSubmitting.value) {
+            if (smsCode.value == "")
+              showAppToast({ title: "请输入验证码", icon: "none" });
+            return Promise.resolve(null);
+          }
+          try {
+            smsSubmitting.value = true;
+            const response = yield smsLogin(new SmsLoginRequest({ mobile: smsMobile.value, code: smsCode.value, platform: getAppPlatform() }));
+            const token = response.data != null ? response.data.getString("token", "") : "";
+            if (response.code == 0 && token != "") {
+              smsCode.value = "";
+              completeLogin(token, false);
+            } else {
+              showAppToast({ title: response.msg || "验证码登录失败", icon: "none" });
+            }
+          } catch (error) {
+            showAppToast({ title: "验证码登录失败，请检查网络", icon: "none" });
+          } finally {
+            smsSubmitting.value = false;
+          }
+        });
+      };
+      const startUniVerifyLogin = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          var _a;
+          if (!ensureAgreementAccepted() || nativeLoginLoading.value)
+            return Promise.resolve(null);
+          try {
+            nativeLoginLoading.value = true;
+            let clientVersion = "1.0.0";
+            try {
+              const appVersion = (_a = uni.getAppBaseInfo().appVersion) !== null && _a !== void 0 ? _a : "";
+              if (appVersion != "")
+                clientVersion = appVersion;
+            } catch (error) {
+              uni.__log__("warn", "at pages/login/login.uvue:345", "获取应用版本失败，使用默认版本号:", error);
+            }
+            const result = yield loginByUniVerify(clientVersion);
+            if (result.ok) {
+              completeLogin(result.token, false);
+              return Promise.resolve(null);
+            }
+            if (!result.cancelled) {
+              showAppToast({ title: result.message + "，可使用验证码登录", icon: "none" });
+              openSmsLogin();
+            }
+          } finally {
+            nativeLoginLoading.value = false;
+          }
+        });
+      };
+      const submit = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!docState.value) {
+            showAppToast({
+              title: "请先阅读并同意用户协议",
+              icon: "error"
+            });
+            return Promise.resolve(null);
+          }
+          try {
+            uni.__log__("log", "at pages/login/login.uvue:462", "准备验证表单...");
+            if (!validateForm())
+              return Promise.resolve(null);
+            uni.__log__("log", "at pages/login/login.uvue:464", "✅ 表单验证通过");
+            const newFormData = new UTSJSONObject({
+              username: form.value.username,
+              password: form.value.password,
+              from: deviceModel.value,
+              type: "USER"
+            });
+            uni.__log__("log", "at pages/login/login.uvue:473", "📤 请求参数:", newFormData);
+            loading.value = true;
+            uni.showLoading(new UTSJSONObject({
+              title: "登录中...",
+              mask: true
+            }));
+            uni.__log__("log", "at pages/login/login.uvue:483", "🚀 开始调用 login 接口...");
+            const res = yield login(newFormData);
+            uni.__log__("log", "at pages/login/login.uvue:485", "✅ 登录接口返回:", res);
+            loading.value = false;
+            uni.hideLoading();
+            const loginData = res.data;
+            const token = loginData != null ? loginData.getString("token", "") : "";
+            if (token != "") {
+              completeLogin(token, true);
+            } else {
+              showAppToast({
+                title: "登录失败，请重试",
+                icon: "error"
+              });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/login/login.uvue:504", "❌ 登录失败:", error);
+            loading.value = false;
+            uni.hideLoading();
+            if (error && error.message) {
+              showAppToast({
+                icon: "error",
+                title: "登录失败，请检查账号、密码或网络"
+              });
+            } else {
+              showAppToast({
+                icon: "error",
+                title: "登录失败，请检查网络后重试"
+              });
+            }
+          }
+        });
+      };
+      const gotoIndex = () => {
+        uni.reLaunch({
+          url: "/pages/index/index"
+        });
+      };
+      const gotoAgreement = () => {
+        showAppModal(new UTSJSONObject({
+          title: "用户协议",
+          content: userAgreement,
+          showCancel: false
+        }));
+      };
+      const gotoPrivacy = () => {
+        showAppModal(new UTSJSONObject({
+          title: "隐私政策",
+          content: privacyPolicy,
+          showCancel: false
+        }));
+      };
+      vue.onMounted(() => {
+        getSystemInfo();
+        loadSavedAccount();
+        prefetchUniVerify();
+        uni.__log__("log", "at pages/login/login.uvue:603", "pswLogin 初始值:", pswLogin.value);
+      });
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
+        const _component_i_checkbox = resolveEasycom(vue.resolveDynamicComponent("i-checkbox"), __easycom_3$1);
+        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
+        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "登陆",
+              "show-back": false,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "banner" }), [
+              vue.createElementVNode("image", new UTSJSONObject({
+                src: _imports_0$2,
+                class: "banner-image",
+                mode: "aspectFill"
+              })),
+              vue.createElementVNode("text", new UTSJSONObject({ class: "title" }), "车联网")
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
+              pswLogin.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
+                vue.createVNode(_component_i_form, new UTSJSONObject({
+                  modelValue: form.value,
+                  rules: pswrules,
+                  labelDirection: "horizontal",
+                  watchValidStatus: "",
+                  "onUpdate:modelValid": updateFormValid
+                }), {
+                  default: vue.withCtx(() => {
+                    return [
+                      vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                        name: "username",
+                        label: "",
+                        required: "",
+                        labelDirection: "horizontal",
+                        labelWidth: "0"
+                      }), {
+                        default: vue.withCtx(() => {
+                          return [
+                            vue.createVNode(_component_i_input, new UTSJSONObject({
+                              modelValue: form.value.username,
+                              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
+                                return form.value.username = $event;
+                              }),
+                              placeholder: "请输入账号",
+                              clearable: "",
+                              prefixIcon: "account-fill"
+                            }), null, 8, ["modelValue"])
+                          ];
+                        }),
+                        _: 1
+                      }),
+                      vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                        name: "password",
+                        label: "",
+                        required: "",
+                        labelDirection: "horizontal",
+                        labelWidth: "0"
+                      }), {
+                        default: vue.withCtx(() => {
+                          return [
+                            vue.createVNode(_component_i_input, new UTSJSONObject({
+                              modelValue: form.value.password,
+                              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                                return form.value.password = $event;
+                              }),
+                              onInput: filterNonLatin,
+                              placeholder: "请输入密码",
+                              password: true
+                            }), null, 8, ["modelValue"])
+                          ];
+                        }),
+                        _: 1
+                      }),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "remember-password" }), [
+                        vue.createVNode(_component_i_checkbox, new UTSJSONObject({
+                          checked: rememberPassword.value,
+                          onChange: toggleRememberPassword,
+                          label: "记住密码"
+                        }), null, 8, ["checked"])
+                      ]),
+                      vue.createVNode(_component_i_button, new UTSJSONObject({
+                        type: "primary",
+                        onClick: submit,
+                        loading: loading.value
+                      }), {
+                        default: vue.withCtx(() => {
+                          return [
+                            vue.createTextVNode("提交")
+                          ];
+                        }),
+                        _: 1
+                      }, 8, ["loading"])
+                    ];
+                  }),
+                  _: 1
+                }, 8, ["modelValue"])
+              ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
+                !smsLoginMode.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 0 }), [
+                  vue.createVNode(_component_i_button, new UTSJSONObject({
+                    type: "primary",
+                    onClick: startUniVerifyLogin,
+                    loading: nativeLoginLoading.value
+                  }), {
+                    default: vue.withCtx(() => {
+                      return [
+                        vue.createTextVNode("本机号码一键登录")
+                      ];
+                    }),
+                    _: 1
+                  }, 8, ["loading"]),
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: "phone-login-switch",
+                    onClick: openSmsLogin
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "验证码登录")
+                  ])
+                ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ key: 1 }), [
+                  vue.createVNode(_component_i_form, null, {
+                    default: vue.withCtx(() => {
+                      return [
+                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                          class: "sms-mobile-item",
+                          label: "",
+                          labelDirection: "horizontal",
+                          labelWidth: "0"
+                        }), {
+                          default: vue.withCtx(() => {
+                            return [
+                              vue.createVNode(_component_i_input, new UTSJSONObject({
+                                modelValue: smsMobile.value,
+                                "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
+                                  return smsMobile.value = $event;
+                                }),
+                                placeholder: "请输入手机号",
+                                type: "number",
+                                clearable: ""
+                              }), null, 8, ["modelValue"])
+                            ];
+                          }),
+                          _: 1
+                        }),
+                        vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                          class: "sms-code-item",
+                          label: "",
+                          labelDirection: "horizontal",
+                          labelWidth: "0"
+                        }), {
+                          default: vue.withCtx(() => {
+                            return [
+                              vue.createVNode(_component_i_input, new UTSJSONObject({
+                                class: "sms-code-input",
+                                modelValue: smsCode.value,
+                                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event = null) => {
+                                  return smsCode.value = $event;
+                                }),
+                                placeholder: "请输入验证码",
+                                type: "number",
+                                clearable: ""
+                              }), {
+                                suffix: vue.withCtx(() => {
+                                  return [
+                                    vue.createElementVNode("view", new UTSJSONObject({
+                                      class: vue.normalizeClass(["sms-send-button", new UTSJSONObject({ "sms-send-button-disabled": smsCooldown.value > 0 || smsSending.value })]),
+                                      onClick: sendSmsCode
+                                    }), [
+                                      vue.createElementVNode("text", new UTSJSONObject({ class: "sms-send-button-text" }), vue.toDisplayString(smsCooldown.value > 0 ? smsCooldown.value + "秒后重试" : "获取验证码"), 1)
+                                    ], 2)
+                                  ];
+                                }),
+                                _: 1
+                              }, 8, ["modelValue"])
+                            ];
+                          }),
+                          _: 1
+                        }),
+                        vue.createVNode(_component_i_button, new UTSJSONObject({
+                          type: "primary",
+                          onClick: submitSmsLogin,
+                          loading: smsSubmitting.value
+                        }), {
+                          default: vue.withCtx(() => {
+                            return [
+                              vue.createTextVNode("手机号验证码登录")
+                            ];
+                          }),
+                          _: 1
+                        }, 8, ["loading"])
+                      ];
+                    }),
+                    _: 1
+                  }),
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: "phone-login-switch",
+                    onClick: closeSmsLogin
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "phone-way" }), "一键登录")
+                  ])
+                ]))
+              ])),
+              vue.createElementVNode("view", new UTSJSONObject({ class: "documents" }), [
+                vue.createVNode(_component_i_checkbox, new UTSJSONObject({
+                  checked: docState.value,
+                  onChange: isDocState
+                }), null, 8, ["checked"]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "doc-info-box" }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "已阅读并同意"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoAgreement
+                  }), "《用户协议》"),
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "doc-text" }), "和"),
+                  vue.createElementVNode("text", new UTSJSONObject({
+                    class: "doc-link",
+                    onClick: gotoPrivacy
+                  }), "《隐私政策》")
+                ])
+              ])
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "other-way" }), [
+              vue.createElementVNode("view", new UTSJSONObject({
+                class: "noLogin",
+                onClick: gotoIndex
+              }), "暂不登录"),
+              vue.createElementVNode("view", new UTSJSONObject({
+                class: "BLogin",
+                onClick: isPswLogin
+              }), vue.toDisplayString(pswLogin.value ? "个人用户登录" : "企业用户登录"), 1)
+            ])
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$r = { "container": { "": { "height": "100%", "backgroundColor": "#ffffff" } }, "banner": { ".container ": { "backgroundColor": "#ffffff", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": "20%" } }, "banner-image": { ".container .banner ": { "width": "180rpx", "height": "180rpx" } }, "title": { ".container .banner ": { "fontSize": "40rpx", "fontWeight": "bold", "color": "#333333" } }, "content": { ".container ": { "backgroundColor": "#ffffff", "paddingTop": "20rpx", "paddingRight": "70rpx", "paddingBottom": "20rpx", "paddingLeft": "70rpx" } }, "other-login": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "30rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "documents": { ".container .content ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "40rpx" } }, "doc-info-box": { ".container .content .documents ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "whiteSpace": "nowrap" } }, "doc-link": { ".container .content .documents .doc-info-box ": { "color": "#007AFF", "fontSize": "28rpx" } }, "doc-text": { ".container .content .documents .doc-info-box ": { "fontSize": "28rpx" } }, "remember-password": { ".container .content ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": "20rpx", "marginLeft": 0, "fontSize": "25rpx" } }, "i-checkbox": { ".container .content .remember-password ": { "display": "flex", "alignItems": "center" } }, "other-way": { ".container ": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "fontSize": "25rpx", "marginTop": "40rpx", "color": "#999999" } }, "noLogin": { ".container .other-way ": { "borderRightWidth": "1rpx", "borderRightStyle": "solid", "borderRightColor": "#999999", "paddingRight": "50rpx" } }, "BLogin": { ".container .other-way ": { "paddingLeft": "50rpx" } }, "wechat-login-btn": { ".container ": { "!color": "#ffffff" } }, "phone-login-switch": { ".container ": { "textAlign": "center", "marginTop": "28rpx" } }, "phone-way": { ".container .phone-login-switch ": { "fontSize": "25rpx", "color": "#8b8c8d" } }, "sms-mobile-item": { ".container ": { "marginBottom": "20rpx" } }, "sms-code-item": { ".container ": { "marginBottom": "32rpx" } }, "sms-code-input": { ".container ": { "width": "100%" } }, "sms-send-button": { ".container ": { "display": "flex", "alignItems": "center", "justifyContent": "center", "height": "56rpx", "paddingTop": 0, "paddingRight": "20rpx", "paddingBottom": 0, "paddingLeft": "20rpx", "borderTopLeftRadius": "28rpx", "borderTopRightRadius": "28rpx", "borderBottomRightRadius": "28rpx", "borderBottomLeftRadius": "28rpx", "backgroundColor": "#007AFF", "color": "#ffffff", "fontSize": "24rpx", "whiteSpace": "nowrap" } }, "sms-send-button-disabled": { ".container ": { "backgroundColor": "#B8D7FF" } }, "sms-send-button-text": { ".container ": { "color": "#ffffff", "fontSize": "24rpx", "lineHeight": "56rpx" } }, "i-form-item": { ".container ": { "paddingTop": 12, "paddingRight": 0, "paddingBottom": 12, "paddingLeft": 0 } } };
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["styles", [_style_0$r]]]);
+  class PickerItem extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            label: { type: String, optional: false },
+            value: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = PickerItem.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.label = this.__props__.label;
+      this.value = this.__props__.value;
+      delete this.__props__;
+    }
+  }
+  class PickerConfirmEvent extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            value: { type: "Unknown", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = PickerConfirmEvent.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.value = this.__props__.value;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
+    __name: "sub-navBar",
+    props: {
+      showTime: {
+        type: Boolean,
+        default: true
+      },
+      showPickerTime: {
+        type: Boolean,
+        default: true
+      },
+      showCar: {
+        type: Boolean,
+        default: false
+      },
+      showPicker: {
+        type: Boolean,
+        default: true
+      },
+      currentTime: {
+        type: String,
+        default: ""
+      },
+      currentCar: {
+        type: String,
+        default: ""
+      },
+      carStatus: {
+        type: String,
+        default: "在线"
+      },
+      times: {
+        type: Array,
+        default: () => {
+          return [[]];
+        }
+        // 默认值调整为二维数组
+      },
+      cars: {
+        type: Array,
+        default: () => {
+          return [[]];
+        }
+        // 默认值调整为二维数组
+      }
+    },
+    emits: ["update:currentTime", "update:currentCar"],
+    setup(__props, _a) {
+      _a.emit;
+      const props = __props;
+      const columns = vue.ref([]);
+      vue.ref(null);
+      const currentPickerType = vue.ref("");
+      const handleTime = () => {
+        columns.value = props.times;
+        currentPickerType.value = "time";
+      };
+      const handleCar = () => {
+        columns.value = props.cars;
+        currentPickerType.value = "car";
+      };
+      return (_ctx = null, _cache = null) => {
+        return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "tools-box" }), [
+          __props.showTime ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 0,
+            class: "second",
+            onClick: _cache[0] || (_cache[0] = ($event = null) => {
+              return __props.showPickerTime ? handleTime : null;
+            })
+          }), [
+            vue.createElementVNode("view", new UTSJSONObject({ class: "times" }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "refresh" }), vue.toDisplayString(__props.currentTime), 1),
+              !__props.showPickerTime ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                key: 0,
+                class: "refresh"
+              }), "刷新一次位置")) : vue.createCommentVNode("", true)
+            ])
+          ])) : (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 1,
+            class: "slot"
+          }))),
+          vue.createElementVNode("view", new UTSJSONObject({ class: "car-box" }), [
+            __props.showCar ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "selectCar",
+              onClick: _cache[1] || (_cache[1] = ($event = null) => {
+                return __props.showPicker ? handleCar : null;
+              })
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "plateNo" }), vue.toDisplayString(__props.currentCar), 1)
+            ])) : vue.createCommentVNode("", true),
+            vue.createElementVNode("view", new UTSJSONObject({
+              class: vue.normalizeClass(["car-state", __props.carStatus == "online" ? "success" : "error"])
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({ class: "state" }), vue.toDisplayString(__props.carStatus == "online" ? "在线" : "离线"), 1)
+            ], 2)
+          ])
+        ]);
+      };
+    }
+  });
+  const _style_0$q = { "tools-box": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx" } }, "slot": { ".tools-box ": { "width": "50rpx", "height": "20rpx" } }, "car-box": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "selectCar": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "marginRight": "20rpx", "backgroundColor": "rgba(3,109,246,0.71)", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "plateNo": { ".tools-box .car-box .selectCar ": { "fontSize": "30rpx", "color": "#ffffff" } }, "car-state": { ".tools-box .car-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "paddingTop": "10rpx", "paddingRight": "15rpx", "paddingBottom": "10rpx", "paddingLeft": "15rpx" } }, "state": { ".tools-box .car-box .car-state ": { "fontSize": "25rpx", "color": "#ffffff" } }, "success": { ".tools-box .car-box ": { "backgroundColor": "#5ac725" } }, "error": { ".tools-box .car-box ": { "backgroundColor": "#f56c6c" } }, "second": { ".tools-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "10rpx", "paddingRight": "10rpx", "paddingBottom": "10rpx", "paddingLeft": "10rpx", "backgroundColor": "rgba(3,109,246,0.71)", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "times": { ".tools-box .second ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "refresh": { ".tools-box .second .times ": { "fontSize": "30rpx", "color": "#ffffff" } }, "down_icon": { ".tools-box ": { "width": "30rpx", "height": "30rpx" } } };
+  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["styles", [_style_0$q]]]);
+  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-grid" }, { __name: "i-grid", props: {
+    items: {
+      type: Array,
+      default() {
+        return ["首页", "分类", "购物车", "我的", "优惠券", "设置"];
+      }
+    },
+    col: {
+      type: Number,
+      default: 3
+    },
+    itemHeight: {
+      type: [String, Number],
+      default: "70"
+    },
+    itemBgColor: {
+      type: String,
+      default: "#ffffff"
+    },
+    bgColor: {
+      type: String,
+      default: "transparent"
+    },
+    width: {
+      type: String,
+      default: "auto"
+    },
+    iconColor: {
+      type: String,
+      default: "#333333"
+    },
+    textColor: {
+      type: String,
+      default: "#888888"
+    },
+    fontSize: {
+      type: [String, Number],
+      default: "13"
+    },
+    iconSize: {
+      type: [String, Number],
+      default: "25"
+    },
+    imageSize: {
+      type: [String, Number],
+      default: "40"
+    },
+    showBorder: {
+      type: Boolean,
+      default: true
+    },
+    borderColor: {
+      type: String,
+      default: "#f5f5f5"
+    },
+    round: {
+      type: [String, Number],
+      default: "0"
+    },
+    isLink: {
+      type: Boolean,
+      default: true
+    }
+  }, emits: ["select", "change", "click", "loadmore"], setup(__props, _a) {
+    var __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    function valueText(value = null) {
+      if (typeof value == "string")
+        return value;
+      if (typeof value == "number" || typeof value == "boolean")
+        return value.toString();
+      return "";
+    }
+    function formatSize(value) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0 || text == "auto") {
+        return text;
+      }
+      return text + "px";
+    }
+    function itemValue(item = null, keyName) {
+      if (item == null || typeof item != "object")
+        return "";
+      const values = item;
+      const value = values[keyName];
+      if (value == null)
+        return "";
+      return valueText(value);
+    }
+    function getItemText(item = null) {
+      const text = itemValue(item, "text");
+      if (text.length > 0)
+        return text;
+      return valueText(item);
+    }
+    function getItemIcon(item = null) {
+      return itemValue(item, "icon");
+    }
+    function getItemImage(item = null) {
+      return itemValue(item, "image");
+    }
+    function getItemName(item = null) {
+      return itemValue(item, "name");
+    }
+    function getItemBgColor(item = null) {
+      const color = itemValue(item, "bgColor");
+      if (color.length > 0)
+        return color;
+      return props.itemBgColor;
+    }
+    function getItemIconColor(item = null) {
+      const color = itemValue(item, "iconColor");
+      if (color.length > 0)
+        return color;
+      return props.iconColor;
+    }
+    function getItemTextColor(item = null) {
+      const color = itemValue(item, "textColor");
+      if (color.length > 0)
+        return color;
+      return props.textColor;
+    }
+    function getItemUrl(item = null) {
+      return itemValue(item, "url");
+    }
+    const bgColor = vue.computed(() => {
+      return props.bgColor;
+    });
+    const gridItems = vue.computed(() => {
+      const items = props.items;
+      if (items == null)
+        return [];
+      return items;
+    });
+    const selected = vue.ref(-1);
+    const gridStyle = vue.computed(() => {
+      return "width:" + props.width + ";background-color:" + bgColor.value + ";border-radius:" + formatSize(props.round) + ";";
+    });
+    function getColumns() {
+      if (props.col <= 1)
+        return 1;
+      if (props.col >= 6)
+        return 6;
+      return props.col;
+    }
+    function getRows() {
+      const columns = getColumns();
+      const items = props.items;
+      if (items == null)
+        return 0;
+      return Math.ceil(items.length / columns);
+    }
+    function getItemWidth() {
+      const columns = getColumns();
+      if (columns == 1)
+        return "100%";
+      if (columns == 2)
+        return "50%";
+      if (columns == 3)
+        return "33.3333%";
+      if (columns == 4)
+        return "25%";
+      if (columns == 5)
+        return "20%";
+      return "16.6667%";
+    }
+    function getItemStyle(index, item = null) {
+      const columns = getColumns();
+      const row = Math.floor(index / columns);
+      const colIndex = index % columns;
+      let style = "width:" + getItemWidth() + ";height:" + formatSize(props.itemHeight) + ";background-color:" + getItemBgColor(item) + ";";
+      if (props.showBorder) {
+        if (colIndex < columns - 1) {
+          style = style + "border-right-width:1px;border-right-style:solid;border-right-color:" + props.borderColor + ";";
+        }
+        if (row < getRows() - 1) {
+          style = style + "border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:" + props.borderColor + ";";
+        }
+      }
+      return style;
+    }
+    function getIconStyle(item = null) {
+      return "color:" + getItemIconColor(item) + ";font-size:" + formatSize(props.iconSize) + ";line-height:" + formatSize(props.iconSize) + ";";
+    }
+    function getImageStyle(item = null) {
+      const size = formatSize(props.imageSize);
+      return "width:" + size + ";height:" + size + ";";
+    }
+    function getTextStyle(item = null) {
+      return "color:" + getItemTextColor(item) + ";font-size:" + formatSize(props.fontSize) + ";";
+    }
+    function buildPayload(item = null, index) {
+      return new UTSJSONObject({
+        index,
+        name: getItemName(item),
+        text: getItemText(item),
+        icon: getItemIcon(item),
+        image: getItemImage(item),
+        url: getItemUrl(item)
+      });
+    }
+    function select(item = null, index) {
+      selected.value = index;
+      const payload = buildPayload(item, index);
+      emit("select", payload);
+      emit("change", payload);
+      emit("click", payload);
+    }
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+        class: "i-grid",
+        style: vue.normalizeStyle(gridStyle.value)
+      }), [
+        (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(gridItems.value, (item = null, index) => {
+          return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: index.toString() + "-" + getItemText(item),
+            class: vue.normalizeClass(selected.value == index ? "i-grid__item i-grid__item--active" : "i-grid__item"),
+            style: vue.normalizeStyle(getItemStyle(index, item)),
+            "hover-class": __props.isLink ? "i-grid__item--hover" : "none",
+            onClick: ($event = null) => {
+              return select(item, index);
+            }
+          }), [
+            getItemImage(item).length > 0 ? (vue.openBlock(), vue.createElementBlock("image", new UTSJSONObject({
+              key: 0,
+              class: "i-grid__image",
+              src: getItemImage(item),
+              style: vue.normalizeStyle(getImageStyle(item)),
+              mode: "aspectFit"
+            }), null, 12, ["src"])) : getItemIcon(item).length > 0 ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+              key: 1,
+              class: "i-grid__icon",
+              style: vue.normalizeStyle(getIconStyle(item))
+            }), vue.toDisplayString(getItemIcon(item)), 5)) : vue.createCommentVNode("", true),
+            vue.createElementVNode("text", new UTSJSONObject({
+              class: "i-grid__text",
+              style: vue.normalizeStyle(getTextStyle(item))
+            }), vue.toDisplayString(getItemText(item)), 5)
+          ], 14, ["hover-class", "onClick"]);
+        }), 128))
+      ], 4);
+    };
+  } }));
+  const _style_0$p = { "i-grid": { "": { "flexDirection": "row", "flexWrap": "wrap", "overflow": "hidden" } }, "i-grid__item": { "": { "boxSizing": "border-box", "overflow": "hidden", "alignItems": "center", "justifyContent": "center" } }, "i-grid__item--hover": { "": { "backgroundColor": "#f3f4f6" } }, "i-grid__item--active": { "": { "backgroundColor": "#ecf5ff" } }, "i-grid__image": { "": { "marginBottom": 8 } }, "i-grid__icon": { "": { "marginBottom": 8, "textAlign": "center", "lines": 1 } }, "i-grid__text": { "": { "lineHeight": "18px", "textAlign": "center", "lines": 1 } } };
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["styles", [_style_0$p]]]);
+  const _imports_0$1 = "/static/sate.png";
+  const _imports_1$1 = "/static/v.png";
+  const _imports_2$1 = "/static/pow.png";
+  const DEFAULT_TK = "1e3374be3d63de65d44dbfdc7b311afb";
+  class AddressResult extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            formatted_address: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = AddressResult.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.formatted_address = this.__props__.formatted_address;
+      delete this.__props__;
+    }
+  }
+  class AddressResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            result: { type: AddressResult, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = AddressResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.result = this.__props__.result;
+      delete this.__props__;
+    }
+  }
+  function getAddress(latitude, longitude, tk = DEFAULT_TK) {
+    return new Promise((resolve, reject) => {
+      const postStr = UTS.JSON.stringify(new UTSJSONObject({
+        lon: longitude,
+        lat: latitude,
+        ver: 1
+      }));
+      uni.request({
+        url: "https://api.tianditu.gov.cn/geocoder?postStr=".concat(encodeURIComponent(postStr), "&type=geocode&tk=").concat(tk),
+        method: "GET",
+        header: new UTSJSONObject({
+          "User-Agent": "Mozilla/5.0"
+        }),
+        success: (res) => {
+          if (res.statusCode != 200 || res.data == null) {
+            reject(new Error("获取地址信息失败，状态码：".concat(res.statusCode)));
+            return null;
+          }
+          const response = res.data;
+          const result = response.getJSON("result");
+          if (result == null) {
+            reject(new Error("获取地址信息失败：".concat(response.getString("msg", "响应缺少结果"))));
+            return null;
+          }
+          const formattedAddress = result.getString("formatted_address", "");
+          if (formattedAddress == "") {
+            reject(new Error("获取地址信息失败：响应缺少地址"));
+            return null;
+          }
+          resolve({ result: new AddressResult({ formatted_address: formattedAddress }) });
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  }
+  class MapCenter extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            latitude: { type: Number, optional: false },
+            longitude: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = MapCenter.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.latitude = this.__props__.latitude;
+      this.longitude = this.__props__.longitude;
+      delete this.__props__;
+    }
+  }
+  class SignalDetail extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            experience: { type: String, optional: false },
+            quality: { type: String, optional: false },
+            color: { type: String, optional: false },
+            level: { type: Number, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = SignalDetail.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.experience = this.__props__.experience;
+      this.quality = this.__props__.quality;
+      this.color = this.__props__.color;
+      this.level = this.__props__.level;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
+    __name: "carInfoDetail",
+    setup(__props) {
+      const deptId = vue.ref("");
+      const imei = vue.ref("");
+      const deviceId = vue.ref("");
+      const center = vue.reactive(new MapCenter({
+        latitude: 39.90469,
+        longitude: 116.40717
+      }));
+      const mapScale = vue.ref(15);
+      const isMapReady = vue.ref(false);
+      const datainfo = vue.ref(new UTSJSONObject({}));
+      const address = vue.ref("");
+      const currentTime = vue.ref("5s");
+      const onCurrentTimeChange = (value) => {
+        currentTime.value = value;
+      };
+      const times = vue.ref([
+        [
+          new UTSJSONObject({ label: "5s", value: "5" }),
+          new UTSJSONObject({ label: "10s", value: "10" }),
+          new UTSJSONObject({ label: "20s", value: "20" }),
+          new UTSJSONObject({ label: "30s", value: "30" }),
+          new UTSJSONObject({ label: "停止刷新", value: "0" })
+        ]
+      ]);
+      const refreshTimer = vue.ref(null);
+      const isRefreshing = vue.ref(false);
+      const popupRef = vue.ref(false);
+      const psw = vue.ref("");
+      const currentOperation = vue.ref(0);
+      const modalTitle = vue.ref("验证密码");
+      const userType = vue.ref("");
+      const filterNonLatin = (value) => {
+        psw.value = value.replace(/[^\x00-\x7F]/g, "");
+      };
+      const markers = vue.ref([]);
+      vue.ref(false);
+      vue.ref(new UTSJSONObject({
+        deviceName: "",
+        carNumber: "",
+        deviceSerial: "",
+        locationType: "",
+        lngLat: "",
+        updateTime: "",
+        locationTime: "",
+        speed: "",
+        totalMileage: "",
+        address: ""
+      }));
+      const currentCarInfo = vue.ref(new UTSJSONObject({}));
+      const signalRssi = vue.ref(null);
+      const signalSat = vue.ref(null);
+      const carVoltage = vue.computed(() => {
+        return currentCarInfo.value["voltage"];
+      });
+      const batteryPercent = vue.computed(() => {
+        return datainfo.value["batteryPercent"];
+      });
+      const getBatteryColor = (batteryPercent2 = null) => {
+        if (batteryPercent2 == null || batteryPercent2 == "")
+          return "#c9c9c9";
+        const batteryValue = parseFloat(batteryPercent2.toString());
+        if (batteryValue >= 70) {
+          return "#07C160";
+        } else if (batteryValue >= 30) {
+          return "#FF9C19";
+        } else if (batteryValue >= 10) {
+          return "#FF6B00";
+        } else {
+          return "#FF0000";
+        }
+      };
+      function getSignalDetail(rssi = null) {
+        if (rssi == null || rssi == "") {
+          return new SignalDetail({
+            experience: "无信号",
+            quality: "无服务",
+            color: "#999",
+            level: 0
+          });
+        }
+        const signalValue = parseFloat(rssi.toString());
+        if (isNaN(signalValue)) {
+          return new SignalDetail({
+            experience: "信号数据无效",
+            quality: "无服务",
+            color: "#999",
+            level: 0
+          });
+        }
+        if (signalValue >= 26) {
+          return new SignalDetail({
+            experience: "极好",
+            quality: "极强",
+            color: "#07C160",
+            level: 5
+          });
+        } else if (signalValue >= 20) {
+          return new SignalDetail({
+            experience: "良好",
+            quality: "强",
+            color: "#52c41a",
+            level: 4
+          });
+        } else if (signalValue >= 15) {
+          return new SignalDetail({
+            experience: "一般",
+            quality: "一般",
+            color: "#faad14",
+            level: 3
+          });
+        } else if (signalValue >= 10) {
+          return new SignalDetail({
+            experience: "差",
+            quality: "较弱",
+            color: "#fa8c16",
+            level: 2
+          });
+        } else if (signalValue >= 1) {
+          return new SignalDetail({
+            experience: "非常差",
+            quality: "微弱",
+            color: "#f5222d",
+            level: 1
+          });
+        } else {
+          return new SignalDetail({
+            experience: "无信号",
+            quality: "无服务",
+            color: "#999",
+            level: 0
+          });
+        }
+      }
+      const getMobileSignalBarClass = (barIndex, rssi = null) => {
+        if (rssi == null || rssi == "") {
+          return "bar-off";
+        }
+        const signalValue = parseFloat(rssi.toString());
+        if (isNaN(signalValue))
+          return "bar-off";
+        const signalDetail = getSignalDetail(signalValue);
+        const level = signalDetail.level;
+        return barIndex < level ? "bar-active" : "bar-off";
+      };
+      const createMarker = (id, lat, lng, type, title = null) => {
+        const connectionStatus = datainfo.value["connectionStatus"];
+        const carType = currentCarInfo.value["carType"];
+        const marker = {
+          id,
+          latitude: lat,
+          longitude: lng,
+          width: 25,
+          height: 25,
+          iconPath: getDeviceIcon(connectionStatus !== null && connectionStatus !== void 0 ? connectionStatus : "", carType !== null && carType !== void 0 ? carType : ""),
+          callout: new UTSJSONObject({
+            content: title || "爱车位置",
+            color: connectionStatus == "online" ? "#fff" : "#666",
+            borderRadius: 10,
+            bgColor: connectionStatus == "online" ? "#07C160" : "#ccc",
+            padding: 5,
+            display: "ALWAYS"
+          })
+        };
+        return marker;
+      };
+      const delay = (ms) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, ms);
+        });
+      };
+      const loadData = (data, retryCount) => {
+        return __awaiter(this, void 0, void 0, function* () {
+          signalRssi.value = null;
+          signalSat.value = null;
+          let retry = retryCount;
+          const tryLoad = (attempt) => {
+            return __awaiter(this, void 0, void 0, function* () {
+              var e_1, _a;
+              try {
+                const res = yield getDevicePos(data);
+                if (!res || !res.data || res.data.length == 0) {
+                  throw new Error("返回数据为空");
+                }
+                let foundDevice = false;
+                try {
+                  for (var _b = __values(res.data), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var item = _c.value;
+                    const itemImei = item.getString("imei", "");
+                    if (itemImei != null && itemImei == imei.value) {
+                      foundDevice = true;
+                      datainfo.value = item;
+                      const attribute = item["attribute"];
+                      signalRssi.value = attribute != null ? attribute["rssi"] : null;
+                      signalSat.value = attribute != null ? attribute["sat"] : null;
+                      const latitude = item.getNumber("latitude", 0);
+                      const longitude = item.getNumber("longitude", 0);
+                      if (latitude == null || longitude == null || latitude.toString().length == 0 || longitude.toString().length == 0) {
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:360", "位置信息缺失", item);
+                        showAppToast({
+                          title: "位置信息缺失",
+                          icon: "none"
+                        });
+                        return false;
+                      }
+                      const lat = parseFloat(latitude.toString());
+                      const lng = parseFloat(longitude.toString());
+                      if (isNaN(lat) || isNaN(lng)) {
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:373", "经纬度格式错误", latitude, longitude);
+                        return false;
+                      }
+                      let convertedLat = lat;
+                      let convertedLng = lng;
+                      try {
+                        const coord = CoordTransform.wgs84ToTencent(lat, lng);
+                        convertedLat = coord.lat;
+                        convertedLng = coord.lng;
+                      } catch (transformError) {
+                        uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:385", "坐标转换失败:", transformError);
+                      }
+                      center.latitude = convertedLat;
+                      center.longitude = convertedLng;
+                      yield delay(50);
+                      const deviceMarker = createMarker(1, convertedLat, convertedLng, "device", currentCarInfo.value["deviceName"]);
+                      markers.value = [];
+                      yield delay(50);
+                      markers.value = [deviceMarker];
+                      isMapReady.value = true;
+                      const connectionStatus = item["connectionStatus"];
+                      if (connectionStatus != "online" && refreshTimer.value !== null) {
+                        const timer = refreshTimer.value;
+                        if (timer !== null) {
+                          clearInterval(timer);
+                        }
+                        refreshTimer.value = null;
+                        isRefreshing.value = false;
+                        showAppToast({
+                          title: "设备已离线，停止自动刷新",
+                          icon: "none"
+                        });
+                      }
+                      if (signalRssi.value != null) {
+                        const signalExp = getSignalDetail(signalRssi.value).experience;
+                        if (signalExp === "差" || signalExp === "非常差" || signalExp === "无信号") {
+                          uni.__log__("warn", "at pages/carInfoDetail/carInfoDetail.uvue:428", "设备 ".concat(imei.value, " 信号较弱: ").concat(signalRssi.value, "dBm"));
+                        }
+                      }
+                    }
+                  }
+                } catch (e_1_1) {
+                  e_1 = { error: e_1_1 };
+                } finally {
+                  try {
+                    if (_c && !_c.done && (_a = _b.return))
+                      _a.call(_b);
+                  } finally {
+                    if (e_1)
+                      throw e_1.error;
+                  }
+                }
+                if (!foundDevice) {
+                  throw new Error("未找到对应的设备数据");
+                }
+                return true;
+              } catch (error) {
+                uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:442", "第".concat(attempt, "次加载设备数据失败:"), error);
+                if (attempt < retry) {
+                  const delayMs = Math.pow(2, attempt) * 1e3;
+                  uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:448", "等待".concat(delayMs / 1e3, "秒后重试..."));
+                  yield delay(delayMs);
+                  return false;
+                } else {
+                  showAppToast({
+                    title: "数据加载失败，请稍后重试",
+                    icon: "none",
+                    duration: 2e3
+                  });
+                  if (datainfo.value.connectionStatus == "online" && refreshTimer.value !== null) {
+                    const timer = refreshTimer.value;
+                    if (timer !== null) {
+                      clearInterval(timer);
+                    }
+                    refreshTimer.value = null;
+                    isRefreshing.value = false;
+                    showAppToast({
+                      title: "数据加载失败，停止自动刷新",
+                      icon: "none"
+                    });
+                  }
+                  return false;
+                }
+              }
+            });
+          };
+          return tryLoad(1);
+        });
+      };
+      const setupAutoRefresh = (intervalValue) => {
+        if (refreshTimer.value !== null) {
+          const timer = refreshTimer.value;
+          if (timer !== null) {
+            clearInterval(timer);
+          }
+          refreshTimer.value = null;
+          isRefreshing.value = false;
+        }
+        if (intervalValue == "0") {
+          isRefreshing.value = false;
+          return null;
+        }
+        if (datainfo.value.connectionStatus != "online") {
+          isRefreshing.value = false;
+          return null;
+        }
+        const intervalSeconds = parseInt(intervalValue);
+        if (intervalSeconds > 0) {
+          isRefreshing.value = true;
+          const intervalMs = intervalSeconds * 1e3;
+          loadData(new UTSJSONObject({
+            deptId: deptId.value,
+            deviceids: imei.value
+          }), 3);
+          refreshTimer.value = setInterval(() => {
+            loadData(new UTSJSONObject({
+              deptId: deptId.value,
+              deviceids: imei.value
+            }), 3);
+          }, intervalMs);
+        }
+      };
+      vue.watch(currentTime, (newVal) => {
+        setupAutoRefresh(newVal);
+      });
+      const stopAutoRefresh = () => {
+        if (refreshTimer.value !== null) {
+          const timer = refreshTimer.value;
+          if (timer !== null) {
+            clearInterval(timer);
+          }
+          refreshTimer.value = null;
+          isRefreshing.value = false;
+        }
+      };
+      const baseList = vue.computed(() => {
+        const list = [new UTSJSONObject({
+          image: "/static/gjhf.png",
+          text: "轨迹回放"
+        }), new UTSJSONObject({
+          image: "/static/clgz.png",
+          text: "车辆跟踪"
+        }), new UTSJSONObject({
+          image: "/static/lcjl.png",
+          text: "里程记录"
+        }), new UTSJSONObject({
+          image: "/static/tcjl.png",
+          text: "停车记录"
+        }), new UTSJSONObject({
+          image: "/static/dzwl.png",
+          text: "电子围栏"
+        }), new UTSJSONObject({
+          image: "/static/navto.png",
+          text: "一键寻车"
+        }), new UTSJSONObject({
+          image: "/static/power.png",
+          text: "恢复油电"
+        }), new UTSJSONObject({
+          image: "/static/offpower.png",
+          text: "断开油电"
+        })];
+        const productId = currentCarInfo.value.productId;
+        if (productId == "product-1141811865601576960" || productId == "product-1183161303028600832") {
+          list.push(new UTSJSONObject({
+            image: "/static/cmd.png",
+            text: "发送指令"
+          }));
+        }
+        return list;
+      });
+      function executeOperation(operationType) {
+        return __awaiter(this, void 0, void 0, function* () {
+          let predictCmdId = 0;
+          let type = 0;
+          if (operationType == 1) {
+            predictCmdId = 2;
+            type = 2;
+          } else if (operationType == 2) {
+            predictCmdId = 1;
+            type = 1;
+          } else {
+            showAppToast({
+              title: "操作类型错误",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          try {
+            uni.showLoading(new UTSJSONObject({
+              title: "执行中...",
+              mask: true
+            }));
+            const res = yield sendCommand(new UTSJSONObject({
+              imei: imei.value,
+              password: userType.value == "1" ? psw.value : "",
+              params: ["1111"],
+              predictCmdId,
+              type
+            }));
+            uni.hideLoading();
+            if (res.code == 0) {
+              showAppToast({
+                title: operationType == 1 ? "恢复油电成功" : "断开油电成功",
+                icon: "success"
+              });
+              psw.value = "";
+            } else {
+              showAppToast({
+                title: res.msg.length > 0 ? res.msg : "操作失败",
+                icon: "none"
+              });
+            }
+          } catch (error) {
+            uni.hideLoading();
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:688", "操作失败:", error);
+            showAppToast({
+              title: "操作失败，请重试",
+              icon: "none"
+            });
+          }
+        });
+      }
+      const confirm = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (userType.value == "1" && psw.value == "") {
+            showAppToast({
+              title: "请输入密码",
+              icon: "none"
+            });
+            return Promise.resolve(null);
+          }
+          executeOperation(currentOperation.value);
+        });
+      };
+      const carDetail = () => {
+        stopAutoRefresh();
+        uni.navigateTo({
+          url: "/pages/userCenter/carDetail/carDetail?deviceId=" + deviceId.value
+        });
+      };
+      const refreshAdress = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          try {
+            const addr = yield getAddress(center.latitude, center.longitude);
+            address.value = addr.result.formatted_address;
+          } catch (error) {
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:724", "获取地址信息失败:", error);
+          }
+        });
+      };
+      function navTo() {
+        let locationName = address.value;
+        if (locationName == "") {
+          locationName = currentCarInfo.value.getString("deviceName", "当前位置");
+        }
+        openLocation(new OpenLocationParams({
+          latitude: center.latitude,
+          longitude: center.longitude,
+          name: locationName
+        }));
+      }
+      const handleGridClick = (event = null) => {
+        const name2 = event;
+        const itemTo = name2.text;
+        if (itemTo == "轨迹回放") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/playBack/playBack?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&lat=" + datainfo.value.latitude + "&lng=" + datainfo.value.longitude
+          });
+        }
+        if (itemTo == "车辆跟踪") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/vehicleTracking/vehicleTracking?imei=" + imei.value + "&deptId=" + deptId.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
+          });
+        }
+        if (itemTo == "里程记录") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/mileageRecord/mileageRecord?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType
+          });
+        }
+        if (itemTo == "停车记录") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/stopRecord/stopRecord?imei=" + imei.value + "&deptId=" + deptId.value
+          });
+        }
+        if (itemTo == "恢复油电") {
+          if (userType.value == "1") {
+            psw.value = "";
+            currentOperation.value = 1;
+            modalTitle.value = "验证密码";
+            popupRef.value = true;
+          } else {
+            executeOperation(1);
+          }
+        }
+        if (itemTo == "断开油电") {
+          if (userType.value == "1") {
+            psw.value = "";
+            currentOperation.value = 2;
+            modalTitle.value = "验证密码";
+            popupRef.value = true;
+          } else {
+            executeOperation(2);
+          }
+        }
+        if (itemTo == "电子围栏") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/geofencing/geofencing?imei=" + imei.value + "&connectionStatus=" + datainfo.value.connectionStatus + "&plateNo=" + currentCarInfo.value.deviceName + "&carType=" + currentCarInfo.value.carType + "&deptId=" + deptId.value + "&deviceName=" + currentCarInfo.value.deviceName
+          });
+        }
+        if (itemTo == "一键寻车") {
+          navTo();
+        }
+        if (itemTo == "发送指令") {
+          stopAutoRefresh();
+          uni.navigateTo({
+            url: "/pages/cmd/cmd?imei=" + imei.value
+          });
+        }
+      };
+      const loadDeviceDetail = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (deviceId.value !== null) {
+            const res = yield getDeviceDetail(deviceId.value);
+            currentCarInfo.value = res.data;
+          } else {
+            uni.__log__("error", "at pages/carInfoDetail/carInfoDetail.uvue:817", "设备id获取失败");
+          }
+        });
+      };
+      vue.onLoad((option) => {
+        deptId.value = option.deptId;
+        imei.value = option.imei;
+        deviceId.value = option.deviceId;
+        const storedUserType = uni.getStorageSync("userType");
+        userType.value = storedUserType !== null && storedUserType !== void 0 ? storedUserType : "";
+        loadDeviceDetail().then(() => {
+          const data = new UTSJSONObject({
+            deptId: deptId.value,
+            deviceids: imei.value
+          });
+          uni.showLoading(new UTSJSONObject({ title: "加载中..." }));
+          loadData(data, 3).then((success) => {
+            uni.hideLoading();
+            if (success && datainfo.value.connectionStatus == "online") {
+              setupAutoRefresh(currentTime.value);
+            }
+          });
+        });
+      });
+      vue.onShow(() => {
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:851", "页面显示，检查自动刷新状态");
+        if (datainfo.value.connectionStatus == "online" && !isRefreshing.value) {
+          setupAutoRefresh(currentTime.value);
+        }
+      });
+      vue.onHide(() => {
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:860", "页面隐藏时停止自动刷新");
+        stopAutoRefresh();
+      });
+      vue.onUnmounted(() => {
+        uni.__log__("log", "at pages/carInfoDetail/carInfoDetail.uvue:865", "页面卸载时停止自动刷新");
+        stopAutoRefresh();
+      });
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_map = vue.resolveComponent("map");
+        const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$1);
+        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+        const _component_i_modal = resolveEasycom(vue.resolveDynamicComponent("i-modal"), __easycom_1$3);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "详情",
+              "show-back": true,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "map-container" }), [
+              vue.unref(isMapReady) ? (vue.openBlock(), vue.createBlock(_component_map, new UTSJSONObject({
+                key: 0,
+                id: "myMap",
+                latitude: vue.unref(center).latitude,
+                longitude: vue.unref(center).longitude,
+                markers: vue.unref(markers),
+                scale: vue.unref(mapScale),
+                style: new UTSJSONObject({ "width": "100%", "height": "100%" }),
+                "show-location": false,
+                "enable-traffic": true,
+                "enable-overlooking": true,
+                "enable-building": true,
+                "enable-3D": true
+              }), null, 8, ["latitude", "longitude", "markers", "scale"])) : vue.createCommentVNode("", true),
+              vue.createVNode(_component_sub_navBar, new UTSJSONObject({
+                class: "sub-nav-overlay",
+                currentTime: vue.unref(currentTime),
+                showTime: true,
+                showPickerTime: false,
+                "onUpdate:currentTime": onCurrentTimeChange,
+                currentCar: vue.unref(currentCarInfo).deviceName,
+                times: vue.unref(times),
+                carStatus: vue.unref(datainfo).connectionStatus,
+                showPicker: false,
+                showCar: true
+              }), null, 8, ["currentTime", "currentCar", "times", "carStatus"])
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "tools-panel" }), [
+              vue.createElementVNode("view", new UTSJSONObject({ class: "imei-box" }), [
+                vue.createElementVNode("view", new UTSJSONObject({
+                  class: "imei-info",
+                  onClick: carDetail
+                }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "imeis" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "imei-text" }), "ID: " + vue.toDisplayString(vue.unref(imei)), 1),
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "pos-time" }))
+                  ]),
+                  vue.createVNode(_component_i_icon, new UTSJSONObject({
+                    name: "/static/arrow-right.png",
+                    fontSize: "16"
+                  }))
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "pos-date" }), [
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "time-item" }), "定位时间: " + vue.toDisplayString(vue.unref(datainfo).positionUpdateTime), 1),
+                  vue.createElementVNode("text", new UTSJSONObject({ class: "time-item" }), "通信时间: " + vue.toDisplayString(vue.unref(datainfo).signalUpdateTime), 1)
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "pos-adress" }), [
+                  vue.createElementVNode("view", new UTSJSONObject({ class: "address-row" }), [
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "address-label",
+                      style: new UTSJSONObject({ "margin-right": "10rpx", "font-size": "22rpx" })
+                    }), "当前位置:"),
+                    vue.unref(address) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                      key: 0,
+                      class: "address-text"
+                    }), vue.toDisplayString(vue.unref(address)), 1)) : (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                      key: 1,
+                      class: "address-text"
+                    }), vue.toDisplayString(vue.unref(center).latitude) + " , " + vue.toDisplayString(vue.unref(center).longitude), 1)),
+                    !vue.unref(address) ? (vue.openBlock(), vue.createElementBlock("text", new UTSJSONObject({
+                      key: 2,
+                      style: new UTSJSONObject({ "color": "#007AFF", "margin-left": "20rpx", "font-weight": "bold", "font-size": "22rpx" }),
+                      onClick: refreshAdress
+                    }), "中文地址")) : vue.createCommentVNode("", true)
+                  ])
+                ]),
+                vue.createElementVNode("view", new UTSJSONObject({ class: "signal-container" }), [
+                  vue.unref(signalRssi) != null ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 0,
+                    class: "signal-item"
+                  }), [
+                    vue.createElementVNode("view", new UTSJSONObject({ class: "mobile-signal" }), [
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "signal-bars-horizontal" }), [
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "signal-bar-h signal-bar-h-1",
+                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(0, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
+                        }), null, 4),
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "signal-bar-h signal-bar-h-2",
+                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(1, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
+                        }), null, 4),
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "signal-bar-h signal-bar-h-3",
+                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(2, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
+                        }), null, 4),
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "signal-bar-h signal-bar-h-4",
+                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(3, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
+                        }), null, 4),
+                        vue.createElementVNode("view", new UTSJSONObject({
+                          class: "signal-bar-h signal-bar-h-5",
+                          style: vue.normalizeStyle({ backgroundColor: getMobileSignalBarClass(4, vue.unref(signalRssi)) == "bar-active" ? getSignalDetail(vue.unref(signalRssi)).color : "#e8e8e8" })
+                        }), null, 4)
+                      ]),
+                      vue.createElementVNode("view", new UTSJSONObject({ class: "signal-info-h" }), [
+                        vue.createElementVNode("text", new UTSJSONObject({
+                          class: "experience",
+                          style: vue.normalizeStyle({ color: getSignalDetail(vue.unref(signalRssi)).color })
+                        }), vue.toDisplayString(getSignalDetail(vue.unref(signalRssi)).experience), 5),
+                        vue.createElementVNode("text", new UTSJSONObject({
+                          class: "signal-value",
+                          style: vue.normalizeStyle({ color: getSignalDetail(vue.unref(signalRssi)).color })
+                        }), "CSQ " + vue.toDisplayString(vue.unref(signalRssi)), 5)
+                      ])
+                    ])
+                  ])) : vue.createCommentVNode("", true),
+                  vue.unref(signalSat) != null ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 1,
+                    class: "satellite-item-h"
+                  }), [
+                    vue.createElementVNode("image", new UTSJSONObject({
+                      class: "satellite-icon",
+                      src: _imports_0$1
+                    })),
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "satellite-text" }), vue.toDisplayString(vue.unref(signalSat)), 1)
+                  ])) : vue.createCommentVNode("", true),
+                  vue.unref(carVoltage) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 2,
+                    class: "power"
+                  }), [
+                    vue.createElementVNode("image", new UTSJSONObject({
+                      class: "power-icon",
+                      src: _imports_1$1
+                    })),
+                    vue.createElementVNode("text", null, vue.toDisplayString(vue.unref(carVoltage)) + "V", 1)
+                  ])) : vue.createCommentVNode("", true),
+                  vue.unref(batteryPercent) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 3,
+                    class: "battery",
+                    style: vue.normalizeStyle({ color: getBatteryColor(vue.unref(batteryPercent)) })
+                  }), [
+                    vue.createElementVNode("image", new UTSJSONObject({
+                      class: "battery-icon",
+                      src: _imports_2$1,
+                      alt: ""
+                    })),
+                    vue.createElementVNode("text", null, vue.toDisplayString(vue.unref(batteryPercent)) + "%", 1)
+                  ], 4)) : vue.createCommentVNode("", true)
+                ])
+              ]),
+              vue.createVNode(_component_i_grid, new UTSJSONObject({
+                items: vue.unref(baseList),
+                col: 5,
+                itemHeight: "88",
+                round: "8",
+                imageSize: 30,
+                iconColor: "#3c9cff",
+                textColor: "#606266",
+                showBorder: true,
+                onClick: _cache[0] || (_cache[0] = ($event = null) => {
+                  return handleGridClick($event);
+                })
+              }), null, 8, ["items"])
+            ]),
+            vue.createElementVNode("view", null, [
+              vue.createVNode(_component_i_modal, new UTSJSONObject({
+                show: vue.unref(popupRef),
+                title: vue.unref(modalTitle),
+                onConfirm: confirm
+              }), {
+                default: vue.withCtx(() => {
+                  return [
+                    vue.createElementVNode("view", null, [
+                      vue.createVNode(_component_i_input, new UTSJSONObject({
+                        modelValue: vue.unref(psw),
+                        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                          return vue.isRef(psw) ? psw.value = $event : null;
+                        }),
+                        onInput: filterNonLatin,
+                        placeholder: "请输入密码",
+                        clearable: "",
+                        password: true
+                      }), null, 8, ["modelValue"])
+                    ])
+                  ];
+                }),
+                _: 1
+              }, 8, ["show", "title"])
+            ])
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$o = { "container": { "": { "position": "relative", "width": "100%", "height": "100%", "display": "flex", "flexDirection": "column", "backgroundColor": "#f5f7fa" } }, "map-container": { ".container ": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "position": "relative" } }, "sub-nav-overlay": { ".container .map-container ": { "position": "absolute", "top": 0, "left": 0, "right": 0, "zIndex": 100 } }, "drag-hint": { ".container .map-container ": { "position": "absolute", "top": "20rpx", "left": 0, "right": 0, "zIndex": 100, "backgroundColor": "rgba(255,255,255,0.9)", "paddingTop": "16rpx", "paddingRight": "16rpx", "paddingBottom": "16rpx", "paddingLeft": "16rpx", "textAlign": "center", "fontSize": "28rpx", "color": "#00aa00", "fontWeight": "bold", "boxShadow": "0 4rpx 10rpx rgba(0, 0, 0, 0.1)" } }, "navTo": { ".container .map-container ": { "width": "60rpx", "height": "60rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "position": "absolute", "zIndex": 100, "bottom": "10%", "right": "30rpx", "paddingTop": "5rpx", "paddingRight": "5rpx", "paddingBottom": "5rpx", "paddingLeft": "5rpx" } }, "tool-nav": { ".container ": { "position": "absolute", "top": "200rpx", "right": "20rpx", "zIndex": 100 } }, "btn-map-list": { ".container .tool-nav ": { "width": "60rpx", "height": "60rpx" } }, "btn-map-list-icon": { ".container .tool-nav ": { "width": "100%", "height": "100%", "paddingTop": "8rpx", "paddingRight": "8rpx", "paddingBottom": "8rpx", "paddingLeft": "8rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx", "backgroundColor": "#69c2f1" } }, "tool-more": { ".container ": { "position": "absolute", "top": "30%", "right": "20rpx", "zIndex": 100, "width": "60rpx", "height": "60rpx" } }, "btn-tool-more-icon": { ".container .tool-more ": { "width": "100%", "height": "100%" } }, "tools-panel": { ".container ": { "width": "100%", "backgroundColor": "#ffffff", "paddingBottom": "70rpx" } }, "refresh-status": { ".container .tools-panel ": { "display": "flex", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": "30rpx", "paddingBottom": "20rpx", "paddingLeft": "30rpx", "backgroundImage": "none", "backgroundColor": "#f8f9fa", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#e8e8e8" } }, "refresh-text": { ".container .tools-panel .refresh-status ": { "fontSize": "26rpx", "color": "#666666" }, ".container .tools-panel .refresh-status .refreshing": { "color": "#1890ff" } }, "refresh-btn": { ".container .tools-panel .refresh-status ": { "marginLeft": "auto", "color": "#1890ff", "fontSize": "26rpx" } }, "imei-box": { ".container .tools-panel ": { "marginTop": "30rpx", "marginRight": "30rpx", "marginBottom": 0, "marginLeft": "30rpx", "borderBottomWidth": "1rpx", "borderBottomStyle": "solid", "borderBottomColor": "#dcdfe6" } }, "imei-info": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "imeis": { ".container .tools-panel .imei-box .imei-info ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center" } }, "imei-text": { ".container .tools-panel .imei-box .imei-info .imeis ": { "fontSize": "28rpx" } }, "pos-time": { ".container .tools-panel .imei-box ": { "fontSize": "20rpx", "color": "#999999", "marginLeft": "30rpx" } }, "pos-date": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "pos-adress": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" } }, "time-item": { ".container .tools-panel .imei-box .pos-date ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress ": { "fontSize": "22rpx", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "color": "#999999" } }, "address-row": { ".container .tools-panel .imei-box .pos-date ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 }, ".container .tools-panel .imei-box .pos-adress ": { "display": "flex", "flexDirection": "row", "justifyContent": "flex-start", "alignItems": "center", "marginTop": "20rpx", "marginRight": 0, "marginBottom": 0, "marginLeft": 0 } }, "address-label": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "color": "#999999" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "color": "#999999" } }, "address-text": { ".container .tools-panel .imei-box .pos-date .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "fontSize": "22rpx", "maxWidth": "490rpx", "lineHeight": 1.4 } }, "pos-icon": { ".container .tools-panel .imei-box .pos-date .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" }, ".container .tools-panel .imei-box .pos-adress .address-row ": { "width": "30rpx", "height": "30rpx", "marginRight": "10rpx" } }, "signal-container": { ".container .tools-panel .imei-box ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": "20rpx", "paddingRight": 0, "paddingBottom": "20rpx", "paddingLeft": 0 } }, "signal-item": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginRight": "10rpx" } }, "mobile-signal": { ".container .tools-panel .imei-box .signal-container .signal-item ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "signal-bars-horizontal": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "row", "alignItems": "flex-end", "height": "40rpx", "marginRight": "5rpx" } }, "signal-bar-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal ": { "width": "8rpx", "marginRight": "3rpx", "borderTopLeftRadius": "2rpx", "borderTopRightRadius": "2rpx", "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-1": { "height": "12rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-2": { "height": "16rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-3": { "height": "20rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-4": { "height": "24rpx" }, ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-bars-horizontal .signal-bar-h-5": { "height": "28rpx" } }, "signal-info-h": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal ": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "signal-value": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "color": "#333333" } }, "experience": { ".container .tools-panel .imei-box .signal-container .signal-item .mobile-signal .signal-info-h ": { "fontSize": "18rpx", "fontWeight": "normal" } }, "satellite-item-h": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "satellite-icon": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "satellite-text": { ".container .tools-panel .imei-box .signal-container .satellite-item-h ": { "fontSize": "24rpx", "color": "#1890ff", "fontWeight": "bold" } }, "power-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "battery-icon": { ".container .tools-panel .imei-box .signal-container ": { "width": "47rpx", "height": "47rpx", "marginRight": "10rpx" } }, "power": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "battery": { ".container .tools-panel .imei-box .signal-container ": { "display": "flex", "flexDirection": "row", "alignItems": "center", "fontSize": "24rpx", "backgroundImage": "none", "backgroundColor": "#f0f8ff", "paddingTop": "10rpx", "paddingRight": "20rpx", "paddingBottom": "10rpx", "paddingLeft": "20rpx", "borderTopLeftRadius": "10rpx", "borderTopRightRadius": "10rpx", "borderBottomRightRadius": "10rpx", "borderBottomLeftRadius": "10rpx" } }, "h-line": { ".container .tools-panel ": { "width": "90%", "height": "2rpx", "backgroundColor": "#f1f1f1", "marginTop": "50rpx", "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "tool-tag-item": { ".container .tools-panel ": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "20rpx", "paddingBottom": "50rpx", "paddingLeft": "20rpx" } }, "speed-control": { ".container .tools-panel ": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "20rpx", "paddingLeft": "20rpx" } }, "slider": { ".container .tools-panel .speed-control ": { "width": "90%", "marginTop": 0, "marginRight": "auto", "marginBottom": 0, "marginLeft": "auto" } }, "grid-text": { ".container .tools-panel ": { "paddingTop": "10rpx", "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "boxSizing": "border-box", "fontSize": "24rpx" } }, "@TRANSITION": { "signal-bar-h": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const PagesCarInfoDetailCarInfoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["styles", [_style_0$o]]]);
+  function ensureCameraPermission(callback) {
+    callback("granted");
+  }
+  function openCameraPermissionSettings() {
+    uni.__log__("log", "at utils/cameraPermission.uts:129", "非 Android 平台无需打开相机权限设置");
+  }
+  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent(Object.assign({ name: "i-popup" }, { __name: "i-popup", props: {
+    show: { type: Boolean, default: false },
+    overlay: { type: Boolean, default: true },
+    mode: { type: String, default: "bottom" },
+    position: { type: String, default: "" },
+    title: { type: String, default: "" },
+    showTitle: { type: Boolean, default: true },
+    showClose: { type: Boolean, default: false },
+    showFooter: { type: Boolean, default: false },
+    showCancel: { type: Boolean, default: true },
+    cancelText: { type: String, default: "" },
+    confirmText: { type: String, default: "" },
+    titleStyle: { type: [String, Object], default: "" },
+    duration: { type: [String, Number], default: 300 },
+    closeable: { type: Boolean, default: false },
+    overlayStyle: { type: [String, Object], default: "" },
+    overlayOpacity: { type: [String, Number], default: 0.5 },
+    closeOnMask: { type: Boolean, default: true },
+    overlayClick: { type: Boolean, default: true },
+    overflayBgColor: { type: String, default: "" },
+    zIndex: { type: [String, Number], default: 10075 },
+    safeBottom: { type: Boolean, default: true },
+    safeTop: { type: Boolean, default: false },
+    closeIcon: { type: String, default: "close" },
+    closeIconColor: { type: String, default: "#909399" },
+    closeIconSize: { type: [String, Number], default: 18 },
+    closeIconPos: { type: String, default: "top-right" },
+    margin: { type: [String, Number], default: 0 },
+    navbarHeight: { type: Number, default: 0 },
+    round: { type: [String, Number], default: 16 },
+    zoom: { type: Boolean, default: true },
+    bgColor: { type: String, default: "#ffffff" },
+    size: { type: [String, Number], default: "" },
+    maxHeight: { type: [String, Number], default: "" },
+    width: { type: [String, Number], default: "" },
+    height: { type: [String, Number], default: "" },
+    customStyle: { type: [String, Object], default: "" },
+    customWrapStyle: { type: [String, Object], default: "" },
+    customFooterStyle: { type: [String, Object], default: "" },
+    contentMargin: { type: [String, Number], default: 16 },
+    widthCoverCenter: { type: Boolean, default: false },
+    offsetTop: { type: [String, Number], default: "0" },
+    offsetBottom: { type: [String, Number], default: "0" },
+    lazy: { type: Boolean, default: false },
+    disabledScroll: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    disabledConfirm: { type: Boolean, default: false },
+    btnColor: { type: String, default: "" },
+    swipeClose: { type: Boolean, default: false },
+    swipeHandle: { type: Boolean, default: true },
+    contentDraggable: { type: Boolean, default: true },
+    swipeCloseThreshold: { type: [String, Number], default: 50 }
+  }, emits: [
+    "click",
+    "open",
+    "close",
+    "beforeOpen",
+    "beforeClose",
+    "cancel",
+    "confirm",
+    "update:show"
+  ], setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const bgColor = vue.computed(() => {
+      return props.bgColor;
+    });
+    const opened = vue.ref(props.show);
+    const active = vue.ref(props.show);
+    const contentReady = vue.ref(!props.lazy || props.show);
+    const startX = vue.ref(0);
+    const startY = vue.ref(0);
+    const offsetX = vue.ref(0);
+    const offsetY = vue.ref(0);
+    const touching = vue.ref(false);
+    let closeTimer = 0;
+    let lazyTimer = 0;
+    const drawerPosition = vue.computed(() => {
+      if (props.position.length > 0)
+        return props.position;
+      return props.mode;
+    });
+    const normalizedMode = vue.computed(() => {
+      if (drawerPosition.value == "left" || drawerPosition.value == "right" || drawerPosition.value == "top" || drawerPosition.value == "center") {
+        return drawerPosition.value;
+      }
+      return "bottom";
+    });
+    function shouldCoverCenter() {
+      return props.widthCoverCenter && (normalizedMode.value == "top" || normalizedMode.value == "bottom") && props.width.toString().length > 0;
+    }
+    function stringifyStyle(value = null) {
+      if (value == null)
+        return "";
+      const text = value.toString();
+      if (text == "[object Object]")
+        return "";
+      if (text.length == 0)
+        return "";
+      return text.endsWith(";") ? text : text + ";";
+    }
+    function formatMs(value = null) {
+      const text = value.toString();
+      if (text.indexOf("ms") >= 0 || text.indexOf("s") >= 0)
+        return text;
+      return text + "ms";
+    }
+    function formatSize(value = null) {
+      const text = value.toString();
+      if (text.indexOf("px") >= 0 || text.indexOf("rpx") >= 0 || text.indexOf("%") >= 0) {
+        return text;
+      }
+      return text + "px";
+    }
+    const rootStyle = vue.computed(() => {
+      return "z-index:" + props.zIndex.toString() + ";";
+    });
+    const panelClass = vue.computed(() => {
+      const classes = ["i-popup__panel"];
+      classes.push("i-popup__panel--" + normalizedMode.value);
+      if (shouldCoverCenter())
+        classes.push("i-popup__panel--cover-center");
+      return classes.join(" ");
+    });
+    const overlayComputedStyle = vue.computed(() => {
+      let bgColor2 = "rgba(0,0,0," + props.overlayOpacity.toString() + ")";
+      if (props.overflayBgColor.length > 0)
+        bgColor2 = props.overflayBgColor;
+      let style = "background-color:" + bgColor2 + ";";
+      style = style + "opacity:" + (active.value ? "1" : "0") + ";";
+      style = style + "transition-duration:" + formatMs(props.duration) + ";";
+      style = style + stringifyStyle(props.overlayStyle);
+      return style;
+    });
+    const titleStyleText = vue.computed(() => {
+      return stringifyStyle(props.titleStyle);
+    });
+    function marginStyle() {
+      const margin = formatSize(props.margin);
+      if (margin == "0px")
+        return "";
+      return "margin:" + margin + ";";
+    }
+    function sizeStyle() {
+      let style = "";
+      const size = props.size.toString();
+      if (normalizedMode.value == "left" || normalizedMode.value == "right") {
+        if (props.width.toString().length > 0) {
+          style = style + "width:" + formatSize(props.width) + ";";
+        } else if (size.length > 0) {
+          style = style + "width:" + formatSize(size) + ";";
+        }
+      } else if (normalizedMode.value == "top" || normalizedMode.value == "bottom") {
+        if (props.width.toString().length == 0 && !shouldCoverCenter()) {
+          style = style + "width:100%;";
+        }
+        if (props.height.toString().length > 0) {
+          style = style + "height:" + formatSize(props.height) + ";";
+        } else if (size.length > 0) {
+          style = style + "height:" + formatSize(size) + ";";
+        }
+        if (props.width.toString().length > 0)
+          style = style + "width:" + formatSize(props.width) + ";";
+      } else {
+        if (props.width.toString().length > 0)
+          style = style + "width:" + formatSize(props.width) + ";";
+        if (props.height.toString().length > 0)
+          style = style + "height:" + formatSize(props.height) + ";";
+      }
+      if (normalizedMode.value == "top") {
+        if (props.navbarHeight > 0)
+          style = style + "top:" + props.navbarHeight.toString() + "px;";
+        if (props.offsetTop.toString().length > 0)
+          style = style + "top:" + formatSize(props.offsetTop) + ";";
+      }
+      if (normalizedMode.value == "bottom" && props.offsetBottom.toString().length > 0) {
+        style = style + "bottom:" + formatSize(props.offsetBottom) + ";";
+      }
+      return style;
+    }
+    function roundStyle() {
+      const round = formatSize(props.round);
+      if (normalizedMode.value == "top")
+        return "border-radius:0 0 " + round + " " + round + ";";
+      if (normalizedMode.value == "bottom")
+        return "border-radius:" + round + " " + round + " 0 0;";
+      if (normalizedMode.value == "left")
+        return "border-radius:0 " + round + " " + round + " 0;";
+      if (normalizedMode.value == "right")
+        return "border-radius:" + round + " 0 0 " + round + ";";
+      if (normalizedMode.value == "center")
+        return "border-radius:" + round + ";";
+      return "";
+    }
+    function safeAreaStyle() {
+      let style = "";
+      if (props.safeTop && normalizedMode.value == "top") {
+        style = style + "padding-top:env(safe-area-inset-top);";
+      }
+      if (props.safeBottom && normalizedMode.value == "bottom") {
+        style = style + "padding-bottom:env(safe-area-inset-bottom);";
+      }
+      return style;
+    }
+    function transformStyle() {
+      const x = offsetX.value.toString();
+      const y = offsetY.value.toString();
+      if (normalizedMode.value == "center") {
+        const scale = props.zoom ? active.value ? "1" : "0.88" : "1";
+        return "opacity:" + (active.value ? "1" : "0") + ";transform:translate(-50%,-50%) translate(" + x + "px," + y + "px) scale(" + scale + ");";
+      }
+      if (normalizedMode.value == "bottom") {
+        const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
+        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "100%") + ");";
+      }
+      if (normalizedMode.value == "top") {
+        const prefix = shouldCoverCenter() ? "translateX(-50%) " : "";
+        return "transform:" + prefix + "translateY(" + (active.value ? y + "px" : "-100%") + ");";
+      }
+      if (normalizedMode.value == "left")
+        return "transform:translateX(" + (active.value ? x + "px" : "-100%") + ");";
+      if (normalizedMode.value == "right")
+        return "transform:translateX(" + (active.value ? x + "px" : "100%") + ");";
+      return "";
+    }
+    const panelStyle = vue.computed(() => {
+      let style = "background-color:" + bgColor.value + ";";
+      style = style + "transition-duration:" + formatMs(props.duration) + ";";
+      style = style + marginStyle();
+      style = style + sizeStyle();
+      style = style + roundStyle();
+      style = style + safeAreaStyle();
+      style = style + transformStyle();
+      style = style + stringifyStyle(props.customStyle);
+      style = style + stringifyStyle(props.customWrapStyle);
+      return style;
+    });
+    const bodyStyle = vue.computed(() => {
+      let style = "padding:" + formatSize(props.contentMargin) + ";";
+      if (props.maxHeight.toString().length > 0)
+        style = style + "max-height:" + formatSize(props.maxHeight) + ";";
+      return style;
+    });
+    const footerStyle = vue.computed(() => {
+      return stringifyStyle(props.customFooterStyle);
+    });
+    const confirmTextStyle = vue.computed(() => {
+      const color = props.btnColor.length > 0 ? props.btnColor : "#1989fa";
+      return "color:" + color + ";";
+    });
+    const confirmTextValue = vue.computed(() => {
+      return props.confirmText.length > 0 ? props.confirmText : "确定";
+    });
+    const cancelTextValue = vue.computed(() => {
+      return props.cancelText.length > 0 ? props.cancelText : "取消";
+    });
+    const contentVisible = vue.computed(() => {
+      return !props.lazy || contentReady.value;
+    });
+    const closeClass = vue.computed(() => {
+      const classes = ["i-popup__close"];
+      let position = "top-right";
+      if (props.closeIconPos == "top-left" || props.closeIconPos == "bottom-left" || props.closeIconPos == "bottom-right") {
+        position = props.closeIconPos;
+      }
+      classes.push("i-popup__close--" + position);
+      return classes.join(" ");
+    });
+    const closeStyle = vue.computed(() => {
+      return "color:" + props.closeIconColor + ";font-size:" + formatSize(props.closeIconSize) + ";";
+    });
+    const closeIconText = vue.computed(() => {
+      if (props.closeIcon == "close")
+        return "×";
+      return props.closeIcon;
+    });
+    const clearTimers = () => {
+      if (closeTimer > 0) {
+        clearTimeout(closeTimer);
+        closeTimer = 0;
+      }
+      if (lazyTimer > 0) {
+        clearTimeout(lazyTimer);
+        lazyTimer = 0;
+      }
+    };
+    const resetOffset = () => {
+      offsetX.value = 0;
+      offsetY.value = 0;
+      touching.value = false;
+    };
+    const animationDuration = () => {
+      const text = props.duration.toString();
+      if (text.indexOf("ms") >= 0)
+        return parseFloat(text.replace("ms", ""));
+      if (text.indexOf("s") >= 0)
+        return parseFloat(text.replace("s", "")) * 1e3;
+      const duration = parseFloat(text);
+      if (isNaN(duration))
+        return 300;
+      return duration;
+    };
+    const openPanel = (shouldEmitUpdate) => {
+      if (props.disabled)
+        return null;
+      if (opened.value && active.value)
+        return null;
+      clearTimers();
+      emit("beforeOpen");
+      opened.value = true;
+      resetOffset();
+      if (!props.lazy)
+        contentReady.value = true;
+      setTimeout(() => {
+        active.value = true;
+        if (props.lazy) {
+          lazyTimer = setTimeout(() => {
+            contentReady.value = true;
+            lazyTimer = 0;
+          }, animationDuration());
+        }
+        emit("open");
+        if (shouldEmitUpdate)
+          emit("update:show", true);
+      }, 20);
+    };
+    const closePanel = (shouldEmitUpdate) => {
+      if (!opened.value && !active.value)
+        return null;
+      clearTimers();
+      emit("beforeClose");
+      active.value = false;
+      if (props.lazy)
+        contentReady.value = false;
+      resetOffset();
+      closeTimer = setTimeout(() => {
+        opened.value = false;
+        closeTimer = 0;
+        emit("close");
+        if (shouldEmitUpdate)
+          emit("update:show", false);
+      }, animationDuration());
+    };
+    vue.watch(() => {
+      return props.show;
+    }, (nextValue) => {
+      if (nextValue) {
+        openPanel(false);
+      } else {
+        closePanel(false);
+      }
+    });
+    function open() {
+      openPanel(true);
+    }
+    function close() {
+      closePanel(true);
+    }
+    function handleOverlayClick() {
+      emit("click");
+      if (!props.overlayClick || !props.closeOnMask)
+        return null;
+      close();
+    }
+    function cancel() {
+      emit("cancel");
+      close();
+    }
+    function confirm() {
+      if (props.disabledConfirm)
+        return null;
+      emit("confirm");
+      close();
+    }
+    const readTouchX = (event) => {
+      let point = null;
+      if (event.touches.length > 0) {
+        point = event.touches[0];
+      } else if (event.changedTouches.length > 0) {
+        point = event.changedTouches[0];
+      }
+      if (point == null)
+        return 0;
+      return point.clientX;
+    };
+    const readTouchY = (event) => {
+      let point = null;
+      if (event.touches.length > 0) {
+        point = event.touches[0];
+      } else if (event.changedTouches.length > 0) {
+        point = event.changedTouches[0];
+      }
+      if (point == null)
+        return 0;
+      return point.clientY;
+    };
+    const handleTouchStart = (event) => {
+      if (!props.swipeClose)
+        return null;
+      touching.value = true;
+      startX.value = readTouchX(event);
+      startY.value = readTouchY(event);
+    };
+    function handleHandleTouchStart(event) {
+      handleTouchStart(event);
+    }
+    function handleTouchMove(event) {
+      if (!props.swipeClose || !touching.value)
+        return null;
+      const currentX = readTouchX(event);
+      const currentY = readTouchY(event);
+      const deltaX = currentX - startX.value;
+      const deltaY = currentY - startY.value;
+      if (normalizedMode.value == "bottom" && deltaY > 0)
+        offsetY.value = deltaY;
+      if (normalizedMode.value == "top" && deltaY < 0)
+        offsetY.value = deltaY;
+      if (normalizedMode.value == "left" && deltaX < 0)
+        offsetX.value = deltaX;
+      if (normalizedMode.value == "right" && deltaX > 0)
+        offsetX.value = deltaX;
+      if (normalizedMode.value == "center" && deltaY > 0)
+        offsetY.value = deltaY;
+    }
+    function handleTouchEnd() {
+      if (!touching.value)
+        return null;
+      touching.value = false;
+      const threshold = parseFloat(props.swipeCloseThreshold.toString());
+      if (Math.abs(offsetX.value) >= threshold || Math.abs(offsetY.value) >= threshold) {
+        close();
+        return null;
+      }
+      resetOffset();
+    }
+    __expose({
+      open,
+      close
+    });
+    return (_ctx = null, _cache = null) => {
+      return vue.openBlock(), vue.createElementBlock("view", null, [
+        vue.createElementVNode("view", new UTSJSONObject({
+          class: "i-popup__trigger",
+          onClick: open
+        }), [
+          vue.renderSlot(_ctx.$slots, "trigger")
+        ]),
+        opened.value ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+          key: 0,
+          class: "i-popup",
+          style: vue.normalizeStyle(rootStyle.value)
+        }), [
+          __props.overlay ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+            key: 0,
+            class: "i-popup__overlay",
+            style: vue.normalizeStyle(overlayComputedStyle.value),
+            onClick: handleOverlayClick
+          }), null, 4)) : vue.createCommentVNode("", true),
+          vue.createElementVNode("view", new UTSJSONObject({
+            class: vue.normalizeClass(panelClass.value),
+            style: vue.normalizeStyle(panelStyle.value),
+            onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+            }, ["stop"]))
+          }), [
+            vue.renderSlot(_ctx.$slots, "bg"),
+            __props.swipeClose && __props.swipeHandle ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 0,
+              class: "i-popup__swipe-handle",
+              onTouchstart: vue.withModifiers(handleHandleTouchStart, ["stop"]),
+              onTouchmove: vue.withModifiers(handleTouchMove, ["stop", "prevent"]),
+              onTouchend: vue.withModifiers(handleTouchEnd, ["stop"]),
+              onTouchcancel: vue.withModifiers(handleTouchEnd, ["stop"])
+            }), [
+              vue.createElementVNode("view", new UTSJSONObject({ class: "i-popup__swipe-bar" }))
+            ], 32)) : vue.createCommentVNode("", true),
+            normalizedMode.value == "bottom" ? vue.renderSlot(_ctx.$slots, "contentTop", new UTSJSONObject({ key: 1 })) : vue.createCommentVNode("", true),
+            vue.renderSlot(_ctx.$slots, "header", new UTSJSONObject({}), () => {
+              return [
+                __props.showTitle && __props.title.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 0,
+                  class: "i-popup__header"
+                }), [
+                  vue.renderSlot(_ctx.$slots, "title", new UTSJSONObject({}), () => {
+                    return [
+                      vue.createElementVNode("text", new UTSJSONObject({
+                        class: "i-popup__title",
+                        style: vue.normalizeStyle(titleStyleText.value)
+                      }), vue.toDisplayString(__props.title), 5)
+                    ];
+                  })
+                ])) : vue.createCommentVNode("", true)
+              ];
+            }),
+            __props.showClose ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 2,
+              class: vue.normalizeClass(closeClass.value),
+              onClick: close
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({
+                class: "i-popup__close-text",
+                style: vue.normalizeStyle(closeStyle.value)
+              }), vue.toDisplayString(closeIconText.value), 5)
+            ], 2)) : vue.createCommentVNode("", true),
+            __props.disabledScroll ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 3,
+              class: "i-popup__body",
+              style: vue.normalizeStyle(bodyStyle.value)
+            }), [
+              contentVisible.value ? vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ key: 0 })) : vue.createCommentVNode("", true)
+            ], 4)) : (vue.openBlock(), vue.createElementBlock("scroll-view", new UTSJSONObject({
+              key: 4,
+              "scroll-y": "",
+              class: "i-popup__body i-popup__body--scroll",
+              style: vue.normalizeStyle(bodyStyle.value)
+            }), [
+              contentVisible.value ? vue.renderSlot(_ctx.$slots, "default", new UTSJSONObject({ key: 0 })) : vue.createCommentVNode("", true)
+            ], 4)),
+            vue.renderSlot(_ctx.$slots, "footer", new UTSJSONObject({}), () => {
+              return [
+                __props.showFooter ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                  key: 0,
+                  class: "i-popup__footer",
+                  style: vue.normalizeStyle(footerStyle.value)
+                }), [
+                  __props.showCancel ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+                    key: 0,
+                    class: "i-popup__footer-button i-popup__footer-button--cancel",
+                    onClick: cancel
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({ class: "i-popup__footer-cancel" }), vue.toDisplayString(cancelTextValue.value), 1)
+                  ])) : vue.createCommentVNode("", true),
+                  vue.createElementVNode("view", new UTSJSONObject({
+                    class: vue.normalizeClass(__props.disabledConfirm ? "i-popup__footer-button i-popup__footer-button--confirm i-popup__footer-button--disabled" : "i-popup__footer-button i-popup__footer-button--confirm"),
+                    onClick: confirm
+                  }), [
+                    vue.createElementVNode("text", new UTSJSONObject({
+                      class: "i-popup__footer-confirm",
+                      style: vue.normalizeStyle(confirmTextStyle.value)
+                    }), vue.toDisplayString(confirmTextValue.value), 5)
+                  ], 2)
+                ], 4)) : vue.createCommentVNode("", true)
+              ];
+            }),
+            __props.closeable && !__props.showClose ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
+              key: 5,
+              class: vue.normalizeClass(closeClass.value),
+              onClick: close
+            }), [
+              vue.createElementVNode("text", new UTSJSONObject({
+                class: "i-popup__close-text",
+                style: vue.normalizeStyle(closeStyle.value)
+              }), vue.toDisplayString(closeIconText.value), 5)
+            ], 2)) : vue.createCommentVNode("", true)
+          ], 6)
+        ], 4)) : vue.createCommentVNode("", true)
+      ]);
+    };
+  } }));
+  const _style_0$n = { "i-popup__trigger": { "": { "flexDirection": "column" } }, "i-popup": { "": { "position": "fixed", "left": 0, "right": 0, "top": 0, "bottom": 0 } }, "i-popup__overlay": { "": { "position": "absolute", "left": 0, "right": 0, "top": 0, "bottom": 0, "transitionProperty": "opacity", "transitionTimingFunction": "ease" } }, "i-popup__panel": { "": { "position": "absolute", "overflow": "hidden", "flexDirection": "column", "boxShadow": "0 12px 34px rgba(15, 23, 42, 0.18)", "transitionProperty": "transform,opacity", "transitionTimingFunction": "cubic-bezier(0.22,1,0.36,1)" } }, "i-popup__panel--bottom": { "": { "left": 0, "right": 0, "bottom": 0, "minHeight": 160 } }, "i-popup__panel--top": { "": { "left": 0, "right": 0, "top": 0, "minHeight": 160 } }, "i-popup__panel--left": { "": { "left": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--right": { "": { "right": 0, "top": 0, "bottom": 0, "width": 280 } }, "i-popup__panel--center": { "": { "left": "50%", "top": "50%", "width": 300 } }, "i-popup__panel--cover-center": { "": { "left": "50%", "right": "auto", "width": "100%", "transformOrigin": "center center" } }, "i-popup__swipe-handle": { "": { "height": 24, "alignItems": "center", "justifyContent": "center" } }, "i-popup__swipe-bar": { "": { "width": 38, "height": 4, "borderTopLeftRadius": 99, "borderTopRightRadius": 99, "borderBottomRightRadius": 99, "borderBottomLeftRadius": 99, "backgroundColor": "#d9dee8" } }, "i-popup__header": { "": { "minHeight": 54, "paddingTop": 0, "paddingRight": 52, "paddingBottom": 0, "paddingLeft": 18, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#f2f3f5", "alignItems": "center", "justifyContent": "center" } }, "i-popup__title": { "": { "color": "#303133", "fontSize": 16, "fontWeight": 600, "lineHeight": "24px" } }, "i-popup__close": { "": { "position": "absolute", "zIndex": 2, "width": 34, "height": 34, "borderTopLeftRadius": 34, "borderTopRightRadius": 34, "borderBottomRightRadius": 34, "borderBottomLeftRadius": 34, "backgroundColor": "rgba(245,247,250,0.92)", "alignItems": "center", "justifyContent": "center" } }, "i-popup__close--top-right": { "": { "right": 12, "top": 10 } }, "i-popup__close--top-left": { "": { "left": 12, "top": 10 } }, "i-popup__close--bottom-left": { "": { "left": 12, "bottom": 10 } }, "i-popup__close--bottom-right": { "": { "right": 12, "bottom": 10 } }, "i-popup__close-text": { "": { "color": "#606266", "fontSize": 22, "lineHeight": "34px", "textAlign": "center" } }, "i-popup__body": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__body--scroll": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "i-popup__footer": { "": { "minHeight": 58, "paddingTop": 10, "paddingRight": 14, "paddingBottom": 10, "paddingLeft": 14, "borderTopWidth": 1, "borderTopStyle": "solid", "borderTopColor": "#f2f3f5", "backgroundColor": "#ffffff", "flexDirection": "row" } }, "i-popup__footer-button": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 40, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "alignItems": "center", "justifyContent": "center" } }, "i-popup__footer-button--cancel": { "": { "marginRight": 8, "backgroundColor": "#f5f7fb" } }, "i-popup__footer-button--confirm": { "": { "backgroundColor": "#eef6ff" } }, "i-popup__footer-button--disabled": { "": { "opacity": 0.45 } }, "i-popup__footer-cancel": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px", "color": "#606266" } }, "i-popup__footer-confirm": { "": { "fontSize": 15, "fontWeight": 600, "lineHeight": "22px" } }, "@TRANSITION": { "i-popup__overlay": { "property": "opacity", "timingFunction": "ease" }, "i-popup__panel": { "property": "transform,opacity", "timingFunction": "cubic-bezier(0.22,1,0.36,1)" } } };
+  const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["styles", [_style_0$n]]]);
+  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
+    __name: "car-icons",
+    props: {
+      show: { type: Boolean, default: false },
+      title: { default: "请选择图标", type: String },
+      col: { default: 4, type: Number },
+      iconSize: { default: 40, type: Number },
+      safeAreaInsetBottom: { type: Boolean, default: true }
+    },
+    emits: ["select", "update:show"],
+    setup(__props, _a) {
+      var __emit = _a.emit;
+      const props = __props;
+      const emit = __emit;
+      const iconList = [
+        new UTSJSONObject({ name: "car", text: "轿车", image: "/static/cars/online/car.png" }),
+        new UTSJSONObject({ name: "suv", text: "越野车", image: "/static/cars/online/suv.png" }),
+        new UTSJSONObject({ name: "bus", text: "公交车", image: "/static/cars/online/bus.png" }),
+        new UTSJSONObject({ name: "huoche", text: "货车", image: "/static/cars/online/huoche.png" }),
+        new UTSJSONObject({ name: "train", text: "火车", image: "/static/cars/online/train.png" }),
+        new UTSJSONObject({ name: "diandong", text: "电动车", image: "/static/cars/online/diandong.png" }),
+        new UTSJSONObject({ name: "moto", text: "摩托车", image: "/static/cars/online/moto.png" }),
+        new UTSJSONObject({ name: "bike", text: "自行车", image: "/static/cars/online/bike.png" }),
+        new UTSJSONObject({ name: "sanlun", text: "三轮车", image: "/static/cars/online/sanlun.png" }),
+        new UTSJSONObject({ name: "tuola", text: "拖拉机", image: "/static/cars/online/tuola.png" }),
+        new UTSJSONObject({ name: "wajue", text: "挖掘机", image: "/static/cars/online/wajue.png" }),
+        new UTSJSONObject({ name: "tuiche", text: "手推车", image: "/static/cars/online/tuiche.png" }),
+        new UTSJSONObject({ name: "baby", text: "婴儿车", image: "/static/cars/online/baby.png" }),
+        new UTSJSONObject({ name: "muma", text: "木马", image: "/static/cars/online/muma.png" }),
+        new UTSJSONObject({ name: "tank", text: "坦克", image: "/static/cars/online/tank.png" }),
+        new UTSJSONObject({ name: "zhuangjia", text: "装甲车", image: "/static/cars/online/zhuangjia.png" }),
+        new UTSJSONObject({ name: "plan", text: "飞机", image: "/static/cars/online/plan.png" }),
+        new UTSJSONObject({ name: "hangmu", text: "航母", image: "/static/cars/online/hangmu.png" }),
+        new UTSJSONObject({ name: "junjian", text: "军舰", image: "/static/cars/online/junjian.png" }),
+        new UTSJSONObject({ name: "walk", text: "步行", image: "/static/cars/online/walk.png" })
+      ];
+      vue.computed(() => {
+        const cols = props.col > 0 ? props.col : 4;
+        return 100 / cols + "%";
+      });
+      const close = () => {
+        emit("update:show", false);
+      };
+      const handleSelect = (item = null) => {
+        const selected = item;
+        uni.__log__("log", "at components/car-icons/car-icons.uvue:93", "选择的图标:", selected);
+        emit("select", selected);
+        close();
+      };
+      const handlePopupClick = () => {
+        uni.__log__("log", "at components/car-icons/car-icons.uvue:100", "Popup clicked");
+      };
+      return (_ctx = null, _cache = null) => {
+        const _component_i_grid = resolveEasycom(vue.resolveDynamicComponent("i-grid"), __easycom_0$1);
+        const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
+        return vue.openBlock(), vue.createBlock(_component_i_popup, new UTSJSONObject({
+          show: props.show,
+          title: _ctx.title,
+          mode: "bottom",
+          safeBottom: _ctx.safeAreaInsetBottom,
+          showClose: "",
+          onClose: close,
+          onClick: handlePopupClick
+        }), new UTSJSONObject({
+          default: vue.withCtx(() => {
+            return [
+              vue.createElementVNode("scroll-view", new UTSJSONObject({
+                class: "icon-selector",
+                "scroll-y": ""
+              }), [
+                vue.createVNode(_component_i_grid, new UTSJSONObject({
+                  items: iconList,
+                  col: 4,
+                  itemHeight: "88",
+                  round: "8",
+                  imageSize: 30,
+                  iconColor: "#3c9cff",
+                  textColor: "#606266",
+                  showBorder: true,
+                  onClick: _cache[0] || (_cache[0] = ($event = null) => {
+                    return handleSelect($event);
+                  })
+                }))
+              ])
+            ];
+          }),
+          _: 1
+        }), 8, ["show", "title", "safeBottom"]);
+      };
+    }
+  });
+  const _style_0$m = { "icon-selector": { "": { "paddingTop": "20rpx", "paddingRight": "20rpx", "paddingBottom": "40rpx", "paddingLeft": "20rpx", "backgroundColor": "#ffffff", "width::-webkit-scrollbar": 4, "backgroundColor::-webkit-scrollbar-thumb": "#dddddd", "borderTopLeftRadius::-webkit-scrollbar-thumb": 4, "borderTopRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomRightRadius::-webkit-scrollbar-thumb": 4, "borderBottomLeftRadius::-webkit-scrollbar-thumb": 4, "backgroundColor::-webkit-scrollbar-track": "#f5f5f5" } }, "icon-grid": { ".icon-selector ": { "width": "100%", "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "grid-item": { ".icon-selector .icon-grid ": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "paddingTop": "20rpx", "paddingRight": "10rpx", "paddingBottom": "20rpx", "paddingLeft": "10rpx", "width": "25%", "height": "100%", "transitionProperty": "all", "transitionDuration": "0.3s", "transitionTimingFunction": "ease" } }, "@TRANSITION": { "grid-item": { "property": "all", "duration": "0.3s", "timingFunction": "ease" } } };
+  const carIcons = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["styles", [_style_0$m]]]);
+  class CarFormData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            deviceName: { type: String, optional: false },
+            imei: { type: String, optional: false },
+            deviceType: { type: String, optional: false },
+            deviceTypeValue: { type: String, optional: false },
+            plateNo: { type: String, optional: false },
+            carType: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = CarFormData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.deviceName = this.__props__.deviceName;
+      this.imei = this.__props__.imei;
+      this.deviceType = this.__props__.deviceType;
+      this.deviceTypeValue = this.__props__.deviceTypeValue;
+      this.plateNo = this.__props__.plateNo;
+      this.carType = this.__props__.carType;
+      delete this.__props__;
+    }
+  }
+  class ScanResultData extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            result: { type: String, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = ScanResultData.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.result = this.__props__.result;
+      delete this.__props__;
+    }
+  }
+  class AddDeviceResponse extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            code: { type: Number, optional: false },
+            msg: { type: String, optional: false },
+            data: { type: CarFormData, optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = AddDeviceResponse.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.code = this.__props__.code;
+      this.msg = this.__props__.msg;
+      this.data = this.__props__.data;
+      delete this.__props__;
+    }
+  }
+  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent({
+    __name: "addCar",
+    setup(__props) {
+      const isRequestingCameraPermission = vue.ref(false);
+      const isNavigatingToScanner = vue.ref(false);
+      const carIconSelectorVisible = vue.ref(false);
+      const loading = vue.ref(false);
+      const formValid = vue.ref(false);
+      const carInfo = vue.ref(new CarFormData({
+        deviceName: "",
+        imei: "",
+        deviceType: "",
+        deviceTypeValue: "",
+        plateNo: "",
+        carType: ""
+      }));
+      vue.ref([]);
+      const rules = [
+        new UTSJSONObject({ name: "imei", required: true, message: "请输入设备ID" }),
+        new UTSJSONObject({ name: "deviceType", required: true, message: "请选择设备图标" })
+      ];
+      const handleModelValid = (value = null) => {
+        formValid.value = !!value;
+      };
+      const openScanPage = () => {
+        if (isNavigatingToScanner.value)
+          return null;
+        isNavigatingToScanner.value = true;
+        uni.__log__("log", "at pages/addCar/addCar.uvue:117", "打开扫码页");
+        uni.navigateTo({
+          url: "/pages/scancode/scancode?source=addCar",
+          fail: (error) => {
+            uni.__log__("error", "at pages/addCar/addCar.uvue:121", "打开扫码页失败:", error);
+            showAppToast({ title: "无法打开扫码页，请重试", icon: "none" });
+          },
+          complete: () => {
+            isNavigatingToScanner.value = false;
+          }
+        });
+      };
+      const handleCameraPermission = (status) => {
+        isRequestingCameraPermission.value = false;
+        if (status == "granted") {
+          openScanPage();
+          return null;
+        }
+        if (status == "settingsRequired") {
+          showAppModal(new UTSJSONObject({
+            title: "需要相机权限",
+            content: "请在系统设置中开启相机权限后再扫码",
+            confirmText: "去设置",
+            cancelText: "取消",
+            success: (res) => {
+              if (res.confirm)
+                openCameraPermissionSettings();
+            }
+          }));
+          return null;
+        }
+        showAppToast({ title: "未获得相机权限，无法扫码", icon: "none" });
+      };
+      const scanCode = () => {
+        if (isRequestingCameraPermission.value || isNavigatingToScanner.value)
+          return null;
+        isRequestingCameraPermission.value = true;
+        ensureCameraPermission(handleCameraPermission);
+      };
+      const handleScanResult = (data) => {
+        uni.__log__("log", "at pages/addCar/addCar.uvue:159", "接收到扫码结果:", data.result);
+        if (data.result.length == 15) {
+          carInfo.value.imei = "0" + data.result.slice(4, 15);
+          return null;
+        }
+        if (data.result.length == 11) {
+          carInfo.value.imei = "0" + data.result;
+          return null;
+        }
+        showAppToast({
+          title: "扫码结果长度不是标准设备ID，请确认后提交",
+          icon: "none"
+        });
+      };
+      const updateCarIconSelectorVisible = (visible) => {
+        carIconSelectorVisible.value = visible;
+      };
+      const selectIcon = (item) => {
+        const name2 = item.getString("name", "");
+        const text = item.getString("text", "");
+        uni.__log__("log", "at pages/addCar/addCar.uvue:182", name2);
+        carInfo.value.deviceType = name2;
+        carInfo.value.deviceTypeValue = text;
+        carIconSelectorVisible.value = false;
+      };
+      const deviceTypeSelectFun = () => {
+        carIconSelectorVisible.value = true;
+      };
+      const refreshDeviceList = () => {
+        uni.$emit("refreshDeviceList");
+      };
+      const validateForm = () => {
+        if (carInfo.value.imei.length == 0) {
+          showAppToast({
+            title: "请输入设备ID",
+            icon: "none"
+          });
+          return false;
+        }
+        if (carInfo.value.deviceType.length == 0) {
+          showAppToast({
+            title: "请选择设备图标",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
+      };
+      const submit = () => {
+        return __awaiter(this, void 0, void 0, function* () {
+          uni.__log__("log", "at pages/addCar/addCar.uvue:219", "=== 开始提交设备 ===");
+          try {
+            if (!validateForm())
+              return Promise.resolve(null);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:224", "✅ 表单验证通过");
+            loading.value = true;
+            uni.showLoading(new UTSJSONObject({
+              title: "添加中...",
+              mask: true
+            }));
+            const submitData = new UTSJSONObject({
+              deviceName: carInfo.value.deviceName,
+              imei: carInfo.value.imei,
+              carType: carInfo.value.deviceType,
+              plateNo: carInfo.value.plateNo
+            });
+            uni.__log__("log", "at pages/addCar/addCar.uvue:239", "📤 提交数据:", submitData);
+            const res = yield addDevice(submitData);
+            uni.__log__("log", "at pages/addCar/addCar.uvue:242", "✅ 添加设备返回:", res);
+            uni.hideLoading();
+            loading.value = false;
+            if (res.code == 0) {
+              showAppToast({
+                title: "添加成功",
+                icon: "success"
+              });
+              uni.setStorageSync("needRefreshHome", true);
+              refreshDeviceList();
+              setTimeout(() => {
+                uni.navigateBack();
+              }, 1500);
+            } else {
+              showAppToast({
+                title: res.msg || "添加失败",
+                icon: "none",
+                duration: 2e3
+              });
+            }
+          } catch (error) {
+            uni.__log__("error", "at pages/addCar/addCar.uvue:269", "❌ 添加设备失败:", error);
+            uni.hideLoading();
+            loading.value = false;
+            showAppToast({
+              title: "添加设备失败",
+              icon: "none"
+            });
+          }
+        });
+      };
+      vue.onLoad(() => {
+      });
+      vue.onShow(() => {
+        isNavigatingToScanner.value = false;
+        const rawResult = uni.getStorageSync("scanCodeResult");
+        const result = rawResult != null ? rawResult.toString() : "";
+        if (result.length > 0) {
+          uni.removeStorageSync("scanCodeResult");
+          handleScanResult(new ScanResultData({ result }));
+        }
+      });
+      vue.onUnload(() => {
+      });
+      return (_ctx = null, _cache = null) => {
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
+        const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
+        const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
+            vue.createVNode(_component_custom_navBar, new UTSJSONObject({
+              title: "添加设备",
+              "show-back": true,
+              backgroundColor: "#fff",
+              textColor: "#333",
+              showCapsule: false
+            })),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "content" }), [
+              vue.createVNode(_component_i_form, new UTSJSONObject({
+                labelPosition: "left",
+                modelValue: carInfo.value,
+                rules,
+                labelDirection: "horizontal",
+                watchValidStatus: "",
+                "onUpdate:modelValid": handleModelValid
+              }), {
+                default: vue.withCtx(() => {
+                  return [
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      label: "设备名称",
+                      name: "deviceName",
+                      labelDirection: "horizontal"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            border: "none",
+                            modelValue: carInfo.value.deviceName,
+                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
+                              return carInfo.value.deviceName = $event;
+                            }),
+                            placeholder: "请输入设备名称"
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      label: "*设备ID",
+                      name: "imei",
+                      labelDirection: "horizontal"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            border: "none",
+                            modelValue: carInfo.value.imei,
+                            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event = null) => {
+                              return carInfo.value.imei = $event;
+                            }),
+                            placeholder: "请输入设备ID(必填)"
+                          }), {
+                            suffix: vue.withCtx(() => {
+                              return [
+                                vue.createVNode(_component_i_icon, new UTSJSONObject({
+                                  name: "/static/sancode.png",
+                                  fontSize: "24",
+                                  onClick: scanCode
+                                }))
+                              ];
+                            }),
+                            _: 1
+                          }, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      label: "车标",
+                      name: "deviceType",
+                      labelDirection: "horizontal"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createElementVNode("view", new UTSJSONObject({
+                            class: "car-type-selector",
+                            onClick: deviceTypeSelectFun
+                          }), [
+                            vue.createElementVNode("text", new UTSJSONObject({
+                              class: vue.normalizeClass(["clickable", new UTSJSONObject({ "placeholder": !carInfo.value.deviceTypeValue })])
+                            }), vue.toDisplayString(carInfo.value.deviceTypeValue || "请选择设备图标(必选)"), 3)
+                          ])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(_component_i_form_item, new UTSJSONObject({
+                      label: "车牌号",
+                      name: "plateNo",
+                      labelDirection: "horizontal"
+                    }), {
+                      default: vue.withCtx(() => {
+                        return [
+                          vue.createVNode(_component_i_input, new UTSJSONObject({
+                            border: "none",
+                            modelValue: carInfo.value.plateNo,
+                            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event = null) => {
+                              return carInfo.value.plateNo = $event;
+                            }),
+                            placeholder: "请输入车牌号"
+                          }), null, 8, ["modelValue"])
+                        ];
+                      }),
+                      _: 1
+                    }),
+                    vue.createVNode(vue.unref(carIcons), new UTSJSONObject({
+                      show: carIconSelectorVisible.value,
+                      "onUpdate:show": updateCarIconSelectorVisible,
+                      onSelect: selectIcon
+                    }), null, 8, ["show"])
+                  ];
+                }),
+                _: 1
+              }, 8, ["modelValue"])
+            ]),
+            vue.createElementVNode("view", new UTSJSONObject({ class: "btn" }), [
+              vue.createVNode(_component_i_button, new UTSJSONObject({
+                type: "primary",
+                onClick: submit,
+                loading: loading.value
+              }), {
+                default: vue.withCtx(() => {
+                  return [
+                    vue.createTextVNode("提交")
+                  ];
+                }),
+                _: 1
+              }, 8, ["loading"])
+            ])
+          ]),
+          vue.createVNode(_component_app_toast)
+        ], 64);
+      };
+    }
+  });
+  const _style_0$l = { "container": { "": { "width": "100%", "height": "100%", "backgroundColor": "#f5f5f5" } }, "content": { ".container ": { "marginTop": "20rpx", "marginRight": "20rpx", "marginBottom": "20rpx", "marginLeft": "20rpx", "paddingTop": "20rpx", "paddingRight": "40rpx", "paddingBottom": "20rpx", "paddingLeft": "40rpx", "backgroundColor": "#ffffff", "borderTopLeftRadius": "20rpx", "borderTopRightRadius": "20rpx", "borderBottomRightRadius": "20rpx", "borderBottomLeftRadius": "20rpx" } }, "clickable": { ".container ": { "marginTop": 10, "color": "#999999", "fontSize": "28rpx" } }, "btn": { ".container ": { "marginTop": "50rpx", "marginRight": "20rpx", "marginBottom": 0, "marginLeft": "20rpx" } }, "plate-input": { ".container ": { "width": "100%" } }, "input-wrapper": { ".container .plate-input ": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#000000", "borderRightColor": "#000000", "borderBottomColor": "#000000", "borderLeftColor": "#000000" } }, "car-input-container": { ".container ": { "display": "flex", "flexDirection": "row" } }, "car-number-input": { ".container ": { "width": "60%", "textAlign": "right" } }, "plate-close": { ".container .car-number-container ": { "height": 40, "display": "flex", "textAlign": "right", "backgroundColor": "#FFFFFF", "flexDirection": "row", "justifyContent": "flex-end", "alignItems": "center" } }, "car-input-item": { ".container .car-input-container .car-input-box ": { "position": "relative", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#E2E2E2", "borderRightColor": "#E2E2E2", "borderBottomColor": "#E2E2E2", "borderLeftColor": "#E2E2E2", "height": 40, "lineHeight": "40px", "textAlign": "center", "fontSize": 17 } }, "new-item-img": { ".container .car-input-container .car-input-box .car-input-item ": { "position": "absolute", "top": -2, "left": "50%", "marginLeft": -15, "height": 13, "width": 30, "zIndex": 9 } }, "i-form-item": { ".container ": { "paddingTop": "5rpx", "paddingRight": "10rpx", "paddingBottom": "5rpx", "paddingLeft": "10rpx", "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 0, "borderBottomWidth": 1, "borderBottomStyle": "solid", "borderBottomColor": "#99999924" } } };
+  const PagesAddCarAddCar = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["styles", [_style_0$l]]]);
   const MODE_YEAR = 1;
   const MODE_MONTH = 2;
   const MODE_DATE = 4;
@@ -14025,7 +13852,7 @@
       locale: locale2
     });
   }
-  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
     __name: "l-date-time-picker",
     props: {
       cancelBtn: { type: String },
@@ -14262,7 +14089,7 @@
         columnCache.clear();
       });
       return (_ctx = null, _cache = null) => {
-        const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$2);
+        const _component_l_picker = resolveEasycom(vue.resolveDynamicComponent("l-picker"), __easycom_0$5);
         return vue.openBlock(), vue.createBlock(_component_l_picker, new UTSJSONObject({
           title: _ctx.title,
           titleStyle: _ctx.titleStyle,
@@ -14289,439 +14116,6 @@
       };
     }
   });
-  function raf(fn = null) {
-    if (typeof fn == "UniAnimationFrameCallback") {
-      return requestAnimationFrame(fn);
-    } else {
-      return requestAnimationFrame(fn);
-    }
-  }
-  function useTransition(options) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-    const state = vue.ref(false);
-    const display = vue.ref(false);
-    const inited = vue.ref(false);
-    const classes = vue.ref("");
-    const name2 = vue.ref((_a = options.defaultName) !== null && _a !== void 0 ? _a : "fade");
-    const enterClass = (_b = options.enterClass) !== null && _b !== void 0 ? _b : "";
-    const enterActiveClass = (_c = options.enterActiveClass) !== null && _c !== void 0 ? _c : "";
-    const enterToClass = (_d = options.enterToClass) !== null && _d !== void 0 ? _d : "";
-    const leaveActiveClass = (_e = options.leaveActiveClass) !== null && _e !== void 0 ? _e : "";
-    const leaveToClass = (_f = options.leaveToClass) !== null && _f !== void 0 ? _f : "";
-    const leaveClass = (_g = options.leaveClass) !== null && _g !== void 0 ? _g : "";
-    const appear = (_h = options.appear) !== null && _h !== void 0 ? _h : false;
-    const duration = (_j = options.duration) !== null && _j !== void 0 ? _j : 300;
-    let status = "";
-    let isTransitionEnd = false;
-    let isTransitioning = false;
-    let timeoutId = -1;
-    let finishTimeoutId = -1;
-    const emitEvent = (event) => {
-      var _a2;
-      (_a2 = options.emits) === null || _a2 === void 0 ? void 0 : _a2.call(options, event);
-    };
-    const finished = () => {
-      var _a2;
-      if (isTransitionEnd)
-        return;
-      isTransitionEnd = true;
-      clearTimeout(finishTimeoutId);
-      if ((_a2 = options.removeClasses) !== null && _a2 !== void 0 ? _a2 : false) {
-        classes.value = "";
-      }
-      emitEvent("after-".concat(status));
-      if (display.value && !state.value) {
-        display.value = false;
-      }
-    };
-    const sleep = () => {
-      return new Promise((resolve) => {
-        vue.nextTick(() => {
-          raf(() => {
-            var _a2, _b2, _c2, _d2;
-            if (((_a2 = options.element) === null || _a2 === void 0 ? void 0 : _a2.value) != null) {
-              (_d2 = (_c2 = (_b2 = options.element) === null || _b2 === void 0 ? void 0 : _b2.value) === null || _c2 === void 0 ? void 0 : _c2.getBoundingClientRectAsync()) === null || _d2 === void 0 ? void 0 : _d2.then((res) => {
-                resolve();
-              });
-            } else {
-              resolve();
-            }
-          });
-        });
-      });
-    };
-    const getClassNames = (name3) => {
-      return /* @__PURE__ */ new Map([
-        ["enter", "l-".concat(name3, "-enter l-").concat(name3, "-enter-active ").concat(enterClass, " ").concat(enterActiveClass)],
-        ["enter-to", "l-".concat(name3, "-enter-to l-").concat(name3, "-enter-active ").concat(enterToClass, " ").concat(enterActiveClass)],
-        ["leave", "l-".concat(name3, "-leave l-").concat(name3, "-leave-active ").concat(leaveClass, " ").concat(leaveActiveClass)],
-        ["leave-to", "l-".concat(name3, "-leave-to l-").concat(name3, "-leave-active ").concat(leaveToClass, " ").concat(leaveActiveClass)]
-      ]);
-    };
-    const transitionQueue = vue.ref([]);
-    const performTransition = (newStatus, eventName) => {
-      return __awaiter(this, void 0, void 0, function* () {
-        var _a2;
-        if (status == newStatus)
-          return;
-        transitionQueue.value.push(newStatus);
-        if (isTransitioning)
-          return;
-        isTransitioning = true;
-        isTransitionEnd = true;
-        while (transitionQueue.value.length > 0) {
-          const currentStatus = transitionQueue.value.shift();
-          status = currentStatus;
-          emitEvent("before-".concat(eventName));
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          yield sleep();
-          if (status != currentStatus)
-            continue;
-          const classNames = getClassNames(name2.value);
-          inited.value = true;
-          display.value = true;
-          classes.value = classNames.get(eventName);
-          emitEvent(eventName);
-          const executeAfterTick = (_a2 = options.onNextTick) === null || _a2 === void 0 ? void 0 : _a2.call(options, eventName);
-          if (executeAfterTick != null) {
-            yield executeAfterTick;
-          }
-          yield sleep();
-          if (status != currentStatus)
-            continue;
-          classes.value = classNames.get("".concat(eventName, "-to"));
-          if (status == "leave") {
-            setTimeout(() => {
-              finished();
-            }, duration);
-          }
-        }
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          if (transitionQueue.value.length == 0 && status == newStatus) {
-            isTransitionEnd = false;
-          }
-        }, duration * 0.8);
-        isTransitioning = false;
-      });
-    };
-    const enter = () => {
-      performTransition("enter", "enter");
-    };
-    const leave = () => {
-      performTransition("leave", "leave");
-    };
-    let init = false;
-    let lastState = null;
-    vue.watchEffect(() => {
-      if (options.visible == null)
-        return;
-      state.value = options.visible();
-      if (lastState == state.value)
-        return;
-      lastState = state.value;
-      if (!appear && !init) {
-        init = true;
-        return;
-      }
-      if (state.value) {
-        enter();
-      } else {
-        leave();
-      }
-    });
-    vue.watchEffect(() => {
-      if (options.name == null)
-        return;
-      name2.value = options.name();
-    });
-    const toggle = (v) => {
-      state.value = v;
-      if (v) {
-        enter();
-      } else {
-        leave();
-      }
-    };
-    return {
-      state,
-      inited,
-      display,
-      classes,
-      name: name2,
-      finished,
-      toggle
-    };
-  }
-  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-overlay",
-    props: {
-      ariaLabel: { default: "关闭", type: String },
-      ariaRole: { default: "button", type: String },
-      lClass: { type: String },
-      bgColor: { type: String },
-      lStyle: { type: null },
-      duration: { default: 300, type: Number },
-      preventScrollThrough: { type: Boolean, default: true },
-      visible: { type: Boolean, default: false },
-      zIndex: { default: 998, type: Number }
-    },
-    emits: ["click", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"],
-    setup(__props, _a) {
-      var __emit = _a.emit;
-      const props = __props;
-      const emit = __emit;
-      const _b = useTransition({
-        defaultName: "fade",
-        appear: props.visible,
-        emits: (name2) => {
-          emit(name2);
-        },
-        visible: () => {
-          return props.visible;
-        },
-        duration: props.duration
-      }), inited = _b.inited, display = _b.display, classes = _b.classes, finished = _b.finished;
-      const styles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        if (props.bgColor != null) {
-          style.set("background-color", props.bgColor);
-        }
-        if (props.zIndex > 0) {
-          style.set("z-index", props.zIndex);
-        }
-        return style;
-      });
-      const noop = () => {
-      };
-      const onClick = (event) => {
-        emit("click", !props.visible);
-      };
-      const overlayRef = vue.ref(null);
-      vue.watchEffect(() => {
-        var _a2, _b2, _c;
-        (_a2 = overlayRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "".concat(props.duration, "ms"));
-        if (!display.value) {
-          (_b2 = overlayRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("display", "none");
-        } else {
-          (_c = overlayRef.value) === null || _c === void 0 ? null : _c.style.setProperty("display", "flex");
-        }
-      });
-      return (_ctx = null, _cache = null) => {
-        return vue.unref(inited) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-          key: 0,
-          class: vue.normalizeClass(["l-overlay", [_ctx.lClass, vue.unref(classes)]]),
-          ref_key: "overlayRef",
-          ref: overlayRef,
-          style: vue.normalizeStyle([vue.unref(styles), _ctx.lStyle]),
-          onClick: vue.withModifiers(onClick, ["stop"]),
-          onTouchmove: vue.withModifiers(noop, ["stop"]),
-          onTransitionend: _cache[0] || (_cache[0] = (...args) => {
-            return vue.unref(finished) && vue.unref(finished)(...args);
-          }),
-          "aria-role": _ctx.ariaRole,
-          "aria-label": _ctx.ariaLabel
-        }), [
-          vue.renderSlot(_ctx.$slots, "default")
-        ], 46, ["aria-role", "aria-label"])) : vue.createCommentVNode("", true);
-      };
-    }
-  });
-  const _style_0$m = { "l-overlay": { "": { "position": "fixed", "top": 0, "left": 0, "width": "100%", "bottom": 0, "backgroundColor": "var(--l-overlay-bg-color, rgba(0, 0, 0, 0.45))", "transitionProperty": "opacity", "transitionTimingFunction": "ease", "zIndex": "var(--l-overlay-z-index, 998)", "opacity": 1, "transitionDuration": "300ms" } }, "l-fade-enter": { "": { "opacity": 0 } }, "l-fade-leave-to": { "": { "opacity": 0 } }, "@TRANSITION": { "l-overlay": { "property": "opacity", "timingFunction": "ease", "duration": "300ms" } } };
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["styles", [_style_0$m]]]);
-  function isDef(value) {
-    return value != null;
-  }
-  function addUnit(value) {
-    if (!isDef(value)) {
-      return null;
-    }
-    value = "".concat(value);
-    return isNumeric$1(value) ? "".concat(value, "px") : value;
-  }
-  function convertRadius(radius) {
-    var _a;
-    if (Array.isArray(radius)) {
-      const values = radius.map((item) => {
-        return addUnit(item);
-      });
-      if (values.length == 1) {
-        return [values[0], values[0], values[0], values[0]];
-      }
-      if (values.length == 2) {
-        return [values[0], values[1], values[0], values[1]];
-      }
-      if (values.length == 3) {
-        return [values[0], values[1], values[2], values[1]];
-      }
-      if (values.length == 4) {
-        return [values[0], values[1], values[2], values[3]];
-      }
-      return ["0", "0", "0", "0"];
-    }
-    const value = (_a = addUnit(radius)) !== null && _a !== void 0 ? _a : "0";
-    return [value, value, value, value];
-  }
-  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
-    __name: "l-popup",
-    props: /* @__PURE__ */ vue.mergeModels(new UTSJSONObject({
-      closeable: { type: Boolean, default: false },
-      closeOnClickOverlay: { type: Boolean, default: true },
-      destroyOnClose: { type: Boolean, default: false },
-      overlayStyle: { type: null },
-      position: { default: "center", type: String },
-      preventScrollThrough: { type: Boolean, default: true },
-      overlay: { type: Boolean, default: true },
-      transitionName: { type: String },
-      visible: { type: Boolean },
-      zIndex: { default: 999, type: Number },
-      duration: { default: 300, type: Number },
-      bgColor: { type: String },
-      closeIcon: { default: "close", type: String },
-      iconColor: { type: String },
-      lStyle: { type: null },
-      safeAreaInsetBottom: { type: Boolean, default: true },
-      safeAreaInsetTop: { type: Boolean, default: false },
-      radius: { type: [String, Number, Array] }
-    }), new UTSJSONObject({
-      "modelValue": { type: Boolean },
-      "modelModifiers": {}
-    })),
-    emits: /* @__PURE__ */ vue.mergeModels(["change", "click-overlay", "click-close", "open", "opened", "close", "closed", "before-enter", "enter", "after-enter", "before-leave", "leave", "after-leave"], ["update:modelValue"]),
-    setup(__props, _a) {
-      var _b;
-      var __emit = _a.emit;
-      const emit = __emit;
-      const props = __props;
-      const modelValue = vue.useModel(__props, "modelValue");
-      const innerValue = vue.computed({
-        set(value) {
-          modelValue.value = value;
-          emit("change", value);
-        },
-        get() {
-          return props.visible || modelValue.value;
-        }
-      });
-      const status = vue.ref("before-enter");
-      const _c = useTransition({
-        defaultName: (_b = props.transitionName) !== null && _b !== void 0 ? _b : "popup-fade",
-        appear: innerValue.value,
-        emits: (name2) => {
-          status.value = name2;
-          if (name2 == "before-enter") {
-            emit("open");
-          } else if (name2 == "after-enter") {
-            emit("opened");
-          } else if (name2 == "before-leave") {
-            emit("close");
-          } else if (name2 == "after-leave") {
-            emit("closed");
-          }
-          emit(name2);
-        },
-        visible: () => {
-          return innerValue.value;
-        },
-        duration: props.duration
-      }), inited = _c.inited, display = _c.display, classes = _c.classes, finished = _c.finished;
-      const overlayZIndex = vue.computed(() => {
-        return props.zIndex > 0 ? props.zIndex - 1 : 998;
-      });
-      const rootClass = vue.computed(() => {
-        const safe = props.safeAreaInsetTop && props.position == "top" ? "l-popup--safe-top" : props.safeAreaInsetBottom && props.position == "bottom" ? "l-popup--safe-bottom" : "";
-        return "l-popup--".concat(props.position, " ").concat(safe, " ").concat(classes.value);
-      });
-      uni.getWindowInfo().safeAreaInsets;
-      const styles = vue.computed(() => {
-        const style = /* @__PURE__ */ new Map();
-        style.set("transition-duration", (["after-leave", "before-enter"].includes(status.value) ? 0 : props.duration) + "ms");
-        if (props.bgColor != null) {
-          style.set("background", props.bgColor);
-        }
-        if (props.zIndex > 0) {
-          style.set("z-index", props.zIndex);
-        }
-        if (props.radius != null) {
-          const values = convertRadius(props.radius);
-          style.set("border-top-left-radius", values[0]);
-          style.set("border-top-right-radius", values[1]);
-          style.set("border-bottom-right-radius", values[2]);
-          style.set("border-bottom-left-radius", values[3]);
-        }
-        return style;
-      });
-      const handleOverlayClick = () => {
-        if (props.closeOnClickOverlay) {
-          innerValue.value = false;
-          emit("click-overlay");
-        }
-      };
-      const handleClose = () => {
-        innerValue.value = false;
-        emit("click-close");
-      };
-      const popupRef = vue.ref(null);
-      vue.watchEffect(() => {
-        var _a2, _b2, _c2, _d;
-        if (!display.value) {
-          (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("pointer-events", "none");
-          (_b2 = popupRef.value) === null || _b2 === void 0 ? null : _b2.style.setProperty("z-index", -1e4);
-        } else {
-          (_c2 = popupRef.value) === null || _c2 === void 0 ? null : _c2.style.setProperty("pointer-events", "auto");
-          (_d = popupRef.value) === null || _d === void 0 ? null : _d.style.setProperty("z-index", props.zIndex);
-        }
-      });
-      return (_ctx = null, _cache = null) => {
-        const _component_l_overlay = resolveEasycom(vue.resolveDynamicComponent("l-overlay"), __easycom_0$1);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          (_ctx.destroyOnClose ? vue.unref(display) && _ctx.overlay : _ctx.overlay) ? (vue.openBlock(), vue.createBlock(_component_l_overlay, new UTSJSONObject({
-            key: 0,
-            visible: vue.unref(innerValue),
-            zIndex: vue.unref(overlayZIndex),
-            appear: true,
-            preventScrollThrough: _ctx.preventScrollThrough,
-            "l-style": _ctx.overlayStyle,
-            onClick: handleOverlayClick
-          }), null, 8, ["visible", "zIndex", "preventScrollThrough", "l-style"])) : vue.createCommentVNode("", true),
-          (_ctx.destroyOnClose ? vue.unref(display) : vue.unref(inited)) ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-            key: 1,
-            class: vue.normalizeClass(["l-popup", vue.unref(rootClass)]),
-            ref_key: "popupRef",
-            ref: popupRef,
-            style: vue.normalizeStyle([vue.unref(styles), _ctx.lStyle]),
-            onTransitionend: _cache[0] || (_cache[0] = (...args) => {
-              return vue.unref(finished) && vue.unref(finished)(...args);
-            })
-          }), [
-            vue.renderSlot(_ctx.$slots, "default"),
-            _ctx.closeable ? (vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
-              key: 0,
-              class: "l-popup__close",
-              onClick: handleClose
-            }), [
-              vue.renderSlot(_ctx.$slots, "close-btn", new UTSJSONObject({}), () => {
-                return [
-                  vue.createVNode(_component_i_icon, new UTSJSONObject({
-                    name: "close",
-                    fontSize: "20",
-                    size: "27px",
-                    color: _ctx.iconColor
-                  }), null, 8, ["color"])
-                ];
-              })
-            ])) : vue.createCommentVNode("", true)
-          ], 38)) : vue.createCommentVNode("", true)
-        ], 64);
-      };
-    }
-  });
-  const _style_0$l = { "l-popup": { "": { "position": "fixed", "transitionDuration": "300ms", "transitionProperty": "transform,opacity", "transitionTimingFunction": "ease", "backgroundColor": "var(--l-popup-bg-color, #fff)", "overflow": "visible", "opacity": 1 }, ".l-popup-fade-enter": { "opacity": 0 }, ".l-popup-fade-leave-to": { "opacity": 0 }, ".l-popup-fade-enter.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-leave-to.l-popup--top": { "transform": "scale(1) translate(0, -100%)" }, ".l-popup-fade-enter.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-leave-to.l-popup--bottom": { "transform": "scale(1) translate(0, 100%)" }, ".l-popup-fade-enter.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-leave-to.l-popup--left": { "transform": "scale(1) translate(-100%, 0)" }, ".l-popup-fade-enter.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-leave-to.l-popup--right": { "transform": "scale(1) translate(100%, 0)" }, ".l-popup-fade-enter.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-popup-fade-leave-to.l-popup--center": { "transform": "translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-enter.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 }, ".l-dialog-leave-to.l-popup--center": { "transform": "scale(0.6) translate(-50%, -50%)", "opacity": 0 } }, "l-popup__close": { "": { "position": "absolute", "top": 0, "right": 0, "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "l-popup__close-icon": { "": { "color": "var(--l-popup-close-icon-color, #000000A6)" } }, "l-popup--top": { "": { "top": 0, "left": 0, "right": 0, "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--bottom": { "": { "bottom": 0, "left": 0, "right": 0, "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "transform": "scale(1) translate(0, 0)" } }, "l-popup--safe-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "l-popup--safe-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "l-popup--left": { "": { "top": 0, "left": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--right": { "": { "top": 0, "right": 0, "bottom": 0, "transform": "scale(1) translate(0, 0)" } }, "l-popup--center": { "": { "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)", "transformOrigin": "50% 50%", "borderTopLeftRadius": "var(--l-popup-border-radius, 9px)", "borderTopRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomRightRadius": "var(--l-popup-border-radius, 9px)", "borderBottomLeftRadius": "var(--l-popup-border-radius, 9px)" } }, "@TRANSITION": { "l-popup": { "duration": "300ms", "property": "transform,opacity", "timingFunction": "ease" } } };
-  const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["styles", [_style_0$l]]]);
   class TrackPoint extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -15378,14 +14772,14 @@
         ++replaySessionId;
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_map = vue.resolveComponent("map");
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$n);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -15623,7 +15017,7 @@
       };
       return (_ctx = null, _cache = null) => {
         const _component_l_icon = vue.resolveComponent("l-icon");
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
         return vue.openBlock(), vue.createBlock(_component_l_popup, new UTSJSONObject({
           modelValue: vue.unref(innerValue),
           "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event = null) => {
@@ -16317,11 +15711,11 @@
         stopTracking(false);
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_map = vue.resolveComponent("map");
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -16775,7 +16169,7 @@
       }, 0);
     }
     return (_ctx = null, _cache = null) => {
-      const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
+      const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
       return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({
         class: vue.normalizeClass(tagClass.value),
         style: vue.normalizeStyle(tagStyle.value),
@@ -17039,13 +16433,13 @@
         showDateTimePicker.value = false;
       };
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$n);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "里程记录",
@@ -17292,12 +16686,12 @@
         }));
       };
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$n);
-        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_l_date_time_picker = resolveEasycom(vue.resolveDynamicComponent("l-date-time-picker"), _sfc_main$l);
+        const _component_l_popup = resolveEasycom(vue.resolveDynamicComponent("l-popup"), __easycom_3$2);
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17506,9 +16900,9 @@
         });
       };
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17693,12 +17087,12 @@
         }
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_form_item = resolveEasycom(vue.resolveDynamicComponent("i-form-item"), __easycom_2$2);
-        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3$1);
+        const _component_i_form = resolveEasycom(vue.resolveDynamicComponent("i-form"), __easycom_3);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -17884,8 +17278,8 @@
         });
       };
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "车辆管理",
@@ -18122,11 +17516,11 @@
         }
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -19740,16 +19134,16 @@
         loadGeofenceList();
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_map = vue.resolveComponent("map");
         const _component_sub_navBar = resolveEasycom(vue.resolveDynamicComponent("sub-navBar"), __easycom_1$1);
-        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$5);
+        const _component_i_icon = resolveEasycom(vue.resolveDynamicComponent("i-icon"), __easycom_2$4);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
         const _component_i_popup = resolveEasycom(vue.resolveDynamicComponent("i-popup"), __easycom_4);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_radio = resolveEasycom(vue.resolveDynamicComponent("i-radio"), __easycom_6);
         const _component_i_switch = resolveEasycom(vue.resolveDynamicComponent("i-switch"), __easycom_7);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -20312,7 +19706,7 @@
       });
       return (_ctx = null, _cache = null) => {
         const _component_camera = vue.resolveComponent("camera");
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock("view", new UTSJSONObject({ class: "container" }), [
           vue.createElementVNode("view", new UTSJSONObject({ class: "scancode-box" }), [
             cameraVisible.value ? (vue.openBlock(), vue.createBlock(_component_camera, new UTSJSONObject({
@@ -20432,8 +19826,8 @@
         });
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createVNode(_component_custom_navBar, new UTSJSONObject({
             title: "续费管理",
@@ -20739,10 +20133,10 @@
         });
       };
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_i_input = resolveEasycom(vue.resolveDynamicComponent("i-input"), __easycom_1$2);
         const _component_i_button = resolveEasycom(vue.resolveDynamicComponent("i-button"), __easycom_2$1);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({
@@ -20973,7 +20367,7 @@
       return (_ctx = null, _cache = null) => {
         const _component_web_view = vue.resolveComponent("web-view");
         const _component_i_empty = resolveEasycom(vue.resolveDynamicComponent("i-empty"), __easycom_0);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "webview-container" }), [
             webviewUrl.value ? (vue.openBlock(), vue.createBlock(_component_web_view, new UTSJSONObject({
@@ -21326,11 +20720,11 @@
         loadUserDeviceList([], true);
       });
       return (_ctx = null, _cache = null) => {
-        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$5);
+        const _component_custom_navBar = resolveEasycom(vue.resolveDynamicComponent("custom-navBar"), __easycom_0$2);
         const _component_map = vue.resolveComponent("map");
         const _component_i_tag = resolveEasycom(vue.resolveDynamicComponent("i-tag"), __easycom_1);
         const _component_indexListMode = resolveEasycom(vue.resolveDynamicComponent("indexListMode"), __easycom_2);
-        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$I);
+        const _component_app_toast = resolveEasycom(vue.resolveDynamicComponent("app-toast"), _sfc_main$E);
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("view", new UTSJSONObject({ class: "container" }), [
             vue.createVNode(_component_custom_navBar, new UTSJSONObject({

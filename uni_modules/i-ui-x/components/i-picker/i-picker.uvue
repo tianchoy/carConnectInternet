@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 defineOptions({ name: 'i-picker' })
 

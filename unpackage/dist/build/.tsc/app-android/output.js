@@ -1,10 +1,10 @@
 'use strict';
 
 require('vue');
+require('java.math.BigDecimal');
 require('android.util.Log');
 require('android.app.Activity');
 require('android.os.Build');
-require('java.math.BigDecimal');
 require('uts.sdk.modules.DCloudUniMapTencent.Polyline');
 require('uts.sdk.modules.DCloudUniMapTencent.LocationObject');
 
@@ -12,7 +12,13 @@ const iIcon_uvue_vue_type_style_index_0_lang = {};
 
 const iLineProgress_uvue_vue_type_style_index_0_lang = {};
 
-const iPicker_uvue_vue_type_style_index_0_lang = {};
+const lPickerItem_uvue_vue_type_style_index_0_lang = {};
+
+const lPicker_uvue_vue_type_style_index_0_lang = {};
+
+const lOverlay_uvue_vue_type_style_index_0_lang = {};
+
+const lPopup_uvue_vue_type_style_index_0_lang = {};
 
 const appModal_uvue_vue_type_style_index_0_lang = {};
 
@@ -55,14 +61,6 @@ const carIcons_uvue_vue_type_style_index_0_lang = {};
 const addCar_uvue_vue_type_style_index_0_lang = {};
 
 const iSlider_uvue_vue_type_style_index_0_lang = {};
-
-const lPickerItem_uvue_vue_type_style_index_0_lang = {};
-
-const lPicker_uvue_vue_type_style_index_0_lang = {};
-
-const lOverlay_uvue_vue_type_style_index_0_lang = {};
-
-const lPopup_uvue_vue_type_style_index_0_lang = {};
 
 const playBack_uvue_vue_type_style_index_0_lang = {};
 

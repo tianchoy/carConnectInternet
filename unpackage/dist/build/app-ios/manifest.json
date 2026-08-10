@@ -24,14 +24,14 @@
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
           }
         },
-        "uni-vibrate": {},
-        "uni-storage": {},
         "uni-showLoading": {},
-        "uni-location": {},
         "uni-getSystemInfo": {},
-        "uni-getAppBaseInfo": {},
+        "uni-storage": {},
+        "uni-vibrate": {},
         "uni-dialogPage": {},
         "uni-event": {},
+        "uni-getAppBaseInfo": {},
+        "uni-location": {},
         "uni-network": {},
         "uni-prompt": {},
         "uni-openLocation": {},

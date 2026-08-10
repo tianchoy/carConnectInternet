@@ -212,6 +212,8 @@
 }
 .container .device-dialog[class] {
   height: 800rpx;
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
 }
 .container .device-dialog .dialog-header[class] {
@@ -238,7 +240,8 @@
   border-bottom: 4rpx solid #2979ff;
 }
 .container .device-dialog .device-list[class] {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   padding: 20rpx 20rpx 75rpx 20rpx;
   box-sizing: border-box;
 }

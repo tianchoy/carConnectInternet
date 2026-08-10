@@ -1,6 +1,7 @@
 import _easycom_i_icon from '@/uni_modules/i-ui-x/components/i-icon/i-icon.uvue'
 import _easycom_i_line_progress from '@/uni_modules/i-ui-x/components/i-line-progress/i-line-progress.uvue'
-import _easycom_i_picker from '@/uni_modules/i-ui-x/components/i-picker/i-picker.uvue'
+import _easycom_l_picker from '@/uni_modules/lime-picker/components/l-picker/l-picker.uvue'
+import _easycom_l_popup from '@/uni_modules/lime-popup/components/l-popup/l-popup.uvue'
 import _easycom_app_toast from '@/components/app-toast/app-toast.uvue'
 import _easycom_app_modal from '@/components/app-modal/app-modal.uvue'
 import _imports_0 from '../../static/exit.png'
@@ -22,6 +23,7 @@ import CoordTransform from '../../utils/coordTransform.uts'
 import { getTodayZeroTime } from '../../utils/gettime.uts'
 import { formatLocalTime, formatTimes } from '../../utils/formateTime.uts'
 import { getDeviceIcon } from '../../utils/cars'
+import type { PickerColumn, PickerColumnItem, PickerConfirmEvent, PickerValue } from '@/uni_modules/lime-picker'
 
 
 type Device = {
@@ -101,14 +103,14 @@ const positionMessage = computed<string>(() => {
     return ''
 })
 const mapScale = ref(12)
+const isMapReady = ref(false)
 const statusBarHeight = ref(20)
 const menuButtonInfo = ref(null)
 const navBarHeight = ref(44)
 const deviceList = ref<Array<Device>>([])
 // picker 相关变量
 const showPicker = ref(false)
-const pickerDefaultIndex = ref<number[]>([0])
-const pickerKey = ref(0)
+const pickerValues = ref<PickerValue[]>([])
 const currentCarImei = ref('')
 const currentCarDeptId = ref('')
 const currentCarDeviceId = ref('')
@@ -150,15 +152,17 @@ const safeDeviceDetail = computed<DeviceDetailState>(() => {
 })
 
 // 处理车辆列表显示 - 返回 picker 选项
-const pickerColumns = computed(() => {
-    return [deviceList.value.map((device): UTSJSONObject => {
+const pickerColumns = computed<PickerColumn[]>(() => {
+    return [deviceList.value.map((device): PickerColumnItem => {
         const displayName = device.deviceName || device.name || device.imei || '未命名设备'
         const statusText = device.connectionStatus == 'online' ? '在线' : '离线'
         return {
-            text: `${displayName} (${statusText})`,
+            id: null,
+            label: `${displayName} (${statusText})`,
             value: device.imei || device.deviceId,
-            disabled: false
-        } as UTSJSONObject
+            disabled: false,
+            children: null
+        }
     })]
 })
 
@@ -220,13 +224,15 @@ const decodeSavedDevice = (raw: any): SavedDevice | null => {
     }
     if (data == null) return null
     const imei = data.getString('imei', '')
-    if (imei == '') return null
+    const deviceId = data.getString('deviceId', '')
+    if (imei == '' && deviceId == '') return null
+    const identity = imei != '' ? imei : deviceId
     const device: SavedDevice = {
-        name: data.getString('name', imei),
-        deviceName: data.getString('deviceName', data.getString('name', imei)),
+        name: data.getString('name', identity),
+        deviceName: data.getString('deviceName', data.getString('name', identity)),
         imei: imei,
         deptId: data.getString('deptId', ''),
-        deviceId: data.getString('deviceId', ''),
+        deviceId: deviceId,
         iccid: data.getString('iccid', ''),
         simMerchant: data.getString('simMerchant', ''),
         connectionStatus: data.getString('connectionStatus', ''),
@@ -308,6 +314,20 @@ const setCurrentCarFromSavedDevice = (savedDevice: any) => {
     center.longitude = savedDevice.longitude
 }
 
+// 查找设备在当前列表中的索引，IMEI 优先，缺失时使用设备 ID
+const findDeviceIndex = (imei: string, deviceId: string): number => {
+    if (imei != '') {
+        const imeiIndex = deviceList.value.findIndex(device =>
+            device.imei == imei || device.value == imei
+        )
+        if (imeiIndex != -1) return imeiIndex
+    }
+    if (deviceId != '') {
+        return deviceList.value.findIndex(device => device.deviceId == deviceId)
+    }
+    return -1
+}
+
 // 处理选择车辆 - 打开 picker
 const handlePicker = () => {
     if (deviceList.value.length == 0) {
@@ -318,29 +338,25 @@ const handlePicker = () => {
         return
     }
 
-    // 更新 picker 的 key 强制刷新
-    pickerKey.value++
-
-    // 设置默认选中索引
+    const currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+    const savedDevice = getSavedSelectedDevice()
+    const savedDeviceIndex = savedDevice != null
+        ? findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+        : -1
     const savedIndex = getSavedSelectedDeviceIndex()
-    if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-        pickerDefaultIndex.value = [savedIndex]
-    } else {
-        // 根据当前选中的设备查找索引
-        const currentIndex = deviceList.value.findIndex(
-            device => device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
-        )
-        if (currentIndex != -1) {
-            pickerDefaultIndex.value = [currentIndex]
-        } else {
-            pickerDefaultIndex.value = [0]
-        }
-    }
 
-    // 延迟打开 picker，确保数据更新完成
-    nextTick(() => {
-        showPicker.value = true
-    })
+    let selectedIndex = currentIndex
+    if (selectedIndex == -1) selectedIndex = savedDeviceIndex
+    if (selectedIndex == -1 && savedIndex != null && savedIndex < deviceList.value.length) {
+        selectedIndex = savedIndex
+    }
+    if (selectedIndex == -1) selectedIndex = 0
+
+    const selectedDevice = deviceList.value[selectedIndex]
+    if (selectedDevice == null) return
+
+    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
+    showPicker.value = true
 }
 
 // 创建标记点
@@ -570,32 +586,33 @@ const loadDeviceData = async (device: Device) => {
 }
 
 // 处理选择车辆确认
-const handleConfirm = (e: UTSJSONObject) => {
-
-    // 关闭 picker
+const handlePickerConfirm = (e: PickerConfirmEvent) => {
     showPicker.value = false
 
-    // i-picker 返回的第一列索引
-    const indexs = e.getArray<number>('indexs')
-    let selectedIndex = indexs != null && indexs.length > 0 ? indexs[0] : -1
-
-    // 如果索引无效，使用当前设备
-    if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-        console.warn('无法解析选中的索引，使用当前设备')
-        const currentIndex = deviceList.value.findIndex(
-            device => device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
+    const selectedValue = e.values.length > 0 ? e.values[0].toString() : ''
+    let selectedIndex = -1
+    if (selectedValue != '') {
+        selectedIndex = deviceList.value.findIndex(device =>
+            device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
         )
-        if (currentIndex != -1) {
-            selectedIndex = currentIndex
-            console.log('使用当前设备索引:', selectedIndex)
-        } else {
-            selectedIndex = 0
-            console.log('使用默认索引: 0')
+    }
+
+    if (selectedIndex < 0 && e.indexs.length > 0) {
+        const eventIndex = e.indexs[0]
+        if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
+            selectedIndex = eventIndex
         }
     }
 
-    const selectedDevice = deviceList.value[selectedIndex]
-    if (!selectedDevice) {
+    if (selectedIndex < 0) {
+        selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+    }
+    if (selectedIndex < 0 && deviceList.value.length > 0) {
+        selectedIndex = 0
+    }
+
+    const selectedDevice = selectedIndex >= 0 ? deviceList.value[selectedIndex] : null
+    if (selectedDevice == null) {
         showAppToast({
             title: '选择设备失败',
             icon: 'none'
@@ -603,13 +620,11 @@ const handleConfirm = (e: UTSJSONObject) => {
         return
     }
 
-    // 检查是否选择了不同的设备
     if (selectedDevice.imei == currentCarImei.value && selectedDevice.deviceId == currentCarDeviceId.value) {
         console.log('选择的设备与当前设备相同，不重复加载')
         return
     }
 
-    // 更新当前选中的设备
     const deviceName = selectedDevice.deviceName || selectedDevice.name || '未命名设备'
     currentCarName.value = deviceName
     currentCarImei.value = selectedDevice.imei || selectedDevice.value
@@ -623,13 +638,8 @@ const handleConfirm = (e: UTSJSONObject) => {
     center.latitude = selectedDevice.latitude
     center.longitude = selectedDevice.longitude
 
-    // 保存选中索引到缓存
-    if (selectedIndex != -1) {
-        saveSelectedDeviceIndex(selectedIndex)
-        pickerDefaultIndex.value = [selectedIndex]
-    }
-
-    // 保存选中的设备信息
+    saveSelectedDeviceIndex(selectedIndex)
+    pickerValues.value = [selectedDevice.imei || selectedDevice.deviceId]
     saveSelectedDevice(selectedDevice)
 
     uni.showLoading({
@@ -637,7 +647,6 @@ const handleConfirm = (e: UTSJSONObject) => {
         mask: true
     })
 
-    // 加载新设备数据
     loadDeviceData(selectedDevice)
 }
 
@@ -680,25 +689,22 @@ const loadDeviceList = async () => {
             let selectedDevice : Device | null = null
             let selectedIdx : number = -1
 
-            // 优先使用保存的索引
-            if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-                selectedDevice = deviceList.value[savedIndex]
-                selectedIdx = savedIndex
-            }
-
-            // 如果索引无效或设备不存在，尝试使用保存的设备信息
-            if (selectedDevice == null && savedDevice != null && savedDevice.imei != '') {
-                selectedDevice = deviceList.value.find(device =>
-                    device.imei == savedDevice.imei ||
-                    device.value == savedDevice.imei
-                )
-                if (selectedDevice) {
-                    selectedIdx = deviceList.value.indexOf(selectedDevice)
+            // 优先按保存的设备身份恢复，避免列表排序变化后选中错误车辆
+            if (savedDevice != null) {
+                selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                if (selectedIdx != -1) {
+                    selectedDevice = deviceList.value[selectedIdx]
+                    saveSelectedDeviceIndex(selectedIdx)
                 } else {
-                    // 保存的设备已被删除，清除保存记录
                     clearSavedSelectedDevice()
                     clearSavedSelectedDeviceIndex()
                 }
+            }
+
+            // 没有可用设备身份时，才使用保存的索引作为兼容回退
+            if (selectedDevice == null && savedIndex != null && savedIndex < deviceList.value.length) {
+                selectedDevice = deviceList.value[savedIndex]
+                selectedIdx = savedIndex
             }
 
             // 如果没有保存的设备或保存的设备无效，使用第一个设备
@@ -727,10 +733,7 @@ const loadDeviceList = async () => {
                 center.latitude = device.latitude
                 center.longitude = device.longitude
 
-                // 设置 picker 默认索引
-                if (selectedIdx != -1) {
-                    pickerDefaultIndex.value = [selectedIdx]
-                }
+                pickerValues.value = [device.imei != '' ? device.imei : device.deviceId]
 
                 await loadDeviceDetail(device.deviceId);
                 await loadDevicePos({
@@ -943,8 +946,11 @@ const toPay = (iccid : string,simMerchant : string) => {
 
 // 跳转登录页
 const gotoLogin = () => {
-    uni.navigateTo({
-        url: '/pages/login/login',
+    isMapReady.value = false
+    nextTick(() => {
+        uni.navigateTo({
+            url: '/pages/login/login',
+        })
     })
 }
 
@@ -1029,6 +1035,7 @@ onLoad(() => {
     initDimensions()
 
     if (checkToken()) {
+        isMapReady.value = true
         loadDeviceList()
     }
 })
@@ -1038,7 +1045,8 @@ return (): any | null => {
 const _component_i_icon = resolveEasyComponent("i-icon",_easycom_i_icon)
 const _component_i_line_progress = resolveEasyComponent("i-line-progress",_easycom_i_line_progress)
 const _component_map = resolveComponent("map")
-const _component_i_picker = resolveEasyComponent("i-picker",_easycom_i_picker)
+const _component_l_picker = resolveEasyComponent("l-picker",_easycom_l_picker)
+const _component_l_popup = resolveEasyComponent("l-popup",_easycom_l_popup)
 const _component_app_toast = resolveEasyComponent("app-toast",_easycom_app_toast)
 const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal)
 
@@ -1172,22 +1180,25 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
               ])
             ]),
             _cE("view", _uM({ class: "map-container" }), [
-              _cV(_component_map, _uM({
-                id: "myMap",
-                latitude: center.latitude,
-                longitude: center.longitude,
-                scale: mapScale.value,
-                style: _nS(_uM({"width":"100%","height":"100%"})),
-                "show-location": true,
-                "enable-traffic": true,
-                "enable-overlooking": true,
-                "enable-building": true,
-                "enable-3D": false,
-                markers: markers.value
-              }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "markers"]),
+              isTrue(isMapReady.value)
+                ? _cV(_component_map, _uM({
+                    key: 0,
+                    id: "myMap",
+                    latitude: center.latitude,
+                    longitude: center.longitude,
+                    scale: mapScale.value,
+                    style: _nS(_uM({"width":"100%","height":"100%"})),
+                    "show-location": true,
+                    "enable-traffic": true,
+                    "enable-overlooking": true,
+                    "enable-building": true,
+                    "enable-3D": false,
+                    markers: markers.value
+                  }), null, 8 /* PROPS */, ["latitude", "longitude", "scale", "style", "markers"])
+                : _cC("v-if", true),
               positionState.value != 'available'
                 ? _cE("view", _uM({
-                    key: 0,
+                    key: 1,
                     class: "map-status"
                   }), [
                     _cE("text", _uM({ class: "map-status-text" }), _tD(positionMessage.value), 1 /* TEXT */),
@@ -1379,18 +1390,26 @@ const _component_app_modal = resolveEasyComponent("app-modal",_easycom_app_modal
           ])
         ])
       ]),
-      isTrue(showPicker.value)
-        ? _cV(_component_i_picker, _uM({
-            key: pickerKey.value,
-            show: showPicker.value,
+      _cV(_component_l_popup, _uM({
+        modelValue: showPicker.value,
+        "onUpdate:modelValue": $event => {(showPicker).value = $event},
+        position: "bottom",
+        closeable: false,
+        "safe-area-inset-bottom": true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cV(_component_l_picker, _uM({
+            modelValue: pickerValues.value,
+            "onUpdate:modelValue": $event => {(pickerValues).value = $event},
+            "cancel-btn": "取消",
+            "confirm-btn": "确认",
             columns: pickerColumns.value,
-            defaultIndex: pickerDefaultIndex.value,
-            visibleItemCount: 5,
-            onConfirm: handleConfirm,
             onCancel: closePicker,
-            onClose: closePicker
-          }), null, 8 /* PROPS */, ["show", "columns", "defaultIndex"])
-        : _cC("v-if", true)
+            onConfirm: handlePickerConfirm
+          }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "columns"])
+        ]),
+        _: 1 /* STABLE */
+      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
     ]),
     _cV(_component_app_toast),
     _cV(_component_app_modal)

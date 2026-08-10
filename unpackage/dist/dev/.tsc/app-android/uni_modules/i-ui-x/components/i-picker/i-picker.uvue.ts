@@ -184,6 +184,8 @@ function normalizeColumn(list: Array<any>): Array<PickerItem> {
 
 const opened = ref(props.show)
 const currentIndexs = ref<Array<number>>([])
+let confirmPending = false
+const IOS_CONFIRM_SETTLE_DELAY = 80
 
 const normalizedColumns = computed<Array<Array<PickerItem>>>(() => {
   const source = props.columns.length > 0 ? props.columns : props.options
@@ -414,6 +416,7 @@ function openByTrigger() {
 }
 
 function close() {
+  confirmPending = false
   if (!opened.value) return
   opened.value = false
   emit('close')
@@ -421,16 +424,41 @@ function close() {
 }
 
 function cancel() {
+  if (confirmPending) return
   emit('cancel', buildChangeEvent(0, selectedIndexAt(0)))
   close()
 }
 
-function confirm() {
+function finalizeConfirm() {
+  if (!confirmPending && opened.value == false) return
   const event = buildConfirmEvent()
   emit('confirm', event)
   emitSelectedValue()
   close()
 }
+
+function confirm() {
+  if (confirmPending || !opened.value) return
+
+
+
+
+
+
+
+
+
+  finalizeConfirm()
+
+}
+
+watch(() => props.show, (show: boolean) => {
+  if (show) {
+    open()
+  } else {
+    close()
+  }
+})
 
 function clear() {
   currentIndexs.value = []
@@ -441,7 +469,7 @@ function clear() {
 }
 
 function handleOverlayClick() {
-  if (!props.closeOnMask) return
+  if (confirmPending || !props.closeOnMask) return
   close()
 }
 

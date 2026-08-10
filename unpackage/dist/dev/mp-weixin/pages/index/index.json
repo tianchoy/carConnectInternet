@@ -3,7 +3,8 @@
   "usingComponents": {
     "i-icon": "../../uni_modules/i-ui-x/components/i-icon/i-icon",
     "i-line-progress": "../../uni_modules/i-ui-x/components/i-line-progress/i-line-progress",
-    "i-picker": "../../uni_modules/i-ui-x/components/i-picker/i-picker",
+    "l-picker": "../../uni_modules/lime-picker/components/l-picker/l-picker",
+    "l-popup": "../../uni_modules/lime-popup/components/l-popup/l-popup",
     "app-toast": "../../components/app-toast/app-toast",
     "app-modal": "../../components/app-modal/app-modal"
   }

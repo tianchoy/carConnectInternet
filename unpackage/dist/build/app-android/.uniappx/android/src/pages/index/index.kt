@@ -49,13 +49,13 @@ open class GenPagesIndexIndex : BasePage {
             }
             )
             val mapScale = ref(12)
+            val isMapReady = ref(false)
             val statusBarHeight = ref(20)
             val menuButtonInfo = ref(null)
             val navBarHeight = ref(44)
             val deviceList = ref(_uA<Device>())
             val showPicker = ref(false)
-            val pickerDefaultIndex = ref(_uA<Number>(0))
-            val pickerKey = ref(0)
+            val pickerValues = ref(_uA<PickerValue>())
             val currentCarImei = ref("")
             val currentCarDeptId = ref("")
             val currentCarDeviceId = ref("")
@@ -75,9 +75,9 @@ open class GenPagesIndexIndex : BasePage {
                 return DeviceDetailState(deviceStatus = DeviceStatus(batteryPercent = detail.deviceStatus.batteryPercent, voltage = detail.deviceStatus.voltage, signalStrength = detail.deviceStatus.signalStrength), connectionStatus = detail.connectionStatus, lastUpdateTime = detail.lastUpdateTime)
             }
             )
-            val pickerColumns = computed(fun(): UTSArray<UTSArray<UTSJSONObject>> {
+            val pickerColumns = computed<UTSArray<PickerColumn>>(fun(): UTSArray<PickerColumn> {
                 return _uA(
-                    deviceList.value.map(fun(device): UTSJSONObject {
+                    deviceList.value.map(fun(device): PickerColumnItem {
                         val displayName = if (device.deviceName != "") {
                             device.deviceName
                         } else {
@@ -96,12 +96,12 @@ open class GenPagesIndexIndex : BasePage {
                         } else {
                             "离线"
                         }
-                        return _uO("text" to ("" + displayName + " (" + statusText + ")"), "value" to if (device.imei != "") {
+                        return PickerColumnItem(id = null, label = "" + displayName + " (" + statusText + ")", value = if (device.imei != "") {
                             device.imei
                         } else {
                             device.deviceId
                         }
-                        , "disabled" to false)
+                        , disabled = false, children = null)
                     }
                     )
                 )
@@ -178,10 +178,16 @@ open class GenPagesIndexIndex : BasePage {
                     return null
                 }
                 val imei = data.getString("imei", "")
-                if (imei == "") {
+                val deviceId = data.getString("deviceId", "")
+                if (imei == "" && deviceId == "") {
                     return null
                 }
-                val device = SavedDevice(name = data.getString("name", imei), deviceName = data.getString("deviceName", data.getString("name", imei)), imei = imei, deptId = data.getString("deptId", ""), deviceId = data.getString("deviceId", ""), iccid = data.getString("iccid", ""), simMerchant = data.getString("simMerchant", ""), connectionStatus = data.getString("connectionStatus", ""), carType = data.getString("carType", ""), plateNo = data.getString("plateNo", ""), latitude = data.getNumber("latitude", 0), longitude = data.getNumber("longitude", 0))
+                val identity = if (imei != "") {
+                    imei
+                } else {
+                    deviceId
+                }
+                val device = SavedDevice(name = data.getString("name", identity), deviceName = data.getString("deviceName", data.getString("name", identity)), imei = imei, deptId = data.getString("deptId", ""), deviceId = deviceId, iccid = data.getString("iccid", ""), simMerchant = data.getString("simMerchant", ""), connectionStatus = data.getString("connectionStatus", ""), carType = data.getString("carType", ""), plateNo = data.getString("plateNo", ""), latitude = data.getNumber("latitude", 0), longitude = data.getNumber("longitude", 0))
                 return device
             }
             val getSavedSelectedDevice = fun(): SavedDevice? {
@@ -239,36 +245,59 @@ open class GenPagesIndexIndex : BasePage {
                     console.error("清除保存设备索引失败:", error)
                 }
             }
+            val findDeviceIndex = fun(imei: String, deviceId: String): Number {
+                if (imei != "") {
+                    val imeiIndex = deviceList.value.findIndex(fun(device): Boolean {
+                        return device.imei == imei || device.value == imei
+                    }
+                    )
+                    if (imeiIndex != -1) {
+                        return imeiIndex
+                    }
+                }
+                if (deviceId != "") {
+                    return deviceList.value.findIndex(fun(device): Boolean {
+                        return device.deviceId == deviceId
+                    }
+                    )
+                }
+                return -1
+            }
             val handlePicker = fun(){
                 if (deviceList.value.length == 0) {
                     showAppToast(ShowToastOptions(title = "暂无车辆数据", icon = "none"))
                     return
                 }
-                pickerKey.value++
-                val savedIndex = getSavedSelectedDeviceIndex()
-                if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-                    pickerDefaultIndex.value = _uA(
-                        savedIndex
-                    )
+                val currentIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+                val savedDevice = getSavedSelectedDevice()
+                val savedDeviceIndex = if (savedDevice != null) {
+                    findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
                 } else {
-                    val currentIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
-                    }
-                    )
-                    if (currentIndex != -1) {
-                        pickerDefaultIndex.value = _uA(
-                            currentIndex
-                        )
+                    -1
+                }
+                val savedIndex = getSavedSelectedDeviceIndex()
+                var selectedIndex = currentIndex
+                if (selectedIndex == -1) {
+                    selectedIndex = savedDeviceIndex
+                }
+                if (selectedIndex == -1 && savedIndex != null && savedIndex < deviceList.value.length) {
+                    selectedIndex = savedIndex
+                }
+                if (selectedIndex == -1) {
+                    selectedIndex = 0
+                }
+                val selectedDevice = deviceList.value[selectedIndex]
+                if (selectedDevice == null) {
+                    return
+                }
+                pickerValues.value = _uA(
+                    if (selectedDevice.imei != "") {
+                        selectedDevice.imei
                     } else {
-                        pickerDefaultIndex.value = _uA(
-                            0
-                        )
+                        selectedDevice.deviceId
                     }
-                }
-                nextTick(fun(){
-                    showPicker.value = true
-                }
                 )
+                showPicker.value = true
             }
             val createMarker = fun(id: Number, lat: Number, lng: Number, type: String, title: String?): Marker {
                 val isOnline = currentCarConnectionStatus.value == "online"
@@ -456,30 +485,38 @@ open class GenPagesIndexIndex : BasePage {
                         }
                 })
             }
-            val handleConfirm = fun(e: UTSJSONObject){
+            val handlePickerConfirm = fun(e: PickerConfirmEvent){
                 showPicker.value = false
-                val indexs = e.getArray<Number>("indexs")
-                var selectedIndex = if (indexs != null && indexs.length > 0) {
-                    indexs[0]
+                val selectedValue = if (e.values.length > 0) {
+                    e.values[0].toString()
                 } else {
-                    -1
+                    ""
                 }
-                if (selectedIndex < 0 || selectedIndex >= deviceList.value.length) {
-                    console.warn("无法解析选中的索引，使用当前设备")
-                    val currentIndex = deviceList.value.findIndex(fun(device): Boolean {
-                        return device.imei == currentCarImei.value || device.deviceId == currentCarDeviceId.value
+                var selectedIndex: Number = -1
+                if (selectedValue != "") {
+                    selectedIndex = deviceList.value.findIndex(fun(device): Boolean {
+                        return device.imei == selectedValue || device.value == selectedValue || device.deviceId == selectedValue
                     }
                     )
-                    if (currentIndex != -1) {
-                        selectedIndex = currentIndex
-                        console.log("使用当前设备索引:", selectedIndex)
-                    } else {
-                        selectedIndex = 0
-                        console.log("使用默认索引: 0")
+                }
+                if (selectedIndex < 0 && e.indexs.length > 0) {
+                    val eventIndex = e.indexs[0]
+                    if (eventIndex >= 0 && eventIndex < deviceList.value.length) {
+                        selectedIndex = eventIndex
                     }
                 }
-                val selectedDevice = deviceList.value[selectedIndex]
-                if (!(selectedDevice != null)) {
+                if (selectedIndex < 0) {
+                    selectedIndex = findDeviceIndex(currentCarImei.value, currentCarDeviceId.value)
+                }
+                if (selectedIndex < 0 && deviceList.value.length > 0) {
+                    selectedIndex = 0
+                }
+                val selectedDevice = if (selectedIndex >= 0) {
+                    deviceList.value[selectedIndex]
+                } else {
+                    null
+                }
+                if (selectedDevice == null) {
                     showAppToast(ShowToastOptions(title = "选择设备失败", icon = "none"))
                     return
                 }
@@ -511,12 +548,14 @@ open class GenPagesIndexIndex : BasePage {
                 currentCarPlateNo.value = selectedDevice.plateNo
                 center.latitude = selectedDevice.latitude
                 center.longitude = selectedDevice.longitude
-                if (selectedIndex != -1) {
-                    saveSelectedDeviceIndex(selectedIndex)
-                    pickerDefaultIndex.value = _uA(
-                        selectedIndex
-                    )
-                }
+                saveSelectedDeviceIndex(selectedIndex)
+                pickerValues.value = _uA(
+                    if (selectedDevice.imei != "") {
+                        selectedDevice.imei
+                    } else {
+                        selectedDevice.deviceId
+                    }
+                )
                 saveSelectedDevice(selectedDevice)
                 uni_showLoading(ShowLoadingOptions(title = "加载车辆数据...", mask = true))
                 loadDeviceData(selectedDevice)
@@ -548,21 +587,19 @@ open class GenPagesIndexIndex : BasePage {
                                 val savedIndex = getSavedSelectedDeviceIndex()
                                 var selectedDevice: Device? = null
                                 var selectedIdx: Number = -1
-                                if (savedIndex != null && savedIndex >= 0 && savedIndex < deviceList.value.length) {
-                                    selectedDevice = deviceList.value[savedIndex]
-                                    selectedIdx = savedIndex
-                                }
-                                if (selectedDevice == null && savedDevice != null && savedDevice.imei != "") {
-                                    selectedDevice = deviceList.value.find(fun(device): Boolean {
-                                        return device.imei == savedDevice.imei || device.value == savedDevice.imei
-                                    }
-                                    )
-                                    if (isTruthy(selectedDevice)) {
-                                        selectedIdx = deviceList.value.indexOf(selectedDevice)
+                                if (savedDevice != null) {
+                                    selectedIdx = findDeviceIndex(savedDevice.imei, savedDevice.deviceId)
+                                    if (selectedIdx != -1) {
+                                        selectedDevice = deviceList.value[selectedIdx]
+                                        saveSelectedDeviceIndex(selectedIdx)
                                     } else {
                                         clearSavedSelectedDevice()
                                         clearSavedSelectedDeviceIndex()
                                     }
+                                }
+                                if (selectedDevice == null && savedIndex != null && savedIndex < deviceList.value.length) {
+                                    selectedDevice = deviceList.value[savedIndex]
+                                    selectedIdx = savedIndex
                                 }
                                 if (!isTruthy(selectedDevice) && deviceList.value.length > 0) {
                                     selectedDevice = deviceList.value[0]
@@ -597,11 +634,13 @@ open class GenPagesIndexIndex : BasePage {
                                     currentCarPlateNo.value = device.plateNo
                                     center.latitude = device.latitude
                                     center.longitude = device.longitude
-                                    if (selectedIdx != -1) {
-                                        pickerDefaultIndex.value = _uA(
-                                            selectedIdx
-                                        )
-                                    }
+                                    pickerValues.value = _uA(
+                                        if (device.imei != "") {
+                                            device.imei
+                                        } else {
+                                            device.deviceId
+                                        }
+                                    )
                                     await(loadDeviceDetail(device.deviceId))
                                     await(loadDevicePos(_uO("deviceId" to device.deviceId, "deviceids" to if (device.imei != "") {
                                         device.imei
@@ -746,7 +785,11 @@ open class GenPagesIndexIndex : BasePage {
                 showAppToast(ShowToastOptions(title = "请在微信小程序中完成充值", icon = "none", duration = 2000, mask = true))
             }
             val gotoLogin = fun(){
-                uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
+                isMapReady.value = false
+                nextTick(fun(){
+                    uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
+                }
+                )
             }
             fun gen_unbindCurrentDevice_fn(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
@@ -795,6 +838,7 @@ open class GenPagesIndexIndex : BasePage {
                 uni_hideTabBar(null)
                 initDimensions()
                 if (checkToken()) {
+                    isMapReady.value = true
                     loadDeviceList()
                 }
             }
@@ -803,7 +847,8 @@ open class GenPagesIndexIndex : BasePage {
                 val _component_i_icon = resolveEasyComponent("i-icon", GenUniModulesIUiXComponentsIIconIIconClass)
                 val _component_i_line_progress = resolveEasyComponent("i-line-progress", GenUniModulesIUiXComponentsILineProgressILineProgressClass)
                 val _component_map = resolveComponent("map")
-                val _component_i_picker = resolveEasyComponent("i-picker", GenUniModulesIUiXComponentsIPickerIPickerClass)
+                val _component_l_picker = resolveEasyComponent("l-picker", GenUniModulesLimePickerComponentsLPickerLPickerClass)
+                val _component_l_popup = resolveEasyComponent("l-popup", GenUniModulesLimePopupComponentsLPopupLPopupClass)
                 val _component_app_toast = resolveEasyComponent("app-toast", GenComponentsAppToastAppToastClass)
                 val _component_app_modal = resolveEasyComponent("app-modal", GenComponentsAppModalAppModalClass)
                 return _cE(Fragment, null, _uA(
@@ -895,15 +940,20 @@ open class GenPagesIndexIndex : BasePage {
                                         ))
                                     )),
                                     _cE("view", _uM("class" to "map-container"), _uA(
-                                        _cV(_component_map, _uM("id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
-                                            "latitude",
-                                            "longitude",
-                                            "scale",
-                                            "style",
-                                            "markers"
-                                        )),
+                                        if (isTrue(isMapReady.value)) {
+                                            _cV(_component_map, _uM("key" to 0, "id" to "myMap", "latitude" to center.latitude, "longitude" to center.longitude, "scale" to mapScale.value, "style" to _nS(_uM("width" to "100%", "height" to "100%")), "show-location" to true, "enable-traffic" to true, "enable-overlooking" to true, "enable-building" to true, "enable-3D" to false, "markers" to markers.value), null, 8, _uA(
+                                                "latitude",
+                                                "longitude",
+                                                "scale",
+                                                "style",
+                                                "markers"
+                                            ))
+                                        } else {
+                                            _cC("v-if", true)
+                                        }
+                                        ,
                                         if (positionState.value != "available") {
-                                            _cE("view", _uM("key" to 0, "class" to "map-status"), _uA(
+                                            _cE("view", _uM("key" to 1, "class" to "map-status"), _uA(
                                                 _cE("text", _uM("class" to "map-status-text"), _tD(positionMessage.value), 1),
                                                 if (positionState.value != "loading") {
                                                     _cE("text", _uM("key" to 0, "class" to "map-status-retry", "onClick" to refreshLocation), "重新获取")
@@ -1034,15 +1084,25 @@ open class GenPagesIndexIndex : BasePage {
                                 ))
                             ))
                         )),
-                        if (isTrue(showPicker.value)) {
-                            _cV(_component_i_picker, _uM("key" to pickerKey.value, "show" to showPicker.value, "columns" to pickerColumns.value, "defaultIndex" to pickerDefaultIndex.value, "visibleItemCount" to 5, "onConfirm" to handleConfirm, "onCancel" to closePicker, "onClose" to closePicker), null, 8, _uA(
-                                "show",
-                                "columns",
-                                "defaultIndex"
-                            ))
-                        } else {
-                            _cC("v-if", true)
+                        _cV(_component_l_popup, _uM("modelValue" to showPicker.value, "onUpdate:modelValue" to fun(`$event`: Boolean){
+                            showPicker.value = `$event`
                         }
+                        , "position" to "bottom", "closeable" to false, "safe-area-inset-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                            return _uA(
+                                _cV(_component_l_picker, _uM("modelValue" to pickerValues.value, "onUpdate:modelValue" to fun(`$event`: UTSArray<PickerValue>){
+                                    pickerValues.value = `$event`
+                                }
+                                , "cancel-btn" to "取消", "confirm-btn" to "确认", "columns" to pickerColumns.value, "onCancel" to closePicker, "onConfirm" to handlePickerConfirm), null, 8, _uA(
+                                    "modelValue",
+                                    "onUpdate:modelValue",
+                                    "columns"
+                                ))
+                            )
+                        }
+                        ), "_" to 1), 8, _uA(
+                            "modelValue",
+                            "onUpdate:modelValue"
+                        ))
                     )),
                     _cV(_component_app_toast),
                     _cV(_component_app_modal)

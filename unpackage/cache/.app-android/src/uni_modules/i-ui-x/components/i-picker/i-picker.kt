@@ -144,6 +144,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             val normalizeColumn = ::gen_normalizeColumn_fn
             val opened = ref(props.show)
             val currentIndexs = ref(_uA<Number>())
+            var confirmPending = false
             val normalizedColumns = computed<UTSArray<UTSArray<PickerItem>>>(fun(): UTSArray<UTSArray<PickerItem>> {
                 val source = if (props.columns.length > 0) {
                     props.columns
@@ -462,6 +463,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             }
             val openByTrigger = ::gen_openByTrigger_fn
             fun gen_close_fn() {
+                confirmPending = false
                 if (!opened.value) {
                     return
                 }
@@ -471,17 +473,41 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             }
             val close = ::gen_close_fn
             fun gen_cancel_fn() {
+                if (confirmPending) {
+                    return
+                }
                 emit("cancel", buildChangeEvent(0, selectedIndexAt(0)))
                 close()
             }
             val cancel = ::gen_cancel_fn
-            fun gen_confirm_fn() {
+            fun gen_finalizeConfirm_fn() {
+                if (!confirmPending && opened.value == false) {
+                    return
+                }
                 val event = buildConfirmEvent()
                 emit("confirm", event)
                 emitSelectedValue()
                 close()
             }
+            val finalizeConfirm = ::gen_finalizeConfirm_fn
+            fun gen_confirm_fn() {
+                if (confirmPending || !opened.value) {
+                    return
+                }
+                finalizeConfirm()
+            }
             val confirm = ::gen_confirm_fn
+            watch(fun(){
+                return props.show
+            }
+            , fun(show: Boolean){
+                if (show) {
+                    open()
+                } else {
+                    close()
+                }
+            }
+            )
             fun gen_clear_fn() {
                 currentIndexs.value = _uA()
                 emit("clear")
@@ -491,7 +517,7 @@ open class GenUniModulesIUiXComponentsIPickerIPicker : VueComponent {
             }
             val clear = ::gen_clear_fn
             fun gen_handleOverlayClick_fn() {
-                if (!props.closeOnMask) {
+                if (confirmPending || !props.closeOnMask) {
                     return
                 }
                 close()
