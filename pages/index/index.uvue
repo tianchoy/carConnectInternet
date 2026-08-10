@@ -1304,8 +1304,8 @@ onLoad(() => {
                 }
                 .nav-tool-add {
                     display: flex;
-                    width: 36rpx;
-                    height: 36rpx;
+                    width: 40rpx;
+                    height: 40rpx;
                     align-items: center;
                     justify-content: center;
                 }
