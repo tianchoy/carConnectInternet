@@ -12,6 +12,10 @@
   },
   "app-ios": {
     "distribute": {
+      "UIBackgroundModes": [
+        "location",
+        "remote-notification"
+      ],
       "privacyDescription": {
         "NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
       },
@@ -24,12 +28,12 @@
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
           }
         },
-        "uni-dialogPage": {},
-        "uni-event": {},
+        "uni-showLoading": {},
         "uni-storage": {},
+        "uni-event": {},
         "uni-location": {},
         "uni-getSystemInfo": {},
-        "uni-showLoading": {},
+        "uni-dialogPage": {},
         "uni-vibrate": {},
         "uni-getAppBaseInfo": {},
         "uni-network": {},

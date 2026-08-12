@@ -112,7 +112,8 @@
 					}
 				},
 				"UIBackgroundModes": [
-					"location"
+					"location",
+					"remote-notification"
 				],
 				"NSLocationWhenInUseUsageDescription": "需要使用您的位置信息提供导航服务",
 				"NSLocationAlwaysAndWhenInUseUsageDescription": "需要使用您的位置信息提供导航服务",
@@ -143,6 +144,10 @@
 	},
 	"app-ios": {
 		"distribute": {
+			"UIBackgroundModes": [
+				"location",
+				"remote-notification"
+			],
 			"privacyDescription": {
 				"NSCameraUsageDescription": "需要使用您的摄像头扫描设备二维码"
 			},

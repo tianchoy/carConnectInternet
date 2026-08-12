@@ -3928,16 +3928,16 @@
   CoordTransform.a = 6378245;
   CoordTransform.ee = 0.006693421622965943;
   CoordTransform.pi = 3.141592653589793;
-  const { registerUTSInterface, initUTSProxyClass, initUTSElementProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
-  const name = "externalMapNavigation";
-  const moduleName = "外部地图导航";
-  const moduleType = "";
-  const errMsg = "";
-  const is_uni_modules = true;
-  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
-  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
-  const getAvailableIOSMapProviderIds = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getAvailableIOSMapProviderIdsByJs", keepAlive: false, params: [], return: "" });
-  const openExternalMap = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "openExternalMapByJs", keepAlive: false, params: [{ "name": "params", "type": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject" }], return: "" });
+  const { registerUTSInterface: registerUTSInterface$1, initUTSProxyClass: initUTSProxyClass$1, initUTSElementProxyClass: initUTSElementProxyClass$1, initUTSProxyFunction: initUTSProxyFunction$1, initUTSPackageName: initUTSPackageName$1, initUTSIndexClassName: initUTSIndexClassName$1, initUTSClassName: initUTSClassName$1 } = uni;
+  const name$1 = "externalMapNavigation";
+  const moduleName$1 = "外部地图导航";
+  const moduleType$1 = "";
+  const errMsg$1 = "";
+  const is_uni_modules$1 = true;
+  const pkg$1 = /* @__PURE__ */ initUTSPackageName$1(name$1, is_uni_modules$1);
+  const cls$1 = /* @__PURE__ */ initUTSIndexClassName$1(name$1, is_uni_modules$1);
+  const getAvailableIOSMapProviderIds = /* @__PURE__ */ initUTSProxyFunction$1(false, { moduleName: moduleName$1, moduleType: moduleType$1, errMsg: errMsg$1, main: true, package: pkg$1, class: cls$1, name: "getAvailableIOSMapProviderIdsByJs", keepAlive: false, params: [], return: "" });
+  const openExternalMap = /* @__PURE__ */ initUTSProxyFunction$1(false, { moduleName: moduleName$1, moduleType: moduleType$1, errMsg: errMsg$1, main: true, package: pkg$1, class: cls$1, name: "openExternalMapByJs", keepAlive: false, params: [{ "name": "params", "type": "UTSSDKModulesExternalMapNavigationExternalMapNavigationParamsJSONObject" }], return: "" });
   class OpenLocationParams extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4106,56 +4106,87 @@
       }
     }));
   }
-  const PUSH_CLIENT_ID_KEY = "push_client_id";
-  const PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id";
-  const PUSH_MESSAGE_STALE_KEY = "push_message_stale";
-  const PUSH_SESSION_KEY = "push_session_key";
-  let initialized = false;
-  let pushClientIdRequesting = false;
-  let pushClientIdRetryCount = 0;
-  let pushClientIdRetryTimer = 0;
-  let pushClientIdRequestTimeout = 0;
-  const PUSH_CLIENT_ID_MAX_RETRY_COUNT = 5;
-  const PUSH_CLIENT_ID_RETRY_DELAY = 3e3;
-  const PUSH_CLIENT_ID_REQUEST_TIMEOUT = 18e3;
-  function pushDebug(message) {
-    uni.__log__("error", "at services/push.uts:23", "[UniPushDebug]", message);
+  const { registerUTSInterface, initUTSProxyClass, initUTSElementProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
+  const name = "jgJpushU";
+  const moduleName = "jg-jpush-u";
+  const moduleType = "";
+  const errMsg = "";
+  const is_uni_modules = true;
+  const pkg = /* @__PURE__ */ initUTSPackageName(name, is_uni_modules);
+  const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
+  const setEventCallBack = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "setEventCallBackByJs", keepAlive: true, params: [{ "name": "param", "type": "UTSSDKModulesJgJpushUEventCallBackParamsJSONObject" }], return: "" });
+  const initPush$1 = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "initPushByJs", keepAlive: false, params: [{ "name": "param", "type": "UTSSDKModulesJgJpushUInitPushParamsJSONObject" }], return: "" });
+  const getRegistrationIdAsync = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getRegistrationIdAsyncByJs", keepAlive: false, params: [{ "name": "callback", "type": "UTSCallback" }], return: "" });
+  const getRegistrationId = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "getRegistrationIdByJs", keepAlive: false, params: [], return: "" });
+  class NormalizedPushEvent extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            provider: { type: "Unknown", optional: false },
+            kind: { type: "Unknown", optional: false },
+            payload: { type: "Any", optional: false }
+          };
+        }
+      };
+    }
+    constructor(options, metadata = NormalizedPushEvent.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.provider = this.__props__.provider;
+      this.kind = this.__props__.kind;
+      this.payload = this.__props__.payload;
+      delete this.__props__;
+    }
   }
-  function clearPushClientIdTimers() {
-    if (pushClientIdRetryTimer > 0) {
-      clearTimeout(pushClientIdRetryTimer);
-      pushClientIdRetryTimer = 0;
-    }
-    if (pushClientIdRequestTimeout > 0) {
-      clearTimeout(pushClientIdRequestTimeout);
-      pushClientIdRequestTimeout = 0;
-    }
+  const PUSH_PROVIDER_KEY = "push_provider";
+  const PUSH_PENDING_MESSAGE_ID_KEY_PREFIX = "push.pending_message_id.";
+  const PUSH_MESSAGE_STALE_KEY_PREFIX = "push.message_stale.";
+  const PUSH_SESSION_KEY_PREFIX = "push.session.";
+  const PUSH_REGISTRATION_ID_KEY_PREFIX = "push.registration_id.";
+  const LEGACY_PUSH_CLIENT_ID_KEY = "push_client_id";
+  const LEGACY_PUSH_PENDING_MESSAGE_ID_KEY = "push_pending_message_id";
+  const LEGACY_PUSH_MESSAGE_STALE_KEY = "push_message_stale";
+  const LEGACY_PUSH_SESSION_KEY = "push_session_key";
+  const PUSH_REGISTRATION_ID_MAX_RETRY_COUNT = 5;
+  const PUSH_REGISTRATION_ID_RETRY_DELAY = 3e3;
+  const PUSH_REGISTRATION_ID_REQUEST_TIMEOUT = 18e3;
+  const DEFAULT_PUSH_PROVIDER = "jpush";
+  const JPUSH_IOS_PRODUCTION_OVERRIDE_KEY = "push_jpush_ios_production_override";
+  const DEFAULT_JPUSH_IOS_IS_PRODUCTION = true;
+  const JPUSH_APP_KEY = "a53c28d734057573f67e16f7";
+  const JPUSH_CHANNEL = "developer-default";
+  function registrationIdKey(provider) {
+    return PUSH_REGISTRATION_ID_KEY_PREFIX + provider;
   }
-  function schedulePushClientIdRetry(reason) {
-    if (pushClientIdRetryCount >= PUSH_CLIENT_ID_MAX_RETRY_COUNT) {
-      pushDebug("UniPush CID 获取超时，已停止重试。原因: " + reason);
-      return null;
-    }
-    if (pushClientIdRetryTimer > 0)
-      return null;
-    pushClientIdRetryCount += 1;
-    pushDebug("UniPush CID 将在 " + PUSH_CLIENT_ID_RETRY_DELAY.toString() + "ms 后重试，第 " + pushClientIdRetryCount.toString() + " 次。原因: " + reason);
-    pushClientIdRetryTimer = setTimeout(() => {
-      pushClientIdRetryTimer = 0;
-      refreshPushClientId();
-    }, PUSH_CLIENT_ID_RETRY_DELAY);
+  function pendingMessageIdKey(provider) {
+    return PUSH_PENDING_MESSAGE_ID_KEY_PREFIX + provider;
+  }
+  function messageStaleKey(provider) {
+    return PUSH_MESSAGE_STALE_KEY_PREFIX + provider;
+  }
+  function sessionKey(provider) {
+    return PUSH_SESSION_KEY_PREFIX + provider;
+  }
+  function pushDebug(provider, message) {
+    uni.__log__("error", "at services/push.uts:77", "[PushManager][" + provider + "] " + message);
   }
   function stringValue(value = null) {
     if (value == null)
       return "";
     return value.toString();
   }
+  function storageString(key) {
+    const value = uni.getStorageSync(key);
+    return value == null ? "" : stringValue(value);
+  }
   function payloadValue(payload = null, key) {
     if (payload == null)
       return "";
     if (typeof payload == "string") {
       try {
-        const parsedPayload = UTS.JSON.parse(payload);
+        const parsedPayload = UTS.JSON.parse(payload, UTSJSONObject);
         if (parsedPayload == null)
           return "";
         return payloadValue(parsedPayload, key);
@@ -4170,131 +4201,366 @@
       return "";
     }
   }
-  function pushMessageId(message = null) {
-    let id = payloadValue(message, "messageId");
-    if (id == "")
-      id = payloadValue(message, "message_id");
-    if (id == "")
-      id = payloadValue(message, "id");
-    if (id == "") {
-      const data = payloadValue(message, "data");
-      if (data != "")
-        id = payloadValue(data, "messageId");
+  function nestedPayloadValue(payload = null, key) {
+    let value = payloadValue(payload, key);
+    if (value != "")
+      return value;
+    const nestedKeys = ["data", "extra", "notificationExtras", "extras"];
+    for (let index = 0; index < nestedKeys.length; index++) {
+      const nestedValue = payloadValue(payload, nestedKeys[index]);
+      if (nestedValue == "")
+        continue;
+      value = payloadValue(nestedValue, key);
+      if (value != "")
+        return value;
     }
+    return "";
+  }
+  function pushMessageId(payload = null) {
+    let id = nestedPayloadValue(payload, "messageId");
+    if (id == "")
+      id = nestedPayloadValue(payload, "message_id");
+    if (id == "")
+      id = nestedPayloadValue(payload, "id");
     return id;
   }
-  function savePushEvent(event = null) {
-    const messageId = pushMessageId(event);
-    if (messageId != "")
-      uni.setStorageSync(PUSH_PENDING_MESSAGE_ID_KEY, messageId);
-    uni.setStorageSync(PUSH_MESSAGE_STALE_KEY, true);
-    return messageId;
+  function jpushIosIsProduction() {
+    const override = storageString(JPUSH_IOS_PRODUCTION_OVERRIDE_KEY);
+    if (override == "false")
+      return false;
+    if (override == "true")
+      return true;
+    return DEFAULT_JPUSH_IOS_IS_PRODUCTION;
   }
-  function isNotificationClick(event = null) {
-    return payloadValue(event, "type").toLowerCase() == "click";
+  function selectedPushProvider() {
+    return DEFAULT_PUSH_PROVIDER;
   }
-  function registerPushListener() {
-    if (initialized)
+  function migrateLegacyStorage(provider) {
+    if (provider != "unipush")
       return null;
-    initialized = true;
-    try {
-      uni.onPushMessage((event = null) => {
-        uni.__log__("log", "at services/push.uts:103", "收到 UniPush 消息");
-        savePushEvent(event);
-        if (isNotificationClick(event)) {
-          uni.switchTab({ url: "/pages/message/message" });
-        }
-      });
-    } catch (error) {
-      uni.__log__("error", "at services/push.uts:110", "注册 UniPush 监听失败:", error);
+    if (storageString(registrationIdKey(provider)) == "") {
+      const legacyId = storageString(LEGACY_PUSH_CLIENT_ID_KEY);
+      if (legacyId != "")
+        uni.setStorageSync(registrationIdKey(provider), legacyId);
     }
-  }
-  function initPush() {
-    registerPushListener();
-    refreshPushClientId();
-  }
-  function refreshPushClientId() {
-    if (pushClientIdRequesting) {
-      pushDebug("UniPush CID 正在获取，跳过重复请求");
-      return null;
+    if (storageString(pendingMessageIdKey(provider)) == "") {
+      const legacyPendingId = storageString(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY);
+      if (legacyPendingId != "")
+        uni.setStorageSync(pendingMessageIdKey(provider), legacyPendingId);
     }
-    pushClientIdRequesting = true;
-    clearPushClientIdTimers();
-    try {
-      pushDebug("开始获取 UniPush CID");
-      pushClientIdRequestTimeout = setTimeout(() => {
-        pushClientIdRequestTimeout = 0;
-        if (!pushClientIdRequesting)
-          return null;
-        pushClientIdRequesting = false;
-        pushDebug("UniPush getPushClientId 回调超时");
-        schedulePushClientIdRetry("回调超时");
-      }, PUSH_CLIENT_ID_REQUEST_TIMEOUT);
-      uni.getPushClientId(new UTSJSONObject({
-        success: (result) => {
-          pushClientIdRequesting = false;
-          if (pushClientIdRequestTimeout > 0) {
-            clearTimeout(pushClientIdRequestTimeout);
-            pushClientIdRequestTimeout = 0;
+    if (storageString(messageStaleKey(provider)) == "") {
+      const legacyStale = storageString(LEGACY_PUSH_MESSAGE_STALE_KEY);
+      if (legacyStale != "")
+        uni.setStorageSync(messageStaleKey(provider), legacyStale);
+    }
+    if (storageString(sessionKey(provider)) == "") {
+      const legacySession = storageString(LEGACY_PUSH_SESSION_KEY);
+      if (legacySession != "")
+        uni.setStorageSync(sessionKey(provider), legacySession);
+    }
+    uni.removeStorageSync(LEGACY_PUSH_CLIENT_ID_KEY);
+    uni.removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY);
+    uni.removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY);
+    uni.removeStorageSync(LEGACY_PUSH_SESSION_KEY);
+  }
+  class UniPushAdapter {
+    constructor() {
+      this.provider = "unipush";
+      this.initialized = false;
+    }
+    init(onEvent, onRegistrationAvailable, onRegistrationId) {
+      if (this.initialized)
+        return null;
+      this.initialized = true;
+      try {
+        uni.onPushMessage((event = null) => {
+          const eventType = payloadValue(event, "type").toLowerCase();
+          onEvent(new NormalizedPushEvent({
+            provider: this.provider,
+            kind: eventType == "click" ? "clicked" : "received",
+            payload: event
+          }));
+        });
+        onRegistrationAvailable();
+      } catch (error) {
+        pushDebug(this.provider, "注册 UniPush 监听失败: " + error.toString());
+      }
+    }
+    getRegistrationId() {
+      return "";
+    }
+    requestRegistrationId(onSuccess, onFailure) {
+      try {
+        uni.getPushClientId(new UTSJSONObject({
+          success: (result) => {
+            const registrationId = result.cid;
+            if (registrationId == "") {
+              onFailure("CID 为空");
+              return null;
+            }
+            pushDebug(this.provider, "UniPush CID: " + registrationId);
+            onSuccess(registrationId);
+          },
+          fail: (error = null) => {
+            onFailure("调用失败: " + error.toString());
           }
-          const clientId = result.cid;
-          pushDebug("UniPush getPushClientId success");
-          if (clientId == "") {
-            pushDebug("UniPush CID 为空");
-            schedulePushClientIdRetry("CID 为空");
+        }));
+      } catch (error) {
+        onFailure("调用异常: " + error.toString());
+      }
+    }
+  }
+  class JPushAdapter {
+    constructor() {
+      this.provider = "jpush";
+      this.initialized = false;
+    }
+    init(onEvent, onRegistrationAvailable, onRegistrationId) {
+      if (this.initialized)
+        return null;
+      this.initialized = true;
+      try {
+        setEventCallBack(new UTSJSONObject({
+          callback: (event = null) => {
+            const eventName = event.eventName;
+            const eventData = event.eventData;
+            if (eventName == "onRegister" || eventName == "onConnected" && eventData == "true") {
+              onRegistrationAvailable();
+              return null;
+            }
+            if (eventName == "onNotifyMessageArrived") {
+              onEvent(new NormalizedPushEvent({ provider: this.provider, kind: "received", payload: eventData }));
+              return null;
+            }
+            if (eventName == "onCustomMessage") {
+              onEvent(new NormalizedPushEvent({ provider: this.provider, kind: "custom", payload: eventData }));
+              return null;
+            }
+            if (eventName == "onClickMessage") {
+              onEvent(new NormalizedPushEvent({ provider: this.provider, kind: "clicked", payload: eventData }));
+            }
+          }
+        }));
+        const isProduction = jpushIosIsProduction();
+        pushDebug(this.provider, "初始化 JPush iOS，APNs 环境: " + (isProduction ? "production" : "development"));
+        initPush$1(new UTSJSONObject({
+          appkey: JPUSH_APP_KEY,
+          channel: JPUSH_CHANNEL,
+          isProduction,
+          advertisingId: ""
+        }));
+        getRegistrationIdAsync((result = null) => {
+          if (result.registrationId != "") {
+            onRegistrationId(result.registrationId, "");
             return null;
           }
-          const cachedClientId = getCachedPushClientId();
-          pushDebug("UniPush CID=" + clientId);
-          if (clientId != cachedClientId) {
-            pushDebug("UniPush CID 已更新");
-          }
-          pushClientIdRetryCount = 0;
-          uni.setStorageSync(PUSH_CLIENT_ID_KEY, clientId);
-        },
-        fail: (error = null) => {
-          pushClientIdRequesting = false;
-          if (pushClientIdRequestTimeout > 0) {
-            clearTimeout(pushClientIdRequestTimeout);
-            pushClientIdRequestTimeout = 0;
-          }
-          pushDebug("UniPush getPushClientId failed: " + error.toString());
-          schedulePushClientIdRetry("调用失败");
-        }
-      }));
-    } catch (error) {
-      pushClientIdRequesting = false;
-      if (pushClientIdRequestTimeout > 0) {
-        clearTimeout(pushClientIdRequestTimeout);
-        pushClientIdRequestTimeout = 0;
+          if (result.code != 0)
+            onRegistrationId("", "JPush iOS RegistrationID 回调失败，错误码: " + result.code);
+        });
+        onRegistrationAvailable();
+      } catch (error) {
+        pushDebug(this.provider, "初始化 JPush 失败: " + error.toString());
       }
-      pushDebug("调用 getPushClientId 异常: " + error.toString());
-      schedulePushClientIdRetry("调用异常");
+    }
+    getRegistrationId() {
+      try {
+        return getRegistrationId();
+      } catch (error) {
+        pushDebug(this.provider, "获取 RegistrationID 失败: " + error.toString());
+      }
+      return "";
     }
   }
+  class PushManager {
+    constructor() {
+      this.provider = "unipush";
+      this.adapter = null;
+      this.initialized = false;
+      this.registrationRequesting = false;
+      this.registrationRetryCount = 0;
+      this.registrationRetryTimer = 0;
+      this.registrationRequestTimeout = 0;
+      this.registrationRequestGeneration = 0;
+    }
+    init() {
+      const selectedProvider = selectedPushProvider();
+      if (this.initialized && this.provider == selectedProvider) {
+        this.refreshRegistrationId();
+        return null;
+      }
+      if (this.initialized) {
+        pushDebug(this.provider, "运行中不能切换推送 provider，请重启应用后生效");
+        return null;
+      }
+      this.provider = selectedProvider;
+      pushDebug(this.provider, "已选择推送 provider: " + this.provider);
+      migrateLegacyStorage(this.provider);
+      uni.setStorageSync(PUSH_PROVIDER_KEY, this.provider);
+      this.adapter = this.provider == "jpush" ? new JPushAdapter() : new UniPushAdapter();
+      this.initialized = true;
+      this.adapter.init((event) => {
+        this.handlePushEvent(event);
+      }, () => {
+        this.refreshRegistrationId();
+      }, (registrationId, reason) => {
+        if (!this.initialized || this.provider != "jpush")
+          return null;
+        if (registrationId != "") {
+          this.saveRegistrationId(registrationId);
+          return null;
+        }
+        if (reason != "") {
+          pushDebug(this.provider, reason);
+          this.scheduleRegistrationRetry(reason);
+        }
+      });
+      this.refreshRegistrationId();
+    }
+    refreshRegistrationId() {
+      if (!this.initialized)
+        this.init();
+      if (this.adapter == null || this.registrationRequesting)
+        return null;
+      if (this.provider == "unipush") {
+        this.requestUniPushRegistrationId(this.adapter);
+        return null;
+      }
+      this.saveJPushRegistrationId();
+    }
+    markAuthenticated() {
+      if (!this.initialized)
+        this.init();
+      uni.setStorageSync(sessionKey(this.provider), "authenticated");
+      this.refreshRegistrationId();
+    }
+    clearSessionState() {
+      uni.removeStorageSync(sessionKey(this.provider));
+      uni.removeStorageSync(pendingMessageIdKey(this.provider));
+      uni.removeStorageSync(messageStaleKey(this.provider));
+      uni.removeStorageSync(LEGACY_PUSH_SESSION_KEY);
+      uni.removeStorageSync(LEGACY_PUSH_PENDING_MESSAGE_ID_KEY);
+      uni.removeStorageSync(LEGACY_PUSH_MESSAGE_STALE_KEY);
+    }
+    consumePendingMessageId() {
+      const value = storageString(pendingMessageIdKey(this.provider));
+      uni.removeStorageSync(pendingMessageIdKey(this.provider));
+      return value;
+    }
+    consumeStaleFlag() {
+      const value = storageString(messageStaleKey(this.provider));
+      uni.removeStorageSync(messageStaleKey(this.provider));
+      return value == "true";
+    }
+    getCachedRegistrationId() {
+      return storageString(registrationIdKey(this.provider));
+    }
+    setLocalProviderForTesting(provider) {
+      return null;
+    }
+    handlePushEvent(event) {
+      const messageId = pushMessageId(event.payload);
+      if (messageId != "")
+        uni.setStorageSync(pendingMessageIdKey(event.provider), messageId);
+      if (event.kind == "received" || event.kind == "clicked" || event.kind == "custom") {
+        uni.setStorageSync(messageStaleKey(event.provider), true);
+      }
+      if (event.kind == "clicked") {
+        uni.switchTab({ url: "/pages/message/message" });
+      }
+    }
+    clearRegistrationTimers() {
+      if (this.registrationRetryTimer > 0) {
+        clearTimeout(this.registrationRetryTimer);
+        this.registrationRetryTimer = 0;
+      }
+      if (this.registrationRequestTimeout > 0) {
+        clearTimeout(this.registrationRequestTimeout);
+        this.registrationRequestTimeout = 0;
+      }
+    }
+    scheduleRegistrationRetry(reason) {
+      if (this.registrationRetryCount >= PUSH_REGISTRATION_ID_MAX_RETRY_COUNT) {
+        pushDebug(this.provider, "设备注册 ID 获取超时，已停止重试。原因: " + reason);
+        return null;
+      }
+      if (this.registrationRetryTimer > 0)
+        return null;
+      this.registrationRetryCount += 1;
+      this.registrationRetryTimer = setTimeout(() => {
+        this.registrationRetryTimer = 0;
+        this.refreshRegistrationId();
+      }, PUSH_REGISTRATION_ID_RETRY_DELAY);
+    }
+    saveRegistrationId(registrationId) {
+      this.clearRegistrationTimers();
+      this.registrationRequesting = false;
+      if (registrationId == "") {
+        this.scheduleRegistrationRetry("注册 ID 为空");
+        return null;
+      }
+      this.registrationRetryCount = 0;
+      uni.setStorageSync(registrationIdKey(this.provider), registrationId);
+      const registrationIdLabel = this.provider == "unipush" ? "UniPush CID 已就绪" : "JPush RegistrationID 已就绪";
+      pushDebug(this.provider, registrationIdLabel + ": " + registrationId);
+    }
+    requestUniPushRegistrationId(adapter) {
+      this.registrationRequesting = true;
+      this.clearRegistrationTimers();
+      const requestGeneration = this.registrationRequestGeneration + 1;
+      this.registrationRequestGeneration = requestGeneration;
+      this.registrationRequestTimeout = setTimeout(() => {
+        if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting)
+          return null;
+        this.registrationRequesting = false;
+        this.registrationRequestTimeout = 0;
+        this.scheduleRegistrationRetry("UniPush 回调超时");
+      }, PUSH_REGISTRATION_ID_REQUEST_TIMEOUT);
+      adapter.requestRegistrationId((registrationId) => {
+        if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting)
+          return null;
+        this.saveRegistrationId(registrationId);
+      }, (reason) => {
+        if (requestGeneration != this.registrationRequestGeneration || !this.registrationRequesting)
+          return null;
+        this.clearRegistrationTimers();
+        this.registrationRequesting = false;
+        this.scheduleRegistrationRetry(reason);
+      });
+    }
+    saveJPushRegistrationId() {
+      if (this.adapter == null)
+        return null;
+      this.registrationRequesting = true;
+      const registrationId = this.adapter.getRegistrationId();
+      this.registrationRequesting = false;
+      if (registrationId == "") {
+        this.scheduleRegistrationRetry("JPush RegistrationID 为空");
+        return null;
+      }
+      this.saveRegistrationId(registrationId);
+    }
+  }
+  const pushManager = new PushManager();
+  function initPush() {
+    pushManager.init();
+  }
+  function refreshPushRegistrationId() {
+    pushManager.refreshRegistrationId();
+  }
+  function refreshPushClientId() {
+    refreshPushRegistrationId();
+  }
   function markPushSessionAuthenticated() {
-    uni.setStorageSync(PUSH_SESSION_KEY, "authenticated");
-    refreshPushClientId();
+    pushManager.markAuthenticated();
   }
   function clearPushSessionState() {
-    uni.removeStorageSync(PUSH_SESSION_KEY);
-    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
+    pushManager.clearSessionState();
   }
   function consumePendingMessageId() {
-    const rawValue = uni.getStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    const value = rawValue == null ? "" : stringValue(rawValue);
-    uni.removeStorageSync(PUSH_PENDING_MESSAGE_ID_KEY);
-    return value;
+    return pushManager.consumePendingMessageId();
   }
   function consumePushStaleFlag() {
-    const value = uni.getStorageSync(PUSH_MESSAGE_STALE_KEY);
-    uni.removeStorageSync(PUSH_MESSAGE_STALE_KEY);
-    return value != null && value.toString() == "true";
-  }
-  function getCachedPushClientId() {
-    const value = uni.getStorageSync(PUSH_CLIENT_ID_KEY);
-    return value == null ? "" : value.toString();
+    return pushManager.consumeStaleFlag();
   }
   class RequestOptions extends UTS.UTSType {
     static get$UTSMetadata$() {
@@ -4408,7 +4674,7 @@
       delete this.__props__;
     }
   }
-  const BASE_URL = "https://car.zdiot.cn:18443/api";
+  const BASE_URL = "http://45.207.216.51:8085/api";
   function handleTokenExpired() {
     uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");

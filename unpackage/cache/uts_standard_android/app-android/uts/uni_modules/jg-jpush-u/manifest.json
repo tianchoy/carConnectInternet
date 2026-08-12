@@ -1,0 +1,57 @@
+{
+  "version": "1",
+  "env": {
+    "vapor": false,
+    "compilerVersion": "5.23.2026080313-alpha"
+  },
+  "files": {
+    "utssdk/app-android/PushMessageReceiver.uts": {
+      "md5": "5d6ed24789fe66ea3ed187756c73652c"
+    },
+    "utssdk/app-android/PushService.uts": {
+      "md5": "d2a2c6c5a4d8aefb3b25af63f4c0092f"
+    },
+    "utssdk/app-android/index.uts": {
+      "md5": "f193a0da16bc7722d52ef2b2e6412b9c"
+    },
+    "utssdk/interface.uts": {
+      "md5": "de0b03c7d9b8c3e1a2bee34c26385962"
+    },
+    "utssdk/unierror.uts": {
+      "md5": "b015d94977486c8fa6cbd27f5117909d"
+    },
+    "API_Comparison_Documentation.md": {
+      "md5": "a233fe1abf3c8930c72e9aa904c41d98"
+    },
+    "Android_API_Documentation.md": {
+      "md5": "4ff059c4d64efa19f92086e6e40be318"
+    },
+    "Android_Integration_Guide.md": {
+      "md5": "e69d8e48248cb79385448f5fdac0d9a5"
+    },
+    "HarmonyOS_API_Documentation.md": {
+      "md5": "b40b374fc82be160f168419b746776ef"
+    },
+    "api.md": {
+      "md5": "2a7aeac6015fb3a109c627cbf68cf7c1"
+    },
+    "iOS_API_Documentation.md": {
+      "md5": "806d0021114dca3791369272b1ae4d82"
+    },
+    "iOS_Integration_Guide.md": {
+      "md5": "f694f4b26d83934d506353ac77a3123c"
+    },
+    "package.json": {
+      "md5": "d999f04238dd2273c3d24240773559b8"
+    },
+    "readme_me.md": {
+      "md5": "120b8a5e7580827637307d55393c8065"
+    },
+    "utssdk/app-android/AndroidManifest.xml": {
+      "md5": "7e39fe163557a519c3c57ebea220d8fd"
+    },
+    "utssdk/app-android/config.json": {
+      "md5": "3d3d1908216c369dfee6a4ba11c98b82"
+    }
+  }
+}

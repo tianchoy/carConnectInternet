@@ -24,6 +24,8 @@ const appModal_uvue_vue_type_style_index_0_lang = {};
 
 uni;
 
+uni;
+
 const index_uvue_vue_type_style_index_0_lang$1 = {};
 
 const customNavBar_uvue_vue_type_style_index_0_lang = {};

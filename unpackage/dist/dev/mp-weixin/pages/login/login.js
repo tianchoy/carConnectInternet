@@ -4,6 +4,7 @@ const common_assets = require("../../common/assets.js");
 const api_request = require("../../api/request.js");
 const utils_toast = require("../../utils/toast.js");
 const utils_modal = require("../../utils/modal.js");
+require("../../services/push.js");
 if (!Array) {
   const _easycom_custom_navBar_1 = common_vendor.resolveComponent("custom-navBar");
   const _easycom_i_input_1 = common_vendor.resolveComponent("i-input");

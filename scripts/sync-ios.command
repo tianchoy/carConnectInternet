@@ -13,9 +13,15 @@ RESOURCE_ROOT="${PROJECT_ROOT}/unpackage/resources/app-ios"
 SOURCE_WWW="${RESOURCE_ROOT}/${APP_ID}/www"
 SOURCE_APP_SERVICE="${SOURCE_WWW}/app-service.js"
 SOURCE_SWIFT="${RESOURCE_ROOT}/uni_modules/${PLUGIN_NAME}/utssdk/app-ios/src/index.swift"
+SOURCE_JPUSH_CONFIG="${RESOURCE_ROOT}/uni_modules/jg-jpush-u/utssdk/app-ios/config.json"
+SOURCE_JPUSH_SWIFT="${RESOURCE_ROOT}/uni_modules/jg-jpush-u/utssdk/app-ios/src/index.swift"
 
 IOS_APP_ROOT="${IOS_PROJECT_ROOT}/UniAppXDemo"
 TARGET_WWW="${IOS_APP_ROOT}/UniAppXDemo/uni-app-x/apps/${APP_ID}/www"
+TARGET_JPUSH_SWIFT="${IOS_APP_ROOT}/UniAppXDemo/JPushUTSBridge.swift"
+TARGET_JPUSH_INFO_PLIST="${IOS_APP_ROOT}/UniAppXDemo/Info.plist"
+TARGET_JPUSH_DEVICE_CONFIG="${IOS_PROJECT_ROOT}/TemporarySampleFramework/DCloudUTSExtAPI.xcframework/ios-arm64/DCloudUTSExtAPI.framework/uts-config.json"
+TARGET_JPUSH_SIMULATOR_CONFIG="${IOS_PROJECT_ROOT}/TemporarySampleFramework/DCloudUTSExtAPI.xcframework/ios-x86_64-simulator/DCloudUTSExtAPI.framework/uts-config.json"
 PLUGIN_ROOT="${IOS_PROJECT_ROOT}/UTSPluginExample/${FRAMEWORK_NAME}"
 PLUGIN_PROJECT="${PLUGIN_ROOT}/${FRAMEWORK_NAME}.xcodeproj"
 PLUGIN_SOURCE="${PLUGIN_ROOT}/${FRAMEWORK_NAME}/index.swift"
@@ -36,6 +42,12 @@ require_path() {
 require_path "${SOURCE_WWW}" "HBuilderX 生成的 iOS Web 资源"
 require_path "${SOURCE_APP_SERVICE}" "HBuilderX 生成的 iOS app-service.js"
 require_path "${SOURCE_SWIFT}" "HBuilderX 生成的 iOS UTS Swift 源码"
+require_path "${SOURCE_JPUSH_CONFIG}" "HBuilderX 生成的 JPush iOS 配置"
+require_path "${SOURCE_JPUSH_SWIFT}" "HBuilderX 生成的 JPush iOS Swift 源码"
+require_path "${TARGET_JPUSH_SWIFT}" "iOS 主工程 JPush Swift 桥接"
+require_path "${TARGET_JPUSH_INFO_PLIST}" "iOS 主工程 Info.plist"
+require_path "${TARGET_JPUSH_DEVICE_CONFIG}" "真机 DCloud UTS Hook 配置"
+require_path "${TARGET_JPUSH_SIMULATOR_CONFIG}" "模拟器 DCloud UTS Hook 配置"
 require_path "${PLUGIN_PROJECT}" "iOS 外部地图 Framework 工程"
 require_path "${PROJECT_ROOT}/nativeResources/ios/Info.plist" "iOS 源资源 Info.plist"
 require_path "${IOS_APP_ROOT}/UniAppXDemo/Info.plist" "iOS 主工程 Info.plist"
@@ -56,11 +68,124 @@ if missing:
 PY
 done
 
-print -- "[1/5] 同步 HBuilderX 生成的 iOS Web 资源"
+print -- "[1/6] 同步 HBuilderX 生成的 iOS Web 资源"
 mkdir -p "${TARGET_WWW}"
 rsync -a --delete --exclude='.DS_Store' "${SOURCE_WWW}/" "${TARGET_WWW}/"
 
-print -- "[2/5] 更新 ${FRAMEWORK_NAME} 的 Swift 源码"
+print -- "[2/6] 同步 JPush iOS 桥接并切换 APNs Hook"
+python3 - "${SOURCE_JPUSH_CONFIG}" "${SOURCE_JPUSH_SWIFT}" "${TARGET_JPUSH_DEVICE_CONFIG}" "${TARGET_JPUSH_SIMULATOR_CONFIG}" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+source_config, source_swift, *target_configs = map(Path, sys.argv[1:])
+jpush_hook = 'UTSSDKModulesJgJpushUJGPushIOSPlugin'
+unipush_hook = 'UTSSDKModulesDCloudUniPushHookProxy'
+
+config = json.loads(source_config.read_text(encoding='utf-8'))
+if config.get('hooksClass') != jpush_hook:
+    raise SystemExit(f'{source_config} 的 hooksClass 不是 {jpush_hook}')
+
+swift = source_swift.read_text(encoding='utf-8')
+required = [
+    '@objc(UTSSDKModulesJgJpushUJGPushIOSPlugin)',
+    'public var ENABLE_JPUSH_IOS_APNS_HOOK = true',
+    'applicationDidFinishLaunchingWithOptions',
+    'didRegisterForRemoteNotifications',
+    'registerDeviceToken',
+]
+missing = [value for value in required if value not in swift]
+if missing:
+    raise SystemExit('HBuilderX 生成的 JPush Swift 缺少预期实现：' + ', '.join(missing))
+
+for target in target_configs:
+    runtime = json.loads(target.read_text(encoding='utf-8'))
+    hooks = runtime.get('hooksClasses')
+    if not isinstance(hooks, list) or not all(isinstance(value, str) for value in hooks):
+        raise SystemExit(f'{target} 的 hooksClasses 格式无效')
+
+    runtime['hooksClasses'] = [
+        value for value in hooks if value not in (unipush_hook, jpush_hook)
+    ] + [jpush_hook]
+    target.write_text(
+        json.dumps(runtime, ensure_ascii=False, indent=2) + '\n',
+        encoding='utf-8',
+    )
+PY
+cp "${SOURCE_JPUSH_SWIFT}" "${TARGET_JPUSH_SWIFT}"
+
+python3 - "${TARGET_JPUSH_SWIFT}" "${TARGET_JPUSH_INFO_PLIST}" <<'PY'
+from pathlib import Path
+import plistlib
+import sys
+
+swift_path, plist_path = map(Path, sys.argv[1:])
+setup = 'JPUSHService.setup(withOption: self.launchOptions, appKey: param.appkey, channel: param.channel, apsForProduction: param.isProduction, advertisingIdentifier: param.advertisingId)'
+setup_replacement = '''let configuredAPNsEnvironment = Bundle.main.object(forInfoDictionaryKey: "JPushAPNsProduction") as? String
+        let apsForProduction = configuredAPNsEnvironment == "true"
+        log("JGPushModule effective APNs environment", apsForProduction ? "production" : "development")
+        JPUSHService.setup(withOption: self.launchOptions, appKey: param.appkey, channel: param.channel, apsForProduction: apsForProduction, advertisingIdentifier: param.advertisingId)'''
+token_registration = '''public func registerDeviceToken(_ token: Data?) {
+        log("JGPushModule registerDeviceToken")
+        if (token == nil) {
+            log("JGPushModule APNs device token is empty")
+            return
+        }
+        JPUSHService.registerDeviceToken(token)
+    }'''
+token_registration_replacement = '''public func registerDeviceToken(_ token: Data?) {
+        log("JGPushModule registerDeviceToken")
+        guard let token else {
+            log("JGPushModule APNs device token is empty")
+            return
+        }
+        JPUSHService.registerDeviceToken(token)
+    }'''
+registration_id_completion = '(resCode: Int, registrationId: String?) -> Void in'
+registration_id_completion_replacement = '(resCode: Int32, registrationId: String?) -> Void in'
+text = swift_path.read_text(encoding='utf-8')
+if setup in text:
+    text = text.replace(setup, setup_replacement, 1)
+elif 'object(forInfoDictionaryKey: "JPushAPNsProduction")' not in text:
+    raise SystemExit('HBuilderX 生成的 JPush Swift 初始化结构已变化，请检查同步脚本。')
+
+if token_registration in text:
+    text = text.replace(token_registration, token_registration_replacement, 1)
+elif 'guard let token else' not in text:
+    raise SystemExit('HBuilderX 生成的 JPush Swift APNs Token 注册结构已变化，请检查同步脚本。')
+
+if registration_id_completion in text:
+    text = text.replace(
+        registration_id_completion,
+        registration_id_completion_replacement,
+        1,
+    )
+elif registration_id_completion_replacement not in text:
+    raise SystemExit('HBuilderX 生成的 JPush RegistrationID 回调结构已变化，请检查同步脚本。')
+
+swift_path.write_text(text, encoding='utf-8')
+
+with plist_path.open('rb') as fp:
+    plist = plistlib.load(fp)
+if plist.get('JPushAPNsProduction') != '$(JPUSH_APNS_PRODUCTION)':
+    raise SystemExit(f'{plist_path} 缺少 JPushAPNsProduction Build Setting 占位符')
+PY
+
+python3 - "${TARGET_JPUSH_DEVICE_CONFIG}" "${TARGET_JPUSH_SIMULATOR_CONFIG}" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+jpush_hook = 'UTSSDKModulesJgJpushUJGPushIOSPlugin'
+unipush_hook = 'UTSSDKModulesDCloudUniPushHookProxy'
+for value in sys.argv[1:]:
+    path = Path(value)
+    hooks = json.loads(path.read_text(encoding='utf-8')).get('hooksClasses', [])
+    if hooks.count(jpush_hook) != 1 or unipush_hook in hooks:
+        raise SystemExit(f'{path} 的 APNs Hook 配置校验失败')
+PY
+
+print -- "[3/6] 更新 ${FRAMEWORK_NAME} 的 Swift 源码"
 cp "${SOURCE_SWIFT}" "${PLUGIN_SOURCE}"
 
 # HBuilderX 当前版本仍会为 UIApplication.openURL 生成已废弃的同步调用。
@@ -143,7 +268,7 @@ if 'getAvailableIOSMapProviders' in text:
     raise SystemExit('HBuilderX 生成的 iOS app-service.js 仍包含旧的地图 Provider 对象桥接。')
 PY
 
-print -- "[3/5] 构建模拟器 Framework"
+print -- "[4/6] 构建模拟器 Framework"
 rm -rf "${SIMULATOR_DERIVED_DATA}"
 xcodebuild \
   -project "${PLUGIN_PROJECT}" \
@@ -154,7 +279,7 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   build
 
-print -- "[4/5] 构建真机 Framework"
+print -- "[5/6] 构建真机 Framework"
 rm -rf "${DEVICE_DERIVED_DATA}"
 xcodebuild \
   -project "${PLUGIN_PROJECT}" \
@@ -170,7 +295,7 @@ DEVICE_FRAMEWORK="${DEVICE_DERIVED_DATA}/Build/Products/${CONFIGURATION}-iphoneo
 require_path "${SIMULATOR_FRAMEWORK}" "模拟器 Framework"
 require_path "${DEVICE_FRAMEWORK}" "真机 Framework"
 
-print -- "[5/5] 生成并替换 XCFramework"
+print -- "[6/6] 生成并替换 XCFramework"
 mkdir -p "${FRAMEWORK_OUTPUT_ROOT}"
 rm -rf "${FRAMEWORK_OUTPUT}"
 xcodebuild -create-xcframework \
