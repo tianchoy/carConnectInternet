@@ -25,6 +25,7 @@ import io.dcloud.uniapp.extapi.hideLoading as uni_hideLoading
 import uts.sdk.modules.jgJpushU.init as initAndroidJPush
 import uts.sdk.modules.jgJpushU.setEventCallBack as setJPushEventCallBack
 import uts.sdk.modules.jgJpushU.getRegistrationId as getAndroidJPushRegistrationId
+import uts.sdk.modules.jgJpushUHuawei.init as initHuaweiJPushVendor
 import io.dcloud.uniapp.extapi.onPushMessage as uni_onPushMessage
 import uts.sdk.modules.externalMapNavigation.openExternalMap
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
@@ -277,6 +278,7 @@ open class JPushAdapter : PushAdapter {
                 }
             }
             ))
+            initHuaweiJPushVendor()
             initAndroidJPush("")
             onRegistrationAvailable()
         }

@@ -41,6 +41,9 @@ import {
 	setEventCallBack as setJPushEventCallBack,
 	getRegistrationId as getAndroidJPushRegistrationId
 } from '@/uni_modules/jg-jpush-u'
+import {
+	init as initHuaweiJPushVendor
+} from '@/uni_modules/jg-jpush-u-huawei'
 
 
 
@@ -268,6 +271,8 @@ class JPushAdapter implements PushAdapter {
 				}
 			})
 
+			// Load Huawei's JPush vendor channel before the JPush core SDK initializes.
+			initHuaweiJPushVendor()
 			// An empty value keeps using the AppKey configured in AndroidManifest.xml.
 			initAndroidJPush('')
 

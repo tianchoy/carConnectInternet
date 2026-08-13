@@ -6,7 +6,6 @@ SCRIPT_NAME="${0:t}"
 PROJECT_ROOT="${SCRIPT_DIR:h}"
 ANDROID_PROJECT_ROOT="${ANDROID_PROJECT_ROOT:-${PROJECT_ROOT:h}/car}"
 APP_ID="${APP_ID:-__UNI__662B0B4}"
-PLUGIN_NAME="external-map-navigation"
 JPUSH_PLUGIN_NAME="jg-jpush-u"
 DRY_RUN=false
 
@@ -58,15 +57,15 @@ command -v rsync >/dev/null 2>&1 || fail "未找到 rsync 命令"
 RESOURCE_ROOT="${PROJECT_ROOT}/unpackage/resources/app-android"
 SOURCE_APP_ROOT="${RESOURCE_ROOT}/${APP_ID}"
 SOURCE_GENERATED_ROOT="${RESOURCE_ROOT}/uniappx/app-android/src"
-SOURCE_PLUGIN_ROOT="${RESOURCE_ROOT}/uni_modules/${PLUGIN_NAME}"
+SOURCE_RESOURCE_PLUGINS_ROOT="${RESOURCE_ROOT}/uni_modules"
 SOURCE_JPUSH_CACHE_ROOT="${PROJECT_ROOT}/unpackage/cache/uts_standard_android/app-android/uts/uni_modules/${JPUSH_PLUGIN_NAME}"
 SOURCE_LOCAL_MAVEN_ROOT="${PROJECT_ROOT}/android-offline-maven"
 
 ANDROID_MAIN_ROOT="${ANDROID_PROJECT_ROOT}/uniappx/src/main"
 TARGET_APP_ROOT="${ANDROID_MAIN_ROOT}/assets/apps/${APP_ID}"
 TARGET_JAVA_ROOT="${ANDROID_MAIN_ROOT}/java"
-TARGET_PLUGIN_ROOT="${TARGET_JAVA_ROOT}/uni_modules/${PLUGIN_NAME}"
-TARGET_JPUSH_PLUGIN_ROOT="${TARGET_JAVA_ROOT}/uni_modules/${JPUSH_PLUGIN_NAME}"
+TARGET_UNI_MODULES_ROOT="${TARGET_JAVA_ROOT}/uni_modules"
+TARGET_JPUSH_PLUGIN_ROOT="${TARGET_UNI_MODULES_ROOT}/${JPUSH_PLUGIN_NAME}"
 TARGET_LOCAL_MAVEN_ROOT="${ANDROID_PROJECT_ROOT}/local-maven"
 
 require_dir "${SOURCE_APP_ROOT}" "HBuilderX 生成的 Android 应用资源目录"
@@ -75,9 +74,7 @@ require_path "${SOURCE_GENERATED_ROOT}/index.kt" "HBuilderX 生成的 Android in
 require_dir "${SOURCE_GENERATED_ROOT}/components" "HBuilderX 生成的 Android components"
 require_dir "${SOURCE_GENERATED_ROOT}/pages" "HBuilderX 生成的 Android pages"
 require_dir "${SOURCE_GENERATED_ROOT}/uni_modules" "HBuilderX 生成的 Android uni_modules"
-require_path "${SOURCE_PLUGIN_ROOT}/utssdk/app-android/AndroidManifest.xml" "外部地图 Android manifest"
-require_path "${SOURCE_PLUGIN_ROOT}/utssdk/app-android/config.json" "外部地图 Android 配置"
-require_path "${SOURCE_PLUGIN_ROOT}/utssdk/app-android/src/index.kt" "外部地图 Android Kotlin 源码"
+require_dir "${SOURCE_RESOURCE_PLUGINS_ROOT}" "HBuilderX 导出的 Android 插件目录"
 require_path "${SOURCE_JPUSH_CACHE_ROOT}/index.kt" "JPush 生成的 Android Kotlin 源码"
 require_path "${SOURCE_JPUSH_CACHE_ROOT}/manifest.json" "JPush 生成的 Android 模块 manifest"
 require_path "${SOURCE_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.aar" "离线 JPush AAR"
@@ -92,10 +89,6 @@ require_path "${ANDROID_MAIN_ROOT}/AndroidManifest.xml" "Android 主 Manifest"
 
 grep -Fq "${APP_ID}" "${ANDROID_MAIN_ROOT}/AndroidManifest.xml" || \
   fail "Android 主 Manifest 未包含 App ID：${APP_ID}"
-grep -Fq 'android.intent.action.VIEW' "${SOURCE_PLUGIN_ROOT}/utssdk/app-android/AndroidManifest.xml" || \
-  fail "外部地图插件 Manifest 缺少 VIEW query"
-grep -Fq 'android:scheme="geo"' "${SOURCE_PLUGIN_ROOT}/utssdk/app-android/AndroidManifest.xml" || \
-  fail "外部地图插件 Manifest 缺少 geo scheme query"
 
 RSYNC_OPTIONS=(-a --delete --exclude='.DS_Store')
 INDEX_RSYNC_OPTIONS=(-a --exclude='.DS_Store')
@@ -112,12 +105,110 @@ sync_dir() {
   rsync "${RSYNC_OPTIONS[@]}" "$@" "${source}/" "${target}/"
 }
 
+sync_generated_modules() {
+  local module_source
+  local module_name
+  local target_module
+
+  for module_source in "${SOURCE_GENERATED_ROOT}/uni_modules"/*(N/); do
+    module_name="${module_source:t}"
+    target_module="${TARGET_UNI_MODULES_ROOT}/${module_name}"
+    [[ "${DRY_RUN}" == true ]] || mkdir -p "${target_module}"
+    print -- "  生成模块：${module_name}"
+    sync_dir "${module_source}" "${target_module}"
+  done
+}
+
+clear_projected_kotlin() {
+  local target_plugin="$1"
+
+  if [[ "${DRY_RUN}" == true ]]; then
+    find "${target_plugin}" -path "${target_plugin}/utssdk" -prune -o \
+      -type f -name '*.kt' -print 2>/dev/null
+  else
+    find "${target_plugin}" -path "${target_plugin}/utssdk" -prune -o \
+      -type f -name '*.kt' -delete
+  fi
+}
+
+sync_exported_plugin() {
+  local plugin_source="$1"
+  local plugin_name="${plugin_source:t}"
+  local target_plugin="${TARGET_UNI_MODULES_ROOT}/${plugin_name}"
+  local source_kotlin_root="${plugin_source}/utssdk/app-android/src"
+
+  [[ "${DRY_RUN}" == true ]] || mkdir -p "${target_plugin}"
+  print -- "  导出插件：${plugin_name}"
+
+  # Keep manifests, config, and resources, but never retain Kotlin beneath
+  # utssdk/app-android/src: Gradle compiles this tree recursively.
+  rsync "${RSYNC_OPTIONS[@]}" --delete-excluded \
+    --exclude='.DS_Store' --exclude='utssdk/app-android/src/***' \
+    "${plugin_source}/" "${target_plugin}/"
+
+  [[ -d "${source_kotlin_root}" ]] || return
+
+  # A plugin's Kotlin must exist once only, at its module root. Remove previous
+  # projections before copying, while preserving non-Kotlin plugin payloads.
+  clear_projected_kotlin "${target_plugin}"
+  rsync "${INDEX_RSYNC_OPTIONS[@]}" \
+    --include='*/' --include='*.kt' --exclude='*' \
+    "${source_kotlin_root}/" "${target_plugin}/"
+}
+
+sync_exported_plugins() {
+  local plugin_source
+
+  for plugin_source in "${SOURCE_RESOURCE_PLUGINS_ROOT}"/*(N/); do
+    sync_exported_plugin "${plugin_source}"
+  done
+}
+
+validate_exported_plugins() {
+  local plugin_source
+  local plugin_name
+  local target_plugin
+  local source_kotlin_root
+  local source_kotlin
+  local relative_kotlin
+
+  for plugin_source in "${SOURCE_RESOURCE_PLUGINS_ROOT}"/*(N/); do
+    plugin_name="${plugin_source:t}"
+    target_plugin="${TARGET_UNI_MODULES_ROOT}/${plugin_name}"
+    source_kotlin_root="${plugin_source}/utssdk/app-android/src"
+    require_dir "${target_plugin}" "同步后的 ${plugin_name} 插件目录"
+
+    if [[ -d "${source_kotlin_root}" ]]; then
+      for source_kotlin in "${source_kotlin_root}"/**/*.kt(N); do
+        relative_kotlin="${source_kotlin#${source_kotlin_root}/}"
+        require_path "${target_plugin}/${relative_kotlin}" "同步后的 ${plugin_name} Kotlin 源码"
+      done
+      if find "${target_plugin}/utssdk/app-android/src" -type f -name '*.kt' -print -quit 2>/dev/null | grep -q .; then
+        fail "同步后的 ${plugin_name} 插件仍保留重复 Kotlin 源码"
+      fi
+    fi
+  done
+}
+
+validate_external_map_plugin() {
+  local source_manifest="${SOURCE_RESOURCE_PLUGINS_ROOT}/external-map-navigation/utssdk/app-android/AndroidManifest.xml"
+  local target_manifest="${TARGET_UNI_MODULES_ROOT}/external-map-navigation/utssdk/app-android/AndroidManifest.xml"
+
+  [[ -e "${source_manifest}" ]] || return
+  grep -Fq 'android.intent.action.VIEW' "${source_manifest}" || \
+    fail "外部地图插件 Manifest 缺少 VIEW query"
+  grep -Fq 'android:scheme="geo"' "${source_manifest}" || \
+    fail "外部地图插件 Manifest 缺少 geo scheme query"
+  require_path "${target_manifest}" "同步后的外部地图 Android manifest"
+  grep -Fq 'android:scheme="geo"' "${target_manifest}" || \
+    fail "同步后的外部地图插件 Manifest 缺少 geo scheme query"
+}
+
 if [[ "${DRY_RUN}" == false ]]; then
   mkdir -p "${TARGET_APP_ROOT}" \
     "${TARGET_JAVA_ROOT}/components" \
     "${TARGET_JAVA_ROOT}/pages" \
-    "${TARGET_JAVA_ROOT}/uni_modules" \
-    "${TARGET_PLUGIN_ROOT}" \
+    "${TARGET_UNI_MODULES_ROOT}" \
     "${TARGET_JPUSH_PLUGIN_ROOT}" \
     "${TARGET_LOCAL_MAVEN_ROOT}"
 fi
@@ -134,13 +225,11 @@ rsync "${INDEX_RSYNC_OPTIONS[@]}" \
 sync_dir "${SOURCE_GENERATED_ROOT}/components" "${TARGET_JAVA_ROOT}/components"
 sync_dir "${SOURCE_GENERATED_ROOT}/pages" "${TARGET_JAVA_ROOT}/pages"
 
-print -- "[4/7] 同步生成的 uni_modules（外部地图和 JPush 插件单独处理）"
-sync_dir "${SOURCE_GENERATED_ROOT}/uni_modules" "${TARGET_JAVA_ROOT}/uni_modules" \
-  --exclude="${PLUGIN_NAME}/" \
-  --exclude="${JPUSH_PLUGIN_NAME}/"
+print -- "[4/7] 同步生成的 uni_modules"
+sync_generated_modules
 
-print -- "[5/7] 同步 ${PLUGIN_NAME} Android 插件"
-sync_dir "${SOURCE_PLUGIN_ROOT}" "${TARGET_PLUGIN_ROOT}"
+print -- "[5/7] 同步 HBuilderX 导出的 Android 插件及 Kotlin 源码"
+sync_exported_plugins
 
 print -- "[6/7] 同步 ${JPUSH_PLUGIN_NAME} 生成的 Android Kotlin 模块"
 sync_dir "${SOURCE_JPUSH_CACHE_ROOT}" "${TARGET_JPUSH_PLUGIN_ROOT}"
@@ -149,15 +238,14 @@ if [[ "${DRY_RUN}" == false ]]; then
   print -- "[7/7] 校验同步结果"
   require_path "${TARGET_APP_ROOT}/www/manifest.json" "同步后的 Android Web manifest"
   require_path "${TARGET_JAVA_ROOT}/index.kt" "同步后的 Android index.kt"
-  require_path "${TARGET_PLUGIN_ROOT}/utssdk/app-android/src/index.kt" "同步后的外部地图 Kotlin 源码"
+  validate_exported_plugins
+  validate_external_map_plugin
   require_path "${TARGET_JPUSH_PLUGIN_ROOT}/index.kt" "同步后的 JPush Kotlin 源码"
   require_path "${TARGET_JPUSH_PLUGIN_ROOT}/manifest.json" "同步后的 JPush 模块 manifest"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.aar" "同步后的离线 JPush AAR"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jpush/6.2.0/jpush-6.2.0.pom" "同步后的离线 JPush POM"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.aar" "同步后的离线 JCore AAR"
   require_path "${TARGET_LOCAL_MAVEN_ROOT}/cn/jiguang/sdk/jcore/5.5.0/jcore-5.5.0.pom" "同步后的离线 JCore POM"
-  grep -Fq 'android:scheme="geo"' "${TARGET_PLUGIN_ROOT}/utssdk/app-android/AndroidManifest.xml" || \
-    fail "同步后的外部地图插件 Manifest 缺少 geo scheme query"
 else
   print -- "[7/7] 预演完成：未执行同步后文件校验。"
 fi

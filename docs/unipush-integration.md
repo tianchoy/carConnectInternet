@@ -1,82 +1,74 @@
 # App 推送前后端对接说明
 
-> 当前 Android 和 iOS 均使用 **UniPush 2.0** 作为运行时推送通道。两端的设备标识均为通过 `uni.getPushClientId()` 获取的 UniPush `CID`，服务端必须使用 UniPush 向该 CID 发送。
+> 当前 Android 与 iOS 均使用 **JPush** 作为运行时推送 provider，设备标识为 JPush `RegistrationID`。服务端必须通过 JPush 向该 RegistrationID 发送，不能将其当作 UniPush CID。
 >
-> 仓库仍保留 JPush 的原生集成，供后续单独调试；当前应用启动路径不会选择或初始化 JPush adapter。**JPush RegistrationID 不是 UniPush CID，不能提交给 UniPush 或用于 UniPush 发送。**
+> Android 已启用华为 JPush 厂商通道：华为/HMS 设备由 JPush 选择华为通道送达；这不是第二个前端 provider，应用也不会直接调用华为 Push Kit。iOS 继续使用 JPush/APNs。
 
 ## 1. 当前运行路径
 
 | 平台 | 前端 provider | 设备标识 | 获取方式 | 服务端发送通道 |
 | --- | --- | --- | --- | --- |
-| iOS | `unipush` | UniPush `CID` | `uni.getPushClientId()` | UniPush |
-| Android | `unipush` | UniPush `CID` | `uni.getPushClientId()` | UniPush |
+| Android | `jpush` | JPush `RegistrationID` | `jg-jpush-u` | JPush（华为设备可走华为厂商通道） |
+| iOS | `jpush` | JPush `RegistrationID` | `jg-jpush-u` | JPush / APNs |
 
-[services/push.uts](../services/push.uts) 在 Android 和 iOS 上均明确选择 `unipush`。应用不会同时初始化两个 provider，也不会将 JPush RegistrationID 作为当前设备标识。
+[services/push.uts](../services/push.uts) 默认选择 `jpush`。Android 会在初始化 JPush 前加载 `jg-jpush-u-huawei`，使其原生 Gradle 配置与华为依赖参与构建；iOS 不加载该 Android 专用模块。
 
-iOS 工程仍链接 JPush，但 [index.uts](../uni_modules/jg-jpush-u/utssdk/app-ios/index.uts) 中的自动 APNs hook 默认关闭。因此当前 UniPush 包只有 UniPush 处理 APNs 注册、`UNUserNotificationCenter` 委托和通知事件；JPush 不会在启动或 APNs token 回调中自行注册。
+## 2. Android 华为厂商通道配置
 
-如需后续单独测试 JPush，必须在**独立的 JPush-only 构建**中同时完成以下操作：
+### 2.1 项目内文件
 
-1. 将 `ENABLE_JPUSH_IOS_APNS_HOOK` 改为 `true`；
-2. 将 [services/push.uts](../services/push.uts) 的 iOS provider 改为 `jpush`；
-3. 完整重新生成、构建并重装应用；
-4. 仅使用 JPush RegistrationID 和 JPush 服务端发送。
+华为 AG Connect 配置文件必须位于：
 
-不要在 JavaScript provider 仍为 `unipush` 的包中开启 JPush 原生 APNs hook，也不要将 JPush RegistrationID 提交到 UniPush。
+```text
+nativeResources/android/agconnect-services.json
+```
 
-## 2. 前端已实现的能力
+该文件由 [jg-jpush-u-huawei](../uni_modules/jg-jpush-u-huawei/readme.md) 在 Android 原生构建时使用。它必须与本应用包名 `uni.app.UNI662B0B4` 一致；不要在业务代码、`manifestPlaceholders.json` 或日志中复制其中的凭据字段。
 
-### 2.1 初始化、本地缓存与日志
+JPush Android AppKey 和 channel 继续通过 [nativeResources/android/manifestPlaceholders.json](../nativeResources/android/manifestPlaceholders.json) 提供，Android 代码以空 AppKey 调用初始化，从而读取原生 Manifest 配置。
 
-应用启动、回到前台及登录成功后会刷新 UniPush CID：
+### 2.2 控制台前置条件
 
-- Android 和 iOS 均注册 `uni.onPushMessage()`，并通过 `uni.getPushClientId()` 获取 CID；
-- 获取失败、返回空 CID 或回调超时时，每 3 秒重试，最多 5 次；
-- CID、待处理的 `messageId`、消息刷新标记和登录会话状态均使用 provider 维度的本地键；
-- CID 成功获取时，会输出 `UniPush CID: <cid>` 日志，便于开发和联调时复制到 DCloud UniPush 控制台测试；
-- 当前前端只缓存 CID，**尚未调用任何后端绑定、更新或解绑接口**。
+发布或真机验证前，须同时完成：
 
-CID 属于设备推送标识。请仅在受控的开发或联调日志中使用，勿将 Apple `.p8` 私钥、APNs device token、业务 token 或其他敏感信息输出到日志。
+1. 在华为 AppGallery Connect 为 `uni.app.UNI662B0B4` 启用 **Push Kit**；
+2. 在 AG Connect 登记实际签名包使用的 SHA-256 证书指纹：Debug、Release，以及计划上架 AppGallery 时的重签名证书；修改后重新下载并替换 `agconnect-services.json`；
+3. 在极光控制台同一 JPush 应用的“华为厂商通道”填写华为 App ID、Client ID/Client Secret 等控制台要求的参数；
+4. 确认 JPush AppKey 归属于该极光应用，且极光、AG Connect、最终 APK/AAB 的包名均为 `uni.app.UNI662B0B4`。
 
-### 2.2 收到推送后的行为
+华为 Client Secret、服务账号私钥和 JPush Master Secret 仅能保存在相应的控制台或后端安全密钥库，**不得**放入客户端代码、原生资源、日志、推送 payload 或 Git 提交。
 
-UniPush 事件使用既有业务处理：
+## 3. 前端行为
 
-1. 从 payload 的 `messageId`、`message_id` 或 `id`（包括 `data`、`extra`、`notificationExtras`、`extras` 嵌套对象）提取业务消息 ID；
-2. 将消息中心标记为需要刷新；
-3. 点击通知时切换到 `/pages/message/message`；
-4. 消息页刷新列表，并在第一页找到相同 `messageId` 时自动打开详情；
-5. 用户打开未读消息时调用现有消息详情/已读接口。
+### 3.1 初始化与 RegistrationID
 
-推送 payload 中的正文或页面 URL 不作为业务页面跳转依据；消息详情以服务端消息中心数据为准。
+应用在启动、回到前台及登录成功后刷新 JPush RegistrationID：
 
-## 3. iOS APNs 与 DCloud UniPush 配置
+- 注册 JPush 事件回调后初始化 Android/iOS JPush；
+- Android 会先加载华为厂商插件，再初始化 JPush 核心 SDK；
+- RegistrationID 为空时每 3 秒重试，最多 5 次；
+- RegistrationID、待处理 `messageId`、消息刷新标记和登录会话状态按 provider 维度缓存；
+- 当前前端只缓存 RegistrationID，尚未调用任何后端绑定、更新或解绑接口。
 
-DCloud UniPush 控制台中的 iOS 配置必须对应应用 Bundle ID `uni.app.UNI662B0B4`。Apple Push Notifications 能力、签名 profile 和上传至 DCloud 的 APNs 凭证必须属于相同的 Apple Team 与 Bundle ID。
+RegistrationID 属于设备推送标识，仅应在受控开发或联调日志中使用。
 
-| 包类型 | 签名 entitlement | DCloud/UniPush APNs 环境 |
-| --- | --- | --- |
-| Debug 真机开发包 | `development` | development / sandbox |
-| Release、TestFlight、App Store 包 | `production` | production |
+### 3.2 收到推送后的行为
 
-仓库中的 Xcode 配置为：
+JPush 事件沿用现有业务处理：
 
-- Debug 使用 `UniAppXDemo/UniAppXDemoDebug.entitlements`，其中 `aps-environment=development`；
-- Release 使用 `UniAppX.entitlements`，其中 `aps-environment=production`。
+1. 从 payload 的 `messageId`、`message_id` 或 `id`（含 `data`、`extra`、`notificationExtras`、`extras`）提取业务消息 ID；
+2. 标记消息中心需要刷新；
+3. 用户点击通知时切换到 `/pages/message/message`；
+4. 消息页刷新列表，并在第一页找到同一 `messageId` 时自动打开详情；
+5. 用户查看未读消息时调用已有消息详情/已读接口。
 
-Apple `.p8` 私钥只能上传和配置在 DCloud UniPush 控制台；不得读取、复制、嵌入代码、输出日志或提交到仓库。
+## 4. 已存在的消息接口
 
-获得 CID 只能证明客户端已完成 UniPush 注册，**不能证明通知一定可送达**。必须对环境匹配的真机包完成实际发送验证。
-
-## 4. 已存在、前端正在调用的消息接口
-
-当前前端 API 基地址为 `https://car.zdiot.cn:18443/api`。受保护接口使用：
+当前前端 API 基地址是 `https://car.zdiot.cn:18443/api`，受保护请求使用：
 
 ```http
 token: <业务登录 token>
 ```
-
-不是 `Authorization: Bearer ...`。HTTP 401 会使客户端清理 token 与本地推送会话状态。
 
 ### 4.1 用户消息列表
 
@@ -84,10 +76,7 @@ token: <业务登录 token>
 | --- | --- |
 | 方法 | `GET` |
 | 路径 | `/usermessage/listForUser` |
-| 认证 | 请求头 `token` |
 | 参数 | `page`、`pageSize` |
-
-服务端返回的每条消息必须带有 `messageId`、`messageType`、`content`、`createTime`、`status`，并按 `createTime` 倒序排列。新推送对应的消息应先落库，使通知点击后消息页能从第一页找到它。
 
 ### 4.2 标记消息已读
 
@@ -95,75 +84,36 @@ token: <业务登录 token>
 | --- | --- |
 | 方法 | `GET` |
 | 路径 | `/usermessage/detail/{msgId}` |
-| 认证 | 请求头 `token` |
 
-当前客户端将该接口作为“查看详情并标记已读”使用。服务端必须验证消息属于当前 token 对应的用户；鉴权过期应返回 HTTP 401。
+## 5. 后端绑定与发送约定
 
-## 5. 后端设备绑定边界与推荐契约
-
-当前仓库未发现设备绑定、更新或解绑 API，客户端**不会凭空调用**任何推送绑定 URL。后端接口上线并确认字段后，才应接入。
-
-建议绑定或更新接口为 `POST /push/client/bind`，认证方式为请求头 `token`，且必须幂等：
+当前仓库未发现绑定、更新或解绑接口，因此客户端不会假设某个 URL。后端接口确认后，推荐的幂等绑定数据为：
 
 ```json
 {
-  "provider": "unipush",
-  "registrationId": "<unipush-cid>",
-  "platform": "ios",
+  "provider": "jpush",
+  "registrationId": "<jpush-registration-id>",
+  "platform": "android",
   "appVersion": "1.0.0"
 }
 ```
 
-Android 示例仅将 `platform` 改为 `android`。后端从 token 确定用户，**客户端不得传 `userId`**。服务端应保存 `(user_id, provider, registration_id)` 的关联、平台、状态及 `last_seen_at`。
+服务端应先创建用户消息记录并生成业务 `messageId`，再查询有效 JPush RegistrationID 绑定，通过 JPush 发送，并将相同的 `messageId` 写入 payload。华为通道由 JPush 后台选择和投递，后端不应拿 RegistrationID 直接调用 Huawei Push Kit。
 
-主动退出登录或账号切换时，后端提供明确的幂等解绑契约后，再由客户端在 token 仍有效时解绑；HTTP 401 时服务端仍应依赖 `last_seen_at` 过期和发送失败回收无效绑定。
+## 6. 真机验证清单
 
-## 6. 服务端发送约定
+### Android 华为/HMS
 
-服务端发送告警、事件或通知时：
+- [ ] 以完整原生 Android 构建生成新包，不能用热重载验证；
+- [ ] 最终包 application ID 为 `uni.app.UNI662B0B4`，实际签名 SHA-256 已登记在 AG Connect；
+- [ ] 在真机华为/HMS 设备安装，Android 13+ 已授予通知权限；
+- [ ] 日志显示 JPush 初始化，并获得非空 JPush RegistrationID；
+- [ ] 在极光控制台按该 RegistrationID 发送测试，验证前台接收、后台系统通知、杀进程/冷启动和点击进入消息中心；
+- [ ] payload 带有效 `messageId`，验证消息中心刷新和详情打开；
+- [ ] 在极光控制台核验华为厂商通道送达状态。
 
-1. 先创建用户消息记录，生成业务 `messageId`，初始 `status=1`；
-2. 查询目标用户有效的 UniPush CID 绑定；
-3. 通过 UniPush 向每个有效 CID 发送；
-4. 在 payload 中放入与消息记录完全一致的 `messageId`；
-5. 记录发送结果和失败原因；推送失败不回滚已创建的消息记录。
+### 回归
 
-推荐业务 payload：
-
-```json
-{
-  "messageId": "10001",
-  "messageType": 1,
-  "bizType": "geofence_alarm"
-}
-```
-
-不要把业务 token、用户敏感信息、Apple `.p8` 私钥、APNs device token 或 JPush 密钥放入 payload。收到 UniPush 设备无效错误时，服务端应将对应绑定标记为 inactive，避免无效重试。
-
-## 7. 真机验证清单
-
-### Debug / sandbox
-
-- [ ] 使用真机开发签名包，检查签名后的 `.app` 含 `aps-environment=development`；
-- [ ] 应用启动日志显示已选择 `unipush`，并输出非空 `UniPush CID`；
-- [ ] 在 DCloud UniPush 控制台使用与开发包匹配的环境，向该 CID 发送测试通知；
-- [ ] 验证前台接收、后台横幅/通知与点击进入消息中心；
-- [ ] 验证消息中心可根据 `messageId` 刷新并打开对应详情。
-
-### Release / TestFlight / App Store
-
-- [ ] Archive 后检查实际签名 `.app` 含 `aps-environment=production`；
-- [ ] 确认 Archive 使用有效的 distribution profile；
-- [ ] 通过 TestFlight 或目标生产分发渠道安装；
-- [ ] 应用启动日志输出该安装实例的非空 `UniPush CID`；
-- [ ] 在 DCloud UniPush 生产环境向该 CID 发送测试通知；
-- [ ] 验证前台接收、后台通知和点击进入消息中心。
-
-开发环境向生产包发送、或生产环境向开发包发送都不应作为成功用例；环境不匹配通常不会送达。
-
-## 8. 当前边界
-
-1. 当前前端尚未上报或解绑 CID；后端提供并确认认证接口后再接入。
-2. 通知点击固定进入消息中心，不支持按 payload 深链到车辆、围栏或轨迹页面。
-3. 点击通知后只会从消息列表第一页定位 `messageId`；服务端应保证新消息按时间倒序位于第一页。
-4. JPush 集成仍保留用于后续单独调试，但当前 Android 和 iOS 的应用推送运行路径均为 UniPush。
+- [ ] 非华为 Android 设备仍可使用 JPush；
+- [ ] iOS JPush/APNs 初始化和通知点击不受 Android 厂商模块影响；
+- [ ] 不存在第二个 provider 初始化，且日志、包内容和 Git 变更不含私钥或 JPush Master Secret。

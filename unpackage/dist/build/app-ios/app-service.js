@@ -4170,7 +4170,7 @@
     return PUSH_SESSION_KEY_PREFIX + provider;
   }
   function pushDebug(provider, message) {
-    uni.__log__("error", "at services/push.uts:77", "[PushManager][" + provider + "] " + message);
+    uni.__log__("error", "at services/push.uts:80", "[PushManager][" + provider + "] " + message);
   }
   function stringValue(value = null) {
     if (value == null)

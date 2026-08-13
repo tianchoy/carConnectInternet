@@ -30,6 +30,7 @@ const JPUSH_IOS_PRODUCTION_OVERRIDE_KEY = 'push_jpush_ios_production_override';
 const DEFAULT_JPUSH_IOS_IS_PRODUCTION = true;
 import AndroidLog from 'android.util.Log';
 import { init as initAndroidJPush, setEventCallBack as setJPushEventCallBack, getRegistrationId as getAndroidJPushRegistrationId } from '@/uni_modules/jg-jpush-u';
+import { init as initHuaweiJPushVendor } from '@/uni_modules/jg-jpush-u-huawei';
 const JPUSH_APP_KEY = 'a53c28d734057573f67e16f7';
 const JPUSH_CHANNEL = 'developer-default';
 function registrationIdKey(provider: PushProviderName): string {
@@ -228,6 +229,8 @@ class JPushAdapter implements PushAdapter {
                     }
                 }
             } as EventCallBackParams);
+            // Load Huawei's JPush vendor channel before the JPush core SDK initializes.
+            initHuaweiJPushVendor();
             // An empty value keeps using the AppKey configured in AndroidManifest.xml.
             initAndroidJPush('');
             onRegistrationAvailable();
