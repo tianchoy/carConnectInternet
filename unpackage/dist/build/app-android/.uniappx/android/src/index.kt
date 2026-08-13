@@ -9130,7 +9130,7 @@ fun main(app: IApp) {
     (createApp()["app"] as VueApp).mount(app, GenUniApp())
 }
 open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
-    override var name: String = "车载GPS"
+    override var name: String = "中导物联"
     override var appid: String = "__UNI__662B0B4"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"

@@ -1,6 +1,6 @@
 {
   "id": "__UNI__662B0B4",
-  "name": "车载GPS",
+  "name": "中导物联",
   "description": "",
   "version": {
     "name": "1.0.0",
@@ -28,14 +28,14 @@
             "key": "FUTBZ-I7V3W-Y7TR2-YK62F-IFTZK-73FKD"
           }
         },
+        "uni-dialogPage": {},
+        "uni-event": {},
         "uni-showLoading": {},
         "uni-storage": {},
-        "uni-event": {},
-        "uni-location": {},
         "uni-getSystemInfo": {},
-        "uni-dialogPage": {},
         "uni-vibrate": {},
         "uni-getAppBaseInfo": {},
+        "uni-location": {},
         "uni-network": {},
         "uni-prompt": {},
         "uni-openLocation": {},
