@@ -32,8 +32,8 @@ type RequestFailure = {
     data?: any
 }
 
-// const BASE_URL = 'https://car.zdiot.cn:18443/api'
-const BASE_URL = 'http://45.207.216.51:8085/api'
+const BASE_URL = 'https://car.zdiot.cn:18443/api'
+// const BASE_URL = 'http://45.207.216.51:8085/api'
 
 // 处理token过期的函数
 function handleTokenExpired(): void {

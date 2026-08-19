@@ -4674,7 +4674,7 @@
       delete this.__props__;
     }
   }
-  const BASE_URL = "http://45.207.216.51:8085/api";
+  const BASE_URL = "https://car.zdiot.cn:18443/api";
   function handleTokenExpired() {
     uni.__log__("log", "at api/http.uts:40", "检测到token过期，执行跳转登录页逻辑");
     uni.removeStorageSync("token");

@@ -3935,7 +3935,7 @@ open class HttpError (
     open var message: String,
     open var data: Any? = null,
 ) : UTSObject()
-val BASE_URL = "http://45.207.216.51:8085/api"
+val BASE_URL = "https://car.zdiot.cn:18443/api"
 fun handleTokenExpired(): Unit {
     console.log("检测到token过期，执行跳转登录页逻辑")
     uni_removeStorageSync("token")
